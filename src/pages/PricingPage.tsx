@@ -1,354 +1,441 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Check, X, ChevronDown, Sparkles } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 type BillingCycle = 'monthly' | 'annual';
+type CtaVariant = 'outline-blue' | 'filled-blue' | 'outline-border';
 
 interface Plan {
   key: string;
   name: string;
-  monthly: number | null; // null = custom
-  blurb: string;
+  tagline: string;
+  monthly: number | null;
+  annual: number | null;
+  trialBadge?: string;
+  ctaLabel: string;
+  ctaVariant: CtaVariant;
+  ctaHref: string;
+  microcopy?: string;
   features: string[];
   popular?: boolean;
-  ctaLabel: string;
-  ctaHref: string;
 }
 
-type CompareCell = string | boolean;
+const C = {
+  blue: '#2563EB',
+  blueL: '#EFF6FF',
+  blueMid: '#DBEAFE',
+  ink: '#0a0f1e',
+  mid: '#374151',
+  muted: '#6B7280',
+  border: '#E5E7EB',
+};
 
 const formatPrice = (n: number) => `$${n.toLocaleString('en-AU')}`;
+
+const PLANS: Plan[] = [
+  {
+    key: 'solo',
+    name: 'Solo',
+    tagline: 'For independent agents starting out',
+    monthly: 799,
+    annual: 7670,
+    trialBadge: '30-day free trial',
+    ctaLabel: 'Start Free Trial',
+    ctaVariant: 'outline-blue',
+    ctaHref: '/for-agents#register',
+    microcopy: 'Credit card required · Cancels anytime before day 31',
+    features: [
+      '1 agent seat',
+      'Up to 5 active listings',
+      '20-language auto-translation',
+      'AI listing descriptions (20 languages)',
+      'CRM — up to 250 contacts',
+      'Property management — up to 10 properties',
+      'Trust accounting (full ledger)',
+      'Halo™ board — 20 buyer briefs/mo',
+      'Voice search',
+      'Basic analytics',
+      'Email support',
+    ],
+  },
+  {
+    key: 'agency',
+    name: 'Agency',
+    tagline: 'For growing agencies ready to scale',
+    monthly: 1999,
+    annual: 19190,
+    popular: true,
+    ctaLabel: 'Book a Demo',
+    ctaVariant: 'filled-blue',
+    ctaHref: '/for-agents#register',
+    microcopy: 'Straight to paid · No trial · Demo available',
+    features: [
+      'Up to 5 agent seats',
+      'Unlimited listings',
+      '20-language auto-translation',
+      'CRM — unlimited contacts + full pipeline',
+      'Property management — unlimited properties',
+      'Full PM automation (arrears, inspections, lease renewals)',
+      'Tenant / owner / supplier no-login portals',
+      'Bank reconciliation',
+      'Pocket listings',
+      'Vacancy KPI dashboard',
+      'Halo™ board — 100 buyer briefs/mo',
+      'Buyer concierge — 100 matches/mo',
+      'Agency-branded profile page',
+      'Full analytics dashboard',
+      'Phone + email support',
+    ],
+  },
+  {
+    key: 'pro',
+    name: 'Agency Pro',
+    tagline: 'For established multi-office agencies',
+    monthly: 3499,
+    annual: 33590,
+    ctaLabel: 'Talk to Sales',
+    ctaVariant: 'outline-border',
+    ctaHref: 'mailto:sales@listhq.com.au?subject=Agency%20Pro%20enquiry',
+    microcopy: 'Sales call required · Custom onboarding included',
+    features: [
+      'Up to 15 agent seats',
+      'Everything in Agency, plus:',
+      'Multi-office management',
+      'Halo™ board — 15 premium credits/mo',
+      'Buyer concierge — unlimited',
+      'Commission calculator',
+      'Performance analytics',
+      'White-label option',
+      'API access + custom integrations',
+      'Dedicated account manager',
+      'SLA support',
+    ],
+  },
+  {
+    key: 'enterprise',
+    name: 'Enterprise',
+    tagline: 'For franchises and networks',
+    monthly: null,
+    annual: null,
+    ctaLabel: 'Contact Sales',
+    ctaVariant: 'outline-border',
+    ctaHref: 'mailto:sales@listhq.com.au?subject=Enterprise%20enquiry',
+    features: [
+      'Unlimited agents',
+      'Everything in Agency Pro, plus:',
+      'Franchise / network management',
+      'Custom white-label',
+      'Custom SLA + uptime guarantee',
+      'Dedicated success manager',
+      'Volume pricing',
+      'Custom integrations',
+    ],
+  },
+];
+
+const FAQS = [
+  {
+    q: 'What happens after my Solo trial?',
+    a: "Seven days before your 30-day trial ends you'll receive an email and an in-app notification. At day 31 your card is charged for the first month. Cancel any time before day 31 to avoid charges.",
+  },
+  {
+    q: 'What are Halo credits?',
+    a: "Halo is ListHQ's reverse marketplace — buyers post exactly what property they want, and agents browse active buyer briefs on the Halo Board. Unlocking a buyer's contact details uses one credit. Plans include monthly credits; additional credits can be purchased from your dashboard.",
+  },
+  {
+    q: 'Does ListHQ replace PropertyMe or Console Cloud?',
+    a: 'Yes. ListHQ includes full trust accounting, property management, rent roll, arrears automation, inspection scheduling, and no-login portals for tenants, owners and suppliers — all state-specific and AFA 2014 compliant.',
+  },
+  {
+    q: 'Can I change plans?',
+    a: 'Yes — upgrade or downgrade at any time from your billing settings. Changes take effect immediately and are pro-rated to your current cycle.',
+  },
+];
+
+function PlanCard({ plan, billing, index }: { plan: Plan; billing: BillingCycle; index: number }) {
+  const navigate = useNavigate();
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setTimeout(() => setVisible(true), index * 100);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.1 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [index]);
+
+  const isCustom = plan.monthly === null;
+  const priceNumber = billing === 'annual' && plan.annual ? plan.annual : plan.monthly;
+  const periodLabel = isCustom ? '' : billing === 'annual' ? '/yr' : '/mo';
+
+  const ctaStyle: React.CSSProperties =
+    plan.ctaVariant === 'filled-blue'
+      ? { background: C.blue, color: '#fff', border: `1px solid ${C.blue}` }
+      : plan.ctaVariant === 'outline-blue'
+        ? { background: '#fff', color: C.blue, border: `1.5px solid ${C.blue}` }
+        : { background: '#fff', color: C.ink, border: `1px solid ${C.border}` };
+
+  const onCta = () => {
+    if (plan.ctaHref.startsWith('mailto:')) window.location.href = plan.ctaHref;
+    else navigate(plan.ctaHref);
+  };
+
+  return (
+    <div
+      ref={ref}
+      className="relative bg-white flex flex-col"
+      style={{
+        border: plan.popular ? `2px solid ${C.blue}` : `1px solid ${C.border}`,
+        borderRadius: 20,
+        padding: '32px 28px',
+        boxShadow: plan.popular ? `0 0 0 6px ${C.blue}15, 0 10px 30px -10px ${C.blue}40` : 'none',
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(20px)',
+        transition: 'opacity 0.5s ease, transform 0.5s ease, box-shadow 0.25s ease',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-4px)';
+        if (!plan.popular)
+          e.currentTarget.style.boxShadow = '0 12px 30px -12px rgba(10,15,30,0.18)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        if (!plan.popular) e.currentTarget.style.boxShadow = 'none';
+      }}
+    >
+      {plan.popular && (
+        <div
+          className="absolute"
+          style={{
+            top: -12,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: C.blue,
+            color: '#fff',
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: '1px',
+            padding: '4px 12px',
+            borderRadius: 999,
+            textTransform: 'uppercase',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          Most Popular
+        </div>
+      )}
+
+      <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', color: C.muted, letterSpacing: '0.5px' }}>
+        {plan.name}
+      </div>
+      <div style={{ fontSize: 13, color: C.muted, marginTop: 6, minHeight: 36 }}>{plan.tagline}</div>
+
+      <div style={{ marginTop: 16, display: 'flex', alignItems: 'baseline', gap: 6 }}>
+        <span style={{ fontSize: 44, fontWeight: 800, color: C.ink, lineHeight: 1 }}>
+          {isCustom ? 'Custom' : formatPrice(priceNumber!)}
+        </span>
+        {periodLabel && <span style={{ fontSize: 13, color: C.muted }}>{periodLabel}</span>}
+      </div>
+      <div style={{ fontSize: 12, color: C.muted, marginTop: 6, minHeight: 18 }}>
+        {isCustom
+          ? 'Tailored to your network'
+          : billing === 'annual'
+            ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ background: C.blueL, color: C.blue, padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 700 }}>Save 20%</span>
+                {`vs ${formatPrice(plan.monthly! * 12)}/yr monthly`}
+              </span>
+            : `or ${formatPrice(plan.annual!)}/yr — save 20%`}
+      </div>
+
+      {plan.trialBadge && (
+        <span
+          style={{
+            marginTop: 14,
+            alignSelf: 'flex-start',
+            background: C.blueL,
+            color: C.blue,
+            fontSize: 11,
+            fontWeight: 700,
+            padding: '4px 10px',
+            borderRadius: 999,
+          }}
+        >
+          {plan.trialBadge}
+        </span>
+      )}
+
+      <button
+        onClick={onCta}
+        style={{
+          ...ctaStyle,
+          marginTop: plan.trialBadge ? 14 : 24,
+          padding: '12px 16px',
+          borderRadius: 12,
+          fontSize: 14,
+          fontWeight: 700,
+          cursor: 'pointer',
+          transition: 'opacity 0.2s ease',
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
+        onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+      >
+        {plan.ctaLabel}
+      </button>
+
+      {plan.microcopy && (
+        <div style={{ fontSize: 11, color: C.muted, marginTop: 8, lineHeight: 1.5 }}>
+          {plan.microcopy}
+        </div>
+      )}
+
+      <ul style={{ marginTop: 22, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {plan.features.map((f) => (
+          <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13, color: C.mid, lineHeight: 1.5 }}>
+            <Check style={{ width: 16, height: 16, color: C.blue, flexShrink: 0, marginTop: 2 }} strokeWidth={2.5} />
+            <span>{f}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export default function PricingPage() {
   const [billing, setBilling] = useState<BillingCycle>('monthly');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [showCompare, setShowCompare] = useState(false);
-  const navigate = useNavigate();
   const { t } = useTranslation();
-
-  const PLANS: Plan[] = [
-    {
-      key: 'solo',
-      name: 'Solo',
-      monthly: 799,
-      blurb: 'For independent agents running their own shop',
-      features: [
-        '1 agent seat',
-        'Up to 10 active listings',
-        'Trust accounting (full ledger)',
-        'Property management (manual)',
-        'CRM & contacts (up to 500)',
-        'AI listing descriptions (20 languages)',
-        'Halo board — browse active buyer briefs',
-        'Email support',
-      ],
-      ctaLabel: t('pricing.startTrial'),
-      ctaHref: '/for-agents#register',
-    },
-    {
-      key: 'agency',
-      name: 'Agency',
-      monthly: 1999,
-      blurb: 'For growing agencies ready to scale',
-      popular: true,
-      features: [
-        'Up to 5 agent seats',
-        'Unlimited listings',
-        'Full PM automation (arrears, inspections, lease renewals)',
-        'Tenant, owner & supplier no-login portals',
-        'Vacancy KPI dashboard',
-        'Buyer concierge (100 matches/mo)',
-        'Full CRM (unlimited contacts)',
-        'Bank reconciliation',
-        'Pocket listings',
-        '5 Halo credits included per month',
-        'Priority support',
-      ],
-      ctaLabel: t('pricing.startTrial'),
-      ctaHref: '/for-agents#register',
-    },
-    {
-      key: 'pro',
-      name: 'Agency Pro',
-      monthly: 3499,
-      blurb: 'For established multi-office agencies',
-      features: [
-        'Up to 15 agent seats',
-        'Unlimited everything',
-        'Full PM automation',
-        'Buyer concierge (unlimited)',
-        '15 Halo credits included per month',
-        'Multi-office management',
-        'Commission calculator',
-        'Performance analytics',
-        'Dedicated account manager',
-      ],
-      ctaLabel: t('pricing.startTrial'),
-      ctaHref: '/for-agents#register',
-    },
-    {
-      key: 'enterprise',
-      name: t('pricing.plan4Name'),
-      monthly: null,
-      blurb: t('pricing.plan4Desc'),
-      features: [
-        'Unlimited agents',
-        'White-label option',
-        'Custom integrations & API',
-        'SLA support',
-        'Contact sales',
-      ],
-      ctaLabel: t('pricing.contactSales'),
-      ctaHref: 'mailto:sales@listhq.com.au?subject=Enterprise%20enquiry',
-    },
-  ];
-
-  const COMPARE_ROWS: { label: string; values: [CompareCell, CompareCell, CompareCell, CompareCell] }[] = [
-    { label: 'Agent seats',                 values: ['1', '5', '15', 'Unlimited'] },
-    { label: 'Active listings',             values: ['10', 'Unlimited', 'Unlimited', 'Unlimited'] },
-    { label: 'AI descriptions (languages)', values: ['20', '20', '20', '20'] },
-    { label: 'CRM contacts',                values: ['500', 'Unlimited', 'Unlimited', 'Unlimited'] },
-    { label: 'Trust accounting',            values: [true, true, true, true] },
-    { label: 'Property management',         values: ['Manual', 'Full automation', 'Full automation', 'Full automation'] },
-    { label: 'Bank reconciliation',         values: [false, true, true, true] },
-    { label: 'Pocket listings',             values: [false, true, true, true] },
-    { label: 'Buyer concierge matches',     values: ['—', '100/mo', 'Unlimited', 'Unlimited'] },
-    { label: 'Halo board access',           values: ['Browse only', 'Browse + 5 credits/mo', 'Browse + 15 credits/mo', 'Custom'] },
-    { label: 'Multi-office management',     values: [false, false, true, true] },
-    { label: 'Commission calculator',       values: [false, false, true, true] },
-    { label: 'Dedicated account manager',   values: [false, false, true, true] },
-  ];
-
-  const FAQS = [
-    {
-      q: 'What happens after my 60-day trial?',
-      a: "Seven days before your trial ends you'll receive an email and an in-app notification with a countdown. At day 58 you'll receive a final reminder. At day 60 your listings are paused — no charges, no surprises. Upgrade to a paid plan at any time to bring everything back online instantly. No credit card is required during the trial.",
-    },
-    {
-      q: 'What are Halo credits?',
-      a: "Halo is ListHQ's reverse marketplace — buyers post exactly what property they want to find, and agents browse active buyer briefs on the Halo Board. Unlocking a buyer's contact details uses one credit. Agency plans include credits monthly. Additional credits can be purchased in bundles from your account dashboard.",
-    },
-    {
-      q: 'Does ListHQ replace PropertyMe or Console Cloud?',
-      a: 'Yes. ListHQ includes full trust accounting, property management, rent roll, arrears automation, inspection scheduling, and no-login portals for tenants, owners and suppliers — all state-specific and AFA 2014 compliant. Agency and above plans include full PM automation. Migrate your existing data using the built-in Migration Wizard.',
-    },
-    {
-      q: 'Can I change plans?',
-      a: 'Yes — upgrade or downgrade at any time from your billing settings. Changes take effect immediately and are pro-rated to your current billing cycle.',
-    },
-    {
-      q: 'Do you support all Australian states and territories?',
-      a: 'Yes. ListHQ is built for all 8 Australian states and territories with state-specific compliance, contracts, inspection notice periods, and trust accounting rules. International support for the UK, United States and UAE is also available.',
-    },
-  ];
-
-  const renderCell = (v: CompareCell) => {
-    if (typeof v === 'boolean') {
-      return v ? (
-        <Check className="w-4 h-4 text-primary mx-auto" />
-      ) : (
-        <X className="w-4 h-4 text-muted-foreground/40 mx-auto" />
-      );
-    }
-    return <span className="text-sm text-foreground">{v}</span>;
-  };
 
   return (
     <>
       <Helmet>
-        <title>Pricing — Plans for every agency · ListHQ</title>
+        <title>Pricing — Replace your entire stack · ListHQ</title>
         <meta
           name="description"
-          content="Transparent pricing for Australian real estate agents and agencies. Trust accounting, property management, CRM, multilingual listings and Halo — all in one subscription. 60-day free trial, no credit card required. Plans from $799/mo."
+          content="CRM, property management, trust accounting and 20-language portal — all in one platform. Plans from $799/mo. No contracts. Cancel anytime."
         />
       </Helmet>
 
-      <div className="bg-background">
-        {/* Hero */}
+      <div style={{ background: '#fff' }}>
+        {/* Header */}
         <section className="max-w-6xl mx-auto px-4 pt-16 pb-10 text-center">
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground tracking-tight">
-            {t('pricing.headline')}
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '1.5px', color: C.blue, textTransform: 'uppercase' }}>
+            Pricing — No Contracts, Cancel Anytime
+          </div>
+          <h1
+            className="font-display"
+            style={{
+              fontSize: 'clamp(32px, 5vw, 52px)',
+              fontWeight: 800,
+              color: C.ink,
+              lineHeight: 1.05,
+              letterSpacing: '-0.02em',
+              marginTop: 14,
+            }}
+          >
+            Replace your entire stack.
+            <br />
+            <span style={{ color: C.blue }}>For less than one REA listing.</span>
           </h1>
-          <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            60-day free trial · No credit card required · Cancel anytime
+          <p style={{ marginTop: 18, fontSize: 16, color: C.mid, maxWidth: 720, marginInline: 'auto', lineHeight: 1.6 }}>
+            CRM · Property management · Trust accounting · 20-language portal — all in one platform.
+            <br />
+            All plans billed monthly. Annual billing saves 20%.
           </p>
 
-          <div className="mt-8 inline-flex items-center gap-1 bg-muted/60 p-1 rounded-full">
-            <button
-              onClick={() => setBilling('monthly')}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition ${
-                billing === 'monthly'
-                  ? 'bg-card text-foreground shadow-sm'
-                  : 'text-muted-foreground'
-              }`}
-            >
-              {t('pricing.monthly')}
-            </button>
-            <button
-              onClick={() => setBilling('annual')}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition inline-flex items-center gap-2 ${
-                billing === 'annual'
-                  ? 'bg-card text-foreground shadow-sm'
-                  : 'text-muted-foreground'
-              }`}
-            >
-              {t('pricing.annual')}
-              <span className="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                {t('pricing.save')}
-              </span>
-            </button>
-          </div>
-        </section>
-
-        {/* Plan cards */}
-        <section className="max-w-6xl mx-auto px-4 pb-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-            {PLANS.map((plan) => {
-              const annualTotal = plan.monthly !== null ? Math.round(plan.monthly * 12 * 0.8) : null;
-              const annualMonthlyEquivalent = plan.monthly !== null ? Math.round((plan.monthly * 12 * 0.8) / 12) : null;
-              const annualSavings = plan.monthly !== null ? plan.monthly * 12 - annualTotal! : null;
-              const displayPrice =
-                plan.monthly === null
-                  ? t('pricing.custom')
-                  : billing === 'monthly'
-                    ? `${formatPrice(plan.monthly)}`
-                    : `${formatPrice(annualMonthlyEquivalent!)}`;
-              const priceSuffix = plan.monthly === null ? '' : '/mo';
-              const subPrice =
-                plan.monthly !== null && billing === 'monthly'
-                  ? `or ${formatPrice(annualTotal!)}/yr billed annually (save 20%)`
-                  : plan.monthly !== null && billing === 'annual'
-                    ? `billed as ${formatPrice(annualTotal!)}/year · save ${formatPrice(annualSavings!)}/year`
-                    : 'Tailored to your needs';
-
+          {/* Billing toggle */}
+          <div
+            style={{
+              marginTop: 28,
+              display: 'inline-flex',
+              gap: 4,
+              background: '#F3F4F6',
+              padding: 4,
+              borderRadius: 999,
+            }}
+          >
+            {(['monthly', 'annual'] as BillingCycle[]).map((b) => {
+              const active = billing === b;
               return (
-                <div
-                  key={plan.key}
-                  className={`relative rounded-2xl border bg-card p-6 flex flex-col ${
-                    plan.popular
-                      ? 'border-primary shadow-lg lg:scale-[1.02] ring-1 ring-primary/20'
-                      : 'border-border'
-                  }`}
+                <button
+                  key={b}
+                  onClick={() => setBilling(b)}
+                  style={{
+                    padding: '8px 18px',
+                    borderRadius: 999,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    border: 'none',
+                    cursor: 'pointer',
+                    background: active ? '#fff' : 'transparent',
+                    color: active ? C.ink : C.muted,
+                    boxShadow: active ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    transition: 'all 0.2s ease',
+                  }}
                 >
-                  {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground shadow">
-                      <Sparkles className="w-3 h-3" /> {t('pricing.mostPopular')}
-                    </div>
+                  {b === 'monthly' ? 'Monthly' : 'Annual'}
+                  {b === 'annual' && (
+                    <span
+                      style={{
+                        background: C.blueL,
+                        color: C.blue,
+                        fontSize: 10,
+                        fontWeight: 700,
+                        padding: '2px 6px',
+                        borderRadius: 6,
+                      }}
+                    >
+                      Save 20%
+                    </span>
                   )}
-                  <h3 className="font-display text-xl font-bold text-foreground">{plan.name}</h3>
-                  <p className="mt-1 text-xs text-muted-foreground min-h-[32px]">{plan.blurb}</p>
-
-                  <div className="mt-5">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-bold text-foreground">{displayPrice}</span>
-                      {priceSuffix && (
-                        <span className="text-sm text-muted-foreground">{priceSuffix}</span>
-                      )}
-                    </div>
-                    <p className="mt-1 text-xs text-muted-foreground">{subPrice}</p>
-                  </div>
-
-                  <span className="mt-4 inline-flex items-center self-start gap-1 text-[10px] font-semibold px-2 py-1 rounded-full bg-primary/10 text-primary">
-                    60-day free trial
-                  </span>
-
-                  <button
-                    onClick={() => {
-                      if (plan.ctaHref.startsWith('mailto:')) {
-                        window.location.href = plan.ctaHref;
-                      } else {
-                        navigate(plan.ctaHref);
-                      }
-                    }}
-                    className={`mt-5 w-full px-4 py-2.5 rounded-xl text-sm font-semibold transition ${
-                      plan.popular
-                        ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                        : 'bg-secondary text-foreground hover:bg-accent border border-border'
-                    }`}
-                  >
-                    {plan.ctaLabel}
-                  </button>
-
-                  <ul className="mt-6 space-y-2.5">
-                    {plan.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2 text-sm text-foreground">
-                        <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                </button>
               );
             })}
           </div>
         </section>
 
-        {/* Comparison table */}
-        <section className="max-w-6xl mx-auto px-4 pb-16">
-          <div className="text-center mb-6">
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-              {t('pricing.comparePlans')}
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {t('pricing.compareSubtitle')}
-            </p>
+        {/* Plan cards */}
+        <section className="max-w-6xl mx-auto px-4 pb-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {PLANS.map((plan, i) => (
+              <PlanCard key={plan.key} plan={plan} billing={billing} index={i} />
+            ))}
           </div>
 
-          {/* Mobile collapse trigger */}
-          <button
-            onClick={() => setShowCompare((v) => !v)}
-            className="md:hidden w-full flex items-center justify-between px-4 py-3 rounded-xl border border-border bg-card text-sm font-medium text-foreground mb-4"
+          <p
+            style={{
+              textAlign: 'center',
+              marginTop: 32,
+              fontSize: 13,
+              color: C.muted,
+              lineHeight: 1.6,
+            }}
           >
-            {showCompare ? 'Hide' : 'Show'} feature comparison
-            <ChevronDown
-              className={`w-4 h-4 transition-transform ${showCompare ? 'rotate-180' : ''}`}
-            />
-          </button>
-
-          <div className={`${showCompare ? 'block' : 'hidden'} md:block overflow-x-auto`}>
-            <table className="w-full border border-border rounded-2xl overflow-hidden bg-card">
-              <thead className="bg-muted/50">
-                <tr>
-                  <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">
-                    Feature
-                  </th>
-                  {PLANS.map((p) => (
-                    <th
-                      key={p.key}
-                      className={`text-center text-xs font-semibold uppercase tracking-wider px-4 py-3 ${
-                        p.popular ? 'text-primary' : 'text-muted-foreground'
-                      }`}
-                    >
-                      {p.name}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {COMPARE_ROWS.map((row, i) => (
-                  <tr key={row.label} className={i % 2 === 0 ? 'bg-background' : 'bg-muted/20'}>
-                    <td className="text-sm text-foreground px-4 py-3 font-medium">{row.label}</td>
-                    {row.values.map((v, j) => (
-                      <td key={j} className="text-center px-4 py-3">
-                        {renderCell(v)}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+            All plans include 60-day listing guarantee · ACCC-compliant trust accounting · Australian data residency
+          </p>
         </section>
 
         {/* FAQ */}
-        <section className="max-w-3xl mx-auto px-4 pb-24">
-          <div className="text-center mb-8">
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-              {t('pricing.faqTitle')}
-            </h2>
-          </div>
+        <section className="max-w-3xl mx-auto px-4 pb-24 pt-10">
+          <h2
+            className="font-display"
+            style={{ fontSize: 28, fontWeight: 800, color: C.ink, textAlign: 'center', marginBottom: 24 }}
+          >
+            {t('pricing.faqTitle') || 'Frequently asked questions'}
+          </h2>
 
           <div className="space-y-3">
             {FAQS.map((faq, i) => {
@@ -356,21 +443,44 @@ export default function PricingPage() {
               return (
                 <div
                   key={faq.q}
-                  className="rounded-2xl border border-border bg-card overflow-hidden"
+                  style={{
+                    background: '#fff',
+                    border: `1px solid ${C.border}`,
+                    borderRadius: 16,
+                    overflow: 'hidden',
+                  }}
                 >
                   <button
                     onClick={() => setOpenFaq(open ? null : i)}
-                    className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left"
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 16,
+                      padding: '16px 20px',
+                      background: 'transparent',
+                      border: 'none',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                    }}
                   >
-                    <span className="text-sm font-semibold text-foreground">{faq.q}</span>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: C.ink }}>{faq.q}</span>
                     <ChevronDown
-                      className={`w-4 h-4 text-muted-foreground transition-transform flex-shrink-0 ${
-                        open ? 'rotate-180' : ''
-                      }`}
+                      style={{
+                        width: 16,
+                        height: 16,
+                        color: C.muted,
+                        flexShrink: 0,
+                        transform: open ? 'rotate(180deg)' : 'none',
+                        transition: 'transform 0.2s ease',
+                      }}
                     />
                   </button>
                   {open && (
-                    <div className="px-5 pb-4 text-sm text-muted-foreground">{faq.a}</div>
+                    <div style={{ padding: '0 20px 16px', fontSize: 13, color: C.mid, lineHeight: 1.6 }}>
+                      {faq.a}
+                    </div>
                   )}
                 </div>
               );
@@ -378,14 +488,23 @@ export default function PricingPage() {
           </div>
 
           <div className="mt-12 text-center">
-            <p className="text-sm text-muted-foreground mb-4">
-              {t('pricing.faqCta')}
-            </p>
+            <p style={{ fontSize: 14, color: C.muted, marginBottom: 12 }}>Still have questions?</p>
             <Link
               to="/help/contact"
-              className="inline-flex items-center px-5 py-2.5 rounded-xl border border-border bg-card text-sm font-semibold text-foreground hover:bg-accent transition"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '12px 20px',
+                borderRadius: 12,
+                border: `1px solid ${C.border}`,
+                background: '#fff',
+                fontSize: 14,
+                fontWeight: 600,
+                color: C.ink,
+                textDecoration: 'none',
+              }}
             >
-              {t('pricing.contactUs')}
+              Contact us
             </Link>
           </div>
         </section>

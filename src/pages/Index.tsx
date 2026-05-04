@@ -831,13 +831,18 @@ const Index = () => {
               Real people. Real homes. <em style={{ color:T.blue, fontStyle:'italic' }}>In their language.</em>
             </h2>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:20 }} className="how-grid">
-              {[
+              {([
                 { i:'M', q:'I found 6 listings near my children\'s school in one afternoon. Other portals had the same listings but I couldn\'t understand anything.', n:'Mei L.', d:'Auburn, NSW · Bought a 4-bed family home' },
-                { i:'T', q:'Tôi tìm thấy căn nhà lý tưởng của mình trong vài giờ. Mọi thứ đều bằng tiếng Việt — giá, trường học, mô tả.', n:'Tuan N.', d:'Box Hill, VIC · Rented a 2-bed apartment' },
+                { i:'T', q:'Tôi tìm thấy căn nhà lý tưởng của mình trong vài giờ. Mọi thứ đều bằng tiếng Việt — giá, trường học, mô tả.', translation:'("I found my dream home in just a few hours. Everything was in Vietnamese — prices, schools, descriptions.")', n:'Tuan N.', d:'Box Hill, VIC · Rented a 2-bed apartment' },
                 { i:'P', q:'I showed prices in INR so I can explain to my parents back home what we\'re looking at. ListHQ gets it.', n:'Priya S.', d:'Mosman, NSW · Bought a waterfront home' },
-              ].map((c, i) => (
+              ] as { i:string; q:string; n:string; d:string; translation?:string }[]).map((c, i) => (
                 <div key={c.n} className={`reveal reveal-d${i+1}`} style={{ background:T.off, border:`1px solid ${T.border}`, borderRadius:20, padding:32 }}>
                   <p style={{ fontSize:15, fontWeight:500, color:T.ink, fontStyle:'italic', lineHeight:1.7, margin:'0 0 24px' }}>"{c.q}"</p>
+                  {c.translation && (
+                    <p style={{ fontSize:12.5, color:T.muted, fontStyle:'normal', lineHeight:1.6, margin:'-16px 0 24px', fontWeight:400 }}>
+                      {c.translation}
+                    </p>
+                  )}
                   <div style={{ display:'flex', alignItems:'center', gap:12 }}>
                     <div style={{ width:42, height:42, borderRadius:'50%', background:T.blueL, color:T.blue, fontWeight:800, fontSize:16, display:'flex', alignItems:'center', justifyContent:'center' }}>{c.i}</div>
                     <div>

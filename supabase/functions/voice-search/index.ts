@@ -28,18 +28,27 @@ Deno.serve(async (req) => {
       }
     }
 
-    // ── Optional auth context ──
+    // ── Required auth ──
     const authHeader = req.headers.get("Authorization");
-    let userId: string | null = null;
-    if (authHeader?.startsWith("Bearer ")) {
-      const anonClient = createClient(
-        Deno.env.get("SUPABASE_URL")!,
-        Deno.env.get("SUPABASE_ANON_KEY")!,
-        { global: { headers: { Authorization: authHeader } } }
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
-      const { data: { user } } = await anonClient.auth.getUser();
-      userId = user?.id ?? null;
     }
+    const anonClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data: { user }, error: authErr } = await anonClient.auth.getUser();
+    if (authErr || !user) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    const userId: string = user.id;
 
     let transcript = rawTranscript || "";
     let detected_language = detectedLanguage || "en";

@@ -377,16 +377,16 @@ const Index = () => {
 
       <div className="wave17">
         {/* ═══ Agent sliver bar ═══ */}
-        <div style={{ background: T.blue, color: '#fff', padding: '13px 16px', fontSize: 12.5, textAlign: 'center' }}>
-          <span>🏆 <strong style={{ color:'#fff' }}>Real estate agents:</strong> reach 7M+ multilingual buyers no other portal can find</span>
-          <span style={{ opacity:.6, margin:'0 10px' }}>·</span>
+        <div style={{ background: '#EFF6FF', borderBottom: '1px solid #DBEAFE', color: '#374151', padding: '10px 16px', fontSize: 12.5, textAlign: 'center' }}>
+          <span>🏆 <strong style={{ color:'#0a0f1e', fontWeight:700 }}>Real estate agents:</strong> reach 7M+ multilingual buyers no other portal can find</span>
+          <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
           <span>Auto-translated listings in 20 languages</span>
-          <span style={{ opacity:.6, margin:'0 10px' }}>·</span>
-          <span>From <strong style={{ color:'#fff' }}>$799/mo</strong></span>
-          <span style={{ opacity:.6, margin:'0 10px' }}>·</span>
+          <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
+          <span>From <strong style={{ color:'#2563EB', fontWeight:700 }}>$799/mo</strong></span>
+          <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
           <span>60 days free</span>
-          <span style={{ opacity:.6, margin:'0 10px' }}>·</span>
-          <a href="/for-agents" className="sliver-link" style={{ color: '#fff', textDecoration: 'none', fontWeight: 700 }}>See how it works →</a>
+          <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
+          <a href="/for-agents" className="sliver-link" style={{ color: '#2563EB', textDecoration: 'none', fontWeight: 700 }}>See how it works →</a>
         </div>
 
         {/* ═══ SECTION 2 — Hero ═══ */}
@@ -399,12 +399,10 @@ const Index = () => {
                 Australia's only multilingual property platform
               </div>
 
-              <h1 style={{ fontSize:'clamp(52px, 6.5vw, 96px)', fontWeight:800, letterSpacing:'-3px', lineHeight:0.95, margin:'0 0 4px', color:T.ink }}>
-                Find your home.
+              <h1 className="hero-headline" style={{ margin:'0 0 12px' }}>
+                <span className="line1">Find your home.</span>
+                <span className={`line2 ${blur ? 'blur-out' : 'blur-in'}`}>{seq.line2}</span>
               </h1>
-              <h2 className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:'clamp(52px, 6.5vw, 96px)', fontWeight:700, letterSpacing:'-3px', lineHeight:0.95, margin:'0 0 12px', color:T.blue, fontStyle:'italic' }}>
-                {seq.line2}
-              </h2>
 
               <div className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:14, fontWeight:500, color:T.mid, marginBottom:16, display:'flex', alignItems:'center', gap:6 }}>
                 <span style={{ fontSize:20, lineHeight:1 }}>{seq.flag}</span> {seq.sub} · click any language below to switch

@@ -1036,6 +1036,31 @@ function AgentBand() {
           .trans-grid{grid-template-columns:1fr !important}
         }
       `}</style>
+      {videoOpen && (
+        <div
+          onClick={() => setVideoOpen(false)}
+          style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', backdropFilter:'blur(8px)', WebkitBackdropFilter:'blur(8px)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', padding:24 }}
+        >
+          <div onClick={(e) => e.stopPropagation()} style={{ position:'relative', width:'100%', maxWidth:854, borderRadius:20, overflow:'hidden', background:'#000', boxShadow:'0 20px 60px rgba(0,0,0,.5)' }}>
+            <button
+              onClick={() => setVideoOpen(false)}
+              aria-label="Close video"
+              style={{ position:'absolute', top:12, right:12, width:36, height:36, borderRadius:'50%', background:'rgba(0,0,0,.6)', color:'#fff', border:'none', fontSize:20, lineHeight:1, cursor:'pointer', zIndex:2, display:'flex', alignItems:'center', justifyContent:'center' }}
+            >×</button>
+            <div style={{ position:'relative', width:'100%', aspectRatio:'16 / 9' }}>
+              <iframe
+                src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+                title="ListHQ 90-second demo"
+                width="854"
+                height="480"
+                style={{ position:'absolute', inset:0, width:'100%', height:'100%', border:0, borderRadius:20 }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

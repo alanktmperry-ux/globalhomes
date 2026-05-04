@@ -146,7 +146,7 @@ export function HaloStep1({ data, update }: Props) {
           <div>
             <p className="text-sm text-muted-foreground mb-2">Max</p>
             <ChipGroup
-              options={[1, 2, 3, 4, '5+', null]}
+              options={[null, 1, 2, 3, 4, '5+']}
               value={data.bedrooms_max}
               onChange={(v) => update({ bedrooms_max: v })}
             />

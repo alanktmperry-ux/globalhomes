@@ -129,13 +129,22 @@ export function UnconfirmedSignups() {
                     </td>
                     <td className="py-2.5 pr-4 text-muted-foreground capitalize">{u.provider}</td>
                     <td className="py-2.5 text-right">
-                      <button
-                        onClick={() => resend(u.id, u.email)}
-                        disabled={resending === u.id}
-                        className="text-xs bg-primary/10 text-primary hover:bg-primary/20 px-3 py-1 rounded-lg font-medium transition-colors disabled:opacity-50"
-                      >
-                        {resending === u.id ? 'Sending…' : 'Resend link'}
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => confirm(u.id)}
+                          disabled={confirming === u.id}
+                          className="text-xs bg-green-500/10 text-green-700 hover:bg-green-500/20 px-3 py-1 rounded-lg font-medium transition-colors disabled:opacity-50"
+                        >
+                          {confirming === u.id ? 'Confirming…' : 'Confirm now'}
+                        </button>
+                        <button
+                          onClick={() => resend(u.id, u.email)}
+                          disabled={resending === u.id}
+                          className="text-xs bg-primary/10 text-primary hover:bg-primary/20 px-3 py-1 rounded-lg font-medium transition-colors disabled:opacity-50"
+                        >
+                          {resending === u.id ? 'Sending…' : 'Resend link'}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

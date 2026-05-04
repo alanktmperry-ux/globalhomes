@@ -256,6 +256,8 @@ const Index = () => {
           if (t) { t.textContent = listing.title; t.classList.remove('hcard-text-hidden'); }
           if (p) { p.textContent = listing.price; p.classList.remove('hcard-text-hidden'); }
         }, 200);
+        const m = metaRef.current;
+        if (m) m.textContent = listing.meta;
       };
       pre.onload = runSwap;
       pre.onerror = runSwap;

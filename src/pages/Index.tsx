@@ -486,18 +486,9 @@ const Index = () => {
            onBlur={(e) => { e.currentTarget.style.left = '-9999px'; e.currentTarget.style.width = '1px'; e.currentTarget.style.height = '1px'; }}>
           Skip to main content
         </a>
-        {/* ═══ Agent sliver bar ═══ */}
-        <div style={{ background: '#EFF6FF', borderBottom: '1px solid #DBEAFE', color: '#374151', padding: '10px 16px', fontSize: 13, textAlign: 'center' }}>
-          <span>🏆 {t('home.sliver.agents')}</span>
-          <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
-          <span>{t('home.sliver.translation')}</span>
-          <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
-          <span>{t('home.sliver.price')}</span>
-          <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
-          <span>{t('home.sliver.free')}</span>
-          <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
-          <a href="/for-agents" className="sliver-link" style={{ color: '#2563EB', textDecoration: 'none', fontWeight: 700 }}>{t('home.sliver.cta')}</a>
-        </div>
+        {/* ═══ Agent sliver bar (rotating) ═══ */}
+        <SliverBar />
+
 
         {/* ═══ SECTION 2 — Hero ═══ */}
         <section id="main-content" style={{ background:'#fff', padding:'72px 24px', minHeight:'calc(100vh - 68px - 50px)' }}>

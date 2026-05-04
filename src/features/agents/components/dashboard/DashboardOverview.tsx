@@ -541,23 +541,7 @@ const DashboardOverview = () => {
           );
         })()}
 
-        {listings.length === 0 && (
-          <div className="bg-primary/10 border border-primary/20 rounded-2xl p-5">
-            <h2 className="font-bold text-lg mb-1">Welcome to ListHQ 👋</h2>
-            <p className="text-sm text-muted-foreground mb-4">Your account is live. Here's how to get started:</p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <button onClick={() => navigate('/dashboard/listings')} className="flex items-center gap-2 bg-background rounded-xl border border-border p-3 text-sm font-medium hover:border-primary/40 transition-colors text-left">
-                <span className="text-xl">🏠</span><div><div className="font-semibold text-sm">Add your first listing</div><div className="text-xs text-muted-foreground">Upload a property</div></div>
-              </button>
-              <button onClick={() => navigate('/dashboard/profile')} className="flex items-center gap-2 bg-background rounded-xl border border-border p-3 text-sm font-medium hover:border-primary/40 transition-colors text-left">
-                <span className="text-xl">👤</span><div><div className="font-semibold text-sm">Complete your profile</div><div className="text-xs text-muted-foreground">Build trust with buyers</div></div>
-              </button>
-              <button onClick={() => navigate('/dashboard/network')} className="flex items-center gap-2 bg-background rounded-xl border border-border p-3 text-sm font-medium hover:border-primary/40 transition-colors text-left">
-                <span className="text-xl">🤝</span><div><div className="font-semibold text-sm">Explore the network</div><div className="text-xs text-muted-foreground">Find off-market deals</div></div>
-              </button>
-            </div>
-          </div>
-        )}
+        {/* Welcome quick-start removed — duplicates Getting Started checklist above */}
 
         {/* Stats Row — driven by layout */}
         {(() => {

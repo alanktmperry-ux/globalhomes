@@ -543,8 +543,12 @@ const DashboardOverview = () => {
 
         {/* Welcome quick-start removed — duplicates Getting Started checklist above */}
 
-        {/* Stats Row — driven by layout */}
-        {(() => {
+        {/* Stats Row — driven by layout. Hidden for brand-new users until they dismiss onboarding or add a listing. */}
+        {(!onboardingDismissed && listings.length === 0) ? (
+          <div className="bg-muted/40 border border-dashed border-border rounded-xl p-5 text-center text-sm text-muted-foreground">
+            Complete setup to unlock your performance metrics.
+          </div>
+        ) : (() => {
           const tileMap: Record<string, { key: CardKey; render: () => React.ReactNode }> = {
             tasks_due: {
               key: 'tasks_due',

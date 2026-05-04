@@ -358,11 +358,9 @@ const Index = () => {
         setVoiceState('processing');
         try {
           const blob = new Blob(chunks, { type: mimeType });
-          // Use the user's selected display language, not the cycling animation language
-          const selectedLang = document.documentElement.lang?.split('-')[0]
-            || navigator.language?.split('-')[0]
-            || 'en';
-          const whisperLang = selectedLang;
+          // Use the active hero-cycle language (matches what's shown on screen)
+          const activeCode = langCodeRef.current || 'en-AU';
+          const whisperLang = activeCode.split('-')[0] || 'en';
           const form = new FormData();
           form.append('audio', new File([blob], 'audio.webm', { type: mimeType }));
           form.append('language', whisperLang);

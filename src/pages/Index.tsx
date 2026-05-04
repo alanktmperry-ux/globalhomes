@@ -864,6 +864,8 @@ const Index = () => {
         {/* ═══ SECTION 9 — Pricing ═══ */}
         <PricingSection navigate={navigate} T={T} />
 
+        <ClosingCTA navigate={navigate} T={T} />
+
         {/* ═══ Search modal ═══ */}
         {modalOpen && (
           <div onClick={closeModal} style={{ position:'fixed', inset:0, backdropFilter:'blur(12px)', background:'rgba(0,0,0,.4)', zIndex:500, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}>
@@ -1313,3 +1315,38 @@ function FAQSection() {
 
 export default Index;
 
+
+function ClosingCTA({ navigate, T }: { navigate: NavFn; T: Theme }) {
+  return (
+    <section style={{ background: '#2563EB', padding: '88px 24px', textAlign: 'center' }}>
+      <div style={{ maxWidth: 640, margin: '0 auto' }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.65)', textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 16 }}>
+          Start today
+        </div>
+        <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 800, color: '#fff', letterSpacing: '-1.5px', lineHeight: 1.1, margin: '0 0 16px' }}>
+          60 days free. No contracts. Cancel anytime.
+        </h2>
+        <p style={{ fontSize: 16, color: 'rgba(255,255,255,.7)', lineHeight: 1.6, margin: '0 auto 36px', maxWidth: 480 }}>
+          Join agents already reaching 7M+ multilingual buyers across Australia.
+        </p>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => navigate('/contact')}
+            style={{ background: '#fff', color: '#0a0f1e', border: 'none', padding: '15px 32px', borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: 'pointer' }}
+          >
+            Start free 60-day trial →
+          </button>
+          <button
+            onClick={() => navigate('/contact')}
+            style={{ background: 'transparent', color: '#fff', border: '1.5px solid rgba(255,255,255,.4)', padding: '15px 28px', borderRadius: 12, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
+          >
+            Talk to sales
+          </button>
+        </div>
+        <p style={{ fontSize: 11, color: 'rgba(255,255,255,.45)', margin: '20px 0 0', fontWeight: 500 }}>
+          No credit card required · Australian data storage · Cancel anytime
+        </p>
+      </div>
+    </section>
+  );
+}

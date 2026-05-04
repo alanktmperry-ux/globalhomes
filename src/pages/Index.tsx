@@ -459,9 +459,16 @@ const Index = () => {
         .hero-headline { font-size: clamp(44px, 5vw, 76px); font-weight: 800; letter-spacing: -2px; line-height: 1.05; color: #0a0f1e; margin-bottom: 0; }
         .hero-headline .line1 { display: block; line-height: 1.1; }
         .hero-headline .line2 { display: block; color: #2563EB; font-style: italic; font-weight: 700; line-height: 1.15; margin-top: 6px; min-height: 1.2em; font-size: clamp(28px, 3.5vw, 58px); }
+        .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
       `}</style>
 
       <div className="wave17">
+        <a href="#main-content"
+           style={{ position:'absolute', left:'-9999px', top:'auto', width:1, height:1, overflow:'hidden' }}
+           onFocus={(e) => { e.currentTarget.style.left = '16px'; e.currentTarget.style.width = 'auto'; e.currentTarget.style.height = 'auto'; }}
+           onBlur={(e) => { e.currentTarget.style.left = '-9999px'; e.currentTarget.style.width = '1px'; e.currentTarget.style.height = '1px'; }}>
+          Skip to main content
+        </a>
         {/* ═══ Agent sliver bar ═══ */}
         <div style={{ background: '#EFF6FF', borderBottom: '1px solid #DBEAFE', color: '#374151', padding: '10px 16px', fontSize: 12.5, textAlign: 'center' }}>
           <span>🏆 <strong style={{ color:'#0a0f1e', fontWeight:700 }}>Real estate agents:</strong> reach 7M+ multilingual buyers no other portal can find</span>

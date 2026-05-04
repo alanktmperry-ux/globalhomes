@@ -143,6 +143,7 @@ const Index = () => {
       setBlur(true);
       setTimeout(() => {
         setSeqIdx((i) => (i + 1) % SEQUENCE.length);
+        setSearchQuery('');
         setBlur(false);
       }, 300);
     }, 4200);

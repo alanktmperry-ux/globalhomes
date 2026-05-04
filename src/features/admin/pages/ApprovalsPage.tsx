@@ -15,7 +15,7 @@ type TabKey = 'agents' | 'demos' | 'partners';
 
 interface DemoRow {
   id: string;
-  name: string;
+  full_name: string;
   email: string;
   agency_name: string | null;
   phone: string | null;
@@ -89,7 +89,7 @@ function DemosTab({ onCount }: { onCount: (n: number) => void }) {
     setLoading(true);
     try {
       const { data, error } = await (supabase.from('demo_requests' as any) as any)
-        .select('id, name, email, agency_name, phone, message, created_at, status')
+        .select('id, full_name, email, agency_name, phone, message, created_at, status')
         .eq('status', 'pending')
         .order('created_at', { ascending: false })
         .limit(50);
@@ -115,8 +115,8 @@ function DemosTab({ onCount }: { onCount: (n: number) => void }) {
         .update({ status: newStatus })
         .eq('id', row.id);
       if (error) throw error;
-      await logAudit(accept ? 'demo_accepted' : 'demo_declined', 'demo_request', row.id, { name: row.name, email: row.email });
-      if (accept) toast.success(`Demo accepted — follow up with ${row.name}`);
+      await logAudit(accept ? 'demo_accepted' : 'demo_declined', 'demo_request', row.id, { name: row.full_name, email: row.email });
+      if (accept) toast.success(`Demo accepted — follow up with ${row.full_name}`);
       else toast.success('Demo declined');
       setRows(prev => {
         const next = prev.filter(r => r.id !== row.id);
@@ -150,7 +150,7 @@ function DemosTab({ onCount }: { onCount: (n: number) => void }) {
         <tbody>
           {rows.map(row => (
             <tr key={row.id} className="border-t border-border">
-              <td className="px-4 py-3 font-medium text-foreground">{row.name}</td>
+              <td className="px-4 py-3 font-medium text-foreground">{row.full_name}</td>
               <td className="px-4 py-3 text-muted-foreground">{row.agency_name || '—'}</td>
               <td className="px-4 py-3 text-muted-foreground">{row.email}</td>
               <td className="px-4 py-3 text-muted-foreground">{row.phone || '—'}</td>

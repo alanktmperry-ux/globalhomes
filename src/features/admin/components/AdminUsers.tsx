@@ -999,6 +999,15 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
                           <Loader2 className="animate-spin text-muted-foreground" size={16} />
                         ) : (
                           <>
+                            {!isSupport && (
+                              <button
+                                onClick={() => handleConvertToAgent(u)}
+                                title="Convert to agent"
+                                className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors"
+                              >
+                                <UserPlus size={14} />
+                              </button>
+                            )}
                             <button
                               onClick={() => handleBan(u.id, !u.banned_until)}
                               className={`p-1.5 rounded-lg transition-colors ${

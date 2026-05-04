@@ -854,6 +854,8 @@ const Index = () => {
         {/* ═══ SECTION 8 — Agent Band ═══ */}
         <AgentBand />
 
+        <FAQSection />
+
         {/* ═══ SECTION 9 — Pricing ═══ */}
         <PricingSection navigate={navigate} T={T} />
 

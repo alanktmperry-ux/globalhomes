@@ -121,7 +121,6 @@ const AgentAuthPage = () => {
     }
     setEmailSubmitting(true);
     try {
-      const cleaned = regEmail.trim().toLowerCase();
       const { error } = await supabase.auth.signInWithOtp({
         email: cleaned,
         options: {

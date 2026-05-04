@@ -671,22 +671,28 @@ const Index = () => {
 
         {/* ═══ SECTION 4 — Trust Strip ═══ */}
         <div style={{ background:T.off, borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}`, padding:'20px 16px' }}>
-          <div style={{ maxWidth:1200, margin:'0 auto', display:'flex', justifyContent:'center', alignItems:'center', flexWrap:'wrap', gap:0 }}>
+          <div className="trust-strip" style={{ maxWidth:1200, margin:'0 auto' }}>
             {[
               { n: propertyCount && propertyCount > 0 ? `${propertyCount.toLocaleString()}+` : '50,000+', l: t('home.trust.listings') },
               { n:'20', l: t('home.trust.languages') },
               { n:'7M+', l: t('home.trust.buyers') },
               { n:'Free', l: t('home.trust.free') },
-            ].map((s, i, arr) => (
-              <div key={s.l} style={{ display:'flex', alignItems:'center' }}>
-                <div style={{ padding:'0 32px', textAlign:'center' }}>
-                  <div style={{ fontSize:22, fontWeight:800, color:T.ink, lineHeight:1 }}>{s.n}</div>
-                  <div style={{ fontSize:13, fontWeight:600, color:T.mid, marginTop:4 }}>{s.l}</div>
-                </div>
-                {i < arr.length - 1 && <div style={{ width:1, height:32, background:T.border }} />}
+            ].map((s) => (
+              <div key={s.l} className="trust-cell" style={{ textAlign:'center', padding:'8px 16px' }}>
+                <div style={{ fontSize:22, fontWeight:800, color:T.ink, lineHeight:1 }}>{s.n}</div>
+                <div style={{ fontSize:13, fontWeight:600, color:T.mid, marginTop:4 }}>{s.l}</div>
               </div>
             ))}
           </div>
+          <style>{`
+            .trust-strip { display:grid; grid-template-columns: repeat(4, 1fr); align-items:center; }
+            .trust-cell + .trust-cell { border-left:1px solid ${T.border}; }
+            @media (max-width: 640px) {
+              .trust-strip { grid-template-columns: repeat(2, 1fr); row-gap: 16px; }
+              .trust-cell + .trust-cell { border-left: none; }
+              .trust-cell:nth-child(even) { border-left: 1px solid ${T.border}; }
+            }
+          `}</style>
         </div>
 
         {/* ═══ SECTION 4b — Featured Listings ═══ */}

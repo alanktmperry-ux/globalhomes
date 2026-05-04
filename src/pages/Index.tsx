@@ -428,37 +428,34 @@ const Index = () => {
                 {/* Left half — Voice */}
                 <div
                   style={{
-                    display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
-                    gap:10, padding:'18px 14px',
+                    display:'flex', flexDirection:'row', alignItems:'center',
+                    gap:12, padding:'14px 16px',
                     background: voiceState === 'listening' ? 'rgba(239,68,68,0.08)' : 'transparent',
-                    transition: 'background 0.2s ease',
-                    animation: voiceState === 'listening' ? 'pulse 1.4s ease-in-out infinite' : 'none',
-                    position:'relative',
+                    transition:'background 0.2s ease',
+                    cursor:'pointer', position:'relative',
                   }}
+                  onClick={startVoice}
                 >
-                  <div style={{
-                    fontSize:11, fontWeight:800, letterSpacing:'.12em', textTransform:'uppercase',
-                    color: voiceState === 'listening' ? '#dc2626' : T.muted,
-                  }}>
-                    {voiceState === 'listening' ? '🎤 Listening…' : voiceState === 'processing' ? 'Processing…' : 'Tap to talk'}
-                  </div>
                   <button
                     type="button"
-                    onClick={startVoice}
-                    title="Tap to talk"
                     aria-label={voiceState === 'listening' ? 'Stop listening' : 'Start voice search'}
                     style={{
-                      position:'relative', width:56, height:56, borderRadius:'50%',
+                      position:'relative', width:40, height:40, borderRadius:'50%', flexShrink:0,
                       background: voiceState === 'processing' ? '#9ca3af' : 'linear-gradient(135deg,#ef4444,#dc2626)',
                       display:'flex', alignItems:'center', justifyContent:'center', color:'#fff',
-                      border:'none', cursor:'pointer', boxShadow:'0 4px 14px rgba(220,38,38,.35)', flexShrink:0,
+                      border:'none', cursor:'pointer', boxShadow:'0 4px 14px rgba(220,38,38,.35)',
                     }}
                   >
                     {voiceState === 'listening' && <span className="mic-ring" />}
-                    {voiceState === 'processing' ? <span className="mic-spin" /> : <Mic size={24} />}
+                    {voiceState === 'processing' ? <span className="mic-spin" /> : <Mic size={18} />}
                   </button>
-                  <div style={{ fontSize:11, color:T.muted, textAlign:'center', lineHeight:1.3 }}>
-                    {seq.mic}
+                  <div style={{ display:'flex', flexDirection:'column', gap:2 }}>
+                    <div style={{ fontSize:13, fontWeight:600, color: voiceState === 'listening' ? '#dc2626' : T.ink, lineHeight:1.2 }}>
+                      {voiceState === 'listening' ? '🎤 Listening…' : voiceState === 'processing' ? 'Processing…' : seq.mic}
+                    </div>
+                    <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.1em', textTransform:'uppercase', color:T.muted }}>
+                      TAP TO TALK · VOICE SEARCH
+                    </div>
                   </div>
                   {voiceUnsupportedTip && (
                     <span

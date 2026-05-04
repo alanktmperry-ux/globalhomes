@@ -287,15 +287,13 @@ const Index = () => {
         setVoiceState('processing');
         try {
           const blob = new Blob(chunks, { type: mimeType });
-          const arrayBuffer = await blob.arrayBuffer();
           const whisperLang = langCodeRef.current?.split('-')[0] || 'en';
+          const form = new FormData();
+          form.append('audio', new File([blob], 'audio.webm', { type: mimeType }));
+          form.append('language', whisperLang);
 
           const { data, error } = await supabase.functions.invoke('transcribe-audio', {
-            body: arrayBuffer,
-            headers: {
-              'X-Language': whisperLang,
-              'Content-Type': mimeType,
-            },
+            body: form,
           });
 
           if (error || !data?.transcript) throw new Error('No transcript');

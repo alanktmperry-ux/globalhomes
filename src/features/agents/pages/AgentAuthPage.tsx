@@ -131,12 +131,10 @@ const AgentAuthPage = () => {
       if (error) throw error;
       sessionStorage.setItem('listhq_pending_email', cleaned);
       setRegEmail(cleaned);
-      toast.success("If an account exists with this email, you'll receive a login link.");
+      toast.success("We've sent a 6-digit code to your email. Check your inbox.");
       setStep('otp');
     } catch {
-      sessionStorage.setItem('listhq_pending_email', regEmail.trim().toLowerCase());
-      toast.success("If an account exists with this email, you'll receive a login link.");
-      setStep('otp');
+      toast.error('Failed to send verification code. Please try again.');
     } finally {
       setEmailSubmitting(false);
     }
@@ -162,7 +160,7 @@ const AgentAuthPage = () => {
         .eq('user_id', u.id)
         .maybeSingle();
       if (agentRow && (agentRow as any).onboarding_complete) {
-        navigate('/dashboard/overview');
+        navigate('/dashboard');
       } else {
         // First-time arrival here = genuine agent signup (no agent row yet, or onboarding not complete)
         if (!agentRow) {

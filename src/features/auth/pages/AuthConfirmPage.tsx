@@ -13,13 +13,19 @@ const AuthConfirmPage = () => {
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
 
-    const handleConfirmation = async () => {
-      // Lovable's email proxy handles the token
-      // and fires onAuthStateChange automatically.
-      // We just need to check if a session exists.
+    const routeUser = async (userId: string) => {
+      const { data: agentRow } = await supabase
+        .from('agents')
+        .select('id, onboarding_complete')
+        .eq('user_id', userId)
+        .maybeSingle();
+      const dest = agentRow && (agentRow as any).onboarding_complete
+        ? '/dashboard'
+        : '/onboarding/agency';
+      navigate(dest, { replace: true });
+    };
 
-      // Give Supabase a moment to process
-      // the auth state change from Lovable
+    const handleConfirmation = async () => {
       await new Promise(r => setTimeout(r, 1500));
 
       const { data: { session } } =
@@ -27,43 +33,28 @@ const AuthConfirmPage = () => {
 
       if (session?.user) {
         setStatus('success');
-        setMessage(
-          'Email confirmed! Taking you to your dashboard...'
-        );
+        setMessage('Email confirmed! Taking you to your dashboard...');
         setTimeout(() => {
-          navigate('/dashboard', { replace: true });
+          routeUser(session.user.id);
         }, 1500);
       } else {
-        // Listen for auth state change
-        // in case Lovable fires it slightly later
         const { data: { subscription } } =
-          supabase.auth.onAuthStateChange(
-            (event, session) => {
-              if (
-                event === 'SIGNED_IN' &&
-                session?.user
-              ) {
-                subscription.unsubscribe();
-                setStatus('success');
-                setMessage(
-                  'Email confirmed! Taking you to your dashboard...'
-                );
-                setTimeout(() => {
-                  navigate('/dashboard',
-                    { replace: true });
-                }, 1500);
-              }
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN' && session?.user) {
+              subscription.unsubscribe();
+              setStatus('success');
+              setMessage('Email confirmed! Taking you to your dashboard...');
+              setTimeout(() => {
+                routeUser(session.user.id);
+              }, 1500);
             }
-          );
+          });
 
-        // If still no session after 8 seconds
-        // something genuinely went wrong
         timeout = setTimeout(() => {
           subscription.unsubscribe();
           setStatus('error');
           setMessage(
-            'Confirmation link has expired or ' +
-            'already been used. Please sign up again.'
+            'Confirmation link has expired or already been used. Please sign up again.'
           );
         }, 8000);
       }

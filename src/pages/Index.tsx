@@ -1342,19 +1342,20 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
 
 function FAQSection() {
   const [open, setOpen] = useState<number | null>(null);
+  const { t } = useTranslation();
   const faqs = [
-    { q: 'Is there a lock-in contract?', a: 'No contracts, ever. Cancel month-to-month with 30 days notice. Your data is always yours to export.' },
-    { q: 'Where is my data stored?', a: 'All data is stored in Australian data centres, fully compliant with the Privacy Act 1988. ListHQ does not share or sell your client data.' },
-    { q: 'Does ListHQ integrate with my existing CRM?', a: 'Yes. ListHQ connects with REX, VaultRE, PropertyMe, and Console via API. Listing data syncs automatically — no double entry.' },
-    { q: 'Can I keep my REA and Domain subscriptions?', a: 'Absolutely. Most ListHQ agents use us alongside REA/Domain. We reach the buyers they miss — not the same buyers.' },
-    { q: 'Does this comply with Australian real estate regulations?', a: 'Yes. ListHQ is built for Australian agents — trust accounting meets state-by-state requirements, and all agent profiles require verified licence numbers.' },
+    { q: t('home.faq.q1'), a: t('home.faq.a1') },
+    { q: t('home.faq.q2'), a: t('home.faq.a2') },
+    { q: t('home.faq.q3'), a: t('home.faq.a3') },
+    { q: t('home.faq.q4'), a: t('home.faq.a4') },
+    { q: t('home.faq.q5'), a: t('home.faq.a5') },
   ];
   return (
     <section style={{ background: '#F9FAFB', padding: '80px 24px' }}>
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        <div style={{ fontSize: 11, fontWeight: 700, color: '#2563EB', textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 14, textAlign: 'center' }}>Common questions</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: '#2563EB', textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 14, textAlign: 'center' }}>{t('home.faq.eyebrow')}</div>
         <h2 style={{ fontSize: 'clamp(28px, 3vw, 40px)', fontWeight: 800, letterSpacing: '-1px', lineHeight: 1.1, margin: '0 0 40px', textAlign: 'center', color: '#0a0f1e' }}>
-          Everything you need to know
+          {t('home.faq.heading')}
         </h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {faqs.map((f, i) => (

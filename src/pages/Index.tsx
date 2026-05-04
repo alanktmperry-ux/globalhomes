@@ -843,9 +843,9 @@ const Index = () => {
         {/* ═══ SECTION 7 — Testimonials ═══ */}
         <section style={{ background:'#fff', padding:'88px 24px' }}>
           <div style={{ maxWidth:1200, margin:'0 auto' }}>
-            <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>What buyers say</div>
+            <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>{t('home.testimonials.eyebrow')}</div>
             <h2 style={{ fontSize:'clamp(32px, 3.5vw, 48px)', fontWeight:800, letterSpacing:'-1.5px', lineHeight:1.1, margin:'0 0 52px' }}>
-              Real people. Real homes. <em style={{ color:T.blue, fontStyle:'italic' }}>In their language.</em>
+              {t('home.testimonials.heading')}
             </h2>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:20 }} className="how-grid">
               {([

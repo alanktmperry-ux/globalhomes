@@ -1097,7 +1097,7 @@ function AgentBand() {
 }
 
 type NavFn = (path: string) => void;
-type Theme = { blue: string; blueL: string; blueMid: string; ink: string; mid: string; muted: string; off: string; border: string; green: string; amber: string };
+type Theme = { blue: string; blueL: string; blueMid: string; ink: string; mid: string; muted: string; off: string; border: string; green: string; amber: string; blueTint: string };
 
 function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
   const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');

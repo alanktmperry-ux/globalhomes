@@ -156,30 +156,38 @@ const Index = () => {
       const listing = FEAT_LISTINGS[next];
       cardIdxRef.current = next;
 
-      // Preload next image
+      // Preload next image — only swap once it's actually loaded
       const pre = new Image();
-      pre.onload = () => {
+      const runSwap = () => {
         const inactive = activeLayerRef.current === 'a' ? layerBRef.current : layerARef.current;
         const active = activeLayerRef.current === 'a' ? layerARef.current : layerBRef.current;
-        if (inactive) inactive.style.backgroundImage = `url(${listing.img})`;
-        // swap active class
+        if (inactive) {
+          inactive.style.backgroundImage = `url(${listing.img})`;
+          // restart ken burns animation on the layer that's about to become active
+          inactive.style.animation = 'none';
+          // force reflow
+          void inactive.offsetWidth;
+          inactive.style.animation = '';
+        }
         requestAnimationFrame(() => {
           if (inactive) inactive.classList.add('active');
           if (active) active.classList.remove('active');
           activeLayerRef.current = activeLayerRef.current === 'a' ? 'b' : 'a';
         });
-      };
-      pre.src = listing.img;
 
-      // Text crossfade
-      const t = titleRef.current;
-      const p = priceRef.current;
-      if (t) t.classList.add('hcard-text-hidden');
-      if (p) p.classList.add('hcard-text-hidden');
-      window.setTimeout(() => {
-        if (t) { t.textContent = listing.title; t.classList.remove('hcard-text-hidden'); }
-        if (p) { p.textContent = listing.price; p.classList.remove('hcard-text-hidden'); }
-      }, 200);
+        // Text fade in parallel with image crossfade
+        const t = titleRef.current;
+        const p = priceRef.current;
+        if (t) t.classList.add('hcard-text-hidden');
+        if (p) p.classList.add('hcard-text-hidden');
+        window.setTimeout(() => {
+          if (t) { t.textContent = listing.title; t.classList.remove('hcard-text-hidden'); }
+          if (p) { p.textContent = listing.price; p.classList.remove('hcard-text-hidden'); }
+        }, 200);
+      };
+      pre.onload = runSwap;
+      pre.onerror = runSwap;
+      pre.src = listing.img;
     }, 5000);
     return () => clearInterval(id);
   }, []);
@@ -348,10 +356,12 @@ const Index = () => {
         .marquee-track { animation: marquee 30s linear infinite; }
         .marquee-track:hover { animation-play-state: paused; }
         .hcard-img-wrap { position: relative; height: 290px; overflow: hidden; }
-        .hcard-layer { position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.9s ease; opacity: 0; }
-        .hcard-layer.active { opacity: 1; }
-        .hcard-title, .hcard-price { transition: opacity 0.2s ease; }
-        .hcard-text-hidden { opacity: 0; }
+        .hcard-layer { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.5s ease-in-out; transform-origin: center center; will-change: transform, opacity; }
+        .hcard-layer.active { opacity: 1; animation: hcard-kenburns 5s ease-in-out forwards; }
+        @keyframes hcard-kenburns { from { transform: scale(1.0); } to { transform: scale(1.06); } }
+        .hcard-title { min-height: 2.8em; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: opacity 0.4s ease; }
+        .hcard-price { min-height: 1.4em; transition: opacity 0.4s ease; }
+        .hcard-text-hidden { opacity: 0 !important; transition: opacity 0.15s ease !important; }
         .chip { background: ${T.off}; border: 1px solid ${T.border}; border-radius: 100px; padding: 7px 14px; font-size: 12.5px; font-weight: 600; color: ${T.mid}; cursor: pointer; transition: all .15s ease; }
         .chip:hover { background: ${T.blueL}; border-color: ${T.blueMid}; color: ${T.blue}; }
         @keyframes typeBlink { 50% { opacity: 0 } }

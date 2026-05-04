@@ -125,6 +125,7 @@ export function PaymentStatusBanner({ onVisibleChange }: { onVisibleChange?: (vi
     );
   }
 
+  reportVisible(false);
   return null;
 }
 

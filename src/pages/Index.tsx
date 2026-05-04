@@ -224,10 +224,12 @@ const Index = () => {
   // ── Voice search (Web Speech API) ──────────────────────────
   const [voiceState, setVoiceState] = useState<'idle' | 'listening' | 'processing'>('idle');
   const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [voiceUnsupportedTip, setVoiceUnsupportedTip] = useState(false);
   const recognitionRef = useRef<any>(null);
   const langCodeRef = useRef<string>(SEQUENCE[0].code);
   const voiceSupportedRef = useRef<boolean>(false);
   const errorTimerRef = useRef<number | null>(null);
+  const tipTimerRef = useRef<number | null>(null);
 
   // Keep active language code in sync (read from ref inside callbacks)
   useEffect(() => {

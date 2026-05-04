@@ -233,11 +233,11 @@ const Index = () => {
   const [voiceState, setVoiceState] = useState<'idle' | 'listening' | 'processing'>('idle');
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const [voiceUnsupportedTip, setVoiceUnsupportedTip] = useState(false);
-  const recognitionRef = useRef<any>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const langCodeRef = useRef<string>(SEQUENCE[0].code);
-  const voiceSupportedRef = useRef<boolean>(false);
   const errorTimerRef = useRef<number | null>(null);
   const tipTimerRef = useRef<number | null>(null);
+  const maxTimerRef = useRef<number | null>(null);
 
   // Keep active language code in sync (read from ref inside callbacks)
   useEffect(() => {
@@ -247,77 +247,91 @@ const Index = () => {
   useEffect(() => {
     return () => {
       if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
-      try { recognitionRef.current?.abort(); } catch { /* noop */ }
-      recognitionRef.current = null;
+      if (maxTimerRef.current) window.clearTimeout(maxTimerRef.current);
+      try {
+        if (mediaRecorderRef.current?.state === 'recording') mediaRecorderRef.current.stop();
+      } catch { /* noop */ }
+      mediaRecorderRef.current = null;
     };
   }, []);
 
-  const startVoice = useCallback(() => {
-    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+  const startVoice = useCallback(async () => {
+    if (voiceState === 'listening' && mediaRecorderRef.current) {
+      try { mediaRecorderRef.current.stop(); } catch { /* noop */ }
+      return;
+    }
 
-    if (!SR) {
-      voiceSupportedRef.current = false;
+    setVoiceError(null);
+
+    if (typeof MediaRecorder === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
       setVoiceUnsupportedTip(true);
       if (tipTimerRef.current) window.clearTimeout(tipTimerRef.current);
       tipTimerRef.current = window.setTimeout(() => setVoiceUnsupportedTip(false), 4000);
       return;
     }
 
-    voiceSupportedRef.current = true;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm';
+      const recorder = new MediaRecorder(stream, { mimeType });
+      const chunks: BlobPart[] = [];
+      mediaRecorderRef.current = recorder;
 
-    if (voiceState === 'listening' && recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch {}
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+
+      recorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        if (maxTimerRef.current) { window.clearTimeout(maxTimerRef.current); maxTimerRef.current = null; }
+        setVoiceState('processing');
+        try {
+          const blob = new Blob(chunks, { type: mimeType });
+          const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+          const file = new File([blob], `recording.${ext}`, { type: mimeType });
+          const whisperLang = langCodeRef.current?.split('-')[0] || 'en';
+          const form = new FormData();
+          form.append('audio', file);
+          form.append('language', whisperLang);
+
+          const { data, error } = await supabase.functions.invoke('transcribe-audio', {
+            body: form,
+          });
+
+          if (error) throw error;
+          const text = (data?.text ?? data?.transcript ?? '').trim();
+          if (!text) throw new Error('No transcript');
+
+          setSearchQuery(text);
+          try { inputRef.current?.blur(); } catch { /* noop */ }
+          window.setTimeout(() => openSearch(text), 250);
+        } catch {
+          setVoiceError('Could not transcribe. Please try again.');
+          if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
+          errorTimerRef.current = window.setTimeout(() => setVoiceError(null), 3000);
+        } finally {
+          setVoiceState('idle');
+          mediaRecorderRef.current = null;
+        }
+      };
+
+      recorder.start();
+      setVoiceState('listening');
+
+      maxTimerRef.current = window.setTimeout(() => {
+        if (mediaRecorderRef.current?.state === 'recording') {
+          try { mediaRecorderRef.current.stop(); } catch { /* noop */ }
+        }
+      }, 10000);
+    } catch (err: any) {
+      setVoiceError(err?.name === 'NotAllowedError'
+        ? 'Microphone access denied. Please allow access in your browser settings.'
+        : 'Microphone not available. Please try again.');
+      if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
+      errorTimerRef.current = window.setTimeout(() => setVoiceError(null), 3000);
       setVoiceState('idle');
-      return;
     }
-
-    const rec = new SR();
-    rec.lang = langCodeRef.current;
-    rec.continuous = false;
-    rec.interimResults = false;
-    recognitionRef.current = rec;
-
-    rec.onresult = (ev: any) => {
-      const transcript = ev.results?.[0]?.[0]?.transcript ?? '';
-      if (transcript) {
-        setSearchQuery(transcript);
-        setVoiceState('idle');
-        try { inputRef.current?.blur(); } catch { /* noop */ }
-        window.setTimeout(() => openSearch(transcript), 350);
-      }
-    };
-
-    rec.onend = () => {
-      setVoiceState('idle');
-    };
-
-    rec.onerror = (ev: any) => {
-      setVoiceState('idle');
-      const code = ev?.error;
-      let msg: string | null = null;
-      switch (code) {
-        case 'not-allowed':
-        case 'service-not-allowed':
-          msg = 'Microphone access denied. Please allow access in your browser settings.'; break;
-        case 'no-speech':
-          msg = 'No speech detected. Try again.'; break;
-        case 'network':
-          msg = 'Network error. Check your connection and try again.'; break;
-        case 'aborted':
-          msg = null; break;
-        default:
-          msg = 'Voice search unavailable. Try typing instead.';
-      }
-      if (msg) {
-        setVoiceError(msg);
-        if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
-        errorTimerRef.current = window.setTimeout(() => setVoiceError(null), 3000);
-      }
-    };
-
-    rec.start();
-    setVoiceState('listening');
-  }, [voiceState]);
+  }, [voiceState, openSearch]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

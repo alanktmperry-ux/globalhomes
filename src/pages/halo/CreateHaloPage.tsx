@@ -143,6 +143,7 @@ export default function CreateHaloPage() {
     const err = validateStep3(data);
     if (err) {
       setStepError(err);
+      scrollToError();
       return;
     }
     if (!user) {

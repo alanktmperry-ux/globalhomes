@@ -488,15 +488,15 @@ const Index = () => {
         </a>
         {/* ═══ Agent sliver bar ═══ */}
         <div style={{ background: '#EFF6FF', borderBottom: '1px solid #DBEAFE', color: '#374151', padding: '10px 16px', fontSize: 13, textAlign: 'center' }}>
-          <span>🏆 <strong style={{ color:'#0a0f1e', fontWeight:700 }}>Real estate agents:</strong> reach 7M+ multilingual buyers no other portal can find</span>
+          <span>🏆 {t('home.sliver.agents')}</span>
           <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
-          <span>Auto-translated listings in 20 languages</span>
+          <span>{t('home.sliver.translation')}</span>
           <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
-          <span>From <strong style={{ color:'#2563EB', fontWeight:700 }}>$799/mo</strong></span>
+          <span>{t('home.sliver.price')}</span>
           <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
-          <span>60 days free</span>
+          <span>{t('home.sliver.free')}</span>
           <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
-          <a href="/for-agents" className="sliver-link" style={{ color: '#2563EB', textDecoration: 'none', fontWeight: 700 }}>See how it works →</a>
+          <a href="/for-agents" className="sliver-link" style={{ color: '#2563EB', textDecoration: 'none', fontWeight: 700 }}>{t('home.sliver.cta')}</a>
         </div>
 
         {/* ═══ SECTION 2 — Hero ═══ */}
@@ -515,7 +515,7 @@ const Index = () => {
               </h1>
 
               <div className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:14, fontWeight:500, color:T.mid, marginBottom:16, display:'flex', alignItems:'center', gap:6 }}>
-                <span style={{ fontSize:20, lineHeight:1 }}>{seq.flag}</span> {seq.sub} · click any language below to switch
+                <span style={{ fontSize:20, lineHeight:1 }}>{seq.flag}</span> {seq.sub} · {t('home.hero.langSwitch')}
               </div>
 
               {/* Search block */}
@@ -550,7 +550,7 @@ const Index = () => {
                       {voiceState === 'listening' ? '🎤 Listening…' : voiceState === 'processing' ? 'Processing…' : seq.mic}
                     </div>
                     <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.1em', textTransform:'uppercase', color:T.muted }}>
-                      TAP TO TALK · VOICE SEARCH
+                      {t('home.hero.tapToTalk')}
                     </div>
                   </div>
                   {voiceUnsupportedTip && (
@@ -589,7 +589,7 @@ const Index = () => {
                     placeholder={seq.ph}
                     style={{ flex:1, border:'none', outline:'none', fontSize:14, padding:'12px 10px', background:'transparent', minWidth:0, color:T.ink }}
                   />
-                  <button type="submit" style={{ background:T.blue, color:'#fff', border:'none', padding:'10px 18px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>Find my home →</button>
+                  <button type="submit" style={{ background:T.blue, color:'#fff', border:'none', padding:'10px 18px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>{t('home.hero.findMyHome')}</button>
                 </div>
               </form>
 
@@ -601,7 +601,7 @@ const Index = () => {
 
               {/* Filter chips */}
               <div style={{ display:'flex', flexWrap:'wrap', gap:8, maxWidth:560, marginTop:14 }}>
-                {['📍 Auburn','📍 Box Hill','📍 Hurstville','Under $1M','3+ beds','Top schools'].map((c) => (
+                {['📍 Auburn','📍 Box Hill','📍 Hurstville', t('home.hero.chip.budget'), t('home.hero.chip.beds'), t('home.hero.chip.schools')].map((c) => (
                   <button key={c} className="chip" onClick={() => openSearch(c)}>
                     {c.startsWith('📍') ? <><span aria-hidden="true">📍 </span>{c.slice(3)}</> : c}
                   </button>
@@ -611,11 +611,11 @@ const Index = () => {
               {/* Live buyers pill */}
               <div style={{ marginTop:18, display:'inline-flex', alignItems:'center', gap:8, background:'rgba(22,163,74,.1)', border:'1px solid rgba(22,163,74,.25)', borderRadius:100, padding:'6px 14px', fontSize:12, fontWeight:700, color:'#16a34a' }}>
                 <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:'#16a34a' }} />
-                <strong>{liveCount}</strong> buyers searching right now
+                <strong>{liveCount}</strong> {t('home.hero.buyersNow')}
               </div>
 
               <div style={{ marginTop:16, maxWidth:560, fontSize:13, color:T.muted, textAlign:'center' }}>
-                🔒 Free for buyers · Always · No account needed to search
+                {t('home.hero.freeForBuyers')}
               </div>
             </div>
 
@@ -644,7 +644,7 @@ const Index = () => {
                   />
                 </div>
                 <div style={{ padding:18 }}>
-                  <span style={{ display:'inline-block', background:T.blueL, color:T.blue, fontSize:11, fontWeight:700, padding:'4px 10px', borderRadius:100, marginBottom:10 }}>🌐 20 languages · auto-translated</span>
+                  <span style={{ display:'inline-block', background:T.blueL, color:T.blue, fontSize:11, fontWeight:700, padding:'4px 10px', borderRadius:100, marginBottom:10 }}>{t('home.hero.cardLangBadge')}</span>
                   <div ref={titleRef} className="hcard-title" id="hcardTitle" style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:6 }}>{initialFront.title}</div>
                   <div ref={priceRef} className="hcard-price" id="hcardPrice" style={{ fontSize:22, fontWeight:800, color:T.ink, marginBottom:8 }}>{initialFront.price}</div>
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:12, color:T.muted, marginBottom:12 }}>
@@ -653,7 +653,7 @@ const Index = () => {
                   </div>
                   <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(22,163,74,.12)', border:'1px solid rgba(22,163,74,.3)', borderRadius:100, padding:'4px 10px', fontSize:11, fontWeight:700, color:'#15803d' }}>
                     <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:'#16a34a' }} />
-                    <span id="enquiryCount">{enquiryCount}</span>&nbsp;people enquired in the last hour
+                    <span id="enquiryCount">{enquiryCount}</span>&nbsp;{t('home.hero.enquiredLastHour')}
                   </div>
                 </div>
               </div>
@@ -682,10 +682,10 @@ const Index = () => {
         <div style={{ background:T.off, borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}`, padding:'20px 16px' }}>
           <div style={{ maxWidth:1200, margin:'0 auto', display:'flex', justifyContent:'center', alignItems:'center', flexWrap:'wrap', gap:0 }}>
             {[
-              { n: propertyCount && propertyCount > 0 ? `${propertyCount.toLocaleString()}+` : '50,000+', l:'live listings' },
-              { n:'20', l:'languages auto-translated' },
-              { n:'7M+', l:'multilingual Australians' },
-              { n:'Free', l:'for buyers · always' },
+              { n: propertyCount && propertyCount > 0 ? `${propertyCount.toLocaleString()}+` : '50,000+', l: t('home.trust.listings') },
+              { n:'20', l: t('home.trust.languages') },
+              { n:'7M+', l: t('home.trust.buyers') },
+              { n:'Free', l: t('home.trust.free') },
             ].map((s, i, arr) => (
               <div key={s.l} style={{ display:'flex', alignItems:'center' }}>
                 <div style={{ padding:'0 32px', textAlign:'center' }}>
@@ -705,17 +705,17 @@ const Index = () => {
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 32 }}>
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 700, color: T.blue, textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 8 }}>
-                    Properties on ListHQ
+                    {t('home.featured.eyebrow')}
                   </div>
                   <h2 style={{ fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: 800, letterSpacing: '-1px', lineHeight: 1.1, margin: 0, color: T.ink }}>
-                    Browse what's listed now
+                    {t('home.featured.heading')}
                   </h2>
                 </div>
                 <button
                   onClick={() => navigate('/buy')}
                   style={{ background: 'transparent', border: `1.5px solid ${T.border}`, borderRadius: 100, padding: '10px 20px', fontSize: 13, fontWeight: 700, color: T.blue, cursor: 'pointer', whiteSpace: 'nowrap' }}
                 >
-                  View all →
+                  {t('home.featured.viewAll')}
                 </button>
               </div>
 
@@ -767,7 +767,7 @@ const Index = () => {
                   onClick={() => navigate('/buy')}
                   style={{ background: T.blue, color: '#fff', border: 'none', padding: '14px 36px', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
                 >
-                  Browse all properties →
+                  {t('home.featured.browseAll')}
                 </button>
               </div>
             </div>
@@ -779,15 +779,15 @@ const Index = () => {
         <section style={{ background: T.blueTint, padding:'88px 24px', borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}` }}>
           <div style={{ maxWidth:1200, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr', gap:64, alignItems:'center' }} className="lang-grid">
             <div>
-              <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>Why ListHQ is different</div>
+              <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>{t('home.langProof.eyebrow')}</div>
               <h2 style={{ fontSize:'clamp(32px, 3.5vw, 48px)', fontWeight:800, letterSpacing:'-1.5px', lineHeight:1.1, margin:'0 0 18px' }}>
-                Where multilingual Australia <em style={{ color:T.blue, fontStyle:'italic' }}>finds home.</em>
+                {t('home.langProof.heading')}
               </h2>
               <p style={{ fontSize:16, color:T.mid, lineHeight:1.7, margin:'0 0 24px' }}>
-                Every listing on ListHQ is automatically translated into 20 languages — Chinese, Vietnamese, Arabic, Hindi and 16 more. No other portal does this.
+                {t('home.langProof.body')}
               </p>
               <button onClick={() => inputRef.current?.focus()} style={{ background:T.blue, color:'#fff', border:'none', padding:'14px 28px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>
-                Find homes in your language →
+                {t('home.langProof.cta')}
               </button>
             </div>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:10 }}>
@@ -843,9 +843,9 @@ const Index = () => {
         {/* ═══ SECTION 7 — Testimonials ═══ */}
         <section style={{ background:'#fff', padding:'88px 24px' }}>
           <div style={{ maxWidth:1200, margin:'0 auto' }}>
-            <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>What buyers say</div>
+            <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>{t('home.testimonials.eyebrow')}</div>
             <h2 style={{ fontSize:'clamp(32px, 3.5vw, 48px)', fontWeight:800, letterSpacing:'-1.5px', lineHeight:1.1, margin:'0 0 52px' }}>
-              Real people. Real homes. <em style={{ color:T.blue, fontStyle:'italic' }}>In their language.</em>
+              {t('home.testimonials.heading')}
             </h2>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:20 }} className="how-grid">
               {([
@@ -973,7 +973,7 @@ function AgentBand() {
               {t('home.agentBannerHeadline')}
             </h2>
             <p style={{ fontSize:16, color:'rgba(255,255,255,.6)', lineHeight:1.6, margin:'0 0 22px', maxWidth:620 }}>
-              Are they finding your listings? ListHQ auto-translates every property you upload into 20 languages — reaching buyers no other portal can. From <strong style={{ color:'#fff' }}>$799/mo</strong>. 60 days free.
+              {t('home.agentBand.para')}
             </p>
             <div style={{ display:'flex', gap:24, flexWrap:'wrap' }}>
               {['McGrath','Belle Property','LJ Hooker','Raine & Horne'].map((b) => (
@@ -984,9 +984,9 @@ function AgentBand() {
           <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
             <button onClick={() => navigate('/pricing')} style={{ background:'#fff', color:T.ink, border:'none', padding:'14px 28px', borderRadius:12, fontSize:15, fontWeight:700, cursor:'pointer' }}>{t('home.agents.cta')} →</button>
             <p style={{ fontSize:11, color:'rgba(255,255,255,.4)', margin:'10px 0 0', fontWeight:500 }}>
-              60 days free · No credit card · Australian data storage
+              {t('home.agentBand.finePrint')}
             </p>
-            <button onClick={() => setVideoOpen(true)} style={{ background:'transparent', color:'rgba(255,255,255,.7)', border:'1px solid rgba(255,255,255,.2)', padding:'14px 28px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>Watch 90-sec demo</button>
+            <button onClick={() => setVideoOpen(true)} style={{ background:'transparent', color:'rgba(255,255,255,.7)', border:'1px solid rgba(255,255,255,.2)', padding:'14px 28px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>{t('home.agentBand.watchDemo')}</button>
           </div>
         </div>
 
@@ -1048,7 +1048,7 @@ function AgentBand() {
         {/* ROI slider */}
         <div className="reveal" style={{ background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.12)', borderRadius:20, padding:36, marginTop:52 }}>
           <div style={{ fontSize:14, fontWeight:600, color:'rgba(255,255,255,.6)', marginBottom:20 }}>
-            If you have <strong style={{ color:'#fff', fontSize:18 }}>{n}</strong> active listings on ListHQ…
+            {t('home.agentBand.roiHeading', { n: String(n) })}
           </div>
           <input type="range" min={1} max={100} value={n} onChange={(e) => setN(Number(e.target.value))}
             aria-label="Number of active listings"
@@ -1056,9 +1056,9 @@ function AgentBand() {
             style={{ width:'100%', accentColor: T.blue }} />
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:16, marginTop:24 }}>
             {[
-              { v: buyers, l:'multilingual buyers reached / month' },
-              { v: '20', l:'languages auto-translated, zero work' },
-              { v: roi, l:'avg. return on $799/mo subscription' },
+              { v: buyers, l: t('home.agentBand.roiLabel1') },
+              { v: '20', l: t('home.agentBand.roiLabel2') },
+              { v: roi, l: t('home.agentBand.roiLabel3') },
             ].map((s) => (
               <div key={s.l} style={{ background:'rgba(255,255,255,.04)', border:'1px solid rgba(255,255,255,.08)', borderRadius:14, padding:20, textAlign:'center' }}>
                 <div style={{ fontSize:32, fontWeight:800, color:T.blue, lineHeight:1, marginBottom:8 }}>{s.v}</div>
@@ -1070,25 +1070,25 @@ function AgentBand() {
 
         {/* Translation demo */}
         <div className="reveal" style={{ background:'rgba(255,255,255,.04)', border:'1px solid rgba(255,255,255,.12)', borderRadius:20, padding:36, marginTop:24 }}>
-          <h3 style={{ fontSize:16, fontWeight:800, color:'#fff', margin:'0 0 6px' }}>See your listing translated — live</h3>
-          <p style={{ fontSize:13, color:'rgba(255,255,255,.5)', margin:'0 0 20px' }}>Type any property description and watch it appear in 5 languages instantly.</p>
+          <h3 style={{ fontSize:16, fontWeight:800, color:'#fff', margin:'0 0 6px' }}>{t('home.agentBand.demoTitle')}</h3>
+          <p style={{ fontSize:13, color:'rgba(255,255,255,.5)', margin:'0 0 20px' }}>{t('home.agentBand.demoSub')}</p>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr auto', gap:12 }} className="trans-grid">
             <input
               type="text"
               value={demoText}
               onChange={(e) => setDemoText(e.target.value)}
-              placeholder="e.g. Spacious 4-bed family home near top schools…"
+              placeholder={t('home.agentBand.demoPlaceholder')}
               style={{ background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.15)', borderRadius:10, padding:'12px 14px', color:'#fff', fontSize:13, outline:'none' }}
             />
             <select value={demoLang} onChange={(e) => setDemoLang(e.target.value as any)}
               style={{ background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.15)', borderRadius:10, padding:'12px 14px', color:'#fff', fontSize:13, outline:'none' }}>
-              <option value="all">All 5 languages</option>
-              <option value="zh">Chinese</option>
-              <option value="vi">Vietnamese</option>
-              <option value="ar">Arabic</option>
-              <option value="hi">Hindi</option>
+              <option value="all">{t('home.agentBand.demoAll')}</option>
+              <option value="zh">{t('home.agentBand.demoChinese')}</option>
+              <option value="vi">{t('home.agentBand.demoVietnamese')}</option>
+              <option value="ar">{t('home.agentBand.demoArabic')}</option>
+              <option value="hi">{t('home.agentBand.demoHindi')}</option>
             </select>
-            <button onClick={runTranslate} style={{ background:T.blue, color:'#fff', border:'none', padding:'12px 22px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>Translate →</button>
+            <button onClick={runTranslate} style={{ background:T.blue, color:'#fff', border:'none', padding:'12px 22px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>{t('home.agentBand.translateBtn')}</button>
           </div>
           {results && (
             <div style={{ display:'flex', flexDirection:'column', gap:10, marginTop:18 }}>
@@ -1152,6 +1152,7 @@ type Theme = { blue: string; blueL: string; blueMid: string; ink: string; mid: s
 
 function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
   const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');
+  const { t } = useTranslation();
 
   const PLANS = [
     {
@@ -1225,12 +1226,12 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
   return (
     <section style={{ background: T.off, padding: '88px 24px' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', textAlign: 'center' }}>
-        <div style={{ fontSize: 11, fontWeight: 700, color: T.blue, textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 14 }}>Pricing — no contracts, cancel anytime</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: T.blue, textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 14 }}>{t('home.pricing.eyebrow')}</div>
         <h2 style={{ fontSize: 'clamp(32px, 3.5vw, 48px)', fontWeight: 800, letterSpacing: '-1.5px', lineHeight: 1.1, margin: '0 0 14px' }}>
-          Built for the way <em style={{ color: T.blue, fontStyle: 'italic', fontFamily: "'DM Serif Display', serif" }}>you work.</em>
+          {t('home.pricing.heading')}
         </h2>
         <p style={{ fontSize: 16, color: T.muted, margin: '0 auto 28px', maxWidth: 680 }}>
-          All plans include 20 languages · trust accounting · AI matching
+          {t('home.pricing.subtext')}
         </p>
 
         {/* Value prop callout */}
@@ -1239,10 +1240,10 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
           padding: '20px 24px', maxWidth: 820, margin: '0 auto 32px', textAlign: 'left',
         }}>
           <div style={{ fontSize: 15, fontWeight: 800, color: T.ink, marginBottom: 6 }}>
-            Why $799/mo is a no-brainer for agents
+            {t('home.pricing.calloutTitle')}
           </div>
           <p style={{ fontSize: 14, color: T.mid, lineHeight: 1.55, margin: 0 }}>
-            REA.com.au and Domain charge $1,500–$7,000 per listing. A CRM costs $300–$600/mo. Property management software another $200–$400/mo. ListHQ replaces all three — CRM, PM platform, and multilingual listing portal — in one subscription, reaching 7M+ multilingual buyers no other portal can find.
+            {t('home.pricing.calloutBody')}
           </p>
         </div>
 
@@ -1260,7 +1261,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
                 transition: 'all .15s',
               }}
             >
-              {b === 'monthly' ? 'Monthly' : 'Annual — save 20%'}
+              {b === 'monthly' ? t('home.pricing.monthly') : t('home.pricing.annual')}
             </button>
           ))}
         </div>
@@ -1287,7 +1288,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
               }}>
                 {p.popular && (
                   <div style={{ position: 'absolute', top: -12, right: 20, background: T.amber, color: '#78350F', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', padding: '5px 12px', borderRadius: 100 }}>
-                    Most popular
+                    {t('home.pricing.mostPopular')}
                   </div>
                 )}
                 <div style={{ fontSize: 12, fontWeight: 700, color: T.muted, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 14 }}>{p.name}</div>
@@ -1295,23 +1296,23 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
                   {isAnnual ? (
                     <>
                       <span style={{ fontSize: 44, fontWeight: 800, color: T.ink, letterSpacing: '-1.5px' }}>{fmt(p.annualMonthly)}</span>
-                      <span style={{ fontSize: 13, color: T.muted }}>/mo</span>
+                      <span style={{ fontSize: 13, color: T.muted }}>{t('home.pricing.perMonth')}</span>
                     </>
                   ) : (
                     <>
                       <span style={{ fontSize: 44, fontWeight: 800, color: T.ink, letterSpacing: '-1.5px' }}>{fmt(p.monthly)}</span>
-                      <span style={{ fontSize: 13, color: T.muted }}>/mo</span>
+                      <span style={{ fontSize: 13, color: T.muted }}>{t('home.pricing.perMonth')}</span>
                     </>
                   )}
                 </div>
                 <div style={{ fontSize: 12, color: T.muted, marginBottom: 14, minHeight: 18 }}>
                   {isAnnual ? (
                     <>
-                      <span style={{ textDecoration: 'line-through', marginRight: 6 }}>{fmt(p.monthly)}/mo</span>
-                      · {fmt(p.annual)}/yr billed annually
+                      <span style={{ textDecoration: 'line-through', marginRight: 6 }}>{fmt(p.monthly)}{t('home.pricing.perMonth')}</span>
+                      · {fmt(p.annual)}{t('home.pricing.billedAnnually')}
                     </>
                   ) : (
-                    <>or {fmt(p.annual)}/yr (save 20%)</>
+                    <>{t('home.pricing.savePercent', { price: fmt(p.annual) })}</>
                   )}
                 </div>
                 <p style={{ fontSize: 13, color: T.muted, margin: '0 0 22px', lineHeight: 1.5 }}>{p.desc}</p>
@@ -1341,19 +1342,20 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
 
 function FAQSection() {
   const [open, setOpen] = useState<number | null>(null);
+  const { t } = useTranslation();
   const faqs = [
-    { q: 'Is there a lock-in contract?', a: 'No contracts, ever. Cancel month-to-month with 30 days notice. Your data is always yours to export.' },
-    { q: 'Where is my data stored?', a: 'All data is stored in Australian data centres, fully compliant with the Privacy Act 1988. ListHQ does not share or sell your client data.' },
-    { q: 'Does ListHQ integrate with my existing CRM?', a: 'Yes. ListHQ connects with REX, VaultRE, PropertyMe, and Console via API. Listing data syncs automatically — no double entry.' },
-    { q: 'Can I keep my REA and Domain subscriptions?', a: 'Absolutely. Most ListHQ agents use us alongside REA/Domain. We reach the buyers they miss — not the same buyers.' },
-    { q: 'Does this comply with Australian real estate regulations?', a: 'Yes. ListHQ is built for Australian agents — trust accounting meets state-by-state requirements, and all agent profiles require verified licence numbers.' },
+    { q: t('home.faq.q1'), a: t('home.faq.a1') },
+    { q: t('home.faq.q2'), a: t('home.faq.a2') },
+    { q: t('home.faq.q3'), a: t('home.faq.a3') },
+    { q: t('home.faq.q4'), a: t('home.faq.a4') },
+    { q: t('home.faq.q5'), a: t('home.faq.a5') },
   ];
   return (
     <section style={{ background: '#F9FAFB', padding: '80px 24px' }}>
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        <div style={{ fontSize: 11, fontWeight: 700, color: '#2563EB', textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 14, textAlign: 'center' }}>Common questions</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: '#2563EB', textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 14, textAlign: 'center' }}>{t('home.faq.eyebrow')}</div>
         <h2 style={{ fontSize: 'clamp(28px, 3vw, 40px)', fontWeight: 800, letterSpacing: '-1px', lineHeight: 1.1, margin: '0 0 40px', textAlign: 'center', color: '#0a0f1e' }}>
-          Everything you need to know
+          {t('home.faq.heading')}
         </h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {faqs.map((f, i) => (
@@ -1381,34 +1383,35 @@ function FAQSection() {
 
 
 function ClosingCTA({ navigate, T }: { navigate: NavFn; T: Theme }) {
+  const { t } = useTranslation();
   return (
     <section style={{ background: '#2563EB', padding: '88px 24px', textAlign: 'center' }}>
       <div style={{ maxWidth: 640, margin: '0 auto' }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.65)', textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 16 }}>
-          Start today
+          {t('home.closingCta.eyebrow')}
         </div>
         <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 800, color: '#fff', letterSpacing: '-1.5px', lineHeight: 1.1, margin: '0 0 16px' }}>
-          60 days free. No contracts. Cancel anytime.
+          {t('home.closingCta.heading')}
         </h2>
         <p style={{ fontSize: 16, color: 'rgba(255,255,255,.7)', lineHeight: 1.6, margin: '0 auto 36px', maxWidth: 480 }}>
-          Join agents already reaching 7M+ multilingual buyers across Australia.
+          {t('home.closingCta.body')}
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
             onClick={() => navigate('/contact')}
             style={{ background: '#fff', color: '#0a0f1e', border: 'none', padding: '15px 32px', borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: 'pointer' }}
           >
-            Start free 60-day trial →
+            {t('home.closingCta.primary')}
           </button>
           <button
             onClick={() => navigate('/contact')}
             style={{ background: 'transparent', color: '#fff', border: '1.5px solid rgba(255,255,255,.4)', padding: '15px 28px', borderRadius: 12, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
           >
-            Talk to sales
+            {t('home.closingCta.secondary')}
           </button>
         </div>
         <p style={{ fontSize: 11, color: 'rgba(255,255,255,.45)', margin: '20px 0 0', fontWeight: 500 }}>
-          No credit card required · Australian data storage · Cancel anytime
+          {t('home.closingCta.finePrint')}
         </p>
       </div>
     </section>

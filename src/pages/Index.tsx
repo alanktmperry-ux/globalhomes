@@ -575,7 +575,7 @@ const Index = () => {
                     placeholder={seq.ph}
                     style={{ flex:1, border:'none', outline:'none', fontSize:14, padding:'12px 10px', background:'transparent', minWidth:0, color:T.ink }}
                   />
-                  <button type="submit" style={{ background:T.blue, color:'#fff', border:'none', padding:'10px 18px', borderRadius:9, fontSize:13, fontWeight:700, cursor:'pointer' }}>Find my home →</button>
+                  <button type="submit" style={{ background:T.blue, color:'#fff', border:'none', padding:'10px 18px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>Find my home →</button>
                 </div>
               </form>
 
@@ -964,7 +964,7 @@ function AgentBand() {
             <p style={{ fontSize:11, color:'rgba(255,255,255,.4)', margin:'10px 0 0', fontWeight:500 }}>
               60 days free · No credit card · Australian data storage
             </p>
-            <button onClick={() => setVideoOpen(true)} style={{ background:'transparent', color:'rgba(255,255,255,.7)', border:'1px solid rgba(255,255,255,.2)', padding:'12px 24px', borderRadius:12, fontSize:14, fontWeight:600, cursor:'pointer' }}>Watch 90-sec demo</button>
+            <button onClick={() => setVideoOpen(true)} style={{ background:'transparent', color:'rgba(255,255,255,.7)', border:'1px solid rgba(255,255,255,.2)', padding:'14px 28px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>Watch 90-sec demo</button>
           </div>
         </div>
 
@@ -1037,7 +1037,7 @@ function AgentBand() {
               <option value="ar">Arabic</option>
               <option value="hi">Hindi</option>
             </select>
-            <button onClick={runTranslate} style={{ background:T.blue, color:'#fff', border:'none', padding:'12px 22px', borderRadius:10, fontSize:13, fontWeight:700, cursor:'pointer' }}>Translate →</button>
+            <button onClick={runTranslate} style={{ background:T.blue, color:'#fff', border:'none', padding:'12px 22px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>Translate →</button>
           </div>
           {results && (
             <div style={{ display:'flex', flexDirection:'column', gap:10, marginTop:18 }}>

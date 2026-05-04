@@ -156,30 +156,38 @@ const Index = () => {
       const listing = FEAT_LISTINGS[next];
       cardIdxRef.current = next;
 
-      // Preload next image
+      // Preload next image — only swap once it's actually loaded
       const pre = new Image();
-      pre.onload = () => {
+      const runSwap = () => {
         const inactive = activeLayerRef.current === 'a' ? layerBRef.current : layerARef.current;
         const active = activeLayerRef.current === 'a' ? layerARef.current : layerBRef.current;
-        if (inactive) inactive.style.backgroundImage = `url(${listing.img})`;
-        // swap active class
+        if (inactive) {
+          inactive.style.backgroundImage = `url(${listing.img})`;
+          // restart ken burns animation on the layer that's about to become active
+          inactive.style.animation = 'none';
+          // force reflow
+          void inactive.offsetWidth;
+          inactive.style.animation = '';
+        }
         requestAnimationFrame(() => {
           if (inactive) inactive.classList.add('active');
           if (active) active.classList.remove('active');
           activeLayerRef.current = activeLayerRef.current === 'a' ? 'b' : 'a';
         });
-      };
-      pre.src = listing.img;
 
-      // Text crossfade
-      const t = titleRef.current;
-      const p = priceRef.current;
-      if (t) t.classList.add('hcard-text-hidden');
-      if (p) p.classList.add('hcard-text-hidden');
-      window.setTimeout(() => {
-        if (t) { t.textContent = listing.title; t.classList.remove('hcard-text-hidden'); }
-        if (p) { p.textContent = listing.price; p.classList.remove('hcard-text-hidden'); }
-      }, 200);
+        // Text fade in parallel with image crossfade
+        const t = titleRef.current;
+        const p = priceRef.current;
+        if (t) t.classList.add('hcard-text-hidden');
+        if (p) p.classList.add('hcard-text-hidden');
+        window.setTimeout(() => {
+          if (t) { t.textContent = listing.title; t.classList.remove('hcard-text-hidden'); }
+          if (p) { p.textContent = listing.price; p.classList.remove('hcard-text-hidden'); }
+        }, 200);
+      };
+      pre.onload = runSwap;
+      pre.onerror = runSwap;
+      pre.src = listing.img;
     }, 5000);
     return () => clearInterval(id);
   }, []);

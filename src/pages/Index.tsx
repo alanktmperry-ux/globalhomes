@@ -424,31 +424,42 @@ const Index = () => {
               </div>
 
               {/* Search block */}
-              <form onSubmit={handleSubmit} style={{ maxWidth:560, background:'#fff', border:`1.5px solid ${T.border}`, borderRadius:14, boxShadow:'0 4px 24px rgba(0,0,0,.07)', display:'flex', alignItems:'center', padding:'6px 6px 6px 0', gap:0 }}>
-                <button
-                  type="button"
-                  onClick={startVoice}
-                  title="Tap to talk"
-                  aria-label={voiceState === 'listening' ? 'Stop listening' : 'Start voice search'}
+              <form onSubmit={handleSubmit} style={{ maxWidth:560, background:'#fff', border:`1.5px solid ${T.border}`, borderRadius:14, boxShadow:'0 4px 24px rgba(0,0,0,.07)', display:'grid', gridTemplateColumns:'minmax(180px, 220px) auto 1fr', alignItems:'stretch', padding:0, gap:0, overflow:'hidden' }}>
+                {/* Left half — Voice */}
+                <div
                   style={{
+                    display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+                    gap:10, padding:'18px 14px',
+                    background: voiceState === 'listening' ? 'rgba(239,68,68,0.08)' : 'transparent',
+                    transition: 'background 0.2s ease',
+                    animation: voiceState === 'listening' ? 'pulse 1.4s ease-in-out infinite' : 'none',
                     position:'relative',
-                    display:'flex', alignItems:'center', gap:10, padding:'10px 16px',
-                    borderRight:`1.5px solid ${T.border}`, background:'transparent', border:'none',
-                    cursor:'pointer',
                   }}
                 >
-                  <span style={{ position:'relative', width:36, height:36, borderRadius:'50%', background: voiceState === 'processing' ? '#9ca3af' : 'linear-gradient(135deg,#ef4444,#dc2626)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', flexShrink:0 }}>
+                  <div style={{
+                    fontSize:11, fontWeight:800, letterSpacing:'.12em', textTransform:'uppercase',
+                    color: voiceState === 'listening' ? '#dc2626' : T.muted,
+                  }}>
+                    {voiceState === 'listening' ? '🎤 Listening…' : voiceState === 'processing' ? 'Processing…' : 'Tap to talk'}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={startVoice}
+                    title="Tap to talk"
+                    aria-label={voiceState === 'listening' ? 'Stop listening' : 'Start voice search'}
+                    style={{
+                      position:'relative', width:56, height:56, borderRadius:'50%',
+                      background: voiceState === 'processing' ? '#9ca3af' : 'linear-gradient(135deg,#ef4444,#dc2626)',
+                      display:'flex', alignItems:'center', justifyContent:'center', color:'#fff',
+                      border:'none', cursor:'pointer', boxShadow:'0 4px 14px rgba(220,38,38,.35)', flexShrink:0,
+                    }}
+                  >
                     {voiceState === 'listening' && <span className="mic-ring" />}
-                    {voiceState === 'processing' ? <span className="mic-spin" /> : <Mic size={16} />}
-                  </span>
-                  <span style={{ textAlign:'left' }}>
-                    <div style={{ fontSize:13, fontWeight:700, color: voiceState === 'listening' ? '#dc2626' : T.ink }}>
-                      {voiceState === 'listening' ? '🎤 Listening…' : voiceState === 'processing' ? 'Processing…' : seq.mic}
-                    </div>
-                    <div style={{ fontSize:10, fontWeight:600, color:T.muted, textTransform:'uppercase', letterSpacing:'.05em' }}>
-                      {voiceState === 'listening' ? 'Tap to stop' : 'Tap to talk · voice search'}
-                    </div>
-                  </span>
+                    {voiceState === 'processing' ? <span className="mic-spin" /> : <Mic size={24} />}
+                  </button>
+                  <div style={{ fontSize:11, color:T.muted, textAlign:'center', lineHeight:1.3 }}>
+                    {seq.mic}
+                  </div>
                   {voiceUnsupportedTip && (
                     <span
                       role="tooltip"
@@ -464,16 +475,27 @@ const Index = () => {
                       🎤 Voice search works in Chrome and Safari. Type your search above, or switch browsers.
                     </span>
                   )}
-                </button>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={seq.ph}
-                  style={{ flex:1, border:'none', outline:'none', fontSize:14, padding:'12px 14px', background:'transparent', minWidth:0, color:T.ink }}
-                />
-                <button type="submit" style={{ background:T.blue, color:'#fff', border:'none', padding:'10px 18px', borderRadius:9, fontSize:13, fontWeight:700, cursor:'pointer' }}>Search</button>
+                </div>
+
+                {/* Divider with "or" */}
+                <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'0 6px', position:'relative' }}>
+                  <div style={{ width:1, flex:1, background:T.border }} />
+                  <div style={{ fontSize:10, fontWeight:700, color:T.muted, textTransform:'uppercase', padding:'4px 0', background:'#fff' }}>or</div>
+                  <div style={{ width:1, flex:1, background:T.border }} />
+                </div>
+
+                {/* Right half — Text */}
+                <div style={{ display:'flex', alignItems:'center', padding:'6px 6px 6px 8px', gap:6 }}>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder={seq.ph}
+                    style={{ flex:1, border:'none', outline:'none', fontSize:14, padding:'12px 10px', background:'transparent', minWidth:0, color:T.ink }}
+                  />
+                  <button type="submit" style={{ background:T.blue, color:'#fff', border:'none', padding:'10px 18px', borderRadius:9, fontSize:13, fontWeight:700, cursor:'pointer' }}>Search</button>
+                </div>
               </form>
 
               {voiceError && (

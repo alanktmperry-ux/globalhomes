@@ -92,10 +92,19 @@ Deno.serve(async (req) => {
     console.log(`[admin-users] action=${action} caller=${caller.id} target=${bodyParams.userId ?? bodyParams.user_id ?? 'n/a'} ts=${new Date().toISOString()}`);
 
     if (action === "list_users") {
-      const page = parseInt(getParam("page", "1")!);
-      const perPage = 50;
-      const { data, error } = await supabase.auth.admin.listUsers({ page, perPage });
-      if (error) throw error;
+      // Fetch ALL auth users (paginated)
+      let allAuthUsers: any[] = [];
+      let authPage = 1;
+      const AUTH_PAGE_SIZE = 1000;
+      while (true) {
+        const { data: pageData, error: listError } = await supabase.auth.admin.listUsers({ page: authPage, perPage: AUTH_PAGE_SIZE });
+        if (listError) throw listError;
+        const pageUsers = pageData?.users ?? [];
+        allAuthUsers = allAuthUsers.concat(pageUsers);
+        if (pageUsers.length < AUTH_PAGE_SIZE) break;
+        authPage++;
+      }
+      const data = { users: allAuthUsers, total: allAuthUsers.length };
 
       // Fetch all agents with subscription info
       const { data: agents } = await supabase

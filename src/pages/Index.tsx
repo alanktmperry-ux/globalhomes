@@ -935,7 +935,7 @@ function AgentBand() {
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
             <button onClick={() => navigate('/pricing')} style={{ background:'#fff', color:T.ink, border:'none', padding:'14px 28px', borderRadius:12, fontSize:15, fontWeight:700, cursor:'pointer' }}>See agent pricing →</button>
-            <button onClick={() => navigate('/for-agents')} style={{ background:'transparent', color:'rgba(255,255,255,.7)', border:'1px solid rgba(255,255,255,.2)', padding:'12px 24px', borderRadius:12, fontSize:14, fontWeight:600, cursor:'pointer' }}>Watch 90-sec demo</button>
+            <button onClick={() => setVideoOpen(true)} style={{ background:'transparent', color:'rgba(255,255,255,.7)', border:'1px solid rgba(255,255,255,.2)', padding:'12px 24px', borderRadius:12, fontSize:14, fontWeight:600, cursor:'pointer' }}>Watch 90-sec demo</button>
           </div>
         </div>
 

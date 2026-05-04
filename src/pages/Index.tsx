@@ -847,7 +847,14 @@ const Index = () => {
                     </p>
                   )}
                   <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-                    <div style={{ width:42, height:42, borderRadius:'50%', background:T.blueL, color:T.blue, fontWeight:800, fontSize:16, display:'flex', alignItems:'center', justifyContent:'center' }}>{c.i}</div>
+                    <div style={{
+                      width:42, height:42, borderRadius:'50%',
+                      background: ['#FEF3C7','#ECFDF5','#EFF6FF'][i],
+                      color: ['#92400E','#065F46','#1E40AF'][i],
+                      fontWeight:800, fontSize:16,
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      border: `2px solid ${['#FDE68A','#A7F3D0','#BFDBFE'][i]}`,
+                    }}>{c.i}</div>
                     <div>
                       <div style={{ fontSize:13, fontWeight:700, color:T.ink }}>{c.n}</div>
                       <div style={{ fontSize:12, color:T.muted }}>{c.d}</div>

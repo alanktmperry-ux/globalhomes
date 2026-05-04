@@ -254,6 +254,7 @@ const Index = () => {
       if (transcript) {
         setSearchQuery(transcript);
         setVoiceState('idle');
+        try { inputRef.current?.blur(); } catch { /* noop */ }
         window.setTimeout(() => openSearch(transcript), 350);
       }
     };

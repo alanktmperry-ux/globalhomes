@@ -32,7 +32,7 @@ export function HaloStep3({ data, update }: Props) {
           id="description"
           value={desc}
           onChange={(e) => update({ description: e.target.value.slice(0, 500) })}
-          placeholder="Describe what you're looking for in your own words..."
+          placeholder="e.g. Family of 4 relocating from China — need a quiet street near a top primary school, open to townhouse or house, not ground floor."
           rows={4}
         />
         <p className="text-xs text-muted-foreground mt-1 text-right">{desc.length} / 500</p>

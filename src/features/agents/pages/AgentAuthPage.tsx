@@ -105,12 +105,17 @@ const AgentAuthPage = () => {
   };
 
   const handleEmailSubmit = async () => {
-    if (!regEmail.trim()) return;
-    if (!dataLocationConsent) {
-      toast.error('Please acknowledge where your data is stored to continue.');
+    const cleaned = regEmail.trim().toLowerCase();
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!cleaned) {
+      setEmailError('Email address is required');
       return;
     }
-    if (!policyConsent) {
+    if (!emailRe.test(cleaned)) {
+      setEmailError('Enter a valid email (e.g. name@agency.com.au)');
+      return;
+    }
+    if (!combinedConsent) {
       toast.error('Please agree to the Privacy Policy and Terms of Service to continue.');
       return;
     }

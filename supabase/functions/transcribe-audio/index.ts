@@ -44,7 +44,7 @@ Deno.serve(async (req) => {
     }
 
     const result = await response.json();
-    return new Response(JSON.stringify({ text: result.text ?? "" }), {
+    return new Response(JSON.stringify({ transcript: result.text ?? "" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" }
     });
   } catch (e) {

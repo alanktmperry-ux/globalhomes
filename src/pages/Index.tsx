@@ -62,12 +62,12 @@ const TILE_LANGS = [
 
 type Listing = { img: string; title: string; price: string; meta: string; };
 const FEAT_LISTINGS: Listing[] = [
-  { img:'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&h=600&fit=crop', title:'Spacious family home, walk to top-ranked schools', price:'$1,250,000', meta:'4 bed · 2 bath · 2 car' },
-  { img:'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop', title:'Modern 3-bed townhouse near transit',              price:'$985,000',   meta:'3 bed · 2 bath · 1 car' },
-  { img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop', title:'Renovated heritage home, walk to cafes',           price:'$1,580,000', meta:'4 bed · 3 bath · 2 car' },
-  { img:'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&h=600&fit=crop', title:'Brand new 5-bed family residence',                 price:'$2,150,000', meta:'5 bed · 4 bath · 2 car' },
-  { img:'https://images.unsplash.com/photo-1598228723793-52759bba239c?w=800&h=600&fit=crop', title:'City-view 2-bed apartment with parking',           price:'$795,000',   meta:'2 bed · 2 bath · 1 car' },
-  { img:'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=800&h=600&fit=crop', title:'Coastal 3-bed home minutes from beach',            price:'$1,395,000', meta:'3 bed · 2 bath · 2 car' },
+  { img:'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&h=600&fit=crop', title:'Spacious 4-bed family home, walk to top-ranked schools', price:'$1,250,000', meta:'4 bed · 2 bath · 2 car' },
+  { img:'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop', title:'Modern 3-bed townhouse near transit',                    price:'$985,000',   meta:'3 bed · 2 bath · 1 car' },
+  { img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop', title:'Renovated 3-bed heritage home, walk to cafes',          price:'$1,580,000', meta:'3 bed · 2 bath · 1 car' },
+  { img:'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&h=600&fit=crop', title:'Brand new 5-bed entertainer with pool',                 price:'$2,150,000', meta:'5 bed · 3 bath · 2 car' },
+  { img:'https://images.unsplash.com/photo-1598228723793-52759bba239c?w=800&h=600&fit=crop', title:'City-view 2-bed apartment with parking',                price:'$795,000',   meta:'2 bed · 1 bath · 1 car' },
+  { img:'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=800&h=600&fit=crop', title:'Coastal 4-bed family home minutes from beach',          price:'$1,395,000', meta:'4 bed · 2 bath · 2 car' },
 ];
 
 const TRANS_MAP = [
@@ -362,8 +362,9 @@ const Index = () => {
         .hcard-title { min-height: 2.8em; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: opacity 0.4s ease; }
         .hcard-price { min-height: 1.4em; transition: opacity 0.4s ease; }
         .hcard-text-hidden { opacity: 0 !important; transition: opacity 0.15s ease !important; }
-        .chip { background: ${T.off}; border: 1px solid ${T.border}; border-radius: 100px; padding: 7px 14px; font-size: 12.5px; font-weight: 600; color: ${T.mid}; cursor: pointer; transition: all .15s ease; }
+        .chip { background: ${T.off}; border: 1px solid ${T.border}; border-radius: 100px; padding: 6px 11px; font-size: 12px; font-weight: 600; color: ${T.mid}; cursor: pointer; transition: all .15s ease; }
         .chip:hover { background: ${T.blueL}; border-color: ${T.blueMid}; color: ${T.blue}; }
+        .sliver-link:hover { text-decoration: underline; }
         @keyframes typeBlink { 50% { opacity: 0 } }
         .type-cursor::after { content:'▋'; color:${T.blue}; margin-left:2px; animation: typeBlink 1s steps(1) infinite; }
         @keyframes micRing { 0% { transform: scale(1); opacity: .55 } 100% { transform: scale(1.85); opacity: 0 } }
@@ -376,16 +377,16 @@ const Index = () => {
 
       <div className="wave17">
         {/* ═══ Agent sliver bar ═══ */}
-        <div style={{ background: T.ink, color: 'rgba(255,255,255,.85)', padding: '13px 16px', fontSize: 12.5, textAlign: 'center' }}>
+        <div style={{ background: T.blue, color: '#fff', padding: '13px 16px', fontSize: 12.5, textAlign: 'center' }}>
           <span>🏆 <strong style={{ color:'#fff' }}>Real estate agents:</strong> reach 7M+ multilingual buyers no other portal can find</span>
-          <span style={{ opacity:.4, margin:'0 10px' }}>·</span>
+          <span style={{ opacity:.6, margin:'0 10px' }}>·</span>
           <span>Auto-translated listings in 20 languages</span>
-          <span style={{ opacity:.4, margin:'0 10px' }}>·</span>
+          <span style={{ opacity:.6, margin:'0 10px' }}>·</span>
           <span>From <strong style={{ color:'#fff' }}>$799/mo</strong></span>
-          <span style={{ opacity:.4, margin:'0 10px' }}>·</span>
+          <span style={{ opacity:.6, margin:'0 10px' }}>·</span>
           <span>60 days free</span>
-          <span style={{ opacity:.4, margin:'0 10px' }}>·</span>
-          <a href="/for-agents" style={{ color: '#93c5fd', textDecoration: 'none', fontWeight: 700 }}>See how it works →</a>
+          <span style={{ opacity:.6, margin:'0 10px' }}>·</span>
+          <a href="/for-agents" className="sliver-link" style={{ color: '#fff', textDecoration: 'none', fontWeight: 700 }}>See how it works →</a>
         </div>
 
         {/* ═══ SECTION 2 — Hero ═══ */}
@@ -401,12 +402,12 @@ const Index = () => {
               <h1 style={{ fontSize:'clamp(52px, 6.5vw, 96px)', fontWeight:800, letterSpacing:'-3px', lineHeight:0.95, margin:'0 0 4px', color:T.ink }}>
                 Find your home.
               </h1>
-              <h2 className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:'clamp(52px, 6.5vw, 96px)', fontWeight:700, letterSpacing:'-3px', lineHeight:0.95, margin:'0 0 20px', color:T.blue, fontStyle:'italic' }}>
+              <h2 className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:'clamp(52px, 6.5vw, 96px)', fontWeight:700, letterSpacing:'-3px', lineHeight:0.95, margin:'0 0 12px', color:T.blue, fontStyle:'italic' }}>
                 {seq.line2}
               </h2>
 
-              <div className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:13, fontWeight:500, color:T.muted, marginBottom:24 }}>
-                {seq.flag} {seq.sub} · click any language below to switch
+              <div className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:14, fontWeight:500, color:T.mid, marginBottom:16, display:'flex', alignItems:'center', gap:6 }}>
+                <span style={{ fontSize:20, lineHeight:1 }}>{seq.flag}</span> {seq.sub} · click any language below to switch
               </div>
 
               {/* Search block */}
@@ -479,6 +480,10 @@ const Index = () => {
               <div style={{ marginTop:18, display:'inline-flex', alignItems:'center', gap:8, background:'rgba(22,163,74,.1)', border:'1px solid rgba(22,163,74,.25)', borderRadius:100, padding:'6px 14px', fontSize:12, fontWeight:700, color:'#16a34a' }}>
                 <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:'#16a34a' }} />
                 <strong>{liveCount}</strong> buyers searching right now
+              </div>
+
+              <div style={{ marginTop:16, maxWidth:560, fontSize:13, color:T.muted, textAlign:'center' }}>
+                🔒 Free for buyers · Always · No account needed to search
               </div>
             </div>
 

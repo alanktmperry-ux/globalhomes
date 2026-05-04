@@ -356,10 +356,12 @@ const Index = () => {
         .marquee-track { animation: marquee 30s linear infinite; }
         .marquee-track:hover { animation-play-state: paused; }
         .hcard-img-wrap { position: relative; height: 290px; overflow: hidden; }
-        .hcard-layer { position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.9s ease; opacity: 0; }
-        .hcard-layer.active { opacity: 1; }
-        .hcard-title, .hcard-price { transition: opacity 0.2s ease; }
-        .hcard-text-hidden { opacity: 0; }
+        .hcard-layer { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.5s ease-in-out; transform-origin: center center; will-change: transform, opacity; }
+        .hcard-layer.active { opacity: 1; animation: hcard-kenburns 5s ease-in-out forwards; }
+        @keyframes hcard-kenburns { from { transform: scale(1.0); } to { transform: scale(1.06); } }
+        .hcard-title { min-height: 2.8em; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: opacity 0.4s ease; }
+        .hcard-price { min-height: 1.4em; transition: opacity 0.4s ease; }
+        .hcard-text-hidden { opacity: 0 !important; transition: opacity 0.15s ease !important; }
         .chip { background: ${T.off}; border: 1px solid ${T.border}; border-radius: 100px; padding: 7px 14px; font-size: 12.5px; font-weight: 600; color: ${T.mid}; cursor: pointer; transition: all .15s ease; }
         .chip:hover { background: ${T.blueL}; border-color: ${T.blueMid}; color: ${T.blue}; }
         @keyframes typeBlink { 50% { opacity: 0 } }

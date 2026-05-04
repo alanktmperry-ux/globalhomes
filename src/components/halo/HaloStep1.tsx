@@ -157,7 +157,7 @@ export function HaloStep1({ data, update }: Props) {
       <div>
         <Label className="text-base font-semibold mb-3 block">Bathrooms (min)</Label>
         <ChipGroup
-          options={[1, 2, '3+', null]}
+          options={[null, 1, 2, '3+']}
           value={data.bathrooms_min}
           onChange={(v) => update({ bathrooms_min: v })}
         />

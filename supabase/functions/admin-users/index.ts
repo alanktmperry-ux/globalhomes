@@ -452,6 +452,17 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (action === "confirm_email") {
+      const { userId } = bodyParams;
+      const { error } = await supabase.auth.admin.updateUserById(userId, {
+        email_confirm: true,
+      });
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (action === "table_stats") {
       const tables = ['profiles', 'properties', 'agents', 'leads', 'voice_searches', 'saved_properties', 'user_roles', 'lead_events'];
       const stats: Record<string, number> = {};

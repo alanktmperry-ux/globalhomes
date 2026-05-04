@@ -244,10 +244,7 @@ const Index = () => {
     langCodeRef.current = SEQUENCE[seqIdx].code;
   }, [seqIdx]);
 
-  // Detect support once (no recognition object created here — Safari requires it inside the click handler)
   useEffect(() => {
-    const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    voiceSupportedRef.current = !!SR;
     return () => {
       if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
       try { recognitionRef.current?.abort(); } catch { /* noop */ }
@@ -256,7 +253,8 @@ const Index = () => {
   }, []);
 
   const startVoice = useCallback(() => {
-    const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
     if (!SR) {
       voiceSupportedRef.current = false;
       setVoiceUnsupportedTip(true);
@@ -264,21 +262,19 @@ const Index = () => {
       tipTimerRef.current = window.setTimeout(() => setVoiceUnsupportedTip(false), 4000);
       return;
     }
+
     voiceSupportedRef.current = true;
 
-    // If already listening, stop
     if (voiceState === 'listening' && recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch { /* noop */ }
+      try { recognitionRef.current.stop(); } catch {}
       setVoiceState('idle');
       return;
     }
 
-    // Create fresh every click — required for Safari user gesture compliance
     const rec = new SR();
     rec.lang = langCodeRef.current;
     rec.continuous = false;
     rec.interimResults = false;
-    rec.maxAlternatives = 1;
     recognitionRef.current = rec;
 
     rec.onresult = (ev: any) => {
@@ -319,10 +315,9 @@ const Index = () => {
       }
     };
 
-    // IMPORTANT: rec.start() must be the last line — synchronous, no await before it
     rec.start();
     setVoiceState('listening');
-  }, [voiceState, openSearch]);
+  }, [voiceState]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

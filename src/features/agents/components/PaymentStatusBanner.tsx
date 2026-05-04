@@ -42,10 +42,11 @@ export function PaymentStatusBanner({ onVisibleChange }: { onVisibleChange?: (vi
       }
     : null;
 
-  if (!agent || !state) return null;
+  if (!agent || !state) { reportVisible(false); return null; }
 
   // Check admin grace period
   if (state.adminGraceUntil && new Date(state.adminGraceUntil) > new Date()) {
+    reportVisible(false);
     return null;
   }
 

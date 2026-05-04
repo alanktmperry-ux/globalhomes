@@ -495,6 +495,58 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (action === "convert_to_agent") {
+      const { userId, email, name } = bodyParams;
+
+      // 1. Grant agent role in app_metadata
+      const { error: metaErr } = await supabase.auth.admin.updateUserById(userId, {
+        app_metadata: { role: 'agent' },
+      });
+      if (metaErr) throw metaErr;
+
+      // 2. Insert into agents table if not already there (else mark approved)
+      const { data: existing } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (!existing) {
+        const { error: insErr } = await supabase.from('agents').insert({
+          user_id: userId,
+          email: email,
+          name: name || email,
+          approval_status: 'approved',
+        });
+        if (insErr) throw insErr;
+      } else {
+        await supabase
+          .from('agents')
+          .update({ approval_status: 'approved' })
+          .eq('user_id', userId);
+      }
+
+      // 3. Upsert user_roles
+      await supabase.from('user_roles').upsert({
+        user_id: userId,
+        role: 'agent',
+      }, { onConflict: 'user_id,role' });
+
+      try {
+        await supabase.from("audit_log").insert({
+          user_id: userData.user.id,
+          action_type: 'convert_to_agent',
+          entity_type: 'user',
+          entity_id: userId,
+          description: `Converted ${email} to agent`,
+        });
+      } catch (_) { /* non-fatal */ }
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (action === "table_stats") {
       const tables = ['profiles', 'properties', 'agents', 'leads', 'voice_searches', 'saved_properties', 'user_roles', 'lead_events'];
       const stats: Record<string, number> = {};

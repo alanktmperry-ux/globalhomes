@@ -1070,25 +1070,25 @@ function AgentBand() {
 
         {/* Translation demo */}
         <div className="reveal" style={{ background:'rgba(255,255,255,.04)', border:'1px solid rgba(255,255,255,.12)', borderRadius:20, padding:36, marginTop:24 }}>
-          <h3 style={{ fontSize:16, fontWeight:800, color:'#fff', margin:'0 0 6px' }}>See your listing translated — live</h3>
-          <p style={{ fontSize:13, color:'rgba(255,255,255,.5)', margin:'0 0 20px' }}>Type any property description and watch it appear in 5 languages instantly.</p>
+          <h3 style={{ fontSize:16, fontWeight:800, color:'#fff', margin:'0 0 6px' }}>{t('home.agentBand.demoTitle')}</h3>
+          <p style={{ fontSize:13, color:'rgba(255,255,255,.5)', margin:'0 0 20px' }}>{t('home.agentBand.demoSub')}</p>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr auto', gap:12 }} className="trans-grid">
             <input
               type="text"
               value={demoText}
               onChange={(e) => setDemoText(e.target.value)}
-              placeholder="e.g. Spacious 4-bed family home near top schools…"
+              placeholder={t('home.agentBand.demoPlaceholder')}
               style={{ background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.15)', borderRadius:10, padding:'12px 14px', color:'#fff', fontSize:13, outline:'none' }}
             />
             <select value={demoLang} onChange={(e) => setDemoLang(e.target.value as any)}
               style={{ background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.15)', borderRadius:10, padding:'12px 14px', color:'#fff', fontSize:13, outline:'none' }}>
-              <option value="all">All 5 languages</option>
-              <option value="zh">Chinese</option>
-              <option value="vi">Vietnamese</option>
-              <option value="ar">Arabic</option>
-              <option value="hi">Hindi</option>
+              <option value="all">{t('home.agentBand.demoAll')}</option>
+              <option value="zh">{t('home.agentBand.demoChinese')}</option>
+              <option value="vi">{t('home.agentBand.demoVietnamese')}</option>
+              <option value="ar">{t('home.agentBand.demoArabic')}</option>
+              <option value="hi">{t('home.agentBand.demoHindi')}</option>
             </select>
-            <button onClick={runTranslate} style={{ background:T.blue, color:'#fff', border:'none', padding:'12px 22px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>Translate →</button>
+            <button onClick={runTranslate} style={{ background:T.blue, color:'#fff', border:'none', padding:'12px 22px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>{t('home.agentBand.translateBtn')}</button>
           </div>
           {results && (
             <div style={{ display:'flex', flexDirection:'column', gap:10, marginTop:18 }}>

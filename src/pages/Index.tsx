@@ -615,7 +615,7 @@ const Index = () => {
               </div>
 
               <div style={{ marginTop:16, maxWidth:560, fontSize:13, color:T.muted, textAlign:'center' }}>
-                🔒 Free for buyers · Always · No account needed to search
+                {t('home.hero.freeForBuyers')}
               </div>
             </div>
 

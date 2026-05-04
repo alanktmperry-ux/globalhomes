@@ -292,7 +292,12 @@ const Index = () => {
   }, [openSearch]);
 
   const startVoice = useCallback(() => {
-    if (!voiceSupportedRef.current) return;
+    if (!voiceSupportedRef.current) {
+      setVoiceUnsupportedTip(true);
+      if (tipTimerRef.current) window.clearTimeout(tipTimerRef.current);
+      tipTimerRef.current = window.setTimeout(() => setVoiceUnsupportedTip(false), 4000);
+      return;
+    }
     const rec = recognitionRef.current;
     if (!rec) return;
     if (voiceState === 'listening') {
@@ -300,12 +305,12 @@ const Index = () => {
       setVoiceState('idle');
       return;
     }
+    rec.lang = langCodeRef.current;
     try {
-      rec.lang = langCodeRef.current;
       rec.start();
       setVoiceState('listening');
     } catch {
-      setVoiceState('idle');
+      // already running — ignore
     }
   }, [voiceState]);
 

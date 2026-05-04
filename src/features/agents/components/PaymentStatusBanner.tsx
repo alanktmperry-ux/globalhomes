@@ -54,6 +54,7 @@ export function PaymentStatusBanner({ onVisibleChange }: { onVisibleChange?: (vi
 
   // STATE 3 — LOCKED
   if (subscriptionStatus === 'locked') {
+    reportVisible(true);
     return <LockedOverlay />;
   }
 

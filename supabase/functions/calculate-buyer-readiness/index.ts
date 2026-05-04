@@ -36,6 +36,21 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Authorization: caller must be the buyer themselves OR an agent
+    if (buyer_id !== user.id) {
+      const { data: agentRow } = await userClient
+        .from("agents")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (!agentRow) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!

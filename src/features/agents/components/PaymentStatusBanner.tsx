@@ -81,6 +81,7 @@ export function PaymentStatusBanner({ onVisibleChange }: { onVisibleChange?: (vi
   // STATE 2 — CRITICAL (days 8-14)
   if (daysSinceFailure >= 8 && daysSinceFailure <= 14) {
     const daysRemaining = 15 - daysSinceFailure;
+    reportVisible(true);
     return (
       <div className="sticky top-0 z-40 w-full bg-red-600 text-white px-4 py-3 text-sm">
         <div className="max-w-5xl mx-auto flex items-center justify-center gap-2 text-center">

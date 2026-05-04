@@ -381,9 +381,12 @@ const Index = () => {
     // Must be called synchronously in the click handler (Safari requirement)
     try {
       recognition.start();
-    } catch {
+    } catch (err) {
       setVoiceState('idle');
       recognitionRef.current = null;
+      setVoiceError('Could not start voice search. Please try again.');
+      if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
+      errorTimerRef.current = window.setTimeout(() => setVoiceError(null), 3000);
     }
   }, [voiceState, openSearch]);
 

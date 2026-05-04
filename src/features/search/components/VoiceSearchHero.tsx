@@ -151,11 +151,8 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const [confidence, setConfidence] = useState<number | null>(null);
   const [suggestions, setSuggestions] = useState<{ description: string; place_id: string }[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [permissionDenied, setPermissionDenied] = useState(false);
-  const recorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<BlobPart[]>([]);
+  const [isListeningWSA, setIsListeningWSA] = useState(false);
+  const recognitionRef = useRef<any>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const suppressAutocompleteRef = useRef(false);

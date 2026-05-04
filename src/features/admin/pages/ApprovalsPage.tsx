@@ -15,7 +15,7 @@ type TabKey = 'agents' | 'demos' | 'partners';
 
 interface DemoRow {
   id: string;
-  name: string;
+  full_name: string;
   email: string;
   agency_name: string | null;
   phone: string | null;

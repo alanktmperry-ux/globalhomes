@@ -705,17 +705,17 @@ const Index = () => {
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 32 }}>
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 700, color: T.blue, textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 8 }}>
-                    Properties on ListHQ
+                    {t('home.featured.eyebrow')}
                   </div>
                   <h2 style={{ fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: 800, letterSpacing: '-1px', lineHeight: 1.1, margin: 0, color: T.ink }}>
-                    Browse what's listed now
+                    {t('home.featured.heading')}
                   </h2>
                 </div>
                 <button
                   onClick={() => navigate('/buy')}
                   style={{ background: 'transparent', border: `1.5px solid ${T.border}`, borderRadius: 100, padding: '10px 20px', fontSize: 13, fontWeight: 700, color: T.blue, cursor: 'pointer', whiteSpace: 'nowrap' }}
                 >
-                  View all →
+                  {t('home.featured.viewAll')}
                 </button>
               </div>
 

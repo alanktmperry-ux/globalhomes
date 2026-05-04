@@ -28,18 +28,27 @@ Deno.serve(async (req) => {
       }
     }
 
-    // ── Optional auth context ──
+    // ── Required auth ──
     const authHeader = req.headers.get("Authorization");
-    let userId: string | null = null;
-    if (authHeader?.startsWith("Bearer ")) {
-      const anonClient = createClient(
-        Deno.env.get("SUPABASE_URL")!,
-        Deno.env.get("SUPABASE_ANON_KEY")!,
-        { global: { headers: { Authorization: authHeader } } }
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
-      const { data: { user } } = await anonClient.auth.getUser();
-      userId = user?.id ?? null;
     }
+    const anonClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data: { user }, error: authErr } = await anonClient.auth.getUser();
+    if (authErr || !user) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    const userId: string = user.id;
 
     let transcript = rawTranscript || "";
     let detected_language = detectedLanguage || "en";
@@ -195,11 +204,11 @@ Return valid JSON only, no markdown, no code fences.`,
 
     // Fire concierge in the background
     if (searchRecord?.id) {
-      const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+      const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
       fetch(`${supabaseUrl}/functions/v1/orchestrate-buyer-concierge`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${supabaseAnonKey}`,
+          "x-internal-secret": serviceRoleKey,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

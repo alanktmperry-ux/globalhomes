@@ -362,7 +362,7 @@ const Index = () => {
         .hcard-title { min-height: 2.8em; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: opacity 0.4s ease; }
         .hcard-price { min-height: 1.4em; transition: opacity 0.4s ease; }
         .hcard-text-hidden { opacity: 0 !important; transition: opacity 0.15s ease !important; }
-        .chip { background: ${T.off}; border: 1px solid ${T.border}; border-radius: 100px; padding: 7px 14px; font-size: 12.5px; font-weight: 600; color: ${T.mid}; cursor: pointer; transition: all .15s ease; }
+        .chip { background: ${T.off}; border: 1px solid ${T.border}; border-radius: 100px; padding: 6px 11px; font-size: 12px; font-weight: 600; color: ${T.mid}; cursor: pointer; transition: all .15s ease; }
         .chip:hover { background: ${T.blueL}; border-color: ${T.blueMid}; color: ${T.blue}; }
         @keyframes typeBlink { 50% { opacity: 0 } }
         .type-cursor::after { content:'▋'; color:${T.blue}; margin-left:2px; animation: typeBlink 1s steps(1) infinite; }

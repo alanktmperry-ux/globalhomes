@@ -1356,7 +1356,24 @@ function FAQSection() {
           {t('home.faq.heading')}
         </h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {faqs.map((f, i) => (
+          {faqs.map((f, i) => {
+            const isOpen = open === i;
+            return (
+              <div key={i} style={{ background: '#fff', borderRadius: 12, border: '1px solid #E5E7EB', overflow: 'hidden' }}>
+                <button
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  aria-expanded={isOpen}
+                  style={{ width: '100%', minHeight: 52, textAlign: 'left', padding: '16px 20px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 15, fontWeight: 700, color: '#0a0f1e', fontFamily: 'inherit', gap: 16 }}
+                >
+                  <span style={{ flex: 1 }}>{f.q}</span>
+                  <span style={{ fontSize: 20, color: '#2563EB', transform: isOpen ? 'rotate(45deg)' : 'none', transition: 'transform .2s', flexShrink: 0, lineHeight: 1 }}>+</span>
+                </button>
+                {isOpen && (
+                  <div style={{ padding: '0 20px 18px', fontSize: 15, color: '#6B7280', lineHeight: 1.65 }}>{f.a}</div>
+                )}
+              </div>
+            );
+          })}
             <div key={i} style={{ background: '#fff', borderRadius: 12, border: '1px solid #E5E7EB', overflow: 'hidden' }}>
               <button
                 onClick={() => setOpen(open === i ? null : i)}

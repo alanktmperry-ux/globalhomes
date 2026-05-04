@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { RentalFilters } from '../hooks/useRentalSearch';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { autocomplete } from '@/shared/lib/googleMapsService';
 
 const AU_STATES = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT'];
 const RENT_MAX_OPTIONS = [300, 400, 500, 600, 700, 800, 1000, 1200, 1500, 2000];
@@ -14,6 +15,9 @@ interface Props {
 export function RentalSearchFilters({ value: filters, onChange }: Props) {
   const [showMore, setShowMore] = useState(false);
   const [suburbInput, setSuburbInput] = useState(filters.suburb ?? '');
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const set = (key: keyof RentalFilters, val: any) =>
     onChange({ ...filters, [key]: val });
@@ -26,12 +30,44 @@ export function RentalSearchFilters({ value: filters, onChange }: Props) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             value={suburbInput}
-            onChange={e => setSuburbInput(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter') set('suburb', suburbInput); }}
-            onBlur={() => set('suburb', suburbInput)}
+            onChange={e => {
+              const val = e.target.value;
+              setSuburbInput(val);
+              if (debounceRef.current) clearTimeout(debounceRef.current);
+              if (!val.trim()) { setSuggestions([]); return; }
+              debounceRef.current = setTimeout(async () => {
+                const results = await autocomplete(val, '(regions)');
+                setSuggestions(results.map(r => r.description.split(',')[0]));
+                setShowSuggestions(true);
+              }, 300);
+            }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') { set('suburb', suburbInput); setShowSuggestions(false); }
+              if (e.key === 'Escape') setShowSuggestions(false);
+            }}
+            onBlur={() => { setTimeout(() => setShowSuggestions(false), 150); set('suburb', suburbInput); }}
+            onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
             placeholder="Suburb, postcode or area"
             className="pl-9 w-full border border-border rounded-xl px-3 py-2.5 text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           />
+          {showSuggestions && suggestions.length > 0 && (
+            <ul className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-xl shadow-lg overflow-hidden">
+              {suggestions.map((s, i) => (
+                <li
+                  key={i}
+                  onMouseDown={() => {
+                    setSuburbInput(s);
+                    set('suburb', s);
+                    setShowSuggestions(false);
+                    setSuggestions([]);
+                  }}
+                  className="px-4 py-2.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                >
+                  {s}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <select
@@ -148,7 +184,7 @@ export function RentalSearchFilters({ value: filters, onChange }: Props) {
           ))}
 
           <button
-            onClick={() => { onChange({}); setSuburbInput(''); }}
+            onClick={() => { onChange({}); setSuburbInput(''); setSuggestions([]); }}
             aria-label="Clear all filters"
             className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive ml-auto"
           >

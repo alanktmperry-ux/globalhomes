@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useOffmarketSubscriptions } from '../hooks/useOffmarketSubscriptions';
-import { Bell, Trash2 } from 'lucide-react';
+import { Bell, Trash2, Search } from 'lucide-react';
+import { autocomplete } from '@/shared/lib/googleMapsService';
 
 const AU_STATES = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT'];
 
@@ -12,6 +13,9 @@ export function OffMarketSubscribePanel() {
   const [maxPrice, setMax] = useState('');
   const [minBeds, setMinBeds] = useState('');
   const [saving, setSaving] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,13 +48,48 @@ export function OffMarketSubscribePanel() {
 
       <form onSubmit={handleAdd} className="space-y-3">
         <div className="flex gap-2">
-          <input
-            value={suburb}
-            onChange={e => setSuburb(e.target.value)}
-            placeholder="Suburb name"
-            className="flex-1 bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-amber-400 focus:outline-none"
-            required
-          />
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+            <input
+              value={suburb}
+              onChange={e => {
+                const val = e.target.value;
+                setSuburb(val);
+                if (debounceRef.current) clearTimeout(debounceRef.current);
+                if (!val.trim()) { setSuggestions([]); return; }
+                debounceRef.current = setTimeout(async () => {
+                  const results = await autocomplete(val, '(regions)');
+                  setSuggestions(results.map(r => r.description.split(',')[0]));
+                  setShowSuggestions(true);
+                }, 300);
+              }}
+              onKeyDown={e => {
+                if (e.key === 'Escape') setShowSuggestions(false);
+              }}
+              onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+              onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
+              placeholder="Suburb name"
+              className="w-full pl-9 bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-amber-400 focus:outline-none"
+              required
+            />
+            {showSuggestions && suggestions.length > 0 && (
+              <ul className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-xl shadow-lg overflow-hidden">
+                {suggestions.map((s, i) => (
+                  <li
+                    key={i}
+                    onMouseDown={() => {
+                      setSuburb(s);
+                      setShowSuggestions(false);
+                      setSuggestions([]);
+                    }}
+                    className="px-4 py-2.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                  >
+                    {s}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
           <select
             value={state}
             onChange={e => setState(e.target.value)}

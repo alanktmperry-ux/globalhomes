@@ -409,7 +409,7 @@ const Index = () => {
         <title>ListHQ — Find your home in any language. Multilingual property search Australia</title>
         <meta name="description" content="Australia's only multilingual property platform. Search 50,000+ listings auto-translated into 20 languages. Free for buyers, always." />
         <link rel="canonical" href="https://globalhomes.lovable.app/" />
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,500;1,700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,700;1,800&display=swap" rel="stylesheet" />
       </Helmet>
 
       <style>{`
@@ -494,7 +494,7 @@ const Index = () => {
 
               <h1 className="hero-headline" style={{ margin:'0 0 12px' }}>
                 <span className="line1">{seq.line1}</span>
-                <span className={`line2 ${blur ? 'blur-out' : 'blur-in'}`}>{seq.line2}</span>
+                <span className={`line2 ${blur ? 'blur-out' : 'blur-in'}`} style={{ fontFamily: "'DM Serif Display', serif" }}>{seq.line2}</span>
               </h1>
 
               <div className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:14, fontWeight:500, color:T.mid, marginBottom:16, display:'flex', alignItems:'center', gap:6 }}>
@@ -945,7 +945,7 @@ function AgentBand() {
           <div>
             <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>For real estate agents</div>
             <h2 style={{ fontSize:'clamp(44px, 5vw, 72px)', fontWeight:800, color:'#fff', letterSpacing:'-2.5px', lineHeight:1, margin:'0 0 22px' }}>
-              <span style={{ color:T.blue }}>1 in 5</span> Australian buyers searches in another language.
+              <span style={{ color:T.blue, fontFamily: "'DM Serif Display', serif" }}>1 in 5</span> Australian buyers searches in another language.
             </h2>
             <p style={{ fontSize:16, color:'rgba(255,255,255,.6)', lineHeight:1.6, margin:'0 0 22px', maxWidth:620 }}>
               Are they finding your listings? ListHQ auto-translates every property you upload into 20 languages — reaching buyers no other portal can. From <strong style={{ color:'#fff' }}>$799/mo</strong>. 60 days free.
@@ -1173,7 +1173,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
       <div style={{ maxWidth: 1200, margin: '0 auto', textAlign: 'center' }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: T.blue, textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 14 }}>Pricing — no contracts, cancel anytime</div>
         <h2 style={{ fontSize: 'clamp(32px, 3.5vw, 48px)', fontWeight: 800, letterSpacing: '-1.5px', lineHeight: 1.1, margin: '0 0 14px' }}>
-          Built for the way <em style={{ color: T.blue, fontStyle: 'italic' }}>you work.</em>
+          Built for the way <em style={{ color: T.blue, fontStyle: 'italic', fontFamily: "'DM Serif Display', serif" }}>you work.</em>
         </h2>
         <p style={{ fontSize: 16, color: T.muted, margin: '0 auto 28px', maxWidth: 680 }}>
           All plans include 20 languages · trust accounting · AI matching

@@ -26,8 +26,9 @@ const AgentAuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [pendingSignIn, setPendingSignIn] = useState(false);
-  const [dataLocationConsent, setDataLocationConsent] = useState(false);
-  const [policyConsent, setPolicyConsent] = useState(false);
+  const [combinedConsent, setCombinedConsent] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [emailTouched, setEmailTouched] = useState(false);
   const [showOAuthConsentModal, setShowOAuthConsentModal] = useState(false);
   const [pendingOAuthProvider, setPendingOAuthProvider] = useState<'google' | 'apple' | null>(null);
 
@@ -104,18 +105,22 @@ const AgentAuthPage = () => {
   };
 
   const handleEmailSubmit = async () => {
-    if (!regEmail.trim()) return;
-    if (!dataLocationConsent) {
-      toast.error('Please acknowledge where your data is stored to continue.');
+    const cleaned = regEmail.trim().toLowerCase();
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!cleaned) {
+      setEmailError('Email address is required');
       return;
     }
-    if (!policyConsent) {
+    if (!emailRe.test(cleaned)) {
+      setEmailError('Enter a valid email (e.g. name@agency.com.au)');
+      return;
+    }
+    if (!combinedConsent) {
       toast.error('Please agree to the Privacy Policy and Terms of Service to continue.');
       return;
     }
     setEmailSubmitting(true);
     try {
-      const cleaned = regEmail.trim().toLowerCase();
       const { error } = await supabase.auth.signInWithOtp({
         email: cleaned,
         options: {
@@ -175,7 +180,7 @@ const AgentAuthPage = () => {
   };
 
   const handleOAuth = async (provider: 'google' | 'apple') => {
-    if (step === 'register' && (!dataLocationConsent || !policyConsent)) {
+    if (step === 'register' && !combinedConsent) {
       setPendingOAuthProvider(provider);
       setShowOAuthConsentModal(true);
       return;
@@ -270,6 +275,22 @@ const AgentAuthPage = () => {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
 
           {/* Form badge */}
+          {/* Back to home (sign-in flows only) */}
+          {(step === 'email' || step === 'password') && (
+            <Link to="/" className="inline-block text-sm text-gray-500 hover:text-gray-800 mb-4">
+              ← Back to ListHQ
+            </Link>
+          )}
+
+          {/* Mobile-only feature pills (replaces left dark panel on small screens) */}
+          {step === 'register' && (
+            <div className="flex flex-wrap gap-2 mb-5 lg:hidden">
+              {['20-language listings', 'AI buyer matching', 'Trust accounting'].map((p) => (
+                <span key={p} className="bg-gray-100 text-gray-700 text-xs rounded-full px-3 py-1">{p}</span>
+              ))}
+            </div>
+          )}
+
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-stone-200 bg-stone-50 mb-5">
             <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
             <span className="text-[10px] font-medium tracking-widest uppercase text-stone-400">
@@ -285,8 +306,9 @@ const AgentAuthPage = () => {
           <p className="text-sm text-stone-400 mb-6 -mt-4">
             {step === 'email' && 'Access your dashboard, listings, and leads.'}
             {step === 'password' && email}
-            {step === 'register' && 'Start your free 60-day trial. No credit card required.'}
+            {step === 'register' && 'Start your free 60-day trial. No contracts, cancel anytime.'}
           </p>
+
 
           {/* ── Step: Email (sign in) ── */}
           {step === 'email' && (
@@ -365,27 +387,6 @@ const AgentAuthPage = () => {
                 <p className="text-xs font-medium text-emerald-700">Free for 60 days — no credit card required. Cancel anytime.</p>
               </div>
 
-              {/* Have these ready checklist */}
-              <div className="bg-stone-50 border border-stone-200 rounded-xl p-4 mb-5">
-                <div className="flex items-center gap-2 text-sm font-semibold text-stone-900 mb-3">
-                  <ListChecks size={16} className="text-primary" />
-                  Have these ready before you begin
-                </div>
-                <div className="space-y-2">
-                  {[
-                    { icon: <FileText size={14} />, text: 'ABN — 11-digit Australian Business Number' },
-                    { icon: <ShieldCheck size={14} />, text: 'Real estate licence number — from your state regulator, not your CPD number' },
-                    { icon: <Building2 size={14} />, text: 'Agency name — your trading name as registered' },
-                    { icon: <Landmark size={14} />, text: 'Trust account BSB & account number — only needed if migrating from another system' },
-                  ].map((item) => (
-                    <div key={item.text} className="flex items-start gap-2 text-xs text-stone-500">
-                      <span className="text-primary mt-0.5 shrink-0">{item.icon}</span>
-                      {item.text}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
               <form onSubmit={(e) => { e.preventDefault(); handleEmailSubmit(); }} className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">
@@ -393,52 +394,72 @@ const AgentAuthPage = () => {
                   </label>
                   <input
                     type="email"
-                    required
                     autoFocus
                     value={regEmail}
-                    onChange={(e) => setRegEmail(e.target.value)}
+                    onChange={(e) => {
+                      setRegEmail(e.target.value);
+                      if (emailError) setEmailError(null);
+                    }}
+                    onBlur={() => {
+                      setEmailTouched(true);
+                      const v = regEmail.trim();
+                      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                      if (!v) setEmailError('Email address is required');
+                      else if (!re.test(v)) setEmailError('Enter a valid email (e.g. name@agency.com.au)');
+                      else setEmailError(null);
+                    }}
                     placeholder="jane@agency.com.au"
-                    className={inputClass}
+                    className={`${inputClass} ${emailError ? 'border-red-500 focus:border-red-500 focus:ring-red-100' : ''}`}
+                    aria-invalid={!!emailError}
                   />
-                  <p className="text-xs text-muted-foreground mt-1.5">
-                    We'll send a confirmation link to this address before you continue.
-                  </p>
+                  {emailError ? (
+                    <p className="text-red-500 text-sm mt-1">{emailError}</p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground mt-1.5">
+                      We'll send a confirmation link to this address before you continue.
+                    </p>
+                  )}
                 </div>
                 <label className="flex items-start gap-2.5 cursor-pointer select-none">
                   <input
                     type="checkbox"
-                    checked={dataLocationConsent}
-                    onChange={(e) => setDataLocationConsent(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-stone-300 text-primary focus:ring-primary cursor-pointer shrink-0"
-                    aria-describedby="agent-data-location-help"
-                  />
-                  <span id="agent-data-location-help" className="text-xs text-muted-foreground leading-relaxed">
-                    I understand my data is stored on secure servers in Singapore. ListHQ complies with the Australian Privacy Act 1988.
-                  </span>
-                </label>
-                <label className="flex items-start gap-2.5 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={policyConsent}
-                    onChange={(e) => setPolicyConsent(e.target.checked)}
+                    checked={combinedConsent}
+                    onChange={(e) => setCombinedConsent(e.target.checked)}
                     className="mt-0.5 h-4 w-4 rounded border-stone-300 text-primary focus:ring-primary cursor-pointer shrink-0"
                   />
                   <span className="text-xs text-muted-foreground leading-relaxed">
                     I agree to the{' '}
                     <Link to="/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Privacy Policy</Link>
                     {' '}and{' '}
-                    <Link to="/terms" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Terms of Service</Link>.
+                    <Link to="/terms" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Terms of Service</Link>
+                    , and understand that my data is stored on secure servers compliant with the Australian Privacy Act 1988.
                   </span>
                 </label>
-                <button type="submit" disabled={emailSubmitting || !dataLocationConsent || !policyConsent} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
+
+                {/* Have these ready checklist — moved below email + consent */}
+                <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-stone-900 mb-3">
+                    <ListChecks size={16} className="text-primary" />
+                    Have these ready before you begin
+                  </div>
+                  <div className="space-y-2">
+                    {[
+                      { icon: <FileText size={14} />, text: 'ABN — 11-digit Australian Business Number' },
+                      { icon: <ShieldCheck size={14} />, text: 'Real estate licence number — from your state regulator, not your CPD number' },
+                      { icon: <Building2 size={14} />, text: 'Agency name — your trading name as registered' },
+                      { icon: <Landmark size={14} />, text: 'Trust account BSB & account number — only needed if migrating from another system' },
+                    ].map((item) => (
+                      <div key={item.text} className="flex items-start gap-2 text-xs text-stone-500">
+                        <span className="text-primary mt-0.5 shrink-0">{item.icon}</span>
+                        {item.text}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <button type="submit" disabled={emailSubmitting || !combinedConsent} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {emailSubmitting ? 'Sending confirmation...' : 'Continue — confirm my email'}
                 </button>
-                <p className="text-xs text-muted-foreground mt-3 text-center leading-relaxed">
-                  By registering, you agree to our{' '}
-                  <Link to="/terms" className="underline underline-offset-2 hover:text-foreground">Terms of Service</Link>
-                  {' '}and{' '}
-                  <Link to="/privacy" className="underline underline-offset-2 hover:text-foreground">Privacy Policy</Link>.
-                </p>
               </form>
 
               <p className="text-sm text-muted-foreground mt-4">

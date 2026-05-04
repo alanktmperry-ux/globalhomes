@@ -160,6 +160,9 @@ export const OTPVerificationScreen = ({ email, onVerified, onBack }: Props) => {
           We sent a 6-digit code to{' '}
           <span className="text-stone-800 font-medium">{email}</span>
         </p>
+        <p className="text-gray-500 text-sm mt-1">
+          Can't find it? Check your spam or junk folder.
+        </p>
 
         <motion.div
           animate={shake ? { x: [0, -8, 8, -6, 6, -3, 3, 0] } : { x: 0 }}

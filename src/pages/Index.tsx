@@ -1350,3 +1350,5 @@ function ClosingCTA({ navigate, T }: { navigate: NavFn; T: Theme }) {
     </section>
   );
 }
+
+export default Index;

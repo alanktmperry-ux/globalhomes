@@ -831,8 +831,8 @@ const DashboardOverview = () => {
           </motion.div>
         )}
 
-        {/* Large cards — driven by layout */}
-        {(() => {
+        {/* Large cards — driven by layout. Hidden for new users. */}
+        {(!onboardingDismissed && listings.length === 0) ? null : (() => {
           const largeCards: Record<string, React.ReactNode> = {
             todays_inspections: (
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}

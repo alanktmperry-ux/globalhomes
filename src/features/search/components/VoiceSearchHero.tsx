@@ -661,24 +661,16 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
                 {/* Mic button (right side) */}
                 <button
-                  onClick={() => startRecording()}
-                  disabled={isProcessing}
+                  onClick={handleMicClick}
                   aria-label="Voice search"
                   className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                    isRecording
+                    isListeningWSA
                       ? 'bg-destructive/10 text-destructive animate-pulse ring-2 ring-destructive/30'
-                      : isProcessing
-                      ? 'bg-secondary text-muted-foreground cursor-wait'
                       : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent'
                   }`}
-                  title={isRecording ? 'Stop recording' : isProcessing ? 'Transcribing...' : 'Voice search'}
+                  title={isListeningWSA ? 'Stop listening' : 'Voice search'}
                 >
-                  {isProcessing || isSearching
-                    ? <Loader2 size={18} className="animate-spin" />
-                    : isRecording
-                    ? <MicOff size={18} />
-                    : <Mic size={18} />
-                  }
+                  {isListeningWSA ? <MicOff size={18} /> : <Mic size={18} />}
                 </button>
 
                 {/* Search CTA button */}

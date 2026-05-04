@@ -983,8 +983,33 @@ function AgentBand() {
             </div>
           ))}
           <div className="reveal reveal-d3" style={{ background:'rgba(255,255,255,.06)', border:'1px solid rgba(255,255,255,.12)', borderRadius:20, padding:20 }}>
-            <div style={{ position:'relative', height:180, borderRadius:12, backgroundImage:'url(https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=400&fit=crop)', backgroundSize:'cover', backgroundPosition:'center', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14 }}>
-              <button onClick={() => setVideoOpen(true)} aria-label="Play demo video" style={{ width:54, height:54, borderRadius:'50%', background:'#fff', border:'none', cursor:'pointer', boxShadow:'0 8px 24px rgba(0,0,0,.3)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <div style={{ position:'relative', height:180, borderRadius:12, background:'#0f1623', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14 }}>
+              {/* Browser chrome */}
+              <div style={{ position:'absolute', top:0, left:0, right:0, height:28, background:'#1e2535', display:'flex', alignItems:'center', padding:'0 10px', gap:5 }}>
+                <span style={{ width:8, height:8, borderRadius:'50%', background:'#ff5f56', display:'inline-block' }} />
+                <span style={{ width:8, height:8, borderRadius:'50%', background:'#ffbd2e', display:'inline-block' }} />
+                <span style={{ width:8, height:8, borderRadius:'50%', background:'#27c93f', display:'inline-block' }} />
+                <div style={{ flex:1, height:14, background:'rgba(255,255,255,.08)', borderRadius:100, margin:'0 8px' }} />
+              </div>
+              {/* Dashboard body */}
+              <div style={{ position:'absolute', top:28, left:0, right:0, bottom:0, display:'flex', padding:8, gap:8 }}>
+                <div style={{ width:'38%', display:'flex', flexDirection:'column', gap:5 }}>
+                  {[0,1,2].map(i => (
+                    <div key={i} style={{ background:'rgba(255,255,255,.06)', borderRadius:6, padding:'6px 8px', display:'flex', gap:6, alignItems:'center' }}>
+                      <div style={{ width:32, height:24, background:'rgba(37,99,235,.3)', borderRadius:4, flexShrink:0 }} />
+                      <div style={{ flex:1 }}>
+                        <div style={{ height:5, background:'rgba(255,255,255,.2)', borderRadius:100, marginBottom:4 }} />
+                        <div style={{ height:4, width:'60%', background:'rgba(255,255,255,.1)', borderRadius:100 }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ flex:1, background:'linear-gradient(135deg, #1a2540, #0f3460)', borderRadius:6, position:'relative', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <span style={{ fontSize:18 }}>📍</span>
+                  <div style={{ position:'absolute', bottom:6, right:6, background:T.blue, color:'#fff', fontSize:8, fontWeight:700, padding:'2px 6px', borderRadius:100 }}>20 langs</div>
+                </div>
+              </div>
+              <button onClick={() => setVideoOpen(true)} aria-label="Play demo video" style={{ position:'relative', zIndex:1, width:54, height:54, borderRadius:'50%', background:'#fff', border:'none', cursor:'pointer', boxShadow:'0 8px 24px rgba(0,0,0,.3)', display:'flex', alignItems:'center', justifyContent:'center' }}>
                 <Play size={22} style={{ marginLeft:3 }} fill={T.ink} />
               </button>
             </div>

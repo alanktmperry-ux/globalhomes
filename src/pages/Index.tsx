@@ -681,6 +681,83 @@ const Index = () => {
           </div>
         </div>
 
+        {/* ═══ SECTION 4b — Featured Listings ═══ */}
+        {featuredListings.length > 0 && (
+          <section style={{ background: '#fff', padding: '72px 24px' }}>
+            <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 32 }}>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: T.blue, textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 8 }}>
+                    Properties on ListHQ
+                  </div>
+                  <h2 style={{ fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: 800, letterSpacing: '-1px', lineHeight: 1.1, margin: 0, color: T.ink }}>
+                    Browse what's listed now
+                  </h2>
+                </div>
+                <button
+                  onClick={() => navigate('/buy')}
+                  style={{ background: 'transparent', border: `1.5px solid ${T.border}`, borderRadius: 100, padding: '10px 20px', fontSize: 13, fontWeight: 700, color: T.blue, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                >
+                  View all →
+                </button>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }} className="feat-grid">
+                {featuredListings.map((p) => {
+                  const img = (p.images && p.images[0]) || p.image_url;
+                  const isRent = p.listing_type === 'rent' || p.listing_type === 'rental';
+                  return (
+                    <div
+                      key={p.id}
+                      onClick={() => navigate(`/property/${p.id}`)}
+                      style={{ borderRadius: 16, border: `1px solid ${T.border}`, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow .2s ease' }}
+                      onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,.1)')}
+                      onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}
+                    >
+                      <div style={{ height: 180, background: T.off2, position: 'relative', overflow: 'hidden' }}>
+                        {img ? (
+                          <img src={img} alt={p.title || p.address} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.subtle, fontSize: 32 }}>🏠</div>
+                        )}
+                        {(p.boost_tier || p.is_featured) && (
+                          <span style={{ position: 'absolute', top: 10, left: 10, background: p.boost_tier ? '#f59e0b' : T.blue, color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 100, textTransform: 'uppercase', letterSpacing: '.06em' }}>
+                            {p.boost_tier ? 'Featured' : 'Premier'}
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ padding: '14px 16px' }}>
+                        <div style={{ fontSize: 18, fontWeight: 800, color: T.ink, marginBottom: 4 }}>
+                          {fmtPrice(p.price, p.listing_type)}
+                        </div>
+                        <div style={{ fontSize: 13, color: T.muted, marginBottom: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {p.address || `${p.suburb}${p.state ? `, ${p.state}` : ''}`}
+                        </div>
+                        <div style={{ display: 'flex', gap: 12, fontSize: 12, color: T.subtle }}>
+                          {p.beds > 0 && <span>🛏 {p.beds}</span>}
+                          {p.baths > 0 && <span>🛁 {p.baths}</span>}
+                          {p.parking > 0 && <span>🚗 {p.parking}</span>}
+                          <span style={{ marginLeft: 'auto', textTransform: 'capitalize' }}>{p.property_type || (isRent ? 'rental' : 'sale')}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div style={{ textAlign: 'center', marginTop: 32 }}>
+                <button
+                  onClick={() => navigate('/buy')}
+                  style={{ background: T.blue, color: '#fff', border: 'none', padding: '14px 36px', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
+                >
+                  Browse all properties →
+                </button>
+              </div>
+            </div>
+            <style>{`@media (max-width: 860px) { .feat-grid { grid-template-columns: 1fr !important; } }`}</style>
+          </section>
+        )}
+
         {/* ═══ SECTION 5 — Language Proof ═══ */}
         <section style={{ background:'#fff', padding:'88px 24px' }}>
           <div style={{ maxWidth:1200, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr', gap:64, alignItems:'center' }} className="lang-grid">

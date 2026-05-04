@@ -955,7 +955,7 @@ function AgentBand() {
           ))}
           <div className="reveal reveal-d3" style={{ background:'rgba(255,255,255,.06)', border:'1px solid rgba(255,255,255,.12)', borderRadius:20, padding:20 }}>
             <div style={{ position:'relative', height:180, borderRadius:12, backgroundImage:'url(https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=400&fit=crop)', backgroundSize:'cover', backgroundPosition:'center', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14 }}>
-              <button style={{ width:54, height:54, borderRadius:'50%', background:'#fff', border:'none', cursor:'pointer', boxShadow:'0 8px 24px rgba(0,0,0,.3)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <button onClick={() => setVideoOpen(true)} aria-label="Play demo video" style={{ width:54, height:54, borderRadius:'50%', background:'#fff', border:'none', cursor:'pointer', boxShadow:'0 8px 24px rgba(0,0,0,.3)', display:'flex', alignItems:'center', justifyContent:'center' }}>
                 <Play size={22} style={{ marginLeft:3 }} fill={T.ink} />
               </button>
             </div>

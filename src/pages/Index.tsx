@@ -779,15 +779,15 @@ const Index = () => {
         <section style={{ background: T.blueTint, padding:'88px 24px', borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}` }}>
           <div style={{ maxWidth:1200, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr', gap:64, alignItems:'center' }} className="lang-grid">
             <div>
-              <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>Why ListHQ is different</div>
+              <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>{t('home.langProof.eyebrow')}</div>
               <h2 style={{ fontSize:'clamp(32px, 3.5vw, 48px)', fontWeight:800, letterSpacing:'-1.5px', lineHeight:1.1, margin:'0 0 18px' }}>
-                Where multilingual Australia <em style={{ color:T.blue, fontStyle:'italic' }}>finds home.</em>
+                {t('home.langProof.heading')}
               </h2>
               <p style={{ fontSize:16, color:T.mid, lineHeight:1.7, margin:'0 0 24px' }}>
-                Every listing on ListHQ is automatically translated into 20 languages — Chinese, Vietnamese, Arabic, Hindi and 16 more. No other portal does this.
+                {t('home.langProof.body')}
               </p>
               <button onClick={() => inputRef.current?.focus()} style={{ background:T.blue, color:'#fff', border:'none', padding:'14px 28px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>
-                Find homes in your language →
+                {t('home.langProof.cta')}
               </button>
             </div>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:10 }}>

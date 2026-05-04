@@ -69,11 +69,12 @@ export function PaymentStatusBanner({ onVisibleChange }: { onVisibleChange?: (vi
     const daysLeft = Math.ceil((trialEndsAt.getTime() - Date.now()) / 86400000);
 
     if (daysLeft >= 0 && daysLeft <= 30) {
+      reportVisible(true);
       return <TrialBanner daysLeft={daysLeft} />;
     }
   }
 
-  if (subscriptionStatus !== 'payment_failed' || !paymentFailedAt) return null;
+  if (subscriptionStatus !== 'payment_failed' || !paymentFailedAt) { reportVisible(false); return null; }
 
   const daysSinceFailure = getDaysSince(paymentFailedAt);
 

@@ -44,14 +44,13 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     title: 'Halo Board',
-    url: '/dashboard/halo-board',
+    url: '',
     icon: Sparkles,
     badgeKey: 'haloCredits',
-  },
-  {
-    title: 'Buy Credits',
-    url: '/dashboard/buy-credits',
-    icon: HandCoins,
+    children: [
+      { title: 'Browse Halo Board', url: '/dashboard/halo-board', icon: Sparkles },
+      { title: 'Buy Credits', url: '/dashboard/buy-credits', icon: HandCoins },
+    ],
   },
   {
     title: 'Listings',

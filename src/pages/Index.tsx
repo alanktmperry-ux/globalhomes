@@ -211,6 +211,7 @@ const Index = () => {
 
   // Language cycle (paused when user manually selected a language)
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const id = setInterval(() => {
       if (manualLangRef.current) return;
       setBlur(true);

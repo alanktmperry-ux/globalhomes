@@ -932,6 +932,7 @@ const Index = () => {
 // ─── Agent Band ───────────────────────────────────────────────
 function AgentBand() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [n, setN] = useState(25);
   const [demoText, setDemoText] = useState('');
   const [demoLang, setDemoLang] = useState<'all' | 'zh' | 'vi' | 'ar' | 'hi'>('all');
@@ -969,7 +970,7 @@ function AgentBand() {
           <div>
             <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>For real estate agents</div>
             <h2 style={{ fontSize:'clamp(44px, 5vw, 72px)', fontWeight:800, color:'#fff', letterSpacing:'-2.5px', lineHeight:1, margin:'0 0 22px' }}>
-              <span style={{ color:T.blue, fontFamily: "'DM Serif Display', serif" }}>1 in 5</span> Australian buyers searches in another language.
+              {t('home.agentBannerHeadline')}
             </h2>
             <p style={{ fontSize:16, color:'rgba(255,255,255,.6)', lineHeight:1.6, margin:'0 0 22px', maxWidth:620 }}>
               Are they finding your listings? ListHQ auto-translates every property you upload into 20 languages — reaching buyers no other portal can. From <strong style={{ color:'#fff' }}>$799/mo</strong>. 60 days free.

@@ -287,20 +287,19 @@ const Index = () => {
         setVoiceState('processing');
         try {
           const blob = new Blob(chunks, { type: mimeType });
-          const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
-          const file = new File([blob], `recording.${ext}`, { type: mimeType });
+          const arrayBuffer = await blob.arrayBuffer();
           const whisperLang = langCodeRef.current?.split('-')[0] || 'en';
-          const form = new FormData();
-          form.append('audio', file);
-          form.append('language', whisperLang);
 
           const { data, error } = await supabase.functions.invoke('transcribe-audio', {
-            body: form,
+            body: arrayBuffer,
+            headers: {
+              'X-Language': whisperLang,
+              'Content-Type': mimeType,
+            },
           });
 
-          if (error) throw error;
-          const text = (data?.text ?? data?.transcript ?? '').trim();
-          if (!text) throw new Error('No transcript');
+          if (error || !data?.transcript) throw new Error('No transcript');
+          const text = data.transcript.trim();
 
           setSearchQuery(text);
           try { inputRef.current?.blur(); } catch { /* noop */ }

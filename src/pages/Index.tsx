@@ -864,6 +864,8 @@ const Index = () => {
         {/* ═══ SECTION 9 — Pricing ═══ */}
         <PricingSection navigate={navigate} T={T} />
 
+        <ClosingCTA navigate={navigate} T={T} />
+
         {/* ═══ Search modal ═══ */}
         {modalOpen && (
           <div onClick={closeModal} style={{ position:'fixed', inset:0, backdropFilter:'blur(12px)', background:'rgba(0,0,0,.4)', zIndex:500, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}>

@@ -483,7 +483,7 @@ const Index = () => {
         </div>
 
         {/* ═══ SECTION 2 — Hero ═══ */}
-        <section style={{ background:'#fff', padding:'72px 24px', minHeight:'calc(100vh - 68px - 50px)' }}>
+        <section id="main-content" style={{ background:'#fff', padding:'72px 24px', minHeight:'calc(100vh - 68px - 50px)' }}>
           <div style={{ maxWidth: 1240, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 460px', gap:48, alignItems:'center' }} className="hero-grid">
             {/* Left */}
             <div>

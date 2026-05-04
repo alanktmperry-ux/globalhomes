@@ -1224,7 +1224,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
                 boxShadow: p.popular ? '0 8px 28px rgba(37,99,235,.12)' : 'none',
               }}>
                 {p.popular && (
-                  <div style={{ position: 'absolute', top: -12, right: 20, background: T.blue, color: '#fff', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', padding: '5px 12px', borderRadius: 100 }}>
+                  <div style={{ position: 'absolute', top: -12, right: 20, background: T.amber, color: '#78350F', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', padding: '5px 12px', borderRadius: 100 }}>
                     Most popular
                   </div>
                 )}

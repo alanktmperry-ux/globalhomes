@@ -503,6 +503,7 @@ const Index = () => {
                 >
                   <button
                     type="button"
+                    onClick={startVoice}
                     aria-label={voiceState === 'listening' ? 'Stop listening' : 'Start voice search'}
                     style={{
                       position:'relative', width:40, height:40, borderRadius:'50%', flexShrink:0,

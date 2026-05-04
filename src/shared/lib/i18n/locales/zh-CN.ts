@@ -449,6 +449,100 @@ export const zhCN: Partial<Record<keyof typeof EnBase, string>> = {
   'home.agentBannerSub': 'ListHQ自动将每个房源翻译成20种语言。前3个月免费。无需信用卡。',
   'home.agentBannerCta': '了解运作方式',
 
+  // ── Sliver bar ──
+  'home.sliver.agents': '🏆 房产中介：触达700万+其他门户无法覆盖的多语言买家',
+  'home.sliver.translation': '房源自动翻译成20种语言',
+  'home.sliver.price': '起价 $799/月',
+  'home.sliver.free': '免费60天',
+  'home.sliver.cta': '了解运作方式 →',
+
+  // ── Hero extras ──
+  'home.hero.langSwitch': '点击下方语言切换',
+  'home.hero.findMyHome': '寻找我的家 →',
+  'home.hero.tapToTalk': '点击说话 · 语音搜索',
+  'home.hero.buyersNow': '位买家正在搜索',
+  'home.hero.freeForBuyers': '🔒 买家免费 · 永久 · 无需注册即可搜索',
+  'home.hero.chip.budget': '100万以内',
+  'home.hero.chip.beds': '3间以上卧室',
+  'home.hero.chip.schools': '顶级学区',
+  'home.hero.cardLangBadge': '🌐 20种语言 · 自动翻译',
+  'home.hero.enquiredLastHour': '人在过去一小时询盘',
+
+  // ── Trust strip ──
+  'home.trust.listings': '在售房源',
+  'home.trust.languages': '种语言自动翻译',
+  'home.trust.buyers': '多语言澳大利亚人',
+  'home.trust.free': '买家免费 · 永久',
+
+  // ── Featured listings ──
+  'home.featured.eyebrow': 'ListHQ精选房源',
+  'home.featured.heading': '浏览正在上架的房源',
+  'home.featured.viewAll': '查看全部 →',
+  'home.featured.browseAll': '浏览所有房源 →',
+
+  // ── Language proof section ──
+  'home.langProof.eyebrow': '为什么选择ListHQ',
+  'home.langProof.heading': '多语言澳大利亚在这里找到家。',
+  'home.langProof.body': 'ListHQ上的每一套房源都自动翻译成20种语言——中文、越南语、阿拉伯语、印地语及其他16种语言。没有其他门户能做到这一点。',
+  'home.langProof.cta': '用您的语言找房 →',
+
+  // ── Testimonials ──
+  'home.testimonials.eyebrow': '买家怎么说',
+  'home.testimonials.heading': '真实的人。真实的家。用他们的语言。',
+
+  // ── Agent band ──
+  'home.agentBand.para': '他们找得到您的房源吗？ListHQ将您上传的每套房源自动翻译成20种语言——触达其他门户无法覆盖的买家。起价 $799/月。免费60天。',
+  'home.agentBand.finePrint': '60天免费 · 无需信用卡 · 澳大利亚数据存储',
+  'home.agentBand.watchDemo': '观看90秒演示',
+  'home.agentBand.roiHeading': '如果您在ListHQ有{n}套在售房源……',
+  'home.agentBand.roiLabel1': '每月触达的多语言买家数',
+  'home.agentBand.roiLabel2': '种语言自动翻译,零额外工作',
+  'home.agentBand.roiLabel3': '$799/月订阅的平均投资回报率',
+  'home.agentBand.demoTitle': '实时查看您的房源翻译效果',
+  'home.agentBand.demoSub': '输入任意房产描述,立即查看5种语言版本。',
+  'home.agentBand.demoPlaceholder': '例如:宽敞的4卧室家庭住宅,毗邻顶级学校…',
+  'home.agentBand.demoAll': '全部5种语言',
+  'home.agentBand.demoChinese': '中文',
+  'home.agentBand.demoVietnamese': '越南语',
+  'home.agentBand.demoArabic': '阿拉伯语',
+  'home.agentBand.demoHindi': '印地语',
+  'home.agentBand.translateBtn': '翻译 →',
+
+  // ── Pricing ──
+  'home.pricing.eyebrow': '定价——无合约,随时取消',
+  'home.pricing.heading': '专为您的工作方式打造。',
+  'home.pricing.subtext': '所有方案包含20种语言 · 信托账户 · AI匹配',
+  'home.pricing.calloutTitle': '为什么$799/月对中介来说是明智之选',
+  'home.pricing.calloutBody': 'REA.com.au 和 Domain 每套房源收费 $1,500–$7,000。CRM 每月需 $300–$600。物业管理软件另需 $200–$400/月。ListHQ 三合一——CRM、物业管理平台和多语言房源门户——一个订阅覆盖,触达700万+其他门户无法覆盖的多语言买家。',
+  'home.pricing.monthly': '按月付费',
+  'home.pricing.annual': '按年付费——节省20%',
+  'home.pricing.mostPopular': '最受欢迎',
+  'home.pricing.perMonth': '/月',
+  'home.pricing.billedAnnually': '/年(按年计费)',
+  'home.pricing.savePercent': '或 {price}/年(节省20%)',
+
+  // ── FAQ ──
+  'home.faq.eyebrow': '常见问题',
+  'home.faq.heading': '您需要了解的一切',
+  'home.faq.q1': '是否有锁定合约?',
+  'home.faq.a1': '永远没有合约。按月取消,提前30天通知即可。您的数据始终可以导出。',
+  'home.faq.q2': '我的数据存储在哪里?',
+  'home.faq.a2': '所有数据存储在澳大利亚数据中心,完全符合1988年隐私法规定。ListHQ不会共享或出售您的客户数据。',
+  'home.faq.q3': 'ListHQ是否与我现有的CRM整合?',
+  'home.faq.a3': '是的。ListHQ通过API与REX、VaultRE、PropertyMe和Console连接。房源数据自动同步——无需重复录入。',
+  'home.faq.q4': '我还能保留REA和Domain的订阅吗?',
+  'home.faq.a4': '当然可以。大多数ListHQ中介同时使用REA/Domain。我们触达的是他们错过的买家——而非相同的买家。',
+  'home.faq.q5': '这是否符合澳大利亚房地产法规?',
+  'home.faq.a5': '是的。ListHQ专为澳大利亚中介打造——信托账户符合各州要求,所有中介资料均需验证执照号码。',
+
+  // ── Closing CTA ──
+  'home.closingCta.eyebrow': '立即开始',
+  'home.closingCta.heading': '免费60天。无合约。随时取消。',
+  'home.closingCta.body': '加入已经触达澳大利亚700万+多语言买家的中介行列。',
+  'home.closingCta.primary': '开始60天免费试用 →',
+  'home.closingCta.secondary': '联系销售',
+  'home.closingCta.finePrint': '无需信用卡 · 澳大利亚数据存储 · 随时取消',
+
   'hero.statBuyersLabel': '澳洲买家以本国语言搜索',
   'hero.statAITools': 'AI工具',
   'hero.browseProperties': '浏览房源',

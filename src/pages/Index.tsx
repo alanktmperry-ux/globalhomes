@@ -949,7 +949,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
         'Dedicated account manager',
       ],
       cta: 'Talk to sales →',
-      sub: 'Custom onboarding · SLA available',
+      sub: 'Custom onboarding',
       action: () => navigate('/contact'),
       style: 'ghost' as const,
       popular: false,

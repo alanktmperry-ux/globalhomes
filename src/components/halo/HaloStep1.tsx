@@ -73,6 +73,25 @@ export function HaloStep1({ data, update }: Props) {
   return (
     <div className="space-y-8">
       <div>
+        <Label className="text-base font-semibold mb-2 block">I speak</Label>
+        <Select
+          value={data.preferred_language}
+          onValueChange={(v) => update({ preferred_language: v })}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="english">English</SelectItem>
+            <SelectItem value="mandarin">Mandarin</SelectItem>
+            <SelectItem value="vietnamese">Vietnamese</SelectItem>
+            <SelectItem value="korean">Korean</SelectItem>
+            <SelectItem value="other">Other</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
         <Label className="text-base font-semibold mb-3 block">I want to *</Label>
         <div className="grid grid-cols-2 gap-3">
           {(['buy', 'rent'] as const).map((intent) => (

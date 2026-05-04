@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye, CheckSquare, Square, MinusSquare, UserCog, Settings, X, Check, Landmark, ShieldCheck, CalendarClock, CircleDollarSign, Headphones } from 'lucide-react';
+import { Search, Ban, Trash2, UserCheck, Loader2, Mail, Clock, Shield, Rocket, Eye, CheckSquare, Square, MinusSquare, UserCog, Settings, X, Check, Landmark, ShieldCheck, CalendarClock, CircleDollarSign, Headphones, UserPlus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
@@ -428,6 +428,23 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
     }
     setActionLoading(null);
     fetchUsers();
+  };
+
+  const handleConvertToAgent = async (user: AuthUser) => {
+    if (!confirm(`Convert ${user.email} to an agent account?`)) return;
+    setActionLoading(user.id);
+    try {
+      await callAdminApi('convert_to_agent', {
+        userId: user.id,
+        email: user.email,
+        name: user.display_name || user.email,
+      });
+      toast({ title: 'Converted to agent', description: `${user.email} is now an agent.` });
+      fetchUsers();
+    } catch (err: unknown) {
+      toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
+    }
+    setActionLoading(null);
   };
 
   const handleDeleteClick = (user: AuthUser) => {
@@ -982,6 +999,15 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
                           <Loader2 className="animate-spin text-muted-foreground" size={16} />
                         ) : (
                           <>
+                            {!isSupport && (
+                              <button
+                                onClick={() => handleConvertToAgent(u)}
+                                title="Convert to agent"
+                                className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors"
+                              >
+                                <UserPlus size={14} />
+                              </button>
+                            )}
                             <button
                               onClick={() => handleBan(u.id, !u.banned_until)}
                               className={`p-1.5 rounded-lg transition-colors ${

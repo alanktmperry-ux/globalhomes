@@ -943,7 +943,7 @@ function AgentBand() {
             </p>
             <div style={{ display:'flex', gap:24, flexWrap:'wrap' }}>
               {['McGrath','Belle Property','LJ Hooker','Raine & Horne'].map((b) => (
-                <span key={b} style={{ fontSize:12, fontWeight:700, color:'rgba(255,255,255,.35)', letterSpacing:'.04em' }}>{b}</span>
+                <span key={b} style={{ fontSize:13, fontWeight:700, color:'rgba(255,255,255,.65)', letterSpacing:'.04em' }}>{b}</span>
               ))}
             </div>
           </div>

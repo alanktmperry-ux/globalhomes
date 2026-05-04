@@ -713,7 +713,7 @@ const Index = () => {
                   </div>
                 ))}
               </div>
-              <button onClick={() => { closeModal(); navigate(`/?q=${encodeURIComponent(modalQuery)}`); }} style={{ width:'100%', marginTop:16, background:T.blue, color:'#fff', border:'none', padding:'12px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>
+              <button onClick={() => { const q = (modalQuery || searchQuery || '').trim(); closeModal(); navigate(q ? `/buy?q=${encodeURIComponent(q)}` : '/buy'); }} style={{ width:'100%', marginTop:16, background:T.blue, color:'#fff', border:'none', padding:'12px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>
                 See all results →
               </button>
             </div>

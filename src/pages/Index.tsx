@@ -1152,6 +1152,7 @@ type Theme = { blue: string; blueL: string; blueMid: string; ink: string; mid: s
 
 function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
   const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');
+  const { t } = useTranslation();
 
   const PLANS = [
     {

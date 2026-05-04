@@ -1296,23 +1296,23 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
                   {isAnnual ? (
                     <>
                       <span style={{ fontSize: 44, fontWeight: 800, color: T.ink, letterSpacing: '-1.5px' }}>{fmt(p.annualMonthly)}</span>
-                      <span style={{ fontSize: 13, color: T.muted }}>/mo</span>
+                      <span style={{ fontSize: 13, color: T.muted }}>{t('home.pricing.perMonth')}</span>
                     </>
                   ) : (
                     <>
                       <span style={{ fontSize: 44, fontWeight: 800, color: T.ink, letterSpacing: '-1.5px' }}>{fmt(p.monthly)}</span>
-                      <span style={{ fontSize: 13, color: T.muted }}>/mo</span>
+                      <span style={{ fontSize: 13, color: T.muted }}>{t('home.pricing.perMonth')}</span>
                     </>
                   )}
                 </div>
                 <div style={{ fontSize: 12, color: T.muted, marginBottom: 14, minHeight: 18 }}>
                   {isAnnual ? (
                     <>
-                      <span style={{ textDecoration: 'line-through', marginRight: 6 }}>{fmt(p.monthly)}/mo</span>
-                      · {fmt(p.annual)}/yr billed annually
+                      <span style={{ textDecoration: 'line-through', marginRight: 6 }}>{fmt(p.monthly)}{t('home.pricing.perMonth')}</span>
+                      · {fmt(p.annual)}{t('home.pricing.billedAnnually')}
                     </>
                   ) : (
-                    <>or {fmt(p.annual)}/yr (save 20%)</>
+                    <>{t('home.pricing.savePercent', { price: fmt(p.annual) })}</>
                   )}
                 </div>
                 <p style={{ fontSize: 13, color: T.muted, margin: '0 0 22px', lineHeight: 1.5 }}>{p.desc}</p>

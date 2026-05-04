@@ -131,12 +131,10 @@ const AgentAuthPage = () => {
       if (error) throw error;
       sessionStorage.setItem('listhq_pending_email', cleaned);
       setRegEmail(cleaned);
-      toast.success("If an account exists with this email, you'll receive a login link.");
+      toast.success("We've sent a 6-digit code to your email. Check your inbox.");
       setStep('otp');
     } catch {
-      sessionStorage.setItem('listhq_pending_email', regEmail.trim().toLowerCase());
-      toast.success("If an account exists with this email, you'll receive a login link.");
-      setStep('otp');
+      toast.error('Failed to send verification code. Please try again.');
     } finally {
       setEmailSubmitting(false);
     }

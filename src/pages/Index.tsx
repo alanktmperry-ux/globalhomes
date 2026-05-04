@@ -376,16 +376,16 @@ const Index = () => {
 
       <div className="wave17">
         {/* ═══ Agent sliver bar ═══ */}
-        <div style={{ background: T.ink, color: 'rgba(255,255,255,.85)', padding: '13px 16px', fontSize: 12.5, textAlign: 'center' }}>
+        <div style={{ background: T.blue, color: '#fff', padding: '13px 16px', fontSize: 12.5, textAlign: 'center' }}>
           <span>🏆 <strong style={{ color:'#fff' }}>Real estate agents:</strong> reach 7M+ multilingual buyers no other portal can find</span>
-          <span style={{ opacity:.4, margin:'0 10px' }}>·</span>
+          <span style={{ opacity:.6, margin:'0 10px' }}>·</span>
           <span>Auto-translated listings in 20 languages</span>
-          <span style={{ opacity:.4, margin:'0 10px' }}>·</span>
+          <span style={{ opacity:.6, margin:'0 10px' }}>·</span>
           <span>From <strong style={{ color:'#fff' }}>$799/mo</strong></span>
-          <span style={{ opacity:.4, margin:'0 10px' }}>·</span>
+          <span style={{ opacity:.6, margin:'0 10px' }}>·</span>
           <span>60 days free</span>
-          <span style={{ opacity:.4, margin:'0 10px' }}>·</span>
-          <a href="/for-agents" style={{ color: '#93c5fd', textDecoration: 'none', fontWeight: 700 }}>See how it works →</a>
+          <span style={{ opacity:.6, margin:'0 10px' }}>·</span>
+          <a href="/for-agents" className="sliver-link" style={{ color: '#fff', textDecoration: 'none', fontWeight: 700 }}>See how it works →</a>
         </div>
 
         {/* ═══ SECTION 2 — Hero ═══ */}

@@ -8,6 +8,7 @@ import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { buildAuditMeta } from '@/shared/lib/auditLog';
 import AgentApprovalQueue from '@/features/admin/components/AgentApprovalQueue';
+import { UnconfirmedSignups } from '@/features/admin/components/UnconfirmedSignups';
 
 type TabKey = 'agents' | 'demos' | 'partners';
 

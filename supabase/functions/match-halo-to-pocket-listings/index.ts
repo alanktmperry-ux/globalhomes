@@ -55,6 +55,13 @@ Deno.serve(async (req) => {
     );
     const resendKey = Deno.env.get('RESEND_API_KEY');
 
+    // Authenticate FIRST
+    const token = req.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
+    const { data: { user }, error: authError } = await admin.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     const { data: halo, error: hErr } = await admin
       .from('halos')
       .select('*')
@@ -66,11 +73,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    const token = req.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
-    const { data: { user }, error: authError } = await admin.auth.getUser(token);
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
     if (user.id !== (halo as any).seeker_id) {
       return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }

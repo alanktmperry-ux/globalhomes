@@ -24,6 +24,7 @@ const AgentDashboardLayout = () => {
   const [mfaRequired, setMfaRequired] = useState(false);
   const [mfaChecked, setMfaChecked] = useState(false);
   const [showMfaPromo, setShowMfaPromo] = useState(false);
+  const [paymentBannerVisible, setPaymentBannerVisible] = useState(false);
 
   // Check Authenticator Assurance Level — if user enrolled TOTP but session is still aal1, gate the dashboard.
   useEffect(() => {

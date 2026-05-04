@@ -104,7 +104,6 @@ const NAV_SECTIONS: NavSection[] = [
       { title: 'Rent Increases', url: '/dashboard/rent-increases', icon: TrendingUp },
       { title: 'Arrears', url: '/dashboard/arrears', icon: AlertCircle, badgeKey: 'arrears', alertWhenBadge: true },
       { title: 'Reports', url: '/dashboard/reports', icon: BarChart3 },
-      { title: 'Renewals Due', url: '/dashboard/rent-roll?filter=renewals', icon: RefreshCw, badgeKey: 'renewals', alertWhenBadge: true },
     ],
   },
   {

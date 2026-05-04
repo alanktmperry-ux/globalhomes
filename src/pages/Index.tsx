@@ -1037,7 +1037,7 @@ function AgentBand() {
               <option value="ar">Arabic</option>
               <option value="hi">Hindi</option>
             </select>
-            <button onClick={runTranslate} style={{ background:T.blue, color:'#fff', border:'none', padding:'12px 22px', borderRadius:10, fontSize:13, fontWeight:700, cursor:'pointer' }}>Translate →</button>
+            <button onClick={runTranslate} style={{ background:T.blue, color:'#fff', border:'none', padding:'12px 22px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>Translate →</button>
           </div>
           {results && (
             <div style={{ display:'flex', flexDirection:'column', gap:10, marginTop:18 }}>

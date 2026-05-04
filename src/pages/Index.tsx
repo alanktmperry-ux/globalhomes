@@ -28,6 +28,7 @@ const T = {
   off2: '#F3F4F6',
   green: '#10B981',
   amber: '#F59E0B',
+  blueTint: '#F5F8FF',
 };
 
 // ─── Language sequence ────────────────────────────────────────
@@ -761,7 +762,7 @@ const Index = () => {
         )}
 
         {/* ═══ SECTION 5 — Language Proof ═══ */}
-        <section style={{ background:'#fff', padding:'88px 24px' }}>
+        <section style={{ background: T.blueTint, padding:'88px 24px', borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}` }}>
           <div style={{ maxWidth:1200, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr', gap:64, alignItems:'center' }} className="lang-grid">
             <div>
               <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>Why ListHQ is different</div>
@@ -1096,7 +1097,7 @@ function AgentBand() {
 }
 
 type NavFn = (path: string) => void;
-type Theme = { blue: string; blueL: string; blueMid: string; ink: string; mid: string; muted: string; off: string; border: string; green: string; amber: string };
+type Theme = { blue: string; blueL: string; blueMid: string; ink: string; mid: string; muted: string; off: string; border: string; green: string; amber: string; blueTint: string };
 
 function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
   const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');

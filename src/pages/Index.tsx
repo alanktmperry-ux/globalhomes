@@ -156,6 +156,7 @@ const Index = () => {
       const next = (cardIdxRef.current + 1) % FEAT_LISTINGS.length;
       const listing = FEAT_LISTINGS[next];
       cardIdxRef.current = next;
+      setBackCardIdx((next + 1) % FEAT_LISTINGS.length);
 
       // Preload next image — only swap once it's actually loaded
       const pre = new Image();
@@ -343,7 +344,7 @@ const Index = () => {
 
   // Initial card content (static — JS handles all subsequent updates via refs)
   const initialFront = FEAT_LISTINGS[0];
-  const backListing = FEAT_LISTINGS[1];
+  const [backCardIdx, setBackCardIdx] = useState(1);
 
   return (
     <>
@@ -531,14 +532,15 @@ const Index = () => {
                   transform:'rotate(-4deg)', filter:'brightness(0.7) blur(1px)',
                   opacity: 0.45,
                   background:'#fff', borderRadius:20, boxShadow:'0 20px 60px rgba(0,0,0,.12)', overflow:'hidden',
+                  transition:'opacity 0.4s ease',
                 }}
               >
-                <div style={{ height:260, backgroundImage:`url(${backListing.img})`, backgroundSize:'cover', backgroundPosition:'center' }} />
+                <div key={`back-img-${backCardIdx}`} style={{ height:260, backgroundImage:`url(${FEAT_LISTINGS[backCardIdx].img})`, backgroundSize:'cover', backgroundPosition:'center', transition:'opacity 0.4s ease' }} />
                 <div style={{ padding:18 }}>
                   <span style={{ display:'inline-block', background:T.blueL, color:T.blue, fontSize:11, fontWeight:700, padding:'4px 10px', borderRadius:100, marginBottom:10 }}>🌐 20 languages · auto-translated</span>
-                  <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:6 }}>{backListing.title}</div>
-                  <div style={{ fontSize:22, fontWeight:800, color:T.ink, marginBottom:8 }}>{backListing.price}</div>
-                  <div style={{ fontSize:12, color:T.muted }}>{backListing.meta}</div>
+                  <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:6 }}>{FEAT_LISTINGS[backCardIdx].title}</div>
+                  <div style={{ fontSize:22, fontWeight:800, color:T.ink, marginBottom:8 }}>{FEAT_LISTINGS[backCardIdx].price}</div>
+                  <div style={{ fontSize:12, color:T.muted }}>{FEAT_LISTINGS[backCardIdx].meta}</div>
                 </div>
               </div>
 

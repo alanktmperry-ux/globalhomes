@@ -226,6 +226,7 @@ const Index = () => {
 
   // Card cycle — crossfade image layer + text inside the static front card
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const id = setInterval(() => {
       const next = (cardIdxRef.current + 1) % FEAT_LISTINGS.length;
       const listing = FEAT_LISTINGS[next];

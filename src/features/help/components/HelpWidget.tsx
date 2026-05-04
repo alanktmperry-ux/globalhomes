@@ -35,16 +35,16 @@ export function HelpWidget() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-24 md:bottom-6 right-4 z-50 w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:bg-primary/90 transition-colors"
+          className="fixed bottom-[80px] md:bottom-6 right-4 z-50 w-11 h-11 md:w-12 md:h-12 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:bg-primary/90 transition-colors"
           aria-label="Help"
         >
-          <HelpCircle size={22} />
+          <HelpCircle size={20} />
         </button>
       )}
 
       {/* Panel */}
       {open && (
-        <div className="fixed bottom-24 md:bottom-6 right-4 z-50 w-80 bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
+        <div className="fixed bottom-[80px] md:bottom-6 right-4 z-50 w-80 bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
           <div className="flex items-center justify-between p-4 border-b border-border bg-secondary/30">
             <h3 className="text-sm font-semibold text-foreground">Help</h3>
             <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">

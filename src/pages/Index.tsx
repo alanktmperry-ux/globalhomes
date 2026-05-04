@@ -486,27 +486,19 @@ const Index = () => {
            onBlur={(e) => { e.currentTarget.style.left = '-9999px'; e.currentTarget.style.width = '1px'; e.currentTarget.style.height = '1px'; }}>
           Skip to main content
         </a>
-        {/* ═══ Agent sliver bar ═══ */}
-        <div style={{ background: '#EFF6FF', borderBottom: '1px solid #DBEAFE', color: '#374151', padding: '10px 16px', fontSize: 13, textAlign: 'center' }}>
-          <span>🏆 {t('home.sliver.agents')}</span>
-          <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
-          <span>{t('home.sliver.translation')}</span>
-          <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
-          <span>{t('home.sliver.price')}</span>
-          <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
-          <span>{t('home.sliver.free')}</span>
-          <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
-          <a href="/for-agents" className="sliver-link" style={{ color: '#2563EB', textDecoration: 'none', fontWeight: 700 }}>{t('home.sliver.cta')}</a>
-        </div>
+        {/* ═══ Agent sliver bar (rotating) ═══ */}
+        <SliverBar />
+        <StickyAcquisitionBar />
+
 
         {/* ═══ SECTION 2 — Hero ═══ */}
         <section id="main-content" style={{ background:'#fff', padding:'72px 24px', minHeight:'calc(100vh - 68px - 50px)' }}>
           <div style={{ maxWidth: 1240, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 460px', gap:48, alignItems:'center' }} className="hero-grid">
             {/* Left */}
             <div>
-              <div style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'6px 14px', borderRadius:100, background:T.blueL, border:`1px solid ${T.blueMid}`, color:T.blue, fontSize:11, fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', marginBottom:24 }}>
-                <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:T.blue }} />
-                {t('hero.eyebrow')}
+              <div style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'6px 12px', borderRadius:100, background:T.blueL, border:`1px solid ${T.blueMid}`, color:T.blue, fontSize:11, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:24, maxWidth:'100%', whiteSpace:'normal', textAlign:'left', lineHeight:1.3 }} className="hero-eyebrow">
+                <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:T.blue, flexShrink:0 }} />
+                <span>{t('hero.eyebrow')}</span>
               </div>
 
               <h1 className="hero-headline" style={{ margin:'0 0 12px' }}>
@@ -680,22 +672,28 @@ const Index = () => {
 
         {/* ═══ SECTION 4 — Trust Strip ═══ */}
         <div style={{ background:T.off, borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}`, padding:'20px 16px' }}>
-          <div style={{ maxWidth:1200, margin:'0 auto', display:'flex', justifyContent:'center', alignItems:'center', flexWrap:'wrap', gap:0 }}>
+          <div className="trust-strip" style={{ maxWidth:1200, margin:'0 auto' }}>
             {[
               { n: propertyCount && propertyCount > 0 ? `${propertyCount.toLocaleString()}+` : '50,000+', l: t('home.trust.listings') },
               { n:'20', l: t('home.trust.languages') },
               { n:'7M+', l: t('home.trust.buyers') },
               { n:'Free', l: t('home.trust.free') },
-            ].map((s, i, arr) => (
-              <div key={s.l} style={{ display:'flex', alignItems:'center' }}>
-                <div style={{ padding:'0 32px', textAlign:'center' }}>
-                  <div style={{ fontSize:22, fontWeight:800, color:T.ink, lineHeight:1 }}>{s.n}</div>
-                  <div style={{ fontSize:13, fontWeight:600, color:T.mid, marginTop:4 }}>{s.l}</div>
-                </div>
-                {i < arr.length - 1 && <div style={{ width:1, height:32, background:T.border }} />}
+            ].map((s) => (
+              <div key={s.l} className="trust-cell" style={{ textAlign:'center', padding:'8px 16px' }}>
+                <div style={{ fontSize:22, fontWeight:800, color:T.ink, lineHeight:1 }}>{s.n}</div>
+                <div style={{ fontSize:13, fontWeight:600, color:T.mid, marginTop:4 }}>{s.l}</div>
               </div>
             ))}
           </div>
+          <style>{`
+            .trust-strip { display:grid; grid-template-columns: repeat(4, 1fr); align-items:center; }
+            .trust-cell + .trust-cell { border-left:1px solid ${T.border}; }
+            @media (max-width: 640px) {
+              .trust-strip { grid-template-columns: repeat(2, 1fr); row-gap: 16px; }
+              .trust-cell + .trust-cell { border-left: none; }
+              .trust-cell:nth-child(even) { border-left: 1px solid ${T.border}; }
+            }
+          `}</style>
         </div>
 
         {/* ═══ SECTION 4b — Featured Listings ═══ */}
@@ -1358,21 +1356,24 @@ function FAQSection() {
           {t('home.faq.heading')}
         </h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {faqs.map((f, i) => (
-            <div key={i} style={{ background: '#fff', borderRadius: 12, border: '1px solid #E5E7EB', overflow: 'hidden' }}>
-              <button
-                onClick={() => setOpen(open === i ? null : i)}
-                aria-expanded={open === i}
-                style={{ width: '100%', textAlign: 'left', padding: '20px 24px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 15, fontWeight: 700, color: '#0a0f1e', fontFamily: 'inherit' }}
-              >
-                {f.q}
-                <span style={{ fontSize: 20, color: '#2563EB', transform: open === i ? 'rotate(45deg)' : 'none', transition: 'transform .2s', flexShrink: 0, marginLeft: 16 }}>+</span>
-              </button>
-              {open === i && (
-                <div style={{ padding: '0 24px 20px', fontSize: 15, color: '#6B7280', lineHeight: 1.65 }}>{f.a}</div>
-              )}
-            </div>
-          ))}
+          {faqs.map((f, i) => {
+            const isOpen = open === i;
+            return (
+              <div key={i} style={{ background: '#fff', borderRadius: 12, border: '1px solid #E5E7EB', overflow: 'hidden' }}>
+                <button
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  aria-expanded={isOpen}
+                  style={{ width: '100%', minHeight: 52, textAlign: 'left', padding: '16px 20px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 15, fontWeight: 700, color: '#0a0f1e', fontFamily: 'inherit', gap: 16 }}
+                >
+                  <span style={{ flex: 1 }}>{f.q}</span>
+                  <span style={{ fontSize: 20, color: '#2563EB', transform: isOpen ? 'rotate(45deg)' : 'none', transition: 'transform .2s', flexShrink: 0, lineHeight: 1 }}>+</span>
+                </button>
+                {isOpen && (
+                  <div style={{ padding: '0 20px 18px', fontSize: 15, color: '#6B7280', lineHeight: 1.65 }}>{f.a}</div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -1418,4 +1419,84 @@ function ClosingCTA({ navigate, T }: { navigate: NavFn; T: Theme }) {
   );
 }
 
+
+function SliverBar() {
+  const { t } = useTranslation();
+  const messages = [
+    `🏆 ${t('home.sliver.agents')}`,
+    `🌐 ${t('home.sliver.translation')}`,
+    `${t('home.sliver.price')} · ${t('home.sliver.free')}`,
+  ];
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const id = setInterval(() => setIdx((i) => (i + 1) % messages.length), 4000);
+    return () => clearInterval(id);
+  }, [messages.length]);
+  return (
+    <div style={{ background: '#EFF6FF', borderBottom: '1px solid #DBEAFE', color: '#374151', padding: '10px 16px', fontSize: 13 }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
+        <div style={{ position: 'relative', flex: '1 1 auto', minHeight: 20, textAlign: 'center', overflow: 'hidden' }}>
+          {messages.map((m, i) => (
+            <div
+              key={i}
+              style={{
+                position: i === idx ? 'relative' : 'absolute',
+                inset: i === idx ? 'auto' : 0,
+                opacity: i === idx ? 1 : 0,
+                transition: 'opacity .5s ease',
+                pointerEvents: i === idx ? 'auto' : 'none',
+                fontWeight: 600,
+              }}
+            >
+              {m}
+            </div>
+          ))}
+        </div>
+        <a href="/for-agents" className="sliver-link" style={{ color: '#2563EB', textDecoration: 'none', fontWeight: 700, whiteSpace: 'nowrap' }}>
+          {t('home.sliver.cta')}
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function StickyAcquisitionBar() {
+  const navigate = useNavigate();
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShow(window.scrollY > 300);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  return (
+    <div
+      className="sticky-acq-bar"
+      style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 40,
+        background: 'rgba(255,255,255,0.96)', backdropFilter: 'blur(10px)',
+        borderBottom: '1px solid #E5E7EB',
+        padding: '10px 24px',
+        transform: show ? 'translateY(0)' : 'translateY(-100%)',
+        transition: 'transform .25s ease',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        gap: 16,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ width: 28, height: 28, borderRadius: 8, background: '#2563EB', color: '#fff', fontSize: 13, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>L</div>
+        <span style={{ fontSize: 15, fontWeight: 700, color: '#0a0f1e' }}>ListHQ</span>
+      </div>
+      <button
+        onClick={() => navigate('/agents/login')}
+        style={{ background: '#2563EB', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+      >
+        Start 60-day free trial
+      </button>
+      <style>{`@media (max-width: 768px) { .sticky-acq-bar { display: none !important; } }`}</style>
+    </div>
+  );
+}
+
 export default Index;
+

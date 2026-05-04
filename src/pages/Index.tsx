@@ -1288,7 +1288,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
               }}>
                 {p.popular && (
                   <div style={{ position: 'absolute', top: -12, right: 20, background: T.amber, color: '#78350F', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', padding: '5px 12px', borderRadius: 100 }}>
-                    Most popular
+                    {t('home.pricing.mostPopular')}
                   </div>
                 )}
                 <div style={{ fontSize: 12, fontWeight: 700, color: T.muted, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 14 }}>{p.name}</div>

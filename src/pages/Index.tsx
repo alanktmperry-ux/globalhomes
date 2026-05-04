@@ -528,7 +528,8 @@ const Index = () => {
                 style={{
                   position:'absolute', right:30, top:10, zIndex:2,
                   width:360, height:480,
-                  transform:'rotate(-4deg)', filter:'brightness(0.88)',
+                  transform:'rotate(-4deg)', filter:'brightness(0.7) blur(1px)',
+                  opacity: 0.45,
                   background:'#fff', borderRadius:20, boxShadow:'0 20px 60px rgba(0,0,0,.12)', overflow:'hidden',
                 }}
               >

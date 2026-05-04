@@ -856,7 +856,7 @@ const Index = () => {
                 <div key={c.n} className={`reveal reveal-d${i+1}`} style={{ background:T.off, border:`1px solid ${T.border}`, borderRadius:20, padding:32 }}>
                   <p style={{ fontSize:15, fontWeight:500, color:T.ink, fontStyle:'italic', lineHeight:1.7, margin:'0 0 24px' }}>"{c.q}"</p>
                   {c.translation && (
-                    <p style={{ fontSize:12.5, color:T.muted, fontStyle:'normal', lineHeight:1.6, margin:'-16px 0 24px', fontWeight:400 }}>
+                    <p style={{ fontSize:13, color:T.muted, fontStyle:'normal', lineHeight:1.6, margin:'-16px 0 24px', fontWeight:400 }}>
                       {c.translation}
                     </p>
                   )}
@@ -1366,7 +1366,7 @@ function FAQSection() {
                 <span style={{ fontSize: 20, color: '#2563EB', transform: open === i ? 'rotate(45deg)' : 'none', transition: 'transform .2s', flexShrink: 0, marginLeft: 16 }}>+</span>
               </button>
               {open === i && (
-                <div style={{ padding: '0 24px 20px', fontSize: 14.5, color: '#6B7280', lineHeight: 1.65 }}>{f.a}</div>
+                <div style={{ padding: '0 24px 20px', fontSize: 15, color: '#6B7280', lineHeight: 1.65 }}>{f.a}</div>
               )}
             </div>
           ))}

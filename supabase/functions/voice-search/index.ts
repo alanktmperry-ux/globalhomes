@@ -204,11 +204,11 @@ Return valid JSON only, no markdown, no code fences.`,
 
     // Fire concierge in the background
     if (searchRecord?.id) {
-      const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+      const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
       fetch(`${supabaseUrl}/functions/v1/orchestrate-buyer-concierge`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${supabaseAnonKey}`,
+          "x-internal-secret": serviceRoleKey,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

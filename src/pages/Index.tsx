@@ -611,7 +611,7 @@ const Index = () => {
               {/* Live buyers pill */}
               <div style={{ marginTop:18, display:'inline-flex', alignItems:'center', gap:8, background:'rgba(22,163,74,.1)', border:'1px solid rgba(22,163,74,.25)', borderRadius:100, padding:'6px 14px', fontSize:12, fontWeight:700, color:'#16a34a' }}>
                 <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:'#16a34a' }} />
-                <strong>{liveCount}</strong> buyers searching right now
+                <strong>{liveCount}</strong> {t('home.hero.buyersNow')}
               </div>
 
               <div style={{ marginTop:16, maxWidth:560, fontSize:13, color:T.muted, textAlign:'center' }}>

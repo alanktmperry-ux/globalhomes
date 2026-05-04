@@ -129,6 +129,7 @@ const Index = () => {
   const layerBRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const priceRef = useRef<HTMLDivElement>(null);
+  const metaRef = useRef<HTMLSpanElement>(null);
   const activeLayerRef = useRef<'a' | 'b'>('a');
   const cardIdxRef = useRef(0);
 

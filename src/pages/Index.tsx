@@ -955,7 +955,7 @@ function AgentBand() {
             </div>
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-            <button onClick={() => navigate('/pricing')} style={{ background:'#fff', color:T.ink, border:'none', padding:'14px 28px', borderRadius:12, fontSize:15, fontWeight:700, cursor:'pointer' }}>See agent pricing →</button>
+            <button onClick={() => navigate('/pricing')} style={{ background:'#fff', color:T.ink, border:'none', padding:'14px 28px', borderRadius:12, fontSize:15, fontWeight:700, cursor:'pointer' }}>Start reaching 7M+ buyers →</button>
             <p style={{ fontSize:11, color:'rgba(255,255,255,.4)', margin:'10px 0 0', fontWeight:500 }}>
               60 days free · No credit card · Australian data storage
             </p>

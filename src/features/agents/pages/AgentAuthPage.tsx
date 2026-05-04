@@ -26,8 +26,9 @@ const AgentAuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [pendingSignIn, setPendingSignIn] = useState(false);
-  const [dataLocationConsent, setDataLocationConsent] = useState(false);
-  const [policyConsent, setPolicyConsent] = useState(false);
+  const [combinedConsent, setCombinedConsent] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [emailTouched, setEmailTouched] = useState(false);
   const [showOAuthConsentModal, setShowOAuthConsentModal] = useState(false);
   const [pendingOAuthProvider, setPendingOAuthProvider] = useState<'google' | 'apple' | null>(null);
 

@@ -1374,20 +1374,6 @@ function FAQSection() {
               </div>
             );
           })}
-            <div key={i} style={{ background: '#fff', borderRadius: 12, border: '1px solid #E5E7EB', overflow: 'hidden' }}>
-              <button
-                onClick={() => setOpen(open === i ? null : i)}
-                aria-expanded={open === i}
-                style={{ width: '100%', textAlign: 'left', padding: '20px 24px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 15, fontWeight: 700, color: '#0a0f1e', fontFamily: 'inherit' }}
-              >
-                {f.q}
-                <span style={{ fontSize: 20, color: '#2563EB', transform: open === i ? 'rotate(45deg)' : 'none', transition: 'transform .2s', flexShrink: 0, marginLeft: 16 }}>+</span>
-              </button>
-              {open === i && (
-                <div style={{ padding: '0 24px 20px', fontSize: 15, color: '#6B7280', lineHeight: 1.65 }}>{f.a}</div>
-              )}
-            </div>
-          ))}
         </div>
       </div>
     </section>

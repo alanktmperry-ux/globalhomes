@@ -572,7 +572,7 @@ const Index = () => {
                     placeholder={seq.ph}
                     style={{ flex:1, border:'none', outline:'none', fontSize:14, padding:'12px 10px', background:'transparent', minWidth:0, color:T.ink }}
                   />
-                  <button type="submit" style={{ background:T.blue, color:'#fff', border:'none', padding:'10px 18px', borderRadius:9, fontSize:13, fontWeight:700, cursor:'pointer' }}>Search</button>
+                  <button type="submit" style={{ background:T.blue, color:'#fff', border:'none', padding:'10px 18px', borderRadius:9, fontSize:13, fontWeight:700, cursor:'pointer' }}>Find my home →</button>
                 </div>
               </form>
 
@@ -770,7 +770,7 @@ const Index = () => {
                 Every listing on ListHQ is automatically translated into 20 languages — Chinese, Vietnamese, Arabic, Hindi and 16 more. No other portal does this.
               </p>
               <button onClick={() => inputRef.current?.focus()} style={{ background:T.blue, color:'#fff', border:'none', padding:'14px 28px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>
-                Search in your language →
+                Find homes in your language →
               </button>
             </div>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:10 }}>
@@ -955,7 +955,7 @@ function AgentBand() {
             </div>
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-            <button onClick={() => navigate('/pricing')} style={{ background:'#fff', color:T.ink, border:'none', padding:'14px 28px', borderRadius:12, fontSize:15, fontWeight:700, cursor:'pointer' }}>See agent pricing →</button>
+            <button onClick={() => navigate('/pricing')} style={{ background:'#fff', color:T.ink, border:'none', padding:'14px 28px', borderRadius:12, fontSize:15, fontWeight:700, cursor:'pointer' }}>Start reaching 7M+ buyers →</button>
             <p style={{ fontSize:11, color:'rgba(255,255,255,.4)', margin:'10px 0 0', fontWeight:500 }}>
               60 days free · No credit card · Australian data storage
             </p>

@@ -376,6 +376,7 @@ const Index = () => {
         .hcard-title { min-height: 2.8em; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: opacity 0.4s ease; }
         .hcard-price { min-height: 1.4em; transition: opacity 0.4s ease; }
         .hcard-text-hidden { opacity: 0 !important; transition: opacity 0.15s ease !important; }
+        .hcard-back { transition: opacity 0.4s ease; }
         .chip { background: ${T.off}; border: 1px solid ${T.border}; border-radius: 100px; padding: 6px 11px; font-size: 12px; font-weight: 600; color: ${T.mid}; cursor: pointer; transition: all .15s ease; }
         .chip:hover { background: ${T.blueL}; border-color: ${T.blueMid}; color: ${T.blue}; }
         .sliver-link:hover { text-decoration: underline; }

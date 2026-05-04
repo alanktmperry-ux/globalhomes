@@ -201,9 +201,32 @@ Deno.serve(async (req) => {
           agency_name: dr.agency_name,
         }));
 
+      // Find agents who registered but whose auth account is missing or unconfirmed
+      const authEmailSet = new Set(allAuthUsers.map((u: any) => (u.email || '').toLowerCase()));
+      const { data: agentRows } = await supabase
+        .from('agents')
+        .select('id, email, name, created_at, approval_status')
+        .not('email', 'is', null);
+      const extraAgentUsers = (agentRows || [])
+        .filter((a: any) => a.email && !authEmailSet.has(a.email.toLowerCase()))
+        .map((a: any) => ({
+          id: a.id,
+          email: a.email,
+          created_at: a.created_at,
+          last_sign_in_at: null,
+          email_confirmed_at: null,
+          banned_until: null,
+          display_name: a.name,
+          provider: 'email',
+          user_type: 'agent_only',
+          is_subscribed: false,
+          plan_type: null,
+          roles: [],
+        }));
+
       return new Response(JSON.stringify({
-        users: [...authUsers, ...demoUsers],
-        total: data.total + demoUsers.length,
+        users: [...authUsers, ...demoUsers, ...extraAgentUsers],
+        total: data.total + demoUsers.length + extraAgentUsers.length,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

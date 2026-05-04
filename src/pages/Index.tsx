@@ -28,6 +28,7 @@ const T = {
   off2: '#F3F4F6',
   green: '#10B981',
   amber: '#F59E0B',
+  blueTint: '#F5F8FF',
 };
 
 // ─── Language sequence ────────────────────────────────────────

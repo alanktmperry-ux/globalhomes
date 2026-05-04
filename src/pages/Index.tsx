@@ -1173,7 +1173,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
       <div style={{ maxWidth: 1200, margin: '0 auto', textAlign: 'center' }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: T.blue, textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 14 }}>Pricing — no contracts, cancel anytime</div>
         <h2 style={{ fontSize: 'clamp(32px, 3.5vw, 48px)', fontWeight: 800, letterSpacing: '-1.5px', lineHeight: 1.1, margin: '0 0 14px' }}>
-          Built for the way <em style={{ color: T.blue, fontStyle: 'italic' }}>you work.</em>
+          Built for the way <em style={{ color: T.blue, fontStyle: 'italic', fontFamily: "'DM Serif Display', serif" }}>you work.</em>
         </h2>
         <p style={{ fontSize: 16, color: T.muted, margin: '0 auto 28px', maxWidth: 680 }}>
           All plans include 20 languages · trust accounting · AI matching

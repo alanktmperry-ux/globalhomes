@@ -15022,6 +15022,7 @@ export type Database = {
         Returns: Json
       }
       get_my_agent_id: { Args: never; Returns: string }
+      get_my_support_pin: { Args: never; Returns: string }
       get_own_agent_sensitive: {
         Args: { p_user_id: string }
         Returns: {
@@ -15042,6 +15043,29 @@ export type Database = {
       get_property_performance: {
         Args: { p_days?: number; p_property_id: string }
         Returns: Json
+      }
+      get_property_private_fields: {
+        Args: { p_id: string }
+        Returns: {
+          owner_email: string
+          owner_name: string
+          owner_phone: string
+          owner_portal_token: string
+          vendor_email: string
+          vendor_name: string
+          vendor_phone: string
+        }[]
+      }
+      get_signature_party_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          id: string
+          order_index: number
+          request_id: string
+          signed_at: string
+          signer_email: string
+          signer_name: string
+        }[]
       }
       get_suburb_benchmarks: { Args: { p_property_id: string }; Returns: Json }
       get_suburb_price_trend: {

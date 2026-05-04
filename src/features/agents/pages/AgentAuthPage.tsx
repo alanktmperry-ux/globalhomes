@@ -275,6 +275,22 @@ const AgentAuthPage = () => {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
 
           {/* Form badge */}
+          {/* Back to home (sign-in flows only) */}
+          {(step === 'email' || step === 'password') && (
+            <Link to="/" className="inline-block text-sm text-gray-500 hover:text-gray-800 mb-4">
+              ← Back to ListHQ
+            </Link>
+          )}
+
+          {/* Mobile-only feature pills (replaces left dark panel on small screens) */}
+          {step === 'register' && (
+            <div className="flex flex-wrap gap-2 mb-5 lg:hidden">
+              {['20-language listings', 'AI buyer matching', 'Trust accounting'].map((p) => (
+                <span key={p} className="bg-gray-100 text-gray-700 text-xs rounded-full px-3 py-1">{p}</span>
+              ))}
+            </div>
+          )}
+
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-stone-200 bg-stone-50 mb-5">
             <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
             <span className="text-[10px] font-medium tracking-widest uppercase text-stone-400">
@@ -290,8 +306,9 @@ const AgentAuthPage = () => {
           <p className="text-sm text-stone-400 mb-6 -mt-4">
             {step === 'email' && 'Access your dashboard, listings, and leads.'}
             {step === 'password' && email}
-            {step === 'register' && 'Start your free 60-day trial. No credit card required.'}
+            {step === 'register' && 'Start your free 60-day trial. No contracts, cancel anytime.'}
           </p>
+
 
           {/* ── Step: Email (sign in) ── */}
           {step === 'email' && (

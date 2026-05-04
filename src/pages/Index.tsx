@@ -932,6 +932,7 @@ const Index = () => {
 // ─── Agent Band ───────────────────────────────────────────────
 function AgentBand() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [n, setN] = useState(25);
   const [demoText, setDemoText] = useState('');
   const [demoLang, setDemoLang] = useState<'all' | 'zh' | 'vi' | 'ar' | 'hi'>('all');

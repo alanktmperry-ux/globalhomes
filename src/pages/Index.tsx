@@ -762,7 +762,7 @@ const Index = () => {
         )}
 
         {/* ═══ SECTION 5 — Language Proof ═══ */}
-        <section style={{ background:'#fff', padding:'88px 24px' }}>
+        <section style={{ background: T.blueTint, padding:'88px 24px', borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}` }}>
           <div style={{ maxWidth:1200, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr', gap:64, alignItems:'center' }} className="lang-grid">
             <div>
               <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>Why ListHQ is different</div>

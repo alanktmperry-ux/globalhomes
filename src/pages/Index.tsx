@@ -601,7 +601,7 @@ const Index = () => {
 
               {/* Filter chips */}
               <div style={{ display:'flex', flexWrap:'wrap', gap:8, maxWidth:560, marginTop:14 }}>
-                {['📍 Auburn','📍 Box Hill','📍 Hurstville','Under $1M','3+ beds','Top schools'].map((c) => (
+                {['📍 Auburn','📍 Box Hill','📍 Hurstville', t('home.hero.chip.budget'), t('home.hero.chip.beds'), t('home.hero.chip.schools')].map((c) => (
                   <button key={c} className="chip" onClick={() => openSearch(c)}>
                     {c.startsWith('📍') ? <><span aria-hidden="true">📍 </span>{c.slice(3)}</> : c}
                   </button>

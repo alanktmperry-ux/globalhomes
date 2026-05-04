@@ -985,6 +985,8 @@ function AgentBand() {
             If you have <strong style={{ color:'#fff', fontSize:18 }}>{n}</strong> active listings on ListHQ…
           </div>
           <input type="range" min={1} max={100} value={n} onChange={(e) => setN(Number(e.target.value))}
+            aria-label="Number of active listings"
+            aria-valuetext={`${n} listings`}
             style={{ width:'100%', accentColor: T.blue }} />
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:16, marginTop:24 }}>
             {[

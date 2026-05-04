@@ -62,12 +62,12 @@ const TILE_LANGS = [
 
 type Listing = { img: string; title: string; price: string; meta: string; };
 const FEAT_LISTINGS: Listing[] = [
-  { img:'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&h=600&fit=crop', title:'Spacious family home, walk to top-ranked schools', price:'$1,250,000', meta:'4 bed · 2 bath · 2 car' },
-  { img:'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop', title:'Modern 3-bed townhouse near transit',              price:'$985,000',   meta:'3 bed · 2 bath · 1 car' },
-  { img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop', title:'Renovated heritage home, walk to cafes',           price:'$1,580,000', meta:'4 bed · 3 bath · 2 car' },
-  { img:'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&h=600&fit=crop', title:'Brand new 5-bed family residence',                 price:'$2,150,000', meta:'5 bed · 4 bath · 2 car' },
-  { img:'https://images.unsplash.com/photo-1598228723793-52759bba239c?w=800&h=600&fit=crop', title:'City-view 2-bed apartment with parking',           price:'$795,000',   meta:'2 bed · 2 bath · 1 car' },
-  { img:'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=800&h=600&fit=crop', title:'Coastal 3-bed home minutes from beach',            price:'$1,395,000', meta:'3 bed · 2 bath · 2 car' },
+  { img:'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&h=600&fit=crop', title:'Spacious 4-bed family home, walk to top-ranked schools', price:'$1,250,000', meta:'4 bed · 2 bath · 2 car' },
+  { img:'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop', title:'Modern 3-bed townhouse near transit',                    price:'$985,000',   meta:'3 bed · 2 bath · 1 car' },
+  { img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop', title:'Renovated 3-bed heritage home, walk to cafes',          price:'$1,580,000', meta:'3 bed · 2 bath · 1 car' },
+  { img:'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&h=600&fit=crop', title:'Brand new 5-bed entertainer with pool',                 price:'$2,150,000', meta:'5 bed · 3 bath · 2 car' },
+  { img:'https://images.unsplash.com/photo-1598228723793-52759bba239c?w=800&h=600&fit=crop', title:'City-view 2-bed apartment with parking',                price:'$795,000',   meta:'2 bed · 1 bath · 1 car' },
+  { img:'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=800&h=600&fit=crop', title:'Coastal 4-bed family home minutes from beach',          price:'$1,395,000', meta:'4 bed · 2 bath · 2 car' },
 ];
 
 const TRANS_MAP = [

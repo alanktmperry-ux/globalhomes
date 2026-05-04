@@ -683,52 +683,7 @@ const Index = () => {
         <AgentBand />
 
         {/* ═══ SECTION 9 — Pricing ═══ */}
-        <section style={{ background:T.off, padding:'88px 24px' }}>
-          <div style={{ maxWidth:1200, margin:'0 auto', textAlign:'center' }}>
-            <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>Pricing — no contracts, cancel anytime</div>
-            <h2 style={{ fontSize:'clamp(32px, 3.5vw, 48px)', fontWeight:800, letterSpacing:'-1.5px', lineHeight:1.1, margin:'0 0 14px' }}>
-              Built for the way <em style={{ color:T.blue, fontStyle:'italic' }}>you work.</em>
-            </h2>
-            <p style={{ fontSize:16, color:T.muted, margin:'0 auto 52px', maxWidth:640 }}>All plans include 60 days free · 20 languages · Trust accounting</p>
-
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:16, maxWidth:960, margin:'0 auto' }} className="pricing-grid">
-              {[
-                { name:'Solo', price:'$799', desc:'Independent agents running their own shop', feats:['1 agent seat · up to 10 active listings','Full trust accounting (full ledger)','20-language auto-translation','AI buyer matching & voice search','Full CRM, pipeline & contacts','Halo™ buyer matching board','Email support'], cta:'Start free 60-day trial', primary:false, popular:false },
-                { name:'Agency', price:'$1,999', desc:'For growing agencies ready to scale', feats:['Up to 5 agent seats','Unlimited listings','20-language auto-translation','Full PM automation + trust accounting','Priority AI matching + lead analytics','Agency-branded profile page','Phone & email support'], cta:'Start free 60-day trial', primary:true, popular:true },
-                { name:'Agency Pro', price:'$3,499', desc:'Established multi-office agencies', feats:['Up to 15 agent seats','Unlimited everything','Full PM automation','Multi-branch dashboard','White-label option','API access + custom integrations','Dedicated account manager'], cta:'Talk to sales', primary:false, popular:false },
-              ].map((p, i) => (
-                <div key={p.name} className={`reveal reveal-d${i+1}`} style={{
-                  background:'#fff', border:`1.5px solid ${p.popular ? T.blue : T.border}`, borderRadius:20, padding:'32px 28px', position:'relative', textAlign:'left',
-                  boxShadow: p.popular ? `0 0 0 3px rgba(37,99,235,.08)` : 'none'
-                }}>
-                  {p.popular && (
-                    <div style={{ position:'absolute', top:-12, left:'50%', transform:'translateX(-50%)', background:T.blue, color:'#fff', fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'.08em', padding:'5px 12px', borderRadius:100 }}>Most popular</div>
-                  )}
-                  <div style={{ fontSize:12, fontWeight:700, color:T.muted, textTransform:'uppercase', letterSpacing:'.08em', marginBottom:14 }}>{p.name}</div>
-                  <div style={{ marginBottom:8 }}>
-                    <span style={{ fontSize:44, fontWeight:800, color:T.ink, letterSpacing:'-1.5px' }}>{p.price}</span>
-                    <span style={{ fontSize:13, color:T.muted }}>/month</span>
-                  </div>
-                  <p style={{ fontSize:13, color:T.muted, margin:'0 0 22px', lineHeight:1.5 }}>{p.desc}</p>
-                  <ul style={{ listStyle:'none', padding:0, margin:'0 0 24px' }}>
-                    {p.feats.map((f) => (
-                      <li key={f} style={{ display:'flex', gap:10, alignItems:'flex-start', fontSize:13.5, color:T.mid, padding:'7px 0' }}>
-                        <span style={{ color:T.blue, fontWeight:700, flexShrink:0 }}>✓</span>{f}
-                      </li>
-                    ))}
-                  </ul>
-                  <button onClick={() => navigate(p.cta.includes('sales') ? '/contact' : '/agents/login')} style={{
-                    width:'100%', padding:'12px 18px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer',
-                    background: p.primary ? T.blue : 'transparent',
-                    color: p.primary ? '#fff' : (p.cta.includes('sales') ? T.ink : T.blue),
-                    border: p.primary ? 'none' : `1.5px solid ${p.cta.includes('sales') ? T.border : T.blue}`,
-                  }}>{p.cta}</button>
-                </div>
-              ))}
-            </div>
-          </div>
-          <style>{`@media (max-width:760px){.pricing-grid{grid-template-columns:1fr !important;max-width:420px}}`}</style>
-        </section>
+        <PricingSection navigate={navigate} T={T} />
 
         {/* ═══ Search modal ═══ */}
         {modalOpen && (

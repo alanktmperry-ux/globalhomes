@@ -121,6 +121,7 @@ const Index = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalQuery, setModalQuery] = useState('');
   const [propertyCount, setPropertyCount] = useState<number | null>(null);
+  const [featuredListings, setFeaturedListings] = useState<any[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Front card crossfade refs
@@ -142,7 +143,49 @@ const Index = () => {
       .then(({ count }) => setPropertyCount(count ?? null));
   }, []);
 
-  // Sync dropdown selection → seqIdx
+  // Featured listings
+  useEffect(() => {
+    const cols = 'id, title, address, suburb, state, price, price_formatted, images, image_url, property_type, beds, baths, parking, listing_type, boost_tier, is_featured';
+    (async () => {
+      const { data: boosted } = await supabase
+        .from('properties')
+        .select(cols)
+        .eq('is_active', true)
+        .or('is_featured.eq.true,boost_tier.not.is.null')
+        .order('created_at', { ascending: false })
+        .limit(6);
+
+      const seen = new Set<string>();
+      const unique = (boosted ?? []).filter((p: any) => { if (seen.has(p.id)) return false; seen.add(p.id); return true; });
+
+      if (unique.length >= 3) {
+        setFeaturedListings(unique.slice(0, 6));
+        return;
+      }
+
+      const { data: fallback } = await supabase
+        .from('properties')
+        .select(cols)
+        .eq('is_active', true)
+        .or('listing_type.eq.sale,listing_type.is.null')
+        .order('created_at', { ascending: false })
+        .limit(6);
+
+      for (const p of (fallback ?? []) as any[]) {
+        if (!seen.has(p.id)) { seen.add(p.id); unique.push(p); }
+        if (unique.length >= 6) break;
+      }
+
+      if (unique.length > 0) setFeaturedListings(unique);
+    })();
+  }, []);
+
+  const fmtPrice = (price: number, listingType?: string) => {
+    if (!price) return 'Price on request';
+    if (listingType === 'rent' || listingType === 'rental') return `$${price.toLocaleString()}/wk`;
+    if (price >= 1_000_000) return `$${(price / 1_000_000).toFixed(price % 1_000_000 === 0 ? 0 : 2)}M`;
+    return `$${price.toLocaleString()}`;
+  };
   useEffect(() => {
     const map: Record<string, number> = {
       zh: 1, 'zh-CN': 1, 'zh-TW': 1,

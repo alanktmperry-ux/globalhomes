@@ -1056,9 +1056,9 @@ function AgentBand() {
             style={{ width:'100%', accentColor: T.blue }} />
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:16, marginTop:24 }}>
             {[
-              { v: buyers, l:'multilingual buyers reached / month' },
-              { v: '20', l:'languages auto-translated, zero work' },
-              { v: roi, l:'avg. return on $799/mo subscription' },
+              { v: buyers, l: t('home.agentBand.roiLabel1') },
+              { v: '20', l: t('home.agentBand.roiLabel2') },
+              { v: roi, l: t('home.agentBand.roiLabel3') },
             ].map((s) => (
               <div key={s.l} style={{ background:'rgba(255,255,255,.04)', border:'1px solid rgba(255,255,255,.08)', borderRadius:14, padding:20, textAlign:'center' }}>
                 <div style={{ fontSize:32, fontWeight:800, color:T.blue, lineHeight:1, marginBottom:8 }}>{s.v}</div>

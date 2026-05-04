@@ -388,7 +388,7 @@ const Index = () => {
         .voice-err { animation: errFade .25s ease-out; }
         .hero-headline { font-size: clamp(44px, 5vw, 76px); font-weight: 800; letter-spacing: -2px; line-height: 1.05; color: #0a0f1e; margin-bottom: 0; }
         .hero-headline .line1 { display: block; line-height: 1.1; }
-        .hero-headline .line2 { display: block; color: #2563EB; font-style: italic; font-weight: 700; line-height: 1.15; margin-top: 6px; min-height: 1.2em; }
+        .hero-headline .line2 { display: block; color: #2563EB; font-style: italic; font-weight: 700; line-height: 1.15; margin-top: 6px; min-height: 1.2em; font-size: clamp(28px, 3.5vw, 58px); }
       `}</style>
 
       <div className="wave17">

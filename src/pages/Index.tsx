@@ -402,12 +402,12 @@ const Index = () => {
               <h1 style={{ fontSize:'clamp(52px, 6.5vw, 96px)', fontWeight:800, letterSpacing:'-3px', lineHeight:0.95, margin:'0 0 4px', color:T.ink }}>
                 Find your home.
               </h1>
-              <h2 className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:'clamp(52px, 6.5vw, 96px)', fontWeight:700, letterSpacing:'-3px', lineHeight:0.95, margin:'0 0 20px', color:T.blue, fontStyle:'italic' }}>
+              <h2 className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:'clamp(52px, 6.5vw, 96px)', fontWeight:700, letterSpacing:'-3px', lineHeight:0.95, margin:'0 0 12px', color:T.blue, fontStyle:'italic' }}>
                 {seq.line2}
               </h2>
 
-              <div className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:13, fontWeight:500, color:T.muted, marginBottom:24 }}>
-                {seq.flag} {seq.sub} · click any language below to switch
+              <div className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:14, fontWeight:500, color:T.mid, marginBottom:16, display:'flex', alignItems:'center', gap:6 }}>
+                <span style={{ fontSize:20, lineHeight:1 }}>{seq.flag}</span> {seq.sub} · click any language below to switch
               </div>
 
               {/* Search block */}

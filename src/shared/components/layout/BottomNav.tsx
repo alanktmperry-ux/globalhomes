@@ -101,11 +101,11 @@ export function BottomNav() {
         {/* Sign in pill / Profile */}
         {!user && !loading ? (
           <button
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/agent-auth')}
             className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-full transition-colors"
           >
             <LogIn size={14} strokeWidth={2} />
-            <span className="text-[12px] font-semibold">Sign in</span>
+            <span className="text-[12px] font-semibold">Try free</span>
           </button>
         ) : user ? (
           <button onClick={() => navigate('/profile')} className={itemClass('/profile')}>

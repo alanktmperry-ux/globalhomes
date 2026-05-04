@@ -767,7 +767,7 @@ const Index = () => {
                   onClick={() => navigate('/buy')}
                   style={{ background: T.blue, color: '#fff', border: 'none', padding: '14px 36px', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
                 >
-                  Browse all properties →
+                  {t('home.featured.browseAll')}
                 </button>
               </div>
             </div>

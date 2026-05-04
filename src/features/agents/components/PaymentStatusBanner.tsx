@@ -19,11 +19,20 @@ function getDaysSince(dateStr: string | null): number {
  * PaymentStatusBanner — renders warning/critical banners or a locked overlay
  * for agents with payment issues. Only renders for authenticated agents.
  */
-export function PaymentStatusBanner() {
+export function PaymentStatusBanner({ onVisibleChange }: { onVisibleChange?: (visible: boolean) => void } = {}) {
   const { agent } = useCurrentAgent();
   const [dismissed, setDismissed] = useState(() =>
     sessionStorage.getItem('payment-banner-dismissed') === 'true'
   );
+  const lastVisibleRef = useRef<boolean | null>(null);
+  const reportVisible = (v: boolean) => {
+    if (lastVisibleRef.current !== v) {
+      lastVisibleRef.current = v;
+      onVisibleChange?.(v);
+    }
+    return v;
+  };
+  useEffect(() => () => { onVisibleChange?.(false); }, [onVisibleChange]);
 
   const state: AgentPaymentState | null = agent
     ? {

@@ -44,14 +44,13 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     title: 'Halo Board',
-    url: '/dashboard/halo-board',
+    url: '',
     icon: Sparkles,
     badgeKey: 'haloCredits',
-  },
-  {
-    title: 'Buy Credits',
-    url: '/dashboard/buy-credits',
-    icon: HandCoins,
+    children: [
+      { title: 'Browse Halo Board', url: '/dashboard/halo-board', icon: Sparkles },
+      { title: 'Buy Credits', url: '/dashboard/buy-credits', icon: HandCoins },
+    ],
   },
   {
     title: 'Listings',
@@ -68,7 +67,7 @@ const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
-    title: 'Property Mgmt',
+    title: 'Tenancies',
     url: '',
     icon: Home,
     children: [
@@ -76,13 +75,21 @@ const NAV_SECTIONS: NavSection[] = [
       { title: 'Rental Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
       { title: 'Vacancies', url: '/dashboard/vacancies', icon: Building2 },
       { title: 'Vacancy KPIs', url: '/dashboard/vacancy-kpi', icon: Activity },
-      { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
+      { title: 'Renewals Due', url: '/dashboard/rent-roll?filter=renewals', icon: RefreshCw, badgeKey: 'renewals', alertWhenBadge: true },
+    ],
+  },
+  {
+    title: 'Compliance',
+    url: '',
+    icon: Shield,
+    children: [
       { title: 'Routine Inspections', url: '/dashboard/pm-inspections', icon: CalendarDays, badgeKey: 'disputes', alertWhenBadge: true },
-      { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },
-      { title: 'Key Register', url: '/dashboard/keys', icon: Scale },
       { title: 'Smoke Alarms', url: '/dashboard/smoke-alarms', icon: AlertCircle, badgeKey: 'smokeAlarms', alertWhenBadge: true },
       { title: 'Bond Claims', url: '/dashboard/bond-claims', icon: Scale },
+      { title: 'Key Register', url: '/dashboard/keys', icon: Scale },
       { title: 'Documents', url: '/dashboard/property-documents', icon: FileText },
+      { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
+      { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },
     ],
   },
   {
@@ -97,7 +104,6 @@ const NAV_SECTIONS: NavSection[] = [
       { title: 'Rent Increases', url: '/dashboard/rent-increases', icon: TrendingUp },
       { title: 'Arrears', url: '/dashboard/arrears', icon: AlertCircle, badgeKey: 'arrears', alertWhenBadge: true },
       { title: 'Reports', url: '/dashboard/reports', icon: BarChart3 },
-      { title: 'Renewals Due', url: '/dashboard/rent-roll?filter=renewals', icon: RefreshCw, badgeKey: 'renewals', alertWhenBadge: true },
     ],
   },
   {
@@ -328,7 +334,7 @@ const AgentDashboardSidebar = () => {
     const Icon = section.icon;
     const badgeVal = section.badgeKey ? badgeValues[section.badgeKey] : '';
 
-    const toggleOnlySections = ['Listings', 'Finance', 'Property Mgmt', 'Market Tools'];
+    const toggleOnlySections = ['Listings', 'Finance', 'Tenancies', 'Compliance', 'Market Tools', 'Halo Board'];
     const isToggleOnly = toggleOnlySections.includes(section.title);
     const canNavigate = !!section.url && !isToggleOnly;
 

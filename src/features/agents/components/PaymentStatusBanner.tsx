@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
@@ -19,11 +19,20 @@ function getDaysSince(dateStr: string | null): number {
  * PaymentStatusBanner — renders warning/critical banners or a locked overlay
  * for agents with payment issues. Only renders for authenticated agents.
  */
-export function PaymentStatusBanner() {
+export function PaymentStatusBanner({ onVisibleChange }: { onVisibleChange?: (visible: boolean) => void } = {}) {
   const { agent } = useCurrentAgent();
   const [dismissed, setDismissed] = useState(() =>
     sessionStorage.getItem('payment-banner-dismissed') === 'true'
   );
+  const lastVisibleRef = useRef<boolean | null>(null);
+  const reportVisible = (v: boolean) => {
+    if (lastVisibleRef.current !== v) {
+      lastVisibleRef.current = v;
+      onVisibleChange?.(v);
+    }
+    return v;
+  };
+  useEffect(() => () => { onVisibleChange?.(false); }, [onVisibleChange]);
 
   const state: AgentPaymentState | null = agent
     ? {
@@ -33,10 +42,11 @@ export function PaymentStatusBanner() {
       }
     : null;
 
-  if (!agent || !state) return null;
+  if (!agent || !state) { reportVisible(false); return null; }
 
   // Check admin grace period
   if (state.adminGraceUntil && new Date(state.adminGraceUntil) > new Date()) {
+    reportVisible(false);
     return null;
   }
 
@@ -44,6 +54,7 @@ export function PaymentStatusBanner() {
 
   // STATE 3 — LOCKED
   if (subscriptionStatus === 'locked') {
+    reportVisible(true);
     return <LockedOverlay />;
   }
 
@@ -58,17 +69,19 @@ export function PaymentStatusBanner() {
     const daysLeft = Math.ceil((trialEndsAt.getTime() - Date.now()) / 86400000);
 
     if (daysLeft >= 0 && daysLeft <= 30) {
+      reportVisible(true);
       return <TrialBanner daysLeft={daysLeft} />;
     }
   }
 
-  if (subscriptionStatus !== 'payment_failed' || !paymentFailedAt) return null;
+  if (subscriptionStatus !== 'payment_failed' || !paymentFailedAt) { reportVisible(false); return null; }
 
   const daysSinceFailure = getDaysSince(paymentFailedAt);
 
   // STATE 2 — CRITICAL (days 8-14)
   if (daysSinceFailure >= 8 && daysSinceFailure <= 14) {
     const daysRemaining = 15 - daysSinceFailure;
+    reportVisible(true);
     return (
       <div className="sticky top-0 z-40 w-full bg-red-600 text-white px-4 py-3 text-sm">
         <div className="max-w-5xl mx-auto flex items-center justify-center gap-2 text-center">
@@ -86,7 +99,8 @@ export function PaymentStatusBanner() {
 
   // STATE 1 — WARNING (days 1-7)
   if (daysSinceFailure >= 1 && daysSinceFailure <= 7) {
-    if (dismissed) return null;
+    if (dismissed) { reportVisible(false); return null; }
+    reportVisible(true);
     return (
       <div className="sticky top-0 z-40 w-full bg-amber-500 text-white px-4 py-3 text-sm">
         <div className="max-w-5xl mx-auto flex items-center justify-between gap-2">
@@ -111,6 +125,7 @@ export function PaymentStatusBanner() {
     );
   }
 
+  reportVisible(false);
   return null;
 }
 

@@ -67,7 +67,7 @@ const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
-    title: 'Property Mgmt',
+    title: 'Tenancies',
     url: '',
     icon: Home,
     children: [
@@ -75,13 +75,21 @@ const NAV_SECTIONS: NavSection[] = [
       { title: 'Rental Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
       { title: 'Vacancies', url: '/dashboard/vacancies', icon: Building2 },
       { title: 'Vacancy KPIs', url: '/dashboard/vacancy-kpi', icon: Activity },
-      { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
+      { title: 'Renewals Due', url: '/dashboard/rent-roll?filter=renewals', icon: RefreshCw, badgeKey: 'renewals', alertWhenBadge: true },
+    ],
+  },
+  {
+    title: 'Compliance',
+    url: '',
+    icon: Shield,
+    children: [
       { title: 'Routine Inspections', url: '/dashboard/pm-inspections', icon: CalendarDays, badgeKey: 'disputes', alertWhenBadge: true },
-      { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },
-      { title: 'Key Register', url: '/dashboard/keys', icon: Scale },
       { title: 'Smoke Alarms', url: '/dashboard/smoke-alarms', icon: AlertCircle, badgeKey: 'smokeAlarms', alertWhenBadge: true },
       { title: 'Bond Claims', url: '/dashboard/bond-claims', icon: Scale },
+      { title: 'Key Register', url: '/dashboard/keys', icon: Scale },
       { title: 'Documents', url: '/dashboard/property-documents', icon: FileText },
+      { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
+      { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },
     ],
   },
   {

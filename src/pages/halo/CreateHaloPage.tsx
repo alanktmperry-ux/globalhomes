@@ -117,10 +117,17 @@ export default function CreateHaloPage() {
 
   const validators = [validateStep1, validateStep2, validateStep3];
 
+  const scrollToError = () => {
+    setTimeout(() => {
+      document.querySelector('[role="alert"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
+  };
+
   const handleNext = () => {
     const err = validators[step - 1](data);
     if (err) {
       setStepError(err);
+      scrollToError();
       return;
     }
     setStepError(null);
@@ -136,6 +143,7 @@ export default function CreateHaloPage() {
     const err = validateStep3(data);
     if (err) {
       setStepError(err);
+      scrollToError();
       return;
     }
     if (!user) {
@@ -175,11 +183,11 @@ export default function CreateHaloPage() {
       } catch { /* non-fatal */ }
 
       localStorage.removeItem(DRAFT_KEY);
-      toast.success('Your Halo is live');
-      navigate('/dashboard/my-halos');
+      navigate('/halo/success');
     } catch (e) {
       console.error(e);
       toast.error('Something went wrong. Please try again.');
+      scrollToError();
     } finally {
       setSubmitting(false);
     }

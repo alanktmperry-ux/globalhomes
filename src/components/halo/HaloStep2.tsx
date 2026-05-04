@@ -97,25 +97,33 @@ export function HaloStep2({ data, update }: Props) {
           <Label htmlFor="budget_min" className="text-base font-semibold mb-2 block">
             Min budget (AUD)
           </Label>
-          <Input
-            id="budget_min"
-            inputMode="numeric"
-            value={formatAUD(data.budget_min)}
-            onChange={(e) => update({ budget_min: parseAUD(e.target.value) })}
-            placeholder="500,000"
-          />
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+            <Input
+              id="budget_min"
+              inputMode="numeric"
+              className="pl-7"
+              value={formatAUD(data.budget_min)}
+              onChange={(e) => update({ budget_min: parseAUD(e.target.value) })}
+              placeholder="500,000"
+            />
+          </div>
         </div>
         <div>
           <Label htmlFor="budget_max" className="text-base font-semibold mb-2 block">
             Max budget (AUD) *
           </Label>
-          <Input
-            id="budget_max"
-            inputMode="numeric"
-            value={formatAUD(data.budget_max)}
-            onChange={(e) => update({ budget_max: parseAUD(e.target.value) ?? 0 })}
-            placeholder="900,000"
-          />
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+            <Input
+              id="budget_max"
+              inputMode="numeric"
+              className="pl-7"
+              value={formatAUD(data.budget_max)}
+              onChange={(e) => update({ budget_max: parseAUD(e.target.value) ?? 0 })}
+              placeholder="900,000"
+            />
+          </div>
         </div>
       </div>
 

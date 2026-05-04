@@ -1,5 +1,6 @@
 import { Building2, Home } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import type { HaloFormData } from '@/types/halo';
 import { PROPERTY_TYPE_OPTIONS } from '@/types/halo';
@@ -72,6 +73,25 @@ export function HaloStep1({ data, update }: Props) {
   return (
     <div className="space-y-8">
       <div>
+        <Label className="text-base font-semibold mb-2 block">I speak</Label>
+        <Select
+          value={data.preferred_language}
+          onValueChange={(v) => update({ preferred_language: v })}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="english">English</SelectItem>
+            <SelectItem value="mandarin">Mandarin</SelectItem>
+            <SelectItem value="vietnamese">Vietnamese</SelectItem>
+            <SelectItem value="korean">Korean</SelectItem>
+            <SelectItem value="other">Other</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
         <Label className="text-base font-semibold mb-3 block">I want to *</Label>
         <div className="grid grid-cols-2 gap-3">
           {(['buy', 'rent'] as const).map((intent) => (
@@ -118,7 +138,7 @@ export function HaloStep1({ data, update }: Props) {
           <div>
             <p className="text-sm text-muted-foreground mb-2">Min</p>
             <ChipGroup
-              options={[1, 2, 3, 4, '5+', null]}
+              options={[null, 1, 2, 3, 4, '5+']}
               value={data.bedrooms_min}
               onChange={(v) => update({ bedrooms_min: v })}
             />
@@ -126,7 +146,7 @@ export function HaloStep1({ data, update }: Props) {
           <div>
             <p className="text-sm text-muted-foreground mb-2">Max</p>
             <ChipGroup
-              options={[1, 2, 3, 4, '5+', null]}
+              options={[null, 1, 2, 3, 4, '5+']}
               value={data.bedrooms_max}
               onChange={(v) => update({ bedrooms_max: v })}
             />
@@ -137,7 +157,7 @@ export function HaloStep1({ data, update }: Props) {
       <div>
         <Label className="text-base font-semibold mb-3 block">Bathrooms (min)</Label>
         <ChipGroup
-          options={[1, 2, '3+', null]}
+          options={[null, 1, 2, '3+']}
           value={data.bathrooms_min}
           onChange={(v) => update({ bathrooms_min: v })}
         />

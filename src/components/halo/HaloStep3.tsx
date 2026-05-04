@@ -1,13 +1,6 @@
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import type { HaloFormData } from '@/types/halo';
 import { MUST_HAVE_OPTIONS } from '@/types/halo';
@@ -39,7 +32,7 @@ export function HaloStep3({ data, update }: Props) {
           id="description"
           value={desc}
           onChange={(e) => update({ description: e.target.value.slice(0, 500) })}
-          placeholder="Describe what you're looking for in your own words..."
+          placeholder="e.g. Family of 4 relocating from China — need a quiet street near a top primary school, open to townhouse or house, not ground floor."
           rows={4}
         />
         <p className="text-xs text-muted-foreground mt-1 text-right">{desc.length} / 500</p>
@@ -81,44 +74,6 @@ export function HaloStep3({ data, update }: Props) {
           maxLength={200}
         />
         <p className="text-xs text-muted-foreground mt-1 text-right">{dealBreakers.length} / 200</p>
-      </div>
-
-      <div>
-        <Label className="text-base font-semibold mb-2 block">Preferred language</Label>
-        <Select
-          value={data.preferred_language}
-          onValueChange={(v) => update({ preferred_language: v })}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="english">English</SelectItem>
-            <SelectItem value="mandarin">Mandarin</SelectItem>
-            <SelectItem value="vietnamese">Vietnamese</SelectItem>
-            <SelectItem value="korean">Korean</SelectItem>
-            <SelectItem value="other">Other</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div>
-        <Label className="text-base font-semibold mb-2 block">How did you hear about us?</Label>
-        <Select
-          value={data.referral_source ?? ''}
-          onValueChange={(v) => update({ referral_source: v || null })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Optional" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="social_media">Social media</SelectItem>
-            <SelectItem value="friend_family">Friend/family</SelectItem>
-            <SelectItem value="google">Google</SelectItem>
-            <SelectItem value="real_estate_agent">Real estate agent</SelectItem>
-            <SelectItem value="other">Other</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
     </div>
   );

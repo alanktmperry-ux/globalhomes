@@ -175,6 +175,7 @@ const HelpContactPage = React.lazy(() => import("./pages/HelpContactPage"));
 const CRMPage = React.lazy(() => import("./features/crm/pages/CRMPage"));
 const SavedSearchesPage = React.lazy(() => import("./features/alerts/pages/SavedSearchesPage"));
 const CreateHaloPage = React.lazy(() => import("./pages/halo/CreateHaloPage"));
+const HaloSuccessPage = React.lazy(() => import("./pages/halo/HaloSuccessPage"));
 const MyHalosPage = React.lazy(() => import("./pages/halo/MyHalosPage"));
 const HaloBoardPage = React.lazy(() => import("./pages/halo/HaloBoardPage"));
 const HaloDetailPage = React.lazy(() => import("./pages/halo/HaloDetailPage"));
@@ -383,6 +384,7 @@ const App = () => (
 
                 {/* Halo — seeker reverse marketplace */}
                 <Route path="/halo/new" element={<ProtectedRoute><CreateHaloPage /></ProtectedRoute>} />
+                <Route path="/halo/success" element={<ProtectedRoute><HaloSuccessPage /></ProtectedRoute>} />
                 <Route path="/dashboard/my-halos" element={<ProtectedRoute><MyHalosPage /></ProtectedRoute>} />
 
                 {/* Agent */}

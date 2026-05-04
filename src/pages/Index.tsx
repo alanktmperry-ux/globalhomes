@@ -890,6 +890,7 @@ function AgentBand() {
   const [demoLang, setDemoLang] = useState<'all' | 'zh' | 'vi' | 'ar' | 'hi'>('all');
   const [results, setResults] = useState<typeof TRANS_MAP[0] | null>(null);
   const [typed, setTyped] = useState({ en:'', zh:'', vi:'', ar:'', hi:'' });
+  const [videoOpen, setVideoOpen] = useState(false);
 
   const buyers = (n * 70).toLocaleString();
   const roi = `${Math.min(12.0, 1.8 + n * 0.1).toFixed(1)}×`;

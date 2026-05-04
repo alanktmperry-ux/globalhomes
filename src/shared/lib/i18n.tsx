@@ -1417,7 +1417,14 @@ export function I18nProvider({ children }: { children: ReactNode }) {
         // Confirmation toast in the new language
         const msg = languageUpdatedMessages[newLang] || languageUpdatedMessages.en;
         const name = languageNames[newLang] || newLang;
-        toast.success(`${msg} — ${name}`);
+        toast.success(`${msg} — ${name}`, {
+          style: {
+            background: '#EFF6FF',
+            border: '1px solid #DBEAFE',
+            color: '#2563EB',
+          },
+          className: 'lang-toast-blue',
+        });
       }
       return newLang;
     });

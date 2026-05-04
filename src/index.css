@@ -154,3 +154,9 @@
 .gm-style > div:first-child {
   pointer-events: auto !important;
 }
+
+/* Language change toast — blue theme override */
+.lang-toast-blue [data-icon] svg,
+.lang-toast-blue [data-icon] {
+  color: #2563EB !important;
+}

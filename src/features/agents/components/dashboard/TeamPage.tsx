@@ -8,6 +8,7 @@ import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
@@ -613,7 +614,13 @@ const TeamPage = () => {
               </div>
               <div>
                 <Label className="text-xs font-medium">Office Address</Label>
-                <Input placeholder="e.g. 123 Collins St, Melbourne VIC 3000" value={newAgencyAddress} onChange={(e) => setNewAgencyAddress(e.target.value)} className="mt-1.5" />
+                <AddressAutocomplete
+                  value={newAgencyAddress}
+                  onChange={(raw) => setNewAgencyAddress(raw)}
+                  onSelect={(parts) => setNewAgencyAddress(parts.address)}
+                  placeholder="e.g. 123 Collins St, Melbourne VIC 3000"
+                  className="mt-1.5"
+                />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -943,7 +950,13 @@ const TeamPage = () => {
             </div>
             <div>
               <Label className="text-xs font-medium">Office Address</Label>
-              <Input placeholder="123 Collins St, Melbourne VIC 3000" value={agencyAddress} onChange={(e) => setAgencyAddress(e.target.value)} className="mt-1.5" />
+              <AddressAutocomplete
+                value={agencyAddress}
+                onChange={(raw) => setAgencyAddress(raw)}
+                onSelect={(parts) => setAgencyAddress(parts.address)}
+                placeholder="123 Collins St, Melbourne VIC 3000"
+                className="mt-1.5"
+              />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>

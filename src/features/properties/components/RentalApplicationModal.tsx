@@ -6,6 +6,7 @@ import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
 
 /* ── Validation schemas per step ── */
 const step1Schema = z.object({
@@ -293,7 +294,13 @@ export function RentalApplicationModal({ property, open, onClose }: Props) {
                         </div>
                         <div>
                           <label className={labelCls}>Current Address *</label>
-                          <input className={inputCls} value={form.currentAddress} onChange={e => set('currentAddress', e.target.value)} placeholder="123 Main St, Sydney NSW 2000" />
+                          <AddressAutocomplete
+                            value={form.currentAddress}
+                            onChange={(raw) => set('currentAddress', raw)}
+                            onSelect={(parts) => set('currentAddress', parts.address)}
+                            placeholder="Start typing your address..."
+                            className={inputCls}
+                          />
                           {errors.currentAddress && <p className={errCls}>{errors.currentAddress}</p>}
                         </div>
                       </>
@@ -332,7 +339,13 @@ export function RentalApplicationModal({ property, open, onClose }: Props) {
                         <p className="text-sm text-muted-foreground mb-2">Your rental history</p>
                         <div>
                           <label className={labelCls}>Previous Address</label>
-                          <input className={inputCls} value={form.previousAddress} onChange={e => set('previousAddress', e.target.value)} placeholder="Previous rental address" />
+                          <AddressAutocomplete
+                            value={form.previousAddress}
+                            onChange={(raw) => set('previousAddress', raw)}
+                            onSelect={(parts) => set('previousAddress', parts.address)}
+                            placeholder="Previous rental address"
+                            className={inputCls}
+                          />
                         </div>
                         <div>
                           <label className={labelCls}>Previous Landlord / Agent Name</label>

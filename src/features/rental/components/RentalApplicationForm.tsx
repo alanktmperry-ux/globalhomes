@@ -4,6 +4,7 @@ import type { CoApplicant } from '../types';
 import { CheckCircle, Plus, Trash2, ShieldCheck, LogIn } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
+import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
 import { supabase } from '@/integrations/supabase/client';
 import type { Session } from '@supabase/supabase-js';
 
@@ -150,7 +151,17 @@ export function RentalApplicationForm({ propertyId, rentPw }: Props) {
               <InputField label="Emergency Contact Phone" field="emergency_contact_phone" type="tel" />
             </div>
           </div>
-          <InputField label="Current Address" field="current_address" required />
+          <div>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">
+              Current Address <span className="text-destructive">*</span>
+            </label>
+            <AddressAutocomplete
+              value={form.current_address}
+              onChange={(raw) => set('current_address', raw)}
+              onSelect={(parts) => set('current_address', parts.address)}
+              placeholder="Start typing your address..."
+            />
+          </div>
           <div>
             <label className="block text-xs font-medium text-muted-foreground mb-1">Time at current address</label>
             <select value={form.time_at_address}

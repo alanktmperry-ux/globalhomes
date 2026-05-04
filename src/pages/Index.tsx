@@ -1133,7 +1133,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
         'Phone & email support',
       ],
       cta: 'Book a demo →',
-      sub: 'Setup included',
+      sub: 'No credit card · Setup included · Cancel anytime',
       action: () => navigate('/contact'),
       style: 'filled' as const,
       popular: true,

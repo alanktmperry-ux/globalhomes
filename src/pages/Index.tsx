@@ -928,7 +928,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
         'Phone & email support',
       ],
       cta: 'Book a demo →',
-      sub: 'No free trial · talk to us first · onboarding included',
+      sub: 'Setup included',
       action: () => navigate('/contact'),
       style: 'filled' as const,
       popular: true,

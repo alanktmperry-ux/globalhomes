@@ -683,52 +683,7 @@ const Index = () => {
         <AgentBand />
 
         {/* ═══ SECTION 9 — Pricing ═══ */}
-        <section style={{ background:T.off, padding:'88px 24px' }}>
-          <div style={{ maxWidth:1200, margin:'0 auto', textAlign:'center' }}>
-            <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>Pricing — no contracts, cancel anytime</div>
-            <h2 style={{ fontSize:'clamp(32px, 3.5vw, 48px)', fontWeight:800, letterSpacing:'-1.5px', lineHeight:1.1, margin:'0 0 14px' }}>
-              Built for the way <em style={{ color:T.blue, fontStyle:'italic' }}>you work.</em>
-            </h2>
-            <p style={{ fontSize:16, color:T.muted, margin:'0 auto 52px', maxWidth:640 }}>All plans include 60 days free · 20 languages · Trust accounting</p>
-
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:16, maxWidth:960, margin:'0 auto' }} className="pricing-grid">
-              {[
-                { name:'Solo', price:'$799', desc:'Independent agents running their own shop', feats:['1 agent seat · up to 10 active listings','Full trust accounting (full ledger)','20-language auto-translation','AI buyer matching & voice search','Full CRM, pipeline & contacts','Halo™ buyer matching board','Email support'], cta:'Start free 60-day trial', primary:false, popular:false },
-                { name:'Agency', price:'$1,999', desc:'For growing agencies ready to scale', feats:['Up to 5 agent seats','Unlimited listings','20-language auto-translation','Full PM automation + trust accounting','Priority AI matching + lead analytics','Agency-branded profile page','Phone & email support'], cta:'Start free 60-day trial', primary:true, popular:true },
-                { name:'Agency Pro', price:'$3,499', desc:'Established multi-office agencies', feats:['Up to 15 agent seats','Unlimited everything','Full PM automation','Multi-branch dashboard','White-label option','API access + custom integrations','Dedicated account manager'], cta:'Talk to sales', primary:false, popular:false },
-              ].map((p, i) => (
-                <div key={p.name} className={`reveal reveal-d${i+1}`} style={{
-                  background:'#fff', border:`1.5px solid ${p.popular ? T.blue : T.border}`, borderRadius:20, padding:'32px 28px', position:'relative', textAlign:'left',
-                  boxShadow: p.popular ? `0 0 0 3px rgba(37,99,235,.08)` : 'none'
-                }}>
-                  {p.popular && (
-                    <div style={{ position:'absolute', top:-12, left:'50%', transform:'translateX(-50%)', background:T.blue, color:'#fff', fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'.08em', padding:'5px 12px', borderRadius:100 }}>Most popular</div>
-                  )}
-                  <div style={{ fontSize:12, fontWeight:700, color:T.muted, textTransform:'uppercase', letterSpacing:'.08em', marginBottom:14 }}>{p.name}</div>
-                  <div style={{ marginBottom:8 }}>
-                    <span style={{ fontSize:44, fontWeight:800, color:T.ink, letterSpacing:'-1.5px' }}>{p.price}</span>
-                    <span style={{ fontSize:13, color:T.muted }}>/month</span>
-                  </div>
-                  <p style={{ fontSize:13, color:T.muted, margin:'0 0 22px', lineHeight:1.5 }}>{p.desc}</p>
-                  <ul style={{ listStyle:'none', padding:0, margin:'0 0 24px' }}>
-                    {p.feats.map((f) => (
-                      <li key={f} style={{ display:'flex', gap:10, alignItems:'flex-start', fontSize:13.5, color:T.mid, padding:'7px 0' }}>
-                        <span style={{ color:T.blue, fontWeight:700, flexShrink:0 }}>✓</span>{f}
-                      </li>
-                    ))}
-                  </ul>
-                  <button onClick={() => navigate(p.cta.includes('sales') ? '/contact' : '/agents/login')} style={{
-                    width:'100%', padding:'12px 18px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer',
-                    background: p.primary ? T.blue : 'transparent',
-                    color: p.primary ? '#fff' : (p.cta.includes('sales') ? T.ink : T.blue),
-                    border: p.primary ? 'none' : `1.5px solid ${p.cta.includes('sales') ? T.border : T.blue}`,
-                  }}>{p.cta}</button>
-                </div>
-              ))}
-            </div>
-          </div>
-          <style>{`@media (max-width:760px){.pricing-grid{grid-template-columns:1fr !important;max-width:420px}}`}</style>
-        </section>
+        <PricingSection navigate={navigate} T={T} />
 
         {/* ═══ Search modal ═══ */}
         {modalOpen && (
@@ -926,4 +881,187 @@ function AgentBand() {
   );
 }
 
+type NavFn = (path: string) => void;
+type Theme = { blue: string; blueL: string; blueMid: string; ink: string; mid: string; muted: string; off: string; border: string };
+
+function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
+  const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');
+
+  const PLANS = [
+    {
+      name: 'Solo',
+      monthly: 799,
+      annual: 7670,
+      annualMonthly: 639,
+      desc: 'Independent agents running their own shop',
+      feats: [
+        '1 agent seat · up to 10 active listings',
+        'Full CRM — pipeline, contacts, deal tracking',
+        'Full trust accounting (complete ledger)',
+        '20-language auto-translation on every listing',
+        'AI buyer matching + voice search',
+        'Halo™ buyer matching board',
+        'Email support',
+      ],
+      cta: 'Start 30-day free trial →',
+      sub: 'Credit card required · auto-charges $799 on day 31 · cancel anytime',
+      action: () => navigate('/agents/login'),
+      style: 'filled' as const,
+      popular: false,
+    },
+    {
+      name: 'Agency',
+      monthly: 1999,
+      annual: 19190,
+      annualMonthly: 1599,
+      desc: 'For growing agencies ready to scale',
+      feats: [
+        'Up to 5 agent seats',
+        'Unlimited listings',
+        'Full CRM for the whole team',
+        'Full PM automation + trust accounting',
+        '20-language auto-translation',
+        'Priority AI matching + lead analytics',
+        'Agency-branded profile page',
+        'Phone & email support',
+      ],
+      cta: 'Book a demo →',
+      sub: 'No free trial · talk to us first · onboarding included',
+      action: () => navigate('/contact'),
+      style: 'filled' as const,
+      popular: true,
+    },
+    {
+      name: 'Agency Pro',
+      monthly: 3499,
+      annual: 33590,
+      annualMonthly: 2799,
+      desc: 'Established multi-office agencies',
+      feats: [
+        'Up to 15 agent seats',
+        'Unlimited everything',
+        'Full PM automation + trust accounting',
+        'Multi-branch dashboard',
+        'White-label option',
+        'API access + custom integrations',
+        'Dedicated account manager',
+      ],
+      cta: 'Talk to sales →',
+      sub: 'Custom onboarding · SLA available',
+      action: () => navigate('/contact'),
+      style: 'ghost' as const,
+      popular: false,
+    },
+  ];
+
+  const fmt = (n: number) => `$${n.toLocaleString('en-US')}`;
+
+  return (
+    <section style={{ background: T.off, padding: '88px 24px' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', textAlign: 'center' }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: T.blue, textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 14 }}>Pricing — no contracts, cancel anytime</div>
+        <h2 style={{ fontSize: 'clamp(32px, 3.5vw, 48px)', fontWeight: 800, letterSpacing: '-1.5px', lineHeight: 1.1, margin: '0 0 14px' }}>
+          Built for the way <em style={{ color: T.blue, fontStyle: 'italic' }}>you work.</em>
+        </h2>
+        <p style={{ fontSize: 16, color: T.muted, margin: '0 auto 28px', maxWidth: 680 }}>
+          All plans include 20 languages · trust accounting · AI matching
+        </p>
+
+        {/* Value prop callout */}
+        <div style={{
+          background: '#EFF6FF', border: '1px solid #DBEAFE', borderRadius: 16,
+          padding: '20px 24px', maxWidth: 820, margin: '0 auto 32px', textAlign: 'left',
+        }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: T.ink, marginBottom: 6 }}>
+            Why $799/mo is a no-brainer for agents
+          </div>
+          <p style={{ fontSize: 13.5, color: T.mid, lineHeight: 1.55, margin: 0 }}>
+            REA.com.au and Domain charge $1,500–$7,000 per listing. A CRM costs $300–$600/mo. Property management software another $200–$400/mo. ListHQ replaces all three — CRM, PM platform, and multilingual listing portal — in one subscription, reaching 7M+ multilingual buyers no other portal can find.
+          </p>
+        </div>
+
+        {/* Billing toggle */}
+        <div style={{ display: 'inline-flex', background: '#fff', border: `1px solid ${T.border}`, borderRadius: 100, padding: 4, marginBottom: 36, gap: 4 }}>
+          {(['monthly', 'annual'] as const).map((b) => (
+            <button
+              key={b}
+              onClick={() => setBilling(b)}
+              style={{
+                padding: '8px 18px', borderRadius: 100, border: 'none', cursor: 'pointer',
+                fontSize: 13, fontWeight: 700,
+                background: billing === b ? T.blue : 'transparent',
+                color: billing === b ? '#fff' : T.mid,
+                transition: 'all .15s',
+              }}
+            >
+              {b === 'monthly' ? 'Monthly' : 'Annual — save 20%'}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, maxWidth: 1040, margin: '0 auto' }} className="pricing-grid">
+          {PLANS.map((p, i) => {
+            const isAnnual = billing === 'annual';
+            return (
+              <div key={p.name} className={`reveal reveal-d${i + 1}`} style={{
+                background: p.popular ? '#F8FBFF' : '#fff',
+                border: `${p.popular ? 2 : 1.5}px solid ${p.popular ? T.blue : T.border}`,
+                borderRadius: 20, padding: '32px 28px', position: 'relative', textAlign: 'left',
+                boxShadow: p.popular ? '0 8px 28px rgba(37,99,235,.12)' : 'none',
+              }}>
+                {p.popular && (
+                  <div style={{ position: 'absolute', top: -12, right: 20, background: T.blue, color: '#fff', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', padding: '5px 12px', borderRadius: 100 }}>
+                    Most popular
+                  </div>
+                )}
+                <div style={{ fontSize: 12, fontWeight: 700, color: T.muted, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 14 }}>{p.name}</div>
+                <div style={{ marginBottom: 6 }}>
+                  {isAnnual ? (
+                    <>
+                      <span style={{ fontSize: 44, fontWeight: 800, color: T.ink, letterSpacing: '-1.5px' }}>{fmt(p.annualMonthly)}</span>
+                      <span style={{ fontSize: 13, color: T.muted }}>/mo</span>
+                    </>
+                  ) : (
+                    <>
+                      <span style={{ fontSize: 44, fontWeight: 800, color: T.ink, letterSpacing: '-1.5px' }}>{fmt(p.monthly)}</span>
+                      <span style={{ fontSize: 13, color: T.muted }}>/mo</span>
+                    </>
+                  )}
+                </div>
+                <div style={{ fontSize: 12, color: T.muted, marginBottom: 14, minHeight: 18 }}>
+                  {isAnnual ? (
+                    <>
+                      <span style={{ textDecoration: 'line-through', marginRight: 6 }}>{fmt(p.monthly)}/mo</span>
+                      · {fmt(p.annual)}/yr billed annually
+                    </>
+                  ) : (
+                    <>or {fmt(p.annual)}/yr (save 20%)</>
+                  )}
+                </div>
+                <p style={{ fontSize: 13, color: T.muted, margin: '0 0 22px', lineHeight: 1.5 }}>{p.desc}</p>
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px' }}>
+                  {p.feats.map((f) => (
+                    <li key={f} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 13.5, color: T.mid, padding: '7px 0' }}>
+                      <span style={{ color: T.blue, fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
+                    </li>
+                  ))}
+                </ul>
+                <button onClick={p.action} style={{
+                  width: '100%', padding: '12px 18px', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer',
+                  background: p.style === 'filled' ? T.blue : 'transparent',
+                  color: p.style === 'filled' ? '#fff' : T.blue,
+                  border: p.style === 'filled' ? 'none' : `1.5px solid ${T.blue}`,
+                }}>{p.cta}</button>
+                <p style={{ fontSize: 11.5, color: T.muted, margin: '10px 0 0', lineHeight: 1.45, textAlign: 'center' }}>{p.sub}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <style>{`@media (max-width:760px){.pricing-grid{grid-template-columns:1fr !important;max-width:420px}}`}</style>
+    </section>
+  );
+}
+
 export default Index;
+

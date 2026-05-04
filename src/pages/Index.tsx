@@ -287,7 +287,11 @@ const Index = () => {
         setVoiceState('processing');
         try {
           const blob = new Blob(chunks, { type: mimeType });
-          const whisperLang = langCodeRef.current?.split('-')[0] || 'en';
+          // Use the user's selected display language, not the cycling animation language
+          const selectedLang = document.documentElement.lang?.split('-')[0]
+            || navigator.language?.split('-')[0]
+            || 'en';
+          const whisperLang = selectedLang;
           const form = new FormData();
           form.append('audio', new File([blob], 'audio.webm', { type: mimeType }));
           form.append('language', whisperLang);

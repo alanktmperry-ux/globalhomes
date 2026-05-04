@@ -487,7 +487,7 @@ const Index = () => {
           Skip to main content
         </a>
         {/* ═══ Agent sliver bar ═══ */}
-        <div style={{ background: '#EFF6FF', borderBottom: '1px solid #DBEAFE', color: '#374151', padding: '10px 16px', fontSize: 12.5, textAlign: 'center' }}>
+        <div style={{ background: '#EFF6FF', borderBottom: '1px solid #DBEAFE', color: '#374151', padding: '10px 16px', fontSize: 13, textAlign: 'center' }}>
           <span>🏆 <strong style={{ color:'#0a0f1e', fontWeight:700 }}>Real estate agents:</strong> reach 7M+ multilingual buyers no other portal can find</span>
           <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
           <span>Auto-translated listings in 20 languages</span>
@@ -996,7 +996,7 @@ function AgentBand() {
             { q:'I was sceptical about another platform fee. Six months in, I\'ve closed three deals to buyers I would have never reached — that\'s $58K in extra commission off a $799/mo subscription.', n:'Mark Thompson', r:'Director, Brisbane Metro Properties', s:'$58K extra commission', i:'MT' },
           ].map((c, i) => (
             <div key={c.n} className={`reveal reveal-d${i+1}`} style={{ background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.10)', borderRadius:16, padding:28 }}>
-              <p style={{ fontStyle:'italic', fontSize:14.5, color:'rgba(255,255,255,.82)', lineHeight:1.6, margin:'0 0 16px' }}>"{c.q}"</p>
+              <p style={{ fontStyle:'italic', fontSize:15, color:'rgba(255,255,255,.82)', lineHeight:1.6, margin:'0 0 16px' }}>"{c.q}"</p>
               <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:14 }}>
                 <div style={{ width:38, height:38, borderRadius:'50%', background:'rgba(255,255,255,.1)', border:'1px solid rgba(255,255,255,.2)', color:'#fff', fontWeight:700, fontSize:13, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>{c.i}</div>
                 <div>
@@ -1040,7 +1040,7 @@ function AgentBand() {
             </div>
             <div style={{ fontSize:10, fontWeight:700, color:'rgba(255,255,255,.5)', textTransform:'uppercase', letterSpacing:'.08em', marginBottom:6 }}>Watch · 90 seconds</div>
             <div style={{ fontSize:15, fontWeight:700, color:'#fff', marginBottom:6 }}>From upload to 20-language listing live</div>
-            <div style={{ fontSize:12.5, color:'rgba(255,255,255,.5)' }}>No signup required · See the full agent platform</div>
+            <div style={{ fontSize:13, color:'rgba(255,255,255,.5)' }}>No signup required · See the full agent platform</div>
           </div>
         </div>
 
@@ -1240,7 +1240,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
           <div style={{ fontSize: 15, fontWeight: 800, color: T.ink, marginBottom: 6 }}>
             Why $799/mo is a no-brainer for agents
           </div>
-          <p style={{ fontSize: 13.5, color: T.mid, lineHeight: 1.55, margin: 0 }}>
+          <p style={{ fontSize: 14, color: T.mid, lineHeight: 1.55, margin: 0 }}>
             REA.com.au and Domain charge $1,500–$7,000 per listing. A CRM costs $300–$600/mo. Property management software another $200–$400/mo. ListHQ replaces all three — CRM, PM platform, and multilingual listing portal — in one subscription, reaching 7M+ multilingual buyers no other portal can find.
           </p>
         </div>
@@ -1316,7 +1316,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
                 <p style={{ fontSize: 13, color: T.muted, margin: '0 0 22px', lineHeight: 1.5 }}>{p.desc}</p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px' }}>
                   {p.feats.map((f) => (
-                    <li key={f} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 13.5, color: T.mid, padding: '7px 0' }}>
+                    <li key={f} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 14, color: T.mid, padding: '7px 0' }}>
                       <span style={{ color: T.green, fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
                     </li>
                   ))}
@@ -1327,7 +1327,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
                   color: p.style === 'filled' ? '#fff' : T.blue,
                   border: p.style === 'filled' ? 'none' : `1.5px solid ${T.blue}`,
                 }}>{p.cta}</button>
-                <p style={{ fontSize: 11.5, color: T.muted, margin: '10px 0 0', lineHeight: 1.45, textAlign: 'center' }}>{p.sub}</p>
+                <p style={{ fontSize: 12, color: T.muted, margin: '10px 0 0', lineHeight: 1.45, textAlign: 'center' }}>{p.sub}</p>
               </div>
             );
           })}

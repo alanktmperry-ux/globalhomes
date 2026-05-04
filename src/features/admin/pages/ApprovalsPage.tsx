@@ -150,7 +150,7 @@ function DemosTab({ onCount }: { onCount: (n: number) => void }) {
         <tbody>
           {rows.map(row => (
             <tr key={row.id} className="border-t border-border">
-              <td className="px-4 py-3 font-medium text-foreground">{row.name}</td>
+              <td className="px-4 py-3 font-medium text-foreground">{row.full_name}</td>
               <td className="px-4 py-3 text-muted-foreground">{row.agency_name || '—'}</td>
               <td className="px-4 py-3 text-muted-foreground">{row.email}</td>
               <td className="px-4 py-3 text-muted-foreground">{row.phone || '—'}</td>

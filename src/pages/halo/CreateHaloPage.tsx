@@ -117,10 +117,17 @@ export default function CreateHaloPage() {
 
   const validators = [validateStep1, validateStep2, validateStep3];
 
+  const scrollToError = () => {
+    setTimeout(() => {
+      document.querySelector('[role="alert"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
+  };
+
   const handleNext = () => {
     const err = validators[step - 1](data);
     if (err) {
       setStepError(err);
+      scrollToError();
       return;
     }
     setStepError(null);

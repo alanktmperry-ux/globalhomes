@@ -211,6 +211,7 @@ const Index = () => {
 
   // Language cycle (paused when user manually selected a language)
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const id = setInterval(() => {
       if (manualLangRef.current) return;
       setBlur(true);
@@ -225,6 +226,7 @@ const Index = () => {
 
   // Card cycle — crossfade image layer + text inside the static front card
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const id = setInterval(() => {
       const next = (cardIdxRef.current + 1) % FEAT_LISTINGS.length;
       const listing = FEAT_LISTINGS[next];
@@ -463,6 +465,18 @@ const Index = () => {
         .hero-headline .line1 { display: block; line-height: 1.1; }
         .hero-headline .line2 { display: block; color: #2563EB; font-style: italic; font-weight: 700; line-height: 1.15; margin-top: 6px; min-height: 1.2em; font-size: clamp(28px, 3.5vw, 58px); }
         .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+        @media (prefers-reduced-motion: reduce) {
+          .marquee-track { animation: none; }
+          .pulseDot { animation: none; opacity: 1; }
+          .hcard-layer { transition: none; }
+          .hcard-title, .hcard-price { transition: none; }
+          .reveal {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+          }
+          .reveal-d1, .reveal-d2, .reveal-d3 { transition-delay: 0s !important; }
+        }
       `}</style>
 
       <div className="wave17">

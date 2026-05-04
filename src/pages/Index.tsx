@@ -403,15 +403,14 @@ const Index = () => {
               <form onSubmit={handleSubmit} style={{ maxWidth:560, background:'#fff', border:`1.5px solid ${T.border}`, borderRadius:14, boxShadow:'0 4px 24px rgba(0,0,0,.07)', display:'flex', alignItems:'center', padding:'6px 6px 6px 0', gap:0 }}>
                 <button
                   type="button"
-                  onClick={voiceSupportedRef.current ? startVoice : undefined}
-                  disabled={!voiceSupportedRef.current}
-                  title={voiceSupportedRef.current ? 'Tap to talk' : 'Voice search not supported in this browser'}
+                  onClick={startVoice}
+                  title={voiceSupportedRef.current ? 'Tap to talk' : 'Voice search works in Chrome and Safari'}
                   aria-label={voiceState === 'listening' ? 'Stop listening' : 'Start voice search'}
                   style={{
+                    position:'relative',
                     display:'flex', alignItems:'center', gap:10, padding:'10px 16px',
                     borderRight:`1.5px solid ${T.border}`, background:'transparent', border:'none',
-                    cursor: voiceSupportedRef.current ? 'pointer' : 'not-allowed',
-                    opacity: voiceSupportedRef.current ? 1 : 0.5,
+                    cursor:'pointer',
                   }}
                 >
                   <span style={{ position:'relative', width:36, height:36, borderRadius:'50%', background: voiceState === 'processing' ? '#9ca3af' : 'linear-gradient(135deg,#ef4444,#dc2626)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', flexShrink:0 }}>
@@ -426,6 +425,21 @@ const Index = () => {
                       {voiceState === 'listening' ? 'Tap to stop' : 'Tap to talk · voice search'}
                     </div>
                   </span>
+                  {voiceUnsupportedTip && (
+                    <span
+                      role="tooltip"
+                      className="voice-tip"
+                      style={{
+                        position:'absolute', bottom:'calc(100% + 8px)', left:'50%', transform:'translateX(-50%)',
+                        background:T.ink, color:'#fff', fontSize:12, fontWeight:500, lineHeight:1.4,
+                        padding:12, borderRadius:10, maxWidth:260, width:'max-content',
+                        boxShadow:'0 6px 20px rgba(0,0,0,.18)', zIndex:20, textAlign:'left',
+                        whiteSpace:'normal',
+                      }}
+                    >
+                      🎤 Voice search works in Chrome and Safari. Type your search above, or switch browsers.
+                    </span>
+                  )}
                 </button>
                 <input
                   ref={inputRef}

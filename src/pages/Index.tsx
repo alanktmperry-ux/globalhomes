@@ -770,7 +770,7 @@ const Index = () => {
                 Every listing on ListHQ is automatically translated into 20 languages — Chinese, Vietnamese, Arabic, Hindi and 16 more. No other portal does this.
               </p>
               <button onClick={() => inputRef.current?.focus()} style={{ background:T.blue, color:'#fff', border:'none', padding:'14px 28px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>
-                Search in your language →
+                Find homes in your language →
               </button>
             </div>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:10 }}>

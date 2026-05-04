@@ -26,6 +26,8 @@ const T = {
   border: '#E5E7EB',
   off: '#F9FAFB',
   off2: '#F3F4F6',
+  green: '#10B981',
+  amber: '#F59E0B',
 };
 
 // ─── Language sequence ────────────────────────────────────────
@@ -1094,7 +1096,7 @@ function AgentBand() {
 }
 
 type NavFn = (path: string) => void;
-type Theme = { blue: string; blueL: string; blueMid: string; ink: string; mid: string; muted: string; off: string; border: string };
+type Theme = { blue: string; blueL: string; blueMid: string; ink: string; mid: string; muted: string; off: string; border: string; green: string; amber: string };
 
 function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
   const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');
@@ -1222,7 +1224,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
                 boxShadow: p.popular ? '0 8px 28px rgba(37,99,235,.12)' : 'none',
               }}>
                 {p.popular && (
-                  <div style={{ position: 'absolute', top: -12, right: 20, background: T.blue, color: '#fff', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', padding: '5px 12px', borderRadius: 100 }}>
+                  <div style={{ position: 'absolute', top: -12, right: 20, background: T.amber, color: '#78350F', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', padding: '5px 12px', borderRadius: 100 }}>
                     Most popular
                   </div>
                 )}
@@ -1254,7 +1256,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px' }}>
                   {p.feats.map((f) => (
                     <li key={f} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 13.5, color: T.mid, padding: '7px 0' }}>
-                      <span style={{ color: T.blue, fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
+                      <span style={{ color: T.green, fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
                     </li>
                   ))}
                 </ul>

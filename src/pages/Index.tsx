@@ -1256,7 +1256,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px' }}>
                   {p.feats.map((f) => (
                     <li key={f} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 13.5, color: T.mid, padding: '7px 0' }}>
-                      <span style={{ color: T.blue, fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
+                      <span style={{ color: T.green, fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
                     </li>
                   ))}
                 </ul>

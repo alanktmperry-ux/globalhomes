@@ -973,7 +973,7 @@ function AgentBand() {
               {t('home.agentBannerHeadline')}
             </h2>
             <p style={{ fontSize:16, color:'rgba(255,255,255,.6)', lineHeight:1.6, margin:'0 0 22px', maxWidth:620 }}>
-              Are they finding your listings? ListHQ auto-translates every property you upload into 20 languages — reaching buyers no other portal can. From <strong style={{ color:'#fff' }}>$799/mo</strong>. 60 days free.
+              {t('home.agentBand.para')}
             </p>
             <div style={{ display:'flex', gap:24, flexWrap:'wrap' }}>
               {['McGrath','Belle Property','LJ Hooker','Raine & Horne'].map((b) => (

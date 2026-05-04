@@ -99,7 +99,8 @@ export function PaymentStatusBanner({ onVisibleChange }: { onVisibleChange?: (vi
 
   // STATE 1 — WARNING (days 1-7)
   if (daysSinceFailure >= 1 && daysSinceFailure <= 7) {
-    if (dismissed) return null;
+    if (dismissed) { reportVisible(false); return null; }
+    reportVisible(true);
     return (
       <div className="sticky top-0 z-40 w-full bg-amber-500 text-white px-4 py-3 text-sm">
         <div className="max-w-5xl mx-auto flex items-center justify-between gap-2">

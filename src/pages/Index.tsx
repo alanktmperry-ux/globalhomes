@@ -1154,7 +1154,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
         'Dedicated account manager',
       ],
       cta: 'Talk to sales →',
-      sub: 'Custom onboarding',
+      sub: 'Response within 4 business hours · Custom onboarding',
       action: () => navigate('/contact'),
       style: 'ghost' as const,
       popular: false,

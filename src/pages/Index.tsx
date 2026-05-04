@@ -495,9 +495,9 @@ const Index = () => {
           <div style={{ maxWidth: 1240, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 460px', gap:48, alignItems:'center' }} className="hero-grid">
             {/* Left */}
             <div>
-              <div style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'6px 14px', borderRadius:100, background:T.blueL, border:`1px solid ${T.blueMid}`, color:T.blue, fontSize:11, fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', marginBottom:24 }}>
-                <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:T.blue }} />
-                {t('hero.eyebrow')}
+              <div style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'6px 12px', borderRadius:100, background:T.blueL, border:`1px solid ${T.blueMid}`, color:T.blue, fontSize:11, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:24, maxWidth:'100%', whiteSpace:'normal', textAlign:'left', lineHeight:1.3 }} className="hero-eyebrow">
+                <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:T.blue, flexShrink:0 }} />
+                <span>{t('hero.eyebrow')}</span>
               </div>
 
               <h1 className="hero-headline" style={{ margin:'0 0 12px' }}>

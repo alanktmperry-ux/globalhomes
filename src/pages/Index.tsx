@@ -488,6 +488,7 @@ const Index = () => {
         </a>
         {/* ═══ Agent sliver bar (rotating) ═══ */}
         <SliverBar />
+        <StickyAcquisitionBar />
 
 
         {/* ═══ SECTION 2 — Hero ═══ */}

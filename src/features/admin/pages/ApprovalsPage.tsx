@@ -115,8 +115,8 @@ function DemosTab({ onCount }: { onCount: (n: number) => void }) {
         .update({ status: newStatus })
         .eq('id', row.id);
       if (error) throw error;
-      await logAudit(accept ? 'demo_accepted' : 'demo_declined', 'demo_request', row.id, { name: row.name, email: row.email });
-      if (accept) toast.success(`Demo accepted — follow up with ${row.name}`);
+      await logAudit(accept ? 'demo_accepted' : 'demo_declined', 'demo_request', row.id, { name: row.full_name, email: row.email });
+      if (accept) toast.success(`Demo accepted — follow up with ${row.full_name}`);
       else toast.success('Demo declined');
       setRows(prev => {
         const next = prev.filter(r => r.id !== row.id);

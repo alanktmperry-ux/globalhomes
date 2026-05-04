@@ -160,7 +160,7 @@ const AgentAuthPage = () => {
         .eq('user_id', u.id)
         .maybeSingle();
       if (agentRow && (agentRow as any).onboarding_complete) {
-        navigate('/dashboard/overview');
+        navigate('/dashboard');
       } else {
         // First-time arrival here = genuine agent signup (no agent row yet, or onboarding not complete)
         if (!agentRow) {

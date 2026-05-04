@@ -1,5 +1,6 @@
 import { Building2, Home } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import type { HaloFormData } from '@/types/halo';
 import { PROPERTY_TYPE_OPTIONS } from '@/types/halo';

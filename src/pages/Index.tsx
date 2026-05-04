@@ -102,7 +102,7 @@ function useScrollReveal() {
           io.unobserve(e.target);
         }
       });
-    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0.04, rootMargin: '0px 0px 0px 0px' });
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, []);
@@ -411,7 +411,7 @@ const Index = () => {
 
       <style>{`
         .wave17 { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: ${T.ink}; }
-        .wave17 .reveal { opacity: 0; transform: translateY(36px); transition: opacity .6s ease, transform .6s ease; }
+        .wave17 .reveal { opacity: 0; transform: translateY(36px); transition: opacity .3s ease, transform .3s ease; }
         .wave17 .reveal.in-view { opacity: 1; transform: translateY(0); }
         .wave17 .reveal-d1 { transition-delay: .1s; }
         .wave17 .reveal-d2 { transition-delay: .2s; }

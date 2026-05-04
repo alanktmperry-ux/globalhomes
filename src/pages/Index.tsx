@@ -364,6 +364,7 @@ const Index = () => {
         .hcard-text-hidden { opacity: 0 !important; transition: opacity 0.15s ease !important; }
         .chip { background: ${T.off}; border: 1px solid ${T.border}; border-radius: 100px; padding: 6px 11px; font-size: 12px; font-weight: 600; color: ${T.mid}; cursor: pointer; transition: all .15s ease; }
         .chip:hover { background: ${T.blueL}; border-color: ${T.blueMid}; color: ${T.blue}; }
+        .sliver-link:hover { text-decoration: underline; }
         @keyframes typeBlink { 50% { opacity: 0 } }
         .type-cursor::after { content:'▋'; color:${T.blue}; margin-left:2px; animation: typeBlink 1s steps(1) infinite; }
         @keyframes micRing { 0% { transform: scale(1); opacity: .55 } 100% { transform: scale(1.85); opacity: 0 } }

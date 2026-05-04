@@ -644,7 +644,7 @@ const Index = () => {
                   />
                 </div>
                 <div style={{ padding:18 }}>
-                  <span style={{ display:'inline-block', background:T.blueL, color:T.blue, fontSize:11, fontWeight:700, padding:'4px 10px', borderRadius:100, marginBottom:10 }}>🌐 20 languages · auto-translated</span>
+                  <span style={{ display:'inline-block', background:T.blueL, color:T.blue, fontSize:11, fontWeight:700, padding:'4px 10px', borderRadius:100, marginBottom:10 }}>{t('home.hero.cardLangBadge')}</span>
                   <div ref={titleRef} className="hcard-title" id="hcardTitle" style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:6 }}>{initialFront.title}</div>
                   <div ref={priceRef} className="hcard-price" id="hcardPrice" style={{ fontSize:22, fontWeight:800, color:T.ink, marginBottom:8 }}>{initialFront.price}</div>
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:12, color:T.muted, marginBottom:12 }}>

@@ -978,13 +978,17 @@ function AgentBand() {
         {/* Quote cards + demo */}
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 360px', gap:16, marginTop:52 }} className="agent-cards">
           {[
-            { q:'ListHQ is the first platform that actually speaks to my Mandarin and Vietnamese buyers without me doing any extra work. Multilingual enquiries are up 3× since we joined.', n:'Sarah Chen', r:'Principal, Sydney Metro Realty · Hurstville NSW', s:'3× more multilingual enquiries' },
-            { q:'I was sceptical about another platform fee. Six months in, I\'ve closed three deals to buyers I would have never reached — that\'s $58K in extra commission off a $799/mo subscription.', n:'Mark Thompson', r:'Director, Brisbane Metro Properties', s:'$58K extra commission' },
+            { q:'ListHQ is the first platform that actually speaks to my Mandarin and Vietnamese buyers without me doing any extra work. Multilingual enquiries are up 3× since we joined.', n:'Sarah Chen', r:'Principal, Sydney Metro Realty · Hurstville NSW', s:'3× more multilingual enquiries', i:'SC' },
+            { q:'I was sceptical about another platform fee. Six months in, I\'ve closed three deals to buyers I would have never reached — that\'s $58K in extra commission off a $799/mo subscription.', n:'Mark Thompson', r:'Director, Brisbane Metro Properties', s:'$58K extra commission', i:'MT' },
           ].map((c, i) => (
             <div key={c.n} className={`reveal reveal-d${i+1}`} style={{ background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.10)', borderRadius:16, padding:28 }}>
               <p style={{ fontStyle:'italic', fontSize:14.5, color:'rgba(255,255,255,.82)', lineHeight:1.6, margin:'0 0 16px' }}>"{c.q}"</p>
-              <div style={{ fontSize:12, fontWeight:600, color:'rgba(255,255,255,.45)', marginBottom:14 }}>
-                <strong style={{ color:'rgba(255,255,255,.7)' }}>{c.n}</strong> — {c.r}
+              <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:14 }}>
+                <div style={{ width:38, height:38, borderRadius:'50%', background:'rgba(255,255,255,.1)', border:'1px solid rgba(255,255,255,.2)', color:'#fff', fontWeight:700, fontSize:13, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>{c.i}</div>
+                <div>
+                  <strong style={{ color:'rgba(255,255,255,.85)', fontSize:13 }}>{c.n}</strong>
+                  <div style={{ fontSize:11, color:'rgba(255,255,255,.4)', marginTop:2 }}>{c.r}</div>
+                </div>
               </div>
               <div style={{ fontSize:22, fontWeight:800, color:T.blue }}>{c.s}</div>
             </div>

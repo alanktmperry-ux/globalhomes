@@ -376,7 +376,18 @@ const Index = () => {
         .hcard-title { min-height: 2.8em; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: opacity 0.4s ease; }
         .hcard-price { min-height: 1.4em; transition: opacity 0.4s ease; }
         .hcard-text-hidden { opacity: 0 !important; transition: opacity 0.15s ease !important; }
-        .hcard-back { transition: opacity 0.4s ease; }
+        .hcard-main { position: relative; }
+        .hcard-main::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: #fff;
+          border-radius: 20px;
+          transform: rotate(-4deg) translate(-12px, -8px);
+          box-shadow: 0 20px 60px rgba(0,0,0,.10);
+          z-index: -1;
+          opacity: 0.75;
+        }
         .chip { background: ${T.off}; border: 1px solid ${T.border}; border-radius: 100px; padding: 6px 11px; font-size: 12px; font-weight: 600; color: ${T.mid}; cursor: pointer; transition: all .15s ease; }
         .chip:hover { background: ${T.blueL}; border-color: ${T.blueMid}; color: ${T.blue}; }
         .sliver-link:hover { text-decoration: underline; }
@@ -524,27 +535,6 @@ const Index = () => {
 
             {/* Right — static card stack with image + text crossfade */}
             <div style={{ position:'relative', height:560 }} className="card-stack hero-cards">
-              {/* Back card — decorative, never moves, never animates */}
-              <div
-                className="hcard hcard-back"
-                style={{
-                  position:'absolute', right:30, top:10, zIndex:2,
-                  width:360, height:480,
-                  transform:'rotate(-4deg)', filter:'brightness(0.7) blur(1px)',
-                  opacity: 0.45,
-                  background:'#fff', borderRadius:20, boxShadow:'0 20px 60px rgba(0,0,0,.12)', overflow:'hidden',
-                  transition:'opacity 0.4s ease',
-                }}
-              >
-                <div key={`back-img-${backCardIdx}`} style={{ height:260, backgroundImage:`url(${FEAT_LISTINGS[backCardIdx].img})`, backgroundSize:'cover', backgroundPosition:'center', transition:'opacity 0.4s ease' }} />
-                <div style={{ padding:18 }}>
-                  <span style={{ display:'inline-block', background:T.blueL, color:T.blue, fontSize:11, fontWeight:700, padding:'4px 10px', borderRadius:100, marginBottom:10 }}>🌐 20 languages · auto-translated</span>
-                  <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:6 }}>{FEAT_LISTINGS[backCardIdx].title}</div>
-                  <div style={{ fontSize:22, fontWeight:800, color:T.ink, marginBottom:8 }}>{FEAT_LISTINGS[backCardIdx].price}</div>
-                  <div style={{ fontSize:12, color:T.muted }}>{FEAT_LISTINGS[backCardIdx].meta}</div>
-                </div>
-              </div>
-
               {/* Front card — static position; image + text crossfade only */}
               <div
                 className="hcard hcard-main"

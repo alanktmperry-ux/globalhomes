@@ -90,7 +90,7 @@ export function UnconfirmedSignups() {
             )}
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Users who entered their email but never clicked the confirmation link.
+            Users who signed up but haven't confirmed their email — or whose signup didn't complete.
           </p>
         </div>
         <button

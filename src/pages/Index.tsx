@@ -1383,34 +1383,35 @@ function FAQSection() {
 
 
 function ClosingCTA({ navigate, T }: { navigate: NavFn; T: Theme }) {
+  const { t } = useTranslation();
   return (
     <section style={{ background: '#2563EB', padding: '88px 24px', textAlign: 'center' }}>
       <div style={{ maxWidth: 640, margin: '0 auto' }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.65)', textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 16 }}>
-          Start today
+          {t('home.closingCta.eyebrow')}
         </div>
         <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 800, color: '#fff', letterSpacing: '-1.5px', lineHeight: 1.1, margin: '0 0 16px' }}>
-          60 days free. No contracts. Cancel anytime.
+          {t('home.closingCta.heading')}
         </h2>
         <p style={{ fontSize: 16, color: 'rgba(255,255,255,.7)', lineHeight: 1.6, margin: '0 auto 36px', maxWidth: 480 }}>
-          Join agents already reaching 7M+ multilingual buyers across Australia.
+          {t('home.closingCta.body')}
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
             onClick={() => navigate('/contact')}
             style={{ background: '#fff', color: '#0a0f1e', border: 'none', padding: '15px 32px', borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: 'pointer' }}
           >
-            Start free 60-day trial →
+            {t('home.closingCta.primary')}
           </button>
           <button
             onClick={() => navigate('/contact')}
             style={{ background: 'transparent', color: '#fff', border: '1.5px solid rgba(255,255,255,.4)', padding: '15px 28px', borderRadius: 12, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
           >
-            Talk to sales
+            {t('home.closingCta.secondary')}
           </button>
         </div>
         <p style={{ fontSize: 11, color: 'rgba(255,255,255,.45)', margin: '20px 0 0', fontWeight: 500 }}>
-          No credit card required · Australian data storage · Cancel anytime
+          {t('home.closingCta.finePrint')}
         </p>
       </div>
     </section>

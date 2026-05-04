@@ -550,7 +550,7 @@ const Index = () => {
                       {voiceState === 'listening' ? '🎤 Listening…' : voiceState === 'processing' ? 'Processing…' : seq.mic}
                     </div>
                     <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.1em', textTransform:'uppercase', color:T.muted }}>
-                      TAP TO TALK · VOICE SEARCH
+                      {t('home.hero.tapToTalk')}
                     </div>
                   </div>
                   {voiceUnsupportedTip && (

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
@@ -108,7 +109,12 @@ export function RequestQuoteModal({ open, onOpenChange, provider }: RequestQuote
           </div>
           <div>
             <Label htmlFor="rq-addr">{t('homeServices.modal.addressLabel')}</Label>
-            <Input id="rq-addr" value={address} onChange={(e) => setAddress(e.target.value)} placeholder={t('homeServices.modal.addressPlaceholder')} />
+            <AddressAutocomplete
+              value={address}
+              onChange={(raw) => setAddress(raw)}
+              onSelect={(parts) => setAddress(parts.address)}
+              placeholder={t('homeServices.modal.addressPlaceholder')}
+            />
           </div>
           <div>
             <Label htmlFor="rq-date">{t('homeServices.modal.dateLabel')}</Label>

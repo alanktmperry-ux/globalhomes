@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, ChevronRight } from 'lucide-react';
 import { useAuctionRegistrations } from '../hooks/useAuctionRegistrations';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
 import type { IdType } from '@/types/auction';
 
 interface Props {
@@ -104,8 +105,12 @@ export function AuctionRegistrationModal({ auctionId, isOnline, open, onClose }:
                     className="px-3 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                   <input value={form.phone} onChange={e => update('phone', e.target.value)} placeholder="Phone *" type="tel"
                     className="px-3 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-                  <input value={form.address} onChange={e => update('address', e.target.value)} placeholder="Address"
-                    className="px-3 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  <AddressAutocomplete
+                    value={form.address}
+                    onChange={(raw) => update('address', raw)}
+                    onSelect={(parts) => update('address', parts.address)}
+                    placeholder="Your residential address"
+                  />
                 </div>
                 <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
                   <input type="checkbox" checked={form.is_buying_for_self} onChange={e => update('is_buying_for_self', e.target.checked)}

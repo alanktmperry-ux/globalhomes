@@ -430,6 +430,23 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
     fetchUsers();
   };
 
+  const handleConvertToAgent = async (user: AuthUser) => {
+    if (!confirm(`Convert ${user.email} to an agent account?`)) return;
+    setActionLoading(user.id);
+    try {
+      await callAdminApi('convert_to_agent', {
+        userId: user.id,
+        email: user.email,
+        name: user.display_name || user.email,
+      });
+      toast({ title: 'Converted to agent', description: `${user.email} is now an agent.` });
+      fetchUsers();
+    } catch (err: unknown) {
+      toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
+    }
+    setActionLoading(null);
+  };
+
   const handleDeleteClick = (user: AuthUser) => {
     const isDemoRequest = user.id.startsWith('demo-');
     if (isDemoRequest) {

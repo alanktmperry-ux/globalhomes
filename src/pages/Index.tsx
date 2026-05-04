@@ -1048,7 +1048,7 @@ function AgentBand() {
         {/* ROI slider */}
         <div className="reveal" style={{ background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.12)', borderRadius:20, padding:36, marginTop:52 }}>
           <div style={{ fontSize:14, fontWeight:600, color:'rgba(255,255,255,.6)', marginBottom:20 }}>
-            If you have <strong style={{ color:'#fff', fontSize:18 }}>{n}</strong> active listings on ListHQ…
+            {t('home.agentBand.roiHeading', { n: String(n) })}
           </div>
           <input type="range" min={1} max={100} value={n} onChange={(e) => setN(Number(e.target.value))}
             aria-label="Number of active listings"

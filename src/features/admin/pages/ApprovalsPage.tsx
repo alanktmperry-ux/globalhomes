@@ -89,7 +89,7 @@ function DemosTab({ onCount }: { onCount: (n: number) => void }) {
     setLoading(true);
     try {
       const { data, error } = await (supabase.from('demo_requests' as any) as any)
-        .select('id, name, email, agency_name, phone, message, created_at, status')
+        .select('id, full_name, email, agency_name, phone, message, created_at, status')
         .eq('status', 'pending')
         .order('created_at', { ascending: false })
         .limit(50);

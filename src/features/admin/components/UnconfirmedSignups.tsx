@@ -53,6 +53,18 @@ export function UnconfirmedSignups() {
     }
   };
 
+  const confirm = async (userId: string) => {
+    setConfirming(userId);
+    try {
+      await supabase.functions.invoke('admin-users', {
+        body: { action: 'confirm_email', userId },
+      });
+      setUsers(prev => prev.filter(u => u.id !== userId));
+    } finally {
+      setConfirming(null);
+    }
+  };
+
   const daysAgo = (dateStr: string) => {
     const days = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86_400_000);
     if (days === 0) return 'Today';

@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Check, X, ChevronDown, Sparkles } from 'lucide-react';
+import { Check, X, ChevronDown } from 'lucide-react';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 type BillingCycle = 'monthly' | 'annual';
@@ -9,13 +9,28 @@ type BillingCycle = 'monthly' | 'annual';
 interface Plan {
   key: string;
   name: string;
+  tagline: string;
   monthly: number | null; // null = custom
-  blurb: string;
+  annual: number | null;
+  trialBadge?: string;
+  ctaLabel: string;
+  ctaVariant: 'outline-blue' | 'filled-blue' | 'outline-border';
+  ctaHref: string;
+  microcopy?: string;
   features: string[];
   popular?: boolean;
-  ctaLabel: string;
-  ctaHref: string;
 }
+
+// Tokens (inline since spec uses --blue-l etc.)
+const C = {
+  blue: '#2563EB',
+  blueL: '#EFF6FF',
+  blueMid: '#DBEAFE',
+  ink: '#0a0f1e',
+  mid: '#374151',
+  muted: '#6B7280',
+  border: '#E5E7EB',
+};
 
 type CompareCell = string | boolean;
 

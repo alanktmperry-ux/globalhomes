@@ -459,9 +459,16 @@ const Index = () => {
         .hero-headline { font-size: clamp(44px, 5vw, 76px); font-weight: 800; letter-spacing: -2px; line-height: 1.05; color: #0a0f1e; margin-bottom: 0; }
         .hero-headline .line1 { display: block; line-height: 1.1; }
         .hero-headline .line2 { display: block; color: #2563EB; font-style: italic; font-weight: 700; line-height: 1.15; margin-top: 6px; min-height: 1.2em; font-size: clamp(28px, 3.5vw, 58px); }
+        .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
       `}</style>
 
       <div className="wave17">
+        <a href="#main-content"
+           style={{ position:'absolute', left:'-9999px', top:'auto', width:1, height:1, overflow:'hidden' }}
+           onFocus={(e) => { e.currentTarget.style.left = '16px'; e.currentTarget.style.width = 'auto'; e.currentTarget.style.height = 'auto'; }}
+           onBlur={(e) => { e.currentTarget.style.left = '-9999px'; e.currentTarget.style.width = '1px'; e.currentTarget.style.height = '1px'; }}>
+          Skip to main content
+        </a>
         {/* ═══ Agent sliver bar ═══ */}
         <div style={{ background: '#EFF6FF', borderBottom: '1px solid #DBEAFE', color: '#374151', padding: '10px 16px', fontSize: 12.5, textAlign: 'center' }}>
           <span>🏆 <strong style={{ color:'#0a0f1e', fontWeight:700 }}>Real estate agents:</strong> reach 7M+ multilingual buyers no other portal can find</span>
@@ -476,7 +483,7 @@ const Index = () => {
         </div>
 
         {/* ═══ SECTION 2 — Hero ═══ */}
-        <section style={{ background:'#fff', padding:'72px 24px', minHeight:'calc(100vh - 68px - 50px)' }}>
+        <section id="main-content" style={{ background:'#fff', padding:'72px 24px', minHeight:'calc(100vh - 68px - 50px)' }}>
           <div style={{ maxWidth: 1240, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 460px', gap:48, alignItems:'center' }} className="hero-grid">
             {/* Left */}
             <div>
@@ -555,7 +562,9 @@ const Index = () => {
 
                 {/* Right half — Text */}
                 <div style={{ display:'flex', alignItems:'center', padding:'6px 6px 6px 8px', gap:6 }}>
+                  <label htmlFor="heroSearch" className="sr-only">Search by address, suburb or school zone</label>
                   <input
+                    id="heroSearch"
                     ref={inputRef}
                     type="text"
                     value={searchQuery}
@@ -576,7 +585,9 @@ const Index = () => {
               {/* Filter chips */}
               <div style={{ display:'flex', flexWrap:'wrap', gap:8, maxWidth:560, marginTop:14 }}>
                 {['📍 Auburn','📍 Box Hill','📍 Hurstville','Under $1M','3+ beds','Top schools'].map((c) => (
-                  <button key={c} className="chip" onClick={() => openSearch(c)}>{c}</button>
+                  <button key={c} className="chip" onClick={() => openSearch(c)}>
+                    {c.startsWith('📍') ? <><span aria-hidden="true">📍 </span>{c.slice(3)}</> : c}
+                  </button>
                 ))}
               </div>
 
@@ -974,6 +985,8 @@ function AgentBand() {
             If you have <strong style={{ color:'#fff', fontSize:18 }}>{n}</strong> active listings on ListHQ…
           </div>
           <input type="range" min={1} max={100} value={n} onChange={(e) => setN(Number(e.target.value))}
+            aria-label="Number of active listings"
+            aria-valuetext={`${n} listings`}
             style={{ width:'100%', accentColor: T.blue }} />
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:16, marginTop:24 }}>
             {[

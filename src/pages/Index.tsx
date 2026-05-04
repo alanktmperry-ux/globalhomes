@@ -494,7 +494,7 @@ const Index = () => {
 
               <h1 className="hero-headline" style={{ margin:'0 0 12px' }}>
                 <span className="line1">{seq.line1}</span>
-                <span className={`line2 ${blur ? 'blur-out' : 'blur-in'}`}>{seq.line2}</span>
+                <span className={`line2 ${blur ? 'blur-out' : 'blur-in'}`} style={{ fontFamily: "'DM Serif Display', serif" }}>{seq.line2}</span>
               </h1>
 
               <div className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:14, fontWeight:500, color:T.mid, marginBottom:16, display:'flex', alignItems:'center', gap:6 }}>

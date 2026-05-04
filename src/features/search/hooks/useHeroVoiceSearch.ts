@@ -52,7 +52,7 @@ export function useHeroVoiceSearch(
   return {
     status: isListening ? 'recording' : ('idle' as const),
     statusLabel: isListening ? 'Listening...' : null,
-    detectedLanguage: null,
+    detectedLanguage: null as string | null,
     isRecording: isListening,
     isProcessing: false,
     startRecording,

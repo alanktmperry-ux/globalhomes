@@ -515,7 +515,7 @@ const Index = () => {
               </h1>
 
               <div className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:14, fontWeight:500, color:T.mid, marginBottom:16, display:'flex', alignItems:'center', gap:6 }}>
-                <span style={{ fontSize:20, lineHeight:1 }}>{seq.flag}</span> {seq.sub} · click any language below to switch
+                <span style={{ fontSize:20, lineHeight:1 }}>{seq.flag}</span> {seq.sub} · {t('home.hero.langSwitch')}
               </div>
 
               {/* Search block */}

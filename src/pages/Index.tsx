@@ -304,11 +304,10 @@ const Index = () => {
   const [voiceState, setVoiceState] = useState<'idle' | 'listening' | 'processing'>('idle');
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const [voiceUnsupportedTip, setVoiceUnsupportedTip] = useState(false);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recognitionRef = useRef<any>(null);
   const langCodeRef = useRef<string>(SEQUENCE[0].code);
   const errorTimerRef = useRef<number | null>(null);
   const tipTimerRef = useRef<number | null>(null);
-  const maxTimerRef = useRef<number | null>(null);
 
   // Keep active language code in sync (read from ref inside callbacks)
   useEffect(() => {
@@ -318,88 +317,73 @@ const Index = () => {
   useEffect(() => {
     return () => {
       if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
-      if (maxTimerRef.current) window.clearTimeout(maxTimerRef.current);
-      try {
-        if (mediaRecorderRef.current?.state === 'recording') mediaRecorderRef.current.stop();
-      } catch { /* noop */ }
-      mediaRecorderRef.current = null;
+      try { recognitionRef.current?.stop?.(); } catch { /* noop */ }
+      recognitionRef.current = null;
     };
   }, []);
 
-  const startVoice = useCallback(async () => {
-    if (voiceState === 'listening' && mediaRecorderRef.current) {
-      try { mediaRecorderRef.current.stop(); } catch { /* noop */ }
-      return;
-    }
+  const startVoice = useCallback(() => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
-    setVoiceError(null);
-
-    if (typeof MediaRecorder === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+    if (!SpeechRecognition) {
       setVoiceUnsupportedTip(true);
       if (tipTimerRef.current) window.clearTimeout(tipTimerRef.current);
       tipTimerRef.current = window.setTimeout(() => setVoiceUnsupportedTip(false), 4000);
       return;
     }
 
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-        ? 'audio/webm;codecs=opus'
-        : MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm';
-      const recorder = new MediaRecorder(stream, { mimeType });
-      const chunks: BlobPart[] = [];
-      mediaRecorderRef.current = recorder;
+    // If already listening, stop
+    if (voiceState === 'listening' && recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch { /* noop */ }
+      return;
+    }
 
-      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+    setVoiceError(null);
 
-      recorder.onstop = async () => {
-        stream.getTracks().forEach(t => t.stop());
-        if (maxTimerRef.current) { window.clearTimeout(maxTimerRef.current); maxTimerRef.current = null; }
-        setVoiceState('processing');
-        try {
-          const blob = new Blob(chunks, { type: mimeType });
-          // Use the active hero-cycle language (matches what's shown on screen)
-          const activeCode = langCodeRef.current || 'en-AU';
-          const whisperLang = activeCode.split('-')[0] || 'en';
-          const form = new FormData();
-          form.append('audio', new File([blob], 'audio.webm', { type: mimeType }));
-          form.append('language', whisperLang);
+    const recognition = new SpeechRecognition();
+    // Set language to currently active hero cycle language — every click
+    recognition.lang = langCodeRef.current || 'en-AU';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognitionRef.current = recognition;
 
-          const { data, error } = await supabase.functions.invoke('transcribe-audio', {
-            body: form,
-          });
+    recognition.onstart = () => setVoiceState('listening');
 
-          if (error || !data?.transcript) throw new Error('No transcript');
-          const text = data.transcript.trim();
+    recognition.onresult = (e: any) => {
+      const text = (e.results?.[0]?.[0]?.transcript || '').trim();
+      if (text) {
+        setSearchQuery(text);
+        try { inputRef.current?.blur(); } catch { /* noop */ }
+        window.setTimeout(() => openSearch(text), 200);
+      }
+    };
 
-          setSearchQuery(text);
-          try { inputRef.current?.blur(); } catch { /* noop */ }
-          window.setTimeout(() => openSearch(text), 250);
-        } catch {
-          setVoiceError('Could not transcribe. Please try again.');
-          if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
-          errorTimerRef.current = window.setTimeout(() => setVoiceError(null), 3000);
-        } finally {
-          setVoiceState('idle');
-          mediaRecorderRef.current = null;
-        }
-      };
-
-      recorder.start();
-      setVoiceState('listening');
-
-      maxTimerRef.current = window.setTimeout(() => {
-        if (mediaRecorderRef.current?.state === 'recording') {
-          try { mediaRecorderRef.current.stop(); } catch { /* noop */ }
-        }
-      }, 10000);
-    } catch (err: any) {
-      setVoiceError(err?.name === 'NotAllowedError'
-        ? 'Microphone access denied. Please allow access in your browser settings.'
-        : 'Microphone not available. Please try again.');
-      if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
-      errorTimerRef.current = window.setTimeout(() => setVoiceError(null), 3000);
+    recognition.onend = () => {
       setVoiceState('idle');
+      recognitionRef.current = null;
+    };
+
+    recognition.onerror = (e: any) => {
+      setVoiceState('idle');
+      recognitionRef.current = null;
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+        setVoiceError('Microphone access denied. Please allow access in your browser settings.');
+      } else if (e.error !== 'aborted' && e.error !== 'no-speech') {
+        setVoiceError('Nothing heard. Please try again.');
+      }
+      if (e.error && e.error !== 'aborted') {
+        if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
+        errorTimerRef.current = window.setTimeout(() => setVoiceError(null), 3000);
+      }
+    };
+
+    // Must be called synchronously in the click handler (Safari requirement)
+    try {
+      recognition.start();
+    } catch {
+      setVoiceState('idle');
+      recognitionRef.current = null;
     }
   }, [voiceState, openSearch]);
 

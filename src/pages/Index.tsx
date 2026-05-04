@@ -653,7 +653,7 @@ const Index = () => {
                   </div>
                   <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(22,163,74,.12)', border:'1px solid rgba(22,163,74,.3)', borderRadius:100, padding:'4px 10px', fontSize:11, fontWeight:700, color:'#15803d' }}>
                     <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:'#16a34a' }} />
-                    <span id="enquiryCount">{enquiryCount}</span>&nbsp;people enquired in the last hour
+                    <span id="enquiryCount">{enquiryCount}</span>&nbsp;{t('home.hero.enquiredLastHour')}
                   </div>
                 </div>
               </div>

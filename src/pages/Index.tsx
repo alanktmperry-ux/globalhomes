@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { Mic, Search, Play, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 // ============================================================
 // Wave 17 V8 — Buyer-first multilingual homepage
@@ -34,11 +35,13 @@ type SeqItem = {
   cardTitle: string; cardPrice: string; code: string; mic: string;
 };
 const SEQUENCE: SeqItem[] = [
-  { lang:'EN',   flag:'🇦🇺', flagLabel:'English',    line1:'Find your home.',          line2:'In any language.',         ph:'Type address, suburb or school zone…',  sub:'Showing in English',         cardTitle:'Spacious family home, walk to top-ranked schools', cardPrice:'$1,250,000',     code:'en-AU', mic:'Speak in your language' },
-  { lang:'中文', flag:'🇨🇳', flagLabel:'中文',        line1:'找到您的家。',              line2:'用您的语言。',              ph:'搜索地址、区域或学区…',                  sub:'正在显示：中文结果',          cardTitle:'宽敞家庭住宅，步行可达顶级学校',                    cardPrice:'¥5,950,000',      code:'zh-CN', mic:'用您的语言说' },
-  { lang:'Viet', flag:'🇻🇳', flagLabel:'Tiếng Việt', line1:'Tìm ngôi nhà của bạn.',    line2:'Bằng ngôn ngữ của bạn.',  ph:'Tìm địa chỉ, khu vực hoặc trường học…', sub:'Đang hiển thị: Tiếng Việt', cardTitle:'Nhà gia đình rộng, đi bộ đến trường top',          cardPrice:'₫20.8 tỷ',        code:'vi-VN', mic:'Nói bằng ngôn ngữ của bạn' },
-  { lang:'عربي', flag:'🇸🇦', flagLabel:'العربية',    line1:'ابحث عن منزلك.',           line2:'بلغتك.',                   ph:'ابحث عن العنوان أو المنطقة…',           sub:'يتم العرض باللغة العربية',  cardTitle:'منزل عائلي فسيح، قريب من أفضل المدارس',           cardPrice:'د.إ 3,062,500',  code:'ar-SA', mic:'تحدث بلغتك' },
-  { lang:'हिंदी',flag:'🇮🇳', flagLabel:'हिंदी',      line1:'अपना घर खोजें।',           line2:'अपनी भाषा में।',           ph:'पता, उपनगर या स्कूल खोजें…',            sub:'हिंदी में दिखाया जा रहा है', cardTitle:'विशाल पारिवारिक घर, शीर्ष स्कूलों तक पैदल',      cardPrice:'₹6.95 करोड़',    code:'hi-IN', mic:'अपनी भाषा में बोलें' },
+  { lang:'EN',    flag:'🇦🇺', flagLabel:'English',    line1:'Find your home.',          line2:'In any language.',          ph:'Type address, suburb or school zone…',    sub:'Showing in English',           cardTitle:'Spacious family home, walk to top-ranked schools', cardPrice:'$1,250,000',      code:'en-AU', mic:'Speak in your language' },
+  { lang:'中文',  flag:'🇨🇳', flagLabel:'中文',        line1:'找到您的家。',              line2:'用您的语言。',              ph:'搜索地址、区域或学区…',                  sub:'正在显示：中文结果',           cardTitle:'宽敞家庭住宅，步行可达顶级学校',                   cardPrice:'¥5,950,000',      code:'zh-CN', mic:'用您的语言说' },
+  { lang:'Viet',  flag:'🇻🇳', flagLabel:'Tiếng Việt', line1:'Tìm ngôi nhà của bạn.',    line2:'Bằng ngôn ngữ của bạn.',   ph:'Tìm địa chỉ, khu vực hoặc trường học…',  sub:'Đang hiển thị: Tiếng Việt',   cardTitle:'Nhà gia đình rộng, đi bộ đến trường top',         cardPrice:'₫20.8 tỷ',        code:'vi-VN', mic:'Nói bằng ngôn ngữ của bạn' },
+  { lang:'عربي',  flag:'🇸🇦', flagLabel:'العربية',    line1:'ابحث عن منزلك.',           line2:'بلغتك.',                   ph:'ابحث عن العنوان أو المنطقة…',            sub:'يتم العرض باللغة العربية',    cardTitle:'منزل عائلي فسيح، قريب من أفضل المدارس',          cardPrice:'د.إ 3,062,500',   code:'ar-SA', mic:'تحدث بلغتك' },
+  { lang:'हिंदी', flag:'🇮🇳', flagLabel:'हिंदी',      line1:'अपना घर खोजें।',           line2:'अपनी भाषा में।',           ph:'पता, उपनगर या स्कूल खोजें…',            sub:'हिंदी में दिखाया जा रहा है', cardTitle:'विशाल पारिवारिक घर, शीर्ष स्कूलों तक पैदल',     cardPrice:'₹6.95 करोड़',    code:'hi-IN', mic:'अपनी भाषा में बोलें' },
+  { lang:'한국어', flag:'🇰🇷', flagLabel:'한국어',      line1:'당신의 집을 찾으세요.',     line2:'당신의 언어로.',           ph:'주소, 교외 또는 학교 구역 검색…',        sub:'한국어로 표시 중',            cardTitle:'넓은 가족 주택, 상위권 학교까지 도보',            cardPrice:'$1,250,000',      code:'ko-KR', mic:'한국어로 말하세요' },
+  { lang:'বাংলা', flag:'🇧🇩', flagLabel:'বাংলা',      line1:'আপনার বাড়ি খুঁজুন।',     line2:'আপনার ভাষায়।',           ph:'ঠিকানা, উপশহর বা স্কুল অঞ্চল খুঁজুন…', sub:'বাংলায় দেখানো হচ্ছে',      cardTitle:'প্রশস্ত পারিবারিক বাড়ি, শীর্ষ স্কুল পর্যন্ত হেঁটে', cardPrice:'$1,250,000', code:'bn-BD', mic:'আপনার ভাষায় কথা বলুন' },
 ];
 
 const MARQUEE_LANGS = [
@@ -108,6 +111,8 @@ function useScrollReveal() {
 // ─── Component ────────────────────────────────────────────────
 const Index = () => {
   const navigate = useNavigate();
+  const { t, language } = useTranslation();
+  const manualLangRef = useRef(false);
   const [seqIdx, setSeqIdx] = useState(0);
   const [blur, setBlur] = useState(false);
   const [liveCount, setLiveCount] = useState(847);
@@ -137,9 +142,30 @@ const Index = () => {
       .then(({ count }) => setPropertyCount(count ?? null));
   }, []);
 
-  // Language cycle
+  // Sync dropdown selection → seqIdx
+  useEffect(() => {
+    const map: Record<string, number> = {
+      zh: 1, 'zh-CN': 1, 'zh-TW': 1,
+      vi: 2,
+      ar: 3,
+      hi: 4,
+      ko: 5,
+      bn: 6,
+    };
+    const idx = map[language];
+    manualLangRef.current = idx !== undefined;
+    setBlur(true);
+    setTimeout(() => {
+      setSeqIdx(idx !== undefined ? idx : 0);
+      setSearchQuery('');
+      setBlur(false);
+    }, 300);
+  }, [language]);
+
+  // Language cycle (paused when user manually selected a language)
   useEffect(() => {
     const id = setInterval(() => {
+      if (manualLangRef.current) return;
       setBlur(true);
       setTimeout(() => {
         setSeqIdx((i) => (i + 1) % SEQUENCE.length);
@@ -148,7 +174,7 @@ const Index = () => {
       }, 300);
     }, 4200);
     return () => clearInterval(id);
-  }, []);
+  }, [language]);
 
   // Card cycle — crossfade image layer + text inside the static front card
   useEffect(() => {
@@ -425,11 +451,11 @@ const Index = () => {
             <div>
               <div style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'6px 14px', borderRadius:100, background:T.blueL, border:`1px solid ${T.blueMid}`, color:T.blue, fontSize:11, fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', marginBottom:24 }}>
                 <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:T.blue }} />
-                Australia's only multilingual property platform
+                {t('hero.eyebrow')}
               </div>
 
               <h1 className="hero-headline" style={{ margin:'0 0 12px' }}>
-                <span className="line1">Find your home.</span>
+                <span className="line1">{seq.line1}</span>
                 <span className={`line2 ${blur ? 'blur-out' : 'blur-in'}`}>{seq.line2}</span>
               </h1>
 
@@ -656,15 +682,15 @@ const Index = () => {
         {/* ═══ SECTION 6 — How It Works ═══ */}
         <section style={{ background:T.off, padding:'88px 24px' }}>
           <div style={{ maxWidth:1200, margin:'0 auto' }}>
-            <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>How it works</div>
+            <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>{t('home.howItWorks.title')}</div>
             <h2 style={{ fontSize:'clamp(32px, 3.5vw, 48px)', fontWeight:800, letterSpacing:'-1.5px', lineHeight:1.1, margin:'0 0 52px' }}>
-              Property search, built <em style={{ color:T.blue, fontStyle:'italic' }}>for you.</em>
+              {t('home.howItWorks.subtitle')}
             </h2>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:24 }} className="how-grid">
               {[
-                { n:'01', t:'Choose your language', b:'Select from 20 languages. The entire experience shifts — results, descriptions, school zones, prices in your currency. Everything.' },
-                { n:'02', t:'Speak or type your search', b:'Tap the microphone and speak naturally in Mandarin, Vietnamese, Arabic, Hindi or 17 other languages. Or type. Both work.' },
-                { n:'03', t:'Find your home', b:'Every listing includes school zone maps, suburb insights and agent contact — all in your language. No barriers between you and your next home.' },
+                { n:'01', t: t('home.howItWorks.step1.title'), b: t('home.howItWorks.step1.desc') },
+                { n:'02', t: t('home.howItWorks.step2.title'), b: t('home.howItWorks.step2.desc') },
+                { n:'03', t: t('home.howItWorks.step3.title'), b: t('home.howItWorks.step3.desc') },
               ].map((s, i) => (
                 <div key={s.n} className={`reveal reveal-d${i+1}`} style={{ background:'#fff', border:`1px solid ${T.border}`, borderRadius:20, padding:'36px 32px' }}>
                   <div style={{ fontSize:64, fontWeight:800, color:T.off2, letterSpacing:'-3px', marginBottom:16, lineHeight:1 }}>{s.n}</div>

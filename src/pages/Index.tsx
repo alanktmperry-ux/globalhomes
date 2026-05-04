@@ -26,6 +26,8 @@ const T = {
   border: '#E5E7EB',
   off: '#F9FAFB',
   off2: '#F3F4F6',
+  green: '#10B981',
+  amber: '#F59E0B',
 };
 
 // ─── Language sequence ────────────────────────────────────────

@@ -244,18 +244,42 @@ const Index = () => {
     langCodeRef.current = SEQUENCE[seqIdx].code;
   }, [seqIdx]);
 
-  // Initialise recognition once
+  // Detect support once (no recognition object created here — Safari requires it inside the click handler)
   useEffect(() => {
+    const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    voiceSupportedRef.current = !!SR;
+    return () => {
+      if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
+      try { recognitionRef.current?.abort(); } catch { /* noop */ }
+      recognitionRef.current = null;
+    };
+  }, []);
+
+  const startVoice = useCallback(() => {
     const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) {
       voiceSupportedRef.current = false;
+      setVoiceUnsupportedTip(true);
+      if (tipTimerRef.current) window.clearTimeout(tipTimerRef.current);
+      tipTimerRef.current = window.setTimeout(() => setVoiceUnsupportedTip(false), 4000);
       return;
     }
     voiceSupportedRef.current = true;
+
+    // If already listening, stop
+    if (voiceState === 'listening' && recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch { /* noop */ }
+      setVoiceState('idle');
+      return;
+    }
+
+    // Create fresh every click — required for Safari user gesture compliance
     const rec = new SR();
+    rec.lang = langCodeRef.current;
+    rec.continuous = false;
     rec.interimResults = false;
     rec.maxAlternatives = 1;
-    rec.continuous = false;
+    recognitionRef.current = rec;
 
     rec.onresult = (ev: any) => {
       const transcript = ev.results?.[0]?.[0]?.transcript ?? '';
@@ -266,7 +290,11 @@ const Index = () => {
         window.setTimeout(() => openSearch(transcript), 350);
       }
     };
-    rec.onend = () => setVoiceState('idle');
+
+    rec.onend = () => {
+      setVoiceState('idle');
+    };
+
     rec.onerror = (ev: any) => {
       setVoiceState('idle');
       const code = ev?.error;
@@ -291,36 +319,10 @@ const Index = () => {
       }
     };
 
-    recognitionRef.current = rec;
-    return () => {
-      try { rec.abort(); } catch { /* noop */ }
-      if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
-      recognitionRef.current = null;
-    };
-  }, [openSearch]);
-
-  const startVoice = useCallback(() => {
-    if (!voiceSupportedRef.current) {
-      setVoiceUnsupportedTip(true);
-      if (tipTimerRef.current) window.clearTimeout(tipTimerRef.current);
-      tipTimerRef.current = window.setTimeout(() => setVoiceUnsupportedTip(false), 4000);
-      return;
-    }
-    const rec = recognitionRef.current;
-    if (!rec) return;
-    if (voiceState === 'listening') {
-      try { rec.stop(); } catch { /* noop */ }
-      setVoiceState('idle');
-      return;
-    }
-    rec.lang = langCodeRef.current;
-    try {
-      rec.start();
-      setVoiceState('listening');
-    } catch {
-      // already running — ignore
-    }
-  }, [voiceState]);
+    // IMPORTANT: rec.start() must be the last line — synchronous, no await before it
+    rec.start();
+    setVoiceState('listening');
+  }, [voiceState, openSearch]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

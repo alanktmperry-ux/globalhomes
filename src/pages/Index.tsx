@@ -1220,8 +1220,18 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
               <div key={p.name} className={`reveal reveal-d${i + 1}`} style={{
                 background: p.popular ? '#F8FBFF' : '#fff',
                 border: `${p.popular ? 2 : 1.5}px solid ${p.popular ? T.blue : T.border}`,
-                borderRadius: 20, padding: '32px 28px', position: 'relative', textAlign: 'left',
-                boxShadow: p.popular ? '0 8px 28px rgba(37,99,235,.12)' : 'none',
+                borderRadius: 20,
+                padding: '32px 28px',
+                position: 'relative',
+                textAlign: 'left' as const,
+                boxShadow: p.popular
+                  ? '0 0 0 3px rgba(37,99,235,.08), 0 16px 48px rgba(37,99,235,.18), 0 4px 12px rgba(37,99,235,.08)'
+                  : 'none',
+                transform: p.popular ? 'scale(1.03)' : 'none',
+                zIndex: p.popular ? 1 : 0,
+                marginTop: p.popular ? -12 : 0,
+                marginBottom: p.popular ? -12 : 0,
+                transition: 'transform .2s, box-shadow .2s',
               }}>
                 {p.popular && (
                   <div style={{ position: 'absolute', top: -12, right: 20, background: T.amber, color: '#78350F', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', padding: '5px 12px', borderRadius: 100 }}>

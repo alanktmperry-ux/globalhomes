@@ -481,6 +481,10 @@ const Index = () => {
                 <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:'#16a34a' }} />
                 <strong>{liveCount}</strong> buyers searching right now
               </div>
+
+              <div style={{ marginTop:16, maxWidth:560, fontSize:13, color:T.muted, textAlign:'center' }}>
+                🔒 Free for buyers · Always · No account needed to search
+              </div>
             </div>
 
             {/* Right — static card stack with image + text crossfade */}

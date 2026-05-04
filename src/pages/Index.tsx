@@ -562,7 +562,9 @@ const Index = () => {
 
                 {/* Right half — Text */}
                 <div style={{ display:'flex', alignItems:'center', padding:'6px 6px 6px 8px', gap:6 }}>
+                  <label htmlFor="heroSearch" className="sr-only">Search by address, suburb or school zone</label>
                   <input
+                    id="heroSearch"
                     ref={inputRef}
                     type="text"
                     value={searchQuery}

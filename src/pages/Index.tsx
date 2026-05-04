@@ -968,7 +968,7 @@ function AgentBand() {
       <div style={{ maxWidth:1200, margin:'0 auto' }}>
         <div style={{ display:'grid', gridTemplateColumns:'1fr auto', gap:60, alignItems:'center' }} className="agent-top">
           <div>
-            <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>For real estate agents</div>
+            <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>{t('home.agents.eyebrow')}</div>
             <h2 style={{ fontSize:'clamp(44px, 5vw, 72px)', fontWeight:800, color:'#fff', letterSpacing:'-2.5px', lineHeight:1, margin:'0 0 22px' }}>
               {t('home.agentBannerHeadline')}
             </h2>
@@ -982,7 +982,7 @@ function AgentBand() {
             </div>
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-            <button onClick={() => navigate('/pricing')} style={{ background:'#fff', color:T.ink, border:'none', padding:'14px 28px', borderRadius:12, fontSize:15, fontWeight:700, cursor:'pointer' }}>Start reaching 7M+ buyers →</button>
+            <button onClick={() => navigate('/pricing')} style={{ background:'#fff', color:T.ink, border:'none', padding:'14px 28px', borderRadius:12, fontSize:15, fontWeight:700, cursor:'pointer' }}>{t('home.agents.cta')} →</button>
             <p style={{ fontSize:11, color:'rgba(255,255,255,.4)', margin:'10px 0 0', fontWeight:500 }}>
               60 days free · No credit card · Australian data storage
             </p>

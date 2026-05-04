@@ -384,6 +384,7 @@ const App = () => (
 
                 {/* Halo — seeker reverse marketplace */}
                 <Route path="/halo/new" element={<ProtectedRoute><CreateHaloPage /></ProtectedRoute>} />
+                <Route path="/halo/success" element={<ProtectedRoute><HaloSuccessPage /></ProtectedRoute>} />
                 <Route path="/dashboard/my-halos" element={<ProtectedRoute><MyHalosPage /></ProtectedRoute>} />
 
                 {/* Agent */}

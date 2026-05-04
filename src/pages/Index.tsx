@@ -427,7 +427,7 @@ const Index = () => {
                 <button
                   type="button"
                   onClick={startVoice}
-                  title={voiceSupportedRef.current ? 'Tap to talk' : 'Voice search works in Chrome and Safari'}
+                  title="Tap to talk"
                   aria-label={voiceState === 'listening' ? 'Stop listening' : 'Start voice search'}
                   style={{
                     position:'relative',

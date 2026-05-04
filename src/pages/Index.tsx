@@ -488,15 +488,15 @@ const Index = () => {
         </a>
         {/* ═══ Agent sliver bar ═══ */}
         <div style={{ background: '#EFF6FF', borderBottom: '1px solid #DBEAFE', color: '#374151', padding: '10px 16px', fontSize: 13, textAlign: 'center' }}>
-          <span>🏆 <strong style={{ color:'#0a0f1e', fontWeight:700 }}>Real estate agents:</strong> reach 7M+ multilingual buyers no other portal can find</span>
+          <span>🏆 {t('home.sliver.agents')}</span>
           <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
-          <span>Auto-translated listings in 20 languages</span>
+          <span>{t('home.sliver.translation')}</span>
           <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
-          <span>From <strong style={{ color:'#2563EB', fontWeight:700 }}>$799/mo</strong></span>
+          <span>{t('home.sliver.price')}</span>
           <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
-          <span>60 days free</span>
+          <span>{t('home.sliver.free')}</span>
           <span style={{ display:'inline-block', width:4, height:4, borderRadius:'50%', background:'#DBEAFE', margin:'0 10px', verticalAlign:'middle' }} />
-          <a href="/for-agents" className="sliver-link" style={{ color: '#2563EB', textDecoration: 'none', fontWeight: 700 }}>See how it works →</a>
+          <a href="/for-agents" className="sliver-link" style={{ color: '#2563EB', textDecoration: 'none', fontWeight: 700 }}>{t('home.sliver.cta')}</a>
         </div>
 
         {/* ═══ SECTION 2 — Hero ═══ */}

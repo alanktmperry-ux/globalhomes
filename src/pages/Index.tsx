@@ -956,6 +956,9 @@ function AgentBand() {
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
             <button onClick={() => navigate('/pricing')} style={{ background:'#fff', color:T.ink, border:'none', padding:'14px 28px', borderRadius:12, fontSize:15, fontWeight:700, cursor:'pointer' }}>See agent pricing →</button>
+            <p style={{ fontSize:11, color:'rgba(255,255,255,.4)', margin:'10px 0 0', fontWeight:500 }}>
+              60 days free · No credit card · Australian data storage
+            </p>
             <button onClick={() => setVideoOpen(true)} style={{ background:'transparent', color:'rgba(255,255,255,.7)', border:'1px solid rgba(255,255,255,.2)', padding:'12px 24px', borderRadius:12, fontSize:14, fontWeight:600, cursor:'pointer' }}>Watch 90-sec demo</button>
           </div>
         </div>
@@ -1133,7 +1136,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
         'Phone & email support',
       ],
       cta: 'Book a demo →',
-      sub: 'Setup included',
+      sub: 'No credit card · Setup included · Cancel anytime',
       action: () => navigate('/contact'),
       style: 'filled' as const,
       popular: true,
@@ -1154,7 +1157,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
         'Dedicated account manager',
       ],
       cta: 'Talk to sales →',
-      sub: 'Custom onboarding',
+      sub: 'Response within 4 business hours · Custom onboarding',
       action: () => navigate('/contact'),
       style: 'ghost' as const,
       popular: false,

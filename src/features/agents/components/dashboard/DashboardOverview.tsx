@@ -652,10 +652,7 @@ const DashboardOverview = () => {
                     <span className="text-[11px] leading-tight">Avg Response Time</span>
                   </div>
                   {respStats.medianMinutes == null ? (
-                    <>
-                      <p className="font-display text-2xl font-extrabold text-muted-foreground">—</p>
-                      <p className="text-[10px] text-muted-foreground leading-tight">Tracks once leads arrive</p>
-                    </>
+                    <p className="font-display text-2xl font-extrabold text-muted-foreground">—</p>
                   ) : (
                     <div className="flex items-baseline gap-1">
                       <p className={`font-display text-2xl font-extrabold ${respColors.text}`}>{formatDuration(respStats.medianMinutes)}</p>

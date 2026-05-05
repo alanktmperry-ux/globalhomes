@@ -652,10 +652,7 @@ const DashboardOverview = () => {
                     <span className="text-[11px] leading-tight">Avg Response Time</span>
                   </div>
                   {respStats.medianMinutes == null ? (
-                    <>
-                      <p className="font-display text-2xl font-extrabold text-muted-foreground">—</p>
-                      <p className="text-[10px] text-muted-foreground leading-tight">Tracks once leads arrive</p>
-                    </>
+                    <p className="font-display text-2xl font-extrabold text-muted-foreground">—</p>
                   ) : (
                     <div className="flex items-baseline gap-1">
                       <p className={`font-display text-2xl font-extrabold ${respColors.text}`}>{formatDuration(respStats.medianMinutes)}</p>
@@ -692,19 +689,25 @@ const DashboardOverview = () => {
               ),
             },
           };
-          const orderedTiles = activeLayout
-            .filter(e => isStatTile(e.card_key) && (e.is_visible || editMode))
-            .map(e => tileMap[e.card_key])
-            .filter(Boolean);
+          const tileOrder: CardKey[] = [
+            'tasks_due', 'active_contacts', 'appraisals_month', 'sales_month',
+            'trust_balance', 'unresponded_leads', 'avg_response_time', 'reputation_score',
+          ];
+          const visibleKeys = new Set(
+            activeLayout.filter(e => e.is_visible || editMode).map(e => e.card_key)
+          );
+          const orderedTiles = tileOrder
+            .filter(k => visibleKeys.has(k) && tileMap[k])
+            .map(k => tileMap[k]);
           return (
-            <div className="grid grid-cols-4 lg:grid-cols-7 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 auto-rows-fr">
               {orderedTiles.map(t => (
                 editMode ? (
                   <CardEditChrome key={t.key} cardKey={t.key} layout={draftLayout ?? layout} onUpdate={setDraftLayout} isMobile={isMobile}>
                     {t.render()}
                   </CardEditChrome>
                 ) : (
-                  <div key={t.key}>{t.render()}</div>
+                  <div key={t.key} className="h-full [&>*]:h-full">{t.render()}</div>
                 )
               ))}
             </div>

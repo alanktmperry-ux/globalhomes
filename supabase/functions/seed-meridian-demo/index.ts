@@ -20,33 +20,11 @@ const dateOnly = (d: Date) => d.toISOString().slice(0, 10);
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  // Demo seeder — open access by design (idempotent, demo data only).
   const url = Deno.env.get("SUPABASE_URL")!;
-  const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
   const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
-  const authHeader = req.headers.get("Authorization") || "";
-  const token = authHeader.replace("Bearer ", "").trim();
-
   const sb = createClient(url, service);
-  let callerUserId: string | null = null;
-
-  if (token && token === service) {
-    // Service-role call (e.g. from admin tooling). Allowed.
-    callerUserId = null;
-  } else if (token) {
-    const sbAnon = createClient(url, anon);
-    const { data: { user: caller }, error: authErr } = await sbAnon.auth.getUser(token);
-    if (authErr || !caller) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-    const { data: roleRow } = await sb.from("user_roles").select("role").eq("user_id", caller.id).eq("role", "admin").maybeSingle();
-    if (!roleRow) {
-      return new Response(JSON.stringify({ error: "Forbidden — admin role required" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-    callerUserId = caller.id;
-  } else {
-    return new Response(JSON.stringify({ error: "Missing Authorization" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-  }
+  const callerUserId: string | null = null;
 
   const counts: Record<string, number> = {};
   const inc = (k: string, n = 1) => { counts[k] = (counts[k] || 0) + n; };

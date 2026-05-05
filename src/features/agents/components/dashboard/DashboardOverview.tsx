@@ -707,7 +707,7 @@ const DashboardOverview = () => {
                     {t.render()}
                   </CardEditChrome>
                 ) : (
-                  <div key={t.key} className="h-full">{t.render()}</div>
+                  <div key={t.key} className="h-full [&>*]:h-full">{t.render()}</div>
                 )
               ))}
             </div>

@@ -611,39 +611,48 @@ Deno.serve(async (req) => {
     // ============================================================
     // 10. rent_payments (parallel record)
     // ============================================================
-    await sb.from("rent_payments").delete().eq("agent_id", lisaAgentId).like("reference", "MD-RNT-%");
-    const rpRows: Record<string, unknown>[] = [];
-    for (const r of rentals) {
-      const weeks = r.propId === propR2 ? 10 : 12;
-      for (let w = weeks; w >= 1; w--) {
-        const periodStart = daysAgo(w * 7);
-        const periodEnd = daysAgo(w * 7 - 6);
-        rpRows.push({
-          tenancy_id: r.tenancy, agent_id: lisaAgentId, property_id: r.propId,
-          amount: r.weekly, payment_date: dateOnly(periodStart),
-          period_from: dateOnly(periodStart), period_to: dateOnly(periodEnd),
-          receipt_number: `MD-RNT-${r.propId.substring(0,4)}-${String(w).padStart(2,"0")}`,
-          payment_method: "bank_transfer", status: "paid",
-          reference: `MD-RNT-${r.propId.substring(0,4)}-${String(w).padStart(2,"0")}`,
-          is_arrears: false,
-        });
+    await step("rent_payments", async () => {
+      await sb.from("rent_payments").delete().eq("agent_id", lisaAgentId).like("reference", "MD-RNT-%");
+      const rpRows: Record<string, unknown>[] = [];
+      for (const r of rentals) {
+        const weeks = r.propId === propR2 ? 10 : 12;
+        for (let w = weeks; w >= 1; w--) {
+          const periodStart = daysAgo(w * 7);
+          const periodEnd = daysAgo(w * 7 - 6);
+          rpRows.push({
+            tenancy_id: r.tenancy, agent_id: lisaAgentId, property_id: r.propId,
+            amount: r.weekly, payment_date: dateOnly(periodStart),
+            period_from: dateOnly(periodStart), period_to: dateOnly(periodEnd),
+            receipt_number: `MD-RNT-${r.propId.substring(0,4)}-${String(w).padStart(2,"0")}`,
+            payment_method: "bank_transfer", status: "paid",
+            reference: `MD-RNT-${r.propId.substring(0,4)}-${String(w).padStart(2,"0")}`,
+            is_arrears: false,
+          });
+        }
       }
-    }
-    if (rpRows.length) { await sb.from("rent_payments").insert(rpRows); inc("rent_payments", rpRows.length); }
+      if (rpRows.length) {
+        const { error } = await sb.from("rent_payments").insert(rpRows);
+        if (error) throw error;
+        inc("rent_payments", rpRows.length);
+      }
+    });
 
     // ============================================================
-    // 11. Sold listing commission (transactions table or trust)
+    // 11. Sold listing commission
     // ============================================================
-    await sb.from("trust_receipts").insert({
-      receipt_number: "MD-COMM-BURWOOD",
-      agent_id: sarahAgentId, trust_account_id: trustAccountId,
-      client_name: "Vendor — 14 Outlook Drive", property_address: "14 Outlook Drive, Burwood East VIC 3151",
-      property_id: propBE, amount: 19900, payment_method: "eft",
-      purpose: "commission", type: "commission", ledger_account: "commission",
-      date_received: dateOnly(daysAgo(28)), date_deposited: dateOnly(daysAgo(27)),
-      status: "cleared", description: "MERIDIAN-DEMO sale commission 2% — 14 Outlook Drive",
+    await step("commission_receipt", async () => {
+      const { error } = await sb.from("trust_receipts").insert({
+        receipt_number: "MD-COMM-BURWOOD",
+        agent_id: sarahAgentId, trust_account_id: trustAccountId,
+        client_name: "Vendor — 14 Outlook Drive", property_address: "14 Outlook Drive, Burwood East VIC 3151",
+        property_id: propBE, amount: 19900, payment_method: "eft",
+        purpose: "commission", type: "commission", ledger_account: "commission",
+        date_received: dateOnly(daysAgo(28)), date_deposited: dateOnly(daysAgo(27)),
+        status: "cleared", description: "MERIDIAN-DEMO sale commission 2% — 14 Outlook Drive",
+      });
+      if (error) throw error;
+      inc("trust_receipts");
     });
-    inc("trust_receipts");
 
     // ============================================================
     // 12. Contacts (4 buyer contacts)

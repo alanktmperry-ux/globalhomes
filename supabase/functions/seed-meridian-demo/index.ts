@@ -27,7 +27,15 @@ Deno.serve(async (req) => {
   const callerUserId: string | null = null;
 
   const counts: Record<string, number> = {};
+  const errors: Record<string, string> = {};
   const inc = (k: string, n = 1) => { counts[k] = (counts[k] || 0) + n; };
+  async function step<T>(name: string, fn: () => Promise<T>): Promise<T | null> {
+    try { return await fn(); } catch (e: any) {
+      console.error(`step[${name}] failed:`, e?.message || e);
+      errors[name] = e?.message || String(e);
+      return null;
+    }
+  }
 
   try {
     // ============================================================

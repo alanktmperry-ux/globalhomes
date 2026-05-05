@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
       agencyId = existingAgency.id;
       await sb.from("agencies").update(agencyPayload).eq("id", agencyId);
     } else {
-      const { data, error } = await sb.from("agencies").insert(agencyPayload).select("id").single();
+      const { data, error } = await sb.from("agencies").insert(agencyPayload).select("id").maybeSingle();
       if (error) throw new Error(`agency: ${error.message}`);
       agencyId = data.id;
       inc("agencies");
@@ -130,7 +130,7 @@ Deno.serve(async (req) => {
         await sb.from("agents").update(payload).eq("id", existing.id);
         return existing.id;
       } else {
-        const { data, error } = await sb.from("agents").insert(payload).select("id").single();
+        const { data, error } = await sb.from("agents").insert(payload).select("id").maybeSingle();
         if (error) throw new Error(`agent ${name}: ${error.message}`);
         inc("agents");
         return data.id;
@@ -190,7 +190,7 @@ Deno.serve(async (req) => {
       trustAccountId = existingTrust.id;
       await sb.from("trust_accounts").update(trustPayload).eq("id", trustAccountId);
     } else {
-      const { data, error } = await sb.from("trust_accounts").insert(trustPayload).select("id").single();
+      const { data, error } = await sb.from("trust_accounts").insert(trustPayload).select("id").maybeSingle();
       if (error) throw new Error(`trust_account: ${error.message}`);
       trustAccountId = data.id;
       inc("trust_accounts");
@@ -210,7 +210,7 @@ Deno.serve(async (req) => {
         await sb.from("properties").update(payload).eq("id", existing.id);
         return existing.id;
       }
-      const { data, error } = await sb.from("properties").insert(payload).select("id").single();
+      const { data, error } = await sb.from("properties").insert(payload).select("id").maybeSingle();
       if (error) throw new Error(`property ${addressKey}: ${error.message}`);
       inc("properties");
       return data.id;
@@ -344,7 +344,7 @@ Deno.serve(async (req) => {
         await sb.from("tenancies").update(payload).eq("id", existing.id);
         return existing.id;
       }
-      const { data, error } = await sb.from("tenancies").insert(payload).select("id").single();
+      const { data, error } = await sb.from("tenancies").insert(payload).select("id").maybeSingle();
       if (error) throw new Error(`tenancy ${propertyId}: ${error.message}`);
       inc("tenancies");
       return data.id;
@@ -447,7 +447,7 @@ Deno.serve(async (req) => {
       rapidPlumbingId = existingSupplier.id;
       await sb.from("suppliers").update(supplierPayload).eq("id", rapidPlumbingId);
     } else {
-      const { data } = await sb.from("suppliers").insert(supplierPayload).select("id").single();
+      const { data } = await sb.from("suppliers").insert(supplierPayload).select("id").maybeSingle();
       rapidPlumbingId = data!.id; inc("suppliers");
     }
 
@@ -657,7 +657,7 @@ Deno.serve(async (req) => {
         last_contacted_at: iso(daysAgo(c.lastActive)),
       };
       if (existing) { await sb.from("contacts").update(payload).eq("id", existing.id); contactIds[c.email] = existing.id; }
-      else { const { data } = await sb.from("contacts").insert(payload).select("id").single(); contactIds[c.email] = data!.id; inc("contacts"); }
+      else { const { data } = await sb.from("contacts").insert(payload).select("id").maybeSingle(); contactIds[c.email] = data!.id; inc("contacts"); }
     }
 
     // ============================================================

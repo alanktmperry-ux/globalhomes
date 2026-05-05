@@ -445,37 +445,42 @@ Deno.serve(async (req) => {
     // ============================================================
     // 8. Maintenance job (rental 3)
     // ============================================================
-    // Supplier
-    const { data: existingSupplier } = await sb.from("suppliers").select("id").eq("business_name", "Rapid Plumbing Services").eq("agent_id", lisaAgentId).maybeSingle();
-    let rapidPlumbingId: string;
-    const supplierPayload = {
-      agent_id: lisaAgentId, business_name: "Rapid Plumbing Services",
-      contact_name: "Steve Rapid", email: "demo+rapidplumbing@listhq.com.au", phone: "0412 555 401",
-      trade_category: "Plumbing", abn: "11 222 333 444", license_number: "PIC-12345",
-      preferred: true, rating_avg: 4.8, jobs_completed: 47, status: "active",
-    };
-    if (existingSupplier) {
-      rapidPlumbingId = existingSupplier.id;
-      await sb.from("suppliers").update(supplierPayload).eq("id", rapidPlumbingId);
-    } else {
-      const { data } = await sb.from("suppliers").insert(supplierPayload).select("id").maybeSingle();
-      rapidPlumbingId = data!.id; inc("suppliers");
-    }
-
-    await sb.from("maintenance_jobs").delete().eq("tenancy_id", tenancy3);
-    await sb.from("maintenance_jobs").insert({
-      tenancy_id: tenancy3, property_id: propR3, agent_id: lisaAgentId,
-      reported_by: "tenant", title: "Leaking kitchen tap",
-      description: "Water pooling under sink. Reported via tenant portal.",
-      priority: "medium", status: "in_progress",
-      assigned_to: "Rapid Plumbing Services", assigned_phone: "0412 555 401",
-      assigned_supplier_id: rapidPlumbingId,
-      supplier_notified_at: iso(daysAgo(3)),
-      supplier_accepted_at: iso(daysAgo(2)),
-      supplier_scheduled_date: dateOnly(daysFromNow(1)),
-      supplier_scheduled_time: "10:00",
+    let rapidPlumbingId: string | null = null;
+    await step("supplier", async () => {
+      const { data: existingSupplier } = await sb.from("suppliers").select("id").eq("business_name", "Rapid Plumbing Services").eq("agent_id", lisaAgentId).maybeSingle();
+      const supplierPayload = {
+        agent_id: lisaAgentId, business_name: "Rapid Plumbing Services",
+        contact_name: "Steve Rapid", email: "demo+rapidplumbing@listhq.com.au", phone: "0412 555 401",
+        trade_category: "Plumbing", abn: "11 222 333 444", license_number: "PIC-12345",
+        preferred: true, rating_avg: 4.8, jobs_completed: 47, status: "active",
+      };
+      if (existingSupplier) {
+        rapidPlumbingId = existingSupplier.id;
+        await sb.from("suppliers").update(supplierPayload).eq("id", rapidPlumbingId);
+      } else {
+        const { data, error } = await sb.from("suppliers").insert(supplierPayload).select("id").maybeSingle();
+        if (error) throw error;
+        rapidPlumbingId = data!.id; inc("suppliers");
+      }
     });
-    inc("maintenance_jobs");
+
+    await step("maintenance_jobs", async () => {
+      await sb.from("maintenance_jobs").delete().eq("tenancy_id", tenancy3);
+      const { error } = await sb.from("maintenance_jobs").insert({
+        tenancy_id: tenancy3, property_id: propR3, agent_id: lisaAgentId,
+        reported_by: "tenant", title: "Leaking kitchen tap",
+        description: "Water pooling under sink. Reported via tenant portal.",
+        priority: "medium", status: "in_progress",
+        assigned_to: "Rapid Plumbing Services", assigned_phone: "0412 555 401",
+        assigned_supplier_id: rapidPlumbingId,
+        supplier_notified_at: iso(daysAgo(3)),
+        supplier_accepted_at: iso(daysAgo(2)),
+        supplier_scheduled_date: dateOnly(daysFromNow(1)),
+        supplier_scheduled_time: "10:00",
+      });
+      if (error) throw error;
+      inc("maintenance_jobs");
+    });
 
     // ============================================================
     // 9. Trust transactions (rent receipts, bond lodgements, disbursements)

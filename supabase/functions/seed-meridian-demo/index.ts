@@ -708,8 +708,9 @@ Deno.serve(async (req) => {
       property_id: propGW, agent_id: jamesAgentId,
       starts_at: iso(daysAgo(3)), ends_at: iso(new Date(daysAgo(3).getTime() + 30*60*1000)),
       max_attendees: 30, status: "completed", notes: "Saturday open home.",
-    }).select("id").single();
-    inc("open_homes");
+    }).select("id").maybeSingle();
+    if (oh.error) console.error("open_homes insert error:", oh.error.message);
+    if (oh.data) inc("open_homes");
 
     if (oh.data) {
       const regs = [];

@@ -1,7 +1,7 @@
 project_id = "ngrkbohpmkzjonaofgbb"
 
 [functions.google-maps-proxy]
-verify_jwt = false
+verify_jwt = true
 
 [functions.manus-search]
 verify_jwt = true

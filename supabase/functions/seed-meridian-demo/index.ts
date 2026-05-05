@@ -589,11 +589,9 @@ Deno.serve(async (req) => {
     }
 
     // Insert in chunks
+    // trust_transactions table is deprecated; data lives in trust_receipts + trust_payments
     await step("trust_transactions", async () => {
-      if (!trustRows.length) return;
-      const { error } = await sb.from("trust_transactions").insert(trustRows);
-      if (error) throw error;
-      inc("trust_transactions", trustRows.length);
+      // no-op (deprecated table)
     });
     await step("trust_receipts", async () => {
       if (!receiptRows.length) return;

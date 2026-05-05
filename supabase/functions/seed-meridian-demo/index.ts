@@ -589,21 +589,24 @@ Deno.serve(async (req) => {
     }
 
     // Insert in chunks
-    if (trustRows.length) {
+    await step("trust_transactions", async () => {
+      if (!trustRows.length) return;
       const { error } = await sb.from("trust_transactions").insert(trustRows);
-      if (error) throw new Error(`trust_transactions: ${error.message}`);
+      if (error) throw error;
       inc("trust_transactions", trustRows.length);
-    }
-    if (receiptRows.length) {
+    });
+    await step("trust_receipts", async () => {
+      if (!receiptRows.length) return;
       const { error } = await sb.from("trust_receipts").insert(receiptRows);
-      if (error) throw new Error(`trust_receipts: ${error.message}`);
+      if (error) throw error;
       inc("trust_receipts", receiptRows.length);
-    }
-    if (paymentRows.length) {
+    });
+    await step("trust_payments", async () => {
+      if (!paymentRows.length) return;
       const { error } = await sb.from("trust_payments").insert(paymentRows);
-      if (error) throw new Error(`trust_payments: ${error.message}`);
+      if (error) throw error;
       inc("trust_payments", paymentRows.length);
-    }
+    });
 
     // ============================================================
     // 10. rent_payments (parallel record)

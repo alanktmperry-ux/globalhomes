@@ -423,21 +423,24 @@ Deno.serve(async (req) => {
     // ============================================================
     // 7. Property inspection (entry done, routine due in 14 days for tenancy1)
     // ============================================================
-    await sb.from("property_inspections").delete().eq("tenancy_id", tenancy1);
-    await sb.from("property_inspections").insert([
-      {
-        tenancy_id: tenancy1, property_id: propR1, agent_id: lisaAgentId,
-        inspection_type: "entry", scheduled_date: dateOnly(daysAgo(180)),
-        conducted_date: dateOnly(daysAgo(180)), status: "completed",
-        finalised_at: iso(daysAgo(179)), overall_notes: "Property in excellent condition at lease start.",
-      },
-      {
-        tenancy_id: tenancy1, property_id: propR1, agent_id: lisaAgentId,
-        inspection_type: "routine", scheduled_date: dateOnly(daysFromNow(14)),
-        status: "scheduled", overall_notes: "Routine 6-month inspection.",
-      },
-    ]);
-    inc("inspections", 2);
+    await step("inspections", async () => {
+      await sb.from("property_inspections").delete().eq("tenancy_id", tenancy1);
+      const { error } = await sb.from("property_inspections").insert([
+        {
+          tenancy_id: tenancy1, property_id: propR1, agent_id: lisaAgentId,
+          inspection_type: "entry", scheduled_date: dateOnly(daysAgo(180)),
+          conducted_date: dateOnly(daysAgo(180)), status: "completed",
+          finalised_at: iso(daysAgo(179)), overall_notes: "Property in excellent condition at lease start.",
+        },
+        {
+          tenancy_id: tenancy1, property_id: propR1, agent_id: lisaAgentId,
+          inspection_type: "routine", scheduled_date: dateOnly(daysFromNow(14)),
+          status: "scheduled", overall_notes: "Routine 6-month inspection.",
+        },
+      ]);
+      if (error) throw error;
+      inc("inspections", 2);
+    });
 
     // ============================================================
     // 8. Maintenance job (rental 3)

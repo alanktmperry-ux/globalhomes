@@ -27,7 +27,15 @@ Deno.serve(async (req) => {
   const callerUserId: string | null = null;
 
   const counts: Record<string, number> = {};
+  const errors: Record<string, string> = {};
   const inc = (k: string, n = 1) => { counts[k] = (counts[k] || 0) + n; };
+  async function step<T>(name: string, fn: () => Promise<T>): Promise<T | null> {
+    try { return await fn(); } catch (e: any) {
+      console.error(`step[${name}] failed:`, e?.message || e);
+      errors[name] = e?.message || String(e);
+      return null;
+    }
+  }
 
   try {
     // ============================================================
@@ -197,7 +205,7 @@ Deno.serve(async (req) => {
     }
 
     // Idempotency: clear demo seeded child rows tagged by reference prefix "MERIDIAN-DEMO"
-    await sb.from("trust_transactions").delete().eq("trust_account_id", trustAccountId).like("reference", "MERIDIAN-DEMO%");
+    // trust_transactions deprecated — skip cleanup
     await sb.from("trust_receipts").delete().eq("agent_id", sarahAgentId).like("description", "MERIDIAN-DEMO%");
     await sb.from("trust_payments").delete().eq("agent_id", sarahAgentId).like("description", "MERIDIAN-DEMO%");
 
@@ -415,56 +423,64 @@ Deno.serve(async (req) => {
     // ============================================================
     // 7. Property inspection (entry done, routine due in 14 days for tenancy1)
     // ============================================================
-    await sb.from("property_inspections").delete().eq("tenancy_id", tenancy1);
-    await sb.from("property_inspections").insert([
-      {
-        tenancy_id: tenancy1, property_id: propR1, agent_id: lisaAgentId,
-        inspection_type: "entry", scheduled_date: dateOnly(daysAgo(180)),
-        conducted_date: dateOnly(daysAgo(180)), status: "completed",
-        finalised_at: iso(daysAgo(179)), overall_notes: "Property in excellent condition at lease start.",
-      },
-      {
-        tenancy_id: tenancy1, property_id: propR1, agent_id: lisaAgentId,
-        inspection_type: "routine", scheduled_date: dateOnly(daysFromNow(14)),
-        status: "scheduled", overall_notes: "Routine 6-month inspection.",
-      },
-    ]);
-    inc("inspections", 2);
+    await step("inspections", async () => {
+      await sb.from("property_inspections").delete().eq("tenancy_id", tenancy1);
+      const { error } = await sb.from("property_inspections").insert([
+        {
+          tenancy_id: tenancy1, property_id: propR1, agent_id: lisaAgentId,
+          inspection_type: "entry", scheduled_date: dateOnly(daysAgo(180)),
+          conducted_date: dateOnly(daysAgo(180)), status: "completed",
+          finalised_at: iso(daysAgo(179)), overall_notes: "Property in excellent condition at lease start.",
+        },
+        {
+          tenancy_id: tenancy1, property_id: propR1, agent_id: lisaAgentId,
+          inspection_type: "routine", scheduled_date: dateOnly(daysFromNow(14)),
+          status: "scheduled", overall_notes: "Routine 6-month inspection.",
+        },
+      ]);
+      if (error) throw error;
+      inc("inspections", 2);
+    });
 
     // ============================================================
     // 8. Maintenance job (rental 3)
     // ============================================================
-    // Supplier
-    const { data: existingSupplier } = await sb.from("suppliers").select("id").eq("business_name", "Rapid Plumbing Services").eq("agent_id", lisaAgentId).maybeSingle();
-    let rapidPlumbingId: string;
-    const supplierPayload = {
-      agent_id: lisaAgentId, business_name: "Rapid Plumbing Services",
-      contact_name: "Steve Rapid", email: "demo+rapidplumbing@listhq.com.au", phone: "0412 555 401",
-      trade_category: "Plumbing", abn: "11 222 333 444", license_number: "PIC-12345",
-      preferred: true, rating_avg: 4.8, jobs_completed: 47, status: "active",
-    };
-    if (existingSupplier) {
-      rapidPlumbingId = existingSupplier.id;
-      await sb.from("suppliers").update(supplierPayload).eq("id", rapidPlumbingId);
-    } else {
-      const { data } = await sb.from("suppliers").insert(supplierPayload).select("id").maybeSingle();
-      rapidPlumbingId = data!.id; inc("suppliers");
-    }
-
-    await sb.from("maintenance_jobs").delete().eq("tenancy_id", tenancy3);
-    await sb.from("maintenance_jobs").insert({
-      tenancy_id: tenancy3, property_id: propR3, agent_id: lisaAgentId,
-      reported_by: "tenant", title: "Leaking kitchen tap",
-      description: "Water pooling under sink. Reported via tenant portal.",
-      priority: "medium", status: "in_progress",
-      assigned_to: "Rapid Plumbing Services", assigned_phone: "0412 555 401",
-      assigned_supplier_id: rapidPlumbingId,
-      supplier_notified_at: iso(daysAgo(3)),
-      supplier_accepted_at: iso(daysAgo(2)),
-      supplier_scheduled_date: dateOnly(daysFromNow(1)),
-      supplier_scheduled_time: "10:00",
+    let rapidPlumbingId: string | null = null;
+    await step("supplier", async () => {
+      const { data: existingSupplier } = await sb.from("suppliers").select("id").eq("business_name", "Rapid Plumbing Services").eq("agent_id", lisaAgentId).maybeSingle();
+      const supplierPayload = {
+        agent_id: lisaAgentId, business_name: "Rapid Plumbing Services",
+        contact_name: "Steve Rapid", email: "demo+rapidplumbing@listhq.com.au", phone: "0412 555 401",
+        trade_category: "plumbing", abn: "11 222 333 444", license_number: "PIC-12345",
+        preferred: true, rating_avg: 4.8, jobs_completed: 47, status: "active",
+      };
+      if (existingSupplier) {
+        rapidPlumbingId = existingSupplier.id;
+        await sb.from("suppliers").update(supplierPayload).eq("id", rapidPlumbingId);
+      } else {
+        const { data, error } = await sb.from("suppliers").insert(supplierPayload).select("id").maybeSingle();
+        if (error) throw error;
+        rapidPlumbingId = data!.id; inc("suppliers");
+      }
     });
-    inc("maintenance_jobs");
+
+    await step("maintenance_jobs", async () => {
+      await sb.from("maintenance_jobs").delete().eq("tenancy_id", tenancy3);
+      const { error } = await sb.from("maintenance_jobs").insert({
+        tenancy_id: tenancy3, property_id: propR3, agent_id: lisaAgentId,
+        reported_by: "tenant", title: "Leaking kitchen tap",
+        description: "Water pooling under sink. Reported via tenant portal.",
+        priority: "routine", status: "in_progress",
+        assigned_to: "Rapid Plumbing Services", assigned_phone: "0412 555 401",
+        assigned_supplier_id: rapidPlumbingId,
+        supplier_notified_at: iso(daysAgo(3)),
+        supplier_accepted_at: iso(daysAgo(2)),
+        supplier_scheduled_date: dateOnly(daysFromNow(1)),
+        supplier_scheduled_time: "10:00",
+      });
+      if (error) throw error;
+      inc("maintenance_jobs");
+    });
 
     // ============================================================
     // 9. Trust transactions (rent receipts, bond lodgements, disbursements)
@@ -573,58 +589,68 @@ Deno.serve(async (req) => {
     }
 
     // Insert in chunks
-    if (trustRows.length) {
-      const { error } = await sb.from("trust_transactions").insert(trustRows);
-      if (error) throw new Error(`trust_transactions: ${error.message}`);
-      inc("trust_transactions", trustRows.length);
-    }
-    if (receiptRows.length) {
+    // trust_transactions table is deprecated; data lives in trust_receipts + trust_payments
+    await step("trust_transactions", async () => {
+      // no-op (deprecated table)
+    });
+    await step("trust_receipts", async () => {
+      if (!receiptRows.length) return;
       const { error } = await sb.from("trust_receipts").insert(receiptRows);
-      if (error) throw new Error(`trust_receipts: ${error.message}`);
+      if (error) throw error;
       inc("trust_receipts", receiptRows.length);
-    }
-    if (paymentRows.length) {
+    });
+    await step("trust_payments", async () => {
+      if (!paymentRows.length) return;
       const { error } = await sb.from("trust_payments").insert(paymentRows);
-      if (error) throw new Error(`trust_payments: ${error.message}`);
+      if (error) throw error;
       inc("trust_payments", paymentRows.length);
-    }
+    });
 
     // ============================================================
     // 10. rent_payments (parallel record)
     // ============================================================
-    await sb.from("rent_payments").delete().eq("agent_id", lisaAgentId).like("reference", "MD-RNT-%");
-    const rpRows: Record<string, unknown>[] = [];
-    for (const r of rentals) {
-      const weeks = r.propId === propR2 ? 10 : 12;
-      for (let w = weeks; w >= 1; w--) {
-        const periodStart = daysAgo(w * 7);
-        const periodEnd = daysAgo(w * 7 - 6);
-        rpRows.push({
-          tenancy_id: r.tenancy, agent_id: lisaAgentId, property_id: r.propId,
-          amount: r.weekly, payment_date: dateOnly(periodStart),
-          period_from: dateOnly(periodStart), period_to: dateOnly(periodEnd),
-          receipt_number: `MD-RNT-${r.propId.substring(0,4)}-${String(w).padStart(2,"0")}`,
-          payment_method: "bank_transfer", status: "paid",
-          reference: `MD-RNT-${r.propId.substring(0,4)}-${String(w).padStart(2,"0")}`,
-          is_arrears: false,
-        });
+    await step("rent_payments", async () => {
+      await sb.from("rent_payments").delete().eq("agent_id", lisaAgentId).like("reference", "MD-RNT-%");
+      const rpRows: Record<string, unknown>[] = [];
+      for (const r of rentals) {
+        const weeks = r.propId === propR2 ? 10 : 12;
+        for (let w = weeks; w >= 1; w--) {
+          const periodStart = daysAgo(w * 7);
+          const periodEnd = daysAgo(w * 7 - 6);
+          rpRows.push({
+            tenancy_id: r.tenancy, agent_id: lisaAgentId, property_id: r.propId,
+            amount: r.weekly, payment_date: dateOnly(periodStart),
+            period_from: dateOnly(periodStart), period_to: dateOnly(periodEnd),
+            receipt_number: `MD-RNT-${r.propId.substring(0,4)}-${String(w).padStart(2,"0")}`,
+            payment_method: "bank_transfer", status: "paid",
+            reference: `MD-RNT-${r.propId.substring(0,4)}-${String(w).padStart(2,"0")}`,
+            is_arrears: false,
+          });
+        }
       }
-    }
-    if (rpRows.length) { await sb.from("rent_payments").insert(rpRows); inc("rent_payments", rpRows.length); }
+      if (rpRows.length) {
+        const { error } = await sb.from("rent_payments").insert(rpRows);
+        if (error) throw error;
+        inc("rent_payments", rpRows.length);
+      }
+    });
 
     // ============================================================
-    // 11. Sold listing commission (transactions table or trust)
+    // 11. Sold listing commission
     // ============================================================
-    await sb.from("trust_receipts").insert({
-      receipt_number: "MD-COMM-BURWOOD",
-      agent_id: sarahAgentId, trust_account_id: trustAccountId,
-      client_name: "Vendor — 14 Outlook Drive", property_address: "14 Outlook Drive, Burwood East VIC 3151",
-      property_id: propBE, amount: 19900, payment_method: "eft",
-      purpose: "commission", type: "commission", ledger_account: "commission",
-      date_received: dateOnly(daysAgo(28)), date_deposited: dateOnly(daysAgo(27)),
-      status: "cleared", description: "MERIDIAN-DEMO sale commission 2% — 14 Outlook Drive",
+    await step("commission_receipt", async () => {
+      const { error } = await sb.from("trust_receipts").insert({
+        receipt_number: "MD-COMM-BURWOOD",
+        agent_id: sarahAgentId, trust_account_id: trustAccountId,
+        client_name: "Vendor — 14 Outlook Drive", property_address: "14 Outlook Drive, Burwood East VIC 3151",
+        property_id: propBE, amount: 19900, payment_method: "eft",
+        purpose: "commission", type: "commission", ledger_account: "commission",
+        date_received: dateOnly(daysAgo(28)), date_deposited: dateOnly(daysAgo(27)),
+        status: "cleared", description: "MERIDIAN-DEMO sale commission 2% — 14 Outlook Drive",
+      });
+      if (error) throw error;
+      inc("trust_receipts");
     });
-    inc("trust_receipts");
 
     // ============================================================
     // 12. Contacts (4 buyer contacts)
@@ -645,139 +671,146 @@ Deno.serve(async (req) => {
         notes: "Saved listings, completed stamp duty calculator, 1 enquiry sent.", lastActive: 2 },
     ];
     const contactIds: Record<string, string> = {};
-    for (const c of contactSpec) {
-      const { data: existing } = await sb.from("contacts").select("id").eq("email", c.email).maybeSingle();
-      const payload = {
-        agency_id: agencyId, created_by: ownerUserId, contact_type: "buyer",
-        first_name: c.first, last_name: c.last, email: c.email, phone: c.phone,
-        preferred_suburbs: c.suburbs, budget_min: c.min, budget_max: c.max,
-        preferred_beds: c.beds, preferred_language: c.lang,
-        assigned_agent_id: jamesAgentId, ranking: c.lastActive <= 2 ? "hot" : "warm",
-        source: "website", notes: c.notes,
-        last_contacted_at: iso(daysAgo(c.lastActive)),
-      };
-      if (existing) { await sb.from("contacts").update(payload).eq("id", existing.id); contactIds[c.email] = existing.id; }
-      else { const { data } = await sb.from("contacts").insert(payload).select("id").maybeSingle(); contactIds[c.email] = data!.id; inc("contacts"); }
-    }
+    await step("contacts", async () => {
+      for (const c of contactSpec) {
+        const { data: existing } = await sb.from("contacts").select("id").eq("email", c.email).maybeSingle();
+        const payload = {
+          agency_id: agencyId, created_by: ownerUserId, contact_type: "buyer",
+          first_name: c.first, last_name: c.last, email: c.email, phone: c.phone,
+          preferred_suburbs: c.suburbs, budget_min: c.min, budget_max: c.max,
+          preferred_beds: c.beds, preferred_language: c.lang,
+          assigned_agent_id: jamesAgentId, ranking: c.lastActive <= 2 ? "hot" : "warm",
+          source: "website", notes: c.notes,
+          last_contacted_at: iso(daysAgo(c.lastActive)),
+        };
+        if (existing) { await sb.from("contacts").update(payload).eq("id", existing.id); contactIds[c.email] = existing.id; }
+        else {
+          const { data, error } = await sb.from("contacts").insert(payload).select("id").maybeSingle();
+          if (error) { console.error("contact insert", c.email, error.message); continue; }
+          contactIds[c.email] = data!.id; inc("contacts");
+        }
+      }
+    });
 
     // ============================================================
     // 13. CRM leads
     // ============================================================
-    const crmSpec = [
-      { email: "wei.zhang.demo@listhq.com.au", score: 87, propId: propGW, stage: "qualified", temp: "hot" },
-      { email: "anh.nguyen.demo@listhq.com.au", score: 62, propId: propBH, stage: "contacted", temp: "warm" },
-      { email: "david.morrison.demo@listhq.com.au", score: 41, propId: null, stage: "new", temp: "cold" },
-      { email: "sophie.park.demo@listhq.com.au", score: 74, propId: propBH, stage: "qualified", temp: "warm" },
-    ];
-    for (const cs of crmSpec) {
-      const cid = contactIds[cs.email];
-      const { data: existing } = await sb.from("crm_leads").select("id").eq("contact_id", cid).maybeSingle();
-      const payload = {
-        contact_id: cid, agent_id: jamesAgentId, source_property_id: cs.propId,
-        enquiry_source: "enquiry_form", lead_temperature: cs.temp,
-        stage: cs.stage, priority: cs.score > 70 ? "high" : "medium",
-        lead_score: cs.score, conversion_status: cs.stage,
-        last_contacted: iso(daysAgo(2)),
-      };
-      if (existing) await sb.from("crm_leads").update(payload).eq("id", existing.id);
-      else { await sb.from("crm_leads").insert(payload); inc("crm_leads"); }
-    }
+    await step("crm_leads", async () => {
+      const crmSpec = [
+        { email: "wei.zhang.demo@listhq.com.au", score: 87, propId: propGW, stage: "qualified", temp: "hot" },
+        { email: "anh.nguyen.demo@listhq.com.au", score: 62, propId: propBH, stage: "contacted", temp: "warm" },
+        { email: "david.morrison.demo@listhq.com.au", score: 41, propId: null, stage: "new", temp: "cold" },
+        { email: "sophie.park.demo@listhq.com.au", score: 74, propId: propBH, stage: "qualified", temp: "warm" },
+      ];
+      for (const cs of crmSpec) {
+        const cid = contactIds[cs.email];
+        if (!cid) continue;
+        const { data: existing } = await sb.from("crm_leads").select("id").eq("contact_id", cid).maybeSingle();
+        const payload = {
+          contact_id: cid, agent_id: jamesAgentId, source_property_id: cs.propId,
+          enquiry_source: "enquiry_form", lead_temperature: cs.temp,
+          stage: cs.stage, priority: cs.score > 70 ? "high" : "medium",
+          lead_score: cs.score, conversion_status: cs.stage,
+          last_contacted: iso(daysAgo(2)),
+        };
+        if (existing) await sb.from("crm_leads").update(payload).eq("id", existing.id);
+        else { const { error } = await sb.from("crm_leads").insert(payload); if (!error) inc("crm_leads"); }
+      }
+    });
 
     // ============================================================
     // 14. Enquiries on Listing 1 (3 leads)
     // ============================================================
-    await sb.from("leads").delete().eq("property_id", propGW).eq("agent_id", jamesAgentId).like("user_email", "%demo@listhq.com.au");
-    await sb.from("leads").insert([
-      { property_id: propGW, agent_id: jamesAgentId, user_name: "Wei Zhang", user_email: "wei.zhang.demo@listhq.com.au", user_phone: "0412 555 501",
-        message: "Very interested — when's the next inspection?", status: "qualified", score: 87,
-        urgency: "ready_to_buy", pre_approval_status: "approved", source: "enquiry_form" },
-      { property_id: propGW, agent_id: jamesAgentId, user_name: "Anh Nguyen", user_email: "anh.nguyen.demo@listhq.com.au", user_phone: "0412 555 502",
-        message: "Is the price negotiable?", status: "new", score: 62,
-        urgency: "next_3_months", pre_approval_status: "in_progress", source: "enquiry_form" },
-      { property_id: propGW, agent_id: jamesAgentId, user_name: "David Morrison", user_email: "david.morrison.demo@listhq.com.au", user_phone: "0412 555 503",
-        message: "Just looking, thanks.", status: "new", score: 41,
-        urgency: "just_browsing", source: "enquiry_form" },
-    ]);
-    inc("leads", 3);
+    await step("leads", async () => {
+      await sb.from("leads").delete().eq("property_id", propGW).eq("agent_id", jamesAgentId).like("user_email", "%demo@listhq.com.au");
+      const { error } = await sb.from("leads").insert([
+        { property_id: propGW, agent_id: jamesAgentId, user_name: "Wei Zhang", user_email: "wei.zhang.demo@listhq.com.au", user_phone: "0412 555 501",
+          message: "Very interested — when's the next inspection?", status: "qualified", score: 87,
+          urgency: "ready_to_buy", pre_approval_status: "approved", source: "enquiry_form" },
+        { property_id: propGW, agent_id: jamesAgentId, user_name: "Anh Nguyen", user_email: "anh.nguyen.demo@listhq.com.au", user_phone: "0412 555 502",
+          message: "Is the price negotiable?", status: "new", score: 62,
+          urgency: "next_3_months", pre_approval_status: "in_progress", source: "enquiry_form" },
+        { property_id: propGW, agent_id: jamesAgentId, user_name: "David Morrison", user_email: "david.morrison.demo@listhq.com.au", user_phone: "0412 555 503",
+          message: "Just looking, thanks.", status: "new", score: 41,
+          urgency: "just_browsing", source: "enquiry_form" },
+      ]);
+      if (error) throw error;
+      inc("leads", 3);
+    });
 
     // ============================================================
     // 15. Open home + registrations (Listing 1)
     // ============================================================
-    await sb.from("open_homes").delete().eq("property_id", propGW).eq("agent_id", jamesAgentId);
-    const oh = await sb.from("open_homes").insert({
-      property_id: propGW, agent_id: jamesAgentId,
-      starts_at: iso(daysAgo(3)), ends_at: iso(new Date(daysAgo(3).getTime() + 30*60*1000)),
-      max_attendees: 30, status: "completed", notes: "Saturday open home.",
-    }).select("id").maybeSingle();
-    if (oh.error) console.error("open_homes insert error:", oh.error.message);
-    if (oh.data) inc("open_homes");
-
-    if (oh.data) {
+    await step("open_homes", async () => {
+      await sb.from("open_homes").delete().eq("property_id", propGW).eq("agent_id", jamesAgentId);
+      const { data, error } = await sb.from("open_homes").insert({
+        property_id: propGW, agent_id: jamesAgentId,
+        starts_at: iso(daysAgo(3)), ends_at: iso(new Date(daysAgo(3).getTime() + 30*60*1000)),
+        max_attendees: 30, status: "completed", notes: "Saturday open home.",
+      }).select("id").maybeSingle();
+      if (error) throw error;
+      if (!data) return;
+      inc("open_homes");
       const regs = [];
       const names = ["Wei Zhang", "Anh Nguyen", "David Morrison", "Mei Lin", "Brian Cox", "Sarah Lee", "Jacob Tan", "Grace Wu", "Henry Liu", "Olivia Park", "Ben Chen", "Emma Wong"];
       for (let i = 0; i < 12; i++) {
         regs.push({
-          open_home_id: oh.data.id, name: names[i],
+          open_home_id: data.id, name: names[i],
           email: `oh.demo.${i}@listhq.com.au`, phone: `04125556${String(i).padStart(2,"0")}`,
           attended: true, attended_at: iso(daysAgo(3)),
         });
       }
-      await sb.from("open_home_registrations").insert(regs);
-      inc("open_home_registrations", 12);
-    }
-
-    // ============================================================
-    // 16. saved_properties (8 buyers saved Listing 1) — needs real auth users; create demo users
-    // ============================================================
-    // Skip — saved_properties FK to auth.users; would require creating 8 dummy auth users. Instead seed view counts via property fields already done.
+      const r = await sb.from("open_home_registrations").insert(regs);
+      if (!r.error) inc("open_home_registrations", 12);
+    });
 
     // ============================================================
     // 17. Halos (2 active briefs)
     // ============================================================
-    // Halos.seeker_id FK to auth.users — create or reuse 2 demo seeker accounts
-    const meiLinUserId = await ensureUser("mei.lin.demo@listhq.com.au", "MeridianDemo2025", "Mei Lin");
-    const investorUserId = await ensureUser("investor.demo@listhq.com.au", "MeridianDemo2025", "Investor");
+    await step("halos", async () => {
+      const meiLinUserId = await ensureUser("mei.lin.demo@listhq.com.au", "MeridianDemo2025", "Mei Lin");
+      const investorUserId = await ensureUser("investor.demo@listhq.com.au", "MeridianDemo2025", "Investor");
+      await sb.from("halos").delete().eq("seeker_id", meiLinUserId);
+      await sb.from("halos").delete().eq("seeker_id", investorUserId);
+      const { error } = await sb.from("halos").insert([
+        {
+          seeker_id: meiLinUserId, intent: "buy",
+          property_types: ["House"], bedrooms_min: 3,
+          suburbs: ["Glen Waverley", "Wheelers Hill", "Mount Waverley"],
+          suburb_flexibility: false,
+          budget_min: 1200000, budget_max: 1500000,
+          timeframe: "3_to_6_months", finance_status: "pre_approved",
+          description: "Young family relocating from Sydney, flexible on settlement.",
+          must_haves: ["Glen Waverley Secondary College zone", "north-facing backyard", "double garage"],
+          preferred_language: "english", status: "active", quality_score: 92,
+          created_at: iso(daysAgo(4)),
+        },
+        {
+          seeker_id: investorUserId, intent: "buy",
+          property_types: ["Apartment", "Unit"], bedrooms_min: 2,
+          suburbs: ["Box Hill", "Burwood", "Nunawading"],
+          suburb_flexibility: false,
+          budget_min: 600000, budget_max: 750000,
+          timeframe: "ready_now", finance_status: "cash_buyer",
+          description: "Investor — strong yield required, low body corporate.",
+          must_haves: ["Strong rental yield", "low body corporate"],
+          preferred_language: "english", status: "active", quality_score: 78,
+          created_at: iso(daysAgo(8)),
+        },
+      ]);
+      if (error) throw error;
+      inc("halos", 2);
+    });
 
-    // Idempotent: clear halos seeded by these users
-    await sb.from("halos").delete().eq("seeker_id", meiLinUserId);
-    await sb.from("halos").delete().eq("seeker_id", investorUserId);
-
-    await sb.from("halos").insert([
-      {
-        seeker_id: meiLinUserId, intent: "buy",
-        property_types: ["House"], bedrooms_min: 3,
-        suburbs: ["Glen Waverley", "Wheelers Hill", "Mount Waverley"],
-        suburb_flexibility: false,
-        budget_min: 1200000, budget_max: 1500000,
-        timeframe: "3_to_6_months", finance_status: "pre_approved",
-        description: "Young family relocating from Sydney, flexible on settlement.",
-        must_haves: ["Glen Waverley Secondary College zone", "north-facing backyard", "double garage"],
-        preferred_language: "english", status: "active", quality_score: 92,
-        created_at: iso(daysAgo(4)),
-      },
-      {
-        seeker_id: investorUserId, intent: "buy",
-        property_types: ["Apartment", "Unit"], bedrooms_min: 2,
-        suburbs: ["Box Hill", "Burwood", "Nunawading"],
-        suburb_flexibility: false,
-        budget_min: 600000, budget_max: 750000,
-        timeframe: "ready_now", finance_status: "cash_buyer",
-        description: "Investor — strong yield required, low body corporate.",
-        must_haves: ["Strong rental yield", "low body corporate"],
-        preferred_language: "english", status: "active", quality_score: 78,
-        created_at: iso(daysAgo(8)),
-      },
-    ]);
-    inc("halos", 2);
-
+    console.log("seed-meridian-demo complete:", JSON.stringify({ counts, errors }, null, 2));
     return new Response(JSON.stringify({
       ok: true, agency_id: agencyId, owner_user_id: ownerUserId,
       login: { email: AGENCY_EMAIL, password: AGENCY_PASSWORD },
-      counts,
+      counts, errors,
     }, null, 2), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (err: any) {
     console.error("seed-meridian-demo error:", err);
-    return new Response(JSON.stringify({ error: err.message, counts }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ error: err.message, counts, errors }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });
 

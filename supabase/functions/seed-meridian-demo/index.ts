@@ -470,7 +470,7 @@ Deno.serve(async (req) => {
         tenancy_id: tenancy3, property_id: propR3, agent_id: lisaAgentId,
         reported_by: "tenant", title: "Leaking kitchen tap",
         description: "Water pooling under sink. Reported via tenant portal.",
-        priority: "medium", status: "in_progress",
+        priority: "routine", status: "in_progress",
         assigned_to: "Rapid Plumbing Services", assigned_phone: "0412 555 401",
         assigned_supplier_id: rapidPlumbingId,
         supplier_notified_at: iso(daysAgo(3)),

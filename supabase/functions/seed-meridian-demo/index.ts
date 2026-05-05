@@ -812,7 +812,7 @@ Deno.serve(async (req) => {
     }, null, 2), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (err: any) {
     console.error("seed-meridian-demo error:", err);
-    return new Response(JSON.stringify({ error: err.message, counts }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ error: err.message, counts, errors }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });
 

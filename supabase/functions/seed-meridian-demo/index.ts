@@ -205,7 +205,7 @@ Deno.serve(async (req) => {
     }
 
     // Idempotency: clear demo seeded child rows tagged by reference prefix "MERIDIAN-DEMO"
-    await sb.from("trust_transactions").delete().eq("trust_account_id", trustAccountId).like("reference", "MERIDIAN-DEMO%");
+    // trust_transactions deprecated — skip cleanup
     await sb.from("trust_receipts").delete().eq("agent_id", sarahAgentId).like("description", "MERIDIAN-DEMO%");
     await sb.from("trust_payments").delete().eq("agent_id", sarahAgentId).like("description", "MERIDIAN-DEMO%");
 

@@ -451,7 +451,7 @@ Deno.serve(async (req) => {
       const supplierPayload = {
         agent_id: lisaAgentId, business_name: "Rapid Plumbing Services",
         contact_name: "Steve Rapid", email: "demo+rapidplumbing@listhq.com.au", phone: "0412 555 401",
-        trade_category: "Plumbing", abn: "11 222 333 444", license_number: "PIC-12345",
+        trade_category: "plumbing", abn: "11 222 333 444", license_number: "PIC-12345",
         preferred: true, rating_avg: 4.8, jobs_completed: 47, status: "active",
       };
       if (existingSupplier) {

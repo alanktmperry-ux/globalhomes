@@ -69,6 +69,8 @@ const PLANS: PlanDef[] = [
     name: 'Agency',
     tagline: 'For small–medium agencies',
     price: 89900,
+    fullPrice: 199900,
+    saving: 'Save $1,400/mo — locked for life',
     seatLimit: 12,
     seatsIncluded: 5,
     extraSeatPrice: 7900,
@@ -77,7 +79,7 @@ const PLANS: PlanDef[] = [
     premiumPerMonth: 3,
     pocketPerMonth: Infinity,
     popular: true,
-    comparison: '15 featured listings = ~$13,500 in REA Highlight equivalents. 3 premium = ~$8,100–$14,100 in REA Premiere. You save $13K+/mo.',
+    comparison: 'Standard price $1,999/mo. 15 featured listings = ~$13,500 in REA Highlight equivalents. 3 premium = ~$8,100–$14,100 in REA Premiere. You save $13K+/mo.',
     features: [
       '5 seats included (+$79/extra seat, up to 12)',
       '75 active listings',

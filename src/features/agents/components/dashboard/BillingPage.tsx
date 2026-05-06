@@ -344,13 +344,21 @@ const BillingPage = () => {
                 </div>
 
                 <div>
-                  <div className="text-2xl font-bold">{monthlyDisplay}</div>
+                  <div className="flex items-baseline gap-2">
+                    <div className="text-2xl font-bold">{monthlyDisplay}</div>
+                    {plan.fullPrice != null && (
+                      <div className="text-sm text-muted-foreground line-through">{formatAUD(plan.fullPrice)}/mo</div>
+                    )}
+                  </div>
+                  {plan.saving && !annual && (
+                    <p className="text-[11px] text-emerald-600 font-medium mt-0.5">{plan.saving}</p>
+                  )}
                   {annual && plan.price != null && annualTotal && (
                     <p className="text-[11px] text-emerald-600 font-medium mt-0.5">
                       {annualTotal} billed annually · 2 months free
                     </p>
                   )}
-                  {!annual && plan.price != null && (
+                  {!annual && plan.price != null && !plan.saving && (
                     <p className="text-[11px] text-muted-foreground mt-0.5">Billed monthly · cancel anytime</p>
                   )}
                 </div>

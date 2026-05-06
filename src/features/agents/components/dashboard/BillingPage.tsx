@@ -23,6 +23,8 @@ interface PlanDef {
   tagline: string;
   price: number | null;        // cents AUD
   priceLabel?: string;          // for "Custom" tiers
+  fullPrice?: number;           // cents AUD — standard non-founding price
+  saving?: string;              // e.g. "Save $500/mo — locked for life"
   seatLimit: number;
   seatsIncluded?: number;
   extraSeatPrice?: number;      // cents AUD per extra seat
@@ -42,12 +44,14 @@ const PLANS: PlanDef[] = [
     name: 'Solo',
     tagline: 'For the independent agent',
     price: 29900,
+    fullPrice: 79900,
+    saving: 'Save $500/mo — locked for life',
     seatLimit: 1,
     listingLimit: 15,
     featuredPerMonth: 2,
     premiumPerMonth: 0,
     pocketPerMonth: 20,
-    comparison: 'One REA Premiere listing costs $2,700–$4,700. Solo gives you a full platform plus 2 featured listings every month.',
+    comparison: 'Standard price $799/mo. One REA Premiere listing costs $2,700–$4,700. Solo gives you a full platform plus 2 featured listings every month.',
     features: [
       '1 agent seat',
       '15 active listings',
@@ -65,6 +69,8 @@ const PLANS: PlanDef[] = [
     name: 'Agency',
     tagline: 'For small–medium agencies',
     price: 89900,
+    fullPrice: 199900,
+    saving: 'Save $1,400/mo — locked for life',
     seatLimit: 12,
     seatsIncluded: 5,
     extraSeatPrice: 7900,
@@ -73,7 +79,7 @@ const PLANS: PlanDef[] = [
     premiumPerMonth: 3,
     pocketPerMonth: Infinity,
     popular: true,
-    comparison: '15 featured listings = ~$13,500 in REA Highlight equivalents. 3 premium = ~$8,100–$14,100 in REA Premiere. You save $13K+/mo.',
+    comparison: 'Standard price $1,999/mo. 15 featured listings = ~$13,500 in REA Highlight equivalents. 3 premium = ~$8,100–$14,100 in REA Premiere. You save $13K+/mo.',
     features: [
       '5 seats included (+$79/extra seat, up to 12)',
       '75 active listings',
@@ -94,13 +100,15 @@ const PLANS: PlanDef[] = [
     name: 'Agency Pro',
     tagline: 'For larger agencies and multi-branch',
     price: 199900,
+    fullPrice: 349900,
+    saving: 'Save $2,300/mo — locked for life',
     seatLimit: Infinity,
     listingLimit: Infinity,
     featuredPerMonth: 50,
     premiumPerMonth: 10,
     pocketPerMonth: Infinity,
     featuredCredits: 75000,
-    comparison: '$750/mo of featured credits included = ~7 free featured listings. Trust accountant integration alone replaces $200–500/mo of bookkeeping fees.',
+    comparison: 'Standard price $3,499/mo. $750/mo of featured credits included = ~7 free featured listings. Trust accountant integration alone replaces $200–500/mo of bookkeeping fees.',
     features: [
       'Unlimited seats',
       'Unlimited listings',
@@ -336,13 +344,21 @@ const BillingPage = () => {
                 </div>
 
                 <div>
-                  <div className="text-2xl font-bold">{monthlyDisplay}</div>
+                  <div className="flex items-baseline gap-2">
+                    <div className="text-2xl font-bold">{monthlyDisplay}</div>
+                    {plan.fullPrice != null && (
+                      <div className="text-sm text-muted-foreground line-through">{formatAUD(plan.fullPrice)}/mo</div>
+                    )}
+                  </div>
+                  {plan.saving && !annual && (
+                    <p className="text-[11px] text-emerald-600 font-medium mt-0.5">{plan.saving}</p>
+                  )}
                   {annual && plan.price != null && annualTotal && (
                     <p className="text-[11px] text-emerald-600 font-medium mt-0.5">
                       {annualTotal} billed annually · 2 months free
                     </p>
                   )}
-                  {!annual && plan.price != null && (
+                  {!annual && plan.price != null && !plan.saving && (
                     <p className="text-[11px] text-muted-foreground mt-0.5">Billed monthly · cancel anytime</p>
                   )}
                 </div>

@@ -23,6 +23,8 @@ interface PlanDef {
   tagline: string;
   price: number | null;        // cents AUD
   priceLabel?: string;          // for "Custom" tiers
+  fullPrice?: number;           // cents AUD — standard non-founding price
+  saving?: string;              // e.g. "Save $500/mo — locked for life"
   seatLimit: number;
   seatsIncluded?: number;
   extraSeatPrice?: number;      // cents AUD per extra seat

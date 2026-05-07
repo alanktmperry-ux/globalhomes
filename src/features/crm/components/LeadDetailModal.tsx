@@ -14,6 +14,15 @@ const ACTIVITY_TYPES: { value: ActivityType; label: string; icon: string }[] = [
   { value: 'task', label: 'Task', icon: '✅' },
 ];
 
+const SMS_TEMPLATES = [
+  { label: 'Follow up', text: (name: string) => `Hi ${name}, just following up on your property enquiry. Are you still looking? Happy to answer any questions.` },
+  { label: 'Open home', text: (name: string) => `Hi ${name}, reminder that we have an open home this Saturday. Would love to see you there — reply for details.` },
+  { label: 'Price drop', text: (name: string) => `Hi ${name}, great news — the vendor has just reduced the price on a property matching your search. Worth a look?` },
+  { label: 'New listing', text: (name: string) => `Hi ${name}, a new property just hit the market that matches your brief. Want me to send the details through?` },
+  { label: 'Offer update', text: (name: string) => `Hi ${name}, just wanted to keep you updated on where things stand with your offer. Do you have a few minutes to chat?` },
+  { label: 'Check in', text: (name: string) => `Hi ${name}, checking in to see how the property search is going. Still actively looking?` },
+];
+
 const STAGES: LeadStage[] = [
   'new', 'contacted', 'qualified', 'offer_stage', 'under_contract', 'settled', 'lost'
 ];
@@ -102,13 +111,23 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
                   </span>
                   <button
                     onClick={e => { e.stopPropagation(); handleCallNow(); }}
-                    className="flex items-center gap-1 text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-0.5 rounded-full transition"
+                    disabled={(lead as any).do_not_contact}
+                    className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full transition
+                      ${(lead as any).do_not_contact
+                        ? 'bg-muted text-muted-foreground cursor-not-allowed opacity-40'
+                        : 'bg-green-500 hover:bg-green-600 text-white'
+                      }`}
                   >
                     📞 Call
                   </button>
                   <button
-                    onClick={e => { e.stopPropagation(); handleSMSNow(); }}
-                    className="flex items-center gap-1 text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-0.5 rounded-full transition"
+                    onClick={e => { e.stopPropagation(); if (!(lead as any).do_not_contact) handleSMSNow(); }}
+                    disabled={(lead as any).do_not_contact}
+                    className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full transition
+                      ${(lead as any).do_not_contact
+                        ? 'bg-muted text-muted-foreground cursor-not-allowed opacity-40'
+                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                      }`}
                   >
                     💬 SMS
                   </button>
@@ -131,6 +150,12 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
             </button>
           </div>
         </div>
+
+        {(lead as any).do_not_contact && (
+          <div className="mx-5 mt-3 flex items-center gap-2 bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2">
+            <span className="text-destructive text-xs font-semibold">🚫 Do Not Contact — calling and SMS are disabled for this lead.</span>
+          </div>
+        )}
 
         {/* Stage + Priority bar */}
         <div className="flex items-center gap-4 px-5 py-3 border-b border-border bg-muted/30">
@@ -337,6 +362,22 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
 
           {tab === 'details' && (
             <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 rounded-xl border border-destructive/20 bg-destructive/5">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Do Not Contact</p>
+                  <p className="text-xs text-muted-foreground">Disables calling and SMS for this lead</p>
+                </div>
+                <button
+                  onClick={() => updateLead(lead.id, { do_not_contact: !(lead as any).do_not_contact } as any)}
+                  className={`relative w-10 h-6 rounded-full transition-colors ${
+                    (lead as any).do_not_contact ? 'bg-destructive' : 'bg-muted-foreground/30'
+                  }`}
+                >
+                  <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                    (lead as any).do_not_contact ? 'translate-x-5' : 'translate-x-1'
+                  }`} />
+                </button>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 {[
                   { label: 'Budget Min', key: 'budget_min', type: 'number' },
@@ -397,6 +438,18 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
                 </button>
               </div>
               <div className="p-4 space-y-3">
+                <div className="flex flex-wrap gap-1.5">
+                  {SMS_TEMPLATES.map(t => (
+                    <button
+                      key={t.label}
+                      type="button"
+                      onClick={() => setSmsBody(t.text(lead.first_name ?? 'there'))}
+                      className="text-[11px] px-2 py-1 rounded-full border border-border bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition"
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
                 <textarea
                   value={smsBody}
                   onChange={e => setSmsBody(e.target.value)}

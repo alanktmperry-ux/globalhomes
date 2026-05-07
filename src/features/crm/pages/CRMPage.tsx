@@ -4,12 +4,16 @@ import { PipelineBoard } from '../components/PipelineBoard';
 import { CRMListView } from '../components/CRMListView';
 import { PipelineKPIBar } from '../components/PipelineKPIBar';
 import { CRMTasksWidget } from '../components/CRMTasksWidget';
+import { DailyCallList } from '../components/DailyCallList';
+import { LeadDetailModal } from '../components/LeadDetailModal';
 import { LayoutList, Kanban } from 'lucide-react';
 import type { UrgencyTier } from '../lib/urgency';
+import type { CRMLead } from '../types';
 
 export default function CRMPage() {
   const [view, setView] = useState<'board' | 'list'>('board');
   const [urgencyFilter, setUrgencyFilter] = useState<UrgencyTier[]>([]);
+  const [selectedLead, setSelectedLead] = useState<CRMLead | null>(null);
 
   const handleUrgencyTileClick = (tier: UrgencyTier) => {
     setUrgencyFilter([tier]);
@@ -64,11 +68,19 @@ export default function CRMPage() {
               ? <PipelineBoard />
               : <CRMListView urgencyFilter={urgencyFilter} onUrgencyFilterChange={setUrgencyFilter} />}
           </div>
-          <div className="w-full lg:w-72 flex-shrink-0">
+          <div className="w-full lg:w-72 flex-shrink-0 space-y-4">
+            <DailyCallList onSelectLead={(lead) => setSelectedLead(lead)} />
             <CRMTasksWidget />
           </div>
         </div>
       </div>
+      {selectedLead && (
+        <LeadDetailModal
+          lead={selectedLead}
+          onClose={() => setSelectedLead(null)}
+          onUpdate={() => setSelectedLead(null)}
+        />
+      )}
     </>
   );
 }

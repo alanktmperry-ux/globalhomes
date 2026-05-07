@@ -84,6 +84,9 @@ export function LeadCard({ lead, onClick, onDragStart, onDragEnd }: Props) {
           )}
         </div>
         <div className="flex items-center gap-1.5">
+          {(lead as any).do_not_contact && (
+            <span className="text-[10px] text-destructive font-medium">🚫 DNC</span>
+          )}
           {cfg && (
             <span className={`text-[10px] px-1.5 py-0.5 rounded-full border inline-flex items-center gap-1 ${cfg.chip}`}>
               <span className={`w-1 h-1 rounded-full ${cfg.dot}`} />

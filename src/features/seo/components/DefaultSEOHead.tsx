@@ -15,8 +15,32 @@ export function DefaultSEOHead() {
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:site" content="@ListHQAU" />
       <meta name="twitter:image" content={OG_IMAGE} />
       <meta name="robots" content="index, follow" />
+      <script type="application/ld+json">{JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "ListHQ",
+        "url": "https://listhq.com.au",
+        "logo": "https://listhq.com.au/og-image.png",
+        "description": "Australia's AI-powered property platform. Search, buy, rent and manage property across Australia in 20 languages.",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer support",
+          "email": "support@listhq.com.au",
+          "availableLanguage": ["English", "Chinese", "Vietnamese", "Arabic", "Hindi"]
+        },
+        "areaServed": {
+          "@type": "Country",
+          "name": "Australia"
+        },
+        "sameAs": [
+          "https://www.linkedin.com/company/listhq",
+          "https://www.facebook.com/listhq",
+          "https://www.instagram.com/listhq"
+        ]
+      })}</script>
     </Helmet>
   );
 }

@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useCRMLeads } from '../hooks/useCRMLeads';
 import { LeadCard } from './LeadCard';
 import { LeadDetailModal } from './LeadDetailModal';
-import { AddLeadModal } from './AddLeadModal';
+import LeadContactForm from '@/shared/components/LeadContactForm';
+import { useAgentId } from '../hooks/useAgentId';
 import type { CRMLead, LeadStage } from '../types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -18,7 +19,8 @@ const STAGES: { value: LeadStage; label: string; color: string }[] = [
 ];
 
 export function PipelineBoard() {
-  const { leads, loading, updateStage, createLead, fetchLeads } = useCRMLeads({ stage: 'all' });
+  const { leads, loading, updateStage, fetchLeads } = useCRMLeads({ stage: 'all' });
+  const agentId = useAgentId();
   const [selectedLead, setSelectedLead] = useState<CRMLead | null>(null);
   const [dragging, setDragging] = useState<string | null>(null);
   const [showAddLead, setShowAddLead] = useState(false);
@@ -110,13 +112,12 @@ export function PipelineBoard() {
         />
       )}
 
-      {showAddLead && (
-        <AddLeadModal
+      {showAddLead && agentId && (
+        <LeadContactForm
+          context="lead"
+          agentId={agentId}
           onClose={() => setShowAddLead(false)}
-          onSave={async (data) => {
-            await createLead(data);
-            setShowAddLead(false);
-          }}
+          onSaved={() => { setShowAddLead(false); fetchLeads(); }}
         />
       )}
     </>

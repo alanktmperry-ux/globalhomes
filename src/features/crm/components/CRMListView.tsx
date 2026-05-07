@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useCRMLeads } from '../hooks/useCRMLeads';
 import { LeadDetailModal } from './LeadDetailModal';
-import { AddLeadModal } from './AddLeadModal';
+import LeadContactForm from '@/shared/components/LeadContactForm';
+import { useAgentId } from '../hooks/useAgentId';
 import type { CRMLead, LeadStage } from '../types';
 import { Search, UserPlus, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -38,7 +39,8 @@ export function CRMListView({ urgencyFilter, onUrgencyFilterChange }: Props) {
   const urgency = urgencyFilter ?? internalUrgency;
   const setUrgency = onUrgencyFilterChange ?? setInternalUrgency;
 
-  const { leads, loading, createLead } = useCRMLeads({
+  const agentId = useAgentId();
+  const { leads, loading, fetchLeads } = useCRMLeads({
     search, stage: stageFilter, urgency: urgency.length ? urgency : undefined,
   });
 
@@ -182,13 +184,12 @@ export function CRMListView({ urgencyFilter, onUrgencyFilterChange }: Props) {
         />
       )}
 
-      {showAddLead && (
-        <AddLeadModal
+      {showAddLead && agentId && (
+        <LeadContactForm
+          context="lead"
+          agentId={agentId}
           onClose={() => setShowAddLead(false)}
-          onSave={async (data) => {
-            await createLead(data);
-            setShowAddLead(false);
-          }}
+          onSaved={() => { setShowAddLead(false); fetchLeads(); }}
         />
       )}
     </div>

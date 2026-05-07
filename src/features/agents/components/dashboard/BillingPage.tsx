@@ -170,6 +170,24 @@ const BillingPage = () => {
   const [upgrading, setUpgrading] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);
   const [annual, setAnnual] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
+
+  const handleOpenPortal = async () => {
+    setPortalLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-billing-portal', {});
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No portal URL returned');
+      }
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err) || 'Could not open billing portal');
+      setPortalLoading(false);
+    }
+  };
+
   const [searchParams] = useSearchParams();
 
   useEffect(() => {

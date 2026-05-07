@@ -505,6 +505,21 @@ const BillingPage = () => {
           </div>
         )}
 
+        {sub.isPaid && (
+          <div className="bg-card border border-border rounded-xl p-5 space-y-3">
+            <h3 className="text-sm font-bold flex items-center gap-1.5">
+              <CreditCard size={14} /> Billing & Invoices
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Manage your payment method, download invoices, or cancel your subscription via the Stripe billing portal.
+            </p>
+            <Button variant="outline" size="sm" onClick={handleOpenPortal} disabled={portalLoading}>
+              {portalLoading ? <Loader2 size={14} className="animate-spin mr-1.5" /> : null}
+              {portalLoading ? 'Opening…' : 'Manage Billing →'}
+            </Button>
+          </div>
+        )}
+
         {/* Payment Method */}
         <div className="bg-card border border-border rounded-xl p-5 space-y-3">
           <h3 className="text-sm font-bold flex items-center gap-1.5">

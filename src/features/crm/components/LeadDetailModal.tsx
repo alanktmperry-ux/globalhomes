@@ -383,6 +383,53 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
             </div>
           )}
         </div>
+        {showSMSComposer && (
+          <div className="absolute inset-0 bg-black/60 rounded-2xl z-10 flex items-center justify-center p-6">
+            <div className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl">
+              <div className="flex items-center justify-between p-4 border-b border-border">
+                <div>
+                  <h3 className="text-sm font-bold text-foreground">💬 SMS to {lead.first_name}</h3>
+                  <p className="text-xs text-muted-foreground">{lead.phone}</p>
+                </div>
+                <button onClick={() => { setShowSMSComposer(false); setSmsBody(''); }}
+                  className="text-muted-foreground hover:text-foreground">
+                  <X size={16} />
+                </button>
+              </div>
+              <div className="p-4 space-y-3">
+                <textarea
+                  value={smsBody}
+                  onChange={e => setSmsBody(e.target.value)}
+                  placeholder={`Hi ${lead.first_name}, just following up on your enquiry…`}
+                  rows={5}
+                  className="w-full border border-border rounded-xl px-3 py-2 text-sm focus:outline-none resize-none bg-background"
+                  autoFocus
+                />
+                <p className="text-xs text-muted-foreground">{smsBody.length} characters · opens your SMS app</p>
+                {smsSent ? (
+                  <div className="text-center text-sm text-green-600 font-medium py-2">✅ SMS sent and logged!</div>
+                ) : (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSendSMS}
+                      disabled={!smsBody.trim()}
+                      className="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-sm py-2 rounded-xl transition disabled:opacity-40"
+                    >
+                      Send SMS
+                    </button>
+                    <button
+                      onClick={() => { navigator.clipboard.writeText(smsBody); }}
+                      className="px-4 py-2 border border-border rounded-xl text-sm text-muted-foreground hover:text-foreground transition"
+                      title="Copy to clipboard"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

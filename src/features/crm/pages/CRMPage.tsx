@@ -4,8 +4,11 @@ import { PipelineBoard } from '../components/PipelineBoard';
 import { CRMListView } from '../components/CRMListView';
 import { PipelineKPIBar } from '../components/PipelineKPIBar';
 import { CRMTasksWidget } from '../components/CRMTasksWidget';
+import { DailyCallList } from '../components/DailyCallList';
+import { LeadDetailModal } from '../components/LeadDetailModal';
 import { LayoutList, Kanban } from 'lucide-react';
 import type { UrgencyTier } from '../lib/urgency';
+import type { CRMLead } from '../types';
 
 export default function CRMPage() {
   const [view, setView] = useState<'board' | 'list'>('board');

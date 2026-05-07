@@ -107,8 +107,8 @@ Deno.serve(async (req) => {
     const resendKey = Deno.env.get("RESEND_API_KEY");
     const emailFrom = Deno.env.get("EMAIL_FROM") || "ListHQ <noreply@listhq.com.au>";
     const joinUrl = existingUser
-      ? `${req.headers.get("origin") || "https://globalhomes.lovable.app"}/partner/dashboard`
-      : `${req.headers.get("origin") || "https://globalhomes.lovable.app"}/partner/join?token=${inviteToken}`;
+      ? `${req.headers.get("origin") || "https://listhq.com.au"}/partner/dashboard`
+      : `${req.headers.get("origin") || "https://listhq.com.au"}/partner/join?token=${inviteToken}`;
 
     if (resendKey) {
       try {

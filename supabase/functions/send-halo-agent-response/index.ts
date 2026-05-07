@@ -151,7 +151,7 @@ Deno.serve(async (req) => {
                     from: 'ListHQ <noreply@listhq.com.au>',
                     to: [refEmail],
                     subject: 'You earned a referral credit on ListHQ',
-                    html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a;"><h1 style="font-size:22px;margin:0 0 12px;">You earned a referral credit</h1><p style="font-size:15px;line-height:1.5;">A buyer you introduced via your listing in <strong>${suburb}</strong> just had their Halo unlocked by an agent. We've added <strong>1 free credit</strong> to your account.</p><p style="margin:24px 0;"><a href="https://globalhomes.lovable.app/dashboard/halo-board" style="display:inline-block;background:#3b82f6;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;">View Halo Board →</a></p><p style="font-size:12px;color:#64748b;margin-top:32px;">— The ListHQ team</p></div>`,
+                    html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a;"><h1 style="font-size:22px;margin:0 0 12px;">You earned a referral credit</h1><p style="font-size:15px;line-height:1.5;">A buyer you introduced via your listing in <strong>${suburb}</strong> just had their Halo unlocked by an agent. We've added <strong>1 free credit</strong> to your account.</p><p style="margin:24px 0;"><a href="https://listhq.com.au/dashboard/halo-board" style="display:inline-block;background:#3b82f6;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;">View Halo Board →</a></p><p style="font-size:12px;color:#64748b;margin-top:32px;">— The ListHQ team</p></div>`,
                   }),
                 });
               }
@@ -195,7 +195,7 @@ Deno.serve(async (req) => {
           <p style="margin: 8px 0 0;">${intentLabel} · ${suburbsLabel} · ${budgetLabel}</p>
         </div>
         <p style="margin: 24px 0;">
-          <a href="https://globalhomes.lovable.app/dashboard/my-halos"
+          <a href="https://listhq.com.au/dashboard/my-halos"
              style="display: inline-block; background: #3b82f6; color: #fff; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
             Manage my Halo →
           </a>
@@ -211,7 +211,6 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        // NOTE: Falls back to onboarding@resend.dev until listhq.com.au DNS is verified in Resend.
         from: 'ListHQ <noreply@listhq.com.au>',
         to: [recipientEmail],
         subject: 'An agent is interested in your Halo',

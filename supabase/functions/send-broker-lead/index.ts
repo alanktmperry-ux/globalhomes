@@ -146,7 +146,7 @@ Deno.serve(async (req: Request) => {
   </table>
   ${payload.buyerMessage ? `<div style="background:#f9fafb;padding:12px;border-radius:8px;margin:16px 0;"><p style="font-weight:600;margin:0 0 4px;">Message</p><p style="margin:0;">${payload.buyerMessage}</p></div>` : ""}
   <p style="font-size:12px;color:#9ca3af;margin-top:24px;">This lead has been recorded in the ListHQ lead register and will appear on your monthly invoice. Lead fee: $${broker.lead_fee_aud} AUD + GST. View your full lead history at your broker portal.</p>
-  <p style="font-size:11px;color:#d1d5db;">ListHQ · globalhomes.lovable.app · ListHQ is a referral platform only and does not provide credit assistance.</p>
+  <p style="font-size:11px;color:#d1d5db;">ListHQ · listhq.com.au · ListHQ is a referral platform only and does not provide credit assistance.</p>
 </div>`;
 
         const buyerEmailHtml = `
@@ -154,7 +154,7 @@ Deno.serve(async (req: Request) => {
   <h2 style="color:#1e40af;">Your finance enquiry has been received</h2>
   <p>Hi ${payload.buyerName},</p>
   <p>Your enquiry has been sent to ${broker.name}, who will be in touch with you shortly${payload.propertyAddress ? ` regarding ${payload.propertyAddress}` : ""}.</p>
-  <p>In the meantime, you can continue browsing properties on <a href="https://globalhomes.lovable.app" style="color:#2563eb;">ListHQ</a>.</p>
+  <p>In the meantime, you can continue browsing properties on <a href="https://listhq.com.au" style="color:#2563eb;">ListHQ</a>.</p>
   <p style="font-size:12px;color:#9ca3af;margin-top:24px;">ListHQ is a referral platform only and does not provide credit assistance.</p>
 </div>`;
 

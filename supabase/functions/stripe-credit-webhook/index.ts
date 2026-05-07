@@ -7,7 +7,7 @@ async function sendEmail(resendKey: string, to: string, subject: string, html: s
   const resp = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: 'ListHQ <onboarding@resend.dev>', to: [to], subject, html }),
+    body: JSON.stringify({ from: Deno.env.get('EMAIL_FROM') ?? 'ListHQ <noreply@listhq.com.au>', to: [to], subject, html }),
   });
   if (!resp.ok) console.error('Resend error', await resp.text());
 }
@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
   if (email && resendKey) {
     await sendEmail(resendKey, email,
       'Your Halo credits have been added',
-      `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a;"><h1 style="font-size:22px;margin:0 0 12px;">Credits added</h1><p style="font-size:15px;line-height:1.5;">Your credits have been added. You now have <strong>${newBalance} credits</strong>.</p><p style="margin:24px 0;"><a href="https://globalhomes.lovable.app/dashboard/halo-board" style="display:inline-block;background:#3b82f6;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Go to Halo Board →</a></p></div>`);
+      `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a;"><h1 style="font-size:22px;margin:0 0 12px;">Credits added</h1><p style="font-size:15px;line-height:1.5;">Your credits have been added. You now have <strong>${newBalance} credits</strong>.</p><p style="margin:24px 0;"><a href="https://listhq.com.au/dashboard/halo-board" style="display:inline-block;background:#3b82f6;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Go to Halo Board →</a></p></div>`);
   }
 
   return new Response('ok', { status: 200 });

@@ -8,7 +8,7 @@ const supabase = createClient(
 );
 const RESEND_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? 'ListHQ Alerts <alerts@listhq.com.au>';
-const APP_URL = Deno.env.get('APP_URL') ?? 'https://globalhomes.lovable.app';
+const APP_URL = Deno.env.get('APP_URL') ?? 'https://listhq.com.au';
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get("Origin"));

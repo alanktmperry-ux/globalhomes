@@ -362,6 +362,22 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
 
           {tab === 'details' && (
             <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 rounded-xl border border-destructive/20 bg-destructive/5">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Do Not Contact</p>
+                  <p className="text-xs text-muted-foreground">Disables calling and SMS for this lead</p>
+                </div>
+                <button
+                  onClick={() => updateLead(lead.id, { do_not_contact: !(lead as any).do_not_contact } as any)}
+                  className={`relative w-10 h-6 rounded-full transition-colors ${
+                    (lead as any).do_not_contact ? 'bg-destructive' : 'bg-muted-foreground/30'
+                  }`}
+                >
+                  <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                    (lead as any).do_not_contact ? 'translate-x-5' : 'translate-x-1'
+                  }`} />
+                </button>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 {[
                   { label: 'Budget Min', key: 'budget_min', type: 'number' },

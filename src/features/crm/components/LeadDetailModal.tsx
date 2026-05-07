@@ -39,6 +39,10 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
   const [taskDue, setTaskDue] = useState('');
   const [tab, setTab] = useState<'timeline' | 'tasks' | 'details'>('timeline');
   const [saving, setSaving] = useState(false);
+  const [showCallLogger, setShowCallLogger] = useState(false);
+  const [showSMSComposer, setShowSMSComposer] = useState(false);
+  const [smsBody, setSmsBody] = useState('');
+  const [smsSent, setSmsSent] = useState(false);
 
   const handleAddActivity = async () => {
     if (!actBody.trim()) return;
@@ -56,10 +60,31 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
     setTaskDue('');
   };
 
+  const handleCallNow = () => {
+    window.open(`tel:${lead.phone}`, '_self');
+    setTab('timeline');
+    setActType('call');
+    setShowCallLogger(true);
+  };
+
+  const handleSMSNow = () => {
+    setShowSMSComposer(true);
+  };
+
+  const handleSendSMS = async () => {
+    if (!smsBody.trim()) return;
+    const encodedBody = encodeURIComponent(smsBody);
+    window.open(`sms:${lead.phone}?body=${encodedBody}`, '_self');
+    await addActivity('sms' as ActivityType, smsBody);
+    setSmsBody('');
+    setSmsSent(true);
+    setTimeout(() => { setShowSMSComposer(false); setSmsSent(false); }, 1500);
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-12 px-4 overflow-y-auto"
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="bg-card rounded-2xl shadow-2xl w-full max-w-2xl border border-border mb-12">
+      <div className="bg-card rounded-2xl shadow-2xl w-full max-w-2xl border border-border mb-12 relative">
         {/* Header */}
         <div className="flex items-start justify-between p-5 border-b border-border">
           <div>
@@ -71,7 +96,23 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
                 <span className="flex items-center gap-1"><Mail size={10} />{lead.email}</span>
               )}
               {lead.phone && (
-                <span className="flex items-center gap-1"><Phone size={10} />{lead.phone}</span>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Phone size={10} />{lead.phone}
+                  </span>
+                  <button
+                    onClick={e => { e.stopPropagation(); handleCallNow(); }}
+                    className="flex items-center gap-1 text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-0.5 rounded-full transition"
+                  >
+                    📞 Call
+                  </button>
+                  <button
+                    onClick={e => { e.stopPropagation(); handleSMSNow(); }}
+                    className="flex items-center gap-1 text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-0.5 rounded-full transition"
+                  >
+                    💬 SMS
+                  </button>
+                </div>
               )}
             </div>
             {lead.property && (
@@ -151,6 +192,15 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
         <div className="p-5 max-h-[50vh] overflow-y-auto">
           {tab === 'timeline' && (
             <div className="space-y-4">
+              {showCallLogger && (
+                <div className="mb-3 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl">
+                  <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-2">📞 Calling {lead.phone} — log the outcome below</p>
+                  <button
+                    onClick={() => setShowCallLogger(false)}
+                    className="text-xs text-muted-foreground hover:text-foreground float-right -mt-5"
+                  >✕</button>
+                </div>
+              )}
               <div className="space-y-3 bg-muted/30 rounded-xl p-4">
                 <div className="flex flex-wrap gap-1.5">
                   {ACTIVITY_TYPES.map(t => (
@@ -333,6 +383,53 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
             </div>
           )}
         </div>
+        {showSMSComposer && (
+          <div className="absolute inset-0 bg-black/60 rounded-2xl z-10 flex items-center justify-center p-6">
+            <div className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl">
+              <div className="flex items-center justify-between p-4 border-b border-border">
+                <div>
+                  <h3 className="text-sm font-bold text-foreground">💬 SMS to {lead.first_name}</h3>
+                  <p className="text-xs text-muted-foreground">{lead.phone}</p>
+                </div>
+                <button onClick={() => { setShowSMSComposer(false); setSmsBody(''); }}
+                  className="text-muted-foreground hover:text-foreground">
+                  <X size={16} />
+                </button>
+              </div>
+              <div className="p-4 space-y-3">
+                <textarea
+                  value={smsBody}
+                  onChange={e => setSmsBody(e.target.value)}
+                  placeholder={`Hi ${lead.first_name}, just following up on your enquiry…`}
+                  rows={5}
+                  className="w-full border border-border rounded-xl px-3 py-2 text-sm focus:outline-none resize-none bg-background"
+                  autoFocus
+                />
+                <p className="text-xs text-muted-foreground">{smsBody.length} characters · opens your SMS app</p>
+                {smsSent ? (
+                  <div className="text-center text-sm text-green-600 font-medium py-2">✅ SMS sent and logged!</div>
+                ) : (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSendSMS}
+                      disabled={!smsBody.trim()}
+                      className="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-sm py-2 rounded-xl transition disabled:opacity-40"
+                    >
+                      Send SMS
+                    </button>
+                    <button
+                      onClick={() => { navigator.clipboard.writeText(smsBody); }}
+                      className="px-4 py-2 border border-border rounded-xl text-sm text-muted-foreground hover:text-foreground transition"
+                      title="Copy to clipboard"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

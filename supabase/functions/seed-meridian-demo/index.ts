@@ -9,7 +9,7 @@ const corsHeaders = {
 
 const AGENCY_SLUG = "meridian-property-group";
 const AGENCY_EMAIL = "demo@listhq.com.au";
-const AGENCY_PASSWORD = "MeridianDemo2025";
+const AGENCY_PASSWORD = Deno.env.get("MERIDIAN_DEMO_PASSWORD") ?? (() => { throw new Error("MERIDIAN_DEMO_PASSWORD env var not set"); })();
 
 const today = () => new Date();
 const daysAgo = (n: number) => { const d = today(); d.setDate(d.getDate() - n); return d; };
@@ -19,6 +19,23 @@ const dateOnly = (d: Date) => d.toISOString().slice(0, 10);
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
+  }
+  const { createClient: _cc } = await import("npm:@supabase/supabase-js@2");
+  const authClient = _cc(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
+    global: { headers: { Authorization: authHeader } },
+  });
+  const { data: { user }, error: authErr } = await authClient.auth.getUser();
+  if (authErr || !user) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
+  }
+  const { data: roles } = await authClient.from("user_roles").select("role").eq("user_id", user.id);
+  if (!roles?.some((r: any) => r.role === "admin")) {
+    return new Response(JSON.stringify({ error: "Admin only" }), { status: 403, headers: corsHeaders });
+  }
 
   // Demo seeder — open access by design (idempotent, demo data only).
   const url = Deno.env.get("SUPABASE_URL")!;

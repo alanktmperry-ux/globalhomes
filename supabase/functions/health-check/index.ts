@@ -8,6 +8,11 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const secret = req.headers.get("x-health-secret");
+  if (!secret || secret !== Deno.env.get("HEALTH_CHECK_SECRET")) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
+  }
+
   const requiredEnvVars = [
     "SUPABASE_URL",
     "SUPABASE_SERVICE_ROLE_KEY",

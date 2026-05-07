@@ -170,6 +170,24 @@ const BillingPage = () => {
   const [upgrading, setUpgrading] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);
   const [annual, setAnnual] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
+
+  const handleOpenPortal = async () => {
+    setPortalLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-billing-portal', {});
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No portal URL returned');
+      }
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err) || 'Could not open billing portal');
+      setPortalLoading(false);
+    }
+  };
+
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -483,6 +501,21 @@ const BillingPage = () => {
             </div>
             <Button variant="outline" size="sm" onClick={() => navigate('/dashboard/team')}>
               <Users size={14} className="mr-1.5" /> Manage Team
+            </Button>
+          </div>
+        )}
+
+        {sub.isPaid && (
+          <div className="bg-card border border-border rounded-xl p-5 space-y-3">
+            <h3 className="text-sm font-bold flex items-center gap-1.5">
+              <CreditCard size={14} /> Billing & Invoices
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Manage your payment method, download invoices, or cancel your subscription via the Stripe billing portal.
+            </p>
+            <Button variant="outline" size="sm" onClick={handleOpenPortal} disabled={portalLoading}>
+              {portalLoading ? <Loader2 size={14} className="animate-spin mr-1.5" /> : null}
+              {portalLoading ? 'Opening…' : 'Manage Billing →'}
             </Button>
           </div>
         )}

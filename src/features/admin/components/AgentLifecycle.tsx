@@ -280,7 +280,7 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
     try {
       const now = new Date();
       const [agentsRes, propsRes, leadsRes, openHomeRes, contactsRes, trustRes] = await Promise.all([
-        supabase.from('agents').select('id, name, email, agency, phone, created_at, is_subscribed, onboarding_complete, lead_source, lifecycle_stage, agent_subscriptions(plan_type)'),
+        supabase.from('agents').select('id, user_id, name, email, agency, phone, created_at, is_subscribed, onboarding_complete, lead_source, lifecycle_stage, agent_subscriptions(plan_type)'),
         supabase.from('properties').select('agent_id, is_active'),
         supabase.from('leads').select('agent_id'),
         supabase.from('properties').select('agent_id, inspection_times').not('inspection_times', 'is', null).limit(5000),

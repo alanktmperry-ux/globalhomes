@@ -71,7 +71,23 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
                 <span className="flex items-center gap-1"><Mail size={10} />{lead.email}</span>
               )}
               {lead.phone && (
-                <span className="flex items-center gap-1"><Phone size={10} />{lead.phone}</span>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Phone size={10} />{lead.phone}
+                  </span>
+                  <button
+                    onClick={e => { e.stopPropagation(); handleCallNow(); }}
+                    className="flex items-center gap-1 text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-0.5 rounded-full transition"
+                  >
+                    📞 Call
+                  </button>
+                  <button
+                    onClick={e => { e.stopPropagation(); handleSMSNow(); }}
+                    className="flex items-center gap-1 text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-0.5 rounded-full transition"
+                  >
+                    💬 SMS
+                  </button>
+                </div>
               )}
             </div>
             {lead.property && (

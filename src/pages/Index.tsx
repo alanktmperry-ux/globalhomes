@@ -571,7 +571,7 @@ const Index = () => {
                 </div>
 
                 {/* Right half — Text */}
-                <div style={{ display:'flex', alignItems:'center', padding:'6px 6px 6px 8px', gap:6 }}>
+                <div style={{ display:'flex', alignItems:'center', padding:'6px 6px 6px 8px', gap:6, flex:1 }}>
                   <label htmlFor="heroSearch" className="sr-only">Search by address, suburb or school zone</label>
                   <input
                     id="heroSearch"
@@ -580,9 +580,11 @@ const Index = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={seq.ph}
-                    style={{ flex:1, border:'none', outline:'none', fontSize:14, padding:'12px 10px', background:'transparent', minWidth:0, color:T.ink }}
+                    style={{ flex:1, border:'none', outline:'none', fontSize:14, padding:'12px 10px', background:'transparent', minWidth:120, color:T.ink }}
                   />
-                  <button type="submit" style={{ background:T.blue, color:'#fff', border:'none', padding:'10px 18px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>{t('home.hero.findMyHome')}</button>
+                  <button type="submit" style={{ background:T.blue, color:'#fff', border:'none', padding:'10px 16px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap', flexShrink:0 }}>
+                    Search →
+                  </button>
                 </div>
               </form>
 
@@ -595,7 +597,7 @@ const Index = () => {
               {/* Filter chips */}
               <div style={{ display:'flex', flexWrap:'wrap', gap:8, maxWidth:560, marginTop:14 }}>
                 {['📍 Auburn','📍 Box Hill','📍 Hurstville', t('home.hero.chip.budget'), t('home.hero.chip.beds'), t('home.hero.chip.schools')].map((c) => (
-                  <button key={c} className="chip" onClick={() => openSearch(c)}>
+                  <button key={c} className="chip" onClick={() => navigate(`/buy?q=${encodeURIComponent(c.replace(/^📍\s*/, ''))}`)}>
                     {c.startsWith('📍') ? <><span aria-hidden="true">📍 </span>{c.slice(3)}</> : c}
                   </button>
                 ))}

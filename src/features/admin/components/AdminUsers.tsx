@@ -841,7 +841,7 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
                       </span>
                     ) : u.last_sign_in_at ? (
                       <span className="flex items-center gap-1">
-                        <Clock size={10} /> {new Date(u.last_sign_in_at).toLocaleDateString()}
+                        <Clock size={10} /> {new Date(u.last_sign_in_at).toLocaleString('en-AU', { dateStyle: 'short', timeStyle: 'short' })}
                       </span>
                     ) : '—'}
                   </td>

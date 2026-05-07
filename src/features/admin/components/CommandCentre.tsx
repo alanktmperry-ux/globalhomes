@@ -955,7 +955,7 @@ export default function CommandCentre() {
                     <p className="text-[11px] text-muted-foreground truncate">
                       Joined {new Date(u.created_at).toLocaleDateString('en-AU')}
                       {u.lastSignIn
-                        ? ` · last seen ${new Date(u.lastSignIn).toLocaleDateString('en-AU')}`
+                        ? ` · last seen ${new Date(u.lastSignIn).toLocaleString('en-AU', { dateStyle: 'short', timeStyle: 'short' })}`
                         : ' · never logged in'}
                     </p>
                   </div>
@@ -1552,7 +1552,7 @@ export default function CommandCentre() {
                   </p>
                   {a.lastSeen && (
                     <p className="text-[10px] text-muted-foreground">
-                      {new Date(a.lastSeen).toLocaleDateString('en-AU')}
+                      {new Date(a.lastSeen).toLocaleString('en-AU', { dateStyle: 'short', timeStyle: 'short' })}
                     </p>
                   )}
                 </div>

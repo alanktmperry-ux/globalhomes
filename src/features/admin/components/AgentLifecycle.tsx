@@ -233,7 +233,7 @@ function AgentRow({ agent, onNoteAdded }: { agent: AgentLifecycleRow; onNoteAdde
           <div className="flex items-center gap-4 text-[11px] text-muted-foreground flex-wrap">
             <span>Joined: <strong className="text-foreground">{new Date(agent.created_at).toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' })}</strong></span>
             {agent.lastLogin && (
-              <span>Last login: <strong className="text-foreground">{new Date(agent.lastLogin).toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' })}</strong></span>
+              <span>Last login: <strong className="text-foreground">{new Date(agent.lastLogin).toLocaleString('en-AU', { dateStyle: 'short', timeStyle: 'short' })}</strong></span>
             )}
             {agent.leadSource && (
               <span>Lead source: <strong className="text-foreground">{agent.leadSource}</strong></span>
@@ -280,7 +280,7 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
     try {
       const now = new Date();
       const [agentsRes, propsRes, leadsRes, openHomeRes, contactsRes, trustRes] = await Promise.all([
-        supabase.from('agents').select('id, name, email, agency, phone, created_at, is_subscribed, onboarding_complete, lead_source, lifecycle_stage, agent_subscriptions(plan_type)'),
+        supabase.from('agents').select('id, user_id, name, email, agency, phone, created_at, is_subscribed, onboarding_complete, lead_source, lifecycle_stage, agent_subscriptions(plan_type)'),
         supabase.from('properties').select('agent_id, is_active'),
         supabase.from('leads').select('agent_id'),
         supabase.from('properties').select('agent_id, inspection_times').not('inspection_times', 'is', null).limit(5000),
@@ -327,7 +327,7 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
         const planType = Array.isArray(a.agent_subscriptions)
           ? a.agent_subscriptions[0]?.plan_type || null
           : a.agent_subscriptions?.plan_type || null;
-        const lastLogin = signInMap.get(a.id) || null;
+        const lastLogin = signInMap.get(a.user_id) || null;
         const daysSinceLogin = lastLogin ? Math.floor((now.getTime() - new Date(lastLogin).getTime()) / 86400000) : 999;
         const trialEnd = new Date(new Date(a.created_at).getTime() + 60 * 86400000);
         const trialDaysLeft = !a.is_subscribed ? Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / 86400000)) : null;

@@ -111,13 +111,23 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
                   </span>
                   <button
                     onClick={e => { e.stopPropagation(); handleCallNow(); }}
-                    className="flex items-center gap-1 text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-0.5 rounded-full transition"
+                    disabled={(lead as any).do_not_contact}
+                    className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full transition
+                      ${(lead as any).do_not_contact
+                        ? 'bg-muted text-muted-foreground cursor-not-allowed opacity-40'
+                        : 'bg-green-500 hover:bg-green-600 text-white'
+                      }`}
                   >
                     📞 Call
                   </button>
                   <button
-                    onClick={e => { e.stopPropagation(); handleSMSNow(); }}
-                    className="flex items-center gap-1 text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-0.5 rounded-full transition"
+                    onClick={e => { e.stopPropagation(); if (!(lead as any).do_not_contact) handleSMSNow(); }}
+                    disabled={(lead as any).do_not_contact}
+                    className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full transition
+                      ${(lead as any).do_not_contact
+                        ? 'bg-muted text-muted-foreground cursor-not-allowed opacity-40'
+                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                      }`}
                   >
                     💬 SMS
                   </button>

@@ -505,7 +505,7 @@ export default function OwnerPortalPage() {
                         <FileText size={14} className="text-muted-foreground shrink-0" />
                         <div className="min-w-0">
                           <p className="font-medium truncate">{d.label || d.document_type}</p>
-                          <p className="text-xs text-muted-foreground">{d.document_type} · {format(parseISO(d.uploaded_at), 'd MMM yyyy')}</p>
+                          <p className="text-xs text-muted-foreground">{d.document_type}{d.uploaded_at ? ` · ${format(parseISO(d.uploaded_at), 'd MMM yyyy')}` : ''}</p>
                         </div>
                       </div>
                       <Button asChild size="sm" variant="outline">

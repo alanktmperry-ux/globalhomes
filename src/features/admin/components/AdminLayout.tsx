@@ -29,6 +29,25 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const { impersonating, impersonatedUser, stopImpersonation, isSupport, isAdmin } = useAuth();
   const [pendingTotal, setPendingTotal] = useState(0);
+  const [mfaRequired, setMfaRequired] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+        if (cancelled) return;
+        setMfaRequired(data.currentLevel === 'aal1' && data.nextLevel === 'aal2');
+      } catch { /* non-fatal */ }
+    })();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async () => {
+      const { data } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (!cancelled) setMfaRequired(data.currentLevel === 'aal1' && data.nextLevel === 'aal2');
+    });
+    return () => { cancelled = true; subscription.unsubscribe(); };
+  }, []);
+
+  if (mfaRequired) return <MFAChallenge />;
 
   useEffect(() => {
     let cancelled = false;

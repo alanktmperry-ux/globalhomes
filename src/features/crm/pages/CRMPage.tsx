@@ -68,11 +68,19 @@ export default function CRMPage() {
               ? <PipelineBoard />
               : <CRMListView urgencyFilter={urgencyFilter} onUrgencyFilterChange={setUrgencyFilter} />}
           </div>
-          <div className="w-full lg:w-72 flex-shrink-0">
+          <div className="w-full lg:w-72 flex-shrink-0 space-y-4">
+            <DailyCallList onSelectLead={(lead) => setSelectedLead(lead)} />
             <CRMTasksWidget />
           </div>
         </div>
       </div>
+      {selectedLead && (
+        <LeadDetailModal
+          lead={selectedLead}
+          onClose={() => setSelectedLead(null)}
+          onUpdate={() => setSelectedLead(null)}
+        />
+      )}
     </>
   );
 }

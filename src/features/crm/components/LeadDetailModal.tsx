@@ -438,6 +438,18 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
                 </button>
               </div>
               <div className="p-4 space-y-3">
+                <div className="flex flex-wrap gap-1.5">
+                  {SMS_TEMPLATES.map(t => (
+                    <button
+                      key={t.label}
+                      type="button"
+                      onClick={() => setSmsBody(t.text(lead.first_name ?? 'there'))}
+                      className="text-[11px] px-2 py-1 rounded-full border border-border bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition"
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
                 <textarea
                   value={smsBody}
                   onChange={e => setSmsBody(e.target.value)}

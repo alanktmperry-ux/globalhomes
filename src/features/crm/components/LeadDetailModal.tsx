@@ -84,7 +84,7 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-12 px-4 overflow-y-auto"
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="bg-card rounded-2xl shadow-2xl w-full max-w-2xl border border-border mb-12">
+      <div className="bg-card rounded-2xl shadow-2xl w-full max-w-2xl border border-border mb-12 relative">
         {/* Header */}
         <div className="flex items-start justify-between p-5 border-b border-border">
           <div>

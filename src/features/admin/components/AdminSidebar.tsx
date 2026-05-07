@@ -84,6 +84,7 @@ export default function AdminSidebar({ pendingApprovalsTotal = 0, isSupport = fa
   const business: NavItem[] = [
     { to: '/admin/revenue', label: 'Revenue', icon: DollarSign },
     { to: '/admin/outreach', label: 'Outreach', icon: Megaphone },
+    { to: '/admin/automations', label: 'Automations', icon: Zap },
   ];
   const system: NavItem[] = [
     { to: '/admin/system', label: 'System', icon: Settings },

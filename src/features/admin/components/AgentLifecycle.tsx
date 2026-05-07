@@ -327,7 +327,7 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
         const planType = Array.isArray(a.agent_subscriptions)
           ? a.agent_subscriptions[0]?.plan_type || null
           : a.agent_subscriptions?.plan_type || null;
-        const lastLogin = signInMap.get(a.id) || null;
+        const lastLogin = signInMap.get(a.user_id) || null;
         const daysSinceLogin = lastLogin ? Math.floor((now.getTime() - new Date(lastLogin).getTime()) / 86400000) : 999;
         const trialEnd = new Date(new Date(a.created_at).getTime() + 60 * 86400000);
         const trialDaysLeft = !a.is_subscribed ? Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / 86400000)) : null;

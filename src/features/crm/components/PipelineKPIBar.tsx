@@ -1,4 +1,7 @@
 import { useCRMLeads } from '../hooks/useCRMLeads';
+import { useCommunicationStats } from '../hooks/useCommunicationStats';
+import { useAgentId } from '../hooks/useAgentId';
+import { Phone, MessageSquare } from 'lucide-react';
 import { URGENCY_CONFIG, URGENCY_TIERS, type UrgencyTier } from '../lib/urgency';
 
 interface Props {
@@ -8,6 +11,8 @@ interface Props {
 
 export function PipelineKPIBar({ onUrgencyClick }: Props) {
   const { leads, loading } = useCRMLeads({ stage: 'all' });
+  const agentId = useAgentId();
+  const { totals: commTotals } = useCommunicationStats({ range: 'month', agentId: agentId ?? undefined });
 
   if (loading) return <div className="h-20 bg-muted/30 rounded-xl animate-pulse" />;
 
@@ -24,10 +29,23 @@ export function PipelineKPIBar({ onUrgencyClick }: Props) {
   return (
     <div className="space-y-3">
       {/* Top row: pipeline meta */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <Tile label="Active Leads" value={active.length} sub="in pipeline" />
         <Tile label="Pipeline Value" value={`$${(totalValue / 1_000_000).toFixed(1)}m`} sub="combined budget" />
         <Tile label="Settled (30d)" value={settled30d} sub="this month" valueClass="text-primary" />
+        <Tile
+          label="Calls (30d)"
+          value={commTotals.calls}
+          sub={commTotals.calls > 0 ? `${Math.round((commTotals.answered / commTotals.calls) * 100)}% answered` : 'none logged'}
+          icon={<Phone size={13} className="text-primary" />}
+        />
+        <Tile
+          label="SMS (30d)"
+          value={commTotals.sms}
+          sub="messages sent"
+          icon={<MessageSquare size={13} className="text-cyan-500" />}
+          valueClass="text-cyan-600 dark:text-cyan-400"
+        />
       </div>
 
       {/* Urgency row */}
@@ -61,11 +79,12 @@ export function PipelineKPIBar({ onUrgencyClick }: Props) {
   );
 }
 
-function Tile({ label, value, sub, valueClass = 'text-foreground' }: {
-  label: string; value: string | number; sub: string; valueClass?: string;
+function Tile({ label, value, sub, valueClass = 'text-foreground', icon }: {
+  label: string; value: string | number; sub: string; valueClass?: string; icon?: React.ReactNode;
 }) {
   return (
     <div className="bg-card border border-border rounded-xl p-4 text-center">
+      {icon && <div className="flex justify-center mb-1">{icon}</div>}
       <p className={`text-2xl font-bold ${valueClass}`}>{value}</p>
       <p className="text-xs font-medium text-foreground">{label}</p>
       <p className="text-[10px] text-muted-foreground">{sub}</p>

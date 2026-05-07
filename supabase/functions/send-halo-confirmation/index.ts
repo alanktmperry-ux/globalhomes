@@ -108,7 +108,7 @@ Deno.serve(async (req) => {
           Agents who have properties matching your requirements will contact you directly.
         </p>
         <p style="margin: 24px 0;">
-          <a href="https://globalhomes.lovable.app/dashboard/my-halos"
+          <a href="https://listhq.com.au/dashboard/my-halos"
              style="display: inline-block; background: #3b82f6; color: #fff; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
             Manage my Halo →
           </a>
@@ -124,7 +124,6 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        // NOTE: Falls back to onboarding@resend.dev until listhq.com.au DNS is verified in Resend.
         from: 'ListHQ <noreply@listhq.com.au>',
         to: [recipientEmail],
         subject: 'Your Halo is live — agents can now find you',

@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const APP_URL = 'https://globalhomes.lovable.app';
+const APP_URL = Deno.env.get('APP_URL') ?? 'https://listhq.com.au';
 
 const PLAN_CONFIG: Record<string, { name: string; monthlyAud: number; listingLimit: number; seatLimit: number }> = {
   solo:       { name: 'Solo',       monthlyAud: 29900,  listingLimit: 15,     seatLimit: 1      },

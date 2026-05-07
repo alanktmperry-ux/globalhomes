@@ -239,9 +239,11 @@ const BuyPage = () => {
 
   const [filters, setFilters] = useState<BuyFilters>(() => parseFiltersFromParams(searchParams));
   const [searchMode, setSearchMode] = useState<'ai' | 'filter'>(() => {
+    const sp = new URLSearchParams(window.location.search);
+    const hasSuburb = sp.get('q') || sp.get('location') || sp.getAll('suburb').length > 0;
+    if (hasSuburb) return 'filter';
     const stored = localStorage.getItem('search-mode');
     if (stored === 'ai' || stored === 'filter') return stored;
-    localStorage.setItem('search-mode', 'ai');
     return 'ai';
   });
 

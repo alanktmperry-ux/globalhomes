@@ -72,7 +72,16 @@ export function LeadCard({ lead, onClick, onDragStart, onDragEnd }: Props) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-muted-foreground">
           {lead.email && <Mail size={10} />}
-          {lead.phone && <Phone size={10} />}
+          {lead.phone && (
+            <a
+              href={`tel:${lead.phone}`}
+              onClick={e => e.stopPropagation()}
+              className="flex items-center gap-0.5 text-green-500 hover:text-green-600 transition"
+              title={`Call ${lead.phone}`}
+            >
+              <Phone size={10} />
+            </a>
+          )}
         </div>
         <div className="flex items-center gap-1.5">
           {cfg && (

@@ -495,6 +495,7 @@ const App = () => (
                   <Route path="halo-analytics" element={<AdminHaloAnalyticsPage />} />
                   <Route path="support" element={<AdminSupportPage />} />
                   <Route path="buyers" element={<AdminBuyersPage />} />
+                  <Route path="automations" element={<AdminAutomationsPage />} />
                 </Route>
                 <Route path="/admin/legacy" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
 

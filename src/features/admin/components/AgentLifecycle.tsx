@@ -233,7 +233,7 @@ function AgentRow({ agent, onNoteAdded }: { agent: AgentLifecycleRow; onNoteAdde
           <div className="flex items-center gap-4 text-[11px] text-muted-foreground flex-wrap">
             <span>Joined: <strong className="text-foreground">{new Date(agent.created_at).toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' })}</strong></span>
             {agent.lastLogin && (
-              <span>Last login: <strong className="text-foreground">{new Date(agent.lastLogin).toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' })}</strong></span>
+              <span>Last login: <strong className="text-foreground">{new Date(agent.lastLogin).toLocaleString('en-AU', { dateStyle: 'short', timeStyle: 'short' })}</strong></span>
             )}
             {agent.leadSource && (
               <span>Lead source: <strong className="text-foreground">{agent.leadSource}</strong></span>

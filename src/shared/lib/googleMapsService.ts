@@ -27,12 +27,22 @@ export async function autocomplete(input: string, types?: string): Promise<{ des
 }
 
 export async function geocode(address: string): Promise<{ lat: number; lng: number } | null> {
-  const { data, error } = await supabase.functions.invoke('google-maps-proxy', {
-    body: { action: 'geocode', input: address },
-  });
-  if (error || !data?.results?.[0]) return null;
-  const loc = data.results[0].geometry.location;
-  return { lat: loc.lat, lng: loc.lng };
+  try {
+    await loadGoogleMapsScript();
+    return await new Promise<{ lat: number; lng: number } | null>((resolve) => {
+      const geocoder = new (window as any).google.maps.Geocoder();
+      geocoder.geocode({ address }, (results: any, status: string) => {
+        if (status === 'OK' && results?.[0]) {
+          const loc = results[0].geometry.location;
+          resolve({ lat: loc.lat(), lng: loc.lng() });
+        } else {
+          resolve(null);
+        }
+      });
+    });
+  } catch {
+    return null;
+  }
 }
 
 export async function getPlaceDetails(placeId: string): Promise<{ lat: number; lng: number; address: string } | null> {

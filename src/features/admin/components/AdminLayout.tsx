@@ -4,6 +4,7 @@ import { Command } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
+import { MFAChallenge } from '@/features/auth/components/MFAChallenge';
 import AdminSidebar from './AdminSidebar';
 import AdminCommandPalette from './AdminCommandPalette';
 import SetPasswordBanner from './SetPasswordBanner';

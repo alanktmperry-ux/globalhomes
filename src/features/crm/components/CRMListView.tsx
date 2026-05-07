@@ -39,7 +39,8 @@ export function CRMListView({ urgencyFilter, onUrgencyFilterChange }: Props) {
   const urgency = urgencyFilter ?? internalUrgency;
   const setUrgency = onUrgencyFilterChange ?? setInternalUrgency;
 
-  const { leads, loading, createLead } = useCRMLeads({
+  const agentId = useAgentId();
+  const { leads, loading, fetchLeads } = useCRMLeads({
     search, stage: stageFilter, urgency: urgency.length ? urgency : undefined,
   });
 

@@ -192,6 +192,15 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
         <div className="p-5 max-h-[50vh] overflow-y-auto">
           {tab === 'timeline' && (
             <div className="space-y-4">
+              {showCallLogger && (
+                <div className="mb-3 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl">
+                  <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-2">📞 Calling {lead.phone} — log the outcome below</p>
+                  <button
+                    onClick={() => setShowCallLogger(false)}
+                    className="text-xs text-muted-foreground hover:text-foreground float-right -mt-5"
+                  >✕</button>
+                </div>
+              )}
               <div className="space-y-3 bg-muted/30 rounded-xl p-4">
                 <div className="flex flex-wrap gap-1.5">
                   {ACTIVITY_TYPES.map(t => (

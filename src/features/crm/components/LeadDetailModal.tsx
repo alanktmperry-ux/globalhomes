@@ -151,6 +151,12 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
           </div>
         </div>
 
+        {(lead as any).do_not_contact && (
+          <div className="mx-5 mt-3 flex items-center gap-2 bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2">
+            <span className="text-destructive text-xs font-semibold">🚫 Do Not Contact — calling and SMS are disabled for this lead.</span>
+          </div>
+        )}
+
         {/* Stage + Priority bar */}
         <div className="flex items-center gap-4 px-5 py-3 border-b border-border bg-muted/30">
           <div className="flex items-center gap-2">

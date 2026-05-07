@@ -1552,7 +1552,7 @@ export default function CommandCentre() {
                   </p>
                   {a.lastSeen && (
                     <p className="text-[10px] text-muted-foreground">
-                      {new Date(a.lastSeen).toLocaleDateString('en-AU')}
+                      {new Date(a.lastSeen).toLocaleString('en-AU', { dateStyle: 'short', timeStyle: 'short' })}
                     </p>
                   )}
                 </div>

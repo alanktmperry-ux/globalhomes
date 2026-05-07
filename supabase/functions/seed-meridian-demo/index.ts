@@ -9,7 +9,7 @@ const corsHeaders = {
 
 const AGENCY_SLUG = "meridian-property-group";
 const AGENCY_EMAIL = "demo@listhq.com.au";
-const AGENCY_PASSWORD = "MeridianDemo2025";
+const AGENCY_PASSWORD = Deno.env.get("MERIDIAN_DEMO_PASSWORD") ?? (() => { throw new Error("MERIDIAN_DEMO_PASSWORD env var not set"); })();
 
 const today = () => new Date();
 const daysAgo = (n: number) => { const d = today(); d.setDate(d.getDate() - n); return d; };

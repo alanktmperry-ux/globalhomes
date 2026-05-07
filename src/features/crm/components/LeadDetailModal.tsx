@@ -39,6 +39,10 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
   const [taskDue, setTaskDue] = useState('');
   const [tab, setTab] = useState<'timeline' | 'tasks' | 'details'>('timeline');
   const [saving, setSaving] = useState(false);
+  const [showCallLogger, setShowCallLogger] = useState(false);
+  const [showSMSComposer, setShowSMSComposer] = useState(false);
+  const [smsBody, setSmsBody] = useState('');
+  const [smsSent, setSmsSent] = useState(false);
 
   const handleAddActivity = async () => {
     if (!actBody.trim()) return;
@@ -54,6 +58,27 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
     await addTask(lead.id, taskTitle, taskDue);
     setTaskTitle('');
     setTaskDue('');
+  };
+
+  const handleCallNow = () => {
+    window.open(`tel:${lead.phone}`, '_self');
+    setTab('timeline');
+    setActType('call');
+    setShowCallLogger(true);
+  };
+
+  const handleSMSNow = () => {
+    setShowSMSComposer(true);
+  };
+
+  const handleSendSMS = async () => {
+    if (!smsBody.trim()) return;
+    const encodedBody = encodeURIComponent(smsBody);
+    window.open(`sms:${lead.phone}?body=${encodedBody}`, '_self');
+    await addActivity('sms' as ActivityType, smsBody);
+    setSmsBody('');
+    setSmsSent(true);
+    setTimeout(() => { setShowSMSComposer(false); setSmsSent(false); }, 1500);
   };
 
   return (

@@ -14,6 +14,15 @@ const ACTIVITY_TYPES: { value: ActivityType; label: string; icon: string }[] = [
   { value: 'task', label: 'Task', icon: '✅' },
 ];
 
+const SMS_TEMPLATES = [
+  { label: 'Follow up', text: (name: string) => `Hi ${name}, just following up on your property enquiry. Are you still looking? Happy to answer any questions.` },
+  { label: 'Open home', text: (name: string) => `Hi ${name}, reminder that we have an open home this Saturday. Would love to see you there — reply for details.` },
+  { label: 'Price drop', text: (name: string) => `Hi ${name}, great news — the vendor has just reduced the price on a property matching your search. Worth a look?` },
+  { label: 'New listing', text: (name: string) => `Hi ${name}, a new property just hit the market that matches your brief. Want me to send the details through?` },
+  { label: 'Offer update', text: (name: string) => `Hi ${name}, just wanted to keep you updated on where things stand with your offer. Do you have a few minutes to chat?` },
+  { label: 'Check in', text: (name: string) => `Hi ${name}, checking in to see how the property search is going. Still actively looking?` },
+];
+
 const STAGES: LeadStage[] = [
   'new', 'contacted', 'qualified', 'offer_stage', 'under_contract', 'settled', 'lost'
 ];

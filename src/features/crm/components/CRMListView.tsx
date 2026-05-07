@@ -184,13 +184,12 @@ export function CRMListView({ urgencyFilter, onUrgencyFilterChange }: Props) {
         />
       )}
 
-      {showAddLead && (
-        <AddLeadModal
+      {showAddLead && agentId && (
+        <LeadContactForm
+          context="lead"
+          agentId={agentId}
           onClose={() => setShowAddLead(false)}
-          onSave={async (data) => {
-            await createLead(data);
-            setShowAddLead(false);
-          }}
+          onSaved={() => { setShowAddLead(false); fetchLeads(); }}
         />
       )}
     </div>

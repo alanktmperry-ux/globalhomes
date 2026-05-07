@@ -955,7 +955,7 @@ export default function CommandCentre() {
                     <p className="text-[11px] text-muted-foreground truncate">
                       Joined {new Date(u.created_at).toLocaleDateString('en-AU')}
                       {u.lastSignIn
-                        ? ` · last seen ${new Date(u.lastSignIn).toLocaleDateString('en-AU')}`
+                        ? ` · last seen ${new Date(u.lastSignIn).toLocaleString('en-AU', { dateStyle: 'short', timeStyle: 'short' })}`
                         : ' · never logged in'}
                     </p>
                   </div>

@@ -4506,6 +4506,7 @@ export type Database = {
           conversion_notes: string | null
           conversion_status: string | null
           created_at: string
+          do_not_contact: boolean
           enquiry_source: string
           expected_close: string | null
           first_contacted_at: string | null
@@ -4546,6 +4547,7 @@ export type Database = {
           conversion_notes?: string | null
           conversion_status?: string | null
           created_at?: string
+          do_not_contact?: boolean
           enquiry_source?: string
           expected_close?: string | null
           first_contacted_at?: string | null
@@ -4586,6 +4588,7 @@ export type Database = {
           conversion_notes?: string | null
           conversion_status?: string | null
           created_at?: string
+          do_not_contact?: boolean
           enquiry_source?: string
           expected_close?: string | null
           first_contacted_at?: string | null

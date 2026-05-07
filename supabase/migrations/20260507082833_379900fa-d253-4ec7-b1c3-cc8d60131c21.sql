@@ -1,0 +1,2 @@
+ALTER TABLE crm_leads ADD COLUMN IF NOT EXISTS do_not_contact boolean NOT NULL DEFAULT false;
+CREATE INDEX IF NOT EXISTS idx_crm_leads_dnc ON crm_leads(agent_id, do_not_contact) WHERE do_not_contact = true;

@@ -19,7 +19,8 @@ const STAGES: { value: LeadStage; label: string; color: string }[] = [
 ];
 
 export function PipelineBoard() {
-  const { leads, loading, updateStage, createLead, fetchLeads } = useCRMLeads({ stage: 'all' });
+  const { leads, loading, updateStage, fetchLeads } = useCRMLeads({ stage: 'all' });
+  const agentId = useAgentId();
   const [selectedLead, setSelectedLead] = useState<CRMLead | null>(null);
   const [dragging, setDragging] = useState<string | null>(null);
   const [showAddLead, setShowAddLead] = useState(false);

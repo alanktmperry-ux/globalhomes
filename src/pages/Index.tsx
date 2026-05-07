@@ -203,7 +203,7 @@ const Index = () => {
     manualLangRef.current = idx !== undefined;
     setBlur(true);
     setTimeout(() => {
-      setSeqIdx(idx !== undefined ? idx : 0);
+      setSeqIdx(idx ?? 0);
       setSearchQuery('');
       setBlur(false);
     }, 300);
@@ -213,7 +213,7 @@ const Index = () => {
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const id = setInterval(() => {
-      if (manualLangRef.current) return;
+      if (manualLangRef.current || language === 'en') return;
       setBlur(true);
       setTimeout(() => {
         setSeqIdx((i) => (i + 1) % SEQUENCE.length);
@@ -401,7 +401,8 @@ const Index = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const q = searchQuery.trim();
-    if (q) openSearch(q);
+    if (!q) return;
+    navigate(`/buy?q=${encodeURIComponent(q)}`);
   };
 
   // Initial card content (static — JS handles all subsequent updates via refs)

@@ -170,6 +170,19 @@ const BillingPage = () => {
   const [upgrading, setUpgrading] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);
   const [annual, setAnnual] = useState(false);
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get('success') === 'true') {
+      toast.success('Subscription activated! Your plan is now live.', { duration: 6000 });
+      navigate('/dashboard/billing', { replace: true });
+    }
+    if (searchParams.get('cancelled') === 'true') {
+      toast.info('Checkout cancelled — no charge was made.');
+      navigate('/dashboard/billing', { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!user) return;

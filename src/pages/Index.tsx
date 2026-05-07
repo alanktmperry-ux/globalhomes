@@ -363,7 +363,7 @@ const Index = () => {
       if (text) {
         setSearchQuery(text);
         try { inputRef.current?.blur(); } catch { /* noop */ }
-        window.setTimeout(() => openSearch(text), 200);
+        window.setTimeout(() => navigate(`/buy?q=${encodeURIComponent(text)}`), 200);
       }
     };
 
@@ -512,7 +512,7 @@ const Index = () => {
               </div>
 
               {/* Search block */}
-              <form onSubmit={handleSubmit} style={{ maxWidth:560, background:'#fff', border:`1.5px solid ${T.border}`, borderRadius:14, boxShadow:'0 4px 24px rgba(0,0,0,.07)', display:'grid', gridTemplateColumns:'minmax(180px, 220px) auto 1fr', alignItems:'stretch', padding:0, gap:0, overflow:'hidden' }}>
+              <form onSubmit={handleSubmit} style={{ maxWidth:680, background:'#fff', border:`1.5px solid ${T.border}`, borderRadius:14, boxShadow:'0 4px 24px rgba(0,0,0,.07)', display:'grid', gridTemplateColumns:'auto auto 1fr', alignItems:'stretch', padding:0, gap:0, overflow:'hidden' }}>
                 {/* Left half — Voice */}
                 <div
                   style={{

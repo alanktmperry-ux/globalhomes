@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useCRMLeads } from '../hooks/useCRMLeads';
 import { LeadDetailModal } from './LeadDetailModal';
-import { AddLeadModal } from './AddLeadModal';
+import LeadContactForm from '@/shared/components/LeadContactForm';
+import { useAgentId } from '../hooks/useAgentId';
 import type { CRMLead, LeadStage } from '../types';
 import { Search, UserPlus, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';

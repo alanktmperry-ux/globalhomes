@@ -12,7 +12,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { useTeamAgents } from '@/features/agents/hooks/useTeamAgents';
 import { logAction } from '@/shared/lib/auditLog';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import DashboardHeader from './DashboardHeader';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { capture } from '@/shared/lib/posthog';

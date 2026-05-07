@@ -13,6 +13,7 @@ import type { CRMLead } from '../types';
 export default function CRMPage() {
   const [view, setView] = useState<'board' | 'list'>('board');
   const [urgencyFilter, setUrgencyFilter] = useState<UrgencyTier[]>([]);
+  const [selectedLead, setSelectedLead] = useState<CRMLead | null>(null);
 
   const handleUrgencyTileClick = (tier: UrgencyTier) => {
     setUrgencyFilter([tier]);

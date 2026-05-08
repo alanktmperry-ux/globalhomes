@@ -1,8 +1,10 @@
 import { Helmet } from "react-helmet-async";
 import { Clock } from "lucide-react";
 import { useAuth } from "@/features/auth/AuthProvider";
+import { usePageTitle } from '@/lib/usePageTitle';
 
 export default function PendingApprovalPage() {
+  usePageTitle('Application Received');
   const { user } = useAuth();
   return (
     <>

@@ -11,6 +11,7 @@ import { HaloStep1, validateStep1 } from '@/components/halo/HaloStep1';
 import { HaloStep2, validateStep2 } from '@/components/halo/HaloStep2';
 import { HaloStep3, validateStep3 } from '@/components/halo/HaloStep3';
 import type { HaloFormData } from '@/types/halo';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 const STEP_LABELS = ['What are you looking for?', 'Where and how much?', 'Tell agents more'];
 
@@ -49,6 +50,7 @@ const initialData: HaloFormData = {
 };
 
 export default function EditHaloPage() {
+  usePageTitle('Edit Your Halo');
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const [step, setStep] = useState(1);

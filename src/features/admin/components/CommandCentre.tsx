@@ -41,6 +41,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from 'recharts';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 type Trend = 'up' | 'down' | 'flat' | null;
 
@@ -252,6 +253,7 @@ function AttentionCard({
 }
 
 export default function CommandCentre() {
+  usePageTitle('Admin — Dashboard');
   const navigate = useNavigate();
   const auth = useAuth();
   const isSupport = !!auth?.isSupport && !auth?.isAdmin;

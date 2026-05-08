@@ -32,10 +32,12 @@ import { WelcomeModal } from './WelcomeModal';
 import { AgentWelcomeModal } from '@/features/agents/components/onboarding/AgentWelcomeModal';
 import { AgentOnboardingProgress } from '@/features/agents/components/onboarding/AgentOnboardingProgress';
 import DashboardHomeStats from './DashboardHomeStats';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 // Australian currency formatter
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 const AU_DATE = (d: string) => {
+  usePageTitle('Dashboard');
   const date = new Date(d);
   return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
 };

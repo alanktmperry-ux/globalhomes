@@ -10,10 +10,12 @@ import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { capture, identify } from '@/shared/lib/posthog';
 import OTPVerificationScreen from '@/features/auth/components/OTPVerificationScreen';
 import agentAuthHero from '@/assets/agent-auth-hero.jpg';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 type Step = 'email' | 'password' | 'register' | 'otp';
 
 const AgentAuthPage = () => {
+  usePageTitle('Log In');
   const navigate = useNavigate();
   const { user, isAgent, isAdmin, loading: authLoading } = useAuth();
 

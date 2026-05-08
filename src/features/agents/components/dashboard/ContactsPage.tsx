@@ -26,10 +26,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { logAction } from '@/shared/lib/auditLog';
 import { toast } from 'sonner';
 import type { Contact } from '@/features/agents/hooks/useContacts';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 const LAST_VIEW_LS_KEY = 'gh-contacts-last-view';
 
 const ContactsPage = () => {
+  usePageTitle('Contacts');
   const { contacts, loading, hasMore, loadMore, createContact, updateContact, deleteContact, addActivity, getActivities, fetchContacts } = useContacts();
   const { user, isPrincipal, isAdmin, agencyId } = useAuth();
   const { agents } = useTeamAgents();

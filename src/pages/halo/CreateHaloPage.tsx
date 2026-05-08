@@ -11,6 +11,7 @@ import { HaloStep1, validateStep1 } from '@/components/halo/HaloStep1';
 import { HaloStep2, validateStep2 } from '@/components/halo/HaloStep2';
 import { HaloStep3, validateStep3 } from '@/components/halo/HaloStep3';
 import type { HaloFormData } from '@/types/halo';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 const DRAFT_KEY = 'halo_draft';
 
@@ -39,6 +40,7 @@ const STEP_LABELS = ['What are you looking for?', 'Where and how much?', 'Tell a
 const VALID_SOURCE_TYPES = new Set(['direct','listing_qr','crm_invite','rent_roll','voice_lead','settlement']);
 
 export default function CreateHaloPage() {
+  usePageTitle('Create Your Halo');
   const navigate = useNavigate();
   const { user } = useAuth();
   const [searchParams] = useSearchParams();

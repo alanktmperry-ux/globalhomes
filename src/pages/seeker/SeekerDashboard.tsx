@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import type { Halo } from '@/types/halo';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 type HaloRow = Halo & { response_count: number; unread_count: number };
 
@@ -17,6 +18,7 @@ const fmtMoney = (n: number | null | undefined) =>
   n == null ? '—' : new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 }).format(n);
 
 export default function SeekerDashboard() {
+  usePageTitle('My Dashboard');
   const { user, loading, isAgent, isAdmin, isPartner, isSupport } = useAuth();
   const navigate = useNavigate();
   const [halos, setHalos] = useState<HaloRow[] | null>(null);

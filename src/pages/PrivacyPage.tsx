@@ -1,4 +1,6 @@
+import { usePageTitle } from '@/lib/usePageTitle';
 export function PrivacyPage() {
+  usePageTitle('Privacy Policy');
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-3xl px-4 py-12 sm:py-16 space-y-8">

@@ -20,10 +20,12 @@ import {
   type HaloBoardFiltersState,
 } from '@/components/halo/HaloBoardFilters';
 import type { Halo } from '@/types/halo';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 type BoardTab = 'all' | 'pocket';
 
 export default function HaloBoardPage() {
+  usePageTitle('Buyer Matches');
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();

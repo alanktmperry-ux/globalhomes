@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, XCircle, MailMinus } from "lucide-react";
+import { usePageTitle } from '@/lib/usePageTitle';
 
 type State =
   | { kind: "loading" }
@@ -15,6 +16,7 @@ type State =
   | { kind: "error"; reason: string };
 
 export default function UnsubscribePage() {
+  usePageTitle('Unsubscribe');
   const [params] = useSearchParams();
   const email = (params.get("email") || "").trim().toLowerCase();
   const token = params.get("token") || "";

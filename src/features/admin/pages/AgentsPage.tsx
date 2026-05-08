@@ -1,8 +1,10 @@
 import { useSearchParams } from 'react-router-dom';
 import AgentLifecycle from '@/features/admin/components/AgentLifecycle';
 import AgentSubscriptionAdmin from '@/features/admin/components/AgentSubscriptionAdmin';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 export default function AgentsPage() {
+  usePageTitle('Admin — Agents');
   const [searchParams] = useSearchParams();
   const filter = searchParams.get('filter');
 

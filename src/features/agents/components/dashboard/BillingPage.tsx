@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 import DashboardHeader from './DashboardHeader';
 import { cn } from '@/lib/utils';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 interface Plan {
   id: 'starter' | 'pro' | 'agency';
@@ -67,6 +68,7 @@ function formatTrialExpiry(createdAt: string | null | undefined): string | null 
 }
 
 export default function BillingPage() {
+  usePageTitle('Billing & Pricing');
   const { agent } = useCurrentAgent();
   const currentPlan = (agent as any)?.subscription_plan as string | null | undefined;
   const isSubscribed = !!agent?.is_subscribed;

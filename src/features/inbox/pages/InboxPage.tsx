@@ -204,9 +204,26 @@ export default function InboxPage() {
         {/* RIGHT — thread */}
         <section className={`flex flex-col min-h-0 ${activeId ? 'flex' : 'hidden md:flex'}`}>
           {!activeThread ? (
-            <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
-              Select a thread
-            </div>
+            !loading && threads.length === 0 && filter === 'all' && !search ? (
+              <div className="flex-1 flex flex-col items-center justify-center py-20 text-center space-y-4 px-6">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                  <MessageSquare size={28} className="text-primary" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-semibold text-foreground">No enquiries yet</h3>
+                  <p className="text-sm text-muted-foreground max-w-xs">
+                    Buyer enquiries will appear here once your listings go live. You'll be able to reply directly from this inbox.
+                  </p>
+                </div>
+                <Button asChild>
+                  <a href="/dashboard/listings">View your listings →</a>
+                </Button>
+              </div>
+            ) : (
+              <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
+                Select a thread
+              </div>
+            )
           ) : (
             <>
               {/* Header */}

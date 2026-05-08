@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Loader2, AlertTriangle, X } from 'lucide-react';
+import { Loader2, AlertTriangle, X, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -296,11 +296,28 @@ export default function HaloBoardPage() {
           </Tabs>
           <HaloBoardFilters value={filters} onChange={setFilters} resultCount={filtered.length} />
           {filtered.length === 0 ? (
-            <p className="text-center text-muted-foreground py-12">
-              {tab === 'pocket'
-                ? 'No Halos match any of your pocket listings yet.'
-                : 'No active Halos match your filters.'}
-            </p>
+            cleanHalos.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                  <Sparkles size={28} className="text-primary" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-semibold text-foreground">No buyer matches yet</h3>
+                  <p className="text-sm text-muted-foreground max-w-xs">
+                    Once you publish a listing, ListHQ automatically matches it to buyers with a matching Halo. They'll appear here.
+                  </p>
+                </div>
+                <Button onClick={() => navigate('/dashboard/listings/new')}>
+                  Publish a listing to start matching →
+                </Button>
+              </div>
+            ) : (
+              <p className="text-center text-muted-foreground py-12">
+                {tab === 'pocket'
+                  ? 'No Halos match any of your pocket listings yet.'
+                  : 'No active Halos match your filters.'}
+              </p>
+            )
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filtered.map((h) => (

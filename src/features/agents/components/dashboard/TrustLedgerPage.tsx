@@ -674,6 +674,22 @@ const TrustLedgerPage = () => {
       />
 
       <div className="p-4 sm:p-6 max-w-[1600px] space-y-5">
+        {receipts.length === 0 && payments.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <Landmark size={28} className="text-primary" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-semibold text-foreground">No trust transactions yet</h3>
+              <p className="text-sm text-muted-foreground max-w-xs">
+                Record your first receipt to begin your AFA-compliant trust ledger.
+              </p>
+            </div>
+            <Button variant="outline" onClick={() => setShowNewReceipt(true)}>
+              Record first receipt →
+            </Button>
+          </div>
+        ) : (<>
         {/* Month Navigator + Summary */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
@@ -830,6 +846,7 @@ const TrustLedgerPage = () => {
             )}
           </TabsContent>
         </Tabs>
+        </>)}
       </div>
 
       <TrustReceiptModal open={showNewReceipt} onOpenChange={setShowNewReceipt} onCreated={fetchData} />

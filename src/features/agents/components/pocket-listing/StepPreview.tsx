@@ -54,7 +54,13 @@ const StepPreview = ({ draft, onPublish, publishing, isEdit }: Props) => {
         view === 'mobile' ? 'max-w-[320px]' : 'max-w-full'
       }`}>
         <div className={`relative ${view === 'mobile' ? 'aspect-[4/3]' : 'aspect-[16/7]'}`}>
-          <img src={mainPhoto} alt="Property" className="w-full h-full object-cover" />
+          {mainPhoto ? (
+            <img src={mainPhoto} alt="Property" className="w-full h-full object-cover" />
+          ) : (
+            <div className={`w-full h-full ${LISTING_PLACEHOLDER_CLASS}`}>
+              <ImageIcon size={32} />
+            </div>
+          )}
           <div className="absolute top-3 left-3">
             <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${
               draft.visibility === 'whisper'

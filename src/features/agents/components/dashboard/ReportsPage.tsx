@@ -206,7 +206,17 @@ const ReportsPage = () => {
   // ─── Trust Reconciliation (per month, last 12 months) ───
   const reconciliationRows = useMemo(() => {
     const months = eachMonthOfInterval({ start: subMonths(new Date(), 11), end: new Date() });
-    let opening = 0;
+    const windowStart = startOfMonth(subMonths(new Date(), 11));
+
+    // Carry-forward: sum all transactions before the 12-month window
+    const histIn = trustReceipts
+      .filter(r => r.date_received && new Date(r.date_received) < windowStart)
+      .reduce((s, r) => s + Number(r.amount || 0), 0);
+    const histOut = trustPayments
+      .filter(p => p.date_paid && new Date(p.date_paid) < windowStart)
+      .reduce((s, p) => s + Number(p.amount || 0), 0);
+
+    let opening = histIn - histOut;
     return months.map(m => {
       const start = startOfMonth(m);
       const end = endOfMonth(m);

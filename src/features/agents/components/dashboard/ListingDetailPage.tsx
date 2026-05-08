@@ -16,6 +16,7 @@ import ListingAccountingTab from './listing-tabs/ListingAccountingTab';
 import ListingMarketTab from './listing-tabs/ListingMarketTab';
 import ListingAnalyticsTab from './listing-tabs/ListingAnalyticsTab';
 import MatchedBuyersWidget from './MatchedBuyersWidget';
+import SavedByBuyersWidget from './SavedByBuyersWidget';
 
 const ListingDetailPage = () => {
   const { listingId } = useParams<{ listingId: string }>();

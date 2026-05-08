@@ -443,10 +443,9 @@ const DashboardOverview = () => {
     }
   };
 
-  // GCI values — real data; new users start at 0
-  const gciActual = 0;
-  const gciBudgeted = 0;
-  const gciPotential = 0;
+  // GCI values — real data from Supabase
+  const monthlyStats = useAgentMonthlyStats(agentId);
+  const { gciActual, gciBudgeted, gciPotential } = monthlyStats;
   const gciPercent = gciBudgeted > 0 ? Math.round((gciActual / gciBudgeted) * 100) : 0;
 
   // Stats row - Australian CRM focus

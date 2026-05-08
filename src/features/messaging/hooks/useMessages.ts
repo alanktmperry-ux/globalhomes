@@ -122,9 +122,8 @@ export function useMessages(conversationId: string | null) {
           if (otherParticipants && otherParticipants.length > 0) {
             const otherId = otherParticipants[0].user_id;
             const { data: agentRow } = await supabase.from('agents').select('email, name').eq('user_id', otherId).maybeSingle();
-            const { data: profileRow } = await supabase.from('profiles').select('display_name').eq('user_id', otherId).maybeSingle();
             const recipientEmail = agentRow?.email;
-            const recipientName = agentRow?.name || profileRow?.display_name || 'there';
+            const recipientName = agentRow?.name || 'there';
 
             if (recipientEmail) {
               await supabase.functions.invoke('send-notification-email', {

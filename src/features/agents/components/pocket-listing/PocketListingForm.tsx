@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useBuyerMatching } from '@/features/agents/hooks/useBuyerMatching';
 import { ArrowLeft, ArrowRight, Save, Loader2, FileText, Trash2, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -263,6 +264,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
   const [publishedListing, setPublishedListing] = useState<{ id: string; address: string; title: string } | null>(null);
   const autoSaveRef = useRef<ReturnType<typeof setInterval>>();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { matchBuyersToListing } = useBuyerMatching();
 
   const update = (partial: Partial<ListingDraft>) =>
@@ -433,7 +435,8 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
       const agentId = agent?.id ?? null;
 
       if (!agentId) {
-        toast.error('Agent profile not found — Please complete your agent registration first.');
+        toast.error('Agent profile not found — redirecting to registration.', { duration: 3000 });
+        setTimeout(() => navigate('/onboarding/agency'), 800);
         setPublishing(false);
         return;
       }

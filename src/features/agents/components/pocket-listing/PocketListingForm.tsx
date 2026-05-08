@@ -121,6 +121,10 @@ export interface ListingDraft {
   description_ja: string;
   title_ko: string;
   description_ko: string;
+  title_vi: string;
+  description_vi: string;
+  title_ar: string;
+  description_ar: string;
 
   // Commercial / Land
   floorAreaSqm?: number;

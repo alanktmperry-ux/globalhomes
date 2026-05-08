@@ -79,7 +79,7 @@ export default function AgentProfilePage() {
         .from('properties')
         .select('id, title, address, suburb, state, price, beds, baths, property_type, images, translations')
         .eq('agent_id', agentId)
-        .eq('status', 'published')
+        .in('status', ['public', 'active', 'published', 'under_offer'])
         .order('created_at', { ascending: false });
 
       if (!cancelled) {

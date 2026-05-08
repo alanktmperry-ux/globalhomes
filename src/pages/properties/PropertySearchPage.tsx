@@ -33,6 +33,7 @@ interface PropertyRow {
   parking: number | null;
   property_type: string | null;
   listing_type: string | null;
+  status: string | null;
   images: string[] | null;
   image_url: string | null;
   translations: any;
@@ -59,8 +60,8 @@ export default function PropertySearchPage() {
     (async () => {
       let query = supabase
         .from('properties')
-        .select('id, address, suburb, price, beds, baths, parking, property_type, listing_type, images, image_url, translations')
-        .in('status', ['public', 'active'])
+        .select('id, address, suburb, price, beds, baths, parking, property_type, listing_type, status, images, image_url, translations')
+        .in('status', ['public', 'active', 'published', 'under_offer'])
         .order('created_at', { ascending: false })
         .limit(48);
 
@@ -218,7 +219,12 @@ export default function PropertySearchPage() {
                   to={`/properties/${p.id}`}
                   className="block rounded-xl border border-border bg-card overflow-hidden hover:shadow-md transition-shadow group"
                 >
-                  <div className="aspect-[16/9] bg-muted overflow-hidden">
+                  <div className="aspect-[16/9] bg-muted overflow-hidden relative">
+                    {p.status === 'under_offer' && (
+                      <span className="absolute top-2 left-2 z-10 bg-amber-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow">
+                        Under offer
+                      </span>
+                    )}
                     {img ? (
                       <img
                         src={img}

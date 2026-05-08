@@ -36,6 +36,7 @@ const UTILITY_PARTNERS = [
   { name: 'Origin Energy', url: 'https://www.originenergy.com.au', color: 'bg-orange-500' },
   { name: 'Telstra', url: 'https://www.telstra.com.au', color: 'bg-blue-500' },
   { name: 'NBN Co', url: 'https://www.nbnco.com.au', color: 'bg-purple-600' },
+  { name: 'Conveyancing', url: '/conveyancing?mode=selling', color: 'bg-indigo-600' },
 ];
 
 const SettlementConcierge = () => {

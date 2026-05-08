@@ -179,10 +179,8 @@ export default function BillingPage() {
             <p className="text-lg font-semibold text-foreground capitalize">
               {currentFrontendPlan ?? 'Free Trial'}
             </p>
-            {trialExpiry && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Trial expires: <span className="font-medium text-foreground">{trialExpiry}</span>
-              </p>
+            {trialEndDate && (
+              <TrialCountdown trialEndsAt={trialEndDate} className="mt-1" />
             )}
           </div>
           {isSubscribed && (

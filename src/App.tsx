@@ -97,6 +97,7 @@ const OnboardingBuyerPrefsPage = React.lazy(() => import("./features/auth/pages/
 const MyApplicationsPage = React.lazy(() => import("./features/rental/pages/MyApplicationsPage"));
 
 const BuyPage = React.lazy(() => import("./pages/BuyPage"));
+const PropertySearchPage = React.lazy(() => import("./pages/properties/PropertySearchPage"));
 const SuburbsIndexPage = React.lazy(() => import("./pages/SuburbsIndexPage"));
 const SigningPage = React.lazy(() => import("./pages/SigningPage"));
 const TenantPortalPage = React.lazy(() => import("./features/tenant/pages/TenantPortalPage"));
@@ -327,6 +328,7 @@ const App = () => (
                   <Route path="/calculator/:slug" element={<BuyerPoolPage />} />
                   <Route path="/school/:state/:slug" element={<SchoolPage />} />
                   
+                  <Route path="/properties" element={<PropertySearchPage />} />
                   <Route path="/buy" element={<BuyPage />} />
                   <Route path="/buy/:state/:suburb" element={<SuburbPage />} />
                   <Route path="/suburb/:state/:slug" element={<SuburbProfilePage />} />

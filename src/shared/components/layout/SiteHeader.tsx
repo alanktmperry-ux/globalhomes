@@ -33,12 +33,12 @@ export function SiteHeader() {
   const { t } = useTranslation();
 
   const PUBLIC_NAV: NavItem[] = [
-    { label: t('nav.search'), to: '/search', icon: Search },
+    { label: t('nav.search'), to: '/properties', icon: Search },
     { label: t('nav.findAgent'), to: '/agents', icon: Users },
     { label: 'Free translator', to: '/tools/multilingual-generator', icon: Sparkles },
   ];
   const SEEKER_NAV: NavItem[] = [
-    { label: t('nav.browseProperties'), to: '/search', icon: Search },
+    { label: t('nav.browseProperties'), to: '/properties', icon: Search },
     { label: t('nav.findAgent'), to: '/agents', icon: Users },
     { label: 'Free translator', to: '/tools/multilingual-generator', icon: Sparkles },
   ];

@@ -108,7 +108,18 @@ export default function TrustStatementModal({ open, onOpenChange }: TrustStateme
           .eq('period_year', year)
           .eq('period_month', month + 1)
           .maybeSingle();
-        setOpeningBalance((bal as any)?.opening_balance ?? 0);
+        if ((bal as any)?.opening_balance != null) {
+          setOpeningBalance((bal as any).opening_balance);
+        } else {
+          // Compute carry-forward from all transactions before this period
+          const [{ data: prevR }, { data: prevP }] = await Promise.all([
+            supabase.from('trust_receipts').select('amount').eq('agent_id', (agentRow as any).id).lt('date_received', startDate),
+            supabase.from('trust_payments').select('amount').eq('agent_id', (agentRow as any).id).lt('date_paid', startDate),
+          ]);
+          const histIn = (prevR || []).reduce((s: number, r: any) => s + r.amount, 0);
+          const histOut = (prevP || []).reduce((s: number, p: any) => s + p.amount, 0);
+          setOpeningBalance(histIn - histOut);
+        }
       } else {
         setOpeningBalance(0);
       }

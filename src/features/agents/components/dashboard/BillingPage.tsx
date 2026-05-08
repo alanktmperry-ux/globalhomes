@@ -87,6 +87,7 @@ function formatTrialExpiry(createdAt: string | null | undefined): string | null 
 export default function BillingPage() {
   usePageTitle('Billing & Pricing');
   const { agent } = useCurrentAgent();
+  const { trialEndsAt } = useSubscription();
   const [searchParams, setSearchParams] = useSearchParams();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
@@ -94,7 +95,12 @@ export default function BillingPage() {
   const rawPlan = (agent as any)?.subscription_plan as string | null | undefined;
   const currentFrontendPlan = rawPlan ? PLAN_ID_TO_FRONTEND[rawPlan] ?? null : null;
   const isSubscribed = !!agent?.is_subscribed;
-  const trialExpiry = !isSubscribed ? formatTrialExpiry(agent?.created_at) : null;
+  const trialEndDate = !isSubscribed
+    ? (trialEndsAt
+        ?? (agent?.created_at
+              ? new Date(new Date(agent.created_at).getTime() + 60 * 24 * 60 * 60 * 1000).toISOString()
+              : null))
+    : null;
   const showSuccess = searchParams.get('success') === 'true';
   const showCancelled = searchParams.get('cancelled') === 'true';
 

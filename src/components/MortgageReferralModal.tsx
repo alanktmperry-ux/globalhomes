@@ -76,12 +76,34 @@ export function MortgageReferralModal({
       property_id: propertyId ?? null,
       status: 'new',
     });
-    setSubmitting(false);
 
     if (error) {
+      setSubmitting(false);
       toast.error('Could not submit. Please try again.');
       return;
     }
+
+    await supabase.from('referral_leads').insert({
+      buyer_name: parsed.data.name,
+      buyer_email: parsed.data.email,
+      buyer_phone: parsed.data.phone,
+      estimated_loan_amount: parsed.data.purchase_price ? Number(parsed.data.purchase_price) : null,
+      loan_type: null,
+      message: `Timeframe: ${parsed.data.timeframe}`,
+      property_id: propertyId ?? null,
+      status: 'new',
+      assigned_broker_id: null,
+    } as any);
+
+    await supabase.functions.invoke('send-notification-email', {
+      body: {
+        to: 'leads@diamondlending.com.au',
+        subject: 'New mortgage referral from ListHQ',
+        body: `New referral received.\n\nName: ${parsed.data.name}\nEmail: ${parsed.data.email}\nPhone: ${parsed.data.phone}\nLoan amount: $${parsed.data.purchase_price ?? ''}\n\nLog in to your broker portal to view and contact this lead.`,
+      },
+    });
+
+    setSubmitting(false);
     toast.success('A broker will contact you within 2 hours');
     onOpenChange(false);
   };

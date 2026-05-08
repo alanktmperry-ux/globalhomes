@@ -1,11 +1,17 @@
 import { Helmet } from "react-helmet-async";
 import { Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { usePageTitle } from '@/lib/usePageTitle';
 
 export default function PendingApprovalPage() {
   usePageTitle('Complete your registration');
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
   return (
     <>
       <Helmet>
@@ -44,6 +50,12 @@ export default function PendingApprovalPage() {
           {user?.email && (
             <p className="text-xs text-muted-foreground mb-2">Signed in as {user.email}</p>
           )}
+          <button
+            onClick={handleSignOut}
+            className="text-xs text-muted-foreground underline hover:text-foreground transition-colors mb-2"
+          >
+            Sign out
+          </button>
           <p className="text-xs text-muted-foreground">
             Questions? Email{" "}
             <a href="mailto:alan@squaredevelopment.com.au" className="underline">

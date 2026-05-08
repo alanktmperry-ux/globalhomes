@@ -32,6 +32,7 @@ interface Payment {
   client_name: string;
   property_address: string;
   amount: number;
+  gst_amount: number;
   payment_method: string;
   purpose: string;
   date_paid: string;

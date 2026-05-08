@@ -8258,6 +8258,39 @@ export type Database = {
           },
         ]
       }
+      partner_buyer_leads: {
+        Row: {
+          consent_given: boolean
+          created_at: string
+          email: string
+          id: string
+          name: string
+          partner_code: string
+          phone: string | null
+          suburb_interest: string | null
+        }
+        Insert: {
+          consent_given?: boolean
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          partner_code: string
+          phone?: string | null
+          suburb_interest?: string | null
+        }
+        Update: {
+          consent_given?: boolean
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          partner_code?: string
+          phone?: string | null
+          suburb_interest?: string | null
+        }
+        Relationships: []
+      }
       partner_members: {
         Row: {
           created_at: string

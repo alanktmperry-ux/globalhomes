@@ -1048,6 +1048,43 @@ export const en = {
   'home.portals.partner.desc': 'Access your partner dashboard and track referral earnings.',
   'home.portals.partner.register': 'Become a partner?',
   'home.portals.signIn': 'Sign in',
+
+  // ── Homepage — pricing plans ──
+  'home.pricing.plan.solo.name': 'Solo',
+  'home.pricing.plan.solo.desc': 'Independent agents running their own shop',
+  'home.pricing.plan.solo.f1': '1 agent seat · up to 10 active listings',
+  'home.pricing.plan.solo.f2': 'Full CRM — pipeline, contacts, deal tracking',
+  'home.pricing.plan.solo.f3': 'Full trust accounting (complete ledger)',
+  'home.pricing.plan.solo.f4': '20-language auto-translation on every listing',
+  'home.pricing.plan.solo.f5': 'AI buyer matching + voice search',
+  'home.pricing.plan.solo.f6': 'Halo listing boost (pay per use)',
+  'home.pricing.plan.solo.cta': 'Start free →',
+  'home.pricing.plan.solo.sub': 'No credit card required',
+  'home.pricing.plan.agency.name': 'Agency',
+  'home.pricing.plan.agency.desc': 'For growing agencies ready to scale',
+  'home.pricing.plan.agency.f1': 'Up to 5 agent seats',
+  'home.pricing.plan.agency.f2': 'Unlimited listings',
+  'home.pricing.plan.agency.f3': 'Full CRM for the whole team',
+  'home.pricing.plan.agency.f4': 'Full PM automation + trust accounting',
+  'home.pricing.plan.agency.f5': '20-language auto-translation',
+  'home.pricing.plan.agency.f6': 'Priority AI matching + lead analytics',
+  'home.pricing.plan.agency.f7': 'Agency-branded profile page',
+  'home.pricing.plan.agency.f8': 'Phone & email support',
+  'home.pricing.plan.agency.cta': 'Book a demo →',
+  'home.pricing.plan.agency.sub': 'No credit card · Setup included · Cancel anytime',
+  'home.pricing.plan.pro.name': 'Agency Pro',
+  'home.pricing.plan.pro.desc': 'Established multi-office agencies',
+  'home.pricing.plan.pro.f1': 'Unlimited agent seats',
+  'home.pricing.plan.pro.f2': 'Unlimited listings',
+  'home.pricing.plan.pro.f3': 'Everything in Agency',
+  'home.pricing.plan.pro.f4': 'White-label buyer portal',
+  'home.pricing.plan.pro.f5': 'Dedicated account manager',
+  'home.pricing.plan.pro.f6': 'Custom API integrations',
+  'home.pricing.plan.pro.cta': 'Contact sales →',
+  'home.pricing.plan.pro.sub': 'Custom pricing · SLA included',
+
+  // ── Homepage — hero / FAQ / closing (additional keys) ──
+  'home.hero.buyersSearching': 'buyers searching right now',
 } as const;
 
 export type TranslationKey = keyof typeof en;

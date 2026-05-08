@@ -264,6 +264,7 @@ export default function CommandCentre() {
   const [data, setData] = useState<CCData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [sendingDigest, setSendingDigest] = useState(false);
   const [monthlyMarketingSpend, setMonthlyMarketingSpend] = useState<number>(() => {
     if (typeof window === 'undefined') return 0;
     const v = window.localStorage.getItem('cc_marketing_spend');

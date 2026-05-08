@@ -6,7 +6,7 @@ import { capture } from '@/shared/lib/posthog';
 import { useI18n, type Language } from '@/shared/lib/i18n';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
-type LanguageKey = 'en' | 'zh_simplified' | 'zh_traditional' | 'vi' | 'ko' | 'ar' | 'ja';
+type LanguageKey = 'en' | 'zh_simplified' | 'zh_traditional' | 'vi' | 'ko' | 'ar' | 'ja' | 'hi' | 'bn' | 'tl' | 'id';
 
 interface Translation {
   title: string;
@@ -52,9 +52,13 @@ const LANGUAGES: { key: LanguageKey; flag: string; label: string }[] = [
   { key: 'ko', flag: '🇰🇷', label: '한국어' },
   { key: 'ar', flag: '🇸🇦', label: 'العربية' },
   { key: 'ja', flag: '🇯🇵', label: '日本語' },
+  { key: 'hi', flag: '🇮🇳', label: 'हिन्दी' },
+  { key: 'bn', flag: '🇧🇩', label: 'বাংলা' },
+  { key: 'tl', flag: '🇵🇭', label: 'Filipino' },
+  { key: 'id', flag: '🇮🇩', label: 'Indonesia' },
 ];
 
-const TRANSLATABLE_LANGS: LanguageKey[] = ['zh_simplified', 'zh_traditional', 'vi', 'ko', 'ar', 'ja'];
+const TRANSLATABLE_LANGS: LanguageKey[] = ['zh_simplified', 'zh_traditional', 'vi', 'ko', 'ar', 'ja', 'hi', 'bn', 'tl', 'id'];
 
 const LANGUAGE_DISPLAY_NAMES: Record<LanguageKey, string> = {
   en: 'English',
@@ -64,6 +68,10 @@ const LANGUAGE_DISPLAY_NAMES: Record<LanguageKey, string> = {
   ko: 'Korean',
   ar: 'Arabic',
   ja: 'Japanese',
+  hi: 'Hindi',
+  bn: 'Bengali',
+  tl: 'Filipino',
+  id: 'Indonesian',
 };
 
 /** Map the i18n Language codes to this component's LanguageKey */
@@ -74,6 +82,10 @@ function i18nLangToListingLang(lang: Language): LanguageKey {
   if (lang === 'ko') return 'ko';
   if (lang === 'ar') return 'ar';
   if (lang === 'ja') return 'ja';
+  if (lang === 'hi') return 'hi';
+  if (lang === 'bn') return 'bn';
+  if ((lang as string) === 'fil') return 'tl';
+  if ((lang as string) === 'id') return 'id';
   return 'en';
 }
 

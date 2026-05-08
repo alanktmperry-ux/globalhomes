@@ -232,46 +232,15 @@ const AgentAuthPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex" style={{ background: '#020817' }}>
+    <div className="min-h-screen flex bg-white">
 
-      {/* ── LEFT: Dark premium panel ── */}
-      <div className="hidden lg:flex lg:w-[48%] shrink-0 flex-col justify-between p-11 relative overflow-hidden">
-        <div className="absolute -top-28 -right-16 w-[380px] h-[380px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%)' }} />
-        <div className="absolute -bottom-16 -left-12 w-[280px] h-[280px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(37,99,235,0.10) 0%, transparent 70%)' }} />
-        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(37,99,235,0.6), rgba(99,179,237,0.4), transparent)' }} />
-
-        <div className="relative z-10 flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-[11px] font-bold text-white">L</div>
-          <span className="text-[15px] font-semibold text-white tracking-tight">ListHQ</span>
-        </div>
-
-        <div className="relative z-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border mb-7" style={{ borderColor: 'rgba(37,99,235,0.3)', background: 'rgba(37,99,235,0.08)' }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-            <span className="text-[11px] font-medium tracking-widest uppercase text-blue-400">Agent Portal</span>
-          </div>
-
-          <h2 className="text-[42px] font-light text-white leading-[1.05] tracking-tight mb-9" style={{ letterSpacing: '-1.5px' }}>
-            Built for agents<br />who move <span className="font-semibold text-blue-400">fast.</span>
-          </h2>
-
-          <div className="flex flex-wrap gap-2 mb-10">
-            {AGENT_PILLS.map(p => (
-              <span key={p} className="px-3.5 py-1.5 rounded-full text-xs text-white/60" style={{ border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)' }}>
-                {p}
-              </span>
-            ))}
-          </div>
-
-          <div className="flex gap-8 pt-7" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-            {[{ val: 'Free', lbl: 'First listing' }, { val: 'Live', lbl: 'Lead alerts' }, { val: 'AI', lbl: 'Buyer matching' }].map(s => (
-              <div key={s.lbl}>
-                <div className="text-xl font-semibold text-white tracking-tight leading-none">{s.val}</div>
-                <div className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{s.lbl}</div>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* ── LEFT: Full-bleed hero image ── */}
+      <div className="hidden lg:block lg:w-[48%] shrink-0 relative">
+        <img
+          src={agentAuthHero}
+          alt="ListHQ agent portal"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
       </div>
 
       {/* ── RIGHT: White form panel ── */}

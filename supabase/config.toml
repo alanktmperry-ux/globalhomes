@@ -96,3 +96,6 @@ verify_jwt = false
 
 [functions.seed-meridian-demo]
 verify_jwt = false
+
+[functions.lendi-pre-approval-webhook]
+verify_jwt = false

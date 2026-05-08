@@ -483,6 +483,18 @@ const DashboardOverview = () => {
       />
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
+        {agentId && (
+          <div className="flex justify-end">
+            <Link
+              to={`/agents/${agentId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-muted-foreground hover:text-primary underline"
+            >
+              Your public profile →
+            </Link>
+          </div>
+        )}
         <div className="flex justify-end">
           <CustomiseToolbar
             editMode={editMode}

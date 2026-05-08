@@ -205,11 +205,9 @@ async function handleDigest(mode: 'daily' | 'weekly') {
     const email = userData?.user?.email;
     if (!email || !RESEND_KEY) continue;
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('full_name')
-      .eq('user_id', (search as any).user_id)
-      .single();
+    const firstName = (userData?.user?.user_metadata?.full_name as string | undefined)?.split(' ')[0]
+      ?? (userData?.user?.user_metadata?.name as string | undefined)?.split(' ')[0]
+      ?? 'there';
 
     // Find recent matching properties
     let q = supabase

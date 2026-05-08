@@ -63,13 +63,9 @@ Deno.serve(async (req) => {
       const email = userData?.user?.email;
       if (!email || !RESEND_KEY) continue;
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('full_name')
-        .eq('user_id', sub.buyer_id)
-        .maybeSingle();
-
-      const firstName = (profile as any)?.full_name?.split(' ')[0] ?? 'there';
+      const firstName = (userData?.user?.user_metadata?.full_name as string | undefined)?.split(' ')[0]
+        ?? (userData?.user?.user_metadata?.name as string | undefined)?.split(' ')[0]
+        ?? 'there';
       const isEOI     = prop.listing_mode === 'eoi';
       const address   = prop.address_hidden
         ? `${prop.suburb}, ${prop.state}`

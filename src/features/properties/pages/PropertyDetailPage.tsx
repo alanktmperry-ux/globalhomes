@@ -114,6 +114,37 @@ export default function PropertyDetailPage() {
   const [translating, setTranslating] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [mortgageOpen, setMortgageOpen] = useState(false);
+  const [socialProof, setSocialProof] = useState<{ suburbSearchers: number; weeklyViews: number } | null>(null);
+
+  useEffect(() => {
+    if (!property?.suburb || !property?.id) return;
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const ninetyAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+    (async () => {
+      try {
+        const [searchersRes, viewsRes] = await Promise.all([
+          supabase
+            .from('buyer_intent')
+            .select('id', { count: 'exact', head: true })
+            .contains('suburbs', [property.suburb])
+            .gte('last_searched_at', ninetyAgo),
+          supabase
+            .from('lead_events')
+            .select('id', { count: 'exact', head: true })
+            .eq('property_id', property.id)
+            .eq('event_type', 'view')
+            .gte('created_at', weekAgo),
+        ]);
+        const suburbSearchers = searchersRes.count ?? 0;
+        const weeklyViews = viewsRes.count ?? 0;
+        if (suburbSearchers > 0 || weeklyViews > 0) {
+          setSocialProof({ suburbSearchers, weeklyViews });
+        }
+      } catch {
+        /* RLS or access issue — silently skip */
+      }
+    })();
+  }, [property?.suburb, property?.id]);
   const { title: translatedTitle, description: translatedDescription, isTranslating, isTranslated } = useListingTranslation(rawProperty);
   useEffect(() => {
     const fetchProperty = async () => {
@@ -649,6 +680,35 @@ export default function PropertyDetailPage() {
                 >
                   {tp('property.viewSuburb', { suburb: property.suburb })} →
                 </Link>
+              )}
+              {socialProof && (
+                <div className="flex flex-wrap items-center gap-3 mt-3 py-2.5 px-4 bg-primary/5 rounded-xl border border-primary/10 text-xs text-muted-foreground">
+                  {socialProof.suburbSearchers > 0 && (
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <strong className="text-foreground">{socialProof.suburbSearchers}</strong>
+                      {' '}buyer{socialProof.suburbSearchers !== 1 ? 's' : ''} searching in {property.suburb}
+                    </span>
+                  )}
+                  {socialProof.suburbSearchers > 0 && socialProof.weeklyViews > 0 && (
+                    <span className="text-border">·</span>
+                  )}
+                  {socialProof.weeklyViews > 0 && (
+                    <span className="flex items-center gap-1.5">
+                      <Eye size={12} className="text-primary" />
+                      <strong className="text-foreground">{socialProof.weeklyViews}</strong>
+                      {' '}view{socialProof.weeklyViews !== 1 ? 's' : ''} this week
+                    </span>
+                  )}
+                  {socialProof.suburbSearchers >= 5 && (
+                    <>
+                      <span className="text-border">·</span>
+                      <span className="flex items-center gap-1 text-amber-600 font-medium">
+                        🔥 High demand suburb
+                      </span>
+                    </>
+                  )}
+                </div>
               )}
               {((property as any).listing_mode === 'eoi' || (property as any).listing_mode === 'off_market') && (
                 <div className="mt-4">

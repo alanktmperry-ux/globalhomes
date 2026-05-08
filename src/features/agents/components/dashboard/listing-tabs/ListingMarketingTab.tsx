@@ -17,7 +17,7 @@ import {
 import {
   Eye, MessageCircle, Calendar,
   DollarSign, Mail, Flame, Clock,
-  ChevronRight, Send, Loader2,
+  ChevronRight, ChevronUp, ChevronDown, Globe, Send, Loader2,
   Zap, Star, CheckCircle2, AlertCircle,
   Camera, Map as MapIcon, Sofa, Bug,
   Languages,

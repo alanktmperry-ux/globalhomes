@@ -264,6 +264,7 @@ export default function CommandCentre() {
   const [data, setData] = useState<CCData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [sendingDigest, setSendingDigest] = useState(false);
   const [monthlyMarketingSpend, setMonthlyMarketingSpend] = useState<number>(() => {
     if (typeof window === 'undefined') return 0;
     const v = window.localStorage.getItem('cc_marketing_spend');
@@ -839,14 +840,35 @@ export default function CommandCentre() {
             <span className="ml-1 opacity-70">· auto-refreshes every 5 min</span>
           </p>
         </div>
-        <button
-          onClick={fetchAll}
-          disabled={refreshing}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-secondary text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
-        >
-          <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={async () => {
+              try {
+                setSendingDigest(true);
+                const { data: result, error } = await supabase.functions.invoke('weekly-agent-digest', { body: {} });
+                if (error) throw error;
+                toast.success(`Digest sent to ${result?.sent ?? 0} agent${result?.sent === 1 ? '' : 's'}`);
+              } catch (e: any) {
+                toast.error(e?.message ?? 'Could not send digest');
+              } finally {
+                setSendingDigest(false);
+              }
+            }}
+            disabled={sendingDigest}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-secondary text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+          >
+            <Mail size={14} className={sendingDigest ? 'animate-pulse' : ''} />
+            {sendingDigest ? 'Sending…' : 'Send digest now'}
+          </button>
+          <button
+            onClick={fetchAll}
+            disabled={refreshing}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-secondary text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* SECTION 1 — Needs Attention */}

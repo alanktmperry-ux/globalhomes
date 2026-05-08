@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, MicOff, Search, Loader2, X, ChevronDown, MapPin, SlidersHorizontal } from 'lucide-react';
+import { Mic, MicOff, Search, Loader2, X, ChevronDown, MapPin, SlidersHorizontal, ImageIcon } from 'lucide-react';
+import { getListingImage, LISTING_PLACEHOLDER_CLASS } from '@/shared/lib/listingImage';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SoundWaveVisualizer } from './SoundWaveVisualizer';

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, Fragment } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -193,8 +193,9 @@ export default function ReferralPartnerManager() {
                 const url = `${window.location.origin}/r/${p.partner_code}`;
                 const partnerLeads = leadsByCode[p.partner_code] || [];
                 return (
-                  <FragmentWithKey key={p.id}>
+                  <Fragment key={p.id}>
                     <tr className="border-t border-border hover:bg-muted/30">
+                      <td className="px-2 py-3">
                         <button
                           type="button"
                           onClick={() => setExpanded(isOpen ? null : p.id)}
@@ -258,7 +259,7 @@ export default function ReferralPartnerManager() {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 );
               })}
             </tbody>

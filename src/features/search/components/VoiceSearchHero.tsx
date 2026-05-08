@@ -260,7 +260,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
         baths: p.baths,
         cars: p.parking,
         tag: p.boost_tier === 'premier' ? 'Premier' : 'Featured',
-        img: p.image_url || p.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&q=70',
+        img: getListingImage(p.image_url, p.images),
       }))
     : [];
 

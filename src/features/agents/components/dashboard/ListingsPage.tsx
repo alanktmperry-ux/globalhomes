@@ -573,8 +573,12 @@ const ListingsPage = () => {
       return { ...merged, _status: overridden ?? getListingStatus(l) };
     });
 
-  const salesListings = withStatus.filter(l => l.listing_type !== 'rent');
-  const rentalListings = withStatus.filter(l => l.listing_type === 'rent');
+  const activeWithStatus = withStatus.filter((l) => !ARCHIVED_STATUSES.has(l._status));
+  const archivedWithStatus = withStatus.filter((l) => ARCHIVED_STATUSES.has(l._status));
+  const lifecycleListings = lifecycleTab === 'active' ? activeWithStatus : archivedWithStatus;
+
+  const salesListings = lifecycleListings.filter(l => l.listing_type !== 'rent');
+  const rentalListings = lifecycleListings.filter(l => l.listing_type === 'rent');
 
   const activeStatusTab = listingMode === 'sale' ? saleStatusTab : rentStatusTab;
   const setActiveStatusTab = listingMode === 'sale' ? setSaleStatusTab : setRentStatusTab;

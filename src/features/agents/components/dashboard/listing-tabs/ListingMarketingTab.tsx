@@ -859,8 +859,8 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               {leads.slice(0, 5).map(l => {
                 const u = URGENCY_LABEL[l.urgency] || URGENCY_LABEL.just_browsing;
                 return (
-                  <>
-                  <tr key={l.id} className="border-b border-border last:border-0 hover:bg-accent/30">
+                  <Fragment key={l.id}>
+                  <tr className="border-b border-border last:border-0 hover:bg-accent/30">
                     <td className="p-3 font-medium">{l.user_name}</td>
                     <td className="p-3 hidden sm:table-cell">
                       <div className="flex items-center gap-2">

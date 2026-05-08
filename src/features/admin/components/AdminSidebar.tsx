@@ -68,6 +68,7 @@ export default function AdminSidebar({ pendingApprovalsTotal = 0, isSupport = fa
     { to: '/admin', label: 'Command Centre', icon: Zap, exact: true },
   ];
   const strategy: NavItem[] = [
+    { to: '/admin/overview', label: 'Overview', icon: BarChart3 },
     { to: '/admin/insights', label: 'Insights', icon: LineChart },
     { to: '/admin/costs', label: 'Costs', icon: Wallet },
   ];

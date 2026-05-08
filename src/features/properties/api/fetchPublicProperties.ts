@@ -27,10 +27,7 @@ export function mapDbProperty(p: PropertyWithAgent): Property {
     baths: p.baths,
     parking: p.parking,
     sqm: p.sqm,
-    imageUrl:
-      p.image_url ||
-      p.images?.[0] ||
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
+    imageUrl: p.image_url || p.images?.[0] || '',
     images: p.images || (p.image_url ? [p.image_url] : []),
     description: p.description || '',
     estimatedValue: p.estimated_value || '',

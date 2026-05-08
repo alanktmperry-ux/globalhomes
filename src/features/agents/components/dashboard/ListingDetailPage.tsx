@@ -158,6 +158,7 @@ const ListingDetailPage = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-secondary mb-6 flex-wrap h-auto gap-1 p-1">
             <TabsTrigger value="details" className="text-xs">Details</TabsTrigger>
+            <TabsTrigger value="analytics" className="text-xs">Analytics</TabsTrigger>
             <TabsTrigger value="marketing" className="text-xs">Marketing</TabsTrigger>
             <TabsTrigger value="buyers" className="text-xs">Buyer Leads</TabsTrigger>
             <TabsTrigger value="documents" className="text-xs">Documents</TabsTrigger>

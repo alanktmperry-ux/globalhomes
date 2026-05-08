@@ -69,6 +69,7 @@ const AnalyticsPage = () => {
         supabase
           .from('voice_searches')
           .select('id, transcript, parsed_query, created_at')
+          .eq('user_id', user.id)
           .gte('created_at', sixMonthsAgo)
           .limit(200),
       ]);

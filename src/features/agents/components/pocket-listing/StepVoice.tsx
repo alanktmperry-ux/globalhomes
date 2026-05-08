@@ -28,7 +28,10 @@ const TONES = [
 
 type Tone = typeof TONES[number]['key'];
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? 'https://ngrkbohpmkzjonaofgbb.supabase.co';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+if (!SUPABASE_URL) {
+  throw new Error('VITE_SUPABASE_URL is not set. Configure it in Lovable project settings.');
+}
 
 const StepVoice = ({ draft, update }: Props) => {
   const [countdown, setCountdown] = useState(30);

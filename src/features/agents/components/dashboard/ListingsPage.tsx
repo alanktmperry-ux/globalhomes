@@ -747,6 +747,7 @@ const ListingsPage = () => {
                   isRental={listingMode === 'rent'}
                   onStatusChange={handleStatusChange}
                   onDelete={handleDelete}
+                  stats={stats}
                 />
               ))}
             </div>

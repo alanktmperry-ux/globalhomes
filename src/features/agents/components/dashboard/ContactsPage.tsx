@@ -223,6 +223,7 @@ const ContactsPage = () => {
               }
             }}
             hasMore={hasMore}
+            onAdd={() => setShowForm(true)}
             onLoadMore={loadMore}
           />
         ) : (

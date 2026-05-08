@@ -10135,6 +10135,30 @@ export type Database = {
           },
         ]
       }
+      referral_partners: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+          partner_code: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          id?: string
+          partner_code: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          partner_code?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       rent_increases: {
         Row: {
           created_at: string

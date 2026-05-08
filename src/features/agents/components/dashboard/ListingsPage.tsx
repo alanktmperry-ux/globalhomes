@@ -512,7 +512,13 @@ const ListingsPage = () => {
     setActionLoading(null);
   };
 
-  const withStatus = listings.map(l => ({ ...l, _status: getListingStatus(l) }));
+  const withStatus = listings
+    .filter((l) => !deletedIds.has(l.id))
+    .map((l) => {
+      const overridden = statusOverrides[l.id];
+      const merged = overridden ? { ...l, status: overridden } : l;
+      return { ...merged, _status: overridden ?? getListingStatus(l) };
+    });
 
   const salesListings = withStatus.filter(l => l.listing_type !== 'rent');
   const rentalListings = withStatus.filter(l => l.listing_type === 'rent');

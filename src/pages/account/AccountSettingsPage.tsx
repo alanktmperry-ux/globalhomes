@@ -42,7 +42,7 @@ export default function AccountSettingsPage() {
     setLoading(true);
     const { data } = await supabase
       .from("profiles")
-      .select("id, full_name, email, phone, language_preference, email_unsubscribed, email_unsubscribed_at")
+      .select("id, full_name, phone, language_preference, email_unsubscribed, email_unsubscribed_at")
       .eq("id", user.id)
       .maybeSingle();
 

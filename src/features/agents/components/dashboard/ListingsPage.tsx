@@ -261,6 +261,7 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
         <h3 className="font-display text-sm font-bold truncate">{l.title}</h3>
         <p className="text-xs text-muted-foreground truncate">{l.address}</p>
         <p className="text-sm font-display font-bold text-primary mt-1">{l.price_formatted}</p>
+        <ListingStats listingId={l.id} stats={stats} />
       </div>
       <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1 shrink-0">
         <button

@@ -12,58 +12,57 @@ const AuthConfirmPage = () => {
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
-
-    const routeUser = async (userId: string) => {
-      const { data: agentRow } = await supabase
-        .from('agents')
-        .select('id, onboarding_complete')
-        .eq('user_id', userId)
-        .maybeSingle();
-      const dest = agentRow && (agentRow as any).onboarding_complete
-        ? '/dashboard'
-        : '/onboarding/agency';
-      navigate(dest, { replace: true });
-    };
+    let subscription: { unsubscribe: () => void } | null = null;
 
     const handleConfirmation = async () => {
+      const routeUser = async (userId: string) => {
+        const { data: agentRow } = await supabase
+          .from('agents')
+          .select('id, onboarding_complete')
+          .eq('user_id', userId)
+          .maybeSingle();
+        const dest = agentRow && (agentRow as any).onboarding_complete
+          ? '/dashboard'
+          : '/onboarding/agency';
+        navigate(dest, { replace: true });
+      };
+
       await new Promise(r => setTimeout(r, 1500));
 
-      const { data: { session } } =
-        await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
 
       if (session?.user) {
         setStatus('success');
         setMessage('Email confirmed! Taking you to your dashboard...');
-        setTimeout(() => {
-          routeUser(session.user.id);
-        }, 1500);
-      } else {
-        const { data: { subscription } } =
-          supabase.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_IN' && session?.user) {
-              subscription.unsubscribe();
-              setStatus('success');
-              setMessage('Email confirmed! Taking you to your dashboard...');
-              setTimeout(() => {
-                routeUser(session.user.id);
-              }, 1500);
-            }
-          });
-
-        timeout = setTimeout(() => {
-          subscription.unsubscribe();
-          setStatus('error');
-          setMessage(
-            'Confirmation link has expired or already been used. Please sign up again.'
-          );
-        }, 8000);
+        setTimeout(() => routeUser(session.user.id), 1500);
+        return;
       }
+
+      const sub = supabase.auth.onAuthStateChange((event, newSession) => {
+        if (event === 'SIGNED_IN' && newSession?.user) {
+          subscription?.unsubscribe();
+          if (timeout) clearTimeout(timeout);
+          setStatus('success');
+          setMessage('Email confirmed! Taking you to your dashboard...');
+          setTimeout(() => routeUser(newSession.user.id), 1500);
+        }
+      });
+      subscription = sub.data.subscription;
+
+      timeout = setTimeout(() => {
+        subscription?.unsubscribe();
+        setStatus('error');
+        setMessage(
+          'Confirmation link has expired or already been used. Please sign up again.'
+        );
+      }, 8000);
     };
 
     handleConfirmation();
 
     return () => {
       if (timeout) clearTimeout(timeout);
+      subscription?.unsubscribe();
     };
   }, [navigate]);
 

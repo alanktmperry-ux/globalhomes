@@ -472,7 +472,7 @@ const DashboardOverview = () => {
 
   return (
     <div>
-      <AgentWelcomeModal />
+      
       {showWelcome && onboardingAgent?.name && (
         <WelcomeModal agentName={onboardingAgent.name} onClose={dismissWelcome} />
       )}

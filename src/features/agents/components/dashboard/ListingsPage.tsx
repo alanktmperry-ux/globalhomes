@@ -697,6 +697,8 @@ const ListingsPage = () => {
                   onSendReport={handleSendReport}
                   navigate={navigate}
                   isRental={listingMode === 'rent'}
+                  onStatusChange={handleStatusChange}
+                  onDelete={handleDelete}
                 />
               ))}
             </div>

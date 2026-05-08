@@ -71,22 +71,7 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
 
   // Pending approval screen for agents who haven't been approved yet.
   if (requireAgent && !isAdmin && approvalState === 'pending') {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-6">
-        <div className="max-w-md text-center space-y-6">
-          <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-            <Clock className="text-primary" size={32} />
-          </div>
-          <h1 className="text-2xl font-bold">Account pending review</h1>
-          <p className="text-muted-foreground">
-            Your agent account is pending review. You'll receive an email within 24 hours once approved.
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Signed in as {user.email}
-          </p>
-        </div>
-      </div>
-    );
+    return <PendingApprovalPage />;
   }
 
   if (requireAgent && !isAgent && !isAdmin && approvalState !== 'approved') {

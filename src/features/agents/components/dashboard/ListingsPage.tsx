@@ -18,6 +18,7 @@ import { PropertyDrawer } from '@/features/properties/components/PropertyDrawer'
 import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 const STATUS_CONFIG: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
   pending: { icon: <Clock size={12} />, label: 'Pending', color: 'bg-amber-500/15 text-amber-600' },

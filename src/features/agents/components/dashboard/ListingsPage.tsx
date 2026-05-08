@@ -414,6 +414,7 @@ const ListingsPage = () => {
   const [listingMode, setListingMode] = useState<'sale' | 'rent'>('sale');
   const [saleStatusTab, setSaleStatusTab] = useState('all');
   const [rentStatusTab, setRentStatusTab] = useState('all');
+  const [lifecycleTab, setLifecycleTab] = useState<'active' | 'archived'>('active');
   const { listings, loading, isMockData, refetch } = useAgentListings();
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);

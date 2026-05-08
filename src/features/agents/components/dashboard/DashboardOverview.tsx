@@ -14,7 +14,8 @@ import { Tooltip as UiTooltip, TooltipTrigger, TooltipContent, TooltipProvider }
 import DashboardHeader from './DashboardHeader';
 import TodayPrioritiesPanel from './TodayPrioritiesPanel';
 import { getIntentTier, INTENT_TOOLTIP } from '@/features/agents/lib/intentScore';
-import { DEMO_REPUTATION, getScoreColor } from '@/features/agents/utils/reputationScore';
+import { getScoreColor } from '@/features/agents/utils/reputationScore';
+import { useAgentMonthlyStats } from '@/features/agents/hooks/useAgentMonthlyStats';
 import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useNavigate, Link } from 'react-router-dom';

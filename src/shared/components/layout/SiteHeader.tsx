@@ -187,6 +187,9 @@ export function SiteHeader() {
                       <button onClick={() => { navigate('/settings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
                         <Settings size={14} className="text-muted-foreground" /> {t('nav.accountSettings')}
                       </button>
+                      <button onClick={() => { navigate('/account/settings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
+                        <Settings size={14} className="text-muted-foreground" /> Profile & password
+                      </button>
                     </>
                   )}
                   {isAgentLike && (

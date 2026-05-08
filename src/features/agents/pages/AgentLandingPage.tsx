@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Target, Bot, Globe, EyeOff, Mic, Zap, BarChart2, Landmark } from 'lucide-react';
 import { SEO } from '@/shared/components/SEO';
 import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
@@ -9,15 +10,15 @@ const AgentLandingPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const features: Array<{ num: string; icon: string; tagKey: string | null; titleKey: string; bodyKey: string; highlight: boolean }> = [
-    { num: '01', icon: '🔮', tagKey: 'agentLanding.badgeUnique', titleKey: 'agentLanding.feature1Title', bodyKey: 'agentLanding.feature1Body', highlight: true },
-    { num: '02', icon: '🤖', tagKey: 'agentLanding.badgeAutomated', titleKey: 'agentLanding.feature2Title', bodyKey: 'agentLanding.feature2Body', highlight: true },
-    { num: '03', icon: '🌐', tagKey: null, titleKey: 'agentLanding.feature3Title', bodyKey: 'agentLanding.feature3Body', highlight: false },
-    { num: '04', icon: '🤫', tagKey: null, titleKey: 'agentLanding.feature4Title', bodyKey: 'agentLanding.feature4Body', highlight: false },
-    { num: '05', icon: '🎤', tagKey: null, titleKey: 'agentLanding.feature5Title', bodyKey: 'agentLanding.feature5Body', highlight: false },
-    { num: '06', icon: '⚡', tagKey: null, titleKey: 'agentLanding.feature6Title', bodyKey: 'agentLanding.feature6Body', highlight: false },
-    { num: '07', icon: '📊', tagKey: null, titleKey: 'agentLanding.feature7Title', bodyKey: 'agentLanding.feature7Body', highlight: false },
-    { num: '08', icon: '🏦', tagKey: null, titleKey: 'agentLanding.feature8Title', bodyKey: 'agentLanding.feature8Body', highlight: false },
+  const features: Array<{ num: string; Icon: React.ComponentType<{ size?: number; className?: string }>; tagKey: string | null; titleKey: string; bodyKey: string; highlight: boolean }> = [
+    { num: '01', Icon: Target,    tagKey: 'agentLanding.badgeUnique',    titleKey: 'agentLanding.feature1Title', bodyKey: 'agentLanding.feature1Body', highlight: true },
+    { num: '02', Icon: Bot,       tagKey: 'agentLanding.badgeAutomated', titleKey: 'agentLanding.feature2Title', bodyKey: 'agentLanding.feature2Body', highlight: true },
+    { num: '03', Icon: Globe,     tagKey: null, titleKey: 'agentLanding.feature3Title', bodyKey: 'agentLanding.feature3Body', highlight: false },
+    { num: '04', Icon: EyeOff,    tagKey: null, titleKey: 'agentLanding.feature4Title', bodyKey: 'agentLanding.feature4Body', highlight: false },
+    { num: '05', Icon: Mic,       tagKey: null, titleKey: 'agentLanding.feature5Title', bodyKey: 'agentLanding.feature5Body', highlight: false },
+    { num: '06', Icon: Zap,       tagKey: null, titleKey: 'agentLanding.feature6Title', bodyKey: 'agentLanding.feature6Body', highlight: false },
+    { num: '07', Icon: BarChart2, tagKey: null, titleKey: 'agentLanding.feature7Title', bodyKey: 'agentLanding.feature7Body', highlight: false },
+    { num: '08', Icon: Landmark,  tagKey: null, titleKey: 'agentLanding.feature8Title', bodyKey: 'agentLanding.feature8Body', highlight: false },
   ];
 
   const themKeys = ['agentLanding.con1','agentLanding.con2','agentLanding.con3','agentLanding.con4','agentLanding.con5','agentLanding.con6','agentLanding.con7'];
@@ -35,12 +36,8 @@ const AgentLandingPage = () => {
       {/* ── HERO ── */}
       <section
         className="relative min-h-screen flex items-center px-6 md:px-16 py-24 overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #0f172a 100%)' }}
+        style={{ background: '#0f172a' }}
       >
-        <div className="pointer-events-none absolute -top-48 -right-36 w-[650px] h-[650px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(59,91,219,0.18) 0%, transparent 70%)' }} />
-        <div className="pointer-events-none absolute -bottom-24 -left-24 w-[500px] h-[500px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%)' }} />
 
         <div className="relative z-10 max-w-2xl">
           <div className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
@@ -129,7 +126,7 @@ const AgentLandingPage = () => {
                     {t(f.tagKey)}
                   </span>
                 )}
-                <span className="block text-3xl mb-4">{f.icon}</span>
+                <span className="block mb-4" style={{ color: f.highlight ? '#3b5bdb' : '#0f172a' }}><f.Icon size={28} /></span>
                 <h3 className="text-base font-black mb-2" style={{ color: f.highlight ? '#1e3a8a' : '#0f172a', fontSize: '17px' }}>
                   {t(f.titleKey)}
                 </h3>

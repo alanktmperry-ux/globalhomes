@@ -847,6 +847,7 @@ const TrustLedgerPage = () => {
             )}
           </TabsContent>
         </Tabs>
+        </>)}
       </div>
 
       <TrustReceiptModal open={showNewReceipt} onOpenChange={setShowNewReceipt} onCreated={fetchData} />

@@ -265,6 +265,16 @@ export default function AdminListingsPage() {
   const bulkArchive = async () => {
     const ids = Array.from(selected);
     setBusy('bulk');
+    const { data: blocked } = await supabase
+      .from('tenancies')
+      .select('property_id')
+      .in('property_id', ids)
+      .in('status', ['active', 'vacating']);
+    if (blocked && blocked.length > 0) {
+      toast.error(`${blocked.length} listing${blocked.length === 1 ? ' has' : 's have'} an active tenancy and cannot be archived. End the tenancy first.`);
+      setBusy(null);
+      return;
+    }
     const { error } = await supabase
       .from('properties')
       .update({ is_active: false, status: 'archived' })
@@ -281,6 +291,16 @@ export default function AdminListingsPage() {
   const bulkDelete = async () => {
     const ids = Array.from(selected);
     setBusy('bulk');
+    const { data: blocked } = await supabase
+      .from('tenancies')
+      .select('property_id')
+      .in('property_id', ids)
+      .in('status', ['active', 'vacating']);
+    if (blocked && blocked.length > 0) {
+      toast.error(`${blocked.length} listing${blocked.length === 1 ? ' has' : 's have'} an active tenancy and cannot be deleted. End the tenancy first.`);
+      setBusy(null);
+      return;
+    }
     const { error } = await supabase.from('properties').delete().in('id', ids);
     if (error) toast.error(error.message);
     else {

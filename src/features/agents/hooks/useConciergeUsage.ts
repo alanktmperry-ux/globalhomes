@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/features/auth/AuthProvider';
 
 interface ConciergeUsage {
   matchesUsed: number;
@@ -66,4 +67,12 @@ export async function recordConciergeAction(
   } catch {
     // non-fatal — table may not exist yet
   }
+}
+
+export function useRecordConciergeAction() {
+  const { impersonating } = useAuth();
+  return async (agentId: string, action: 'match_viewed' | 'intro_sent', entityId?: string) => {
+    if (impersonating) return;
+    return recordConciergeAction(agentId, action, entityId);
+  };
 }

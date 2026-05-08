@@ -18,7 +18,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 import { Progress } from '@/components/ui/progress';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
-import { useConciergeUsage, recordConciergeAction } from '@/features/agents/hooks/useConciergeUsage';
+import { useConciergeUsage, useRecordConciergeAction } from '@/features/agents/hooks/useConciergeUsage';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 import { useNavigate } from 'react-router-dom';
 
@@ -148,6 +148,7 @@ const BuyerConciergePage = () => {
   const { canAccessBuyerConcierge, conciergeMatchesPerMonth, conciergeIntrosPerMonth } = useSubscription();
   const { agent } = useCurrentAgent();
   const { matchesUsed, introsUsed, refresh: refreshUsage } = useConciergeUsage(agent?.id || null);
+  const recordConciergeAction = useRecordConciergeAction();
 
   const matchLimit = conciergeMatchesPerMonth === Infinity ? null : conciergeMatchesPerMonth;
   const introLimit = conciergeIntrosPerMonth === Infinity ? null : conciergeIntrosPerMonth;

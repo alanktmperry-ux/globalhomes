@@ -978,15 +978,35 @@ export default function PropertyDetailPage() {
               </div>
             </div>
 
-            {/* Virtual Tour / Video / Floor Plan */}
-            {((property as any).virtual_tour_url || (property as any).video_url || (property as any).floor_plan_url) && (
-              <TourTabStrip
-                virtualTourUrl={(property as any).virtual_tour_url ?? null}
-                videoUrl={(property as any).video_url ?? null}
-                floorPlanUrl={(property as any).floor_plan_url ?? null}
-                propertyAddress={property.address}
-              />
-            )}
+            {/* Uploaded walkthrough video (native player) */}
+            {(() => {
+              const vUrl: string | null = (property as any).video_url ?? null;
+              const isUploadedVideo = !!vUrl && /\.(mp4|mov|webm)(\?|$)/i.test(vUrl);
+              const tourVideoUrl = isUploadedVideo ? null : vUrl;
+              return (
+                <>
+                  {isUploadedVideo && (
+                    <div className="space-y-3">
+                      <h3 className="text-base font-semibold">Walkthrough Video</h3>
+                      <video
+                        src={vUrl!}
+                        controls
+                        className="w-full rounded-2xl bg-muted"
+                        preload="metadata"
+                      />
+                    </div>
+                  )}
+                  {((property as any).virtual_tour_url || tourVideoUrl || (property as any).floor_plan_url) && (
+                    <TourTabStrip
+                      virtualTourUrl={(property as any).virtual_tour_url ?? null}
+                      videoUrl={tourVideoUrl}
+                      floorPlanUrl={(property as any).floor_plan_url ?? null}
+                      propertyAddress={property.address}
+                    />
+                  )}
+                </>
+              );
+            })()}
 
 
             {/* Multilingual Translations */}

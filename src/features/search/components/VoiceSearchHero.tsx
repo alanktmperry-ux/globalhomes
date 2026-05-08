@@ -891,8 +891,10 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
               <div className="relative rounded-2xl overflow-hidden group cursor-pointer">
                 {featuredLoading ? (
                   <Skeleton className="absolute inset-0 w-full h-full" />
+                ) : dedupedFeatured[0]?.img ? (
+                  <img src={dedupedFeatured[0].img} alt={dedupedFeatured[0]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="eager" fetchPriority="high" />
                 ) : (
-                  <img src={dedupedFeatured[0]?.img} alt={dedupedFeatured[0]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="eager" fetchPriority="high" />
+                  <div className={`absolute inset-0 ${LISTING_PLACEHOLDER_CLASS}`}><ImageIcon size={32} /></div>
                 )}
                 <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.7) 100%)'}} />
                 <div className="absolute top-3 left-3">

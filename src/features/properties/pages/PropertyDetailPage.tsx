@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { PropertySEOHead } from '@/features/seo/components/PropertySEOHead';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X, PawPrint, Sofa, Clock, FileText, Users, Phone, MessageCircle, Globe, Loader2, ScrollText, HardHat } from 'lucide-react';
 import MultilingualListingDetail from '@/features/properties/components/MultilingualListingDetail';
@@ -58,7 +58,19 @@ export default function PropertyDetailPage() {
   // Support both /property/:slug and /property/:uuid for backward compat
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { t } = useI18n();
+  const { t, setLanguage } = useI18n();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const langParam = searchParams.get('lang');
+    if (langParam) {
+      setLanguage(langParam as any);
+      const url = new URL(window.location.href);
+      url.searchParams.delete('lang');
+      window.history.replaceState({}, '', url.toString());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const { t: tp } = useTranslation();
   const { formatPrice, currency, listingMode } = useCurrency();
   const { isSaved, toggleSaved } = useSavedProperties();

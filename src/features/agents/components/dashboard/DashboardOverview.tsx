@@ -30,7 +30,7 @@ import { ReputationExplainerModal } from './ReputationExplainerModal';
 import { useResponseTimeStats, formatDuration, getResponseTimeColor } from '@/features/agents/hooks/useResponseTimeStats';
 import { ResponseTimeModal } from './ResponseTimeModal';
 import { WelcomeModal } from './WelcomeModal';
-import { AgentWelcomeModal } from '@/features/agents/components/onboarding/AgentWelcomeModal';
+
 import { AgentOnboardingProgress } from '@/features/agents/components/onboarding/AgentOnboardingProgress';
 import DashboardHomeStats from './DashboardHomeStats';
 import { usePageTitle } from '@/lib/usePageTitle';

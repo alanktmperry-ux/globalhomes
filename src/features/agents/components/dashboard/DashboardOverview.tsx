@@ -28,6 +28,7 @@ import { useAgentReputation, getReputationTier } from '@/features/agents/hooks/u
 import { ReputationExplainerModal } from './ReputationExplainerModal';
 import { useResponseTimeStats, formatDuration, getResponseTimeColor } from '@/features/agents/hooks/useResponseTimeStats';
 import { ResponseTimeModal } from './ResponseTimeModal';
+import { WelcomeModal } from './WelcomeModal';
 
 // Australian currency formatter
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
@@ -150,6 +151,15 @@ const DashboardOverview = () => {
   } | null>(null);
   const [onboardingHasListing, setOnboardingHasListing] = useState(false);
   const [onboardingSteps, setOnboardingSteps] = useState<Record<string, boolean>>({});
+
+  const WELCOME_KEY = 'listhq_agent_welcomed';
+  const [showWelcome, setShowWelcome] = useState(() => {
+    try { return !localStorage.getItem(WELCOME_KEY); } catch { return false; }
+  });
+  const dismissWelcome = () => {
+    try { localStorage.setItem(WELCOME_KEY, '1'); } catch {}
+    setShowWelcome(false);
+  };
 
   const persistOnboardingStep = async (key: string) => {
     if (!user) return;
@@ -457,6 +467,9 @@ const DashboardOverview = () => {
 
   return (
     <div>
+      {showWelcome && onboardingAgent?.name && (
+        <WelcomeModal agentName={onboardingAgent.name} onClose={dismissWelcome} />
+      )}
       <DashboardHeader
         title="Dashboard"
        subtitle={`Welcome back, ${(() => {

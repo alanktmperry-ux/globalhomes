@@ -938,6 +938,39 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
           Organise an inspection →
         </button>
       </div>
+
+      {/* ── MULTILINGUAL TRANSLATIONS ── */}
+      <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+        <h3 className="text-sm font-bold flex items-center gap-2">
+          <Languages size={16} className="text-primary" />
+          Multilingual translations
+        </h3>
+        {translateDone ? (
+          <div className="flex items-center gap-2 text-sm text-emerald-600">
+            <CheckCircle2 size={15} />
+            Translated — visible to buyers in Chinese, Vietnamese, Korean, Arabic &amp; Japanese.
+          </div>
+        ) : (
+          <>
+            <p className="text-xs text-muted-foreground">
+              Generate translations so international buyers can read this listing in their language. Takes about 10 seconds.
+            </p>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleTranslate}
+              disabled={translating}
+              className="gap-2"
+            >
+              {translating ? (
+                <><Loader2 size={13} className="animate-spin" /> Translating…</>
+              ) : (
+                <><Languages size={13} /> Generate translations</>
+              )}
+            </Button>
+          </>
+        )}
+      </div>
     </div>
   );
 };

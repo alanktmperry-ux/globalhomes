@@ -22,6 +22,7 @@ interface Provider {
   state: string | null;
   rating: number | null;
   logo_url: string | null;
+  contact_email: string | null;
 }
 
 const CATEGORIES = [
@@ -59,7 +60,7 @@ export default function HomeServicesPage() {
       setLoading(true);
       const { data, error } = await supabase
         .from('home_service_providers')
-        .select('id, name, category, description, price_from, price_to, price_unit, suburb, state, rating, logo_url')
+        .select('id, name, category, description, price_from, price_to, price_unit, suburb, state, rating, logo_url, contact_email')
         .eq('is_active', true)
         .order('rating', { ascending: false });
       if (!error && data) setProviders(data as Provider[]);
@@ -200,6 +201,7 @@ export default function HomeServicesPage() {
           open={!!quoteProvider}
           onOpenChange={(open) => { if (!open) setQuoteProvider(null); }}
           provider={quoteProvider}
+          providerEmail={quoteProvider?.contact_email ?? null}
         />
       </div>
     </>

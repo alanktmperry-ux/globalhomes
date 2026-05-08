@@ -30,9 +30,10 @@ interface RequestQuoteModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   provider: Provider | null;
+  providerEmail?: string | null;
 }
 
-export function RequestQuoteModal({ open, onOpenChange, provider }: RequestQuoteModalProps) {
+export function RequestQuoteModal({ open, onOpenChange, provider, providerEmail = null }: RequestQuoteModalProps) {
   const { t } = useTranslation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -81,6 +82,21 @@ export function RequestQuoteModal({ open, onOpenChange, provider }: RequestQuote
       toast.error('Could not submit your request. Please try again.');
       return;
     }
+
+    if (providerEmail) {
+      try {
+        await supabase.functions.invoke('send-notification-email', {
+          body: {
+            to: providerEmail,
+            subject: 'New booking request from ListHQ',
+            body: `You have a new enquiry.\n\nCustomer: ${parsed.data.customer_name}\nEmail: ${parsed.data.customer_email}\nPhone: ${parsed.data.customer_phone || ''}\nProperty: ${parsed.data.property_address || ''}\nPreferred date: ${parsed.data.preferred_date || ''}\nMessage: ${parsed.data.message || ''}\n\nLog in to ListHQ to view this booking.`,
+          },
+        });
+      } catch (e) {
+        console.error('notify provider failed', e);
+      }
+    }
+
     toast.success('Your request has been sent — the provider will contact you within 4 hours');
     onOpenChange(false);
   };

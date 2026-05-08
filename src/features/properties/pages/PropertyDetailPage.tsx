@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { PropertySEOHead } from '@/features/seo/components/PropertySEOHead';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X, PawPrint, Sofa, Clock, FileText, Users, Phone, MessageCircle, Globe, Loader2, ScrollText } from 'lucide-react';
+import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X, PawPrint, Sofa, Clock, FileText, Users, Phone, MessageCircle, Globe, Loader2, ScrollText, HardHat } from 'lucide-react';
 import MultilingualListingDetail from '@/features/properties/components/MultilingualListingDetail';
 import { OpenHomesCard } from '@/features/properties/components/OpenHomesCard';
 import { ListingChatWidget } from '@/features/properties/components/ListingChatWidget';
@@ -1151,6 +1151,29 @@ export default function PropertyDetailPage() {
                       onClick={() => setConveyancingOpen(true)}
                     >
                       Get a Quote
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!isRental && (
+              <div className="rounded-xl border border-border bg-card p-5">
+                <div className="flex items-start gap-3">
+                  <div className="rounded-lg bg-primary/10 p-2.5">
+                    <HardHat className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-foreground">Building & Pest Inspection</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Independent reports for confident buyers. Book before you go unconditional.
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="mt-3"
+                      onClick={() => navigate('/home-services?category=building_inspection')}
+                    >
+                      Book Inspection
                     </Button>
                   </div>
                 </div>

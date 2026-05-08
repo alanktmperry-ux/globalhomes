@@ -5998,6 +5998,7 @@ export type Database = {
       home_service_providers: {
         Row: {
           category: string
+          contact_email: string | null
           created_at: string
           description: string | null
           email: string | null
@@ -6016,6 +6017,7 @@ export type Database = {
         }
         Insert: {
           category: string
+          contact_email?: string | null
           created_at?: string
           description?: string | null
           email?: string | null
@@ -6034,6 +6036,7 @@ export type Database = {
         }
         Update: {
           category?: string
+          contact_email?: string | null
           created_at?: string
           description?: string | null
           email?: string | null

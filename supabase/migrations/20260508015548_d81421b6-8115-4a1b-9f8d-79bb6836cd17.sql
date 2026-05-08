@@ -1,0 +1,1 @@
+ALTER TABLE public.home_service_providers ADD COLUMN IF NOT EXISTS contact_email TEXT;

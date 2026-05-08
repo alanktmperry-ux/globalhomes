@@ -531,6 +531,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         title_ar: draft.title_ar || null,
         description_ar: draft.description_ar || null,
         virtual_tour_url: draft.virtual_tour_url?.trim() || null,
+        video_url: draft.video_url?.trim() || null,
         is_exclusive: draft.isExclusive || false,
         exclusive_start_date: draft.isExclusive && !editPropertyId ? new Date().toISOString() : undefined,
         exclusive_end_date: draft.isExclusive && !editPropertyId ? new Date(Date.now() + 14 * 86_400_000).toISOString() : undefined,

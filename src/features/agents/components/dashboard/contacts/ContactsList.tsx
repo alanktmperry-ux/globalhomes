@@ -311,29 +311,28 @@ const ContactsList = ({
 
       {/* List */}
       {filtered.length === 0 ? (
-        <div className="text-center py-16 px-4">
-          {contacts.length === 0 ? (
-            <div className="space-y-3 max-w-xs mx-auto">
-              <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center mx-auto">
-                <Users size={22} className="text-muted-foreground" />
-              </div>
-              <p className="font-semibold text-foreground text-sm">No contacts yet</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Add buyers, vendors, and leads. Import from a CSV or add them one by one.
-              </p>
-              {onAdd && (
-                <button
-                  onClick={onAdd}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
-                >
-                  <Plus size={13} /> Add first contact
-                </button>
-              )}
+        contacts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <Users size={28} className="text-primary" />
             </div>
-          ) : (
+            <div className="space-y-1">
+              <h3 className="font-semibold text-foreground">No contacts yet</h3>
+              <p className="text-sm text-muted-foreground max-w-xs">
+                Add your buyers, sellers and leads. Track every interaction in one place.
+              </p>
+            </div>
+            {onAdd && (
+              <Button onClick={onAdd}>
+                <Plus size={14} className="mr-1.5" /> Add your first contact →
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="text-center py-16 px-4">
             <p className="text-sm text-muted-foreground">No contacts match your filters.</p>
-          )}
-        </div>
+          </div>
+        )
       ) : (
         <div className="bg-card border border-border rounded-xl overflow-hidden">
           <div className="overflow-x-auto">

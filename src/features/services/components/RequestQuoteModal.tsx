@@ -30,9 +30,10 @@ interface RequestQuoteModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   provider: Provider | null;
+  providerEmail?: string | null;
 }
 
-export function RequestQuoteModal({ open, onOpenChange, provider }: RequestQuoteModalProps) {
+export function RequestQuoteModal({ open, onOpenChange, provider, providerEmail = null }: RequestQuoteModalProps) {
   const { t } = useTranslation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');

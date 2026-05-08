@@ -65,7 +65,9 @@ export function PaymentStatusBanner({ onVisibleChange }: { onVisibleChange?: (vi
     !agent.is_subscribed &&
     agent.created_at
   ) {
-    const trialEndsAt = new Date(new Date(agent.created_at).getTime() + 60 * 86400 * 1000);
+    const trialEndsAt = agent.subscription_expires_at
+      ? new Date(agent.subscription_expires_at)
+      : new Date(new Date(agent.created_at).getTime() + 60 * 86400 * 1000);
     const daysLeft = Math.ceil((trialEndsAt.getTime() - Date.now()) / 86400000);
 
     if (daysLeft >= 0 && daysLeft <= 30) {

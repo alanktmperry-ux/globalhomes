@@ -139,11 +139,13 @@ export default function PartnerReferralPage() {
 
 function buildPartnerWelcomeEmail({
   buyerName,
+  buyerEmail,
   partnerName,
   suburbInterest,
   registerUrl,
 }: {
   buyerName: string;
+  buyerEmail: string;
   partnerName: string;
   suburbInterest: string;
   registerUrl: string;

@@ -46,12 +46,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("user_id", approval.user_id)
-      .single();
-
     // Get email from auth.users
     const { data: authUser } = await supabase.auth.admin.getUserById(approval.user_id);
     const email = authUser?.user?.email;
@@ -63,7 +57,9 @@ Deno.serve(async (req) => {
     }
 
     const isVerified = approval.status === "verified";
-    const name = profile?.full_name?.split(" ")[0] ?? "there";
+    const name = (authUser?.user?.user_metadata?.full_name as string | undefined)?.split(' ')[0]
+      ?? (authUser?.user?.user_metadata?.name as string | undefined)?.split(' ')[0]
+      ?? 'there';
     const amount = approval.approved_amount
       ? `$${Number(approval.approved_amount).toLocaleString()}`
       : null;

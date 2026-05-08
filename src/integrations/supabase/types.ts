@@ -8983,8 +8983,10 @@ export type Database = {
           created_at: string
           currency_code: string | null
           description: string | null
+          description_ar: string | null
           description_ja: string | null
           description_ko: string | null
+          description_vi: string | null
           description_zh: string | null
           description_zh_tw: string | null
           electricity_included: boolean | null
@@ -9090,8 +9092,10 @@ export type Database = {
           suburb: string
           tags: string[] | null
           title: string
+          title_ar: string | null
           title_ja: string | null
           title_ko: string | null
+          title_vi: string | null
           title_zh: string | null
           title_zh_tw: string | null
           translation_status: string | null
@@ -9137,8 +9141,10 @@ export type Database = {
           created_at?: string
           currency_code?: string | null
           description?: string | null
+          description_ar?: string | null
           description_ja?: string | null
           description_ko?: string | null
+          description_vi?: string | null
           description_zh?: string | null
           description_zh_tw?: string | null
           electricity_included?: boolean | null
@@ -9244,8 +9250,10 @@ export type Database = {
           suburb: string
           tags?: string[] | null
           title: string
+          title_ar?: string | null
           title_ja?: string | null
           title_ko?: string | null
+          title_vi?: string | null
           title_zh?: string | null
           title_zh_tw?: string | null
           translation_status?: string | null
@@ -9291,8 +9299,10 @@ export type Database = {
           created_at?: string
           currency_code?: string | null
           description?: string | null
+          description_ar?: string | null
           description_ja?: string | null
           description_ko?: string | null
+          description_vi?: string | null
           description_zh?: string | null
           description_zh_tw?: string | null
           electricity_included?: boolean | null
@@ -9398,8 +9408,10 @@ export type Database = {
           suburb?: string
           tags?: string[] | null
           title?: string
+          title_ar?: string | null
           title_ja?: string | null
           title_ko?: string | null
+          title_vi?: string | null
           title_zh?: string | null
           title_zh_tw?: string | null
           translation_status?: string | null
@@ -15319,8 +15331,10 @@ export type Database = {
               created_at: string
               currency_code: string | null
               description: string | null
+              description_ar: string | null
               description_ja: string | null
               description_ko: string | null
+              description_vi: string | null
               description_zh: string | null
               description_zh_tw: string | null
               electricity_included: boolean | null
@@ -15426,8 +15440,10 @@ export type Database = {
               suburb: string
               tags: string[] | null
               title: string
+              title_ar: string | null
               title_ja: string | null
               title_ko: string | null
+              title_vi: string | null
               title_zh: string | null
               title_zh_tw: string | null
               translation_status: string | null
@@ -15488,8 +15504,10 @@ export type Database = {
               created_at: string
               currency_code: string | null
               description: string | null
+              description_ar: string | null
               description_ja: string | null
               description_ko: string | null
+              description_vi: string | null
               description_zh: string | null
               description_zh_tw: string | null
               electricity_included: boolean | null
@@ -15595,8 +15613,10 @@ export type Database = {
               suburb: string
               tags: string[] | null
               title: string
+              title_ar: string | null
               title_ja: string | null
               title_ko: string | null
+              title_vi: string | null
               title_zh: string | null
               title_zh_tw: string | null
               translation_status: string | null

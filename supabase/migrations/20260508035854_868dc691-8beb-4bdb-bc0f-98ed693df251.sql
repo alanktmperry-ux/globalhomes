@@ -1,0 +1,5 @@
+ALTER TABLE properties
+  ADD COLUMN IF NOT EXISTS title_vi TEXT,
+  ADD COLUMN IF NOT EXISTS description_vi TEXT,
+  ADD COLUMN IF NOT EXISTS title_ar TEXT,
+  ADD COLUMN IF NOT EXISTS description_ar TEXT;

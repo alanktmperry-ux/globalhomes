@@ -315,6 +315,11 @@ const BillingPage = () => {
               <h3 className="text-sm font-bold">Current Plan</h3>
               <p className="text-2xl font-bold text-primary mt-1">{planLabel}</p>
             </div>
+            {!sub.isDemo && sub.plan && (
+              <Button variant="outline" size="sm" onClick={openBillingPortal}>
+                Manage Subscription
+              </Button>
+            )}
           </div>
           {sub.isDemo && (
             <p className="text-sm text-amber-600">

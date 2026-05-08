@@ -254,6 +254,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
   }));
   const [publishing, setPublishing] = useState(false);
   const [loadingEdit, setLoadingEdit] = useState(!!loadPropertyId);
+  const [publishedListing, setPublishedListing] = useState<{ id: string; address: string; title: string } | null>(null);
   const autoSaveRef = useRef<ReturnType<typeof setInterval>>();
   const { user } = useAuth();
   const { matchBuyersToListing } = useBuyerMatching();

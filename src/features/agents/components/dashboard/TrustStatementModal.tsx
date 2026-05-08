@@ -20,6 +20,7 @@ interface Receipt {
   client_name: string;
   property_address: string;
   amount: number;
+  gst_amount: number;
   payment_method: string;
   purpose: string;
   date_received: string;
@@ -31,6 +32,7 @@ interface Payment {
   client_name: string;
   property_address: string;
   amount: number;
+  gst_amount: number;
   payment_method: string;
   purpose: string;
   date_paid: string;
@@ -79,12 +81,12 @@ export default function TrustStatementModal({ open, onOpenChange }: TrustStateme
     const [{ data: agent }, { data: recs }, { data: pays }] = await Promise.all([
       supabase.from('agents').select('name, agency, license_number').eq('user_id', user.id).maybeSingle(),
       supabase.from('trust_receipts')
-        .select('receipt_number, client_name, property_address, amount, payment_method, purpose, date_received, status')
+        .select('receipt_number, client_name, property_address, amount, gst_amount, payment_method, purpose, date_received, status')
         .gte('date_received', startDate)
         .lt('date_received', endDate)
         .order('date_received'),
       supabase.from('trust_payments')
-        .select('payment_number, client_name, property_address, amount, payment_method, purpose, date_paid, status, payee_name, reference')
+        .select('payment_number, client_name, property_address, amount, gst_amount, payment_method, purpose, date_paid, status, payee_name, reference')
         .gte('date_paid', startDate)
         .lt('date_paid', endDate)
         .order('date_paid'),
@@ -122,8 +124,8 @@ export default function TrustStatementModal({ open, onOpenChange }: TrustStateme
   const totalIn = receipts.reduce((s, r) => s + r.amount, 0);
   const totalOut = payments.reduce((s, p) => s + p.amount, 0);
   const closingBalance = openingBalance + totalIn - totalOut;
-  const gstOnReceipts = totalIn / 11;
-  const gstOnPayments = totalOut / 11;
+  const gstOnReceipts = receipts.reduce((s, r) => s + (r.gst_amount ?? 0), 0);
+  const gstOnPayments = payments.reduce((s, p) => s + (p.gst_amount ?? 0), 0);
 
   const handleGeneratePdf = () => {
     const agentName = agentInfo?.name || 'Agent';

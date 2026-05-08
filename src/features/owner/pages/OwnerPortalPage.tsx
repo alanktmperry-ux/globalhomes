@@ -223,7 +223,8 @@ export default function OwnerPortalPage() {
     net: acc.net + Number(s.net_amount_aud || 0),
   }), { gross: 0, fee: 0, maint: 0, net: 0 });
 
-  const visibleStatements = showAllStatements ? statements : statements.slice(0, 3);
+  const safeStatements = statements ?? [];
+  const visibleStatements = showAllStatements ? safeStatements : safeStatements.slice(0, 3);
 
   const vacancy = !tenancy ? { label: 'Vacant', color: 'bg-amber-500/10 text-amber-700' }
     : tenancy.status === 'vacating' ? { label: 'Vacating', color: 'bg-amber-500/10 text-amber-700' }
@@ -312,7 +313,7 @@ export default function OwnerPortalPage() {
         {/* Section 2: Financial */}
         <section>
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">Financial summary</h2>
-          {statements.length === 0 ? (
+          {safeStatements.length === 0 ? (
             <Card><CardContent className="p-6 text-center text-sm text-muted-foreground">No statements yet — your property manager will publish your first statement after the next rent collection cycle.</CardContent></Card>
           ) : (
             <>
@@ -336,7 +337,7 @@ export default function OwnerPortalPage() {
                   </Card>
                 ))}
               </div>
-              {statements.length > 3 && (
+              {safeStatements.length > 3 && (
                 <Button variant="ghost" size="sm" className="mt-2" onClick={() => setShowAllStatements(!showAllStatements)}>
                   {showAllStatements ? <>Show less <ChevronUp size={14} className="ml-1" /></> : <>View all statements <ChevronDown size={14} className="ml-1" /></>}
                 </Button>

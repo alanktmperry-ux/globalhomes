@@ -263,12 +263,24 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
 
   return (
     <div className="bg-card border border-border rounded-xl p-4 flex flex-col sm:flex-row gap-4">
-      <img
-        src={getListingThumb(l)}
-        alt=""
-        className="w-full sm:w-28 h-20 rounded-lg object-cover shrink-0 cursor-pointer transition-transform duration-200 hover:scale-105"
-        onClick={() => onSelect(toProperty(l))}
-      />
+      {(() => {
+        const thumb = getListingThumb(l);
+        return thumb ? (
+          <img
+            src={thumb}
+            alt=""
+            className="w-full sm:w-28 h-20 rounded-lg object-cover shrink-0 cursor-pointer transition-transform duration-200 hover:scale-105"
+            onClick={() => onSelect(toProperty(l))}
+          />
+        ) : (
+          <div
+            className={`w-full sm:w-28 h-20 rounded-lg shrink-0 cursor-pointer ${LISTING_PLACEHOLDER_CLASS}`}
+            onClick={() => onSelect(toProperty(l))}
+          >
+            <ImageIcon size={20} />
+          </div>
+        );
+      })()}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1 flex-wrap">
           {l._source === 'db' ? (

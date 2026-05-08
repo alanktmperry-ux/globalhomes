@@ -536,7 +536,14 @@ const BuyerConciergePage = () => {
                     {(matchLimit !== null ? filteredTable.slice(0, matchLimit) : filteredTable).map((m) => (
                       <TableRow key={m.id} className="cursor-pointer" onClick={() => openContact(m)}>
                         <TableCell>
-                          <p className="font-medium text-sm">{buyerName(m)}</p>
+                          <p className="font-medium text-sm">
+                            {buyerName(m)}
+                            {m.profile?.language_preference && m.profile.language_preference !== 'en' && (
+                              <span className="ml-1.5 text-base leading-none" title={m.profile.language_preference}>
+                                {LANG_FLAGS[m.profile.language_preference] ?? '🌐'}
+                              </span>
+                            )}
+                          </p>
                           <p className="text-xs text-muted-foreground flex items-center gap-1">
                             <MapPin size={10} /> {buyerSuburb(m)}
                           </p>

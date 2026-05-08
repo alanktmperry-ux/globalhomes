@@ -127,6 +127,7 @@ const ReviewsPage = React.lazy(() => import("@/features/agents/components/dashbo
 const TerritoryPage = React.lazy(() => import("@/features/agents/components/dashboard/TerritoryPage"));
 const ContactsPage = React.lazy(() => import("@/features/agents/components/dashboard/ContactsPage"));
 const ListingDetailPage = React.lazy(() => import("@/features/agents/components/dashboard/ListingDetailPage"));
+const ListingEditPage = React.lazy(() => import("@/features/agents/components/dashboard/ListingEditPage"));
 const TrustAccountingPage = React.lazy(() => import("@/features/agents/components/dashboard/TrustAccountingPage"));
 const InvestmentDashboardPage = React.lazy(() => import("@/features/agents/components/dashboard/InvestmentDashboardPage"));
 const TrustLedgerPage = React.lazy(() => import("@/features/agents/components/dashboard/TrustLedgerPage"));
@@ -416,6 +417,7 @@ const App = () => (
                   <Route path="listings" element={<ListingsPage />} />
                   <Route path="listings/new" element={<PocketListingPage />} />
                   <Route path="listings/:listingId" element={<ListingDetailPage />} />
+                  <Route path="listings/:listingId/edit" element={<ListingEditPage />} />
                   <Route path="listings/:listingId/eoi" element={<AgentEOIPage />} />
                   <Route path="listings/:propertyId/performance" element={<ListingPerformancePage />} />
                   <Route path="contacts" element={<ContactsPage />} />

@@ -150,7 +150,7 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
             </Button>
           )}
           <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" disabled={actionLoading === l.id} onClick={() => {
-            if (l._source === 'db') navigate(`/pocket-listing?edit=${l.id}`);
+            if (l._source === 'db') navigate(`/dashboard/listings/${l.id}/edit`);
           }}>
             <Pencil size={10} /> Edit
           </Button>

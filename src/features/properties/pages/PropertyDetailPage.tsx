@@ -54,6 +54,7 @@ import { MortgageReferralModal } from '@/components/MortgageReferralModal';
 import { useListingTranslation } from '@/features/properties/hooks/useListingTranslation';
 import { HaloFromListingCTA } from '@/components/halo/HaloFromListingCTA';
 import { useOffmarketSubscriptions } from '@/features/offmarket/hooks/useOffmarketSubscriptions';
+import { ListingImageGallery } from '@/features/properties/components/ListingImageGallery';
 
 export default function PropertyDetailPage() {
   // Support both /property/:slug and /property/:uuid for backward compat
@@ -103,9 +104,7 @@ export default function PropertyDetailPage() {
   useLogPropertyView(property?.id);
   const [rawProperty, setRawProperty] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [imageIndex, setImageIndex] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [rentalEnquiryOpen, setRentalEnquiryOpen] = useState(false);
   const [inspectionBookingOpen, setInspectionBookingOpen] = useState(false);
   const [rentalApplicationOpen, setRentalApplicationOpen] = useState(false);
@@ -533,8 +532,6 @@ export default function PropertyDetailPage() {
     };
   }, [property]);
 
-  const prevImage = () => setImageIndex(i => (i > 0 ? i - 1 : (property?.images.length || 1) - 1));
-  const nextImage = () => setImageIndex(i => (i < (property?.images.length || 1) - 1 ? i + 1 : 0));
 
   if (loading) {
     return (
@@ -615,58 +612,31 @@ export default function PropertyDetailPage() {
 
       <main className="max-w-6xl mx-auto w-full px-4 pb-24 md:pb-12">
         {/* Hero image gallery */}
-        <div className="relative rounded-2xl overflow-hidden aspect-[16/9] md:aspect-[2.4/1] mb-4">
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={imageIndex}
-              src={images[imageIndex]}
-              alt={`${property.title} - Photo ${imageIndex + 1}`}
-              className="w-full h-full object-cover cursor-pointer"
-              onClick={() => setLightboxOpen(true)}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            />
-          </AnimatePresence>
-
-          {images.length > 1 && (
-            <>
-              <button onClick={prevImage} className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors shadow-md">
-                <ChevronLeft size={20} />
-              </button>
-              <button onClick={nextImage} className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors shadow-md">
-                <ChevronRight size={20} />
-              </button>
-            </>
-          )}
-
-          <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm text-xs font-medium text-foreground">
-            {imageIndex + 1}/{images.length}
-          </div>
-
-          {/* Badges */}
-          <div className="absolute top-4 left-4 flex gap-2">
-            {badge && (
-              <span className={`px-3 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase shadow-sm ${badge.className}`}>
-                {badge.label}
+        <ListingImageGallery
+          images={images}
+          address={property.address}
+          overlay={
+            <div className="absolute top-4 left-4 flex gap-2 pointer-events-none">
+              {badge && (
+                <span className={`px-3 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase shadow-sm ${badge.className}`}>
+                  {badge.label}
+                </span>
+              )}
+              <span className="px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm text-xs font-bold tracking-wide uppercase text-foreground">
+                {property.propertyType}
               </span>
-            )}
-            <span className="px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm text-xs font-bold tracking-wide uppercase text-foreground">
-              {property.propertyType}
-            </span>
-            {isRental && property.contactClicks > 0 && (
-              <span className="px-3 py-1.5 rounded-full bg-primary/90 text-primary-foreground text-xs font-bold tracking-wide uppercase shadow-sm flex items-center gap-1">
-                <Users size={12} />
-                {tp(property.contactClicks === 1 ? 'property.applications' : 'property.applicationsPlural', { count: property.contactClicks })}
-              </span>
-            )}
-          </div>
-
-        </div>
+              {isRental && property.contactClicks > 0 && (
+                <span className="px-3 py-1.5 rounded-full bg-primary/90 text-primary-foreground text-xs font-bold tracking-wide uppercase shadow-sm flex items-center gap-1">
+                  <Users size={12} />
+                  {tp(property.contactClicks === 1 ? 'property.applications' : 'property.applicationsPlural', { count: property.contactClicks })}
+                </span>
+              )}
+            </div>
+          }
+        />
 
         {/* Action bar below hero */}
-        <div className="flex flex-wrap gap-2 mt-4 mb-4">
+        <div className="flex flex-wrap gap-2 mt-4 mb-6">
           <button
             onClick={() => toggleSaved(property.id)}
             className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 h-10 rounded-full border border-border bg-card text-sm font-medium text-foreground hover:bg-secondary transition-colors"
@@ -675,23 +645,6 @@ export default function PropertyDetailPage() {
             {saved ? tp('property.saved') : tp('property.save')}
           </button>
         </div>
-
-        {/* Thumbnail strip */}
-        {images.length > 1 && (
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-1 snap-x snap-mandatory scroll-smooth">
-            {images.map((img, i) => (
-              <button
-                key={i}
-                onClick={() => setImageIndex(i)}
-                className={`shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-all snap-start ${
-                  i === imageIndex ? 'border-primary shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
-                }`}
-              >
-                <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
-              </button>
-            ))}
-          </div>
-        )}
 
         {/* Content grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1442,31 +1395,7 @@ export default function PropertyDetailPage() {
         </div>
       )}
 
-      {/* Lightbox */}
-      <AnimatePresence>
-        {lightboxOpen && (
-          <motion.div
-            className="fixed inset-0 z-[60] bg-black/95 flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <button onClick={() => setLightboxOpen(false)} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white z-10">
-              <X size={20} />
-            </button>
-            <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white">
-              <ChevronLeft size={24} />
-            </button>
-            <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white">
-              <ChevronRight size={24} />
-            </button>
-            <img src={images[imageIndex]} alt="" className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg" />
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 text-sm font-medium">
-              {imageIndex + 1} / {images.length}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Lightbox is now handled inside ListingImageGallery */}
 
 
       {/* Mobile sticky enquiry bar */}

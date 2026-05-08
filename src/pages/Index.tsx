@@ -1004,6 +1004,7 @@ function AgentBand() {
             <div style={{ fontSize:15, fontWeight:700, color:'#fff', marginBottom:6 }}>From upload to 20-language listing live</div>
             <div style={{ fontSize:13, color:'rgba(255,255,255,.5)' }}>No signup required · See the full agent platform</div>
           </div>
+          </div>
         </div>
 
         {/* ROI slider */}

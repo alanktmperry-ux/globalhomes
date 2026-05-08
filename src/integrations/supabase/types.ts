@@ -15113,6 +15113,13 @@ export type Database = {
         Returns: Json
       }
       get_inspection_by_token: { Args: { p_token: string }; Returns: Json }
+      get_listing_save_stats: {
+        Args: { _property_id: string }
+        Returns: {
+          recent_count: number
+          save_count: number
+        }[]
+      }
       get_live_bids: {
         Args: { p_auction_id: string; p_limit?: number }
         Returns: Json

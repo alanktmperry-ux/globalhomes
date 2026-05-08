@@ -79,6 +79,7 @@ const ResetPasswordPage = React.lazy(() => import("./pages/ResetPasswordPage"));
 const AgencyProfilePage = React.lazy(() => import("./pages/AgencyProfilePage"));
 const PropertyDetailPage = React.lazy(() => import("./pages/PropertyDetailPage"));
 const AgentPublicProfilePage = React.lazy(() => import("./pages/AgentPublicProfilePage"));
+const AgentProfilePublic = React.lazy(() => import("./features/public/AgentProfilePage"));
 const BuyerSettingsPage = React.lazy(() => import("./pages/BuyerSettingsPage"));
 const TermsPage = React.lazy(() => import("./pages/TermsPage"));
 const PrivacyPage = React.lazy(() => import("./pages/PrivacyPage"));
@@ -298,6 +299,7 @@ const App = () => (
                   <Route path="/property/:id" element={<PropertyDetailPage />} />
                   <Route path="/agent/:id" element={<AgentPublicProfilePage />} />
                   <Route path="/agents" element={<FindAgentPage />} />
+                  <Route path="/agents/:agentId" element={<AgentProfilePublic />} />
                   <Route path="/brokers" element={<FindBrokerPage />} />
                   <Route path="/for-agents" element={<AgentLandingPage />} />
                   <Route path="/pricing" element={<PricingPage />} />

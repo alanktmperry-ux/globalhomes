@@ -1,5 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import AgentLifecycle from '@/features/admin/components/AgentLifecycle';
+import AgentSubscriptionAdmin from '@/features/admin/components/AgentSubscriptionAdmin';
 
 export default function AgentsPage() {
   const [searchParams] = useSearchParams();
@@ -13,7 +14,9 @@ export default function AgentsPage() {
           Lifecycle, adoption scores, and CRM for every agent on the platform.
         </p>
       </div>
+      <AgentSubscriptionAdmin />
       <AgentLifecycle filter={filter} />
     </div>
   );
 }
+

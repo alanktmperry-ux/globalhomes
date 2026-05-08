@@ -181,7 +181,28 @@ export function useSubscription(): SubscriptionState {
     };
 
     fetch();
-    return () => { cancelled = true; };
+
+    // Realtime: re-fetch whenever this agent's subscription row changes.
+    // Stripe webhook updates agent_subscriptions; this picks up the change
+    // without a manual page refresh.
+    const channel = supabase
+      .channel(`agent_subscription_${agent.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'agent_subscriptions',
+          filter: `agent_id=eq.${agent.id}`,
+        },
+        () => { if (!cancelled) fetch(); }
+      )
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
   }, [user, agent?.id]);
 
   if (subLoadingTimeout && state.loading) {

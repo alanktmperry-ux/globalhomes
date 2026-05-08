@@ -266,6 +266,8 @@ Deno.serve(async (req) => {
               : 'Contact agent';
 
             const subject = `New match: ${listing.beds ?? ''}bd in ${listing.suburb ?? 'your area'}`;
+            const unsubToken = await generateUnsubToken(profile.email);
+            const unsubUrl = `https://globalhomes.lovable.app/unsubscribe?email=${encodeURIComponent(profile.email)}&token=${unsubToken}`;
 
             const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">

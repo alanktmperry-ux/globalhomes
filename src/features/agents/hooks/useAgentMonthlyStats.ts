@@ -33,36 +33,35 @@ export function useAgentMonthlyStats(agentId: string | null | undefined): AgentM
     const now = new Date();
     const fyStart = new Date(now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1, 6, 1);
 
-    const [appraisalsRes, salesRes, fyRes, pipelineRes, agentRes] = await Promise.all([
-      supabase
-        .from('contacts')
-        .select('id', { count: 'exact', head: true })
-        .eq('agent_id', agentId)
-        .eq('seller_pipeline_stage', 'appraisal')
-        .gte('updated_at', monthStart.toISOString()),
-      supabase
-        .from('properties')
-        .select('commission_amount')
-        .eq('agent_id', agentId)
-        .gte('settled_at', monthStart.toISOString())
-        .not('settled_at', 'is', null),
-      supabase
-        .from('properties')
-        .select('commission_amount')
-        .eq('agent_id', agentId)
-        .gte('settled_at', fyStart.toISOString())
-        .not('settled_at', 'is', null),
-      supabase
-        .from('properties')
-        .select('commission_amount, list_price, commission_rate')
-        .eq('agent_id', agentId)
-        .is('settled_at', null),
-      supabase
-        .from('agents')
-        .select('gci_budget_annual')
-        .eq('id', agentId)
-        .maybeSingle(),
-    ]);
+    const sb: any = supabase;
+    const appraisalsRes = await sb
+      .from('contacts')
+      .select('id', { count: 'exact', head: true })
+      .eq('agent_id', agentId)
+      .eq('seller_pipeline_stage', 'appraisal')
+      .gte('updated_at', monthStart.toISOString());
+    const salesRes = await sb
+      .from('properties')
+      .select('commission_amount')
+      .eq('agent_id', agentId)
+      .gte('settled_at', monthStart.toISOString())
+      .not('settled_at', 'is', null);
+    const fyRes = await sb
+      .from('properties')
+      .select('commission_amount')
+      .eq('agent_id', agentId)
+      .gte('settled_at', fyStart.toISOString())
+      .not('settled_at', 'is', null);
+    const pipelineRes = await sb
+      .from('properties')
+      .select('commission_amount, list_price, commission_rate')
+      .eq('agent_id', agentId)
+      .is('settled_at', null);
+    const agentRes = await sb
+      .from('agents')
+      .select('gci_budget_annual')
+      .eq('id', agentId)
+      .maybeSingle();
 
     const salesThisMonthAmount = ((salesRes.data as any[]) ?? [])
       .reduce((s, r) => s + Number(r.commission_amount ?? 0), 0);

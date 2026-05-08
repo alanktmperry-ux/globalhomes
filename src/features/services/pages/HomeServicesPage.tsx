@@ -201,6 +201,7 @@ export default function HomeServicesPage() {
           open={!!quoteProvider}
           onOpenChange={(open) => { if (!open) setQuoteProvider(null); }}
           provider={quoteProvider}
+          providerEmail={quoteProvider?.contact_email ?? null}
         />
       </div>
     </>

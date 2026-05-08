@@ -73,6 +73,130 @@ function toProperty(l: AgentListing): Property {
   };
 }
 
+const STATUS_BADGE_CLASS: Record<string, string> = {
+  public: 'bg-green-100 text-green-800',
+  published: 'bg-green-100 text-green-800',
+  pending: 'bg-amber-100 text-amber-800',
+  draft: 'bg-muted text-muted-foreground',
+  whisper: 'bg-foreground/10 text-foreground',
+  'coming-soon': 'bg-blue-100 text-blue-800',
+  under_offer: 'bg-amber-100 text-amber-800',
+  sold: 'bg-slate-100 text-slate-600',
+  leased: 'bg-slate-100 text-slate-600',
+};
+
+const STATUS_LABEL: Record<string, string> = {
+  public: 'Published',
+  under_offer: 'Under offer',
+  sold: 'Sold',
+  leased: 'Leased',
+  draft: 'Draft',
+  pending: 'Pending',
+  whisper: 'Whisper',
+  'coming-soon': 'Coming soon',
+};
+
+function StatusMenu({
+  listing,
+  onStatusChange,
+  onDelete,
+}: {
+  listing: { id: string; status: string; listing_type?: string | null };
+  onStatusChange: (id: string, status: string) => void;
+  onDelete: (id: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const isRental = listing.listing_type === 'rent';
+
+  const allOptions = [
+    { value: 'public', label: 'Published', description: 'Live in search results' },
+    { value: 'under_offer', label: 'Under offer', description: 'Visible with badge, excluded from search' },
+    {
+      value: isRental ? 'leased' : 'sold',
+      label: isRental ? 'Leased' : 'Sold',
+      description: 'Hidden from all search results',
+    },
+    { value: 'draft', label: 'Unpublish', description: 'Revert to draft — hidden from buyers' },
+  ];
+  const options = allOptions.filter((o) => o.value !== listing.status);
+
+  async function changeStatus(newStatus: string) {
+    setSaving(true);
+    setOpen(false);
+    const update: Record<string, unknown> = { status: newStatus };
+    if (newStatus === 'sold' || newStatus === 'leased' || newStatus === 'draft') update.is_active = false;
+    if (newStatus === 'public') update.is_active = true;
+    const { error } = await supabase.from('properties').update(update as any).eq('id', listing.id);
+    if (error) {
+      toast.error('Failed to update status');
+    } else {
+      onStatusChange(listing.id, newStatus);
+      toast.success('Listing status updated');
+    }
+    setSaving(false);
+  }
+
+  async function handleDelete() {
+    if (!confirm('Delete this listing? This cannot be undone.')) return;
+    setSaving(true);
+    setOpen(false);
+    const { error } = await supabase.from('properties').delete().eq('id', listing.id);
+    if (error) {
+      toast.error('Failed to delete listing');
+    } else {
+      onDelete(listing.id);
+      toast.success('Listing deleted');
+    }
+    setSaving(false);
+  }
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        disabled={saving}
+        className={cn(
+          'px-2.5 py-1 rounded-full text-[10px] font-medium border-0 cursor-pointer hover:opacity-80 transition-opacity inline-flex items-center gap-1',
+          STATUS_BADGE_CLASS[listing.status] ?? STATUS_BADGE_CLASS.draft,
+        )}
+      >
+        {saving ? 'Saving…' : STATUS_LABEL[listing.status] ?? listing.status.replace('_', ' ')}
+        <ChevronDown size={10} />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} />
+          <div className="absolute left-0 top-full mt-1 w-56 rounded-xl border border-border bg-card shadow-lg z-30 overflow-hidden">
+            {options.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => changeStatus(opt.value)}
+                className="w-full text-left px-4 py-2.5 hover:bg-accent transition-colors"
+              >
+                <p className="text-sm font-medium text-foreground">{opt.label}</p>
+                <p className="text-xs text-muted-foreground">{opt.description}</p>
+              </button>
+            ))}
+            <div className="border-t border-border">
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="w-full text-left px-4 py-2.5 hover:bg-destructive/10 transition-colors text-destructive"
+              >
+                <p className="text-sm font-medium">Delete listing</p>
+                <p className="text-xs opacity-70">Permanent — cannot be undone</p>
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 interface ListingCardProps {
   l: AgentListing & { _status: string };
   actionLoading: string | null;
@@ -82,9 +206,11 @@ interface ListingCardProps {
   onSendReport: (l: AgentListing) => void;
   navigate: ReturnType<typeof useNavigate>;
   isRental?: boolean;
+  onStatusChange: (id: string, status: string) => void;
+  onDelete: (id: string) => void;
 }
 
-const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSendReport, navigate, isRental }: ListingCardProps) => {
+const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSendReport, navigate, isRental, onStatusChange, onDelete }: ListingCardProps) => {
   const s = STATUS_CONFIG[l._status] || STATUS_CONFIG.public;
   const days = getListingDays(l);
   const leads = getListingLeads(l);

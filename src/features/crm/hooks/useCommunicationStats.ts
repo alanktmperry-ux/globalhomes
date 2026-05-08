@@ -16,12 +16,26 @@ export interface AgentCommsStats {
   lastActivity: string | null;
 }
 
+export interface CommsTotals {
+  calls: number;
+  answered: number;
+  missed: number;
+  voicemail: number;
+  sms: number;
+  avgDuration: number;
+}
+
 interface ActivityRow {
   agent_id: string;
   type: string;
   outcome: string | null;
   duration_seconds: number | null;
   created_at: string;
+}
+
+interface Options {
+  range?: CommsRange;
+  agentId?: string;
 }
 
 function rangeStart(range: CommsRange): string | null {
@@ -32,8 +46,15 @@ function rangeStart(range: CommsRange): string | null {
   return d.toISOString();
 }
 
-export function useCommunicationStats(range: CommsRange) {
+const EMPTY_TOTALS: CommsTotals = { calls: 0, answered: 0, missed: 0, voicemail: 0, sms: 0, avgDuration: 0 };
+
+export function useCommunicationStats(arg: CommsRange | Options = 'month') {
+  const opts: Options = typeof arg === 'string' ? { range: arg } : arg;
+  const range: CommsRange = opts.range ?? 'month';
+  const agentId = opts.agentId;
+
   const [stats, setStats] = useState<AgentCommsStats[]>([]);
+  const [totals, setTotals] = useState<CommsTotals>(EMPTY_TOTALS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,6 +71,7 @@ export function useCommunicationStats(range: CommsRange) {
 
         const since = rangeStart(range);
         if (since) query = query.gte('created_at', since);
+        if (agentId) query = query.eq('agent_id', agentId);
 
         const { data, error: qErr } = await query.limit(10000);
         if (qErr) throw qErr;
@@ -67,6 +89,9 @@ export function useCommunicationStats(range: CommsRange) {
         }
 
         const grouped = new Map<string, AgentCommsStats>();
+        const t: CommsTotals = { calls: 0, answered: 0, missed: 0, voicemail: 0, sms: 0, avgDuration: 0 };
+        let totalDuration = 0;
+
         for (const r of rows) {
           if (!r.agent_id) continue;
           let s = grouped.get(r.agent_id);
@@ -87,27 +112,34 @@ export function useCommunicationStats(range: CommsRange) {
           }
           if (r.type === 'call') {
             s.totalCalls += 1;
-            if (r.outcome === 'answered') s.answered += 1;
-            else if (r.outcome === 'missed') s.missed += 1;
-            else if (r.outcome === 'voicemail') s.voicemail += 1;
-            else if (r.outcome === 'no_answer') s.noAnswer += 1;
-            // accumulate duration in avgCallDuration field temporarily
-            if (r.duration_seconds) s.avgCallDuration += r.duration_seconds;
+            t.calls += 1;
+            if (r.outcome === 'answered') { s.answered += 1; t.answered += 1; }
+            else if (r.outcome === 'missed') { s.missed += 1; t.missed += 1; }
+            else if (r.outcome === 'voicemail') { s.voicemail += 1; t.voicemail += 1; }
+            else if (r.outcome === 'no_answer') { s.noAnswer += 1; }
+            if (r.duration_seconds) {
+              s.avgCallDuration += r.duration_seconds;
+              totalDuration += r.duration_seconds;
+            }
           } else if (r.type === 'sms') {
             s.totalSms += 1;
+            t.sms += 1;
           }
           if (!s.lastActivity || r.created_at > s.lastActivity) s.lastActivity = r.created_at;
         }
 
-        // finalize avg
         const result = Array.from(grouped.values()).map((s) => ({
           ...s,
           avgCallDuration: s.totalCalls > 0 ? Math.round(s.avgCallDuration / s.totalCalls) : 0,
         }));
-
         result.sort((a, b) => b.totalCalls + b.totalSms - (a.totalCalls + a.totalSms));
 
-        if (!cancelled) setStats(result);
+        t.avgDuration = t.calls > 0 ? Math.round(totalDuration / t.calls) : 0;
+
+        if (!cancelled) {
+          setStats(result);
+          setTotals(t);
+        }
       } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load stats');
       } finally {
@@ -117,7 +149,7 @@ export function useCommunicationStats(range: CommsRange) {
     return () => {
       cancelled = true;
     };
-  }, [range]);
+  }, [range, agentId]);
 
-  return { stats, loading, error };
+  return { stats, totals, loading, error };
 }

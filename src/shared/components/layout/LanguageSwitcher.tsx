@@ -9,6 +9,7 @@ import {
   FROM_LEGACY_CODE_MAP,
   type SupportedLanguageCode,
 } from '@/shared/lib/i18n/config';
+import { supabase } from '@/integrations/supabase/client';
 
 // Locales with complete translation files. Others render as "Coming soon".
 const AVAILABLE_LOCALES: ReadonlySet<SupportedLanguageCode> = new Set([
@@ -121,6 +122,15 @@ export function LanguageSwitcher() {
                     } catch { /* storage unavailable — non-fatal */ }
                     setOpen(false);
                     document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
+                    // Persist to profile if logged in (non-blocking — failure is silent)
+                    supabase.auth.getUser().then(({ data }) => {
+                      if (data?.user) {
+                        supabase.from('profiles')
+                          .update({ language_preference: code })
+                          .eq('user_id', data.user.id)
+                          .then(() => {});
+                      }
+                    });
                   }}
                   className={`text-sm px-3 py-2 rounded-lg text-left transition-colors flex items-center justify-between ${
                     !isAvailable

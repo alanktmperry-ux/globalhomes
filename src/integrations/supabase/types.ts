@@ -8849,6 +8849,7 @@ export type Database = {
           display_name: string | null
           full_name: string | null
           id: string
+          language_preference: string | null
           onboarded: boolean | null
           onboarding_steps_completed: Json | null
           phone: string | null
@@ -8874,6 +8875,7 @@ export type Database = {
           display_name?: string | null
           full_name?: string | null
           id?: string
+          language_preference?: string | null
           onboarded?: boolean | null
           onboarding_steps_completed?: Json | null
           phone?: string | null
@@ -8899,6 +8901,7 @@ export type Database = {
           display_name?: string | null
           full_name?: string | null
           id?: string
+          language_preference?: string | null
           onboarded?: boolean | null
           onboarding_steps_completed?: Json | null
           phone?: string | null

@@ -64,7 +64,13 @@ interface ProfileLite {
   user_id: string;
   display_name: string | null;
   full_name: string | null;
+  language_preference: string | null;
 }
+
+const LANG_FLAGS: Record<string, string> = {
+  'zh-CN': '🇨🇳', 'zh-TW': '🇹🇼', vi: '🇻🇳', ko: '🇰🇷',
+  ar: '🇸🇦', ja: '🇯🇵', hi: '🇮🇳', bn: '🇧🇩',
+};
 
 type EnrichedMatch = MatchRow & {
   intent: BuyerIntent | null;
@@ -188,7 +194,7 @@ const BuyerConciergePage = () => {
           ? supabase.from('properties').select('id,title,address,suburb,price,images').in('id', listingIds)
           : Promise.resolve({ data: [] as ListingLite[] }),
         buyerIds.length
-          ? supabase.from('profiles').select('user_id,display_name,full_name').in('user_id', buyerIds)
+          ? supabase.from('profiles').select('user_id,display_name,full_name,language_preference').in('user_id', buyerIds)
           : Promise.resolve({ data: [] as ProfileLite[] }),
       ]);
 
@@ -394,7 +400,13 @@ const BuyerConciergePage = () => {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <p className="font-semibold text-sm truncate">
-                          {buyerName(m)} <span className="text-muted-foreground font-normal">— {buyerSuburb(m)}</span>
+                          {buyerName(m)}
+                          {m.profile?.language_preference && m.profile.language_preference !== 'en' && (
+                            <span className="ml-1.5 text-base leading-none" title={m.profile.language_preference}>
+                              {LANG_FLAGS[m.profile.language_preference] ?? '🌐'}
+                            </span>
+                          )}
+                          <span className="text-muted-foreground font-normal"> — {buyerSuburb(m)}</span>
                         </p>
                         <p className="text-xs text-muted-foreground mt-0.5">{wantsSummary(m.intent)}</p>
                       </div>
@@ -458,7 +470,14 @@ const BuyerConciergePage = () => {
                         {group.items.slice(0, 8).map((m) => (
                           <div key={m.id} className="flex items-center gap-3 py-2 border-t text-sm">
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium truncate">{buyerName(m)}</p>
+                              <p className="font-medium truncate">
+                                {buyerName(m)}
+                                {m.profile?.language_preference && m.profile.language_preference !== 'en' && (
+                                  <span className="ml-1.5 text-base leading-none" title={m.profile.language_preference}>
+                                    {LANG_FLAGS[m.profile.language_preference] ?? '🌐'}
+                                  </span>
+                                )}
+                              </p>
                               <p className="text-xs text-muted-foreground truncate">{wantsSummary(m.intent)}</p>
                             </div>
                             <div className="w-32"><ReadinessBar score={m.readiness_score} /></div>
@@ -517,7 +536,14 @@ const BuyerConciergePage = () => {
                     {(matchLimit !== null ? filteredTable.slice(0, matchLimit) : filteredTable).map((m) => (
                       <TableRow key={m.id} className="cursor-pointer" onClick={() => openContact(m)}>
                         <TableCell>
-                          <p className="font-medium text-sm">{buyerName(m)}</p>
+                          <p className="font-medium text-sm">
+                            {buyerName(m)}
+                            {m.profile?.language_preference && m.profile.language_preference !== 'en' && (
+                              <span className="ml-1.5 text-base leading-none" title={m.profile.language_preference}>
+                                {LANG_FLAGS[m.profile.language_preference] ?? '🌐'}
+                              </span>
+                            )}
+                          </p>
                           <p className="text-xs text-muted-foreground flex items-center gap-1">
                             <MapPin size={10} /> {buyerSuburb(m)}
                           </p>

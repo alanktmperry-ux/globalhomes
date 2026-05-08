@@ -17,6 +17,7 @@ const CURRENT_AGENT_SELECT = `
   payment_failed_at,
   admin_grace_until,
   created_at,
+  subscription_expires_at,
   is_subscribed
 `;
 

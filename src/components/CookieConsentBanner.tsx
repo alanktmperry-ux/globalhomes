@@ -39,6 +39,10 @@ export function CookieConsentBanner() {
             <Link to="/privacy" className="underline font-medium text-primary">
               Privacy Policy
             </Link>
+            {' '}and{' '}
+            <Link to="/terms" className="underline font-medium text-primary">
+              Terms of Service
+            </Link>
             {' '}in accordance with the Australian Privacy Act 1988.
           </p>
           <div className="flex items-center gap-2 shrink-0">

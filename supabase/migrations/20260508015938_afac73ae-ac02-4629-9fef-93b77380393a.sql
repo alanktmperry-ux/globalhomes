@@ -1,0 +1,1 @@
+ALTER TABLE public.brokers ADD COLUMN IF NOT EXISTS api_key TEXT UNIQUE;

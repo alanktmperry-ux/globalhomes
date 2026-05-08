@@ -2626,6 +2626,7 @@ export type Database = {
           acl_number: string
           agency_id: string | null
           agency_role: string
+          api_key: string | null
           approval_status: string | null
           auth_user_id: string | null
           calendar_url: string | null
@@ -2656,6 +2657,7 @@ export type Database = {
           acl_number: string
           agency_id?: string | null
           agency_role?: string
+          api_key?: string | null
           approval_status?: string | null
           auth_user_id?: string | null
           calendar_url?: string | null
@@ -2686,6 +2688,7 @@ export type Database = {
           acl_number?: string
           agency_id?: string | null
           agency_role?: string
+          api_key?: string | null
           approval_status?: string | null
           auth_user_id?: string | null
           calendar_url?: string | null

@@ -1,3 +1,4 @@
+import { usePageTitle } from '@/lib/usePageTitle';
 import { SEO } from '@/shared/components/SEO';
 import { useEffect, useState } from 'react';
 import { ArrowUp } from 'lucide-react';

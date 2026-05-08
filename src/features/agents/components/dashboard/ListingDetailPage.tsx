@@ -205,6 +205,7 @@ const ListingDetailPage = () => {
         </Tabs>
         </div>
         <aside className="space-y-4">
+          <SavedByBuyersWidget listingId={listing.id} />
           <MatchedBuyersWidget listingId={listing.id} />
         </aside>
       </div>

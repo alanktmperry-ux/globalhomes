@@ -160,6 +160,7 @@ const StepTranslate = ({ draft, update }: Props) => {
             )}
           </div>
           <Textarea
+            dir={active.dir}
             value={titleValue}
             onChange={(e) =>
               update({ [active.titleField]: e.target.value.slice(0, TITLE_LIMIT) } as Partial<ListingDraft>)
@@ -196,6 +197,7 @@ const StepTranslate = ({ draft, update }: Props) => {
             )}
           </div>
           <Textarea
+            dir={active.dir}
             value={descValue}
             onChange={(e) => update({ [active.descField]: e.target.value } as Partial<ListingDraft>)}
             placeholder={`Enter description in ${active.label}…`}

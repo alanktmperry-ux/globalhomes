@@ -128,6 +128,7 @@ export interface ListingDraft {
 
   // Media
   virtual_tour_url: string;
+  video_url?: string;
 
   // Commercial / Land
   floorAreaSqm?: number;

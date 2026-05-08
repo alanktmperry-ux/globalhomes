@@ -731,9 +731,7 @@ const ListingsPage = () => {
           <StatusTabs activeTab={activeStatusTab} setActiveTab={setActiveStatusTab} counts={counts} />
 
           {loading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="animate-spin text-primary" size={24} />
-            </div>
+            <ListingsSkeleton />
           ) : filtered.length === 0 ? (
             lifecycleTab === 'archived' ? (
               <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">

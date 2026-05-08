@@ -989,6 +989,75 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
           </>
         )}
       </div>
+
+      {/* ── BUYER LANGUAGE PREVIEW ── */}
+      {translateDone && (
+        <div className="bg-card border border-border rounded-xl overflow-hidden">
+          <button
+            type="button"
+            onClick={handleOpenPreview}
+            className="w-full flex items-center justify-between p-4 text-sm font-bold hover:bg-muted/40 transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              <Globe size={16} className="text-primary" />
+              Preview in buyer language
+            </span>
+            {previewOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+          </button>
+          {previewOpen && (
+            <div className="border-t border-border p-4 space-y-3">
+              {previewLoading ? (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 size={14} className="animate-spin" /> Loading translations…
+                </div>
+              ) : previewTranslations && Object.keys(previewTranslations).length > 0 ? (
+                <>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      { key: 'zh_simplified', flag: '🇨🇳', label: '普通话' },
+                      { key: 'zh_traditional', flag: '🇭🇰', label: '廣東話' },
+                      { key: 'vi', flag: '🇻🇳', label: 'Tiếng Việt' },
+                      { key: 'ko', flag: '🇰🇷', label: '한국어' },
+                      { key: 'ar', flag: '🇸🇦', label: 'العربية' },
+                      { key: 'ja', flag: '🇯🇵', label: '日本語' },
+                    ].filter(l => previewTranslations[l.key]).map(l => (
+                      <button
+                        key={l.key}
+                        type="button"
+                        onClick={() => setPreviewLang(l.key)}
+                        className={`px-2.5 py-1 rounded-lg text-xs border transition-all ${
+                          previewLang === l.key
+                            ? 'bg-primary/10 border-primary/40 text-primary'
+                            : 'bg-secondary border-border text-muted-foreground hover:border-primary/30'
+                        }`}
+                      >
+                        {l.flag} {l.label}
+                      </button>
+                    ))}
+                  </div>
+                  <div
+                    className="bg-muted/30 rounded-xl p-4 space-y-2"
+                    dir={previewLang === 'ar' ? 'rtl' : 'ltr'}
+                  >
+                    {previewTranslations[previewLang]?.title && (
+                      <p className="font-semibold text-foreground text-sm leading-snug">
+                        {previewTranslations[previewLang].title}
+                      </p>
+                    )}
+                    {previewTranslations[previewLang]?.description && (
+                      <p className="text-muted-foreground text-xs leading-relaxed whitespace-pre-wrap">
+                        {previewTranslations[previewLang].description}
+                      </p>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <p className="text-xs text-muted-foreground">No translations found — click "Generate translations" above first.</p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

@@ -615,58 +615,31 @@ export default function PropertyDetailPage() {
 
       <main className="max-w-6xl mx-auto w-full px-4 pb-24 md:pb-12">
         {/* Hero image gallery */}
-        <div className="relative rounded-2xl overflow-hidden aspect-[16/9] md:aspect-[2.4/1] mb-4">
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={imageIndex}
-              src={images[imageIndex]}
-              alt={`${property.title} - Photo ${imageIndex + 1}`}
-              className="w-full h-full object-cover cursor-pointer"
-              onClick={() => setLightboxOpen(true)}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            />
-          </AnimatePresence>
-
-          {images.length > 1 && (
-            <>
-              <button onClick={prevImage} className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors shadow-md">
-                <ChevronLeft size={20} />
-              </button>
-              <button onClick={nextImage} className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors shadow-md">
-                <ChevronRight size={20} />
-              </button>
-            </>
-          )}
-
-          <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm text-xs font-medium text-foreground">
-            {imageIndex + 1}/{images.length}
-          </div>
-
-          {/* Badges */}
-          <div className="absolute top-4 left-4 flex gap-2">
-            {badge && (
-              <span className={`px-3 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase shadow-sm ${badge.className}`}>
-                {badge.label}
+        <ListingImageGallery
+          images={images}
+          address={property.address}
+          overlay={
+            <div className="absolute top-4 left-4 flex gap-2 pointer-events-none">
+              {badge && (
+                <span className={`px-3 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase shadow-sm ${badge.className}`}>
+                  {badge.label}
+                </span>
+              )}
+              <span className="px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm text-xs font-bold tracking-wide uppercase text-foreground">
+                {property.propertyType}
               </span>
-            )}
-            <span className="px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm text-xs font-bold tracking-wide uppercase text-foreground">
-              {property.propertyType}
-            </span>
-            {isRental && property.contactClicks > 0 && (
-              <span className="px-3 py-1.5 rounded-full bg-primary/90 text-primary-foreground text-xs font-bold tracking-wide uppercase shadow-sm flex items-center gap-1">
-                <Users size={12} />
-                {tp(property.contactClicks === 1 ? 'property.applications' : 'property.applicationsPlural', { count: property.contactClicks })}
-              </span>
-            )}
-          </div>
-
-        </div>
+              {isRental && property.contactClicks > 0 && (
+                <span className="px-3 py-1.5 rounded-full bg-primary/90 text-primary-foreground text-xs font-bold tracking-wide uppercase shadow-sm flex items-center gap-1">
+                  <Users size={12} />
+                  {tp(property.contactClicks === 1 ? 'property.applications' : 'property.applicationsPlural', { count: property.contactClicks })}
+                </span>
+              )}
+            </div>
+          }
+        />
 
         {/* Action bar below hero */}
-        <div className="flex flex-wrap gap-2 mt-4 mb-4">
+        <div className="flex flex-wrap gap-2 mt-4 mb-6">
           <button
             onClick={() => toggleSaved(property.id)}
             className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 h-10 rounded-full border border-border bg-card text-sm font-medium text-foreground hover:bg-secondary transition-colors"
@@ -675,23 +648,6 @@ export default function PropertyDetailPage() {
             {saved ? tp('property.saved') : tp('property.save')}
           </button>
         </div>
-
-        {/* Thumbnail strip */}
-        {images.length > 1 && (
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-1 snap-x snap-mandatory scroll-smooth">
-            {images.map((img, i) => (
-              <button
-                key={i}
-                onClick={() => setImageIndex(i)}
-                className={`shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-all snap-start ${
-                  i === imageIndex ? 'border-primary shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
-                }`}
-              >
-                <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
-              </button>
-            ))}
-          </div>
-        )}
 
         {/* Content grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

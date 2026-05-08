@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PartyPopper, MapPin, Clock, ChevronDown, ChevronUp, Star, ExternalLink, Gift, Loader2, Home } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -36,10 +36,12 @@ const UTILITY_PARTNERS = [
   { name: 'Origin Energy', url: 'https://www.originenergy.com.au', color: 'bg-orange-500' },
   { name: 'Telstra', url: 'https://www.telstra.com.au', color: 'bg-blue-500' },
   { name: 'NBN Co', url: 'https://www.nbnco.com.au', color: 'bg-purple-600' },
+  { name: 'Conveyancing', url: '/conveyancing?mode=selling', color: 'bg-indigo-600' },
 ];
 
 const SettlementConcierge = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -307,12 +309,28 @@ const SettlementConcierge = () => {
           </DialogHeader>
           <p className="text-sm text-muted-foreground mb-4">Help {utilityModal?.buyerName} get set up at their new home.</p>
           <div className="space-y-3">
-            {UTILITY_PARTNERS.map(u => (
-              <a key={u.name} href={u.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-accent transition-colors">
-                <span className="font-medium text-sm">{u.name}</span>
-                <ExternalLink size={14} className="text-muted-foreground" />
-              </a>
-            ))}
+            {UTILITY_PARTNERS.map(u => {
+              const isInternal = u.url.startsWith('/');
+              if (isInternal) {
+                return (
+                  <button
+                    key={u.name}
+                    type="button"
+                    onClick={() => { setUtilityModal(null); navigate(u.url); }}
+                    className="w-full flex items-center justify-between p-3 rounded-lg border border-border hover:bg-accent transition-colors text-left"
+                  >
+                    <span className="font-medium text-sm">{u.name}</span>
+                    <ExternalLink size={14} className="text-muted-foreground" />
+                  </button>
+                );
+              }
+              return (
+                <a key={u.name} href={u.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-accent transition-colors">
+                  <span className="font-medium text-sm">{u.name}</span>
+                  <ExternalLink size={14} className="text-muted-foreground" />
+                </a>
+              );
+            })}
           </div>
         </DialogContent>
       </Dialog>

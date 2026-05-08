@@ -19,6 +19,7 @@ interface Conveyancer {
   rating: number | null;
   specialties: string[] | null;
   logo_url: string | null;
+  email: string | null;
 }
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
@@ -37,7 +38,7 @@ const ConveyancingPage = () => {
       setLoading(true);
       const { data, error } = await supabase
         .from('conveyancers' as any)
-        .select('id, firm_name, contact_name, fee_from, fee_to, suburbs_covered, turnaround_days, rating, specialties, logo_url')
+        .select('id, firm_name, contact_name, fee_from, fee_to, suburbs_covered, turnaround_days, rating, specialties, logo_url, email')
         .eq('is_active', true)
         .order('rating', { ascending: false });
       if (!error && data) setItems(data as any);
@@ -165,6 +166,7 @@ const ConveyancingPage = () => {
         onOpenChange={setQuoteOpen}
         conveyancerId={selected?.id ?? null}
         conveyancerName={selected?.firm_name ?? null}
+        conveyancerEmail={selected?.email ?? null}
         defaultTransactionType={transactionType}
         source="conveyancing_page"
       />

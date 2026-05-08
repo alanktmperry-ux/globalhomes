@@ -24,6 +24,7 @@ export interface GetQuoteModalProps {
   onOpenChange: (open: boolean) => void;
   conveyancerId?: string | null;
   conveyancerName?: string | null;
+  conveyancerEmail?: string | null;
   defaultTransactionType?: 'Buying' | 'Selling' | 'Both';
   source?: string;
   propertyId?: string | null;
@@ -35,6 +36,7 @@ export const GetQuoteModal = ({
   onOpenChange,
   conveyancerId = null,
   conveyancerName = null,
+  conveyancerEmail = null,
   defaultTransactionType = 'Buying',
   source = 'conveyancing_page',
   propertyId = null,
@@ -82,6 +84,21 @@ export const GetQuoteModal = ({
         status: 'new',
       });
       if (error) throw error;
+
+      if (conveyancerEmail) {
+        try {
+          await supabase.functions.invoke('send-notification-email', {
+            body: {
+              to: conveyancerEmail,
+              subject: 'New conveyancing enquiry from ListHQ',
+              body: `New quote request received.\n\nName: ${parsed.data.name}\nEmail: ${parsed.data.email}\nPhone: ${parsed.data.phone}\nTransaction: ${parsed.data.transaction_type}\nProperty: ${parsed.data.property_address || ''}\n\nLog in to ListHQ to view this enquiry.`,
+            },
+          });
+        } catch (e) {
+          console.error('notify conveyancer failed', e);
+        }
+      }
+
       toast.success('A conveyancer will contact you within 2 hours');
       onOpenChange(false);
       setName(''); setEmail(''); setPhone(''); setAddress('');

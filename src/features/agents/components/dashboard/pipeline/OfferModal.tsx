@@ -165,6 +165,20 @@ const OfferModal = ({ open, onOpenChange, card, propertyId, agentId, onSent }: O
               </Button>
               <Button variant="ghost" onClick={() => onOpenChange(false)} className="text-xs">Cancel</Button>
             </div>
+
+            <div className="mt-4 pt-3 border-t border-border">
+              <p className="text-xs text-muted-foreground">
+                Tip: Remind your buyer to organise conveyancing before settlement.
+              </p>
+              <a
+                href="/conveyancing"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-primary hover:underline mt-1 inline-block"
+              >
+                Find a conveyancer →
+              </a>
+            </div>
           </>
         )}
       </DialogContent>

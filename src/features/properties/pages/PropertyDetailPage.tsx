@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { PropertySEOHead } from '@/features/seo/components/PropertySEOHead';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X, PawPrint, Sofa, Clock, FileText, Users, Phone, MessageCircle, Globe, Loader2 } from 'lucide-react';
+import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X, PawPrint, Sofa, Clock, FileText, Users, Phone, MessageCircle, Globe, Loader2, ScrollText } from 'lucide-react';
 import MultilingualListingDetail from '@/features/properties/components/MultilingualListingDetail';
 import { OpenHomesCard } from '@/features/properties/components/OpenHomesCard';
 import { ListingChatWidget } from '@/features/properties/components/ListingChatWidget';
@@ -48,6 +48,7 @@ import { DocumentVault } from '@/features/documents/components/DocumentVault';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { ShareSheet } from '@/shared/components/ShareSheet';
 import { MortgageBrokerCTA } from '@/features/mortgage/components/MortgageBrokerCTA';
+import { GetQuoteModal } from '@/features/conveyancing/components/GetQuoteModal';
 import { MortgageReferralModal } from '@/components/MortgageReferralModal';
 import { useListingTranslation } from '@/features/properties/hooks/useListingTranslation';
 import { HaloFromListingCTA } from '@/components/halo/HaloFromListingCTA';
@@ -79,6 +80,7 @@ export default function PropertyDetailPage() {
   const [rentalEnquiryOpen, setRentalEnquiryOpen] = useState(false);
   const [inspectionBookingOpen, setInspectionBookingOpen] = useState(false);
   const [rentalApplicationOpen, setRentalApplicationOpen] = useState(false);
+  const [conveyancingOpen, setConveyancingOpen] = useState(false);
   const [inspectionTimes, setInspectionTimes] = useState<InspectionSlot[]>([]);
   const [isOwnerAgent, setIsOwnerAgent] = useState(false);
   const [translating, setTranslating] = useState(false);
@@ -1131,6 +1133,37 @@ export default function PropertyDetailPage() {
                 agentId={property.agent?.id ?? null}
               />
             )}
+
+            {!isRental && (
+              <div className="rounded-xl border border-border bg-card p-5">
+                <div className="flex items-start gap-3">
+                  <div className="rounded-lg bg-primary/10 p-2.5">
+                    <ScrollText className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-foreground">Need a conveyancer?</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Fixed-fee conveyancing from licensed professionals. No hidden costs.
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="mt-3"
+                      onClick={() => setConveyancingOpen(true)}
+                    >
+                      Get a Quote
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <GetQuoteModal
+              open={conveyancingOpen}
+              onOpenChange={setConveyancingOpen}
+              defaultTransactionType="Buying"
+              propertyId={property.id}
+              source="property_detail"
+            />
 
             <HaloFromListingCTA
               listingId={property.id}

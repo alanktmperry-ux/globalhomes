@@ -17,6 +17,24 @@ import {
 } from '@/features/inbox/hooks/useInbox';
 import TemplatePicker, { type TemplatePickerContact } from '@/features/messaging/components/TemplatePicker';
 import { usePageTitle } from '@/lib/usePageTitle';
+import { Skeleton } from '@/components/ui/skeleton';
+
+function InboxSkeleton() {
+  return (
+    <div>
+      {[...Array(6)].map((_, i) => (
+        <div key={i} className="flex items-start gap-2.5 p-3 border-b border-border">
+          <Skeleton className="h-9 w-9 rounded-full flex-shrink-0" />
+          <div className="flex-1 space-y-1.5">
+            <Skeleton className="h-3 w-1/2" />
+            <Skeleton className="h-3 w-3/4" />
+            <Skeleton className="h-3 w-2/3" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 const FILTERS: { key: InboxFilter; label: string }[] = [
   { key: 'all', label: 'All' },

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useBuyerMatching } from '@/features/agents/hooks/useBuyerMatching';
-import { ArrowLeft, ArrowRight, Save, Loader2, FileText, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Save, Loader2, FileText, Trash2, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';

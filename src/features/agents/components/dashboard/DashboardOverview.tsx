@@ -17,7 +17,7 @@ import { getIntentTier, INTENT_TOOLTIP } from '@/features/agents/lib/intentScore
 import { DEMO_REPUTATION, getScoreColor } from '@/features/agents/utils/reputationScore';
 import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, CartesianGrid } from 'recharts';
 import { toast } from 'sonner';
@@ -483,6 +483,18 @@ const DashboardOverview = () => {
       />
 
       <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
+        {agentId && (
+          <div className="flex justify-end">
+            <Link
+              to={`/agents/${agentId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-muted-foreground hover:text-primary underline"
+            >
+              Your public profile →
+            </Link>
+          </div>
+        )}
         <div className="flex justify-end">
           <CustomiseToolbar
             editMode={editMode}

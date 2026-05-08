@@ -470,7 +470,14 @@ const BuyerConciergePage = () => {
                         {group.items.slice(0, 8).map((m) => (
                           <div key={m.id} className="flex items-center gap-3 py-2 border-t text-sm">
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium truncate">{buyerName(m)}</p>
+                              <p className="font-medium truncate">
+                                {buyerName(m)}
+                                {m.profile?.language_preference && m.profile.language_preference !== 'en' && (
+                                  <span className="ml-1.5 text-base leading-none" title={m.profile.language_preference}>
+                                    {LANG_FLAGS[m.profile.language_preference] ?? '🌐'}
+                                  </span>
+                                )}
+                              </p>
                               <p className="text-xs text-muted-foreground truncate">{wantsSummary(m.intent)}</p>
                             </div>
                             <div className="w-32"><ReadinessBar score={m.readiness_score} /></div>

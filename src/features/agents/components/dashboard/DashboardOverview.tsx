@@ -464,8 +464,8 @@ const DashboardOverview = () => {
   const stats = [
     { label: 'Tasks Due', value: String(tasksDue), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts?tab=tasks' },
     { label: 'Active Contacts', value: String(activeContacts), icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
-    { label: 'Appraisals This Month', value: '0', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/pipeline?stage=appraisal' },
-    { label: 'Sales This Month', value: AUD.format(0), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/performance' },
+    { label: 'Appraisals This Month', value: String(monthlyStats.appraisalsThisMonth), icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/pipeline?stage=appraisal' },
+    { label: 'Sales This Month', value: AUD.format(monthlyStats.salesThisMonthAmount), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/performance' },
     { label: 'Trust Balance', value: AUD.format(trustBalance), icon: <Landmark size={16} />, color: 'text-success', link: '/dashboard/trust' },
     { label: 'Unresponded Leads', value: String(unrespondedValue), icon: <Zap size={16} />, color: unrespondedValue > 0 ? 'text-destructive' : 'text-success', link: '/dashboard/leads' },
   ];

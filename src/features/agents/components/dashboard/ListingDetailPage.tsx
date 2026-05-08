@@ -14,6 +14,7 @@ import ListingBuyerLeadsTab from './listing-tabs/ListingBuyerLeadsTab';
 import { DocumentVault } from '@/features/documents/components/DocumentVault';
 import ListingAccountingTab from './listing-tabs/ListingAccountingTab';
 import ListingMarketTab from './listing-tabs/ListingMarketTab';
+import ListingAnalyticsTab from './listing-tabs/ListingAnalyticsTab';
 import MatchedBuyersWidget from './MatchedBuyersWidget';
 
 const ListingDetailPage = () => {

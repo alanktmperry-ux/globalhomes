@@ -1157,6 +1157,29 @@ export default function PropertyDetailPage() {
               </div>
             )}
 
+            {!isRental && (
+              <div className="rounded-xl border border-border bg-card p-5">
+                <div className="flex items-start gap-3">
+                  <div className="rounded-lg bg-primary/10 p-2.5">
+                    <HardHat className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-foreground">Building & Pest Inspection</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Independent reports for confident buyers. Book before you go unconditional.
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="mt-3"
+                      onClick={() => navigate('/home-services?category=building_inspection')}
+                    >
+                      Book Inspection
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <GetQuoteModal
               open={conveyancingOpen}
               onOpenChange={setConveyancingOpen}

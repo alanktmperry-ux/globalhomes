@@ -182,6 +182,29 @@ export default function CreateHaloPage() {
         });
       } catch { /* non-fatal */ }
 
+      // Save buyer's preferred language to profile for auto-language on property pages
+      const LANG_TO_I18N: Record<string, string> = {
+        mandarin: 'zh-CN',
+        cantonese: 'zh-TW',
+        vietnamese: 'vi',
+        korean: 'ko',
+        arabic: 'ar',
+        japanese: 'ja',
+        hindi: 'hi',
+        bengali: 'bn',
+        filipino: 'tl',
+        indonesian: 'id',
+        english: 'en',
+      };
+      const i18nCode = LANG_TO_I18N[String(data.preferred_language)] || 'en';
+      if (i18nCode !== 'en') {
+        supabase
+          .from('profiles')
+          .update({ language_preference: i18nCode } as any)
+          .eq('user_id', user.id)
+          .then(() => {});
+      }
+
       localStorage.removeItem(DRAFT_KEY);
       navigate('/halo/success');
     } catch (e) {

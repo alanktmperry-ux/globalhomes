@@ -82,10 +82,17 @@ export function HaloStep1({ data, update }: Props) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="english">English</SelectItem>
-            <SelectItem value="mandarin">Mandarin</SelectItem>
-            <SelectItem value="vietnamese">Vietnamese</SelectItem>
-            <SelectItem value="korean">Korean</SelectItem>
+            <SelectItem value="english">🇦🇺 English</SelectItem>
+            <SelectItem value="mandarin">🇨🇳 Mandarin (普通话)</SelectItem>
+            <SelectItem value="cantonese">🇭🇰 Cantonese (廣東話)</SelectItem>
+            <SelectItem value="vietnamese">🇻🇳 Vietnamese (Tiếng Việt)</SelectItem>
+            <SelectItem value="korean">🇰🇷 Korean (한국어)</SelectItem>
+            <SelectItem value="arabic">🇸🇦 Arabic (العربية)</SelectItem>
+            <SelectItem value="japanese">🇯🇵 Japanese (日本語)</SelectItem>
+            <SelectItem value="hindi">🇮🇳 Hindi (हिन्दी)</SelectItem>
+            <SelectItem value="bengali">🇧🇩 Bengali (বাংলা)</SelectItem>
+            <SelectItem value="filipino">🇵🇭 Filipino (Tagalog)</SelectItem>
+            <SelectItem value="indonesian">🇮🇩 Indonesian (Bahasa)</SelectItem>
             <SelectItem value="other">Other</SelectItem>
           </SelectContent>
         </Select>

@@ -66,8 +66,8 @@ function getListingDays(l: AgentListing): number {
   return Math.max(0, Math.floor((Date.now() - new Date(l.listed_date).getTime()) / 86400000));
 }
 
-function getListingThumb(l: AgentListing): string {
-  return l.image_url || l.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&h=150&fit=crop';
+function getListingThumb(l: AgentListing): string | null {
+  return getListingImage(l.image_url, l.images);
 }
 
 function toProperty(l: AgentListing): Property {

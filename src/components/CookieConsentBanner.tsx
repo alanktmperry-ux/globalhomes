@@ -1,33 +1,27 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { CONSENT_KEY, initPostHog } from '@/shared/lib/analyticsConsent';
+import { X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-const STORAGE_KEY = CONSENT_KEY;
+const CONSENT_KEY = 'listhq_cookie_consent';
 
 export function CookieConsentBanner() {
   const [visible, setVisible] = useState(false);
-  const [closing, setClosing] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const existing = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
-    if (!existing) {
-      const t = setTimeout(() => {
-        setMounted(true);
-        setVisible(true);
-      }, 400);
-      return () => clearTimeout(t);
-    }
+    const stored = localStorage.getItem(CONSENT_KEY);
+    if (!stored) setVisible(true);
   }, []);
 
-  const dismiss = (value: 'accepted' | 'declined') => {
-    try { localStorage.setItem(STORAGE_KEY, value); } catch { /* ignore */ }
-    if (value === 'accepted') {
-      initPostHog();
-    }
-    setClosing(true);
-    setTimeout(() => setVisible(false), 200);
-  };
+  function accept() {
+    localStorage.setItem(CONSENT_KEY, 'accepted');
+    setVisible(false);
+  }
+
+  function decline() {
+    localStorage.setItem(CONSENT_KEY, 'declined');
+    setVisible(false);
+  }
 
   if (!visible) return null;
 
@@ -35,30 +29,33 @@ export function CookieConsentBanner() {
     <div
       role="dialog"
       aria-label="Cookie consent"
-      className={`fixed z-[200] bottom-4 left-4 right-4 sm:right-auto sm:max-w-[380px] transition-all duration-300 ease-out ${
-        mounted && !closing ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-      }`}
+      className="fixed inset-x-0 bottom-0 z-[200] p-3 sm:p-4 pointer-events-none"
     >
-      <div className="bg-white border border-gray-200 shadow-lg rounded-xl p-4">
-        <p className="text-sm text-gray-700 leading-snug mb-3">
-          We use cookies to improve your experience.{' '}
-          <Link to="/privacy" className="text-primary hover:underline font-medium">
-            Privacy Policy
-          </Link>
-        </p>
-        <div className="flex items-center justify-end gap-2">
-          <button
-            onClick={() => dismiss('declined')}
-            className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            Decline
-          </button>
-          <button
-            onClick={() => dismiss('accepted')}
-            className="px-4 py-2 text-sm font-semibold bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-          >
-            Accept All
-          </button>
+      <div className="pointer-events-auto mx-auto max-w-4xl rounded-xl border border-border bg-card shadow-lg p-4 sm:p-5">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <p className="text-sm text-foreground flex-1 leading-relaxed">
+            We use cookies to keep you logged in and improve your experience.
+            By using ListHQ, you agree to our{' '}
+            <Link to="/privacy" className="underline font-medium text-primary">
+              Privacy Policy
+            </Link>
+            {' '}in accordance with the Australian Privacy Act 1988.
+          </p>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button variant="outline" size="sm" onClick={decline}>
+              Decline
+            </Button>
+            <Button size="sm" onClick={accept}>
+              Accept cookies
+            </Button>
+            <button
+              onClick={decline}
+              aria-label="Close"
+              className="ml-1 inline-flex items-center justify-center w-9 h-9 rounded-full text-muted-foreground hover:bg-accent transition-colors"
+            >
+              <X size={16} />
+            </button>
+          </div>
         </div>
       </div>
     </div>

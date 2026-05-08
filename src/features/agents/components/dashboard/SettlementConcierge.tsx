@@ -41,6 +41,7 @@ const UTILITY_PARTNERS = [
 
 const SettlementConcierge = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);

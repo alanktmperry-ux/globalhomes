@@ -10,8 +10,8 @@ const APP_URL = Deno.env.get('APP_URL') ?? 'https://listhq.com.au';
 
 const PLAN_CONFIG: Record<string, { name: string; monthlyAud: number; listingLimit: number; seatLimit: number }> = {
   solo:       { name: 'Solo',       monthlyAud: 29900,  listingLimit: 15,     seatLimit: 1      },
-  agency:     { name: 'Agency',     monthlyAud: 89900,  listingLimit: 75,     seatLimit: 12     },
-  agency_pro: { name: 'Agency Pro', monthlyAud: 199900, listingLimit: 999999, seatLimit: 999999 },
+  agency:     { name: 'Agency',     monthlyAud: 59900,  listingLimit: 75,     seatLimit: 12     },
+  agency_pro: { name: 'Agency Pro', monthlyAud: 119900, listingLimit: 999999, seatLimit: 999999 },
 };
 
 Deno.serve(async (req) => {

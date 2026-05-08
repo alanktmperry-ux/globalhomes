@@ -624,7 +624,8 @@ const DashboardOverview = () => {
                     <span className="text-success shrink-0 mt-0.5"><ClipboardList size={16} /></span>
                     <span className="text-[11px] leading-tight">Appraisals This Month</span>
                   </div>
-                  <p className="font-display text-2xl font-extrabold">0</p>
+                  <p className="font-display text-2xl font-extrabold text-muted-foreground">—</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Add from Pipeline</p>
                 </motion.div>
               ),
             },
@@ -639,7 +640,8 @@ const DashboardOverview = () => {
                     <span className="text-primary shrink-0 mt-0.5"><DollarSign size={16} /></span>
                     <span className="text-[11px] leading-tight">Sales This Month</span>
                   </div>
-                  <p className="font-display text-2xl font-extrabold">{AUD.format(0)}</p>
+                  <p className="font-display text-2xl font-extrabold text-muted-foreground">—</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Add from Pipeline</p>
                 </motion.div>
               ),
             },
@@ -970,6 +972,12 @@ const DashboardOverview = () => {
                 <h3 className="font-display text-sm font-bold mb-4 flex items-center gap-2">
                   <DollarSign size={16} className="text-primary" /> GCI — Gross Commission Income
                 </h3>
+                {gciActual === 0 && gciBudgeted === 0 && gciPotential === 0 ? (
+                  <div className="text-center py-6">
+                    <p className="text-sm font-semibold text-muted-foreground">No settled sales yet</p>
+                    <p className="text-xs text-muted-foreground mt-1">GCI will appear here once you record a settled deal.</p>
+                  </div>
+                ) : (
                 <div className="space-y-3">
                   <div>
                     <div className="flex justify-between text-xs mb-1">
@@ -996,6 +1004,7 @@ const DashboardOverview = () => {
                     You're at <strong className="text-primary">{gciPercent}%</strong> of your annual budget target
                   </p>
                 </div>
+                )}
               </motion.div>
             ),
             pipeline_12mo: (

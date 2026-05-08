@@ -118,8 +118,6 @@ const Index = () => {
   const manualLangRef = useRef(false);
   const [seqIdx, setSeqIdx] = useState(0);
   const [blur, setBlur] = useState(false);
-  const [liveCount, setLiveCount] = useState(847);
-  const [enquiryCount, setEnquiryCount] = useState(3);
   const [searchQuery, setSearchQuery] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalQuery, setModalQuery] = useState('');
@@ -271,24 +269,6 @@ const Index = () => {
     return () => clearInterval(id);
   }, []);
 
-  // Live buyer count
-  useEffect(() => {
-    const id = setInterval(() => {
-      setLiveCount((c) => {
-        const delta = Math.floor(Math.random() * 27) - 11;
-        return Math.max(600, Math.min(1200, c + delta));
-      });
-    }, 3200);
-    return () => clearInterval(id);
-  }, []);
-
-  // Enquiry count
-  useEffect(() => {
-    const id = setInterval(() => {
-      setEnquiryCount(2 + Math.floor(Math.random() * 7));
-    }, 7500);
-    return () => clearInterval(id);
-  }, []);
 
   const openSearch = useCallback((q: string) => {
     setModalQuery(q);
@@ -413,7 +393,7 @@ const Index = () => {
     <>
       <Helmet>
         <title>ListHQ — Find your home in any language. Multilingual property search Australia</title>
-        <meta name="description" content="Australia's only multilingual property platform. Search 50,000+ listings auto-translated into 20 languages. Free for buyers, always." />
+        <meta name="description" content="Australia's only multilingual property platform. Listings auto-translated into 20 languages. Free for buyers, always." />
         <link rel="canonical" href="https://listhq.com.au/" />
         <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,700;1,800&display=swap" rel="stylesheet" />
       </Helmet>
@@ -603,11 +583,6 @@ const Index = () => {
                 ))}
               </div>
 
-              {/* Live buyers pill */}
-              <div style={{ marginTop:18, display:'inline-flex', alignItems:'center', gap:8, background:'rgba(22,163,74,.1)', border:'1px solid rgba(22,163,74,.25)', borderRadius:100, padding:'6px 14px', fontSize:12, fontWeight:700, color:'#16a34a' }}>
-                <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:'#16a34a' }} />
-                <strong>{liveCount}</strong> {t('home.hero.buyersNow')}
-              </div>
 
               <div style={{ marginTop:16, maxWidth:560, fontSize:13, color:T.muted, textAlign:'center' }}>
                 {t('home.hero.freeForBuyers')}
@@ -646,10 +621,6 @@ const Index = () => {
                     <span ref={metaRef}>{initialFront.meta}</span>
                     <span style={{ background:T.blueL, color:T.blue, padding:'3px 8px', borderRadius:100, fontWeight:700 }}>🌐 20 langs</span>
                   </div>
-                  <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(22,163,74,.12)', border:'1px solid rgba(22,163,74,.3)', borderRadius:100, padding:'4px 10px', fontSize:11, fontWeight:700, color:'#15803d' }}>
-                    <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:'#16a34a' }} />
-                    <span id="enquiryCount">{enquiryCount}</span>&nbsp;{t('home.hero.enquiredLastHour')}
-                  </div>
                 </div>
               </div>
             </div>
@@ -677,9 +648,8 @@ const Index = () => {
         <div style={{ background:T.off, borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}`, padding:'20px 16px' }}>
           <div className="trust-strip" style={{ maxWidth:1200, margin:'0 auto' }}>
             {[
-              { n: propertyCount && propertyCount > 0 ? `${propertyCount.toLocaleString()}+` : '50,000+', l: t('home.trust.listings') },
+              { n: propertyCount && propertyCount > 0 ? `${propertyCount.toLocaleString()}+` : '—', l: t('home.trust.listings') },
               { n:'20', l: t('home.trust.languages') },
-              { n:'7M+', l: t('home.trust.buyers') },
               { n:'Free', l: t('home.trust.free') },
             ].map((s) => (
               <div key={s.l} className="trust-cell" style={{ textAlign:'center', padding:'8px 16px' }}>
@@ -689,7 +659,7 @@ const Index = () => {
             ))}
           </div>
           <style>{`
-            .trust-strip { display:grid; grid-template-columns: repeat(4, 1fr); align-items:center; }
+            .trust-strip { display:grid; grid-template-columns: repeat(3, 1fr); align-items:center; }
             .trust-cell + .trust-cell { border-left:1px solid ${T.border}; }
             @media (max-width: 640px) {
               .trust-strip { grid-template-columns: repeat(2, 1fr); row-gap: 16px; }
@@ -991,24 +961,14 @@ function AgentBand() {
           </div>
         </div>
 
-        {/* Quote cards + demo */}
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 360px', gap:16, marginTop:52 }} className="agent-cards">
-          {[
-            { q:'ListHQ is the first platform that actually speaks to my Mandarin and Vietnamese buyers without me doing any extra work. Multilingual enquiries are up 3× since we joined.', n:'Sarah Chen', r:'Principal, Sydney Metro Realty · Hurstville NSW', s:'3× more multilingual enquiries', i:'SC' },
-            { q:'I was sceptical about another platform fee. Six months in, I\'ve closed three deals to buyers I would have never reached — that\'s $58K in extra commission off a $799/mo subscription.', n:'Mark Thompson', r:'Director, Brisbane Metro Properties', s:'$58K extra commission', i:'MT' },
-          ].map((c, i) => (
-            <div key={c.n} className={`reveal reveal-d${i+1}`} style={{ background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.10)', borderRadius:16, padding:28 }}>
-              <p style={{ fontStyle:'italic', fontSize:15, color:'rgba(255,255,255,.82)', lineHeight:1.6, margin:'0 0 16px' }}>"{c.q}"</p>
-              <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:14 }}>
-                <div style={{ width:38, height:38, borderRadius:'50%', background:'rgba(255,255,255,.1)', border:'1px solid rgba(255,255,255,.2)', color:'#fff', fontWeight:700, fontSize:13, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>{c.i}</div>
-                <div>
-                  <strong style={{ color:'rgba(255,255,255,.85)', fontSize:13 }}>{c.n}</strong>
-                  <div style={{ fontSize:11, color:'rgba(255,255,255,.4)', marginTop:2 }}>{c.r}</div>
-                </div>
-              </div>
-              <div style={{ fontSize:22, fontWeight:800, color:T.blue }}>{c.s}</div>
-            </div>
-          ))}
+        {/* Trust signal + demo */}
+        <div style={{ marginTop:52, marginBottom:20, textAlign:'center' }}>
+          <p style={{ fontSize:13, fontWeight:600, color:'rgba(255,255,255,.55)', letterSpacing:'.04em', margin:0 }}>
+            Trusted by early-access agencies across NSW and VIC
+          </p>
+        </div>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr', gap:16, justifyItems:'center' }} className="agent-cards">
+          <div style={{ width:'100%', maxWidth:480 }}>
           <div className="reveal reveal-d3" style={{ background:'rgba(255,255,255,.06)', border:'1px solid rgba(255,255,255,.12)', borderRadius:20, padding:20 }}>
             <div style={{ position:'relative', height:180, borderRadius:12, background:'#0f1623', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14 }}>
               {/* Browser chrome */}
@@ -1043,6 +1003,7 @@ function AgentBand() {
             <div style={{ fontSize:10, fontWeight:700, color:'rgba(255,255,255,.5)', textTransform:'uppercase', letterSpacing:'.08em', marginBottom:6 }}>Watch · 90 seconds</div>
             <div style={{ fontSize:15, fontWeight:700, color:'#fff', marginBottom:6 }}>From upload to 20-language listing live</div>
             <div style={{ fontSize:13, color:'rgba(255,255,255,.5)' }}>No signup required · See the full agent platform</div>
+          </div>
           </div>
         </div>
 

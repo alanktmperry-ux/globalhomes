@@ -82,6 +82,7 @@ const PropertyDetailPage = React.lazy(() => import("./pages/PropertyDetailPage")
 const AgentPublicProfilePage = React.lazy(() => import("./pages/AgentPublicProfilePage"));
 const AgentProfilePublic = React.lazy(() => import("./features/public/AgentProfilePage"));
 const BuyerSettingsPage = React.lazy(() => import("./pages/BuyerSettingsPage"));
+const AccountSettingsPage = React.lazy(() => import("./pages/account/AccountSettingsPage"));
 const TermsPage = React.lazy(() => import("./pages/TermsPage"));
 const PrivacyPage = React.lazy(() => import("./pages/PrivacyPage"));
 const UnsubscribePage = React.lazy(() => import("./pages/UnsubscribePage"));

@@ -4457,9 +4457,12 @@ export type Database = {
           completed: boolean
           created_at: string
           due_at: string | null
+          duration_seconds: number | null
           event_data: Json | null
           id: string
           lead_id: string
+          outcome: string | null
+          phone_number: string | null
           subject: string | null
           type: string
         }
@@ -4470,9 +4473,12 @@ export type Database = {
           completed?: boolean
           created_at?: string
           due_at?: string | null
+          duration_seconds?: number | null
           event_data?: Json | null
           id?: string
           lead_id: string
+          outcome?: string | null
+          phone_number?: string | null
           subject?: string | null
           type: string
         }
@@ -4483,9 +4489,12 @@ export type Database = {
           completed?: boolean
           created_at?: string
           due_at?: string | null
+          duration_seconds?: number | null
           event_data?: Json | null
           id?: string
           lead_id?: string
+          outcome?: string | null
+          phone_number?: string | null
           subject?: string | null
           type?: string
         }

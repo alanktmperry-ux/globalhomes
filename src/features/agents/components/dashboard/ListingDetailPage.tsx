@@ -14,6 +14,7 @@ import ListingBuyerLeadsTab from './listing-tabs/ListingBuyerLeadsTab';
 import { DocumentVault } from '@/features/documents/components/DocumentVault';
 import ListingAccountingTab from './listing-tabs/ListingAccountingTab';
 import ListingMarketTab from './listing-tabs/ListingMarketTab';
+import ListingAnalyticsTab from './listing-tabs/ListingAnalyticsTab';
 import MatchedBuyersWidget from './MatchedBuyersWidget';
 
 const ListingDetailPage = () => {
@@ -157,6 +158,7 @@ const ListingDetailPage = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-secondary mb-6 flex-wrap h-auto gap-1 p-1">
             <TabsTrigger value="details" className="text-xs">Details</TabsTrigger>
+            <TabsTrigger value="analytics" className="text-xs">Analytics</TabsTrigger>
             <TabsTrigger value="marketing" className="text-xs">Marketing</TabsTrigger>
             <TabsTrigger value="buyers" className="text-xs">Buyer Leads</TabsTrigger>
             <TabsTrigger value="documents" className="text-xs">Documents</TabsTrigger>
@@ -178,6 +180,10 @@ const ListingDetailPage = () => {
 
           <TabsContent value="marketing">
             <ListingMarketingTab listing={listing} onViewAllLeads={() => setActiveTab('buyers')} />
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <ListingAnalyticsTab listingId={listing.id} agentId={agentId} />
           </TabsContent>
 
           <TabsContent value="buyers">

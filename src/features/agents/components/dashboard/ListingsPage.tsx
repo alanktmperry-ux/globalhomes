@@ -2,7 +2,7 @@ import { useState, useEffect, lazy, Suspense } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Info, Loader2, Pencil, Globe, Home, Building, MoreHorizontal, FileBarChart2, Copy, Mail, List as ListIcon, Kanban, ExternalLink, ChevronDown } from 'lucide-react';
+import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Info, Loader2, Pencil, Globe, Home, Building, MoreHorizontal, FileBarChart2, Copy, Mail, List as ListIcon, Kanban, ExternalLink, ChevronDown, MessageSquare } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -197,6 +197,25 @@ function StatusMenu({
   );
 }
 
+interface ListingStatsMaps {
+  views: Record<string, number>;
+  enquiries: Record<string, number>;
+  matches: Record<string, number>;
+}
+
+function ListingStats({ listingId, stats }: { listingId: string; stats: ListingStatsMaps }) {
+  const views = stats.views[listingId] ?? 0;
+  const enquiries = stats.enquiries[listingId] ?? 0;
+  const matches = stats.matches[listingId] ?? 0;
+  return (
+    <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+      <span className="flex items-center gap-1"><Eye size={12} />{views} view{views !== 1 ? 's' : ''}</span>
+      <span className="flex items-center gap-1"><MessageSquare size={12} />{enquiries} enquir{enquiries !== 1 ? 'ies' : 'y'}</span>
+      <span className="flex items-center gap-1"><Sparkles size={12} />{matches} match{matches !== 1 ? 'es' : ''}</span>
+    </div>
+  );
+}
+
 interface ListingCardProps {
   l: AgentListing & { _status: string };
   actionLoading: string | null;
@@ -208,9 +227,10 @@ interface ListingCardProps {
   isRental?: boolean;
   onStatusChange: (id: string, status: string) => void;
   onDelete: (id: string) => void;
+  stats: ListingStatsMaps;
 }
 
-const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSendReport, navigate, isRental, onStatusChange, onDelete }: ListingCardProps) => {
+const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSendReport, navigate, isRental, onStatusChange, onDelete, stats }: ListingCardProps) => {
   const s = STATUS_CONFIG[l._status] || STATUS_CONFIG.public;
   const days = getListingDays(l);
   const leads = getListingLeads(l);
@@ -241,6 +261,7 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
         <h3 className="font-display text-sm font-bold truncate">{l.title}</h3>
         <p className="text-xs text-muted-foreground truncate">{l.address}</p>
         <p className="text-sm font-display font-bold text-primary mt-1">{l.price_formatted}</p>
+        <ListingStats listingId={l.id} stats={stats} />
       </div>
       <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1 shrink-0">
         <button
@@ -395,6 +416,33 @@ const ListingsPage = () => {
   const [reportModal, setReportModal] = useState<{ url: string; address: string; token: string; propertyId: string; agentId: string } | null>(null);
   const [statusOverrides, setStatusOverrides] = useState<Record<string, string>>({});
   const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
+  const [stats, setStats] = useState<ListingStatsMaps>({ views: {}, enquiries: {}, matches: {} });
+
+  useEffect(() => {
+    if (!agent?.id) return;
+    let cancelled = false;
+    (async () => {
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 86400 * 1000).toISOString();
+      const [enqRes, viewRes, matchRes] = await Promise.all([
+        supabase.from('leads').select('property_id').eq('agent_id', agent.id),
+        supabase.from('lead_events').select('property_id').eq('event_type', 'view').gte('created_at', thirtyDaysAgo),
+        supabase.from('listing_buyer_matches').select('listing_id').eq('agent_id', agent.id),
+      ]);
+      if (cancelled) return;
+      const buildMap = (rows: any[] | null, key: string) =>
+        (rows ?? []).reduce<Record<string, number>>((acc, row) => {
+          const id = row?.[key];
+          if (id) acc[id] = (acc[id] ?? 0) + 1;
+          return acc;
+        }, {});
+      setStats({
+        enquiries: buildMap(enqRes.data as any[], 'property_id'),
+        views: buildMap(viewRes.data as any[], 'property_id'),
+        matches: buildMap(matchRes.data as any[], 'listing_id'),
+      });
+    })();
+    return () => { cancelled = true; };
+  }, [agent?.id, listings.length]);
 
   const handleStatusChange = (id: string, status: string) => {
     setStatusOverrides((prev) => ({ ...prev, [id]: status }));
@@ -699,6 +747,7 @@ const ListingsPage = () => {
                   isRental={listingMode === 'rent'}
                   onStatusChange={handleStatusChange}
                   onDelete={handleDelete}
+                  stats={stats}
                 />
               ))}
             </div>

@@ -402,6 +402,20 @@ const StepSettings = ({ draft, update }: Props) => {
                 className="bg-card border-border"
               />
             </div>
+
+            <div>
+              <Label className="text-xs mb-1 block">Virtual tour URL (optional)</Label>
+              <Input
+                type="url"
+                value={draft.virtual_tour_url || ''}
+                onChange={(e) => update({ virtual_tour_url: e.target.value })}
+                placeholder="https://my.matterport.com/show/?m=..."
+                className="bg-card border-border"
+              />
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Matterport, YouTube, or any 360° tour link
+              </p>
+            </div>
           </div>
         </>
       )}

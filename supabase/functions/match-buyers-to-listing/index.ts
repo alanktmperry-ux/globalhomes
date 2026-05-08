@@ -292,7 +292,7 @@ Deno.serve(async (req) => {
   </div>
   <div style="text-align:center;font-size:11px;color:#bbb;padding:16px 0;">
     ListHQ · listhq.com.au<br>
-    <a href="https://globalhomes.lovable.app/unsubscribe?email=${encodeURIComponent(profile.email)}" style="color:#bbb;">Unsubscribe</a>
+    <a href="${unsubUrl}" style="color:#bbb;">Unsubscribe</a>
   </div>
 </div>
 </body></html>`;

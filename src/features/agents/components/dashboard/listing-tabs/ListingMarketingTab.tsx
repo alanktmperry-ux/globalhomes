@@ -990,6 +990,42 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
         )}
       </div>
 
+      {/* ── SHARE TRANSLATED LISTING ── */}
+      {translateDone && (
+        <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+          <div className="flex items-center gap-2 text-sm font-bold">
+            <Share2 size={14} className="text-primary" />
+            Share translated listing
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Send buyers a link that opens directly in their language.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { lang: 'zh', flag: '🇨🇳', label: 'Chinese (Simplified)' },
+              { lang: 'zh-TW', flag: '🇹🇼', label: 'Chinese (Traditional)' },
+              { lang: 'vi', flag: '🇻🇳', label: 'Vietnamese' },
+              { lang: 'ko', flag: '🇰🇷', label: 'Korean' },
+              { lang: 'ar', flag: '🇸🇦', label: 'Arabic' },
+              { lang: 'ja', flag: '🇯🇵', label: 'Japanese' },
+            ].map(({ lang, flag, label }) => (
+              <button
+                key={lang}
+                type="button"
+                onClick={() => {
+                  const url = `${window.location.origin}/property/${listing.id}?lang=${lang}`;
+                  navigator.clipboard.writeText(url);
+                  toast.success(`${flag} ${label} link copied`);
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-secondary text-xs font-medium text-muted-foreground hover:border-primary/40 hover:text-foreground transition-all"
+              >
+                {flag} {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ── BUYER LANGUAGE PREVIEW ── */}
       {translateDone && (
         <div className="bg-card border border-border rounded-xl overflow-hidden">

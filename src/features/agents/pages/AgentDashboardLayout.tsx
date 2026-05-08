@@ -5,6 +5,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
 import AgentDashboardSidebar from '@/features/agents/components/dashboard/AgentDashboardSidebar';
+import { DashboardBottomTabs } from '@/features/agents/components/dashboard/DashboardBottomTabs';
 import { PaymentStatusBanner } from '@/features/agents/components/PaymentStatusBanner';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 import { PageSkeleton } from '@/shared/components/PageSkeleton';

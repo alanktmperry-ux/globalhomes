@@ -442,7 +442,7 @@ const ListingsPage = () => {
       });
     })();
     return () => { cancelled = true; };
-  }, [agent?.id, fetchKey]);
+  }, [agent?.id, listings.length]);
 
   const handleStatusChange = (id: string, status: string) => {
     setStatusOverrides((prev) => ({ ...prev, [id]: status }));

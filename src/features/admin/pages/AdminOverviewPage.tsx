@@ -10,7 +10,7 @@ const PLAN_PRICE: Record<string, number> = {
 
 interface AgentRow {
   id: string;
-  full_name: string | null;
+  name: string | null;
   email: string | null;
   subscription_plan: string | null;
   subscription_status: string | null;
@@ -55,9 +55,9 @@ export default function AdminOverviewPage() {
       const { data } = await supabase
         .from('agents')
         .select(
-          'id, full_name, email, subscription_plan, subscription_status, is_subscribed, created_at, payment_failed_at',
+          'id, name, email, subscription_plan, subscription_status, is_subscribed, created_at, payment_failed_at',
         );
-      setAgents((data ?? []) as AgentRow[]);
+      setAgents((data ?? []) as unknown as AgentRow[]);
     })();
   }, []);
 
@@ -199,7 +199,7 @@ export default function AdminOverviewPage() {
           {soonExpiring.map(({ agent, daysLeft }) => (
             <div key={agent.id} className="flex items-center justify-between text-sm">
               <span className="text-amber-900 truncate">
-                {agent.full_name || agent.email || agent.id}
+                {agent.name || agent.email || agent.id}
               </span>
               <span className="text-amber-700 font-medium whitespace-nowrap ml-3">
                 {daysLeft} day{daysLeft !== 1 ? 's' : ''} left

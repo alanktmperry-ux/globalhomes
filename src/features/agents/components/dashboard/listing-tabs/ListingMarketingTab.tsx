@@ -400,6 +400,8 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
     setPreviewTranslations((data?.translations as any) ?? {});
     setPreviewLoading(false);
   };
+
+  return (
     <div className="space-y-6">
       {/* ── PREPARE YOUR LISTING — service marketplace ── */}
       <div className="bg-card border border-border rounded-xl p-5">

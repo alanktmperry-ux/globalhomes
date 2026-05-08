@@ -13,20 +13,16 @@ interface Props {
   update: (p: Partial<ListingDraft>) => void;
 }
 
-type LangKey = 'zh-CN' | 'zh-TW' | 'ja' | 'ko';
+const LANGUAGES = [
+  { key: 'zh-CN', flag: '🇨🇳', label: 'Chinese (Simplified)', titleField: 'title_zh',    descField: 'description_zh',    responseKey: 'zh_simplified', dir: 'ltr' },
+  { key: 'zh-TW', flag: '🇹🇼', label: 'Chinese (Traditional)', titleField: 'title_zh_tw', descField: 'description_zh_tw', responseKey: 'zh_traditional', dir: 'ltr' },
+  { key: 'ja',    flag: '🇯🇵', label: 'Japanese',              titleField: 'title_ja',    descField: 'description_ja',    responseKey: 'ja', dir: 'ltr' },
+  { key: 'ko',    flag: '🇰🇷', label: 'Korean',                titleField: 'title_ko',    descField: 'description_ko',    responseKey: 'ko', dir: 'ltr' },
+  { key: 'vi',    flag: '🇻🇳', label: 'Vietnamese',            titleField: 'title_vi',    descField: 'description_vi',    responseKey: 'vi', dir: 'ltr' },
+  { key: 'ar',    flag: '🇸🇦', label: 'Arabic',                titleField: 'title_ar',    descField: 'description_ar',    responseKey: 'ar', dir: 'rtl' },
+] as const;
 
-const LANGUAGES: {
-  key: LangKey;
-  flag: string;
-  label: string;
-  titleField: keyof ListingDraft;
-  descField: keyof ListingDraft;
-}[] = [
-  { key: 'zh-CN', flag: '🇨🇳', label: 'Chinese (Simplified)', titleField: 'title_zh', descField: 'description_zh' },
-  { key: 'zh-TW', flag: '🇹🇼', label: 'Chinese (Traditional)', titleField: 'title_zh_tw', descField: 'description_zh_tw' },
-  { key: 'ja', flag: '🇯🇵', label: 'Japanese', titleField: 'title_ja', descField: 'description_ja' },
-  { key: 'ko', flag: '🇰🇷', label: 'Korean', titleField: 'title_ko', descField: 'description_ko' },
-];
+type LangKey = typeof LANGUAGES[number]['key'];
 
 const TITLE_LIMIT = 120;
 
@@ -64,22 +60,19 @@ const StepTranslate = ({ draft, update }: Props) => {
     }
     setTranslating(activeLang);
     try {
-      const { data, error } = await supabase.functions.invoke('generate-translations', {
-        body: {
-          type: 'translate_text',
-          target_language: activeLang,
-          title: sourceTitle,
-          description: sourceDescription,
-          bullets: draft.generatedBullets,
-        },
+      const { data, error } = await supabase.functions.invoke('translate-listing-preview', {
+        body: { title: sourceTitle, description: sourceDescription },
       });
 
       if (error) throw error;
-      if (!data || data.error) throw new Error(data?.error || 'Translation failed');
+      if (!data?.translations) throw new Error('No translations returned');
+
+      const t = data.translations[active.responseKey];
+      if (!t) throw new Error(`No translation for ${active.label}`);
 
       update({
-        [active.titleField]: (data.title as string) || '',
-        [active.descField]: (data.description as string) || '',
+        [active.titleField]: t.title || '',
+        [active.descField]: t.description || '',
       } as Partial<ListingDraft>);
 
       toast.success(`Translated to ${active.label}`);
@@ -167,6 +160,7 @@ const StepTranslate = ({ draft, update }: Props) => {
             )}
           </div>
           <Textarea
+            dir={active.dir}
             value={titleValue}
             onChange={(e) =>
               update({ [active.titleField]: e.target.value.slice(0, TITLE_LIMIT) } as Partial<ListingDraft>)
@@ -203,6 +197,7 @@ const StepTranslate = ({ draft, update }: Props) => {
             )}
           </div>
           <Textarea
+            dir={active.dir}
             value={descValue}
             onChange={(e) => update({ [active.descField]: e.target.value } as Partial<ListingDraft>)}
             placeholder={`Enter description in ${active.label}…`}

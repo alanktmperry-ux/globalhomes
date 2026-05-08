@@ -961,24 +961,14 @@ function AgentBand() {
           </div>
         </div>
 
-        {/* Quote cards + demo */}
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 360px', gap:16, marginTop:52 }} className="agent-cards">
-          {[
-            { q:'ListHQ is the first platform that actually speaks to my Mandarin and Vietnamese buyers without me doing any extra work. Multilingual enquiries are up 3× since we joined.', n:'Sarah Chen', r:'Principal, Sydney Metro Realty · Hurstville NSW', s:'3× more multilingual enquiries', i:'SC' },
-            { q:'I was sceptical about another platform fee. Six months in, I\'ve closed three deals to buyers I would have never reached — that\'s $58K in extra commission off a $799/mo subscription.', n:'Mark Thompson', r:'Director, Brisbane Metro Properties', s:'$58K extra commission', i:'MT' },
-          ].map((c, i) => (
-            <div key={c.n} className={`reveal reveal-d${i+1}`} style={{ background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.10)', borderRadius:16, padding:28 }}>
-              <p style={{ fontStyle:'italic', fontSize:15, color:'rgba(255,255,255,.82)', lineHeight:1.6, margin:'0 0 16px' }}>"{c.q}"</p>
-              <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:14 }}>
-                <div style={{ width:38, height:38, borderRadius:'50%', background:'rgba(255,255,255,.1)', border:'1px solid rgba(255,255,255,.2)', color:'#fff', fontWeight:700, fontSize:13, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>{c.i}</div>
-                <div>
-                  <strong style={{ color:'rgba(255,255,255,.85)', fontSize:13 }}>{c.n}</strong>
-                  <div style={{ fontSize:11, color:'rgba(255,255,255,.4)', marginTop:2 }}>{c.r}</div>
-                </div>
-              </div>
-              <div style={{ fontSize:22, fontWeight:800, color:T.blue }}>{c.s}</div>
-            </div>
-          ))}
+        {/* Trust signal + demo */}
+        <div style={{ marginTop:52, marginBottom:20, textAlign:'center' }}>
+          <p style={{ fontSize:13, fontWeight:600, color:'rgba(255,255,255,.55)', letterSpacing:'.04em', margin:0 }}>
+            Trusted by early-access agencies across NSW and VIC
+          </p>
+        </div>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr', gap:16, justifyItems:'center' }} className="agent-cards">
+          <div style={{ width:'100%', maxWidth:480 }}>
           <div className="reveal reveal-d3" style={{ background:'rgba(255,255,255,.06)', border:'1px solid rgba(255,255,255,.12)', borderRadius:20, padding:20 }}>
             <div style={{ position:'relative', height:180, borderRadius:12, background:'#0f1623', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14 }}>
               {/* Browser chrome */}

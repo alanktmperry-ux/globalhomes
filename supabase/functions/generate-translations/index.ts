@@ -121,10 +121,20 @@ Return ONLY valid JSON. No markdown, no code fences.`;
 
   const result = await callAI(systemPrompt, userPrompt);
 
+  // Read existing translations so manually-entered ones are not overwritten
+  const { data: existing } = await supabase
+    .from("properties")
+    .select("translations")
+    .eq("id", listingId)
+    .maybeSingle();
+  const existingTrans = (existing?.translations as Record<string, unknown> | null) ?? {};
+  // Merge: existing keys take priority (agent's manual entries win over AI)
+  const mergedTranslations = { ...result.translations, ...existingTrans };
+
   const { error: updateError } = await supabase
     .from("properties")
     .update({
-      translations: result.translations,
+      translations: mergedTranslations,
       agent_insights: result.agent_insights,
       translation_status: "complete",
       translations_generated_at: new Date().toISOString(),

@@ -514,6 +514,21 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         exclusive_end_date: draft.isExclusive && !editPropertyId ? new Date(Date.now() + 14 * 86_400_000).toISOString() : undefined,
       } as any;
 
+      // Seed translations JSONB from any manually-entered wizard translations.
+      // generate-translations will merge AI output on top but will not overwrite these.
+      const manualTranslations: Record<string, { title: string | null; description: string | null }> = {};
+      if (draft.title_zh || draft.description_zh)
+        manualTranslations['zh_simplified'] = { title: draft.title_zh || null, description: draft.description_zh || null };
+      if (draft.title_zh_tw || draft.description_zh_tw)
+        manualTranslations['zh_traditional'] = { title: draft.title_zh_tw || null, description: draft.description_zh_tw || null };
+      if (draft.title_ja || draft.description_ja)
+        manualTranslations['ja'] = { title: draft.title_ja || null, description: draft.description_ja || null };
+      if (draft.title_ko || draft.description_ko)
+        manualTranslations['ko'] = { title: draft.title_ko || null, description: draft.description_ko || null };
+      if (Object.keys(manualTranslations).length > 0) {
+        (payload as any).translations = manualTranslations;
+      }
+
       // Add 'Pets considered' to features if applicable
       if (draft.petsAllowed && !payload.features?.includes('Pets considered')) {
         payload.features = [...(payload.features || []), 'Pets considered'];

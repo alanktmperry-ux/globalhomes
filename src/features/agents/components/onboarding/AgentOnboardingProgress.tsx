@@ -28,15 +28,15 @@ export function useOnboardingSteps() {
       // Fetch full agent profile fields
       const { data: full } = await supabase
         .from('agents')
-        .select('name, licence_number, bio, suburbs, subscription_plan')
+        .select('name, license_number, bio, service_areas, subscription_plan')
         .eq('id', agentId)
         .maybeSingle();
 
       const profileDone = !!(
         (full as any)?.name &&
-        (full as any)?.licence_number &&
+        (full as any)?.license_number &&
         (full as any)?.bio &&
-        ((full as any)?.suburbs?.length ?? 0) > 0
+        ((full as any)?.service_areas?.length ?? 0) > 0
       );
 
       const { count: listingCount } = await supabase

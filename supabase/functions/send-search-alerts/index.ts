@@ -205,11 +205,9 @@ async function handleDigest(mode: 'daily' | 'weekly') {
     const email = userData?.user?.email;
     if (!email || !RESEND_KEY) continue;
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('full_name')
-      .eq('user_id', (search as any).user_id)
-      .single();
+    const firstName = (userData?.user?.user_metadata?.full_name as string | undefined)?.split(' ')[0]
+      ?? (userData?.user?.user_metadata?.name as string | undefined)?.split(' ')[0]
+      ?? 'there';
 
     // Find recent matching properties
     let q = supabase
@@ -256,7 +254,7 @@ async function handleDigest(mode: 'daily' | 'weekly') {
         subject: `🏡 ${matches.length} new propert${matches.length > 1 ? 'ies' : 'y'} for "${(search as any).name}"`,
         html: `
           <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px">
-            <p>Hi ${(profile as any)?.full_name?.split(' ')[0] ?? 'there'},</p>
+            <p>Hi ${firstName},</p>
             <p>Here's your ${mode} digest for "<strong>${(search as any).name}</strong>":</p>
             <table style="width:100%;border-collapse:collapse;margin:16px 0">${listingRows}</table>
             <a href="${APP_URL}/" style="display:inline-block;background:#1a1a1a;color:white;padding:12px 24px;border-radius:8px;text-decoration:none">View All Matches →</a>

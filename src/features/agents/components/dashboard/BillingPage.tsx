@@ -240,6 +240,15 @@ const BillingPage = () => {
     }
   };
 
+  const openBillingPortal = async () => {
+    const { data, error } = await supabase.functions.invoke('create-billing-portal');
+    if (error || !data?.url) {
+      toast.error('Could not open billing portal — please contact support');
+      return;
+    }
+    window.location.href = data.url;
+  };
+
   if (sub.loading) {
     return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" size={24} /></div>;
   }
@@ -306,6 +315,11 @@ const BillingPage = () => {
               <h3 className="text-sm font-bold">Current Plan</h3>
               <p className="text-2xl font-bold text-primary mt-1">{planLabel}</p>
             </div>
+            {!sub.isDemo && sub.plan && (
+              <Button variant="outline" size="sm" onClick={openBillingPortal}>
+                Manage Subscription
+              </Button>
+            )}
           </div>
           {sub.isDemo && (
             <p className="text-sm text-amber-600">

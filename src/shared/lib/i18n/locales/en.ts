@@ -451,7 +451,7 @@ export const en = {
   // ── Sliver bar ──
   'home.sliver.agents': 'Real estate agents: reach 7M+ multilingual buyers no other portal can find',
   'home.sliver.translation': 'Auto-translated listings in 20 languages',
-  'home.sliver.price': 'From $799/mo',
+  'home.sliver.price': 'From $299/mo',
   'home.sliver.free': '60 days free',
   'home.sliver.cta': 'See how it works →',
 
@@ -490,13 +490,13 @@ export const en = {
   'home.testimonials.heading': 'Real people. Real homes. In their language.',
 
   // ── Agent band ──
-  'home.agentBand.para': 'Are they finding your listings? ListHQ auto-translates every property you upload into 20 languages — reaching buyers no other portal can. From $799/mo. 60 days free.',
+  'home.agentBand.para': 'Are they finding your listings? ListHQ auto-translates every property you upload into 20 languages — reaching buyers no other portal can. From $299/mo. 60 days free.',
   'home.agentBand.finePrint': '60 days free · No credit card · Australian data storage',
   'home.agentBand.watchDemo': 'Watch 90-sec demo',
   'home.agentBand.roiHeading': 'If you have {n} active listings on ListHQ…',
   'home.agentBand.roiLabel1': 'multilingual buyers reached / month',
   'home.agentBand.roiLabel2': 'languages auto-translated, zero work',
-  'home.agentBand.roiLabel3': 'avg. return on $799/mo subscription',
+  'home.agentBand.roiLabel3': 'avg. return on $299/mo subscription',
   'home.agentBand.demoTitle': 'See your listing translated — live',
   'home.agentBand.demoSub': 'Type any property description and watch it appear in 5 languages instantly.',
   'home.agentBand.demoPlaceholder': 'e.g. Spacious 4-bed family home near top schools…',
@@ -511,7 +511,7 @@ export const en = {
   'home.pricing.eyebrow': 'Pricing — no contracts, cancel anytime',
   'home.pricing.heading': 'Built for the way you work.',
   'home.pricing.subtext': 'All plans include 20 languages · trust accounting · AI matching',
-  'home.pricing.calloutTitle': 'Why $799/mo is a no-brainer for agents',
+  'home.pricing.calloutTitle': 'Why $299/mo is a no-brainer for agents',
   'home.pricing.calloutBody': 'REA.com.au and Domain charge $1,500–$7,000 per listing. A CRM costs $300–$600/mo. Property management software another $200–$400/mo. ListHQ replaces all three — CRM, PM platform, and multilingual listing portal — in one subscription, reaching 7M+ multilingual buyers no other portal can find.',
   'home.pricing.monthly': 'Monthly',
   'home.pricing.annual': 'Annual — save 20%',

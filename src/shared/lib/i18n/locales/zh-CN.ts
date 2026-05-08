@@ -452,7 +452,7 @@ export const zhCN: Partial<Record<keyof typeof EnBase, string>> = {
   // ── Sliver bar ──
   'home.sliver.agents': '🏆 房产中介：触达700万+其他门户无法覆盖的多语言买家',
   'home.sliver.translation': '房源自动翻译成20种语言',
-  'home.sliver.price': '起价 $799/月',
+  'home.sliver.price': '起价 $299/月',
   'home.sliver.free': '免费60天',
   'home.sliver.cta': '了解运作方式 →',
 
@@ -491,13 +491,13 @@ export const zhCN: Partial<Record<keyof typeof EnBase, string>> = {
   'home.testimonials.heading': '真实的人。真实的家。用他们的语言。',
 
   // ── Agent band ──
-  'home.agentBand.para': '他们找得到您的房源吗？ListHQ将您上传的每套房源自动翻译成20种语言——触达其他门户无法覆盖的买家。起价 $799/月。免费60天。',
+  'home.agentBand.para': '他们找得到您的房源吗？ListHQ将您上传的每套房源自动翻译成20种语言——触达其他门户无法覆盖的买家。起价 $299/月。免费60天。',
   'home.agentBand.finePrint': '60天免费 · 无需信用卡 · 澳大利亚数据存储',
   'home.agentBand.watchDemo': '观看90秒演示',
   'home.agentBand.roiHeading': '如果您在ListHQ有{n}套在售房源……',
   'home.agentBand.roiLabel1': '每月触达的多语言买家数',
   'home.agentBand.roiLabel2': '种语言自动翻译,零额外工作',
-  'home.agentBand.roiLabel3': '$799/月订阅的平均投资回报率',
+  'home.agentBand.roiLabel3': '$299/月订阅的平均投资回报率',
   'home.agentBand.demoTitle': '实时查看您的房源翻译效果',
   'home.agentBand.demoSub': '输入任意房产描述,立即查看5种语言版本。',
   'home.agentBand.demoPlaceholder': '例如:宽敞的4卧室家庭住宅,毗邻顶级学校…',
@@ -512,7 +512,7 @@ export const zhCN: Partial<Record<keyof typeof EnBase, string>> = {
   'home.pricing.eyebrow': '定价——无合约,随时取消',
   'home.pricing.heading': '专为您的工作方式打造。',
   'home.pricing.subtext': '所有方案包含20种语言 · 信托账户 · AI匹配',
-  'home.pricing.calloutTitle': '为什么$799/月对中介来说是明智之选',
+  'home.pricing.calloutTitle': '为什么$299/月对中介来说是明智之选',
   'home.pricing.calloutBody': 'REA.com.au 和 Domain 每套房源收费 $1,500–$7,000。CRM 每月需 $300–$600。物业管理软件另需 $200–$400/月。ListHQ 三合一——CRM、物业管理平台和多语言房源门户——一个订阅覆盖,触达700万+其他门户无法覆盖的多语言买家。',
   'home.pricing.monthly': '按月付费',
   'home.pricing.annual': '按年付费——节省20%',

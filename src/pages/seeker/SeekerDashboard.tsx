@@ -22,7 +22,9 @@ export default function SeekerDashboard() {
   const [halos, setHalos] = useState<HaloRow[] | null>(null);
   const [unreadTotal, setUnreadTotal] = useState(0);
   const [filter, setFilter] = useState<'all' | 'buy' | 'rent'>('all');
-  const [profile, setProfile] = useState<{ first_name: string | null; full_name: string | null } | null>(null);
+  const [profile, setProfile] = useState<{ first_name: string | null; full_name: string | null; language_preference: string | null } | null>(null);
+  const [buyerIntent, setBuyerIntent] = useState<any | null>(null);
+  const [matches, setMatches] = useState<any[]>([]);
 
   useEffect(() => {
     if (!user) return;

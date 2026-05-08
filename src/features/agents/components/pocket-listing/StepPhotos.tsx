@@ -19,7 +19,10 @@ const DEMO_PHOTOS = [
 
 const StepPhotos = ({ draft, update }: Props) => {
   const fileRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [videoDragOver, setVideoDragOver] = useState(false);
+  const [videoUploading, setVideoUploading] = useState(false);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [overIdx, setOverIdx] = useState<number | null>(null);
   const [uploading, setUploading] = useState(false);

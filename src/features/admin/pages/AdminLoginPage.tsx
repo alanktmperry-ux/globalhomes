@@ -64,7 +64,7 @@ export default function AdminLoginPage() {
       const { error } = await supabase.auth.resetPasswordForEmail(
         resetEmail.trim().toLowerCase(),
         // Bug Fix 1: All password reset emails must link back to /login (handled site-wide).
-        { redirectTo: 'https://globalhomes.lovable.app/login' }
+        { redirectTo: `${window.location.origin}/login` }
       );
       if (error) throw error;
       toast.success("Check your email for a password reset link");

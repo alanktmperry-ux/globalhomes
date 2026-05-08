@@ -223,6 +223,7 @@ const DEFAULT_DRAFT: ListingDraft = {
   title_ar: '',
   description_ar: '',
   virtual_tour_url: '',
+  video_url: '',
 };
 
 const STEPS = ['Address', 'Basics', 'Photos', 'Voice', 'Translate', 'Settings', 'Preview'];

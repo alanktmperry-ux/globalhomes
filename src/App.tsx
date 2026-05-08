@@ -48,6 +48,7 @@ const AdminAgentsPage = React.lazy(() => import("./features/admin/pages/AgentsPa
 const AdminPartnersPage = React.lazy(() => import("./features/admin/pages/PartnersPage"));
 const AdminBrokers = React.lazy(() => import("./features/admin/components/AdminBrokers"));
 const AdminSupportPage = React.lazy(() => import("./features/admin/pages/SupportPage"));
+const MultilingualGenerator = React.lazy(() => import("./features/public/MultilingualGenerator"));
 const AdminListingsPage = React.lazy(() => import("./features/admin/pages/AdminListingsPage"));
 const AdminInsightsPage = React.lazy(() => import("./features/admin/pages/InsightsPage"));
 const AdminCostsPage = React.lazy(() => import("./features/admin/pages/CostsPage"));
@@ -308,6 +309,7 @@ const App = () => (
                   <Route path="/sign/:token" element={<SigningPage />} />
                   <Route path="/privacy" element={<PrivacyPage />} />
                   <Route path="/unsubscribe" element={<UnsubscribePage />} />
+                  <Route path="/tools/multilingual-listing" element={<MultilingualGenerator />} />
                   <Route path="/stamp-duty-calculator" element={<StampDutyPage />} />
                   <Route path="/mortgage-calculator" element={<MortgageCalculatorPage />} />
                   <Route path="/buyer-pool" element={<BuyerPoolPage />} />

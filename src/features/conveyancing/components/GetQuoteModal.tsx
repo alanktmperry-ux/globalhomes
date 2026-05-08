@@ -24,6 +24,7 @@ export interface GetQuoteModalProps {
   onOpenChange: (open: boolean) => void;
   conveyancerId?: string | null;
   conveyancerName?: string | null;
+  conveyancerEmail?: string | null;
   defaultTransactionType?: 'Buying' | 'Selling' | 'Both';
   source?: string;
   propertyId?: string | null;
@@ -35,6 +36,7 @@ export const GetQuoteModal = ({
   onOpenChange,
   conveyancerId = null,
   conveyancerName = null,
+  conveyancerEmail = null,
   defaultTransactionType = 'Buying',
   source = 'conveyancing_page',
   propertyId = null,

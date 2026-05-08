@@ -175,9 +175,7 @@ export default function InboxPage() {
 
           <div className="flex-1 overflow-y-auto">
             {loading ? (
-              <div className="flex items-center justify-center p-8">
-                <Loader2 className="animate-spin text-muted-foreground" size={20} />
-              </div>
+              <InboxSkeleton />
             ) : threads.length === 0 ? (
               <div className="text-center p-8 text-sm text-muted-foreground">
                 <MailOpen className="mx-auto mb-2 opacity-50" size={28} />

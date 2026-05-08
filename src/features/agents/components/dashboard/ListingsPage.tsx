@@ -243,7 +243,7 @@ const ListingsPage = () => {
   const { listings, loading, isMockData, refetch } = useAgentListings();
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [reportModal, setReportModal] = useState<{ url: string; address: string } | null>(null);
+  const [reportModal, setReportModal] = useState<{ url: string; address: string; token: string; propertyId: string; agentId: string } | null>(null);
 
   const handleSendReport = async (l: AgentListing) => {
     if (l._source !== 'db') {

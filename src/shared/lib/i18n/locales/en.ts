@@ -1049,65 +1049,7 @@ export const en = {
   'home.portals.partner.register': 'Become a partner?',
   'home.portals.signIn': 'Sign in',
 
-  // ── Homepage — sliver bar ──
-  'home.sliver.agents': 'Real estate agents: reach 7M+ multilingual buyers no other portal can find',
-  'home.sliver.translation': 'Auto-translated listings in 20 languages',
-  'home.sliver.price': 'From $799/mo',
-  'home.sliver.free': '60 days free',
-  'home.sliver.cta': 'See how it works →',
-
-  // ── Homepage — hero ──
-  'home.hero.langSwitch': 'click any language below to switch',
-  'home.hero.findMyHome': 'Find my home',
-  'home.hero.buyersSearching': 'buyers searching right now',
-  'home.hero.freeForBuyers': '🔒 Free for buyers · Always · No account needed to search',
-  'home.hero.chip.budget': 'Under $1M',
-  'home.hero.chip.beds': '3+ beds',
-  'home.hero.chip.schools': 'Top schools',
-  'home.hero.cardLangBadge': '🌐 20 languages · auto-translated',
-  'home.hero.enquiredLastHour': 'people enquired in the last hour',
-
-  // ── Homepage — trust strip ──
-  'home.trust.listings': 'live listings',
-  'home.trust.languages': 'languages auto-translated',
-  'home.trust.buyers': 'multilingual Australians',
-  'home.trust.free': 'for buyers · always',
-
-  // ── Homepage — featured listings ──
-  'home.featured.eyebrow': 'Properties on ListHQ',
-  'home.featured.heading': "Browse what's listed now",
-  'home.featured.viewAll': 'View all →',
-  'home.featured.browseAll': 'Browse all properties →',
-
-  // ── Homepage — language proof ──
-  'home.langProof.eyebrow': 'Why ListHQ is different',
-  'home.langProof.heading': 'Where multilingual Australia finds home.',
-  'home.langProof.body': 'Every listing on ListHQ is automatically translated into 20 languages — Chinese, Vietnamese, Arabic, Hindi and 16 more. No other portal does this.',
-  'home.langProof.cta': 'Find homes in your language →',
-
-  // ── Homepage — testimonials ──
-  'home.testimonials.eyebrow': 'What buyers say',
-  'home.testimonials.heading': 'Real people. Real homes. In their language.',
-
-  // ── Homepage — agent band ──
-  'home.agentBand.para': 'Are they finding your listings? ListHQ auto-translates every property you upload into 20 languages — reaching buyers no other portal can. From $799/mo. 60 days free.',
-  'home.agentBand.finePrint': '60 days free · No credit card · Australian data storage',
-  'home.agentBand.watchDemo': 'Watch 90-sec demo',
-  'home.agentBand.roiHeading': 'If you have {n} active listings on ListHQ…',
-  'home.agentBand.roiLabel1': 'multilingual buyers reached / month',
-  'home.agentBand.roiLabel2': 'languages auto-translated, zero work',
-  'home.agentBand.roiLabel3': 'avg. return on $799/mo subscription',
-  'home.agentBand.demoTitle': 'See your listing translated live',
-
-  // ── Homepage — pricing ──
-  'home.pricing.heading': 'Built for the way you work.',
-  'home.pricing.subtext': 'All plans include 20 languages · trust accounting · AI matching',
-  'home.pricing.calloutTitle': 'Why $799/mo is a no-brainer for agents',
-  'home.pricing.calloutBody': 'REA.com.au and Domain charge $1,500–$7,000 per listing. A CRM costs $300–$600/mo. Property management software another $200–$400/mo. ListHQ replaces all three — CRM, PM platform, and multilingual listing portal — in one subscription, reaching 7M+ multilingual buyers no other portal can find.',
-  'home.pricing.monthly': 'Monthly',
-  'home.pricing.annual': 'Annual — save 20%',
-  'home.pricing.mostPopular': 'Most popular',
-  'home.pricing.perMonth': '/mo',
+  // ── Homepage — pricing plans ──
   'home.pricing.plan.solo.name': 'Solo',
   'home.pricing.plan.solo.desc': 'Independent agents running their own shop',
   'home.pricing.plan.solo.f1': '1 agent seat · up to 10 active listings',
@@ -1141,24 +1083,8 @@ export const en = {
   'home.pricing.plan.pro.cta': 'Contact sales →',
   'home.pricing.plan.pro.sub': 'Custom pricing · SLA included',
 
-  // ── Homepage — FAQ ──
-  'home.faq.heading': 'Questions agents ask us',
-  'home.faq.q1': 'Do I own my data?',
-  'home.faq.a1': 'Yes. Your listings, your clients, your data — always. Your data is always yours to export.',
-  'home.faq.q2': 'Where is my data stored?',
-  'home.faq.a2': 'All data is stored in Australian data centres, fully compliant with the Privacy Act 1988. ListHQ does not share or sell your client data.',
-  'home.faq.q3': 'Does ListHQ integrate with my existing CRM?',
-  'home.faq.a3': 'Yes. ListHQ connects with REX, VaultRE, PropertyMe, and Console via API. Listing data syncs automatically — no double entry.',
-  'home.faq.q4': 'Can I keep my REA and Domain subscriptions?',
-  'home.faq.a4': 'Absolutely. Most ListHQ agents use us alongside REA/Domain. We complement rather than replace — and our multilingual reach finds buyers no other portal can.',
-  'home.faq.q5': 'Is ListHQ compliant with real estate licensing laws?',
-  'home.faq.a5': 'Yes. ListHQ is built for the Australian market with state-by-state requirements, and all agent profiles require verified licence numbers.',
-
-  // ── Homepage — closing CTA ──
-  'home.closingCta.heading': 'Ready to reach buyers no other portal can find?',
-  'home.closingCta.primary': 'Start your 60-day free trial',
-  'home.closingCta.secondary': 'Talk to sales',
-  'home.closingCta.finePrint': 'No credit card required · Australian data storage · Cancel anytime',
+  // ── Homepage — hero / FAQ / closing (additional keys) ──
+  'home.hero.buyersSearching': 'buyers searching right now',
 } as const;
 
 export type TranslationKey = keyof typeof en;

@@ -1453,6 +1453,18 @@ export default function PropertyDetailPage() {
       </AnimatePresence>
 
 
+      {/* Mobile sticky enquiry bar */}
+      {!isRental && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 p-3 bg-background/95 backdrop-blur border-t border-border sm:hidden">
+          <button
+            onClick={handleCtaClick}
+            className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-md hover:bg-primary/90 transition-colors"
+          >
+            {tp('property.enquireAbout') || 'Enquire about this property'}
+          </button>
+        </div>
+      )}
+
       <AgentContactModal
         property={property}
         open={contactOpen}

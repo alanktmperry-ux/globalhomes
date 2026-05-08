@@ -173,7 +173,7 @@ const AgentLandingPage = () => {
               </p>
               {usKeys.map((k) => (
                 <div key={k} className="flex items-start gap-3 mb-4 text-sm leading-snug" style={{ color: '#e2e8f0' }}>
-                  <span className="shrink-0 mt-0.5">✓</span>
+                  <Check size={16} className="shrink-0 mt-0.5 text-blue-300" strokeWidth={2.5} />
                   {t(k)}
                 </div>
               ))}

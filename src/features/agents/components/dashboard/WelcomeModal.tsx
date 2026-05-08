@@ -28,9 +28,9 @@ export function WelcomeModal({ agentName, onClose }: Props) {
           <X size={18} />
         </button>
 
-        {/* Logo mark */}
-        <div className="mx-auto w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center text-xl font-semibold mb-3">
-          L
+        {/* Logo mark — matches header lockup */}
+        <div className="mx-auto w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-cyan-accent flex items-center justify-center mb-3 shrink-0">
+          <Globe size={26} className="text-primary-foreground" />
         </div>
 
         <h2 className="text-xl font-semibold text-center">

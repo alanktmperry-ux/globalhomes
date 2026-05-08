@@ -68,7 +68,23 @@ export default function PropertyDetailPage() {
       const url = new URL(window.location.href);
       url.searchParams.delete('lang');
       window.history.replaceState({}, '', url.toString());
+      return;
     }
+    // No URL param — check logged-in buyer's profile preference
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase
+        .from('profiles')
+        .select('language_preference')
+        .eq('user_id', user.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          const pref = (data as any)?.language_preference;
+          if (pref && pref !== 'en') {
+            setLanguage(pref as any);
+          }
+        });
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const { t: tp } = useTranslation();

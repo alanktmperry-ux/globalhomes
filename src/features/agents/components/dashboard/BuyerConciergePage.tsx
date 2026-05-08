@@ -400,7 +400,13 @@ const BuyerConciergePage = () => {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <p className="font-semibold text-sm truncate">
-                          {buyerName(m)} <span className="text-muted-foreground font-normal">— {buyerSuburb(m)}</span>
+                          {buyerName(m)}
+                          {m.profile?.language_preference && m.profile.language_preference !== 'en' && (
+                            <span className="ml-1.5 text-base leading-none" title={m.profile.language_preference}>
+                              {LANG_FLAGS[m.profile.language_preference] ?? '🌐'}
+                            </span>
+                          )}
+                          <span className="text-muted-foreground font-normal"> — {buyerSuburb(m)}</span>
                         </p>
                         <p className="text-xs text-muted-foreground mt-0.5">{wantsSummary(m.intent)}</p>
                       </div>

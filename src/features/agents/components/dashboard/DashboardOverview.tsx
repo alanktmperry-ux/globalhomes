@@ -29,6 +29,8 @@ import { ReputationExplainerModal } from './ReputationExplainerModal';
 import { useResponseTimeStats, formatDuration, getResponseTimeColor } from '@/features/agents/hooks/useResponseTimeStats';
 import { ResponseTimeModal } from './ResponseTimeModal';
 import { WelcomeModal } from './WelcomeModal';
+import { AgentWelcomeModal } from '@/features/agents/components/onboarding/AgentWelcomeModal';
+import { AgentOnboardingProgress } from '@/features/agents/components/onboarding/AgentOnboardingProgress';
 
 // Australian currency formatter
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });

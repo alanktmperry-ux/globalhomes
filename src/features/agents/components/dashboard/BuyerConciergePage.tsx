@@ -194,7 +194,7 @@ const BuyerConciergePage = () => {
           ? supabase.from('properties').select('id,title,address,suburb,price,images').in('id', listingIds)
           : Promise.resolve({ data: [] as ListingLite[] }),
         buyerIds.length
-          ? supabase.from('profiles').select('user_id,display_name,full_name').in('user_id', buyerIds)
+          ? supabase.from('profiles').select('user_id,display_name,full_name,language_preference').in('user_id', buyerIds)
           : Promise.resolve({ data: [] as ProfileLite[] }),
       ]);
 

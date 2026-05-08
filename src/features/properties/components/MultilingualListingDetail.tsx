@@ -6,7 +6,7 @@ import { capture } from '@/shared/lib/posthog';
 import { useI18n, type Language } from '@/shared/lib/i18n';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
-type LanguageKey = 'en' | 'zh_simplified' | 'zh_traditional' | 'vi';
+type LanguageKey = 'en' | 'zh_simplified' | 'zh_traditional' | 'vi' | 'ko' | 'ar' | 'ja';
 
 interface Translation {
   title: string;

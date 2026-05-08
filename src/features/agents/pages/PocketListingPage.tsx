@@ -12,6 +12,7 @@ import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { useToast } from '@/shared/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 const PocketListingPage = () => {
   const navigate = useNavigate();

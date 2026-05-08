@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Youtube, Linkedin } from 'lucide-react';
+import { Instagram, Youtube, Linkedin, Globe } from 'lucide-react';
 
 export function SiteFooter() {
   return (
@@ -14,8 +14,10 @@ export function SiteFooter() {
 
           {/* Brand col */}
           <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-[11px] font-bold text-white">L</div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-cyan-accent flex items-center justify-center shrink-0">
+                <Globe size={18} className="text-primary-foreground" />
+              </div>
               <span className="text-[15px] font-semibold text-white tracking-tight">ListHQ</span>
             </div>
             <p className="text-[13px] leading-relaxed mb-5 max-w-[200px]" style={{ color: 'rgba(255,255,255,0.55)' }}>

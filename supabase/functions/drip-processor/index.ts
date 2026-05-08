@@ -28,6 +28,30 @@ function interpolate(template: string, vars: Record<string, string>): string {
   return template.replace(/\{\{(\w+)\}\}/g, (_, key) => vars[key] ?? '');
 }
 
+async function generateUnsubToken(email: string): Promise<string> {
+  const secret = Deno.env.get('UNSUBSCRIBE_SECRET') || 'fallback-secret';
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(email));
+  return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function appendUnsubFooter(html: string, recipientEmail: string): Promise<string> {
+  const token = await generateUnsubToken(recipientEmail);
+  const url = `https://globalhomes.lovable.app/unsubscribe?email=${encodeURIComponent(recipientEmail)}&token=${token}`;
+  const footer = `
+  <div style="margin-top:32px;padding-top:16px;border-top:1px solid #eee;text-align:center;font-size:11px;color:#aaa;">
+    <p style="margin:0 0 4px;">You're receiving this because you have a ListHQ agent account.</p>
+    <p style="margin:0;"><a href="${url}" style="color:#aaa;text-decoration:underline;">Unsubscribe</a> from non-essential emails.</p>
+  </div>`;
+  return html.includes('</body>') ? html.replace('</body>', `${footer}</body>`) : html + footer;
+}
+
 async function sendEmail(
   to: string,
   subject: string,
@@ -188,7 +212,7 @@ Deno.serve(async (req) => {
       if (step.channel === 'email' && agent?.email) {
         recipient = agent.email;
         const subject = interpolate(step.subject ?? '', vars);
-        const html    = interpolate(step.body, vars);
+        const html    = await appendUnsubFooter(interpolate(step.body, vars), recipient);
         sendResult = await sendEmail(recipient, subject, html);
 
       } else if (step.channel === 'sms' && agent?.phone) {

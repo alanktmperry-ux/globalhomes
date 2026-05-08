@@ -950,7 +950,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                       </td>
                     </tr>
                   )}
-                  </>
+                  </Fragment>
                 );
               })}
             </tbody>

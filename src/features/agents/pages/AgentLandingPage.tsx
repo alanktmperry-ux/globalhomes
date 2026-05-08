@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Target, Bot, Globe, EyeOff, Mic, Zap, BarChart2, Landmark } from 'lucide-react';
+import { Target, Bot, Globe, EyeOff, Mic, Zap, BarChart2, Landmark, Check } from 'lucide-react';
 import { SEO } from '@/shared/components/SEO';
 import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
@@ -173,7 +173,7 @@ const AgentLandingPage = () => {
               </p>
               {usKeys.map((k) => (
                 <div key={k} className="flex items-start gap-3 mb-4 text-sm leading-snug" style={{ color: '#e2e8f0' }}>
-                  <span className="shrink-0 mt-0.5">✓</span>
+                  <Check size={16} className="shrink-0 mt-0.5 text-blue-300" strokeWidth={2.5} />
                   {t(k)}
                 </div>
               ))}
@@ -200,7 +200,7 @@ const AgentLandingPage = () => {
           {/* Value prop callout */}
           <div className="mx-auto mb-10" style={{ maxWidth: 760, background: '#EFF6FF', border: '1px solid #DBEAFE', borderRadius: 16, padding: '20px 24px' }}>
             <div className="font-extrabold mb-1.5" style={{ color: '#0a0f1e', fontSize: 15 }}>
-              Why $799/mo is a no-brainer for agents
+              Why $299/mo is a no-brainer for agents
             </div>
             <p className="text-sm" style={{ color: '#374151', lineHeight: 1.55 }}>
               REA.com.au and Domain charge $1,500–$7,000 per listing. A CRM costs $300–$600/mo. Property management software another $200–$400/mo. ListHQ replaces all three — CRM, PM platform, and multilingual listing portal — in one subscription, reaching 7M+ multilingual buyers no other portal can find.
@@ -209,15 +209,15 @@ const AgentLandingPage = () => {
 
           <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
             {[
-              { name: 'Solo', price: '$799/mo', desc: 'Independent agents running their own shop',
+              { name: 'Solo', price: '$299/mo', desc: 'Independent agents running their own shop',
                 feats: ['1 agent seat · up to 10 active listings','Full CRM — pipeline, contacts, deal tracking','Full trust accounting (complete ledger)','20-language auto-translation on every listing','AI buyer matching + voice search','Halo™ buyer matching board','Email support'],
-                cta: 'Start 30-day free trial →', sub: 'Credit card required · auto-charges $799 on day 31 · cancel anytime',
+                cta: 'Start 30-day free trial →', sub: 'Credit card required · auto-charges $299 on day 31 · cancel anytime',
                 action: () => setShowModal(true), filled: true, popular: false },
-              { name: 'Agency', price: '$1,999/mo', desc: 'For growing agencies ready to scale',
+              { name: 'Agency', price: '$599/mo', desc: 'For growing agencies ready to scale',
                 feats: ['Up to 5 agent seats','Unlimited listings','Full CRM for the whole team','Full PM automation + trust accounting','20-language auto-translation','Priority AI matching + lead analytics','Agency-branded profile page','Phone & email support'],
                 cta: 'Book a demo →', sub: 'No free trial · talk to us first · onboarding included',
                 action: () => navigate('/contact'), filled: true, popular: true },
-              { name: 'Agency Pro', price: '$3,499/mo', desc: 'Established multi-office agencies',
+              { name: 'Agency Pro', price: '$1,199/mo', desc: 'Established multi-office agencies',
                 feats: ['Up to 15 agent seats','Unlimited everything','Full PM automation + trust accounting','Multi-branch dashboard','White-label option','API access + custom integrations','Dedicated account manager'],
                 cta: 'Talk to sales →', sub: 'Custom onboarding · SLA available',
                 action: () => navigate('/contact'), filled: false, popular: false },
@@ -234,12 +234,13 @@ const AgentLandingPage = () => {
                   </div>
                 )}
                 <div style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 12 }}>{p.name}</div>
-                <div style={{ fontSize: 36, fontWeight: 800, color: '#0a0f1e', letterSpacing: '-1px', marginBottom: 8 }}>{p.price}</div>
+                <div style={{ fontSize: 36, fontWeight: 800, color: '#0a0f1e', letterSpacing: '-1px', marginBottom: 4 }}>{p.price}</div>
+                <div className="text-xs text-muted-foreground" style={{ marginBottom: 8 }}>Founding member — locked for life</div>
                 <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px', lineHeight: 1.5 }}>{p.desc}</p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 22px' }}>
                   {p.feats.map((f) => (
                     <li key={f} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 13.5, color: '#374151', padding: '6px 0' }}>
-                      <span style={{ color: '#2563EB', fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
+                      <Check size={16} style={{ color: '#2563EB', flexShrink: 0 }} strokeWidth={2.5} />{f}
                     </li>
                   ))}
                 </ul>

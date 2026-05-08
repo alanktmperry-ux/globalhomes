@@ -229,6 +229,72 @@ Deno.serve(async (req) => {
       if (insErr) console.error("match insert error", insErr);
     }
 
+    // Notify matched buyers — non-blocking, best effort
+    if (goodMatches.length > 0) {
+      const notifyBuyers = async () => {
+        for (const m of goodMatches) {
+          try {
+            if (!m.buyer.buyer_id) continue;
+
+            const { data: profile } = await admin
+              .from('profiles')
+              .select('email, language_preference')
+              .eq('user_id', m.buyer.buyer_id)
+              .maybeSingle();
+
+            if (!profile?.email) continue;
+
+            const langPref = (profile as any).language_preference || 'en';
+            const langParam = langPref !== 'en' ? `?lang=${encodeURIComponent(langPref)}` : '';
+            const propertyUrl = `https://globalhomes.lovable.app/property/${listing.id}${langParam}`;
+
+            const listingPrice = listing.price
+              ? new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 }).format(listing.price)
+              : 'Contact agent';
+
+            const subject = `New match: ${listing.beds ?? ''}bd in ${listing.suburb ?? 'your area'}`;
+
+            const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<div style="max-width:520px;margin:0 auto;padding:32px 20px;">
+  <div style="text-align:center;margin-bottom:20px;">
+    <span style="font-size:22px;font-weight:700;color:#1a1a2e;">ListHQ</span>
+  </div>
+  <div style="background:#fff;border-radius:16px;padding:28px 24px;">
+    <p style="font-size:13px;color:#888;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">New match for your buyer profile</p>
+    <h1 style="font-size:20px;font-weight:700;color:#1a1a2e;margin:0 0 16px;">${listing.beds ?? '?'}bd ${listing.property_type ?? 'property'} in ${listing.suburb ?? 'your area'}</h1>
+    <div style="background:#f8f8f8;border-radius:10px;padding:16px;margin-bottom:20px;">
+      <div style="font-size:22px;font-weight:700;color:#1a1a2e;margin-bottom:4px;">${listingPrice}</div>
+      <div style="font-size:13px;color:#666;">${listing.suburb ?? ''}${listing.state ? ', ' + listing.state : ''} · ${listing.beds ?? '?'} bed · ${listing.baths ?? '?'} bath</div>
+    </div>
+    <p style="font-size:13px;color:#555;margin:0 0 4px;">Match score: <strong>${m.match_score}/100</strong></p>
+    <p style="font-size:12px;color:#888;margin:0 0 24px;font-style:italic;">${m.reasoning}</p>
+    <div style="text-align:center;">
+      <a href="${propertyUrl}" style="display:inline-block;background:#1a1a2e;color:#fff;text-decoration:none;font-weight:600;font-size:14px;padding:14px 32px;border-radius:10px;">
+        View property →
+      </a>
+    </div>
+  </div>
+  <div style="text-align:center;font-size:11px;color:#bbb;padding:16px 0;">
+    ListHQ · listhq.com.au<br>
+    <a href="https://globalhomes.lovable.app/unsubscribe?email=${encodeURIComponent(profile.email)}" style="color:#bbb;">Unsubscribe</a>
+  </div>
+</div>
+</body></html>`;
+
+            await admin.functions.invoke('send-notification-email', {
+              body: { to: profile.email, subject, html },
+            });
+
+            await new Promise(r => setTimeout(r, 200));
+          } catch (err) {
+            console.warn('Buyer notification failed for buyer_id:', m.buyer.buyer_id, err);
+          }
+        }
+      };
+
+      notifyBuyers().catch(err => console.warn('notifyBuyers error:', err));
+    }
     return new Response(
       JSON.stringify({
         listing_id,

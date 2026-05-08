@@ -37,8 +37,9 @@ Deno.serve(async (req) => {
     if (requested_from && !recipientEmail) {
       const { data: u } = await supabase.auth.admin.getUserById(requested_from);
       recipientEmail = u?.user?.email;
-      const { data: pr } = await supabase.from('profiles').select('full_name').eq('user_id', requested_from).maybeSingle();
-      recipientName = (pr as any)?.full_name?.split(' ')[0] ?? 'there';
+      recipientName = (u?.user?.user_metadata?.full_name as string | undefined)?.split(' ')[0]
+        ?? (u?.user?.user_metadata?.name as string | undefined)?.split(' ')[0]
+        ?? 'there';
     }
     if (!recipientEmail || !RESEND) {
       return new Response(JSON.stringify({ error: 'No recipient or RESEND key' }), {

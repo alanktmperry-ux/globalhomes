@@ -152,7 +152,7 @@ const ContactsList = ({
     !active ? null : sort.dir === 'asc' ? <ArrowUp size={10} className="inline ml-1" /> : <ArrowDown size={10} className="inline ml-1" />;
 
   if (loading) {
-    return <div className="text-center py-12 text-muted-foreground">Loading contacts...</div>;
+    return <ContactsSkeleton />;
   }
 
   const tagsActive = filters.tags.ids.length > 0;

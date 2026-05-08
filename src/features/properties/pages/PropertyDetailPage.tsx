@@ -80,6 +80,7 @@ export default function PropertyDetailPage() {
   const [rentalEnquiryOpen, setRentalEnquiryOpen] = useState(false);
   const [inspectionBookingOpen, setInspectionBookingOpen] = useState(false);
   const [rentalApplicationOpen, setRentalApplicationOpen] = useState(false);
+  const [conveyancingOpen, setConveyancingOpen] = useState(false);
   const [inspectionTimes, setInspectionTimes] = useState<InspectionSlot[]>([]);
   const [isOwnerAgent, setIsOwnerAgent] = useState(false);
   const [translating, setTranslating] = useState(false);

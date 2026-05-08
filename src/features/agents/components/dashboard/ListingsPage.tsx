@@ -679,6 +679,27 @@ const ListingsPage = () => {
             </div>
           )}
 
+          {/* Active / Archived lifecycle tabs */}
+          <div className="inline-flex bg-muted rounded-lg p-1 mb-4 gap-1">
+            {(['active', 'archived'] as const).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setLifecycleTab(tab)}
+                className={cn(
+                  'px-4 py-1.5 rounded-lg text-xs font-medium transition-colors',
+                  lifecycleTab === tab
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                {tab === 'active'
+                  ? `Active (${activeWithStatus.length})`
+                  : `Sold / Archived (${archivedWithStatus.length})`}
+              </button>
+            ))}
+          </div>
+
           {/* Sale / Rent toggle */}
           <div className="flex items-center gap-2 mb-4">
             <Button

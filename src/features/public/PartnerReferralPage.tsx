@@ -62,9 +62,10 @@ export default function PartnerReferralPage() {
         subject: `${partnerName} invited you to ListHQ`,
         html: buildPartnerWelcomeEmail({
           buyerName: formData.name,
+          buyerEmail: formData.email,
           partnerName,
           suburbInterest: formData.suburb_interest || '',
-          registerUrl: `${window.location.origin}/register`,
+          registerUrl: `${window.location.origin}/login`,
         }),
       },
     }).catch(() => { /* non-fatal */ });

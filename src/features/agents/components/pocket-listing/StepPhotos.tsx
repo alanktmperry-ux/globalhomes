@@ -321,6 +321,68 @@ const StepPhotos = ({ draft, update }: Props) => {
           </div>
         </div>
       )}
+
+      {/* Walkthrough Video */}
+      <div className="space-y-2 pt-2 border-t border-border">
+        <Label className="text-sm font-semibold block">Property Walkthrough Video (optional)</Label>
+        <p className="text-xs text-muted-foreground -mt-1">
+          MP4, MOV, or WebM · max 200 MB · one video per listing
+        </p>
+
+        {!draft.video_url ? (
+          <div
+            onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setVideoDragOver(true); }}
+            onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); e.dataTransfer.dropEffect = 'copy'; setVideoDragOver(true); }}
+            onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setVideoDragOver(false); }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setVideoDragOver(false);
+              const f = e.dataTransfer.files?.[0];
+              if (f) void uploadVideo(f);
+            }}
+            onClick={() => videoRef.current?.click()}
+            className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-colors ${
+              videoDragOver ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40'
+            }`}
+          >
+            {videoUploading ? (
+              <Loader2 size={28} className="mx-auto text-primary mb-2 animate-spin" />
+            ) : (
+              <Play size={28} className="mx-auto text-muted-foreground mb-2" />
+            )}
+            <p className="text-sm font-medium">{videoUploading ? 'Uploading video…' : 'Drop walkthrough video here'}</p>
+            {!videoUploading && <p className="text-xs text-muted-foreground mt-1">or click to browse</p>}
+            <input
+              ref={videoRef}
+              type="file"
+              accept="video/mp4,video/quicktime,video/webm,.mp4,.mov,.webm"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void uploadVideo(f);
+              }}
+            />
+          </div>
+        ) : (
+          <div className="relative rounded-2xl overflow-hidden bg-muted">
+            <video
+              src={draft.video_url}
+              controls
+              className="w-full max-h-72 bg-black"
+              preload="metadata"
+            />
+            <button
+              type="button"
+              onClick={() => update({ video_url: '' })}
+              className="absolute top-2 right-2 w-9 h-9 rounded-full bg-background/90 hover:bg-red-500 hover:text-white text-foreground flex items-center justify-center shadow"
+              title="Remove video"
+            >
+              <Trash2 size={15} />
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

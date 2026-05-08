@@ -1,4 +1,5 @@
-import { Smartphone, Monitor, Bed, Bath, Car, MapPin, CheckCircle2, Sparkles, Loader2 } from 'lucide-react';
+import { Smartphone, Monitor, Bed, Bath, Car, MapPin, CheckCircle2, Sparkles, Loader2, ImageIcon } from 'lucide-react';
+import { getListingImage, LISTING_PLACEHOLDER_CLASS } from '@/shared/lib/listingImage';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import type { ListingDraft } from './PocketListingForm';

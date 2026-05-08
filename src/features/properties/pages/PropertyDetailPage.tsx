@@ -48,6 +48,7 @@ import { DocumentVault } from '@/features/documents/components/DocumentVault';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { ShareSheet } from '@/shared/components/ShareSheet';
 import { MortgageBrokerCTA } from '@/features/mortgage/components/MortgageBrokerCTA';
+import { GetQuoteModal } from '@/features/conveyancing/components/GetQuoteModal';
 import { MortgageReferralModal } from '@/components/MortgageReferralModal';
 import { useListingTranslation } from '@/features/properties/hooks/useListingTranslation';
 import { HaloFromListingCTA } from '@/components/halo/HaloFromListingCTA';

@@ -193,9 +193,8 @@ export default function ReferralPartnerManager() {
                 const url = `${window.location.origin}/r/${p.partner_code}`;
                 const partnerLeads = leadsByCode[p.partner_code] || [];
                 return (
-                  <>
-                    <tr key={p.id} className="border-t border-border hover:bg-muted/30">
-                      <td className="px-2 py-3">
+                  <FragmentWithKey key={p.id}>
+                    <tr className="border-t border-border hover:bg-muted/30">
                         <button
                           type="button"
                           onClick={() => setExpanded(isOpen ? null : p.id)}

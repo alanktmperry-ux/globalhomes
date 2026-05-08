@@ -19,6 +19,7 @@ interface Conveyancer {
   rating: number | null;
   specialties: string[] | null;
   logo_url: string | null;
+  email: string | null;
 }
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });

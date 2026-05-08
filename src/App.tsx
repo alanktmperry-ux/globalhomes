@@ -50,6 +50,7 @@ const AdminReferralPartnersPage = React.lazy(() => import("./features/admin/page
 const AdminBrokers = React.lazy(() => import("./features/admin/components/AdminBrokers"));
 const AdminSupportPage = React.lazy(() => import("./features/admin/pages/SupportPage"));
 const MultilingualGenerator = React.lazy(() => import("./features/public/MultilingualGenerator"));
+const MultilingualGeneratorPage = React.lazy(() => import("./pages/tools/MultilingualGeneratorPage"));
 const PartnerReferralPage = React.lazy(() => import("./features/public/PartnerReferralPage"));
 const ReferralPartnerDashboard = React.lazy(() => import("./features/referral/pages/ReferralPartnerDashboard"));
 const AdminListingsPage = React.lazy(() => import("./features/admin/pages/AdminListingsPage"));

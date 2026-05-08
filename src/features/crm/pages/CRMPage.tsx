@@ -6,7 +6,8 @@ import { PipelineKPIBar } from '../components/PipelineKPIBar';
 import { CRMTasksWidget } from '../components/CRMTasksWidget';
 import { DailyCallList } from '../components/DailyCallList';
 import { LeadDetailModal } from '../components/LeadDetailModal';
-import { LayoutList, Kanban } from 'lucide-react';
+import { LayoutList, Kanban, Upload } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { UrgencyTier } from '../lib/urgency';
 import type { CRMLead } from '../types';
 
@@ -34,7 +35,13 @@ export default function CRMPage() {
               All leads auto-synced from enquiries, open homes, and EOIs
             </p>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
+            <Link
+              to="/dashboard/crm/import"
+              className="inline-flex items-center gap-1.5 px-3 h-9 rounded-lg border border-border bg-background text-sm font-medium hover:border-primary/50 hover:text-primary transition"
+            >
+              <Upload size={14} /> Import contacts
+            </Link>
             <button
               onClick={() => setView('board')}
               className={`p-2 rounded-lg border transition

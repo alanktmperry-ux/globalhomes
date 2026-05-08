@@ -185,6 +185,7 @@ const HelpVendorsPage = React.lazy(() => import("./pages/HelpVendorsPage"));
 const HelpPropertyManagersPage = React.lazy(() => import("./pages/HelpPropertyManagersPage"));
 const HelpContactPage = React.lazy(() => import("./pages/HelpContactPage"));
 const CRMPage = React.lazy(() => import("./features/crm/pages/CRMPage"));
+const ContactImportPage = React.lazy(() => import("./features/agents/components/dashboard/ContactImportPage"));
 const SavedSearchesPage = React.lazy(() => import("./features/alerts/pages/SavedSearchesPage"));
 const CreateHaloPage = React.lazy(() => import("./pages/halo/CreateHaloPage"));
 const EditHaloPage = React.lazy(() => import("./pages/halo/EditHaloPage"));
@@ -435,6 +436,7 @@ const App = () => (
                   <Route path="rental-applications" element={<RentalApplicationsPage />} />
                   <Route path="pipeline" element={<PipelinePage />} />
                   <Route path="crm" element={<CRMPage />} />
+                  <Route path="crm/import" element={<ContactImportPage />} />
                   <Route path="inspection-mode" element={<InspectionModePage />} />
                   <Route path="settlements" element={<SettlementConcierge />} />
                   <Route path="commission" element={<CommissionCalculator />} />

@@ -503,16 +503,33 @@ const ListingsPage = () => {
               <Loader2 className="animate-spin text-primary" size={24} />
             </div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-16 text-muted-foreground">
-              <div className="mb-3">
-                {listingMode === 'rent' ? <Building size={32} className="mx-auto opacity-40" /> : <Home size={32} className="mx-auto opacity-40" />}
+            withStatus.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                  <Home size={28} className="text-primary" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-semibold text-foreground">No listings yet</h3>
+                  <p className="text-sm text-muted-foreground max-w-xs">
+                    Add your first property and generate multilingual translations in under 60 seconds.
+                  </p>
+                </div>
+                <Button onClick={() => navigate('/dashboard/listings/new')}>
+                  Add your first listing →
+                </Button>
               </div>
-              <p className="text-sm font-medium">No {listingMode === 'rent' ? 'rental' : 'sale'} listings{activeStatusTab !== 'all' ? ` with status "${activeStatusTab}"` : ''}</p>
-              <p className="text-xs mt-1">Create a new listing to get started.</p>
-              <Button size="sm" className="mt-4 gap-1.5 text-xs" onClick={() => navigate('/pocket-listing')}>
-                <Plus size={14} /> New {listingMode === 'rent' ? 'Rental' : 'Sale'} Listing
-              </Button>
-            </div>
+            ) : (
+              <div className="text-center py-16 text-muted-foreground">
+                <div className="mb-3">
+                  {listingMode === 'rent' ? <Building size={32} className="mx-auto opacity-40" /> : <Home size={32} className="mx-auto opacity-40" />}
+                </div>
+                <p className="text-sm font-medium">No {listingMode === 'rent' ? 'rental' : 'sale'} listings{activeStatusTab !== 'all' ? ` with status "${activeStatusTab}"` : ''}</p>
+                <p className="text-xs mt-1">Create a new listing to get started.</p>
+                <Button size="sm" className="mt-4 gap-1.5 text-xs" onClick={() => navigate('/pocket-listing')}>
+                  <Plus size={14} /> New {listingMode === 'rent' ? 'Rental' : 'Sale'} Listing
+                </Button>
+              </div>
+            )
           ) : (
             <div className="space-y-3">
               {filtered.map((l) => (

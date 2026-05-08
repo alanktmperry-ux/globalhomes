@@ -491,6 +491,7 @@ const DashboardOverview = () => {
             onReset={resetEdit}
           />
         </div>
+        <AgentOnboardingProgress />
         <TodayPrioritiesPanel />
         {!onboardingDismissed && (() => {
           const step1 = !!(onboardingAgent?.name && onboardingAgent?.phone && onboardingAgent?.avatar_url && onboardingAgent?.bio);

@@ -6,7 +6,8 @@ import { PipelineKPIBar } from '../components/PipelineKPIBar';
 import { CRMTasksWidget } from '../components/CRMTasksWidget';
 import { DailyCallList } from '../components/DailyCallList';
 import { LeadDetailModal } from '../components/LeadDetailModal';
-import { LayoutList, Kanban } from 'lucide-react';
+import { LayoutList, Kanban, Upload } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { UrgencyTier } from '../lib/urgency';
 import type { CRMLead } from '../types';
 

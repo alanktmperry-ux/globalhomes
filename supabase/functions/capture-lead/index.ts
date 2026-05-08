@@ -180,6 +180,59 @@ Deno.serve(async (req) => {
     }
     // ────────────────────────────────────────────────────────────
 
+    // ── Buyer auto-reply confirmation email (non-fatal) ────────
+    try {
+      const { data: property } = await supabase
+        .from('properties')
+        .select('address, slug, id')
+        .eq('id', propertyId)
+        .maybeSingle();
+
+      const { data: agentRow } = await supabase
+        .from('agents')
+        .select('full_name, first_name, last_name')
+        .eq('id', agentId)
+        .maybeSingle();
+
+      const agentName =
+        (agentRow as any)?.full_name ||
+        [(agentRow as any)?.first_name, (agentRow as any)?.last_name].filter(Boolean).join(' ') ||
+        'The agent';
+
+      const propAddress = property?.address || 'the property';
+      const listingUrl = `https://listhq.com.au/property/${property?.slug || property?.id || propertyId}`;
+
+      const html = `
+        <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;color:#0f172a;">
+          <p>Hi ${userName.split(' ')[0]},</p>
+          <p>Thanks for your enquiry about <strong>${propAddress}</strong>.</p>
+          <p>${agentName} will be in touch with you soon.</p>
+          <p>In the meantime, you can view the listing here:<br>
+            <a href="${listingUrl}" style="color:#3b82f6;">${propAddress}</a>
+          </p>
+          <p style="margin-top:24px;">If you'd like to find more properties that match your needs,
+            <a href="https://listhq.com.au/halo/create" style="color:#3b82f6;">create a free Halo</a>
+            and we'll match you automatically.</p>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;">
+          <p style="font-size:11px;color:#9ca3af;">
+            You're receiving this because you submitted an enquiry on ListHQ.
+            This is a one-time confirmation — you won't receive further emails unless you create an account.
+          </p>
+        </div>
+      `;
+
+      await supabase.functions.invoke('send-notification-email', {
+        body: {
+          to: userEmail,
+          subject: `Enquiry received — ${propAddress}`,
+          html,
+        },
+      });
+    } catch (replyErr) {
+      console.warn('Buyer auto-reply failed (non-fatal):', replyErr);
+    }
+    // ────────────────────────────────────────────────────────────
+
     return new Response(
       JSON.stringify({
         success: true,

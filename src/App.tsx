@@ -55,6 +55,7 @@ const PartnerReferralPage = React.lazy(() => import("./features/public/PartnerRe
 const ReferralPartnerDashboard = React.lazy(() => import("./features/referral/pages/ReferralPartnerDashboard"));
 const AdminListingsPage = React.lazy(() => import("./features/admin/pages/AdminListingsPage"));
 const AdminInsightsPage = React.lazy(() => import("./features/admin/pages/InsightsPage"));
+const AdminOverviewPage = React.lazy(() => import("./features/admin/pages/AdminOverviewPage"));
 const AdminCostsPage = React.lazy(() => import("./features/admin/pages/CostsPage"));
 const AboutPage = React.lazy(() => import("./pages/About"));
 const BoxHillVicPage = React.lazy(() => import("./pages/suburbs/BoxHillVic"));
@@ -490,6 +491,7 @@ const App = () => (
                 <Route path="/admin/login" element={<AdminLoginPage />} />
                 <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>
                   <Route index element={<CommandCentre />} />
+                  <Route path="overview" element={<AdminOverviewPage />} />
                   <Route path="approvals" element={<AdminApprovalsPage />} />
                   <Route path="users" element={<AdminUsersPage />} />
                   <Route path="agents" element={<AdminAgentsPage />} />

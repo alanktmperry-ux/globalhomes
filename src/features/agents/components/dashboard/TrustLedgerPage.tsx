@@ -157,16 +157,35 @@ const TrustLedgerPage = () => {
   const nextMonth = () => { if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); } else setViewMonth(m => m + 1); };
 
   useEffect(() => {
-    if (!accounts[0]?.id) return;
-    supabase
-      .from('trust_account_balances')
-      .select('opening_balance')
-      .eq('trust_account_id', accounts[0].id)
-      .eq('period_year', viewYear)
-      .eq('period_month', viewMonth + 1)
-      .maybeSingle()
-      .then(({ data }) => setOpeningBalance((data as any)?.opening_balance ?? 0));
-  }, [accounts, viewMonth, viewYear]);
+    if (!accounts[0]?.id || !agent?.id) return;
+    const fetchOpening = async () => {
+      // 1. Check for a stored/reconciled balance for this month
+      const { data: stored } = await supabase
+        .from('trust_account_balances')
+        .select('opening_balance')
+        .eq('trust_account_id', accounts[0].id)
+        .eq('period_year', viewYear)
+        .eq('period_month', viewMonth + 1)
+        .maybeSingle();
+
+      if ((stored as any)?.opening_balance != null) {
+        setOpeningBalance((stored as any).opening_balance);
+        return;
+      }
+
+      // 2. No stored row — compute from all transactions before month start
+      const monthStart = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-01`;
+      const [{ data: prevR }, { data: prevP }] = await Promise.all([
+        supabase.from('trust_receipts').select('amount').eq('agent_id', agent.id).lt('date_received', monthStart),
+        supabase.from('trust_payments').select('amount').eq('agent_id', agent.id).lt('date_paid', monthStart),
+      ]);
+      const histIn = (prevR || []).reduce((s: number, r: any) => s + r.amount, 0);
+      const histOut = (prevP || []).reduce((s: number, p: any) => s + p.amount, 0);
+      setOpeningBalance(histIn - histOut);
+    };
+    fetchOpening();
+  }, [accounts, agent?.id, viewMonth, viewYear]);
+
 
   const fetchData = useCallback(async () => {
     if (!user) return;

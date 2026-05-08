@@ -637,11 +637,10 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         }
 
         fireAIMatch(inserted.id);
+        setPublishedListing({ id: inserted.id, address: draft.address, title });
       }
 
-      if (!editPropertyId && inserted) {
-        setPublishedListing({ id: inserted.id, address: draft.address, title });
-      } else {
+      if (editPropertyId) {
         onPublish(title);
       }
     } catch (err: any) {

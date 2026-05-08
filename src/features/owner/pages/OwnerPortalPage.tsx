@@ -223,7 +223,8 @@ export default function OwnerPortalPage() {
     net: acc.net + Number(s.net_amount_aud || 0),
   }), { gross: 0, fee: 0, maint: 0, net: 0 });
 
-  const visibleStatements = showAllStatements ? statements : statements.slice(0, 3);
+  const safeStatements = statements ?? [];
+  const visibleStatements = showAllStatements ? safeStatements : safeStatements.slice(0, 3);
 
   const vacancy = !tenancy ? { label: 'Vacant', color: 'bg-amber-500/10 text-amber-700' }
     : tenancy.status === 'vacating' ? { label: 'Vacating', color: 'bg-amber-500/10 text-amber-700' }

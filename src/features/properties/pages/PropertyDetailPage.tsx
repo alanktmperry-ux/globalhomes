@@ -532,8 +532,6 @@ export default function PropertyDetailPage() {
     };
   }, [property]);
 
-  const prevImage = () => setImageIndex(i => (i > 0 ? i - 1 : (property?.images.length || 1) - 1));
-  const nextImage = () => setImageIndex(i => (i < (property?.images.length || 1) - 1 ? i + 1 : 0));
 
   if (loading) {
     return (

@@ -196,6 +196,49 @@ const StepPhotos = ({ draft, update }: Props) => {
     void addPhotos(files);
   };
 
+  const ALLOWED_VIDEO_MIME = ['video/mp4', 'video/quicktime', 'video/webm'];
+  const VIDEO_EXT_TO_MIME: Record<string, string> = {
+    mp4: 'video/mp4', mov: 'video/quicktime', webm: 'video/webm',
+  };
+
+  const uploadVideo = async (file: File) => {
+    if (!user?.id) {
+      toast.error('You must be signed in to upload video.');
+      return;
+    }
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    const resolvedType = ALLOWED_VIDEO_MIME.includes(file.type)
+      ? file.type
+      : VIDEO_EXT_TO_MIME[ext];
+    if (!resolvedType) {
+      toast.error('Unsupported video format — please upload MP4, MOV, or WebM.');
+      return;
+    }
+    if (file.size > 200 * 1024 * 1024) {
+      toast.error('Video is too large — 200 MB limit.');
+      return;
+    }
+    setVideoUploading(true);
+    const safeExt = ext || resolvedType.split('/')[1] || 'mp4';
+    const filePath = `${user.id}/${crypto.randomUUID()}.${safeExt}`;
+    const { error } = await supabase.storage
+      .from('property-videos')
+      .upload(filePath, file, { upsert: false, contentType: resolvedType });
+    if (videoRef.current) videoRef.current.value = '';
+    if (error) {
+      console.error('[StepPhotos] video upload failed', error);
+      toast.error(`Video upload failed: ${error.message}`);
+      setVideoUploading(false);
+      return;
+    }
+    const { data: { publicUrl } } = supabase.storage
+      .from('property-videos')
+      .getPublicUrl(filePath);
+    update({ video_url: publicUrl });
+    toast.success('Walkthrough video added.');
+    setVideoUploading(false);
+  };
+
   return (
     <div className="space-y-4">
       <Label className="text-sm font-semibold block">Property Photos (up to 20)</Label>

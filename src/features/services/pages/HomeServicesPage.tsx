@@ -60,7 +60,7 @@ export default function HomeServicesPage() {
       setLoading(true);
       const { data, error } = await supabase
         .from('home_service_providers')
-        .select('id, name, category, description, price_from, price_to, price_unit, suburb, state, rating, logo_url')
+        .select('id, name, category, description, price_from, price_to, price_unit, suburb, state, rating, logo_url, contact_email')
         .eq('is_active', true)
         .order('rating', { ascending: false });
       if (!error && data) setProviders(data as Provider[]);

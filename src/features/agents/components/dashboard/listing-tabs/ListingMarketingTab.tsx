@@ -20,6 +20,7 @@ import {
   ChevronRight, Send, Loader2,
   Zap, Star, CheckCircle2, AlertCircle,
   Camera, Map as MapIcon, Sofa, Bug,
+  Languages,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

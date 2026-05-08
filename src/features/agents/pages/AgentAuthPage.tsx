@@ -26,7 +26,8 @@ const AgentAuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [pendingSignIn, setPendingSignIn] = useState(false);
-  const [combinedConsent, setCombinedConsent] = useState(false);
+  const [dataLocationConsent, setDataLocationConsent] = useState(false);
+  const [policyConsent, setPolicyConsent] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [emailTouched, setEmailTouched] = useState(false);
   const [showOAuthConsentModal, setShowOAuthConsentModal] = useState(false);
@@ -105,20 +106,25 @@ const AgentAuthPage = () => {
   };
 
   const handleEmailSubmit = async () => {
-    const cleaned = regEmail.trim().toLowerCase();
     const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!cleaned) {
+    const trimmed = regEmail.trim();
+    if (!trimmed) {
       setEmailError('Email address is required');
       return;
     }
-    if (!emailRe.test(cleaned)) {
+    if (!emailRe.test(trimmed)) {
       setEmailError('Enter a valid email (e.g. name@agency.com.au)');
       return;
     }
-    if (!combinedConsent) {
+    if (!dataLocationConsent) {
+      toast.error('Please acknowledge where your data is stored to continue.');
+      return;
+    }
+    if (!policyConsent) {
       toast.error('Please agree to the Privacy Policy and Terms of Service to continue.');
       return;
     }
+    const cleaned = regEmail.trim().toLowerCase();
     setEmailSubmitting(true);
     try {
       const { error } = await supabase.auth.signInWithOtp({
@@ -178,7 +184,7 @@ const AgentAuthPage = () => {
   };
 
   const handleOAuth = async (provider: 'google' | 'apple') => {
-    if (step === 'register' && !combinedConsent) {
+    if (step === 'register' && !(dataLocationConsent && policyConsent)) {
       setPendingOAuthProvider(provider);
       setShowOAuthConsentModal(true);
       return;
@@ -273,21 +279,6 @@ const AgentAuthPage = () => {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
 
           {/* Form badge */}
-          {/* Back to home (sign-in flows only) */}
-          {(step === 'email' || step === 'password') && (
-            <Link to="/" className="inline-block text-sm text-gray-500 hover:text-gray-800 mb-4">
-              ← Back to ListHQ
-            </Link>
-          )}
-
-          {/* Mobile-only feature pills (replaces left dark panel on small screens) */}
-          {step === 'register' && (
-            <div className="flex flex-wrap gap-2 mb-5 lg:hidden">
-              {['20-language listings', 'AI buyer matching', 'Trust accounting'].map((p) => (
-                <span key={p} className="bg-gray-100 text-gray-700 text-xs rounded-full px-3 py-1">{p}</span>
-              ))}
-            </div>
-          )}
 
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-stone-200 bg-stone-50 mb-5">
             <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
@@ -421,16 +412,26 @@ const AgentAuthPage = () => {
                 <label className="flex items-start gap-2.5 cursor-pointer select-none">
                   <input
                     type="checkbox"
-                    checked={combinedConsent}
-                    onChange={(e) => setCombinedConsent(e.target.checked)}
+                    checked={dataLocationConsent}
+                    onChange={(e) => setDataLocationConsent(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-stone-300 text-primary focus:ring-primary cursor-pointer shrink-0"
+                  />
+                  <span className="text-xs text-muted-foreground leading-relaxed">
+                    I understand that my data is stored on secure servers compliant with the Australian Privacy Act 1988.
+                  </span>
+                </label>
+                <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={policyConsent}
+                    onChange={(e) => setPolicyConsent(e.target.checked)}
                     className="mt-0.5 h-4 w-4 rounded border-stone-300 text-primary focus:ring-primary cursor-pointer shrink-0"
                   />
                   <span className="text-xs text-muted-foreground leading-relaxed">
                     I agree to the{' '}
                     <Link to="/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Privacy Policy</Link>
                     {' '}and{' '}
-                    <Link to="/terms" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Terms of Service</Link>
-                    , and understand that my data is stored on secure servers compliant with the Australian Privacy Act 1988.
+                    <Link to="/terms" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Terms of Service</Link>.
                   </span>
                 </label>
 
@@ -455,7 +456,7 @@ const AgentAuthPage = () => {
                   </div>
                 </div>
 
-                <button type="submit" disabled={emailSubmitting || !combinedConsent} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
+                <button type="submit" disabled={emailSubmitting || !(dataLocationConsent && policyConsent)} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {emailSubmitting ? 'Sending confirmation...' : 'Continue — confirm my email'}
                 </button>
               </form>

@@ -2,7 +2,7 @@ import { useState, useEffect, lazy, Suspense } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Info, Loader2, Pencil, Globe, Home, Building, MoreHorizontal, FileBarChart2, Copy, Mail, List as ListIcon, Kanban } from 'lucide-react';
+import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Info, Loader2, Pencil, Globe, Home, Building, MoreHorizontal, FileBarChart2, Copy, Mail, List as ListIcon, Kanban, ExternalLink } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -133,6 +133,20 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
           {l._source === 'db' && (
             <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" onClick={() => navigate(`/dashboard/listings/${l.id}`)}>
               <Eye size={10} /> Manage
+            </Button>
+          )}
+          {l._source === 'db' && l._status === 'public' && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-[10px] h-6 px-2 gap-0.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(`/property/${l.id}`, '_blank');
+              }}
+              title="View buyer-facing listing in a new tab"
+            >
+              <ExternalLink size={10} /> View live
             </Button>
           )}
           <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" disabled={actionLoading === l.id} onClick={() => {

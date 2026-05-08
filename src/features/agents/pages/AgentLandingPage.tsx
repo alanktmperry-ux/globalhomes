@@ -234,7 +234,8 @@ const AgentLandingPage = () => {
                   </div>
                 )}
                 <div style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 12 }}>{p.name}</div>
-                <div style={{ fontSize: 36, fontWeight: 800, color: '#0a0f1e', letterSpacing: '-1px', marginBottom: 8 }}>{p.price}</div>
+                <div style={{ fontSize: 36, fontWeight: 800, color: '#0a0f1e', letterSpacing: '-1px', marginBottom: 4 }}>{p.price}</div>
+                <div className="text-xs text-muted-foreground" style={{ marginBottom: 8 }}>Founding member — locked for life</div>
                 <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px', lineHeight: 1.5 }}>{p.desc}</p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 22px' }}>
                   {p.feats.map((f) => (

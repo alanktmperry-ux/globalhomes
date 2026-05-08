@@ -6,6 +6,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
 import PocketListingForm from '@/features/agents/components/pocket-listing/PocketListingForm';
 import { toast } from 'sonner';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 interface ListingMeta {
   id: string;
@@ -15,6 +16,7 @@ interface ListingMeta {
 }
 
 const ListingEditPage = () => {
+  usePageTitle('Edit Listing');
   const { listingId } = useParams<{ listingId: string }>();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();

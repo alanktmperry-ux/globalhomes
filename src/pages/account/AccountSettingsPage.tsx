@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/shared/hooks/use-toast";
 import { getErrorMessage } from "@/shared/lib/errorUtils";
+import { usePageTitle } from '@/lib/usePageTitle';
 
 type Profile = {
   id: string;
@@ -21,6 +22,7 @@ type Profile = {
 };
 
 export default function AccountSettingsPage() {
+  usePageTitle('Account Settings');
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();

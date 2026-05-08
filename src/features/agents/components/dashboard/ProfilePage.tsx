@@ -18,6 +18,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { autocomplete } from '@/shared/lib/googleMapsService';
 import DashboardHeader from './DashboardHeader';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 interface AgentData {
   id: string;
@@ -57,6 +58,7 @@ interface Credential {
 }
 
 const ProfilePage = () => {
+  usePageTitle('Profile Settings');
   const { user } = useAuth();
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);

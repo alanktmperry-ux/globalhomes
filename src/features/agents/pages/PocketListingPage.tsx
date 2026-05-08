@@ -12,12 +12,14 @@ import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { useToast } from '@/shared/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 const PocketListingPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const editId = searchParams.get('edit');
+  usePageTitle(editId ? 'Edit Listing' : 'New Listing');
   const duplicateId = searchParams.get('duplicate');
   const typeParam = searchParams.get('type');
   const routeState = location.state as { type?: 'sale' | 'rent' | 'rental', _ts?: number } | null;

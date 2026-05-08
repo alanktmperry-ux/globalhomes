@@ -18,6 +18,7 @@ import { PropertyDrawer } from '@/features/properties/components/PropertyDrawer'
 import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 const STATUS_CONFIG: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
   pending: { icon: <Clock size={12} />, label: 'Pending', color: 'bg-amber-500/15 text-amber-600' },
@@ -381,7 +382,10 @@ const StatusTabs = ({
   </Tabs>
 );
 
+const ARCHIVED_STATUSES = new Set(['sold', 'leased']);
+
 const ListingsPage = () => {
+  usePageTitle('My Listings');
   const navigate = useNavigate();
   const sub = useSubscription();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -410,6 +414,7 @@ const ListingsPage = () => {
   const [listingMode, setListingMode] = useState<'sale' | 'rent'>('sale');
   const [saleStatusTab, setSaleStatusTab] = useState('all');
   const [rentStatusTab, setRentStatusTab] = useState('all');
+  const [lifecycleTab, setLifecycleTab] = useState<'active' | 'archived'>('active');
   const { listings, loading, isMockData, refetch } = useAgentListings();
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -568,8 +573,12 @@ const ListingsPage = () => {
       return { ...merged, _status: overridden ?? getListingStatus(l) };
     });
 
-  const salesListings = withStatus.filter(l => l.listing_type !== 'rent');
-  const rentalListings = withStatus.filter(l => l.listing_type === 'rent');
+  const activeWithStatus = withStatus.filter((l) => !ARCHIVED_STATUSES.has(l._status));
+  const archivedWithStatus = withStatus.filter((l) => ARCHIVED_STATUSES.has(l._status));
+  const lifecycleListings = lifecycleTab === 'active' ? activeWithStatus : archivedWithStatus;
+
+  const salesListings = lifecycleListings.filter(l => l.listing_type !== 'rent');
+  const rentalListings = lifecycleListings.filter(l => l.listing_type === 'rent');
 
   const activeStatusTab = listingMode === 'sale' ? saleStatusTab : rentStatusTab;
   const setActiveStatusTab = listingMode === 'sale' ? setSaleStatusTab : setRentStatusTab;
@@ -670,6 +679,27 @@ const ListingsPage = () => {
             </div>
           )}
 
+          {/* Active / Archived lifecycle tabs */}
+          <div className="inline-flex bg-muted rounded-lg p-1 mb-4 gap-1">
+            {(['active', 'archived'] as const).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setLifecycleTab(tab)}
+                className={cn(
+                  'px-4 py-1.5 rounded-lg text-xs font-medium transition-colors',
+                  lifecycleTab === tab
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                {tab === 'active'
+                  ? `Active (${activeWithStatus.length})`
+                  : `Sold / Archived (${archivedWithStatus.length})`}
+              </button>
+            ))}
+          </div>
+
           {/* Sale / Rent toggle */}
           <div className="flex items-center gap-2 mb-4">
             <Button
@@ -705,7 +735,17 @@ const ListingsPage = () => {
               <Loader2 className="animate-spin text-primary" size={24} />
             </div>
           ) : filtered.length === 0 ? (
-            withStatus.length === 0 ? (
+            lifecycleTab === 'archived' ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
+                <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center">
+                  <CheckCircle2 size={28} className="text-muted-foreground" />
+                </div>
+                <h3 className="font-semibold text-foreground">No archived listings</h3>
+                <p className="text-sm text-muted-foreground max-w-xs">
+                  Listings marked as Sold or Leased will appear here.
+                </p>
+              </div>
+            ) : withStatus.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
                 <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
                   <Home size={28} className="text-primary" />

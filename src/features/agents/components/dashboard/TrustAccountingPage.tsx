@@ -29,6 +29,7 @@ import { useAgentStateCompliance } from '@/features/agents/hooks/useAgentStateCo
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2 });
 const DATE_FMT = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -555,6 +556,7 @@ const TrustAccountingPage = () => {
 
   // ── Transaction Form Fields (shared between new & edit) ──
   function renderTxFormFields() {
+  usePageTitle('Trust Accounting');
     return (
       <div className="space-y-3">
         {!showEditTx && (

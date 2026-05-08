@@ -16,6 +16,7 @@ import {
   type InboxFilter, type InboxThreadRow, type InboxChannel,
 } from '@/features/inbox/hooks/useInbox';
 import TemplatePicker, { type TemplatePickerContact } from '@/features/messaging/components/TemplatePicker';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 const FILTERS: { key: InboxFilter; label: string }[] = [
   { key: 'all', label: 'All' },
@@ -37,6 +38,7 @@ function initials(t: InboxThreadRow): string {
 }
 
 export default function InboxPage() {
+  usePageTitle('Inbox');
   const [filter, setFilter] = useState<InboxFilter>('all');
   const [search, setSearch] = useState('');
   const [activeId, setActiveId] = useState<string | null>(null);

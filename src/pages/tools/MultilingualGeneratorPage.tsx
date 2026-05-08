@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 type TranslationMap = Record<string, { title?: string; description?: string }>;
 
@@ -31,6 +32,7 @@ const LOADING_MESSAGES = [
 ];
 
 export default function MultilingualGeneratorPage() {
+  usePageTitle('Free Multilingual Generator');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);

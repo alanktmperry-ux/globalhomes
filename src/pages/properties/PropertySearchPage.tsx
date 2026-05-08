@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import { usePageTitle } from '@/lib/usePageTitle';
 
 type Intent = 'buy' | 'rent' | '';
 
@@ -42,6 +43,7 @@ interface PropertyRow {
 const TYPES = ['House', 'Apartment', 'Townhouse', 'Unit', 'Land', 'Rural', 'Commercial'];
 
 export default function PropertySearchPage() {
+  usePageTitle('Browse Properties');
   const [filters, setFilters] = useState<Filters>(EMPTY);
   const [debouncedSuburb, setDebouncedSuburb] = useState('');
   const [properties, setProperties] = useState<PropertyRow[]>([]);

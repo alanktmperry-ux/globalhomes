@@ -28,21 +28,19 @@ export async function autocomplete(input: string, types?: string): Promise<{ des
 
 export async function geocode(address: string): Promise<{ lat: number; lng: number } | null> {
   try {
-    const { data, error } = await supabase.functions.invoke('google-maps-proxy', {
-      body: { action: 'geocode', input: address },
+    await loadGoogleMapsScript();
+    return await new Promise<{ lat: number; lng: number } | null>((resolve) => {
+      const geocoder = new (window as any).google.maps.Geocoder();
+      geocoder.geocode({ address }, (results: any, status: string) => {
+        if (status === 'OK' && results?.[0]) {
+          const loc = results[0].geometry.location;
+          resolve({ lat: loc.lat(), lng: loc.lng() });
+        } else {
+          resolve(null);
+        }
+      });
     });
-    if (error) {
-      console.error('[geocode] proxy error', error, { address });
-      return null;
-    }
-    if (!data?.results?.[0]) {
-      console.error('[geocode] no results', { address, status: data?.status, error_message: data?.error_message, data });
-      return null;
-    }
-    const loc = data.results[0].geometry.location;
-    return { lat: loc.lat, lng: loc.lng };
-  } catch (e) {
-    console.error('[geocode] threw', e, { address });
+  } catch {
     return null;
   }
 }

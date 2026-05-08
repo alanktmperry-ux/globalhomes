@@ -19,6 +19,7 @@ const PocketListingPage = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const editId = searchParams.get('edit');
+  usePageTitle(editId ? 'Edit Listing' : 'New Listing');
   const duplicateId = searchParams.get('duplicate');
   const typeParam = searchParams.get('type');
   const routeState = location.state as { type?: 'sale' | 'rent' | 'rental', _ts?: number } | null;

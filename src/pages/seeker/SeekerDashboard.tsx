@@ -483,3 +483,96 @@ function PlanningToBuy() {
     </section>
   );
 }
+
+function fmtAud(n: number | null | undefined) {
+  if (n == null) return null;
+  return new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 }).format(Number(n));
+}
+
+function HaloSummaryCard({ intent }: { intent: any | null }) {
+  if (!intent) {
+    return (
+      <div className="rounded-xl border border-border bg-card p-5 space-y-3 mb-4">
+        <h2 className="font-semibold text-sm text-foreground">Your Halo</h2>
+        <p className="text-sm text-muted-foreground">Create your Halo to start receiving matches.</p>
+        <Button asChild size="sm">
+          <Link to="/halo/new">Create your Halo →</Link>
+        </Button>
+      </div>
+    );
+  }
+  const suburbs = (intent.suburbs ?? []) as string[];
+  const types = (intent.property_types ?? []) as string[];
+  const minP = fmtAud(intent.min_price);
+  const maxP = fmtAud(intent.max_price);
+  const priceLabel = minP && maxP ? `${minP} – ${maxP}` : maxP ? `Up to ${maxP}` : minP ? `From ${minP}` : null;
+
+  const Chip = ({ children }: { children: React.ReactNode }) => (
+    <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-foreground">
+      {children}
+    </span>
+  );
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5 space-y-3 mb-4">
+      <div className="flex items-center justify-between">
+        <h2 className="font-semibold text-sm text-foreground">Your Halo</h2>
+        <Link to="/halo/new" className="text-xs text-primary hover:underline">Edit</Link>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Chip>🏡 Buy</Chip>
+        {suburbs.length > 0 && <Chip>{suburbs.join(', ')}</Chip>}
+        {priceLabel && <Chip>{priceLabel}</Chip>}
+        {intent.bedrooms != null && <Chip>{intent.bedrooms}+ bed</Chip>}
+        {types.map((t) => <Chip key={t}>{t}</Chip>)}
+      </div>
+    </div>
+  );
+}
+
+function MatchedListings({ matches }: { matches: any[] }) {
+  return (
+    <div className="space-y-3 mb-4">
+      <h2 className="font-semibold text-sm text-foreground">
+        Properties matched to you
+        {matches.length > 0 && (
+          <span className="ml-2 text-xs font-normal text-muted-foreground">({matches.length} found)</span>
+        )}
+      </h2>
+      {matches.length === 0 ? (
+        <div className="rounded-xl border border-border bg-card p-5">
+          <p className="text-sm text-muted-foreground">
+            No matches yet — we'll notify you by email when a property matches your Halo.
+          </p>
+        </div>
+      ) : (
+        matches.map((match) => {
+          const p = match.properties;
+          const price = p.price_formatted ?? (p.price ? `$${Number(p.price).toLocaleString('en-AU')}` : '—');
+          return (
+            <Link
+              key={match.id}
+              to={`/properties/${p.id}`}
+              className="block rounded-xl border border-border bg-card p-4 hover:bg-accent transition-colors space-y-1"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="font-medium text-sm text-foreground line-clamp-1">{p.address}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {p.suburb}{p.beds != null ? ` · ${p.beds} bed` : ''}{p.baths != null ? ` · ${p.baths} bath` : ''}
+                  </p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="text-sm font-semibold text-foreground">{price}</p>
+                  {match.match_score != null && (
+                    <p className="text-xs text-primary font-medium">{match.match_score}% match</p>
+                  )}
+                </div>
+              </div>
+            </Link>
+          );
+        })
+      )}
+    </div>
+  );
+}

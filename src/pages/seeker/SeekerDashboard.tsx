@@ -22,7 +22,9 @@ export default function SeekerDashboard() {
   const [halos, setHalos] = useState<HaloRow[] | null>(null);
   const [unreadTotal, setUnreadTotal] = useState(0);
   const [filter, setFilter] = useState<'all' | 'buy' | 'rent'>('all');
-  const [profile, setProfile] = useState<{ first_name: string | null; full_name: string | null } | null>(null);
+  const [profile, setProfile] = useState<{ first_name: string | null; full_name: string | null; language_preference: string | null } | null>(null);
+  const [buyerIntent, setBuyerIntent] = useState<any | null>(null);
+  const [matches, setMatches] = useState<any[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -30,10 +32,27 @@ export default function SeekerDashboard() {
     (async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('first_name, full_name')
+        .select('first_name, full_name, language_preference')
         .eq('id', user.id)
         .maybeSingle();
       if (!cancelled) setProfile(data as any);
+
+      const { data: bi } = await supabase
+        .from('buyer_intent')
+        .select('*')
+        .eq('buyer_id', user.id)
+        .order('last_searched_at', { ascending: false, nullsFirst: false })
+        .limit(1)
+        .maybeSingle();
+      if (!cancelled) setBuyerIntent(bi);
+
+      const { data: matchRows } = await supabase
+        .from('listing_buyer_matches')
+        .select('id, listing_id, match_score, match_reasoning, properties:listing_id(id, address, suburb, beds, baths, price, price_formatted)')
+        .eq('buyer_id', user.id)
+        .order('match_score', { ascending: false })
+        .limit(10);
+      if (!cancelled) setMatches((matchRows ?? []).filter((m: any) => m.properties));
     })();
     return () => { cancelled = true; };
   }, [user]);
@@ -139,8 +158,27 @@ export default function SeekerDashboard() {
           </div>
         ) : (
           <>
+            {/* Language preference banner */}
+            {profile?.language_preference && profile.language_preference !== 'en' && (
+              <div className="mb-6 rounded-xl bg-primary/5 border border-primary/20 p-4 flex items-center gap-3">
+                <span className="text-lg">🌐</span>
+                <div>
+                  <p className="text-sm font-medium text-foreground">Listings shown in your language</p>
+                  <p className="text-xs text-muted-foreground">
+                    Property details are automatically displayed in your preferred language when available.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Halo summary card */}
+            <HaloSummaryCard intent={buyerIntent} />
+
+            {/* Matched listings */}
+            <MatchedListings matches={matches} />
+
             {/* Stats */}
-            <section className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+            <section className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 mt-8">
               <StatTile label="Active Halos" value={String(stats.active)} />
               <StatTile label="Unread Responses" value={String(stats.unread)} highlight={stats.unread > 0} />
               <StatTile label="Languages" value={stats.languages} small />
@@ -443,5 +481,98 @@ function PlanningToBuy() {
         <p className="text-xs text-[#94A3B8] mt-3">Also available in Korean, Arabic, Hindi — free, no obligation.</p>
       </div>
     </section>
+  );
+}
+
+function fmtAud(n: number | null | undefined) {
+  if (n == null) return null;
+  return new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 }).format(Number(n));
+}
+
+function HaloSummaryCard({ intent }: { intent: any | null }) {
+  if (!intent) {
+    return (
+      <div className="rounded-xl border border-border bg-card p-5 space-y-3 mb-4">
+        <h2 className="font-semibold text-sm text-foreground">Your Halo</h2>
+        <p className="text-sm text-muted-foreground">Create your Halo to start receiving matches.</p>
+        <Button asChild size="sm">
+          <Link to="/halo/new">Create your Halo →</Link>
+        </Button>
+      </div>
+    );
+  }
+  const suburbs = (intent.suburbs ?? []) as string[];
+  const types = (intent.property_types ?? []) as string[];
+  const minP = fmtAud(intent.min_price);
+  const maxP = fmtAud(intent.max_price);
+  const priceLabel = minP && maxP ? `${minP} – ${maxP}` : maxP ? `Up to ${maxP}` : minP ? `From ${minP}` : null;
+
+  const Chip = ({ children }: { children: React.ReactNode }) => (
+    <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-foreground">
+      {children}
+    </span>
+  );
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5 space-y-3 mb-4">
+      <div className="flex items-center justify-between">
+        <h2 className="font-semibold text-sm text-foreground">Your Halo</h2>
+        <Link to="/halo/new" className="text-xs text-primary hover:underline">Edit</Link>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Chip>🏡 Buy</Chip>
+        {suburbs.length > 0 && <Chip>{suburbs.join(', ')}</Chip>}
+        {priceLabel && <Chip>{priceLabel}</Chip>}
+        {intent.bedrooms != null && <Chip>{intent.bedrooms}+ bed</Chip>}
+        {types.map((t) => <Chip key={t}>{t}</Chip>)}
+      </div>
+    </div>
+  );
+}
+
+function MatchedListings({ matches }: { matches: any[] }) {
+  return (
+    <div className="space-y-3 mb-4">
+      <h2 className="font-semibold text-sm text-foreground">
+        Properties matched to you
+        {matches.length > 0 && (
+          <span className="ml-2 text-xs font-normal text-muted-foreground">({matches.length} found)</span>
+        )}
+      </h2>
+      {matches.length === 0 ? (
+        <div className="rounded-xl border border-border bg-card p-5">
+          <p className="text-sm text-muted-foreground">
+            No matches yet — we'll notify you by email when a property matches your Halo.
+          </p>
+        </div>
+      ) : (
+        matches.map((match) => {
+          const p = match.properties;
+          const price = p.price_formatted ?? (p.price ? `$${Number(p.price).toLocaleString('en-AU')}` : '—');
+          return (
+            <Link
+              key={match.id}
+              to={`/properties/${p.id}`}
+              className="block rounded-xl border border-border bg-card p-4 hover:bg-accent transition-colors space-y-1"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="font-medium text-sm text-foreground line-clamp-1">{p.address}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {p.suburb}{p.beds != null ? ` · ${p.beds} bed` : ''}{p.baths != null ? ` · ${p.baths} bath` : ''}
+                  </p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="text-sm font-semibold text-foreground">{price}</p>
+                  {match.match_score != null && (
+                    <p className="text-xs text-primary font-medium">{match.match_score}% match</p>
+                  )}
+                </div>
+              </div>
+            </Link>
+          );
+        })
+      )}
+    </div>
   );
 }

@@ -639,7 +639,11 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         fireAIMatch(inserted.id);
       }
 
-      onPublish(title);
+      if (!editPropertyId && inserted) {
+        setPublishedListing({ id: inserted.id, address: draft.address, title });
+      } else {
+        onPublish(title);
+      }
     } catch (err: any) {
       console.error('Publish error:', err);
       const msg = err?.message || err?.error_description || err?.details || err?.hint || (typeof err === 'string' ? err : JSON.stringify(err));

@@ -30,7 +30,11 @@ export default function UnsubscribePage() {
         return;
       }
       try {
-        const url = `https://ngrkbohpmkzjonaofgbb.supabase.co/functions/v1/unsubscribe-email?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`;
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        if (!supabaseUrl) {
+          throw new Error('VITE_SUPABASE_URL is not set. Configure it in Lovable project settings.');
+        }
+        const url = `${supabaseUrl}/functions/v1/unsubscribe-email?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`;
         const res = await fetch(url);
         const json = await res.json();
         if (cancelled) return;

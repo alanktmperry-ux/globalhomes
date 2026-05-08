@@ -17,7 +17,7 @@ import { getIntentTier, INTENT_TOOLTIP } from '@/features/agents/lib/intentScore
 import { DEMO_REPUTATION, getScoreColor } from '@/features/agents/utils/reputationScore';
 import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, CartesianGrid } from 'recharts';
 import { toast } from 'sonner';

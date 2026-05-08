@@ -735,7 +735,17 @@ const ListingsPage = () => {
               <Loader2 className="animate-spin text-primary" size={24} />
             </div>
           ) : filtered.length === 0 ? (
-            withStatus.length === 0 ? (
+            lifecycleTab === 'archived' ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
+                <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center">
+                  <CheckCircle2 size={28} className="text-muted-foreground" />
+                </div>
+                <h3 className="font-semibold text-foreground">No archived listings</h3>
+                <p className="text-sm text-muted-foreground max-w-xs">
+                  Listings marked as Sold or Leased will appear here.
+                </p>
+              </div>
+            ) : withStatus.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
                 <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
                   <Home size={28} className="text-primary" />

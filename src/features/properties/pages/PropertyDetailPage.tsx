@@ -479,7 +479,7 @@ export default function PropertyDetailPage() {
     const title = `${property.address || 'Property'} — ${property.beds ?? 0} bed, ${property.baths ?? 0} bath | ListHQ`;
     const description = property.description
       ? property.description.slice(0, 160)
-      : `${property.property_type || 'Property'} in ${property.suburb || ''}. Listed on ListHQ.`;
+      : `${(property as any).propertyType || (property as any).property_type || 'Property'} in ${property.suburb || ''}. Listed on ListHQ.`;
     const image = property.images?.[0] ?? '';
     const url = window.location.href;
 

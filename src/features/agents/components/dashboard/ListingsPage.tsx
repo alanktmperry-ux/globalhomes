@@ -286,7 +286,7 @@ const ListingsPage = () => {
       }
 
       const url = `${window.location.origin}/vendor-report/${token}`;
-      setReportModal({ url, address: l.address });
+      setReportModal({ url, address: l.address, token: token!, propertyId: l.id, agentId: agent.id });
     } catch (e) {
       console.error(e);
       toast.error('Failed to generate report link');

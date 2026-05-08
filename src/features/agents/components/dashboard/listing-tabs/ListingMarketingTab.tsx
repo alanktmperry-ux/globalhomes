@@ -88,6 +88,9 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   const [vendorName, setVendorName] = useState(listing.vendor_name || '');
   const [vendorEmail, setVendorEmail] = useState(listing.vendor_email || '');
   const [sending, setSending] = useState(false);
+  const [replyTo, setReplyTo] = useState<string | null>(null);
+  const [replyDraft, setReplyDraft] = useState('');
+  const [replySending, setReplySending] = useState(false);
   const [translating, setTranslating] = useState(false);
   const [translateDone, setTranslateDone] = useState(
     (listing as any).translation_status === 'complete'

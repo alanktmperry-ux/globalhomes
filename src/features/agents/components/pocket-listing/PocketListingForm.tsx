@@ -701,6 +701,60 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
     );
   }
 
+  if (publishedListing) {
+    return (
+      <div className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
+        <div className="max-w-sm w-full space-y-6">
+          <div className="text-5xl mb-2">🎉</div>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Listing is live!</h1>
+            <p className="text-muted-foreground mt-1 text-sm">{publishedListing.address}</p>
+          </div>
+
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 text-sm text-left space-y-2">
+            <p className="flex items-center gap-2 text-foreground font-medium">
+              <span className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs">✓</span>
+              Listing published
+            </p>
+            <p className="flex items-center gap-2 text-muted-foreground">
+              <Loader2 size={14} className="animate-spin text-primary" />
+              Matching buyers to your listing…
+            </p>
+            <p className="flex items-center gap-2 text-muted-foreground">
+              <Loader2 size={14} className="animate-spin text-primary" />
+              Generating multilingual versions…
+            </p>
+          </div>
+
+          <div className="space-y-2 pt-2">
+            <Button
+              className="w-full gap-2"
+              onClick={() => {
+                const url = `${window.location.origin}/property/${publishedListing.id}?lang=zh-CN`;
+                navigator.clipboard.writeText(url).catch(() => {});
+                toast.success('Mandarin link copied — share it with your Chinese-speaking buyers');
+              }}
+            >
+              <Share2 size={14} />
+              Copy Mandarin listing link
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => onPublish(publishedListing.title)}
+            >
+              Go to my listings
+            </Button>
+          </div>
+
+          <p className="text-[10px] text-muted-foreground">
+            Buyers with matching Halos will be notified automatically
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-card border border-border rounded-2xl flex flex-col max-h-[calc(100vh-12rem)] min-h-0">
       {/* Progress */}

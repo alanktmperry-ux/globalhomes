@@ -14,7 +14,6 @@ import { getErrorMessage } from "@/shared/lib/errorUtils";
 type Profile = {
   id: string;
   full_name: string | null;
-  email: string | null;
   phone: string | null;
   language_preference: string | null;
   email_unsubscribed: boolean | null;

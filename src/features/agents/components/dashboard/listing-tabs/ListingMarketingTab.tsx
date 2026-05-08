@@ -387,7 +387,19 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
     }
   };
 
-  return (
+  const handleOpenPreview = async () => {
+    if (previewOpen) { setPreviewOpen(false); return; }
+    setPreviewOpen(true);
+    if (previewTranslations) return;
+    setPreviewLoading(true);
+    const { data } = await supabase
+      .from('properties')
+      .select('translations')
+      .eq('id', listing.id)
+      .maybeSingle();
+    setPreviewTranslations((data?.translations as any) ?? {});
+    setPreviewLoading(false);
+  };
     <div className="space-y-6">
       {/* ── PREPARE YOUR LISTING — service marketplace ── */}
       <div className="bg-card border border-border rounded-xl p-5">

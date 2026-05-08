@@ -275,17 +275,19 @@ export default function RevenueBilling() {
       // Add-on revenue (last 30 days)
       try {
         const since = new Date(now.getTime() - 30 * 86400000).toISOString();
-        const { data: addonData } = await supabase.from('addon_purchases' as any)
-          .select('id, addon_type, amount_aud, created_at, agent_id')
+        const { data: addonData } = await supabase
+          .from('halo_credit_purchases')
+          .select('id, package_id, amount_paid_aud, created_at, agent_id, status')
           .gte('created_at', since)
+          .eq('status', 'completed')
           .order('created_at', { ascending: false })
           .limit(200);
         const totals: Record<string, { units: number; revenue: number }> = {};
         (addonData || []).forEach((p: any) => {
-          const key = p.addon_type || 'other';
+          const key = 'halo_credits';
           if (!totals[key]) totals[key] = { units: 0, revenue: 0 };
           totals[key].units += 1;
-          totals[key].revenue += Number(p.amount_aud || 0);
+          totals[key].revenue += Number(p.amount_paid_aud || 0);
         });
         setAddonTotals(totals);
       } catch {

@@ -338,6 +338,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         vendorEmail: (prop as any).vendor_email || '',
         vendorPhone: (prop as any).vendor_phone || '',
         virtual_tour_url: (prop as any).virtual_tour_url || '',
+        video_url: (prop as any).video_url || '',
       });
       setLoadingEdit(false);
     };

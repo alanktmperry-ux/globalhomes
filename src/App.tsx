@@ -46,6 +46,7 @@ const CommandCentre = React.lazy(() => import("./features/admin/components/Comma
 const AdminApprovalsPage = React.lazy(() => import("./features/admin/pages/ApprovalsPage"));
 const AdminAgentsPage = React.lazy(() => import("./features/admin/pages/AgentsPage"));
 const AdminPartnersPage = React.lazy(() => import("./features/admin/pages/PartnersPage"));
+const AdminReferralPartnersPage = React.lazy(() => import("./features/admin/pages/ReferralPartnersPage"));
 const AdminBrokers = React.lazy(() => import("./features/admin/components/AdminBrokers"));
 const AdminSupportPage = React.lazy(() => import("./features/admin/pages/SupportPage"));
 const MultilingualGenerator = React.lazy(() => import("./features/public/MultilingualGenerator"));
@@ -495,6 +496,7 @@ const App = () => (
                   <Route path="system" element={<AdminSystemPage />} />
                   <Route path="system/webhooks" element={<AdminWebhookDiagnosticPage />} />
                   <Route path="partners" element={<AdminPartnersPage />} />
+                  <Route path="referral-partners" element={<AdminReferralPartnersPage />} />
                   <Route path="brokers" element={<AdminBrokers />} />
                   <Route path="halo-credits" element={<AdminHaloCreditsPage />} />
                   <Route path="halo-health" element={<AdminHaloHealthPage />} />

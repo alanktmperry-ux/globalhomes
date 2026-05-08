@@ -9,6 +9,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { capture, identify } from '@/shared/lib/posthog';
 import OTPVerificationScreen from '@/features/auth/components/OTPVerificationScreen';
+import agentAuthHero from '@/assets/agent-auth-hero.jpg';
 
 type Step = 'email' | 'password' | 'register' | 'otp';
 

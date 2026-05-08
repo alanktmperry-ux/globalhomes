@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Target, Bot, Globe, EyeOff, Mic, Zap, BarChart2, Landmark } from 'lucide-react';
 import { SEO } from '@/shared/components/SEO';

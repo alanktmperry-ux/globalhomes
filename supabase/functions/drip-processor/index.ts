@@ -211,9 +211,19 @@ Deno.serve(async (req) => {
 
       if (step.channel === 'email' && agent?.email) {
         recipient = agent.email;
-        const subject = interpolate(step.subject ?? '', vars);
-        const html    = await appendUnsubFooter(interpolate(step.body, vars), recipient);
-        sendResult = await sendEmail(recipient, subject, html);
+        // Spam Act 2003 — skip if recipient previously unsubscribed
+        const { data: unsub } = await supabase
+          .from('email_unsubscribes')
+          .select('id')
+          .eq('email', recipient.trim().toLowerCase())
+          .maybeSingle();
+        if (unsub) {
+          sendResult = { ok: true, error: 'recipient_unsubscribed' };
+        } else {
+          const subject = interpolate(step.subject ?? '', vars);
+          const html    = await appendUnsubFooter(interpolate(step.body, vars), recipient);
+          sendResult = await sendEmail(recipient, subject, html);
+        }
 
       } else if (step.channel === 'sms' && agent?.phone) {
         recipient = agent.phone;

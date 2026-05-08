@@ -257,6 +257,17 @@ Deno.serve(async (req) => {
 
             if (!profile?.email) continue;
 
+            // Spam Act 2003 — skip if recipient previously unsubscribed
+            const { data: unsub } = await admin
+              .from('email_unsubscribes')
+              .select('id')
+              .eq('email', profile.email.trim().toLowerCase())
+              .maybeSingle();
+            if (unsub) {
+              console.log('Skipping unsubscribed recipient:', profile.email);
+              continue;
+            }
+
             const langPref = (profile as any).language_preference || 'en';
             const langParam = langPref !== 'en' ? `?lang=${encodeURIComponent(langPref)}` : '';
             const propertyUrl = `https://globalhomes.lovable.app/property/${listing.id}${langParam}`;

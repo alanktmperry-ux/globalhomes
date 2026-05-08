@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useBuyerMatching } from '@/features/agents/hooks/useBuyerMatching';
-import { ArrowLeft, ArrowRight, Save, Loader2, FileText, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Save, Loader2, FileText, Trash2, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
@@ -254,6 +254,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
   }));
   const [publishing, setPublishing] = useState(false);
   const [loadingEdit, setLoadingEdit] = useState(!!loadPropertyId);
+  const [publishedListing, setPublishedListing] = useState<{ id: string; address: string; title: string } | null>(null);
   const autoSaveRef = useRef<ReturnType<typeof setInterval>>();
   const { user } = useAuth();
   const { matchBuyersToListing } = useBuyerMatching();
@@ -636,9 +637,12 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         }
 
         fireAIMatch(inserted.id);
+        setPublishedListing({ id: inserted.id, address: draft.address, title });
       }
 
-      onPublish(title);
+      if (editPropertyId) {
+        onPublish(title);
+      }
     } catch (err: any) {
       console.error('Publish error:', err);
       const msg = err?.message || err?.error_description || err?.details || err?.hint || (typeof err === 'string' ? err : JSON.stringify(err));
@@ -692,6 +696,60 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
           <Button size="sm" variant="outline" onClick={discardDraft} className="gap-1.5">
             <Trash2 size={14} /> No, start fresh
           </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (publishedListing) {
+    return (
+      <div className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
+        <div className="max-w-sm w-full space-y-6">
+          <div className="text-5xl mb-2">🎉</div>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Listing is live!</h1>
+            <p className="text-muted-foreground mt-1 text-sm">{publishedListing.address}</p>
+          </div>
+
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 text-sm text-left space-y-2">
+            <p className="flex items-center gap-2 text-foreground font-medium">
+              <span className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs">✓</span>
+              Listing published
+            </p>
+            <p className="flex items-center gap-2 text-muted-foreground">
+              <Loader2 size={14} className="animate-spin text-primary" />
+              Matching buyers to your listing…
+            </p>
+            <p className="flex items-center gap-2 text-muted-foreground">
+              <Loader2 size={14} className="animate-spin text-primary" />
+              Generating multilingual versions…
+            </p>
+          </div>
+
+          <div className="space-y-2 pt-2">
+            <Button
+              className="w-full gap-2"
+              onClick={() => {
+                const url = `${window.location.origin}/property/${publishedListing.id}?lang=zh-CN`;
+                navigator.clipboard.writeText(url).catch(() => {});
+                toast.success('Mandarin link copied — share it with your Chinese-speaking buyers');
+              }}
+            >
+              <Share2 size={14} />
+              Copy Mandarin listing link
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => onPublish(publishedListing.title)}
+            >
+              Go to my listings
+            </Button>
+          </div>
+
+          <p className="text-[10px] text-muted-foreground">
+            Buyers with matching Halos will be notified automatically
+          </p>
         </div>
       </div>
     );

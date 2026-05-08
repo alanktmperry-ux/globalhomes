@@ -91,6 +91,10 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   const [translateDone, setTranslateDone] = useState(
     (listing as any).translation_status === 'complete'
   );
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewLang, setPreviewLang] = useState<string>('zh_simplified');
+  const [previewTranslations, setPreviewTranslations] = useState<Record<string, { title: string; description: string }> | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const isFeaturedActive = boostState.is_featured && boostState.featured_until && new Date(boostState.featured_until) > new Date();
   const isBoostPending = boostState.boost_requested_at && !boostState.is_featured;

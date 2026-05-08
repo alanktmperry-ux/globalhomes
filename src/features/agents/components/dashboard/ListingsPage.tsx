@@ -197,6 +197,25 @@ function StatusMenu({
   );
 }
 
+interface ListingStatsMaps {
+  views: Record<string, number>;
+  enquiries: Record<string, number>;
+  matches: Record<string, number>;
+}
+
+function ListingStats({ listingId, stats }: { listingId: string; stats: ListingStatsMaps }) {
+  const views = stats.views[listingId] ?? 0;
+  const enquiries = stats.enquiries[listingId] ?? 0;
+  const matches = stats.matches[listingId] ?? 0;
+  return (
+    <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+      <span className="flex items-center gap-1"><Eye size={12} />{views} view{views !== 1 ? 's' : ''}</span>
+      <span className="flex items-center gap-1"><MessageSquare size={12} />{enquiries} enquir{enquiries !== 1 ? 'ies' : 'y'}</span>
+      <span className="flex items-center gap-1"><Sparkles size={12} />{matches} match{matches !== 1 ? 'es' : ''}</span>
+    </div>
+  );
+}
+
 interface ListingCardProps {
   l: AgentListing & { _status: string };
   actionLoading: string | null;
@@ -208,9 +227,10 @@ interface ListingCardProps {
   isRental?: boolean;
   onStatusChange: (id: string, status: string) => void;
   onDelete: (id: string) => void;
+  stats: ListingStatsMaps;
 }
 
-const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSendReport, navigate, isRental, onStatusChange, onDelete }: ListingCardProps) => {
+const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSendReport, navigate, isRental, onStatusChange, onDelete, stats }: ListingCardProps) => {
   const s = STATUS_CONFIG[l._status] || STATUS_CONFIG.public;
   const days = getListingDays(l);
   const leads = getListingLeads(l);

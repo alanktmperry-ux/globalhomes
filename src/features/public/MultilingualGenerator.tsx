@@ -14,6 +14,10 @@ const LANGS = [
   { key: 'ko', flag: '🇰🇷', label: 'Korean' },
   { key: 'ar', flag: '🇸🇦', label: 'Arabic' },
   { key: 'ja', flag: '🇯🇵', label: 'Japanese' },
+  { key: 'hi', flag: '🇮🇳', label: 'Hindi' },
+  { key: 'bn', flag: '🇧🇩', label: 'Bengali' },
+  { key: 'tl', flag: '🇵🇭', label: 'Filipino' },
+  { key: 'id', flag: '🇮🇩', label: 'Indonesian' },
 ];
 
 type TranslationMap = Record<string, { title?: string; description?: string }>;
@@ -58,7 +62,7 @@ export default function MultilingualGenerator() {
           </div>
           <h1 className="text-4xl font-semibold text-foreground tracking-tight">Multilingual Listing Generator</h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Paste any property listing and instantly see it translated into 6 languages — ready to reach Chinese, Vietnamese, Korean, Arabic, and Japanese buyers.
+            Paste any property listing and instantly see it translated into 10 languages — reach Chinese, Vietnamese, Korean, Arabic, Japanese, Hindi, Bengali, Filipino, and Indonesian buyers.
           </p>
         </div>
 
@@ -87,7 +91,7 @@ export default function MultilingualGenerator() {
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button onClick={handleTranslate} disabled={loading} className="w-full gap-2">
-            {loading ? <><Loader2 size={14} className="animate-spin" /> Translating…</> : <><Sparkles size={14} /> Translate into 6 languages</>}
+            {loading ? <><Loader2 size={14} className="animate-spin" /> Translating…</> : <><Sparkles size={14} /> Translate into 10 languages</>}
           </Button>
         </div>
 

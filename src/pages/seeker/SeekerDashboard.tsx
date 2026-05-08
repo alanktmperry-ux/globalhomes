@@ -158,8 +158,27 @@ export default function SeekerDashboard() {
           </div>
         ) : (
           <>
+            {/* Language preference banner */}
+            {profile?.language_preference && profile.language_preference !== 'en' && (
+              <div className="mb-6 rounded-xl bg-primary/5 border border-primary/20 p-4 flex items-center gap-3">
+                <span className="text-lg">🌐</span>
+                <div>
+                  <p className="text-sm font-medium text-foreground">Listings shown in your language</p>
+                  <p className="text-xs text-muted-foreground">
+                    Property details are automatically displayed in your preferred language when available.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Halo summary card */}
+            <HaloSummaryCard intent={buyerIntent} />
+
+            {/* Matched listings */}
+            <MatchedListings matches={matches} />
+
             {/* Stats */}
-            <section className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+            <section className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 mt-8">
               <StatTile label="Active Halos" value={String(stats.active)} />
               <StatTile label="Unread Responses" value={String(stats.unread)} highlight={stats.unread > 0} />
               <StatTile label="Languages" value={stats.languages} small />

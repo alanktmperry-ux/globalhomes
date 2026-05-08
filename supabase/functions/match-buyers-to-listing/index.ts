@@ -9,6 +9,19 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+async function generateUnsubToken(email: string): Promise<string> {
+  const secret = Deno.env.get('UNSUBSCRIBE_SECRET') || 'fallback-secret';
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(email));
+  return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 const SCORING_TOOL = {
   type: "function",
   function: {
@@ -253,6 +266,8 @@ Deno.serve(async (req) => {
               : 'Contact agent';
 
             const subject = `New match: ${listing.beds ?? ''}bd in ${listing.suburb ?? 'your area'}`;
+            const unsubToken = await generateUnsubToken(profile.email);
+            const unsubUrl = `https://globalhomes.lovable.app/unsubscribe?email=${encodeURIComponent(profile.email)}&token=${unsubToken}`;
 
             const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
@@ -277,7 +292,7 @@ Deno.serve(async (req) => {
   </div>
   <div style="text-align:center;font-size:11px;color:#bbb;padding:16px 0;">
     ListHQ · listhq.com.au<br>
-    <a href="https://globalhomes.lovable.app/unsubscribe?email=${encodeURIComponent(profile.email)}" style="color:#bbb;">Unsubscribe</a>
+    <a href="${unsubUrl}" style="color:#bbb;">Unsubscribe</a>
   </div>
 </div>
 </body></html>`;

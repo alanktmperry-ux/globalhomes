@@ -62,9 +62,10 @@ export default function PartnerReferralPage() {
         subject: `${partnerName} invited you to ListHQ`,
         html: buildPartnerWelcomeEmail({
           buyerName: formData.name,
+          buyerEmail: formData.email,
           partnerName,
           suburbInterest: formData.suburb_interest || '',
-          registerUrl: `${window.location.origin}/register`,
+          registerUrl: `${window.location.origin}/login`,
         }),
       },
     }).catch(() => { /* non-fatal */ });
@@ -138,11 +139,13 @@ export default function PartnerReferralPage() {
 
 function buildPartnerWelcomeEmail({
   buyerName,
+  buyerEmail,
   partnerName,
   suburbInterest,
   registerUrl,
 }: {
   buyerName: string;
+  buyerEmail: string;
   partnerName: string;
   suburbInterest: string;
   registerUrl: string;
@@ -174,7 +177,7 @@ function buildPartnerWelcomeEmail({
   </div>
   <div style="text-align:center;font-size:11px;color:#bbb;padding:8px 0;">
     ListHQ · listhq.com.au<br>
-    You received this because ${partnerName} shared your details with ListHQ. <a href="${registerUrl.replace('/register', '/unsubscribe')}" style="color:#bbb;">Unsubscribe</a>
+    You received this because ${partnerName} shared your details with ListHQ. <a href="${window.location.origin}/unsubscribe?email=${encodeURIComponent(buyerEmail)}" style="color:#bbb;">Unsubscribe</a>
   </div>
 </div>
 </body></html>`;

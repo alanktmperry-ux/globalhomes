@@ -58,7 +58,7 @@ export default function PropertyDetailPage() {
   // Support both /property/:slug and /property/:uuid for backward compat
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { t, setLanguage } = useI18n();
+  const { t, language, setLanguage } = useI18n();
   const [searchParams] = useSearchParams();
 
   useEffect(() => {

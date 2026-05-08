@@ -1,0 +1,1 @@
+ALTER TABLE public.agents ADD COLUMN IF NOT EXISTS gci_budget_annual numeric DEFAULT 0;

@@ -988,6 +988,7 @@ export type Database = {
           cpd_hours_required: number | null
           created_at: string
           email: string | null
+          gci_budget_annual: number | null
           handles_trust_accounting: boolean | null
           headline: string | null
           id: string
@@ -1047,6 +1048,7 @@ export type Database = {
           cpd_hours_required?: number | null
           created_at?: string
           email?: string | null
+          gci_budget_annual?: number | null
           handles_trust_accounting?: boolean | null
           headline?: string | null
           id?: string
@@ -1106,6 +1108,7 @@ export type Database = {
           cpd_hours_required?: number | null
           created_at?: string
           email?: string | null
+          gci_budget_annual?: number | null
           handles_trust_accounting?: boolean | null
           headline?: string | null
           id?: string

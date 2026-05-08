@@ -58,7 +58,7 @@ export function useOnboardingSteps() {
         );
       }
 
-      const { count: contactCount } = await supabase
+      const { count: contactCount } = await (supabase as any)
         .from('contacts')
         .select('id', { count: 'exact', head: true })
         .eq('agent_id', agentId);

@@ -472,6 +472,57 @@ export default function PropertyDetailPage() {
     });
   }, [property]);
 
+  // Inject Open Graph + Twitter meta tags so social shares show property previews
+  useEffect(() => {
+    if (!property) return;
+
+    const title = `${property.address || 'Property'} — ${property.beds ?? 0} bed, ${property.baths ?? 0} bath | ListHQ`;
+    const description = property.description
+      ? property.description.slice(0, 160)
+      : `${property.property_type || 'Property'} in ${property.suburb || ''}. Listed on ListHQ.`;
+    const image = property.images?.[0] ?? '';
+    const url = window.location.href;
+
+    document.title = title;
+
+    function setMeta(prop: string, content: string) {
+      let el = document.querySelector(`meta[property="${prop}"]`);
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute('property', prop);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', content);
+    }
+
+    function setNameMeta(name: string, content: string) {
+      let el = document.querySelector(`meta[name="${name}"]`);
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute('name', name);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', content);
+    }
+
+    setMeta('og:title', title);
+    setMeta('og:description', description);
+    setMeta('og:url', url);
+    setMeta('og:type', 'website');
+    setMeta('og:site_name', 'ListHQ');
+    if (image) setMeta('og:image', image);
+
+    setNameMeta('description', description);
+    setNameMeta('twitter:card', 'summary_large_image');
+    setNameMeta('twitter:title', title);
+    setNameMeta('twitter:description', description);
+    if (image) setNameMeta('twitter:image', image);
+
+    return () => {
+      document.title = 'ListHQ';
+    };
+  }, [property]);
+
   const prevImage = () => setImageIndex(i => (i > 0 ? i - 1 : (property?.images.length || 1) - 1));
   const nextImage = () => setImageIndex(i => (i < (property?.images.length || 1) - 1 ? i + 1 : 0));
 

@@ -314,6 +314,7 @@ const App = () => (
                   <Route path="/privacy" element={<PrivacyPage />} />
                   <Route path="/unsubscribe" element={<UnsubscribePage />} />
                   <Route path="/tools/multilingual-listing" element={<MultilingualGenerator />} />
+                  <Route path="/tools/multilingual-generator" element={<MultilingualGeneratorPage />} />
                   <Route path="/r/:code" element={<PartnerReferralPage />} />
                   <Route path="/referral-partner/dashboard" element={<ReferralPartnerDashboard />} />
                   <Route path="/stamp-duty-calculator" element={<StampDutyPage />} />

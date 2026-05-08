@@ -124,8 +124,8 @@ export default function TrustStatementModal({ open, onOpenChange }: TrustStateme
   const totalIn = receipts.reduce((s, r) => s + r.amount, 0);
   const totalOut = payments.reduce((s, p) => s + p.amount, 0);
   const closingBalance = openingBalance + totalIn - totalOut;
-  const gstOnReceipts = totalIn / 11;
-  const gstOnPayments = totalOut / 11;
+  const gstOnReceipts = receipts.reduce((s, r) => s + (r.gst_amount ?? 0), 0);
+  const gstOnPayments = payments.reduce((s, p) => s + (p.gst_amount ?? 0), 0);
 
   const handleGeneratePdf = () => {
     const agentName = agentInfo?.name || 'Agent';

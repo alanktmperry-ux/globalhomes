@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Youtube } from 'lucide-react';
+import { Instagram, Youtube, Linkedin } from 'lucide-react';
 
 export function SiteFooter() {
   return (
@@ -24,6 +24,7 @@ export function SiteFooter() {
             <div className="flex gap-2">
               {[
                 { icon: Instagram, href: 'https://www.instagram.com/list_hq', label: 'Instagram' },
+                { icon: Linkedin, href: 'https://www.linkedin.com/company/listhq', label: 'LinkedIn' },
                 { icon: Youtube, href: 'https://www.youtube.com/@ListHQ-u8w', label: 'YouTube' },
               ].map(({ icon: Icon, href, label }) => (
                 <a
@@ -141,7 +142,7 @@ export function SiteFooter() {
         <div className="flex flex-col gap-3 pt-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
             <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
-              © 2026 ListHQ Pty Ltd. All rights reserved. · ABN 65 608 526 781
+              © {new Date().getFullYear()} ListHQ Pty Ltd. All rights reserved. · ABN 65 608 526 781
             </span>
 <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
               Licensed agents only · Australian property law

@@ -693,7 +693,6 @@ const TrustLedgerPage = () => {
         {/* Month Navigator + Summary */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2">
             <Button size="icon" variant="outline" className="h-8 w-8" onClick={prevMonth}>
               <ChevronLeft size={14} />
             </Button>

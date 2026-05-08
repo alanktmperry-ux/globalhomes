@@ -101,12 +101,13 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // ── Auth: require service_role key OR a valid admin/agent JWT ──
+    // ── Auth: verify JWT / service_role ──
     const authHeader = req.headers.get('Authorization') ?? '';
     const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
-    let authorized = false;
+    let callerUser: { id: string } | null = null;
+    let isPrivileged = false; // admin or agent
     if (bearer === serviceRoleKey) {
-      authorized = true;
+      isPrivileged = true;
     } else if (bearer) {
       const authClient = createClient(
         supabaseUrl,
@@ -115,28 +116,36 @@ Deno.serve(async (req) => {
       );
       const { data: userData } = await authClient.auth.getUser();
       if (userData?.user) {
+        callerUser = userData.user;
         const { data: roles } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', userData.user.id);
         const roleList = (roles ?? []).map((r: any) => r.role);
-        if (roleList.includes('admin') || roleList.includes('agent')) authorized = true;
+        if (roleList.includes('admin') || roleList.includes('agent')) isPrivileged = true;
       }
-    }
-    if (!authorized) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
     }
 
     const payload = await req.json();
 
-    // Direct send mode: { to, subject, html }
+    // Direct send mode requires privileged caller
     if (payload.to && payload.subject && payload.html) {
+      if (!isPrivileged) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
       const p = payload as DirectPayload;
       const result = await sendViaResend(p.to, p.subject, p.html);
       return new Response(JSON.stringify({ success: result.ok, reason: result.reason }), {
         status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Legacy type-based mode: any authenticated user is allowed
+    if (!isPrivileged && !callerUser) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
@@ -239,52 +248,64 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     } else {
-      // Existing lead/event notification flow
-      if (!payload.agent_id) {
-        return new Response(JSON.stringify({ error: 'Missing agent_id' }), {
-          status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      const { data: agent, error: agentError } = await supabase
-        .from('agents')
-        .select('email, name')
-        .eq('id', payload.agent_id)
-        .maybeSingle();
-
-      if (agentError || !agent?.email) {
-        console.error('Could not find agent email:', agentError);
-        return new Response(JSON.stringify({ error: 'Agent email not found' }), {
-          status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      recipientEmail = agent.email;
-
-      let propertyTitle = '';
-      let propertyAddress = '';
-      if (payload.property_id) {
-        const { data: prop } = await supabase
-          .from('properties')
-          .select('title, address, suburb, state')
-          .eq('id', payload.property_id)
-          .maybeSingle();
-        if (prop) {
-          propertyTitle = prop.title;
-          propertyAddress = `${prop.address}, ${prop.suburb}, ${prop.state}`;
+      if (payload.recipient_email) {
+        recipientEmail = payload.recipient_email;
+        const msgText = typeof payload.message === 'string'
+          ? payload.message.replace(/\n/g, '<br>')
+          : '';
+        emailHtml = `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a;padding:24px;">
+          <h2 style="font-size:18px;margin:0 0 12px;">${payload.title || 'Notification from ListHQ'}</h2>
+          <p style="font-size:14px;line-height:1.6;">${msgText}</p>
+          <p style="font-size:12px;color:#6b7280;margin:24px 0 0;">ListHQ &mdash; <a href="https://listhq.com.au">listhq.com.au</a></p>
+        </div>`;
+      } else {
+        // Existing lead/event notification flow
+        if (!payload.agent_id) {
+          return new Response(JSON.stringify({ error: 'Missing agent_id' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
         }
-      }
+        const { data: agent, error: agentError } = await supabase
+          .from('agents')
+          .select('email, name')
+          .eq('id', payload.agent_id)
+          .maybeSingle();
 
-      emailHtml = buildLeadEventEmailHtml({
-        agentName: agent.name,
-        type,
-        title: title || '',
-        message: payload.message || '',
-        propertyTitle,
-        propertyAddress,
-        leadName: payload.lead_name,
-        leadEmail: payload.lead_email,
-        leadPhone: payload.lead_phone,
-        leadMessage: payload.lead_message,
-      });
+        if (agentError || !agent?.email) {
+          console.error('Could not find agent email:', agentError);
+          return new Response(JSON.stringify({ error: 'Agent email not found' }), {
+            status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        recipientEmail = agent.email;
+
+        let propertyTitle = '';
+        let propertyAddress = '';
+        if (payload.property_id) {
+          const { data: prop } = await supabase
+            .from('properties')
+            .select('title, address, suburb, state')
+            .eq('id', payload.property_id)
+            .maybeSingle();
+          if (prop) {
+            propertyTitle = prop.title;
+            propertyAddress = `${prop.address}, ${prop.suburb}, ${prop.state}`;
+          }
+        }
+
+        emailHtml = buildLeadEventEmailHtml({
+          agentName: agent.name,
+          type,
+          title: title || '',
+          message: payload.message || '',
+          propertyTitle,
+          propertyAddress,
+          leadName: payload.lead_name,
+          leadEmail: payload.lead_email,
+          leadPhone: payload.lead_phone,
+          leadMessage: payload.lead_message,
+        });
+      }
     }
 
     if (!recipientEmail) {

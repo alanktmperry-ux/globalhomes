@@ -7,6 +7,7 @@ import { lovable } from '@/integrations/lovable/index';
 import { toast } from 'sonner';
 import seekerHero from '@/assets/seeker-auth-hero.jpg';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
+import OTPVerificationScreen from '@/features/auth/components/OTPVerificationScreen';
 
 type Mode = 'signin' | 'signup';
 
@@ -23,6 +24,8 @@ const SeekerAuthPage = () => {
   const [policyConsent, setPolicyConsent] = useState(false);
   const [showOAuthConsentModal, setShowOAuthConsentModal] = useState(false);
   const [pendingOAuthProvider, setPendingOAuthProvider] = useState<'google' | 'apple' | null>(null);
+  const [otpStep, setOtpStep] = useState(false);
+  const [pendingOtpEmail, setPendingOtpEmail] = useState('');
 
   // Bug Fix 1: password reset emails redirect to /login. If we land here with a
   // recovery token in the URL hash, forward to /reset-password preserving the hash
@@ -79,46 +82,34 @@ const SeekerAuthPage = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!email.trim()) {
-      setError('Email is required.');
-      return;
-    }
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters.');
-      return;
-    }
-    if (!dataLocationConsent) {
-      setError('Please acknowledge where your data is stored to continue.');
-      return;
-    }
-    if (!policyConsent) {
-      setError('Please agree to the Privacy Policy and Terms of Service to continue.');
-      return;
-    }
+    if (!email.trim()) { setError('Email is required.'); return; }
+    if (password.length < 8) { setError('Password must be at least 8 characters.'); return; }
+    if (!dataLocationConsent) { setError('Please acknowledge where your data is stored to continue.'); return; }
+    if (!policyConsent) { setError('Please agree to the Privacy Policy and Terms of Service to continue.'); return; }
     setLoading(true);
     try {
-      const { error: upErr } = await supabase.auth.signUp({
+      const { error: otpErr } = await supabase.auth.signInWithOtp({
         email: email.trim().toLowerCase(),
-        password,
-        options: {
-          data: {
-            display_name: displayName || email,
-          },
-        },
+        options: { shouldCreateUser: true },
       });
-      if (upErr) {
-        const msg = upErr.message || '';
-        if (/registered|exists/i.test(msg)) {
-          setError('Could not create account. If you already have an account, try signing in.');
-        } else {
-          setError(msg || 'Could not create account. Please try again.');
-        }
-        return;
-      }
+      if (otpErr) throw otpErr;
+      setPendingOtpEmail(email.trim().toLowerCase());
+      setOtpStep(true);
+    } catch (err) {
+      setError(getErrorMessage(err) || 'Could not send verification code. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      // With email confirmations disabled, signUp returns a session immediately.
+  const handleSeekerOtpVerified = async () => {
+    try {
       const { data: { user: u } } = await supabase.auth.getUser();
       if (u) {
+        // Set password so user can sign in with email+password later
+        try {
+          await supabase.auth.updateUser({ password });
+        } catch { /* non-fatal */ }
         try {
           await supabase.from('profiles').upsert(
             {
@@ -129,21 +120,13 @@ const SeekerAuthPage = () => {
             } as any,
             { onConflict: 'user_id' },
           );
-        } catch {
-          // non-fatal
-        }
-        toast.success('Account created');
-        navigate('/onboarding/role', { replace: true });
-        return;
+        } catch { /* non-fatal */ }
       }
-
-      // Fallback: confirmations may still be enabled on the project.
-      toast.success('Check your email to confirm your account.');
-      setMode('signin');
+      toast.success('Account created — welcome to ListHQ!');
+      navigate('/onboarding/role', { replace: true });
     } catch (err) {
-      setError(getErrorMessage(err) || 'Could not create account. Please try again.');
-    } finally {
-      setLoading(false);
+      toast.error('Account setup failed', { description: getErrorMessage(err) });
+      navigate('/onboarding/role', { replace: true });
     }
   };
 

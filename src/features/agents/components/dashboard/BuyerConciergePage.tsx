@@ -148,6 +148,7 @@ const BuyerConciergePage = () => {
   const { canAccessBuyerConcierge, conciergeMatchesPerMonth, conciergeIntrosPerMonth } = useSubscription();
   const { agent } = useCurrentAgent();
   const { matchesUsed, introsUsed, refresh: refreshUsage } = useConciergeUsage(agent?.id || null);
+  const recordConciergeAction = useRecordConciergeAction();
 
   const matchLimit = conciergeMatchesPerMonth === Infinity ? null : conciergeMatchesPerMonth;
   const introLimit = conciergeIntrosPerMonth === Infinity ? null : conciergeIntrosPerMonth;

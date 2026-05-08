@@ -69,9 +69,10 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
     return <Navigate to="/onboarding/agency" replace />;
   }
 
-  // Pending approval screen for agents who haven't been approved yet.
+  // Auto-approval model: agents are approved on wizard completion. If somehow still pending,
+  // route them back to the wizard to finish their details rather than blocking them.
   if (requireAgent && !isAdmin && approvalState === 'pending') {
-    return <PendingApprovalPage />;
+    return <Navigate to="/onboarding/agency" replace />;
   }
 
   if (requireAgent && !isAgent && !isAdmin && approvalState !== 'approved') {

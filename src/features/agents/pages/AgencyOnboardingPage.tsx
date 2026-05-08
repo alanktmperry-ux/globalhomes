@@ -195,7 +195,7 @@ export default function AgencyOnboardingPage() {
 
   const completeOnboarding = async () => {
     if (!user) return;
-    const { error } = await supabase.from('agents').update({ onboarding_complete: true } as any).eq('user_id', user.id);
+    const { error } = await supabase.from('agents').update({ onboarding_complete: true, is_approved: true } as any).eq('user_id', user.id);
     if (error) throw error;
     await refreshRoles();
 

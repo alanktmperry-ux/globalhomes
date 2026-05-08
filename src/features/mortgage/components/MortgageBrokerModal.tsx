@@ -88,7 +88,7 @@ export function MortgageBrokerModal({
       property_id: propertyId ?? null,
       status: 'new',
       assigned_broker_id: null,
-    });
+    } as any);
 
     await supabase.functions.invoke('send-notification-email', {
       body: {

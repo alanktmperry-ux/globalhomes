@@ -659,7 +659,7 @@ const Index = () => {
             ))}
           </div>
           <style>{`
-            .trust-strip { display:grid; grid-template-columns: repeat(4, 1fr); align-items:center; }
+            .trust-strip { display:grid; grid-template-columns: repeat(3, 1fr); align-items:center; }
             .trust-cell + .trust-cell { border-left:1px solid ${T.border}; }
             @media (max-width: 640px) {
               .trust-strip { grid-template-columns: repeat(2, 1fr); row-gap: 16px; }

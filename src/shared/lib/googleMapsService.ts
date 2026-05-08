@@ -31,10 +31,18 @@ export async function geocode(address: string): Promise<{ lat: number; lng: numb
     const { data, error } = await supabase.functions.invoke('google-maps-proxy', {
       body: { action: 'geocode', input: address },
     });
-    if (error || !data?.results?.[0]) return null;
+    if (error) {
+      console.error('[geocode] proxy error', error, { address });
+      return null;
+    }
+    if (!data?.results?.[0]) {
+      console.error('[geocode] no results', { address, status: data?.status, error_message: data?.error_message, data });
+      return null;
+    }
     const loc = data.results[0].geometry.location;
     return { lat: loc.lat, lng: loc.lng };
-  } catch {
+  } catch (e) {
+    console.error('[geocode] threw', e, { address });
     return null;
   }
 }

@@ -86,7 +86,7 @@ export default function TrustStatementModal({ open, onOpenChange }: TrustStateme
         .lt('date_received', endDate)
         .order('date_received'),
       supabase.from('trust_payments')
-        .select('payment_number, client_name, property_address, amount, payment_method, purpose, date_paid, status, payee_name, reference')
+        .select('payment_number, client_name, property_address, amount, gst_amount, payment_method, purpose, date_paid, status, payee_name, reference')
         .gte('date_paid', startDate)
         .lt('date_paid', endDate)
         .order('date_paid'),

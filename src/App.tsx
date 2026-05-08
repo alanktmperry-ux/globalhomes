@@ -374,7 +374,7 @@ const App = () => (
                 <Route path="/auth/callback" element={<AuthCallbackPage />} />
                 <Route path="/onboarding/role" element={<OnboardingRolePage />} />
                 <Route path="/onboarding/buyer-prefs" element={<OnboardingBuyerPrefsPage />} />
-                <Route path="/register/pending" element={<PendingApprovalPage /></Route>}
+                <Route path="/register/pending" element={<PendingApprovalPage />} />
                 <Route path="/open-home/signin/:token" element={<OpenHomeSignInPage />} />
                 <Route path="/vendor-report/:token" element={<VendorReportPage />} />
                 <Route path="/inspection-report/:token" element={<InspectionReportPublic />} />

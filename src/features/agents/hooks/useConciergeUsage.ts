@@ -66,6 +66,7 @@ export async function recordConciergeAction(
     });
   } catch {
     // non-fatal — table may not exist yet
+  }
 }
 
 export function useRecordConciergeAction() {
@@ -74,5 +75,4 @@ export function useRecordConciergeAction() {
     if (impersonating) return;
     return recordConciergeAction(agentId, action, entityId);
   };
-}
 }

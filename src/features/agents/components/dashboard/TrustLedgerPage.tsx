@@ -10,7 +10,7 @@ import {
   Receipt, ArrowUpCircle, ArrowDownCircle, CalendarIcon, Search,
   FileDown, DollarSign, Clock, CheckCircle2, XCircle, Filter,
   FileText, ChevronLeft, ChevronRight, Download, ShieldCheck,
-  AlertTriangle, BookOpen, PlusCircle, ArrowLeftRight,
+  AlertTriangle, BookOpen, PlusCircle, ArrowLeftRight, Landmark,
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Label } from '@/components/ui/label';
@@ -751,10 +751,20 @@ const TrustLedgerPage = () => {
                 <TableBody>
                   {entriesWithBalance.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center text-muted-foreground py-12 text-sm">
-                        {searchQuery || filterStatus !== 'all'
-                          ? 'No entries match your filters.'
-                          : `No trust entries for ${monthNames[viewMonth]} ${viewYear}.`}
+                      <TableCell colSpan={9} className="py-14">
+                        <div className="text-center space-y-2 max-w-xs mx-auto">
+                          {searchQuery || filterStatus !== 'all' ? (
+                            <p className="text-sm text-muted-foreground">No entries match your filters.</p>
+                          ) : (
+                            <>
+                              <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mx-auto">
+                                <Landmark size={18} className="text-muted-foreground" />
+                              </div>
+                              <p className="font-medium text-sm text-foreground">No trust entries for {monthNames[viewMonth]} {viewYear}</p>
+                              <p className="text-xs text-muted-foreground">Record a receipt or payment to start tracking your trust account for this period.</p>
+                            </>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ) : (

@@ -32,10 +32,27 @@ export default function SeekerDashboard() {
     (async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('first_name, full_name')
+        .select('first_name, full_name, language_preference')
         .eq('id', user.id)
         .maybeSingle();
       if (!cancelled) setProfile(data as any);
+
+      const { data: bi } = await supabase
+        .from('buyer_intent')
+        .select('*')
+        .eq('buyer_id', user.id)
+        .order('last_searched_at', { ascending: false, nullsFirst: false })
+        .limit(1)
+        .maybeSingle();
+      if (!cancelled) setBuyerIntent(bi);
+
+      const { data: matchRows } = await supabase
+        .from('listing_buyer_matches')
+        .select('id, listing_id, match_score, match_reasoning, properties:listing_id(id, address, suburb, beds, baths, price, price_formatted)')
+        .eq('buyer_id', user.id)
+        .order('match_score', { ascending: false })
+        .limit(10);
+      if (!cancelled) setMatches((matchRows ?? []).filter((m: any) => m.properties));
     })();
     return () => { cancelled = true; };
   }, [user]);

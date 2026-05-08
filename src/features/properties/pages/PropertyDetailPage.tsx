@@ -117,6 +117,16 @@ export default function PropertyDetailPage() {
   const [mortgageOpen, setMortgageOpen] = useState(false);
   const [socialProof, setSocialProof] = useState<{ suburbSearchers: number; weeklyViews: number } | null>(null);
 
+  // Fire-and-forget view tracking
+  useEffect(() => {
+    if (!property?.id) return;
+    supabase.from('lead_events').insert({
+      property_id: property.id,
+      event_type: 'view',
+      suburb: property.suburb,
+    } as any).then(() => {});
+  }, [property?.id]);
+
   useEffect(() => {
     if (!property?.suburb || !property?.id) return;
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();

@@ -9,6 +9,7 @@ import {
   FROM_LEGACY_CODE_MAP,
   type SupportedLanguageCode,
 } from '@/shared/lib/i18n/config';
+import { supabase } from '@/integrations/supabase/client';
 
 // Locales with complete translation files. Others render as "Coming soon".
 const AVAILABLE_LOCALES: ReadonlySet<SupportedLanguageCode> = new Set([

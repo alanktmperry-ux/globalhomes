@@ -101,12 +101,13 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // ── Auth: require service_role key OR a valid admin/agent JWT ──
+    // ── Auth: verify JWT / service_role ──
     const authHeader = req.headers.get('Authorization') ?? '';
     const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
-    let authorized = false;
+    let callerUser: { id: string } | null = null;
+    let isPrivileged = false; // admin or agent
     if (bearer === serviceRoleKey) {
-      authorized = true;
+      isPrivileged = true;
     } else if (bearer) {
       const authClient = createClient(
         supabaseUrl,
@@ -115,28 +116,36 @@ Deno.serve(async (req) => {
       );
       const { data: userData } = await authClient.auth.getUser();
       if (userData?.user) {
+        callerUser = userData.user;
         const { data: roles } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', userData.user.id);
         const roleList = (roles ?? []).map((r: any) => r.role);
-        if (roleList.includes('admin') || roleList.includes('agent')) authorized = true;
+        if (roleList.includes('admin') || roleList.includes('agent')) isPrivileged = true;
       }
-    }
-    if (!authorized) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
     }
 
     const payload = await req.json();
 
-    // Direct send mode: { to, subject, html }
+    // Direct send mode requires privileged caller
     if (payload.to && payload.subject && payload.html) {
+      if (!isPrivileged) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
       const p = payload as DirectPayload;
       const result = await sendViaResend(p.to, p.subject, p.html);
       return new Response(JSON.stringify({ success: result.ok, reason: result.reason }), {
         status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Legacy type-based mode: any authenticated user is allowed
+    if (!isPrivileged && !callerUser) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 

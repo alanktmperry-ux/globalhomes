@@ -166,6 +166,7 @@ const ConveyancingPage = () => {
         onOpenChange={setQuoteOpen}
         conveyancerId={selected?.id ?? null}
         conveyancerName={selected?.firm_name ?? null}
+        conveyancerEmail={selected?.email ?? null}
         defaultTransactionType={transactionType}
         source="conveyancing_page"
       />

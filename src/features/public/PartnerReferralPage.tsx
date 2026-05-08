@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,19 @@ export default function PartnerReferralPage() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState('');
+  const [partnerName, setPartnerName] = useState('A property specialist');
+
+  useEffect(() => {
+    if (!code) return;
+    (supabase as any)
+      .from('referral_partners')
+      .select('display_name')
+      .eq('partner_code', code)
+      .maybeSingle()
+      .then(({ data }: { data: { display_name?: string } | null }) => {
+        if (data?.display_name) setPartnerName(data.display_name);
+      });
+  }, [code]);
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm(s => ({ ...s, [k]: e.target.value }));
@@ -24,12 +37,15 @@ export default function PartnerReferralPage() {
     }
     setSubmitting(true);
     setError('');
-    const { error: err } = await supabase.from('partner_buyer_leads').insert({
-      partner_code: code ?? 'unknown',
+    const formData = {
       name: form.name.trim(),
       email: form.email.trim().toLowerCase(),
       phone: form.phone.trim() || null,
       suburb_interest: form.suburb_interest.trim() || null,
+    };
+    const { error: err } = await supabase.from('partner_buyer_leads').insert({
+      partner_code: code ?? 'unknown',
+      ...formData,
       consent_given: true,
     } as any);
     setSubmitting(false);
@@ -38,6 +54,20 @@ export default function PartnerReferralPage() {
       return;
     }
     setDone(true);
+
+    // Non-blocking welcome email
+    supabase.functions.invoke('send-notification-email', {
+      body: {
+        to: formData.email,
+        subject: `${partnerName} invited you to ListHQ`,
+        html: buildPartnerWelcomeEmail({
+          buyerName: formData.name,
+          partnerName,
+          suburbInterest: formData.suburb_interest || '',
+          registerUrl: `${window.location.origin}/register`,
+        }),
+      },
+    }).catch(() => { /* non-fatal */ });
   };
 
   if (done) {
@@ -104,4 +134,48 @@ export default function PartnerReferralPage() {
       </div>
     </div>
   );
+}
+
+function buildPartnerWelcomeEmail({
+  buyerName,
+  partnerName,
+  suburbInterest,
+  registerUrl,
+}: {
+  buyerName: string;
+  partnerName: string;
+  suburbInterest: string;
+  registerUrl: string;
+}): string {
+  const first = buyerName.trim().split(/\s+/)[0];
+  const suburb = suburbInterest?.trim() || 'your area';
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<div style="max-width:520px;margin:0 auto;padding:32px 20px;">
+  <div style="text-align:center;margin-bottom:24px;">
+    <span style="font-size:22px;font-weight:700;color:#1a1a2e;">ListHQ</span>
+  </div>
+  <div style="background:#fff;border-radius:16px;padding:32px 28px;margin-bottom:16px;">
+    <p style="font-size:15px;color:#1a1a2e;margin:0 0 12px;font-weight:600;">Hi ${first},</p>
+    <p style="font-size:14px;color:#555;margin:0 0 16px;line-height:1.6;">
+      ${partnerName} thought you'd find ListHQ useful — it matches buyers like you with off-market and multilingual listings in ${suburb}.
+    </p>
+    <p style="font-size:14px;color:#555;margin:0 0 24px;line-height:1.6;">
+      Create a free buyer profile (called a <strong>Halo</strong>) and we'll notify you the moment a matching property comes up — including listings in Mandarin, Vietnamese, and other languages.
+    </p>
+    <div style="text-align:center;margin:24px 0;">
+      <a href="${registerUrl}" style="display:inline-block;background:#1a1a2e;color:#fff;text-decoration:none;font-weight:600;font-size:14px;padding:14px 32px;border-radius:10px;">
+        Create my free buyer profile →
+      </a>
+    </div>
+    <p style="font-size:12px;color:#aaa;text-align:center;margin:16px 0 0;">
+      Takes 2 minutes. No credit card required.
+    </p>
+  </div>
+  <div style="text-align:center;font-size:11px;color:#bbb;padding:8px 0;">
+    ListHQ · listhq.com.au<br>
+    You received this because ${partnerName} shared your details with ListHQ. <a href="${registerUrl.replace('/register', '/unsubscribe')}" style="color:#bbb;">Unsubscribe</a>
+  </div>
+</div>
+</body></html>`;
 }

@@ -14,7 +14,8 @@ import { Tooltip as UiTooltip, TooltipTrigger, TooltipContent, TooltipProvider }
 import DashboardHeader from './DashboardHeader';
 import TodayPrioritiesPanel from './TodayPrioritiesPanel';
 import { getIntentTier, INTENT_TOOLTIP } from '@/features/agents/lib/intentScore';
-import { DEMO_REPUTATION, getScoreColor } from '@/features/agents/utils/reputationScore';
+import { getScoreColor } from '@/features/agents/utils/reputationScore';
+import { useAgentMonthlyStats } from '@/features/agents/hooks/useAgentMonthlyStats';
 import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useNavigate, Link } from 'react-router-dom';
@@ -442,10 +443,9 @@ const DashboardOverview = () => {
     }
   };
 
-  // GCI values — real data; new users start at 0
-  const gciActual = 0;
-  const gciBudgeted = 0;
-  const gciPotential = 0;
+  // GCI values — real data from Supabase
+  const monthlyStats = useAgentMonthlyStats(agentId);
+  const { gciActual, gciBudgeted, gciPotential } = monthlyStats;
   const gciPercent = gciBudgeted > 0 ? Math.round((gciActual / gciBudgeted) * 100) : 0;
 
   // Stats row - Australian CRM focus
@@ -464,8 +464,8 @@ const DashboardOverview = () => {
   const stats = [
     { label: 'Tasks Due', value: String(tasksDue), icon: <CheckSquare size={16} />, color: 'text-destructive', link: '/dashboard/contacts?tab=tasks' },
     { label: 'Active Contacts', value: String(activeContacts), icon: <Users size={16} />, color: 'text-primary', link: '/dashboard/contacts' },
-    { label: 'Appraisals This Month', value: '0', icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/pipeline?stage=appraisal' },
-    { label: 'Sales This Month', value: AUD.format(0), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/performance' },
+    { label: 'Appraisals This Month', value: String(monthlyStats.appraisalsThisMonth), icon: <ClipboardList size={16} />, color: 'text-success', link: '/dashboard/pipeline?stage=appraisal' },
+    { label: 'Sales This Month', value: AUD.format(monthlyStats.salesThisMonthAmount), icon: <DollarSign size={16} />, color: 'text-primary', link: '/dashboard/performance' },
     { label: 'Trust Balance', value: AUD.format(trustBalance), icon: <Landmark size={16} />, color: 'text-success', link: '/dashboard/trust' },
     { label: 'Unresponded Leads', value: String(unrespondedValue), icon: <Zap size={16} />, color: unrespondedValue > 0 ? 'text-destructive' : 'text-success', link: '/dashboard/leads' },
   ];

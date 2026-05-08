@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Target, Bot, Globe, EyeOff, Mic, Zap, BarChart2, Landmark } from 'lucide-react';
+import { Target, Bot, Globe, EyeOff, Mic, Zap, BarChart2, Landmark, Check } from 'lucide-react';
 import { SEO } from '@/shared/components/SEO';
 import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';

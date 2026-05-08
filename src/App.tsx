@@ -436,6 +436,7 @@ const App = () => (
                   <Route path="rental-applications" element={<RentalApplicationsPage />} />
                   <Route path="pipeline" element={<PipelinePage />} />
                   <Route path="crm" element={<CRMPage />} />
+                  <Route path="crm/import" element={<ContactImportPage />} />
                   <Route path="inspection-mode" element={<InspectionModePage />} />
                   <Route path="settlements" element={<SettlementConcierge />} />
                   <Route path="commission" element={<CommissionCalculator />} />

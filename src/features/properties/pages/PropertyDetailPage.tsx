@@ -1399,31 +1399,7 @@ export default function PropertyDetailPage() {
         </div>
       )}
 
-      {/* Lightbox */}
-      <AnimatePresence>
-        {lightboxOpen && (
-          <motion.div
-            className="fixed inset-0 z-[60] bg-black/95 flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <button onClick={() => setLightboxOpen(false)} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white z-10">
-              <X size={20} />
-            </button>
-            <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white">
-              <ChevronLeft size={24} />
-            </button>
-            <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white">
-              <ChevronRight size={24} />
-            </button>
-            <img src={images[imageIndex]} alt="" className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg" />
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 text-sm font-medium">
-              {imageIndex + 1} / {images.length}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Lightbox is now handled inside ListingImageGallery */}
 
 
       {/* Mobile sticky enquiry bar */}

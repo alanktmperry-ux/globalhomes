@@ -214,6 +214,18 @@ export default function AgencyOnboardingPage() {
         });
       }
     } catch { /* non-fatal */ }
+
+    // Best-effort admin alert email — non-fatal
+    try {
+      await supabase.functions.invoke('send-notification-email', {
+        body: {
+          type: 'admin_new_agent',
+          agent_name: principalName || user.email || 'Unknown',
+          agent_agency: agencyName || 'Independent',
+          agent_email: user.email || '',
+        },
+      });
+    } catch { /* non-fatal */ }
   };
 
   const getAuthToken = async () => {

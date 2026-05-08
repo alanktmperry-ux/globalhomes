@@ -83,6 +83,7 @@ const AgentPublicProfilePage = React.lazy(() => import("./pages/AgentPublicProfi
 const AgentProfilePublic = React.lazy(() => import("./features/public/AgentProfilePage"));
 const BuyerSettingsPage = React.lazy(() => import("./pages/BuyerSettingsPage"));
 const AccountSettingsPage = React.lazy(() => import("./pages/account/AccountSettingsPage"));
+const PendingApprovalPage = React.lazy(() => import("./pages/auth/PendingApprovalPage"));
 const TermsPage = React.lazy(() => import("./pages/TermsPage"));
 const PrivacyPage = React.lazy(() => import("./pages/PrivacyPage"));
 const UnsubscribePage = React.lazy(() => import("./pages/UnsubscribePage"));
@@ -373,6 +374,7 @@ const App = () => (
                 <Route path="/auth/callback" element={<AuthCallbackPage />} />
                 <Route path="/onboarding/role" element={<OnboardingRolePage />} />
                 <Route path="/onboarding/buyer-prefs" element={<OnboardingBuyerPrefsPage />} />
+                <Route path="/register/pending" element={<PendingApprovalPage />} />
                 <Route path="/open-home/signin/:token" element={<OpenHomeSignInPage />} />
                 <Route path="/vendor-report/:token" element={<VendorReportPage />} />
                 <Route path="/inspection-report/:token" element={<InspectionReportPublic />} />

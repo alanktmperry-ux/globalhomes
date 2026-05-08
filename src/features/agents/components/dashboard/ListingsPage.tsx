@@ -416,6 +416,33 @@ const ListingsPage = () => {
   const [reportModal, setReportModal] = useState<{ url: string; address: string; token: string; propertyId: string; agentId: string } | null>(null);
   const [statusOverrides, setStatusOverrides] = useState<Record<string, string>>({});
   const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
+  const [stats, setStats] = useState<ListingStatsMaps>({ views: {}, enquiries: {}, matches: {} });
+
+  useEffect(() => {
+    if (!agent?.id) return;
+    let cancelled = false;
+    (async () => {
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 86400 * 1000).toISOString();
+      const [enqRes, viewRes, matchRes] = await Promise.all([
+        supabase.from('leads').select('property_id').eq('agent_id', agent.id),
+        supabase.from('lead_events').select('property_id').eq('event_type', 'view').gte('created_at', thirtyDaysAgo),
+        supabase.from('listing_buyer_matches').select('listing_id').eq('agent_id', agent.id),
+      ]);
+      if (cancelled) return;
+      const buildMap = (rows: any[] | null, key: string) =>
+        (rows ?? []).reduce<Record<string, number>>((acc, row) => {
+          const id = row?.[key];
+          if (id) acc[id] = (acc[id] ?? 0) + 1;
+          return acc;
+        }, {});
+      setStats({
+        enquiries: buildMap(enqRes.data as any[], 'property_id'),
+        views: buildMap(viewRes.data as any[], 'property_id'),
+        matches: buildMap(matchRes.data as any[], 'listing_id'),
+      });
+    })();
+    return () => { cancelled = true; };
+  }, [agent?.id, fetchKey]);
 
   const handleStatusChange = (id: string, status: string) => {
     setStatusOverrides((prev) => ({ ...prev, [id]: status }));

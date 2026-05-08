@@ -574,7 +574,9 @@ export default function PropertyDetailPage() {
   }
 
   const saved = isSaved(property.id);
-  const images = property.images.length > 0 ? property.images : [property.imageUrl];
+  const images = property.images.length > 0
+    ? property.images
+    : (property.imageUrl ? [property.imageUrl] : []);
   const isRental = listingMode === 'rent' || property.listingType === 'rent' || property.listingType === 'rental' || property.price < 50000;
 
   // Rental-specific derived data

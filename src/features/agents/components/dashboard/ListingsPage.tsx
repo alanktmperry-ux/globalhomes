@@ -393,6 +393,19 @@ const ListingsPage = () => {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [reportModal, setReportModal] = useState<{ url: string; address: string; token: string; propertyId: string; agentId: string } | null>(null);
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, string>>({});
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
+
+  const handleStatusChange = (id: string, status: string) => {
+    setStatusOverrides((prev) => ({ ...prev, [id]: status }));
+  };
+  const handleDelete = (id: string) => {
+    setDeletedIds((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  };
 
   const handleSendReport = async (l: AgentListing) => {
     if (l._source !== 'db') {

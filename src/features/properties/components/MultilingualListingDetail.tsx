@@ -253,7 +253,7 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
       )}
 
       {/* Title */}
-      <div className="flex items-start gap-3 flex-wrap">
+      <div className="flex items-start gap-3 flex-wrap" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <h1 className="font-display text-2xl font-bold text-foreground leading-tight flex-1">
           {title}
         </h1>
@@ -267,12 +267,12 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
 
       {/* Summary */}
       {summary && (
-        <p className="text-base text-muted-foreground italic">{summary}</p>
+        <p className="text-base text-muted-foreground italic" dir={language === 'ar' ? 'rtl' : 'ltr'}>{summary}</p>
       )}
 
       {/* Description */}
       {description && (
-        <div className="prose prose-sm max-w-none text-foreground dark:prose-invert">
+        <div className="prose prose-sm max-w-none text-foreground dark:prose-invert" dir={language === 'ar' ? 'rtl' : 'ltr'}>
           {description.split('\n').map((p, i) => (
             <p key={i}>{p}</p>
           ))}

@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
-import PendingApprovalPage from '@/pages/auth/PendingApprovalPage';
+
 
 interface Props {
   children: React.ReactNode;

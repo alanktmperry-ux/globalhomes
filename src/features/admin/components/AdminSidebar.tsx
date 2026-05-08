@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Zap, CheckCircle, Users, Building2, DollarSign, Megaphone, Settings,
-  Shield, ArrowLeft, UserCog, LineChart, BookOpen, Wallet, HelpCircle, Landmark, Coins, Activity, BarChart3, Webhook,
+  Shield, ArrowLeft, UserCog, LineChart, BookOpen, Wallet, HelpCircle, Landmark, Coins, Activity, BarChart3, Webhook, PhoneCall,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -84,7 +84,7 @@ export default function AdminSidebar({ pendingApprovalsTotal = 0, isSupport = fa
   const business: NavItem[] = [
     { to: '/admin/revenue', label: 'Revenue', icon: DollarSign },
     { to: '/admin/outreach', label: 'Outreach', icon: Megaphone },
-    { to: '/admin/automations', label: 'Automations', icon: Zap },
+    { to: '/admin/comms-stats', label: 'Comms Stats', icon: PhoneCall },
   ];
   const system: NavItem[] = [
     { to: '/admin/system', label: 'System', icon: Settings },

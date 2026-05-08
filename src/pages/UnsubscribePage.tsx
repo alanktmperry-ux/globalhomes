@@ -131,8 +131,8 @@ export default function UnsubscribePage() {
               <p className="mt-2 text-xs text-slate-500">
                 You'll still receive essential account emails (login, password reset, billing).
               </p>
-              <Link to="/" className="inline-block mt-6 text-sm text-blue-600 hover:underline">
-                Return to ListHQ
+              <Link to="/account/settings" className="inline-block mt-6 text-sm text-blue-600 hover:underline">
+                Manage notification settings
               </Link>
             </>
           )}

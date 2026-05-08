@@ -38,7 +38,7 @@ const ConveyancingPage = () => {
       setLoading(true);
       const { data, error } = await supabase
         .from('conveyancers' as any)
-        .select('id, firm_name, contact_name, fee_from, fee_to, suburbs_covered, turnaround_days, rating, specialties, logo_url')
+        .select('id, firm_name, contact_name, fee_from, fee_to, suburbs_covered, turnaround_days, rating, specialties, logo_url, email')
         .eq('is_active', true)
         .order('rating', { ascending: false });
       if (!error && data) setItems(data as any);

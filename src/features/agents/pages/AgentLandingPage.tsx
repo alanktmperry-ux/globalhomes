@@ -200,7 +200,7 @@ const AgentLandingPage = () => {
           {/* Value prop callout */}
           <div className="mx-auto mb-10" style={{ maxWidth: 760, background: '#EFF6FF', border: '1px solid #DBEAFE', borderRadius: 16, padding: '20px 24px' }}>
             <div className="font-extrabold mb-1.5" style={{ color: '#0a0f1e', fontSize: 15 }}>
-              Why $799/mo is a no-brainer for agents
+              Why $299/mo is a no-brainer for agents
             </div>
             <p className="text-sm" style={{ color: '#374151', lineHeight: 1.55 }}>
               REA.com.au and Domain charge $1,500–$7,000 per listing. A CRM costs $300–$600/mo. Property management software another $200–$400/mo. ListHQ replaces all three — CRM, PM platform, and multilingual listing portal — in one subscription, reaching 7M+ multilingual buyers no other portal can find.

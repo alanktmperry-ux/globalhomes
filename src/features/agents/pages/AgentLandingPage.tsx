@@ -240,7 +240,7 @@ const AgentLandingPage = () => {
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 22px' }}>
                   {p.feats.map((f) => (
                     <li key={f} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 13.5, color: '#374151', padding: '6px 0' }}>
-                      <span style={{ color: '#2563EB', fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
+                      <Check size={16} style={{ color: '#2563EB', flexShrink: 0 }} strokeWidth={2.5} />{f}
                     </li>
                   ))}
                 </ul>

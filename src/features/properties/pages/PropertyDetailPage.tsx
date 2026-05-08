@@ -104,9 +104,7 @@ export default function PropertyDetailPage() {
   useLogPropertyView(property?.id);
   const [rawProperty, setRawProperty] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [imageIndex, setImageIndex] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [rentalEnquiryOpen, setRentalEnquiryOpen] = useState(false);
   const [inspectionBookingOpen, setInspectionBookingOpen] = useState(false);
   const [rentalApplicationOpen, setRentalApplicationOpen] = useState(false);

@@ -19,6 +19,29 @@ import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { usePageTitle } from '@/lib/usePageTitle';
+import { Skeleton } from '@/components/ui/skeleton';
+
+function ListingsSkeleton() {
+  return (
+    <div className="space-y-3">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card">
+          <Skeleton className="w-20 h-20 rounded-lg flex-shrink-0" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-2/3" />
+            <Skeleton className="h-3 w-1/3" />
+            <div className="flex gap-2">
+              <Skeleton className="h-3 w-12" />
+              <Skeleton className="h-3 w-12" />
+              <Skeleton className="h-3 w-12" />
+            </div>
+          </div>
+          <Skeleton className="h-8 w-20" />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 const STATUS_CONFIG: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
   pending: { icon: <Clock size={12} />, label: 'Pending', color: 'bg-amber-500/15 text-amber-600' },
@@ -731,9 +754,7 @@ const ListingsPage = () => {
           <StatusTabs activeTab={activeStatusTab} setActiveTab={setActiveStatusTab} counts={counts} />
 
           {loading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="animate-spin text-primary" size={24} />
-            </div>
+            <ListingsSkeleton />
           ) : filtered.length === 0 ? (
             lifecycleTab === 'archived' ? (
               <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">

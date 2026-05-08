@@ -56,6 +56,29 @@ import { HaloFromListingCTA } from '@/components/halo/HaloFromListingCTA';
 import { useOffmarketSubscriptions } from '@/features/offmarket/hooks/useOffmarketSubscriptions';
 import { ListingImageGallery } from '@/features/properties/components/ListingImageGallery';
 
+import { Skeleton } from '@/components/ui/skeleton';
+
+function PropertyDetailSkeleton() {
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <Skeleton className="aspect-[16/9] w-full rounded-2xl" />
+      <div className="grid grid-cols-4 gap-2">
+        {[...Array(4)].map((_, i) => <Skeleton key={i} className="aspect-square rounded-lg" />)}
+      </div>
+      <div className="space-y-3">
+        <Skeleton className="h-8 w-2/3" />
+        <Skeleton className="h-5 w-1/3" />
+        <Skeleton className="h-5 w-1/4" />
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-3/4" />
+      </div>
+    </div>
+  );
+}
+
 export default function PropertyDetailPage() {
   // Support both /property/:slug and /property/:uuid for backward compat
   const { id } = useParams<{ id: string }>();
@@ -534,11 +557,7 @@ export default function PropertyDetailPage() {
 
 
   if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return <PropertyDetailSkeleton />;
   }
 
   if (!property) {

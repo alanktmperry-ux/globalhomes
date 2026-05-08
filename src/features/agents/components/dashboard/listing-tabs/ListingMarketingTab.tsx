@@ -20,6 +20,7 @@ import {
   ChevronRight, Send, Loader2,
   Zap, Star, CheckCircle2, AlertCircle,
   Camera, Map as MapIcon, Sofa, Bug,
+  Languages,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -86,6 +87,10 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   const [vendorName, setVendorName] = useState(listing.vendor_name || '');
   const [vendorEmail, setVendorEmail] = useState(listing.vendor_email || '');
   const [sending, setSending] = useState(false);
+  const [translating, setTranslating] = useState(false);
+  const [translateDone, setTranslateDone] = useState(
+    (listing as any).translation_status === 'complete'
+  );
 
   const isFeaturedActive = boostState.is_featured && boostState.featured_until && new Date(boostState.featured_until) > new Date();
   const isBoostPending = boostState.boost_requested_at && !boostState.is_featured;
@@ -361,6 +366,21 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
       console.error(e);
     }
     setSending(false);
+  };
+
+  const handleTranslate = async () => {
+    setTranslating(true);
+    try {
+      await supabase.functions.invoke('generate-translations', {
+        body: { mode: 'full_listing', listing_id: listing.id },
+      });
+      setTranslateDone(true);
+      toast.success('Translations generated — buyers can now read this listing in 6 languages.');
+    } catch {
+      toast.error('Translation failed — please try again.');
+    } finally {
+      setTranslating(false);
+    }
   };
 
   return (
@@ -917,6 +937,39 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
         >
           Organise an inspection →
         </button>
+      </div>
+
+      {/* ── MULTILINGUAL TRANSLATIONS ── */}
+      <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+        <h3 className="text-sm font-bold flex items-center gap-2">
+          <Languages size={16} className="text-primary" />
+          Multilingual translations
+        </h3>
+        {translateDone ? (
+          <div className="flex items-center gap-2 text-sm text-emerald-600">
+            <CheckCircle2 size={15} />
+            Translated — visible to buyers in Chinese, Vietnamese, Korean, Arabic &amp; Japanese.
+          </div>
+        ) : (
+          <>
+            <p className="text-xs text-muted-foreground">
+              Generate translations so international buyers can read this listing in their language. Takes about 10 seconds.
+            </p>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleTranslate}
+              disabled={translating}
+              className="gap-2"
+            >
+              {translating ? (
+                <><Loader2 size={13} className="animate-spin" /> Translating…</>
+              ) : (
+                <><Languages size={13} /> Generate translations</>
+              )}
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );

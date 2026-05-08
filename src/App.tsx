@@ -64,7 +64,7 @@ const AdminBuyersPage = React.lazy(() => import("./features/admin/pages/BuyersPa
 const AdminUsersPage = React.lazy(() => import("./features/admin/pages/UsersPage"));
 const AdminSystemPage = React.lazy(() => import("./features/admin/pages/SystemPage"));
 const AdminWebhookDiagnosticPage = React.lazy(() => import("./features/admin/pages/WebhookDiagnosticPage"));
-const AdminAutomationsPage = React.lazy(() => import("./pages/admin/AdminAutomationsPage"));
+const AdminCommsStatsPage = React.lazy(() => import("./features/admin/pages/AdminCommsStatsPage"));
 const SupportLoginPage = React.lazy(() => import("./features/admin/pages/SupportLoginPage"));
 const SupportDashboardLayout = React.lazy(() => import("./features/admin/pages/SupportDashboardLayout"));
 const SupportTicketsWrapper = React.lazy(() => import("./features/admin/pages/SupportTicketsWrapper"));
@@ -495,7 +495,7 @@ const App = () => (
                   <Route path="halo-analytics" element={<AdminHaloAnalyticsPage />} />
                   <Route path="support" element={<AdminSupportPage />} />
                   <Route path="buyers" element={<AdminBuyersPage />} />
-                  <Route path="automations" element={<AdminAutomationsPage />} />
+                  <Route path="comms-stats" element={<AdminCommsStatsPage />} />
                 </Route>
                 <Route path="/admin/legacy" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
 

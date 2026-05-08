@@ -50,6 +50,7 @@ const AdminReferralPartnersPage = React.lazy(() => import("./features/admin/page
 const AdminBrokers = React.lazy(() => import("./features/admin/components/AdminBrokers"));
 const AdminSupportPage = React.lazy(() => import("./features/admin/pages/SupportPage"));
 const MultilingualGenerator = React.lazy(() => import("./features/public/MultilingualGenerator"));
+const MultilingualGeneratorPage = React.lazy(() => import("./pages/tools/MultilingualGeneratorPage"));
 const PartnerReferralPage = React.lazy(() => import("./features/public/PartnerReferralPage"));
 const ReferralPartnerDashboard = React.lazy(() => import("./features/referral/pages/ReferralPartnerDashboard"));
 const AdminListingsPage = React.lazy(() => import("./features/admin/pages/AdminListingsPage"));
@@ -313,6 +314,7 @@ const App = () => (
                   <Route path="/privacy" element={<PrivacyPage />} />
                   <Route path="/unsubscribe" element={<UnsubscribePage />} />
                   <Route path="/tools/multilingual-listing" element={<MultilingualGenerator />} />
+                  <Route path="/tools/multilingual-generator" element={<MultilingualGeneratorPage />} />
                   <Route path="/r/:code" element={<PartnerReferralPage />} />
                   <Route path="/referral-partner/dashboard" element={<ReferralPartnerDashboard />} />
                   <Route path="/stamp-duty-calculator" element={<StampDutyPage />} />

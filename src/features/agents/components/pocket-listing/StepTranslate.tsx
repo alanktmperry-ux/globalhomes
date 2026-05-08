@@ -60,22 +60,19 @@ const StepTranslate = ({ draft, update }: Props) => {
     }
     setTranslating(activeLang);
     try {
-      const { data, error } = await supabase.functions.invoke('generate-translations', {
-        body: {
-          type: 'translate_text',
-          target_language: activeLang,
-          title: sourceTitle,
-          description: sourceDescription,
-          bullets: draft.generatedBullets,
-        },
+      const { data, error } = await supabase.functions.invoke('translate-listing-preview', {
+        body: { title: sourceTitle, description: sourceDescription },
       });
 
       if (error) throw error;
-      if (!data || data.error) throw new Error(data?.error || 'Translation failed');
+      if (!data?.translations) throw new Error('No translations returned');
+
+      const t = data.translations[active.responseKey];
+      if (!t) throw new Error(`No translation for ${active.label}`);
 
       update({
-        [active.titleField]: (data.title as string) || '',
-        [active.descField]: (data.description as string) || '',
+        [active.titleField]: t.title || '',
+        [active.descField]: t.description || '',
       } as Partial<ListingDraft>);
 
       toast.success(`Translated to ${active.label}`);

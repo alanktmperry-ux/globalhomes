@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, Loader2, Copy, Send, FileDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 // generateOfferPdf is dynamically imported in handleDownloadPdf so jsPDF
 // (~150KB) is excluded from the initial bundle and only loaded when an
 // agent actually clicks "Download PDF".

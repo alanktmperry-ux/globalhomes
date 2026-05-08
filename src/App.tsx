@@ -309,6 +309,7 @@ const App = () => (
                   <Route path="/sign/:token" element={<SigningPage />} />
                   <Route path="/privacy" element={<PrivacyPage />} />
                   <Route path="/unsubscribe" element={<UnsubscribePage />} />
+                  <Route path="/tools/multilingual-listing" element={<MultilingualGenerator />} />
                   <Route path="/stamp-duty-calculator" element={<StampDutyPage />} />
                   <Route path="/mortgage-calculator" element={<MortgageCalculatorPage />} />
                   <Route path="/buyer-pool" element={<BuyerPoolPage />} />

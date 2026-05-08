@@ -64,7 +64,13 @@ interface ProfileLite {
   user_id: string;
   display_name: string | null;
   full_name: string | null;
+  language_preference: string | null;
 }
+
+const LANG_FLAGS: Record<string, string> = {
+  'zh-CN': '🇨🇳', 'zh-TW': '🇹🇼', vi: '🇻🇳', ko: '🇰🇷',
+  ar: '🇸🇦', ja: '🇯🇵', hi: '🇮🇳', bn: '🇧🇩',
+};
 
 type EnrichedMatch = MatchRow & {
   intent: BuyerIntent | null;

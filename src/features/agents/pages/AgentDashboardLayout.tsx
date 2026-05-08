@@ -132,12 +132,13 @@ const AgentDashboardLayout = () => {
               <NotificationBell />
             </div>
           )}
-          <div className="p-4 md:p-6 flex-1">
+          <div className="p-4 md:p-6 flex-1 pb-20 lg:pb-6">
             <Suspense fallback={<PageSkeleton />}>
               <Outlet />
             </Suspense>
           </div>
         </main>
+        <DashboardBottomTabs />
       </div>
     </SidebarProvider>
   );

@@ -309,12 +309,28 @@ const SettlementConcierge = () => {
           </DialogHeader>
           <p className="text-sm text-muted-foreground mb-4">Help {utilityModal?.buyerName} get set up at their new home.</p>
           <div className="space-y-3">
-            {UTILITY_PARTNERS.map(u => (
-              <a key={u.name} href={u.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-accent transition-colors">
-                <span className="font-medium text-sm">{u.name}</span>
-                <ExternalLink size={14} className="text-muted-foreground" />
-              </a>
-            ))}
+            {UTILITY_PARTNERS.map(u => {
+              const isInternal = u.url.startsWith('/');
+              if (isInternal) {
+                return (
+                  <button
+                    key={u.name}
+                    type="button"
+                    onClick={() => { setUtilityModal(null); navigate(u.url); }}
+                    className="w-full flex items-center justify-between p-3 rounded-lg border border-border hover:bg-accent transition-colors text-left"
+                  >
+                    <span className="font-medium text-sm">{u.name}</span>
+                    <ExternalLink size={14} className="text-muted-foreground" />
+                  </button>
+                );
+              }
+              return (
+                <a key={u.name} href={u.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-accent transition-colors">
+                  <span className="font-medium text-sm">{u.name}</span>
+                  <ExternalLink size={14} className="text-muted-foreground" />
+                </a>
+              );
+            })}
           </div>
         </DialogContent>
       </Dialog>

@@ -118,8 +118,6 @@ const Index = () => {
   const manualLangRef = useRef(false);
   const [seqIdx, setSeqIdx] = useState(0);
   const [blur, setBlur] = useState(false);
-  const [liveCount, setLiveCount] = useState(847);
-  const [enquiryCount, setEnquiryCount] = useState(3);
   const [searchQuery, setSearchQuery] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalQuery, setModalQuery] = useState('');
@@ -271,24 +269,6 @@ const Index = () => {
     return () => clearInterval(id);
   }, []);
 
-  // Live buyer count
-  useEffect(() => {
-    const id = setInterval(() => {
-      setLiveCount((c) => {
-        const delta = Math.floor(Math.random() * 27) - 11;
-        return Math.max(600, Math.min(1200, c + delta));
-      });
-    }, 3200);
-    return () => clearInterval(id);
-  }, []);
-
-  // Enquiry count
-  useEffect(() => {
-    const id = setInterval(() => {
-      setEnquiryCount(2 + Math.floor(Math.random() * 7));
-    }, 7500);
-    return () => clearInterval(id);
-  }, []);
 
   const openSearch = useCallback((q: string) => {
     setModalQuery(q);
@@ -413,7 +393,7 @@ const Index = () => {
     <>
       <Helmet>
         <title>ListHQ — Find your home in any language. Multilingual property search Australia</title>
-        <meta name="description" content="Australia's only multilingual property platform. Search 50,000+ listings auto-translated into 20 languages. Free for buyers, always." />
+        <meta name="description" content="Australia's only multilingual property platform. Listings auto-translated into 20 languages. Free for buyers, always." />
         <link rel="canonical" href="https://listhq.com.au/" />
         <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,700;1,800&display=swap" rel="stylesheet" />
       </Helmet>
@@ -603,11 +583,6 @@ const Index = () => {
                 ))}
               </div>
 
-              {/* Live buyers pill */}
-              <div style={{ marginTop:18, display:'inline-flex', alignItems:'center', gap:8, background:'rgba(22,163,74,.1)', border:'1px solid rgba(22,163,74,.25)', borderRadius:100, padding:'6px 14px', fontSize:12, fontWeight:700, color:'#16a34a' }}>
-                <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:'#16a34a' }} />
-                <strong>{liveCount}</strong> {t('home.hero.buyersNow')}
-              </div>
 
               <div style={{ marginTop:16, maxWidth:560, fontSize:13, color:T.muted, textAlign:'center' }}>
                 {t('home.hero.freeForBuyers')}
@@ -646,10 +621,6 @@ const Index = () => {
                     <span ref={metaRef}>{initialFront.meta}</span>
                     <span style={{ background:T.blueL, color:T.blue, padding:'3px 8px', borderRadius:100, fontWeight:700 }}>🌐 20 langs</span>
                   </div>
-                  <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(22,163,74,.12)', border:'1px solid rgba(22,163,74,.3)', borderRadius:100, padding:'4px 10px', fontSize:11, fontWeight:700, color:'#15803d' }}>
-                    <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:'#16a34a' }} />
-                    <span id="enquiryCount">{enquiryCount}</span>&nbsp;{t('home.hero.enquiredLastHour')}
-                  </div>
                 </div>
               </div>
             </div>
@@ -677,9 +648,8 @@ const Index = () => {
         <div style={{ background:T.off, borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}`, padding:'20px 16px' }}>
           <div className="trust-strip" style={{ maxWidth:1200, margin:'0 auto' }}>
             {[
-              { n: propertyCount && propertyCount > 0 ? `${propertyCount.toLocaleString()}+` : '50,000+', l: t('home.trust.listings') },
+              { n: propertyCount && propertyCount > 0 ? `${propertyCount.toLocaleString()}+` : '—', l: t('home.trust.listings') },
               { n:'20', l: t('home.trust.languages') },
-              { n:'7M+', l: t('home.trust.buyers') },
               { n:'Free', l: t('home.trust.free') },
             ].map((s) => (
               <div key={s.l} className="trust-cell" style={{ textAlign:'center', padding:'8px 16px' }}>

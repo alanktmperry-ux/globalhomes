@@ -31,6 +31,7 @@ import { ResponseTimeModal } from './ResponseTimeModal';
 import { WelcomeModal } from './WelcomeModal';
 import { AgentWelcomeModal } from '@/features/agents/components/onboarding/AgentWelcomeModal';
 import { AgentOnboardingProgress } from '@/features/agents/components/onboarding/AgentOnboardingProgress';
+import DashboardHomeStats from './DashboardHomeStats';
 
 // Australian currency formatter
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
@@ -504,6 +505,7 @@ const DashboardOverview = () => {
           />
         </div>
         <AgentOnboardingProgress />
+        <DashboardHomeStats agentId={agentId} />
         <TodayPrioritiesPanel />
         {!onboardingDismissed && (() => {
           const step1 = !!(onboardingAgent?.name && onboardingAgent?.phone && onboardingAgent?.avatar_url && onboardingAgent?.bio);

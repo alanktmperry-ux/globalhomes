@@ -182,6 +182,10 @@ const ListingDetailPage = () => {
             <ListingMarketingTab listing={listing} onViewAllLeads={() => setActiveTab('buyers')} />
           </TabsContent>
 
+          <TabsContent value="analytics">
+            <ListingAnalyticsTab listingId={listing.id} agentId={agentId} />
+          </TabsContent>
+
           <TabsContent value="buyers">
             <ListingBuyerLeadsTab listing={listing} />
           </TabsContent>

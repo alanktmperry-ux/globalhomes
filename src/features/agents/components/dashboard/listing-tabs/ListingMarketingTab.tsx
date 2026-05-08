@@ -87,6 +87,10 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   const [vendorName, setVendorName] = useState(listing.vendor_name || '');
   const [vendorEmail, setVendorEmail] = useState(listing.vendor_email || '');
   const [sending, setSending] = useState(false);
+  const [translating, setTranslating] = useState(false);
+  const [translateDone, setTranslateDone] = useState(
+    (listing as any).translation_status === 'complete'
+  );
 
   const isFeaturedActive = boostState.is_featured && boostState.featured_until && new Date(boostState.featured_until) > new Date();
   const isBoostPending = boostState.boost_requested_at && !boostState.is_featured;

@@ -54,6 +54,7 @@ import { MortgageReferralModal } from '@/components/MortgageReferralModal';
 import { useListingTranslation } from '@/features/properties/hooks/useListingTranslation';
 import { HaloFromListingCTA } from '@/components/halo/HaloFromListingCTA';
 import { useOffmarketSubscriptions } from '@/features/offmarket/hooks/useOffmarketSubscriptions';
+import { ListingImageGallery } from '@/features/properties/components/ListingImageGallery';
 
 export default function PropertyDetailPage() {
   // Support both /property/:slug and /property/:uuid for backward compat

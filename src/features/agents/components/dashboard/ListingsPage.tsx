@@ -243,7 +243,7 @@ const ListingsPage = () => {
   const { listings, loading, isMockData, refetch } = useAgentListings();
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [reportModal, setReportModal] = useState<{ url: string; address: string } | null>(null);
+  const [reportModal, setReportModal] = useState<{ url: string; address: string; token: string; propertyId: string; agentId: string } | null>(null);
 
   const handleSendReport = async (l: AgentListing) => {
     if (l._source !== 'db') {
@@ -286,7 +286,7 @@ const ListingsPage = () => {
       }
 
       const url = `${window.location.origin}/vendor-report/${token}`;
-      setReportModal({ url, address: l.address });
+      setReportModal({ url, address: l.address, token: token!, propertyId: l.id, agentId: agent.id });
     } catch (e) {
       console.error(e);
       toast.error('Failed to generate report link');
@@ -531,14 +531,20 @@ const ListingsPage = () => {
         onClose={() => setReportModal(null)}
         url={reportModal?.url ?? ''}
         address={reportModal?.address ?? ''}
+        token={reportModal?.token ?? ''}
+        propertyId={reportModal?.propertyId ?? ''}
+        agentId={reportModal?.agentId ?? ''}
       />
     </>
   );
 };
 
 const VendorReportDialog = ({
-  open, onClose, url, address,
-}: { open: boolean; onClose: () => void; url: string; address: string }) => {
+  open, onClose, url, address, token, propertyId, agentId,
+}: { open: boolean; onClose: () => void; url: string; address: string; token: string; propertyId: string; agentId: string }) => {
+  const [vendorEmail, setVendorEmail] = useState('');
+  const [sending, setSending] = useState(false);
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(url);
@@ -548,13 +554,28 @@ const VendorReportDialog = ({
     }
   };
 
-  const handleEmail = () => {
-    const subject = encodeURIComponent(`Your property report for ${address}`);
-    const body = encodeURIComponent(
-      `Hi,\n\nHere's your weekly performance report for ${address}:\n${url}\n\nThis link is valid for 30 days.`
-    );
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  const handleSendEmail = async () => {
+    if (!vendorEmail.trim() || !vendorEmail.includes('@')) {
+      toast.error('Enter a valid email address');
+      return;
+    }
+    setSending(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-vendor-report-link', {
+        body: { token, vendor_email: vendorEmail.trim(), property_id: propertyId },
+      });
+      if (error) throw error;
+      toast.success(`Report link sent to ${vendorEmail.trim()}`);
+      setVendorEmail('');
+    } catch {
+      toast.error('Could not send email');
+    } finally {
+      setSending(false);
+    }
   };
+
+  // Suppress unused agentId warning — reserved for future audit logging
+  void agentId;
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
@@ -570,18 +591,30 @@ const VendorReportDialog = ({
         </DialogHeader>
         <div className="space-y-3">
           <Input readOnly value={url} className="text-xs font-mono" onFocus={(e) => e.currentTarget.select()} />
-          <div className="flex gap-2">
-            <Button onClick={handleCopy} className="flex-1 gap-1.5 text-xs">
-              <Copy size={14} /> Copy link
-            </Button>
-            <Button onClick={handleEmail} variant="outline" className="flex-1 gap-1.5 text-xs">
-              <Mail size={14} /> Send by email
-            </Button>
+          <Button onClick={handleCopy} variant="outline" className="w-full gap-1.5 text-xs">
+            <Copy size={14} /> Copy link
+          </Button>
+          <div className="pt-2 border-t space-y-2">
+            <label className="text-xs font-medium text-muted-foreground">Send link by email</label>
+            <div className="flex gap-2">
+              <Input
+                type="email"
+                placeholder="vendor@example.com"
+                value={vendorEmail}
+                onChange={(e) => setVendorEmail(e.target.value)}
+                className="text-xs"
+                disabled={sending}
+              />
+              <Button onClick={handleSendEmail} disabled={sending} className="gap-1.5 text-xs">
+                <Mail size={14} /> {sending ? 'Sending…' : 'Send'}
+              </Button>
+            </div>
           </div>
         </div>
       </DialogContent>
     </Dialog>
   );
 };
+
 
 export default ListingsPage;

@@ -54,7 +54,7 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
 
   if (!user) {
     // Admin routes have their own login screen — never bounce admins to the seeker login (or worse, a 404).
-    return <Navigate to={requireAdmin ? '/agents/login' : '/login'} replace />;
+    return <Navigate to={requireAdmin ? '/admin/login' : '/login'} replace />;
   }
 
   if (user && !user.email_confirmed_at && !isAdmin) {

@@ -75,18 +75,22 @@ const LANGUAGE_DISPLAY_NAMES: Record<LanguageKey, string> = {
 };
 
 /** Map the i18n Language codes to this component's LanguageKey */
-function i18nLangToListingLang(lang: Language): LanguageKey {
-  if (lang === 'zh') return 'zh_simplified';
-  if (lang === 'zh-TW') return 'zh_traditional';
-  if (lang === 'vi') return 'vi';
-  if (lang === 'ko') return 'ko';
-  if (lang === 'ar') return 'ar';
-  if (lang === 'ja') return 'ja';
-  if (lang === 'hi') return 'hi';
-  if (lang === 'bn') return 'bn';
-  if ((lang as string) === 'fil') return 'tl';
-  if ((lang as string) === 'id') return 'id';
-  return 'en';
+function i18nLangToListingLang(lang: Language | string): LanguageKey {
+  switch (lang) {
+    case 'zh':
+    case 'zh-CN': return 'zh_simplified';
+    case 'zh-TW': return 'zh_traditional';
+    case 'vi':    return 'vi';
+    case 'ko':    return 'ko';
+    case 'ar':    return 'ar';
+    case 'ja':    return 'ja';
+    case 'hi':    return 'hi';
+    case 'bn':    return 'bn';
+    case 'fil':
+    case 'tl':    return 'tl';
+    case 'id':    return 'id';
+    default:      return 'en';
+  }
 }
 
 const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {

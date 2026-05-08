@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, Loader2, Copy, Send, FileDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 // generateOfferPdf is dynamically imported in handleDownloadPdf so jsPDF
 // (~150KB) is excluded from the initial bundle and only loaded when an
 // agent actually clicks "Download PDF".
@@ -46,7 +46,7 @@ const OfferModal = ({ open, onOpenChange, card, propertyId, agentId, onSent }: O
       setSuburbMedian(data.suburbMedian || null);
       setOfferId(data.offerId || null);
     } catch (err: unknown) {
-      toast({ title: 'Generation failed', description: getErrorMessage(err), variant: 'destructive' });
+      toast.error('Generation failed: ' + getErrorMessage(err));
     } finally {
       setGenerating(false);
     }
@@ -54,7 +54,7 @@ const OfferModal = ({ open, onOpenChange, card, propertyId, agentId, onSent }: O
 
   const handleCopy = () => {
     navigator.clipboard.writeText(draftText);
-    toast({ title: 'Copied to clipboard' });
+    toast.success('Copied to clipboard');
   };
 
   const handleDownloadPdf = async () => {
@@ -69,19 +69,27 @@ const OfferModal = ({ open, onOpenChange, card, propertyId, agentId, onSent }: O
       comparableSales,
       suburbMedian,
     });
-    toast({ title: 'PDF downloaded' });
+    toast.success('PDF downloaded');
   };
 
   const handleMarkSent = async () => {
     if (!offerId) return;
     setMarking(true);
     try {
-      await supabase.from('offers').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', offerId);
-      toast({ title: 'Offer marked as sent' });
+      const { error: updateErr } = await supabase
+        .from('offers')
+        .update({ status: 'sent', sent_at: new Date().toISOString() })
+        .eq('id', offerId);
+      if (updateErr) {
+        console.error('Failed to mark offer as sent:', updateErr);
+        toast.error('Offer generated but status update failed — please refresh.');
+        return;
+      }
+      toast.success('Offer marked as sent');
       onSent(offerId);
       onOpenChange(false);
     } catch {
-      toast({ title: 'Failed to update', variant: 'destructive' });
+      toast.error('Failed to update');
     } finally {
       setMarking(false);
     }

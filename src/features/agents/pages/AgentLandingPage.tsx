@@ -209,15 +209,15 @@ const AgentLandingPage = () => {
 
           <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
             {[
-              { name: 'Solo', price: '$799/mo', desc: 'Independent agents running their own shop',
+              { name: 'Solo', price: '$299/mo', desc: 'Independent agents running their own shop',
                 feats: ['1 agent seat · up to 10 active listings','Full CRM — pipeline, contacts, deal tracking','Full trust accounting (complete ledger)','20-language auto-translation on every listing','AI buyer matching + voice search','Halo™ buyer matching board','Email support'],
-                cta: 'Start 30-day free trial →', sub: 'Credit card required · auto-charges $799 on day 31 · cancel anytime',
+                cta: 'Start 30-day free trial →', sub: 'Credit card required · auto-charges $299 on day 31 · cancel anytime',
                 action: () => setShowModal(true), filled: true, popular: false },
-              { name: 'Agency', price: '$1,999/mo', desc: 'For growing agencies ready to scale',
+              { name: 'Agency', price: '$599/mo', desc: 'For growing agencies ready to scale',
                 feats: ['Up to 5 agent seats','Unlimited listings','Full CRM for the whole team','Full PM automation + trust accounting','20-language auto-translation','Priority AI matching + lead analytics','Agency-branded profile page','Phone & email support'],
                 cta: 'Book a demo →', sub: 'No free trial · talk to us first · onboarding included',
                 action: () => navigate('/contact'), filled: true, popular: true },
-              { name: 'Agency Pro', price: '$3,499/mo', desc: 'Established multi-office agencies',
+              { name: 'Agency Pro', price: '$1,199/mo', desc: 'Established multi-office agencies',
                 feats: ['Up to 15 agent seats','Unlimited everything','Full PM automation + trust accounting','Multi-branch dashboard','White-label option','API access + custom integrations','Dedicated account manager'],
                 cta: 'Talk to sales →', sub: 'Custom onboarding · SLA available',
                 action: () => navigate('/contact'), filled: false, popular: false },

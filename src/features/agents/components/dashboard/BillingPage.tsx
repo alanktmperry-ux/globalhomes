@@ -240,6 +240,15 @@ const BillingPage = () => {
     }
   };
 
+  const openBillingPortal = async () => {
+    const { data, error } = await supabase.functions.invoke('create-billing-portal');
+    if (error || !data?.url) {
+      toast.error('Could not open billing portal — please contact support');
+      return;
+    }
+    window.location.href = data.url;
+  };
+
   if (sub.loading) {
     return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" size={24} /></div>;
   }

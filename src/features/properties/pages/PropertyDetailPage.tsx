@@ -682,6 +682,11 @@ export default function PropertyDetailPage() {
                   {tp('property.viewSuburb', { suburb: property.suburb })} →
                 </Link>
               )}
+              <ListingLanguageSwitcher
+                translations={(property as any).translations}
+                currentLang={language === 'zh' ? 'zh-CN' : language}
+                onChange={(code) => setLanguage((code === 'zh-CN' ? 'zh' : code) as any)}
+              />
               {socialProof && (
                 <div className="flex flex-wrap items-center gap-3 mt-3 py-2.5 px-4 bg-primary/5 rounded-xl border border-primary/10 text-xs text-muted-foreground">
                   {socialProof.suburbSearchers > 0 && (

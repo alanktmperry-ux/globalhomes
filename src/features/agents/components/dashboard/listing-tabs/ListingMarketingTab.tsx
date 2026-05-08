@@ -368,6 +368,21 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
     setSending(false);
   };
 
+  const handleTranslate = async () => {
+    setTranslating(true);
+    try {
+      await supabase.functions.invoke('generate-translations', {
+        body: { mode: 'full_listing', listing_id: listing.id },
+      });
+      setTranslateDone(true);
+      toast.success('Translations generated — buyers can now read this listing in 6 languages.');
+    } catch {
+      toast.error('Translation failed — please try again.');
+    } finally {
+      setTranslating(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* ── PREPARE YOUR LISTING — service marketplace ── */}

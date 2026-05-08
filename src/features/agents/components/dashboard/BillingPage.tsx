@@ -9,6 +9,8 @@ import { toast } from 'sonner';
 import DashboardHeader from './DashboardHeader';
 import { cn } from '@/lib/utils';
 import { usePageTitle } from '@/lib/usePageTitle';
+import { useSubscription } from '@/features/agents/hooks/useSubscription';
+import { TrialCountdown } from './TrialCountdown';
 
 interface Plan {
   id: 'starter' | 'pro' | 'agency';

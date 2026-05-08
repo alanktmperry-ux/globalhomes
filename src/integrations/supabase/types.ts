@@ -8880,6 +8880,8 @@ export type Database = {
           bio: string | null
           created_at: string
           display_name: string | null
+          email_unsubscribed: boolean
+          email_unsubscribed_at: string | null
           full_name: string | null
           id: string
           language_preference: string | null
@@ -8906,6 +8908,8 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          email_unsubscribed?: boolean
+          email_unsubscribed_at?: string | null
           full_name?: string | null
           id?: string
           language_preference?: string | null
@@ -8932,6 +8936,8 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          email_unsubscribed?: boolean
+          email_unsubscribed_at?: string | null
           full_name?: string | null
           id?: string
           language_preference?: string | null

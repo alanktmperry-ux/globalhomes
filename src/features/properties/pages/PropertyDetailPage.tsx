@@ -5,6 +5,7 @@ import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X, PawPrint, Sofa, Clock, FileText, Users, Phone, MessageCircle, Globe, Loader2, ScrollText, HardHat } from 'lucide-react';
 import MultilingualListingDetail from '@/features/properties/components/MultilingualListingDetail';
+import { ListingLanguageSwitcher } from '@/features/properties/components/ListingLanguageSwitcher';
 import { OpenHomesCard } from '@/features/properties/components/OpenHomesCard';
 import { ListingChatWidget } from '@/features/properties/components/ListingChatWidget';
 import { Button } from '@/components/ui/button';
@@ -58,7 +59,7 @@ export default function PropertyDetailPage() {
   // Support both /property/:slug and /property/:uuid for backward compat
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { t, setLanguage } = useI18n();
+  const { t, language, setLanguage } = useI18n();
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -681,6 +682,11 @@ export default function PropertyDetailPage() {
                   {tp('property.viewSuburb', { suburb: property.suburb })} →
                 </Link>
               )}
+              <ListingLanguageSwitcher
+                translations={(property as any).translations}
+                currentLang={language === 'zh' ? 'zh-CN' : language}
+                onChange={(code) => setLanguage((code === 'zh-CN' ? 'zh' : code) as any)}
+              />
               {socialProof && (
                 <div className="flex flex-wrap items-center gap-3 mt-3 py-2.5 px-4 bg-primary/5 rounded-xl border border-primary/10 text-xs text-muted-foreground">
                   {socialProof.suburbSearchers > 0 && (

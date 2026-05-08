@@ -128,6 +128,7 @@ export interface ListingDraft {
 
   // Media
   virtual_tour_url: string;
+  video_url?: string;
 
   // Commercial / Land
   floorAreaSqm?: number;
@@ -222,6 +223,7 @@ const DEFAULT_DRAFT: ListingDraft = {
   title_ar: '',
   description_ar: '',
   virtual_tour_url: '',
+  video_url: '',
 };
 
 const STEPS = ['Address', 'Basics', 'Photos', 'Voice', 'Translate', 'Settings', 'Preview'];
@@ -336,6 +338,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         vendorEmail: (prop as any).vendor_email || '',
         vendorPhone: (prop as any).vendor_phone || '',
         virtual_tour_url: (prop as any).virtual_tour_url || '',
+        video_url: (prop as any).video_url || '',
       });
       setLoadingEdit(false);
     };
@@ -528,6 +531,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         title_ar: draft.title_ar || null,
         description_ar: draft.description_ar || null,
         virtual_tour_url: draft.virtual_tour_url?.trim() || null,
+        video_url: draft.video_url?.trim() || null,
         is_exclusive: draft.isExclusive || false,
         exclusive_start_date: draft.isExclusive && !editPropertyId ? new Date().toISOString() : undefined,
         exclusive_end_date: draft.isExclusive && !editPropertyId ? new Date(Date.now() + 14 * 86_400_000).toISOString() : undefined,

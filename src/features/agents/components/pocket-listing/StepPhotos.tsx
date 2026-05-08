@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Upload, Star, X, ImagePlus, Sparkles, GripVertical, Loader2 } from 'lucide-react';
+import { Upload, Star, X, ImagePlus, Sparkles, GripVertical, Loader2, Play, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,7 +19,10 @@ const DEMO_PHOTOS = [
 
 const StepPhotos = ({ draft, update }: Props) => {
   const fileRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [videoDragOver, setVideoDragOver] = useState(false);
+  const [videoUploading, setVideoUploading] = useState(false);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [overIdx, setOverIdx] = useState<number | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -193,6 +196,49 @@ const StepPhotos = ({ draft, update }: Props) => {
     void addPhotos(files);
   };
 
+  const ALLOWED_VIDEO_MIME = ['video/mp4', 'video/quicktime', 'video/webm'];
+  const VIDEO_EXT_TO_MIME: Record<string, string> = {
+    mp4: 'video/mp4', mov: 'video/quicktime', webm: 'video/webm',
+  };
+
+  const uploadVideo = async (file: File) => {
+    if (!user?.id) {
+      toast.error('You must be signed in to upload video.');
+      return;
+    }
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    const resolvedType = ALLOWED_VIDEO_MIME.includes(file.type)
+      ? file.type
+      : VIDEO_EXT_TO_MIME[ext];
+    if (!resolvedType) {
+      toast.error('Unsupported video format — please upload MP4, MOV, or WebM.');
+      return;
+    }
+    if (file.size > 200 * 1024 * 1024) {
+      toast.error('Video is too large — 200 MB limit.');
+      return;
+    }
+    setVideoUploading(true);
+    const safeExt = ext || resolvedType.split('/')[1] || 'mp4';
+    const filePath = `${user.id}/${crypto.randomUUID()}.${safeExt}`;
+    const { error } = await supabase.storage
+      .from('property-videos')
+      .upload(filePath, file, { upsert: false, contentType: resolvedType });
+    if (videoRef.current) videoRef.current.value = '';
+    if (error) {
+      console.error('[StepPhotos] video upload failed', error);
+      toast.error(`Video upload failed: ${error.message}`);
+      setVideoUploading(false);
+      return;
+    }
+    const { data: { publicUrl } } = supabase.storage
+      .from('property-videos')
+      .getPublicUrl(filePath);
+    update({ video_url: publicUrl });
+    toast.success('Walkthrough video added.');
+    setVideoUploading(false);
+  };
+
   return (
     <div className="space-y-4">
       <Label className="text-sm font-semibold block">Property Photos (up to 20)</Label>
@@ -318,6 +364,68 @@ const StepPhotos = ({ draft, update }: Props) => {
           </div>
         </div>
       )}
+
+      {/* Walkthrough Video */}
+      <div className="space-y-2 pt-2 border-t border-border">
+        <Label className="text-sm font-semibold block">Property Walkthrough Video (optional)</Label>
+        <p className="text-xs text-muted-foreground -mt-1">
+          MP4, MOV, or WebM · max 200 MB · one video per listing
+        </p>
+
+        {!draft.video_url ? (
+          <div
+            onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setVideoDragOver(true); }}
+            onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); e.dataTransfer.dropEffect = 'copy'; setVideoDragOver(true); }}
+            onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setVideoDragOver(false); }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setVideoDragOver(false);
+              const f = e.dataTransfer.files?.[0];
+              if (f) void uploadVideo(f);
+            }}
+            onClick={() => videoRef.current?.click()}
+            className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-colors ${
+              videoDragOver ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40'
+            }`}
+          >
+            {videoUploading ? (
+              <Loader2 size={28} className="mx-auto text-primary mb-2 animate-spin" />
+            ) : (
+              <Play size={28} className="mx-auto text-muted-foreground mb-2" />
+            )}
+            <p className="text-sm font-medium">{videoUploading ? 'Uploading video…' : 'Drop walkthrough video here'}</p>
+            {!videoUploading && <p className="text-xs text-muted-foreground mt-1">or click to browse</p>}
+            <input
+              ref={videoRef}
+              type="file"
+              accept="video/mp4,video/quicktime,video/webm,.mp4,.mov,.webm"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void uploadVideo(f);
+              }}
+            />
+          </div>
+        ) : (
+          <div className="relative rounded-2xl overflow-hidden bg-muted">
+            <video
+              src={draft.video_url}
+              controls
+              className="w-full max-h-72 bg-black"
+              preload="metadata"
+            />
+            <button
+              type="button"
+              onClick={() => update({ video_url: '' })}
+              className="absolute top-2 right-2 w-9 h-9 rounded-full bg-background/90 hover:bg-red-500 hover:text-white text-foreground flex items-center justify-center shadow"
+              title="Remove video"
+            >
+              <Trash2 size={15} />
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

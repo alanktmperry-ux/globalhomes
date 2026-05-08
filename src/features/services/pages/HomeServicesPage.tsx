@@ -22,6 +22,7 @@ interface Provider {
   state: string | null;
   rating: number | null;
   logo_url: string | null;
+  contact_email: string | null;
 }
 
 const CATEGORIES = [

@@ -337,7 +337,7 @@ export default function OwnerPortalPage() {
                   </Card>
                 ))}
               </div>
-              {statements.length > 3 && (
+              {safeStatements.length > 3 && (
                 <Button variant="ghost" size="sm" className="mt-2" onClick={() => setShowAllStatements(!showAllStatements)}>
                   {showAllStatements ? <>Show less <ChevronUp size={14} className="ml-1" /></> : <>View all statements <ChevronDown size={14} className="ml-1" /></>}
                 </Button>

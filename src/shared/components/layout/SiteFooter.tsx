@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Youtube, Linkedin } from 'lucide-react';
+import { Instagram, Youtube, Linkedin, Globe } from 'lucide-react';
 
 export function SiteFooter() {
   return (

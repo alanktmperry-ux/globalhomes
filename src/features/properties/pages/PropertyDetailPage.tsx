@@ -3,7 +3,8 @@ import { Helmet } from 'react-helmet-async';
 import { PropertySEOHead } from '@/features/seo/components/PropertySEOHead';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X, PawPrint, Sofa, Clock, FileText, Users, Phone, MessageCircle, Globe, Loader2, ScrollText, HardHat } from 'lucide-react';
+import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X, PawPrint, Sofa, Clock, FileText, Users, Phone, MessageCircle, Globe, Loader2, ScrollText, HardHat, ImageIcon } from 'lucide-react';
+import { LISTING_PLACEHOLDER_CLASS } from '@/shared/lib/listingImage';
 import MultilingualListingDetail from '@/features/properties/components/MultilingualListingDetail';
 import { ListingLanguageSwitcher } from '@/features/properties/components/ListingLanguageSwitcher';
 import { OpenHomesCard } from '@/features/properties/components/OpenHomesCard';
@@ -573,7 +574,9 @@ export default function PropertyDetailPage() {
   }
 
   const saved = isSaved(property.id);
-  const images = property.images.length > 0 ? property.images : [property.imageUrl];
+  const images = property.images.length > 0
+    ? property.images
+    : (property.imageUrl ? [property.imageUrl] : []);
   const isRental = listingMode === 'rent' || property.listingType === 'rent' || property.listingType === 'rental' || property.price < 50000;
 
   // Rental-specific derived data
@@ -631,28 +634,34 @@ export default function PropertyDetailPage() {
 
       <main className="max-w-6xl mx-auto w-full px-4 pb-24 md:pb-12">
         {/* Hero image gallery */}
-        <ListingImageGallery
-          images={images}
-          address={property.address}
-          overlay={
-            <div className="absolute top-4 left-4 flex gap-2 pointer-events-none">
-              {badge && (
-                <span className={`px-3 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase shadow-sm ${badge.className}`}>
-                  {badge.label}
+        {images.length > 0 ? (
+          <ListingImageGallery
+            images={images}
+            address={property.address}
+            overlay={
+              <div className="absolute top-4 left-4 flex gap-2 pointer-events-none">
+                {badge && (
+                  <span className={`px-3 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase shadow-sm ${badge.className}`}>
+                    {badge.label}
+                  </span>
+                )}
+                <span className="px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm text-xs font-bold tracking-wide uppercase text-foreground">
+                  {property.propertyType}
                 </span>
-              )}
-              <span className="px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm text-xs font-bold tracking-wide uppercase text-foreground">
-                {property.propertyType}
-              </span>
-              {isRental && property.contactClicks > 0 && (
-                <span className="px-3 py-1.5 rounded-full bg-primary/90 text-primary-foreground text-xs font-bold tracking-wide uppercase shadow-sm flex items-center gap-1">
-                  <Users size={12} />
-                  {tp(property.contactClicks === 1 ? 'property.applications' : 'property.applicationsPlural', { count: property.contactClicks })}
-                </span>
-              )}
-            </div>
-          }
-        />
+                {isRental && property.contactClicks > 0 && (
+                  <span className="px-3 py-1.5 rounded-full bg-primary/90 text-primary-foreground text-xs font-bold tracking-wide uppercase shadow-sm flex items-center gap-1">
+                    <Users size={12} />
+                    {tp(property.contactClicks === 1 ? 'property.applications' : 'property.applicationsPlural', { count: property.contactClicks })}
+                  </span>
+                )}
+              </div>
+            }
+          />
+        ) : (
+          <div className={`w-full aspect-[16/9] rounded-2xl ${LISTING_PLACEHOLDER_CLASS}`}>
+            <ImageIcon size={48} />
+          </div>
+        )}
 
         {/* Action bar below hero */}
         <div className="flex flex-wrap gap-2 mt-4 mb-6">

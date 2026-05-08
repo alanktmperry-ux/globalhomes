@@ -1,4 +1,5 @@
-import { Smartphone, Monitor, Bed, Bath, Car, MapPin, CheckCircle2, Sparkles, Loader2 } from 'lucide-react';
+import { Smartphone, Monitor, Bed, Bath, Car, MapPin, CheckCircle2, Sparkles, Loader2, ImageIcon } from 'lucide-react';
+import { getListingImage, LISTING_PLACEHOLDER_CLASS } from '@/shared/lib/listingImage';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import type { ListingDraft } from './PocketListingForm';
@@ -22,7 +23,7 @@ const formatPrice = (d: ListingDraft) => {
 
 const StepPreview = ({ draft, onPublish, publishing, isEdit }: Props) => {
   const [view, setView] = useState<'mobile' | 'desktop'>('mobile');
-  const mainPhoto = draft.photos[draft.primaryPhoto] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=400&fit=crop';
+  const mainPhoto = getListingImage(draft.photos[draft.primaryPhoto], draft.photos);
 
   return (
     <div className="space-y-4">
@@ -53,7 +54,13 @@ const StepPreview = ({ draft, onPublish, publishing, isEdit }: Props) => {
         view === 'mobile' ? 'max-w-[320px]' : 'max-w-full'
       }`}>
         <div className={`relative ${view === 'mobile' ? 'aspect-[4/3]' : 'aspect-[16/7]'}`}>
-          <img src={mainPhoto} alt="Property" className="w-full h-full object-cover" />
+          {mainPhoto ? (
+            <img src={mainPhoto} alt="Property" className="w-full h-full object-cover" />
+          ) : (
+            <div className={`w-full h-full ${LISTING_PLACEHOLDER_CLASS}`}>
+              <ImageIcon size={32} />
+            </div>
+          )}
           <div className="absolute top-3 left-3">
             <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${
               draft.visibility === 'whisper'

@@ -2,7 +2,8 @@ import { useState, useEffect, lazy, Suspense } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Info, Loader2, Pencil, Globe, Home, Building, MoreHorizontal, FileBarChart2, Copy, Mail, List as ListIcon, Kanban, ExternalLink, ChevronDown, MessageSquare } from 'lucide-react';
+import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Info, Loader2, Pencil, Globe, Home, Building, MoreHorizontal, FileBarChart2, Copy, Mail, List as ListIcon, Kanban, ExternalLink, ChevronDown, MessageSquare, ImageIcon } from 'lucide-react';
+import { getListingImage, LISTING_PLACEHOLDER_CLASS } from '@/shared/lib/listingImage';
 import { cn } from '@/shared/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -65,8 +66,8 @@ function getListingDays(l: AgentListing): number {
   return Math.max(0, Math.floor((Date.now() - new Date(l.listed_date).getTime()) / 86400000));
 }
 
-function getListingThumb(l: AgentListing): string {
-  return l.image_url || l.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&h=150&fit=crop';
+function getListingThumb(l: AgentListing): string | null {
+  return getListingImage(l.image_url, l.images);
 }
 
 function toProperty(l: AgentListing): Property {
@@ -262,12 +263,24 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
 
   return (
     <div className="bg-card border border-border rounded-xl p-4 flex flex-col sm:flex-row gap-4">
-      <img
-        src={getListingThumb(l)}
-        alt=""
-        className="w-full sm:w-28 h-20 rounded-lg object-cover shrink-0 cursor-pointer transition-transform duration-200 hover:scale-105"
-        onClick={() => onSelect(toProperty(l))}
-      />
+      {(() => {
+        const thumb = getListingThumb(l);
+        return thumb ? (
+          <img
+            src={thumb}
+            alt=""
+            className="w-full sm:w-28 h-20 rounded-lg object-cover shrink-0 cursor-pointer transition-transform duration-200 hover:scale-105"
+            onClick={() => onSelect(toProperty(l))}
+          />
+        ) : (
+          <div
+            className={`w-full sm:w-28 h-20 rounded-lg shrink-0 cursor-pointer ${LISTING_PLACEHOLDER_CLASS}`}
+            onClick={() => onSelect(toProperty(l))}
+          >
+            <ImageIcon size={20} />
+          </div>
+        );
+      })()}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1 flex-wrap">
           {l._source === 'db' ? (

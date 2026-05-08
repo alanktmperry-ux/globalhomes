@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, MicOff, Search, Loader2, X, ChevronDown, MapPin, SlidersHorizontal } from 'lucide-react';
+import { Mic, MicOff, Search, Loader2, X, ChevronDown, MapPin, SlidersHorizontal, ImageIcon } from 'lucide-react';
+import { getListingImage, LISTING_PLACEHOLDER_CLASS } from '@/shared/lib/listingImage';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SoundWaveVisualizer } from './SoundWaveVisualizer';
@@ -259,7 +260,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
         baths: p.baths,
         cars: p.parking,
         tag: p.boost_tier === 'premier' ? 'Premier' : 'Featured',
-        img: p.image_url || p.images?.[0] || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&q=70',
+        img: getListingImage(p.image_url, p.images),
       }))
     : [];
 
@@ -890,8 +891,10 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
               <div className="relative rounded-2xl overflow-hidden group cursor-pointer">
                 {featuredLoading ? (
                   <Skeleton className="absolute inset-0 w-full h-full" />
+                ) : dedupedFeatured[0]?.img ? (
+                  <img src={dedupedFeatured[0].img} alt={dedupedFeatured[0]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="eager" fetchPriority="high" />
                 ) : (
-                  <img src={dedupedFeatured[0]?.img} alt={dedupedFeatured[0]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="eager" fetchPriority="high" />
+                  <div className={`absolute inset-0 ${LISTING_PLACEHOLDER_CLASS}`}><ImageIcon size={32} /></div>
                 )}
                 <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.7) 100%)'}} />
                 <div className="absolute top-3 left-3">
@@ -918,8 +921,10 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                     <div key={idx} className="relative rounded-2xl overflow-hidden group cursor-pointer">
                       {featuredLoading ? (
                         <Skeleton className="absolute inset-0 w-full h-full" />
-                      ) : (
+                      ) : item.img ? (
                         <img src={item.img} alt={item.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+                      ) : (
+                        <div className={`absolute inset-0 ${LISTING_PLACEHOLDER_CLASS}`}><ImageIcon size={24} /></div>
                       )}
                       <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 30%,rgba(0,0,0,0.65) 100%)'}} />
                       <div className="absolute top-2.5 left-2.5">
@@ -997,8 +1002,10 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
             <div className="row-span-2 relative rounded-2xl overflow-hidden cursor-pointer group" style={{ minHeight: '280px' }}>
               {featuredLoading ? (
                 <Skeleton className="absolute inset-0 w-full h-full" />
+              ) : dedupedFeatured[3 % dedupedFeatured.length]?.img ? (
+                <img src={dedupedFeatured[3 % dedupedFeatured.length].img} alt={dedupedFeatured[3 % dedupedFeatured.length]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="eager" fetchPriority="high" />
               ) : (
-                <img src={dedupedFeatured[3 % dedupedFeatured.length]?.img} alt={dedupedFeatured[3 % dedupedFeatured.length]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="eager" fetchPriority="high" />
+                <div className={`absolute inset-0 ${LISTING_PLACEHOLDER_CLASS}`}><ImageIcon size={40} /></div>
               )}
               <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 30%,rgba(0,0,0,0.72) 100%)'}} />
               <span className="absolute top-3 left-3 text-[9px] font-bold px-2.5 py-1 rounded-full text-white bg-foreground/80">
@@ -1043,8 +1050,10 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
                 <div key={i} className="relative rounded-2xl overflow-hidden cursor-pointer group" style={{ height: '134px' }}>
                   {featuredLoading ? (
                     <Skeleton className="absolute inset-0 w-full h-full" />
+                  ) : dedupedFeatured[idx]?.img ? (
+                    <img src={dedupedFeatured[idx].img} alt={dedupedFeatured[idx]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                   ) : (
-                    <img src={dedupedFeatured[idx]?.img} alt={dedupedFeatured[idx]?.address} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                    <div className={`absolute inset-0 ${LISTING_PLACEHOLDER_CLASS}`}><ImageIcon size={20} /></div>
                   )}
                   <div className="absolute inset-0" style={{background: 'linear-gradient(180deg,transparent 25%,rgba(0,0,0,0.65) 100%)'}} />
                   {dedupedFeatured[idx]?.tag && (

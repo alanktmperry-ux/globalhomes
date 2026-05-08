@@ -904,6 +904,20 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
           </>
         )}
       </div>
+
+      <div className="bg-muted border border-border rounded-lg p-4">
+        <h4 className="text-sm font-semibold mb-1">Pre-listing building inspection</h4>
+        <p className="text-xs text-muted-foreground leading-relaxed mb-2">
+          Vendors who provide an upfront inspection report sell faster and attract more confident buyers. Attach a report to your listing as a trust signal.
+        </p>
+        <button
+          type="button"
+          onClick={() => navigate('/home-services?category=building_inspection')}
+          className="text-xs font-medium text-primary hover:underline"
+        >
+          Organise an inspection →
+        </button>
+      </div>
     </div>
   );
 };

@@ -214,6 +214,10 @@ const DEFAULT_DRAFT: ListingDraft = {
   description_ja: '',
   title_ko: '',
   description_ko: '',
+  title_vi: '',
+  description_vi: '',
+  title_ar: '',
+  description_ar: '',
 };
 
 const STEPS = ['Address', 'Basics', 'Photos', 'Voice', 'Translate', 'Settings', 'Preview'];
@@ -513,6 +517,10 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         description_ja: draft.description_ja || null,
         title_ko: draft.title_ko || null,
         description_ko: draft.description_ko || null,
+        title_vi: draft.title_vi || null,
+        description_vi: draft.description_vi || null,
+        title_ar: draft.title_ar || null,
+        description_ar: draft.description_ar || null,
         is_exclusive: draft.isExclusive || false,
         exclusive_start_date: draft.isExclusive && !editPropertyId ? new Date().toISOString() : undefined,
         exclusive_end_date: draft.isExclusive && !editPropertyId ? new Date(Date.now() + 14 * 86_400_000).toISOString() : undefined,

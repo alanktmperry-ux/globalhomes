@@ -313,7 +313,7 @@ export default function OwnerPortalPage() {
         {/* Section 2: Financial */}
         <section>
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">Financial summary</h2>
-          {statements.length === 0 ? (
+          {safeStatements.length === 0 ? (
             <Card><CardContent className="p-6 text-center text-sm text-muted-foreground">No statements yet — your property manager will publish your first statement after the next rent collection cycle.</CardContent></Card>
           ) : (
             <>

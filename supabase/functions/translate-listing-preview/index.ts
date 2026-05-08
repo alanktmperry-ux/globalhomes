@@ -25,7 +25,19 @@ Deno.serve(async (req) => {
   if (!LOVABLE_API_KEY) return jsonResponse({ error: "Not configured" }, 503);
 
   const systemPrompt = `You are a multilingual real estate translation specialist for the Australian property market. Return valid JSON only.`;
-  const userPrompt = `Translate this Australian property listing into 6 languages. Return JSON with keys: zh_simplified, zh_traditional, vi, ko, ar, ja. Each key contains { title, description }.
+  const userPrompt = `Translate the following real estate listing into exactly these 10 languages and return a JSON object with these exact keys:
+- zh_simplified (Simplified Chinese)
+- zh_traditional (Traditional Chinese)
+- vi (Vietnamese)
+- ko (Korean)
+- ar (Arabic)
+- ja (Japanese)
+- hi (Hindi)
+- bn (Bengali)
+- tl (Tagalog / Filipino)
+- id (Indonesian)
+
+Return ONLY valid JSON. Each key maps to an object with "title" and "description" fields.
 
 Title: ${title}
 

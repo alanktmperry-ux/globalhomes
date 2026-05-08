@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { PropertyRow } from '@/features/agents/types/listing';
 import MarketingSupplierToggle from '../MarketingSupplierToggle';
@@ -27,6 +27,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 
@@ -87,6 +88,9 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   const [vendorName, setVendorName] = useState(listing.vendor_name || '');
   const [vendorEmail, setVendorEmail] = useState(listing.vendor_email || '');
   const [sending, setSending] = useState(false);
+  const [replyTo, setReplyTo] = useState<string | null>(null);
+  const [replyDraft, setReplyDraft] = useState('');
+  const [replySending, setReplySending] = useState(false);
   const [translating, setTranslating] = useState(false);
   const [translateDone, setTranslateDone] = useState(
     (listing as any).translation_status === 'complete'
@@ -848,13 +852,15 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                 <th className="text-left p-3 hidden sm:table-cell">Contact</th>
                 <th className="text-left p-3">Urgency</th>
                 <th className="text-right p-3 hidden sm:table-cell">Date</th>
+                <th className="text-right p-3">Reply</th>
               </tr>
             </thead>
             <tbody>
               {leads.slice(0, 5).map(l => {
                 const u = URGENCY_LABEL[l.urgency] || URGENCY_LABEL.just_browsing;
                 return (
-                  <tr key={l.id} className="border-b border-border last:border-0 hover:bg-accent/30">
+                  <Fragment key={l.id}>
+                  <tr className="border-b border-border last:border-0 hover:bg-accent/30">
                     <td className="p-3 font-medium">{l.user_name}</td>
                     <td className="p-3 hidden sm:table-cell">
                       <div className="flex items-center gap-2">
@@ -869,7 +875,82 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                     <td className="p-3 text-right text-muted-foreground text-xs hidden sm:table-cell">
                       {AU_DATE(l.created_at)}
                     </td>
+                    <td className="text-right pr-3">
+                      {l.user_email && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 text-xs gap-1"
+                          onClick={() => {
+                            setReplyTo(replyTo === l.id ? null : l.id);
+                            setReplyDraft('');
+                          }}
+                        >
+                          <Mail size={12} />
+                          {replyTo === l.id ? 'Cancel' : 'Reply'}
+                        </Button>
+                      )}
+                    </td>
                   </tr>
+                  {replyTo === l.id && (
+                    <tr key={`${l.id}-reply`}>
+                      <td colSpan={5} className="px-3 pb-3 pt-0">
+                        <div className="bg-muted/40 rounded-xl p-3 space-y-2 border border-border">
+                          <p className="text-xs text-muted-foreground">
+                            Replying to <strong>{l.user_name}</strong> ({l.user_email})
+                          </p>
+                          <Textarea
+                            value={replyDraft}
+                            onChange={e => setReplyDraft(e.target.value)}
+                            placeholder={`Hi ${l.user_name?.split(' ')[0] || 'there'},\n\nThank you for your enquiry about ${listing.address}.\n\n`}
+                            rows={5}
+                            className="text-sm"
+                          />
+                          <div className="flex items-center justify-between">
+                            <p className="text-[10px] text-muted-foreground">Sent from your ListHQ account</p>
+                            <Button
+                              size="sm"
+                              className="gap-1.5 text-xs"
+                              disabled={!replyDraft.trim() || replySending}
+                              onClick={async () => {
+                                setReplySending(true);
+                                try {
+                                  const { data: agent } = await supabase
+                                    .from('agents')
+                                    .select('name, email, agency')
+                                    .eq('user_id', user?.id ?? '')
+                                    .maybeSingle();
+                                  await supabase.functions.invoke('send-notification-email', {
+                                    body: {
+                                      to: l.user_email,
+                                      subject: `Re: Your enquiry — ${listing.address}`,
+                                      html: `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;">
+                                        <p style="color:#888;font-size:12px;margin-bottom:16px;">Reply from ${(agent as any)?.name || 'Your Agent'}${(agent as any)?.agency ? ' · ' + (agent as any).agency : ''}</p>
+                                        <div style="white-space:pre-wrap;font-size:14px;color:#1a1a1a;line-height:1.6;">${replyDraft.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+                                        <hr style="margin:24px 0;border:none;border-top:1px solid #eee;" />
+                                        <p style="font-size:11px;color:#aaa;">Sent via ListHQ · listhq.com.au</p>
+                                      </div>`,
+                                    },
+                                  });
+                                  toast.success(`Reply sent to ${l.user_email}`);
+                                  setReplyTo(null);
+                                  setReplyDraft('');
+                                } catch {
+                                  toast.error('Failed to send — please try again');
+                                } finally {
+                                  setReplySending(false);
+                                }
+                              }}
+                            >
+                              {replySending ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+                              {replySending ? 'Sending…' : 'Send reply'}
+                            </Button>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                  </Fragment>
                 );
               })}
             </tbody>

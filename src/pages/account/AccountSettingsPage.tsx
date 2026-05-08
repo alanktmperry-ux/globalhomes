@@ -174,7 +174,7 @@ export default function AccountSettingsPage() {
             </div>
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" value={profile.email ?? ""} disabled />
+              <Input id="email" value={user?.email ?? ""} disabled />
               <p className="mt-1 text-xs text-slate-500">
                 Email cannot be changed here. Contact{" "}
                 <a href="mailto:support@listhq.com.au" className="underline">

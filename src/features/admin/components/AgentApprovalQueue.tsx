@@ -100,6 +100,11 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
       return;
     }
 
+    // Start the 60-day trial clock from approval time
+    await (supabase.from('agents') as any).update({
+      subscription_expires_at: new Date(Date.now() + 60 * 86400 * 1000).toISOString(),
+    }).eq('id', agent.id);
+
     await writeAuditLog('approve', agent, null);
 
     // Send notification to agent (routed through dispatcher)
@@ -109,6 +114,19 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
       title: 'Your agent account has been approved',
       message: 'Your ListHQ agent account is now active. You can create and publish listings.',
     });
+
+    // Send full branded onboarding welcome email
+    try {
+      await supabase.functions.invoke('send-welcome-email', {
+        body: {
+          type: 'agent',
+          user_id: agent.user_id,
+          name: agent.name,
+          email: agent.email,
+          agency: agent.agency || '',
+        },
+      });
+    } catch { /* non-blocking */ }
 
     toast({ title: `${agent.name} approved` });
     setActionLoading(null);

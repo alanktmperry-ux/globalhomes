@@ -17,6 +17,7 @@ const CURRENT_AGENT_SELECT = `
   payment_failed_at,
   admin_grace_until,
   created_at,
+  subscription_expires_at,
   is_subscribed
 `;
 
@@ -35,6 +36,7 @@ export interface CurrentAgent {
   payment_failed_at: string | null;
   admin_grace_until: string | null;
   created_at: string;
+  subscription_expires_at: string | null;
   is_subscribed: boolean;
 }
 

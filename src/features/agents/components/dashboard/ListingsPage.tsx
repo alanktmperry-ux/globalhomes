@@ -225,8 +225,16 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
         onClick={() => onSelect(toProperty(l))}
       />
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          <Badge className={`${s.color} text-[10px] gap-0.5 border-0`}>{s.icon} {s.label}</Badge>
+        <div className="flex items-center gap-2 mb-1 flex-wrap">
+          {l._source === 'db' ? (
+            <StatusMenu
+              listing={{ id: l.id, status: l._status, listing_type: l.listing_type }}
+              onStatusChange={onStatusChange}
+              onDelete={onDelete}
+            />
+          ) : (
+            <Badge className={`${s.color} text-[10px] gap-0.5 border-0`}>{s.icon} {s.label}</Badge>
+          )}
           {isRental && <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">Rental</Badge>}
           <span className={`text-xs font-bold ${daysColor}`}>{days}d</span>
         </div>

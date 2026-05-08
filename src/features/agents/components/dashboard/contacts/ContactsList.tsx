@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Flame, Thermometer, Snowflake, Search, Trash2, Phone, Mail, ArrowUp, ArrowDown, AlarmClock, AlertTriangle, X } from 'lucide-react';
+import { Flame, Thermometer, Snowflake, Search, Trash2, Phone, Mail, ArrowUp, ArrowDown, AlarmClock, AlertTriangle, X, Users, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -63,12 +63,13 @@ interface Props {
   onDelete: (id: string) => void;
   hasMore?: boolean;
   onLoadMore?: () => void;
+  onAdd?: () => void;
 }
 
 const ContactsList = ({
   contacts, loading, filters, sort, columns,
   onFiltersChange, onSortChange, onSelect, onDelete,
-  hasMore, onLoadMore,
+  hasMore, onLoadMore, onAdd,
 }: Props) => {
   const showCol = (k: ContactColumnKey) => columns.includes(k);
 
@@ -310,8 +311,28 @@ const ContactsList = ({
 
       {/* List */}
       {filtered.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          {contacts.length === 0 ? 'No contacts yet. Add your first contact!' : 'No contacts match your filters.'}
+        <div className="text-center py-16 px-4">
+          {contacts.length === 0 ? (
+            <div className="space-y-3 max-w-xs mx-auto">
+              <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center mx-auto">
+                <Users size={22} className="text-muted-foreground" />
+              </div>
+              <p className="font-semibold text-foreground text-sm">No contacts yet</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Add buyers, vendors, and leads. Import from a CSV or add them one by one.
+              </p>
+              {onAdd && (
+                <button
+                  onClick={onAdd}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
+                >
+                  <Plus size={13} /> Add first contact
+                </button>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">No contacts match your filters.</p>
+          )}
         </div>
       ) : (
         <div className="bg-card border border-border rounded-xl overflow-hidden">

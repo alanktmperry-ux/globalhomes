@@ -12,7 +12,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
   Loader2, Sparkles, Archive, Mail, Home, ChevronDown, ChevronRight,
-  Flame, Search as SearchIcon, MapPin, ArrowUpDown, Lock,
+  Flame, Search as SearchIcon, MapPin, ArrowUpDown, Lock, ArrowRight,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
@@ -382,6 +382,12 @@ const BuyerConciergePage = () => {
             <p className="text-sm text-muted-foreground mt-1">
               Once buyers search for properties matching yours, they'll appear here automatically.
             </p>
+            <a
+              href="/dashboard/listings"
+              className="inline-flex items-center gap-1 mt-4 text-xs font-medium text-primary hover:underline"
+            >
+              Publish a listing to start matching <ArrowRight size={12} />
+            </a>
           </CardContent>
         </Card>
       ) : (

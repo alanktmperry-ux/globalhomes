@@ -24,7 +24,7 @@ describe('detectLanguage', () => {
 
   it('returns "zh" for Simplified Chinese', () => {
 
-    expect(detectLanguage('找四房在Glen Waverley')).toBe('zh');
+    expect(detectLanguage('找四房在墨尔本')).toBe('zh');
 
   });
 

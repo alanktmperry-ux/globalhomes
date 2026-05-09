@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { translateSearchQuery } from '@/features/properties/lib/translationService';
 import { parsePropertyQuery, filtersToChips, type ParsedFilters } from '@/features/search/lib/parsePropertyQuery';
+import { detectLanguage } from '@/features/search/lib/detectLanguage';
 import { SlidersHorizontal } from 'lucide-react';
 
 const EXAMPLE_PROMPTS = [
@@ -67,7 +68,9 @@ export function AIPropertySearch({ onRefineWithFilters }: AIPropertySearchProps 
       // natural-language query to English first so the AI search edge function
       // (which expects English suburb/property-type extraction) gets clean input.
       let searchQuery = q;
-      if (language !== 'en') {
+      const detectedLang = detectLanguage(q);
+      const shouldTranslate = detectedLang !== 'en' && detectedLang !== 'unknown';
+      if (shouldTranslate) {
         try {
           const { englishQuery } = await translateSearchQuery(q);
           if (englishQuery && englishQuery.trim()) searchQuery = englishQuery;

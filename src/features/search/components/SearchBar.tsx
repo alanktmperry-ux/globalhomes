@@ -7,6 +7,7 @@ import { useI18n } from '@/shared/lib/i18n';
 import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
 import { autocomplete } from '@/shared/lib/googleMapsService';
 import { useToast } from '@/shared/hooks/use-toast';
+import { detectLanguage } from '@/features/search/lib/detectLanguage';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -79,6 +80,14 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
     setShowSuggestions(false);
     const trimmed = query.trim();
     if (!trimmed) return;
+
+    const detectedLang = detectLanguage(trimmed);
+    const shouldTranslate = detectedLang !== 'en' && detectedLang !== 'unknown';
+
+    if (!shouldTranslate) {
+      onSearch(trimmed);
+      return;
+    }
 
     setIsTranslating(true);
     try {

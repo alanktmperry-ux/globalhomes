@@ -370,30 +370,31 @@ Deno.serve(async (req) => {
     }
 
     if (body.listing_id) {
-      // --- Ownership / admin authorization check ---
-      const supabaseAdmin = createClient(
-        Deno.env.get("SUPABASE_URL")!,
-        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-      );
+      // --- Ownership / admin authorization check (skipped for service role) ---
+      if (!isServiceRole && caller) {
+        const supabaseAdmin = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+        );
 
-      const { data: ownedListing } = await supabaseAdmin
-        .from("properties")
-        .select("id, agents!inner(user_id)")
-        .eq("id", body.listing_id)
-        .eq("agents.user_id", caller.id)
-        .maybeSingle();
-
-      if (!ownedListing) {
-        // Check for admin role as fallback
-        const { data: adminRole } = await supabaseAdmin
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", caller.id)
-          .eq("role", "admin")
+        const { data: ownedListing } = await supabaseAdmin
+          .from("properties")
+          .select("id, agents!inner(user_id)")
+          .eq("id", body.listing_id)
+          .eq("agents.user_id", caller.id)
           .maybeSingle();
 
-        if (!adminRole) {
-          return jsonResponse({ error: "You do not have permission to translate this listing" }, 403);
+        if (!ownedListing) {
+          const { data: adminRole } = await supabaseAdmin
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", caller.id)
+            .eq("role", "admin")
+            .maybeSingle();
+
+          if (!adminRole) {
+            return jsonResponse({ error: "You do not have permission to translate this listing" }, 403);
+          }
         }
       }
       // --- End authorization check ---

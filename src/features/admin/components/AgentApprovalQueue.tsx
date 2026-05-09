@@ -115,17 +115,13 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
       message: 'Your ListHQ agent account is now active. You can create and publish listings.',
     });
 
-    // Send full branded onboarding welcome email
+    // Send branded onboarding welcome email (Touch 2 'verified' — deduped server-side)
     try {
-      await supabase.functions.invoke('send-welcome-email', {
-        body: {
-          type: 'agent',
-          user_id: agent.user_id,
-          name: agent.name,
-          email: agent.email,
-          agency: agent.agency || '',
-        },
-      });
+      if (agent.user_id) {
+        await supabase.functions.invoke('send-welcome-email', {
+          body: { user_id: agent.user_id, category: 'verified' },
+        });
+      }
     } catch { /* non-blocking */ }
 
     toast({ title: `${agent.name} approved` });

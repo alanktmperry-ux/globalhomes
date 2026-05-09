@@ -13,7 +13,15 @@ const AuthConfirmPage = () => {
     let timeout: ReturnType<typeof setTimeout>;
     let subscription: { unsubscribe: () => void } | null = null;
 
+    const fireWelcome = (uid: string) => {
+      // Touch 2 — fire-and-forget, never blocks onboarding
+      supabase.functions.invoke('send-welcome-email', {
+        body: { user_id: uid, category: 'verified' },
+      }).catch(() => { /* non-fatal */ });
+    };
+
     const routeUser = async (userId: string) => {
+      fireWelcome(userId);
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {

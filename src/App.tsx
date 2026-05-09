@@ -5,7 +5,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { I18nProvider } from "@/shared/lib/i18n";
 
 import { CurrencyProvider } from "@/shared/lib/CurrencyContext";
@@ -265,6 +265,12 @@ function SearchRedirect() {
   return <Navigate to={`/${search}`} replace />;
 }
 
+/** Redirects /property/:id to /properties/:id so old bookmarks/shares don't 404 */
+function PropertyRedirect() {
+  const { id } = useParams<{ id: string }>();
+  return <Navigate to={`/properties/${id}`} replace />;
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -305,7 +311,8 @@ const App = () => (
                   <Route path="/" element={<Index />} />
                   {/* /search?q=... redirects to /?q=... so bookmarked/shared search URLs don't 404 */}
                   <Route path="/search" element={<SearchRedirect />} />
-                  <Route path="/property/:id" element={<PropertyDetailPage />} />
+                  <Route path="/properties/:id" element={<PropertyDetailPage />} />
+                  <Route path="/property/:id" element={<PropertyRedirect />} />
                   <Route path="/agent/:id" element={<AgentPublicProfilePage />} />
                   <Route path="/agents" element={<FindAgentPage />} />
                   <Route path="/agents/:agentId" element={<AgentProfilePublic />} />

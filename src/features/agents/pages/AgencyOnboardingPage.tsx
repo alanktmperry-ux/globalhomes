@@ -199,18 +199,12 @@ export default function AgencyOnboardingPage() {
     if (error) throw error;
     await refreshRoles();
 
-    // Best-effort welcome email — non-fatal
+    // Best-effort welcome email (Touch 2 'verified' — server-side dedup is idempotent)
     try {
       const { data: { user: u } } = await supabase.auth.getUser();
-      if (u?.email) {
+      if (u?.id) {
         await supabase.functions.invoke('send-welcome-email', {
-          body: {
-            type: 'agent',
-            user_id: u.id,
-            name: principalName || u.email,
-            email: u.email,
-            agency: agencyName || '',
-          },
+          body: { user_id: u.id, category: 'verified' },
         });
       }
     } catch { /* non-fatal */ }

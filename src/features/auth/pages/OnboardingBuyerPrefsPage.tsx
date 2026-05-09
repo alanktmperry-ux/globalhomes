@@ -30,14 +30,9 @@ export default function OnboardingBuyerPrefsPage() {
   const sendWelcomeEmail = async () => {
     try {
       const { data: { user: u } } = await supabase.auth.getUser();
-      if (u?.email) {
+      if (u?.id) {
         await supabase.functions.invoke('send-welcome-email', {
-          body: {
-            type: 'buyer',
-            user_id: u.id,
-            name: (u.user_metadata as any)?.display_name || '',
-            email: u.email,
-          },
+          body: { user_id: u.id, category: 'verified' },
         });
       }
     } catch { /* non-fatal */ }

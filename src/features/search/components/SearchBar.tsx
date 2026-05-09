@@ -81,6 +81,14 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
     const trimmed = query.trim();
     if (!trimmed) return;
 
+    const detectedLang = detectLanguage(trimmed);
+    const shouldTranslate = detectedLang !== 'en' && detectedLang !== 'unknown';
+
+    if (!shouldTranslate) {
+      onSearch(trimmed);
+      return;
+    }
+
     setIsTranslating(true);
     try {
       const controller = new AbortController();

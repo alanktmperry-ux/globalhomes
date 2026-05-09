@@ -130,7 +130,7 @@ export function AIPropertySearch({ onRefineWithFilters, listingType = 'sale' }: 
     } finally {
       setLoading(false);
     }
-  }, [user, t, language]);
+  }, [user, t, language, listingType]);
 
   const handleSelect = useCallback((p: Property) => navigate(`/property/${p.id}`), [navigate]);
   const handleToggleSave = useCallback((id: string) => {

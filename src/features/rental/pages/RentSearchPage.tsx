@@ -9,6 +9,7 @@ import { SearchModeTabs } from '@/features/search/components/SearchModeTabs';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Filter, X } from 'lucide-react';
+import { AIPropertySearch } from '@/features/properties/components/AIPropertySearch';
 
 function parseRentalFiltersFromParams(sp: URLSearchParams): RentalFilters {
   return {

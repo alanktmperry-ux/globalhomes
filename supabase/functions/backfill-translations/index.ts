@@ -17,7 +17,7 @@ Deno.serve(async (req) => {
     .select("id, suburb, title")
     .eq("is_active", true)
     .eq("translation_status", "pending")
-    .limit(10);
+    .limit(2);
 
   if (queryErr) {
     return new Response(JSON.stringify({ error: queryErr.message }), {

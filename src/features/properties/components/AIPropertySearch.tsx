@@ -16,10 +16,16 @@ import { parsePropertyQuery, filtersToChips, type ParsedFilters } from '@/featur
 import { detectLanguage } from '@/features/search/lib/detectLanguage';
 import { SlidersHorizontal } from 'lucide-react';
 
-const EXAMPLE_PROMPTS = [
+const EXAMPLE_PROMPTS_SALE = [
   'Quiet family home near good schools',
   'Modern apartment close to cafes and transport',
   'Spacious house with a backyard under $900k',
+];
+
+const EXAMPLE_PROMPTS_RENT = [
+  '2 bedroom apartment under $600/week in Box Hill',
+  'Pet-friendly house near Glen Waverley schools',
+  'Furnished unit near Parramatta station',
 ];
 
 function getSessionId(): string {
@@ -44,9 +50,11 @@ interface AIPropertySearchProps {
   /** When provided, shows a "Refine in filters" button that hands the parsed
    *  query off to the parent's filter UI. */
   onRefineWithFilters?: (parsed: ParsedFilters) => void;
+  listingType?: 'sale' | 'rent';
 }
 
-export function AIPropertySearch({ onRefineWithFilters }: AIPropertySearchProps = {}) {
+export function AIPropertySearch({ onRefineWithFilters, listingType = 'sale' }: AIPropertySearchProps = {}) {
+  const examplePrompts = listingType === 'rent' ? EXAMPLE_PROMPTS_RENT : EXAMPLE_PROMPTS_SALE;
   const { t, language } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth() ?? { user: null } as any;
@@ -86,6 +94,7 @@ export function AIPropertySearch({ onRefineWithFilters }: AIPropertySearchProps 
           query: searchQuery,
           session_id: getSessionId(),
           buyer_id: user?.id ?? undefined,
+          listing_type: listingType === 'rent' ? 'rent' : undefined,
         },
       });
       if (error) {
@@ -121,7 +130,7 @@ export function AIPropertySearch({ onRefineWithFilters }: AIPropertySearchProps 
     } finally {
       setLoading(false);
     }
-  }, [user, t, language]);
+  }, [user, t, language, listingType]);
 
   const handleSelect = useCallback((p: Property) => navigate(`/property/${p.id}`), [navigate]);
   const handleToggleSave = useCallback((id: string) => {
@@ -245,7 +254,7 @@ export function AIPropertySearch({ onRefineWithFilters }: AIPropertySearchProps 
             {t('No exact matches — try describing the lifestyle instead of just the specs')}
           </p>
           <div className="flex flex-wrap justify-center gap-2">
-            {EXAMPLE_PROMPTS.map(p => (
+            {examplePrompts.map((p: string) => (
               <button
                 key={p}
                 onClick={() => { setQuery(p); runSearch(p); }}

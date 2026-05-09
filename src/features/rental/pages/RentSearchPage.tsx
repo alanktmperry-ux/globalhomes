@@ -9,6 +9,7 @@ import { SearchModeTabs } from '@/features/search/components/SearchModeTabs';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Filter, X } from 'lucide-react';
+import { AIPropertySearch } from '@/features/properties/components/AIPropertySearch';
 
 function parseRentalFiltersFromParams(sp: URLSearchParams): RentalFilters {
   return {
@@ -66,7 +67,10 @@ export default function RentSearchPage() {
           </p>
         </div>
 
-        {/* Mobile: filter sheet trigger */}
+        {/* AI-powered rental search (multilingual) */}
+        <AIPropertySearch listingType="rent" />
+
+
         <div className="md:hidden flex items-center gap-2">
           <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
             <SheetTrigger asChild>

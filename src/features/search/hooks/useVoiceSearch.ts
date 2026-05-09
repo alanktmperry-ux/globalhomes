@@ -117,7 +117,7 @@ export function useVoiceSearch(
       }
       setIsListening(false);
     }
-  }, [isSupported, onResult, onError]);
+  }, [isSupported, onResult, onError, language]);
 
   const stopListening = useCallback(() => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {

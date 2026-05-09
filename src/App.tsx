@@ -12,6 +12,7 @@ import { CurrencyProvider } from "@/shared/lib/CurrencyContext";
 import { AuthProvider, useAuth } from "@/features/auth/AuthProvider";
 import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
 import AppErrorBoundary from "@/components/AppErrorBoundary";
+import { BetaGate } from "@/features/beta-gate/BetaGate";
 import { PageSkeleton } from "@/shared/components/PageSkeleton";
 import { DefaultSEOHead } from "@/features/seo/components/DefaultSEOHead";
 import { HelpWidget } from "@/features/help/components/HelpWidget";
@@ -297,6 +298,7 @@ const App = () => (
              <HelpWidget />
              <CookieConsentBanner />
              <Suspense fallback={<PageLoader />}>
+              <BetaGate>
               <Routes>
                 {/* Public with shared navbar/footer */}
                 <Route element={<PublicLayout />}>
@@ -536,6 +538,7 @@ const App = () => (
 
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              </BetaGate>
             </Suspense>
             <CookieConsentBanner />
         </TooltipProvider>

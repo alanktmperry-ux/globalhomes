@@ -329,13 +329,20 @@ Deno.serve(async (req) => {
     }
 
     const token = authHeader.replace("Bearer ", "");
-    const supabaseAnon = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!
-    );
-    const { data: { user: caller }, error: authError } = await supabaseAnon.auth.getUser(token);
-    if (authError || !caller) {
-      return jsonResponse({ error: "Unauthorized" }, 401);
+    const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const isServiceRole = token === SERVICE_ROLE;
+
+    let caller: { id: string } | null = null;
+    if (!isServiceRole) {
+      const supabaseAnon = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!
+      );
+      const { data: { user }, error: authError } = await supabaseAnon.auth.getUser(token);
+      if (authError || !user) {
+        return jsonResponse({ error: "Unauthorized" }, 401);
+      }
+      caller = { id: user.id };
     }
     // --- End authentication check ---
 

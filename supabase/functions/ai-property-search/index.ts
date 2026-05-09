@@ -257,9 +257,13 @@ Deno.serve(async (req) => {
         .from("properties")
         .select(PROPERTIES_WITH_AGENTS)
         .eq("is_active", true)
-        .not("listing_type", "eq", "rent")
         .order("created_at", { ascending: false })
         .limit(60);
+      if (listingTypeFilter === 'rent') {
+        fallback = fallback.eq('listing_type', 'rent');
+      } else {
+        fallback = fallback.not('listing_type', 'eq', 'rent');
+      }
       if (intent.min_price) fallback = fallback.gte("price", intent.min_price);
       if (intent.max_price) fallback = fallback.lte("price", intent.max_price);
       if (intent.bedrooms) fallback = fallback.gte("beds", intent.bedrooms);

@@ -38,10 +38,7 @@ export const SignupEmail = ({
           You're moments away from joining Australia's multilingual property platform.
         </Text>
         <Text style={text}>
-          Please confirm your email address ({' '}
-          <Link href={siteUrl} style={link}>
-            <strong>{siteName}</strong>
-          </Link>
+          Please confirm your email address (
           <Link href={`mailto:${recipient}`} style={link}>
             {recipient}
           </Link>

@@ -14,6 +14,30 @@ export function BetaGate({ children }: Props) {
   const [error, setError] = useState('');
   const [shake, setShake] = useState(false);
 
+  // Bypass beta gate for auth callback / verification routes so Supabase
+  // email-confirmation links are not intercepted (P0: BetaGate was eating
+  // the verification token, leaving every new signup stuck unconfirmed).
+  const path = typeof window !== 'undefined' ? window.location.pathname : '';
+  const search = typeof window !== 'undefined' ? window.location.search : '';
+  const hash = typeof window !== 'undefined' ? window.location.hash : '';
+  const AUTH_BYPASS_PATHS = [
+    '/auth/callback',
+    '/auth/confirm',
+    '/auth/verify',
+    '/auth/v1/verify',
+    '/reset-password',
+  ];
+  const isAuthCallback =
+    AUTH_BYPASS_PATHS.some((p) => path.startsWith(p)) ||
+    search.includes('token_hash=') ||
+    search.includes('access_token=') ||
+    search.includes('code=') ||
+    hash.includes('access_token=') ||
+    hash.includes('type=signup') ||
+    hash.includes('type=recovery') ||
+    hash.includes('type=email');
+  if (isAuthCallback) return <>{children}</>;
+
   if (granted) return <>{children}</>;
 
   const handleSubmit = (e: FormEvent) => {

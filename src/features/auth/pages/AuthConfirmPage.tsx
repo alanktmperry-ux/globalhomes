@@ -2,64 +2,82 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { capture, identify } from '@/shared/lib/posthog';
 
 const AuthConfirmPage = () => {
   const navigate = useNavigate();
-  const [status, setStatus] = useState<
-    'verifying' | 'success' | 'error'
-  >('verifying');
+  const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
     let subscription: { unsubscribe: () => void } | null = null;
 
+    const routeUser = async (userId: string) => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          navigate('/login', { replace: true });
+          return;
+        }
+        const role = (user.user_metadata as { registered_as?: string } | null)?.registered_as;
+        if (role === 'agent') {
+          try {
+            await supabase.from('profiles').upsert(
+              { user_id: user.id, user_role: 'agent' as any, onboarded: false } as any,
+              { onConflict: 'user_id' },
+            );
+          } catch { /* non-fatal */ }
+          try {
+            identify(user.id, { email: user.email, plan: 'trial' });
+            capture('agent_signed_up', { source: 'auth_confirm' });
+          } catch { /* analytics never breaks the flow */ }
+          navigate('/onboarding/agency', { replace: true });
+        } else {
+          try {
+            await supabase.from('profiles').upsert(
+              {
+                user_id: user.id,
+                terms_accepted_at: new Date().toISOString(),
+                terms_version: '1.0',
+              } as any,
+              { onConflict: 'user_id' },
+            );
+          } catch { /* non-fatal */ }
+          navigate('/onboarding/role', { replace: true });
+        }
+      } catch {
+        navigate('/onboarding/role', { replace: true });
+      }
+    };
+
     const handleConfirmation = async () => {
-      const routeUser = async (userId: string) => {
-        const { data: agentRow } = await supabase
-          .from('agents')
-          .select('id, onboarding_complete')
-          .eq('user_id', userId)
-          .maybeSingle();
-        const dest = agentRow && (agentRow as any).onboarding_complete
-          ? '/dashboard'
-          : '/onboarding/agency';
-        navigate(dest, { replace: true });
-      };
-
       await new Promise(r => setTimeout(r, 1500));
-
       const { data: { session } } = await supabase.auth.getSession();
-
       if (session?.user) {
         setStatus('success');
-        setMessage('Email confirmed! Taking you to your dashboard...');
-        setTimeout(() => routeUser(session.user.id), 1500);
+        setMessage('Email confirmed! Setting up your account...');
+        setTimeout(() => routeUser(session.user.id), 1200);
         return;
       }
-
       const sub = supabase.auth.onAuthStateChange((event, newSession) => {
         if (event === 'SIGNED_IN' && newSession?.user) {
           subscription?.unsubscribe();
           if (timeout) clearTimeout(timeout);
           setStatus('success');
-          setMessage('Email confirmed! Taking you to your dashboard...');
-          setTimeout(() => routeUser(newSession.user.id), 1500);
+          setMessage('Email confirmed! Setting up your account...');
+          setTimeout(() => routeUser(newSession.user.id), 1200);
         }
       });
       subscription = sub.data.subscription;
-
       timeout = setTimeout(() => {
         subscription?.unsubscribe();
         setStatus('error');
-        setMessage(
-          'Confirmation link has expired or already been used. Please sign up again.'
-        );
+        setMessage('Confirmation link has expired or already been used. Please sign up again.');
       }, 8000);
     };
 
     handleConfirmation();
-
     return () => {
       if (timeout) clearTimeout(timeout);
       subscription?.unsubscribe();
@@ -69,7 +87,6 @@ const AuthConfirmPage = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md text-center space-y-6">
-
         <div className="flex justify-center">
           {status === 'verifying' && (
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -87,7 +104,6 @@ const AuthConfirmPage = () => {
             </div>
           )}
         </div>
-
         <div>
           <h1 className="text-2xl font-bold text-foreground mb-2">
             {status === 'verifying' && 'Confirming your email…'}
@@ -99,16 +115,14 @@ const AuthConfirmPage = () => {
             {message}
           </p>
         </div>
-
         {status === 'error' && (
           <Link
-            to="/agents/login"
+            to="/login"
             className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
           >
             Back to sign in
           </Link>
         )}
-
       </div>
     </div>
   );

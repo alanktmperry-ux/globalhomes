@@ -72,10 +72,19 @@ export function useVoiceSearch(
             reader.readAsDataURL(blob);
           });
 
+          // Map UI language to ISO 639-1 transcription code
+          const langMap: Record<string, string> = {
+            'zh-CN': 'zh', 'zh-TW': 'zh', 'vi': 'vi', 'ko': 'ko', 'ar': 'ar',
+            'hi': 'hi', 'bn': 'bn', 'pa': 'pa', 'ta': 'ta', 'ja': 'ja',
+            'id': 'id', 'ms': 'ms', 'th': 'th', 'fil': 'tl', 'it': 'it',
+            'es': 'es', 'fr': 'fr', 'pt': 'pt', 'ru': 'ru', 'en': 'en',
+          };
+          const language_hint = langMap[language] || 'en';
+
           const { data, error } = await supabase.functions.invoke(
             'voice-search',
             {
-              body: { audio: base64, mimeType },
+              body: { audio: base64, mimeType, language_hint },
             }
           );
 
@@ -108,7 +117,7 @@ export function useVoiceSearch(
       }
       setIsListening(false);
     }
-  }, [isSupported, onResult, onError]);
+  }, [isSupported, onResult, onError, language]);
 
   const stopListening = useCallback(() => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {

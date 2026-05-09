@@ -10,7 +10,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { audio, mimeType, transcript: rawTranscript, detectedLanguage, userLocation, sessionId, audioDuration } = body;
+    const { audio, mimeType, transcript: rawTranscript, detectedLanguage, userLocation, sessionId, audioDuration, language_hint } = body;
 
     // ── Input validation ──
     if (audio && typeof audio === "string") {
@@ -72,8 +72,16 @@ Deno.serve(async (req) => {
 
       const contentType = mimeType || "audio/webm";
 
+      // If a language hint is provided, use it (overrides auto-detect for accuracy).
+      const dgLang = typeof language_hint === "string" && language_hint.length >= 2
+        ? language_hint.split("-")[0]
+        : null;
+      const dgUrl = dgLang
+        ? `https://api.deepgram.com/v1/listen?model=nova-3&language=${encodeURIComponent(dgLang)}&punctuate=true&smart_format=true`
+        : "https://api.deepgram.com/v1/listen?model=nova-3&detect_language=true&punctuate=true&smart_format=true";
+
       const dgResponse = await fetch(
-        "https://api.deepgram.com/v1/listen?model=nova-3&detect_language=true&punctuate=true&smart_format=true",
+        dgUrl,
         {
           method: "POST",
           headers: {

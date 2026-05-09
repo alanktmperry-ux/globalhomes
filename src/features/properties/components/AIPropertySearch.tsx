@@ -16,10 +16,16 @@ import { parsePropertyQuery, filtersToChips, type ParsedFilters } from '@/featur
 import { detectLanguage } from '@/features/search/lib/detectLanguage';
 import { SlidersHorizontal } from 'lucide-react';
 
-const EXAMPLE_PROMPTS = [
+const EXAMPLE_PROMPTS_SALE = [
   'Quiet family home near good schools',
   'Modern apartment close to cafes and transport',
   'Spacious house with a backyard under $900k',
+];
+
+const EXAMPLE_PROMPTS_RENT = [
+  '2 bedroom apartment under $600/week in Box Hill',
+  'Pet-friendly house near Glen Waverley schools',
+  'Furnished unit near Parramatta station',
 ];
 
 function getSessionId(): string {

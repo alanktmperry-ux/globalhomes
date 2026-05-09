@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { capture, identify } from '@/shared/lib/posthog';
-import OTPVerificationScreen from '@/features/auth/components/OTPVerificationScreen';
+import { Mail, ArrowLeft } from 'lucide-react';
 import agentAuthHero from '@/assets/agent-auth-hero.jpg';
 import { usePageTitle } from '@/lib/usePageTitle';
 
@@ -119,6 +119,10 @@ const AgentAuthPage = () => {
       setEmailError('Enter a valid email (e.g. name@agency.com.au)');
       return;
     }
+    if (password.length < 8) {
+      toast.error('Password must be at least 8 characters.');
+      return;
+    }
     if (!dataLocationConsent) {
       toast.error('Please acknowledge where your data is stored to continue.');
       return;
@@ -130,59 +134,23 @@ const AgentAuthPage = () => {
     const cleaned = regEmail.trim().toLowerCase();
     setEmailSubmitting(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({
+      const { error: signUpErr } = await supabase.auth.signUp({
         email: cleaned,
+        password,
         options: {
-          shouldCreateUser: true,
-          data: { registration_started: true, registered_as: 'agent' },
+          emailRedirectTo: window.location.origin + '/auth/confirm',
+          data: { registered_as: 'agent', registration_started: true },
         },
       });
-      if (error) throw error;
+      if (signUpErr) throw signUpErr;
       sessionStorage.setItem('listhq_pending_email', cleaned);
       setRegEmail(cleaned);
-      toast.success("We've sent a 6-digit code to your email. Check your inbox.");
+      toast.success("We've sent a confirmation link to your email. Click it to activate your account.");
       setStep('otp');
-    } catch {
-      toast.error('Failed to send verification code. Please try again.');
+    } catch (err) {
+      toast.error(getErrorMessage(err) || 'Failed to send confirmation email. Please try again.');
     } finally {
       setEmailSubmitting(false);
-    }
-  };
-
-  const handleAgentOtpVerified = async () => {
-    try {
-      const { data: { user: u } } = await supabase.auth.getUser();
-      if (!u) {
-        navigate('/onboarding/agency');
-        return;
-      }
-      // Stamp role hint in profiles
-      try {
-        await supabase.from('profiles').upsert(
-          { user_id: u.id, user_role: 'agent' as any, onboarded: false } as any,
-          { onConflict: 'user_id' },
-        );
-      } catch { /* non-fatal */ }
-      const { data: agentRow } = await supabase
-        .from('agents')
-        .select('id, onboarding_complete')
-        .eq('user_id', u.id)
-        .maybeSingle();
-      if (agentRow && (agentRow as any).onboarding_complete) {
-        navigate('/dashboard');
-      } else {
-        // First-time arrival here = genuine agent signup (no agent row yet, or onboarding not complete)
-        if (!agentRow) {
-          try {
-            identify(u.id, { email: u.email, plan: 'trial' });
-            capture('agent_signed_up', { source: 'agent_auth_otp' });
-          } catch { /* analytics never breaks the flow */ }
-        }
-        navigate('/onboarding/agency');
-      }
-    } catch (err) {
-      toast.error('Sign-in succeeded but routing failed', { description: getErrorMessage(err) });
-      navigate('/onboarding/agency');
     }
   };
 
@@ -225,11 +193,36 @@ const AgentAuthPage = () => {
 
   if (step === 'otp') {
     return (
-      <OTPVerificationScreen
-        email={regEmail}
-        onVerified={handleAgentOtpVerified}
-        onBack={() => setStep('register')}
-      />
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-[420px] bg-white rounded-3xl border border-stone-200 shadow-sm p-8 sm:p-10">
+          <button
+            type="button"
+            onClick={() => setStep('register')}
+            className="flex items-center gap-1.5 text-[13px] text-stone-500 hover:text-stone-800 mb-8 transition-colors"
+          >
+            <ArrowLeft size={14} /> Back
+          </button>
+          <div className="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center mb-6">
+            <Mail size={26} className="text-blue-600" />
+          </div>
+          <h1 className="text-[28px] font-semibold tracking-[-0.5px] text-stone-900 leading-tight">
+            Check your email
+          </h1>
+          <p className="text-[15px] text-stone-600 mt-3 leading-relaxed">
+            We sent a confirmation link to{' '}
+            <span className="text-stone-900 font-medium">{regEmail}</span>. Click the link in the email to activate your account.
+          </p>
+          <p className="text-[13px] text-stone-400 mt-4">
+            Can't find it? Check your spam folder.
+          </p>
+          <Link
+            to="/agents/login"
+            className="mt-8 inline-flex items-center gap-1.5 text-[14px] text-blue-600 hover:text-blue-700 font-medium"
+          >
+            <ArrowLeft size={14} /> Back to login
+          </Link>
+        </div>
+      </div>
     );
   }
 
@@ -380,6 +373,21 @@ const AgentAuthPage = () => {
                       We'll send a confirmation link to this address before you continue.
                     </p>
                   )}
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">
+                    Password<span className="text-destructive">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    minLength={8}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="At least 8 characters"
+                    autoComplete="new-password"
+                    className={inputClass}
+                  />
                 </div>
                 <label className="flex items-start gap-2.5 cursor-pointer select-none">
                   <input

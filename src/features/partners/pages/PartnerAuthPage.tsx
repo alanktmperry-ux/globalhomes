@@ -6,6 +6,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { isDisposableEmail } from '@/shared/lib/disposableEmails';
 const partnerHero = 'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800&q=80';
 
 type Step = 'email' | 'password' | 'register';
@@ -25,6 +26,7 @@ const PartnerAuthPage = () => {
   const [registered, setRegistered] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [pendingSignIn, setPendingSignIn] = useState(false);
+  const [pendingSignup, setPendingSignup] = useState(false);
   const captchaRef = useRef<HCaptcha>(null);
   const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
 
@@ -49,6 +51,15 @@ const PartnerAuthPage = () => {
       handleSignIn({ preventDefault: () => {} } as React.FormEvent);
     }
   }, [pendingSignIn, captchaToken]);
+
+  // Auto-submit register after captcha verification
+  useEffect(() => {
+    if (pendingSignup && captchaToken && step === 'register') {
+      setPendingSignup(false);
+      handleRegister({ preventDefault: () => {} } as React.FormEvent);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingSignup, captchaToken]);
 
   const handleEmailContinue = (e: React.FormEvent) => {
     e.preventDefault();

@@ -269,6 +269,7 @@ function SearchRedirect() {
 function PropertyRedirect() {
   const { id } = useParams<{ id: string }>();
   return <Navigate to={`/properties/${id}`} replace />;
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -7,7 +7,7 @@ import { lovable } from '@/integrations/lovable/index';
 import { toast } from 'sonner';
 import seekerHero from '@/assets/seeker-auth-hero.jpg';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
-import OTPVerificationScreen from '@/features/auth/components/OTPVerificationScreen';
+import { ArrowLeft, Mail } from 'lucide-react';
 
 type Mode = 'signin' | 'signup';
 

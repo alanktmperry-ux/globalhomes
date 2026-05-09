@@ -9,6 +9,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { capture, identify } from '@/shared/lib/posthog';
 import { Mail, ArrowLeft } from 'lucide-react';
+import ResendConfirmationButton from '@/features/auth/components/ResendConfirmationButton';
 import agentAuthHero from '@/assets/agent-auth-hero.jpg';
 import { usePageTitle } from '@/lib/usePageTitle';
 

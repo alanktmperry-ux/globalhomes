@@ -88,45 +88,21 @@ const SeekerAuthPage = () => {
     if (!policyConsent) { setError('Please agree to the Privacy Policy and Terms of Service to continue.'); return; }
     setLoading(true);
     try {
-      const { error: otpErr } = await supabase.auth.signInWithOtp({
+      const { error: signUpErr } = await supabase.auth.signUp({
         email: email.trim().toLowerCase(),
-        options: { shouldCreateUser: true },
+        password,
+        options: {
+          emailRedirectTo: window.location.origin + '/auth/confirm',
+          data: { registered_as: 'seeker', display_name: displayName || undefined },
+        },
       });
-      if (otpErr) throw otpErr;
+      if (signUpErr) throw signUpErr;
       setPendingOtpEmail(email.trim().toLowerCase());
       setOtpStep(true);
     } catch (err) {
-      setError(getErrorMessage(err) || 'Could not send verification code. Please try again.');
+      setError(getErrorMessage(err) || 'Could not send confirmation email. Please try again.');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleSeekerOtpVerified = async () => {
-    try {
-      const { data: { user: u } } = await supabase.auth.getUser();
-      if (u) {
-        // Set password so user can sign in with email+password later
-        try {
-          await supabase.auth.updateUser({ password });
-        } catch { /* non-fatal */ }
-        try {
-          await supabase.from('profiles').upsert(
-            {
-              user_id: u.id,
-              terms_accepted_at: new Date().toISOString(),
-              terms_version: '1.0',
-              display_name: displayName || undefined,
-            } as any,
-            { onConflict: 'user_id' },
-          );
-        } catch { /* non-fatal */ }
-      }
-      toast.success('Account created — welcome to ListHQ!');
-      navigate('/onboarding/role', { replace: true });
-    } catch (err) {
-      toast.error('Account setup failed', { description: getErrorMessage(err) });
-      navigate('/onboarding/role', { replace: true });
     }
   };
 

@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import seekerHero from '@/assets/seeker-auth-hero.jpg';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { ArrowLeft, Mail } from 'lucide-react';
+import ResendConfirmationButton from '@/features/auth/components/ResendConfirmationButton';
 
 type Mode = 'signin' | 'signup';
 

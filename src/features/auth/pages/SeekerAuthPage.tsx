@@ -164,11 +164,36 @@ const SeekerAuthPage = () => {
 
   if (otpStep) {
     return (
-      <OTPVerificationScreen
-        email={pendingOtpEmail}
-        onVerified={handleSeekerOtpVerified}
-        onBack={() => setOtpStep(false)}
-      />
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-[420px] bg-white rounded-3xl border border-stone-200 shadow-sm p-8 sm:p-10">
+          <button
+            type="button"
+            onClick={() => setOtpStep(false)}
+            className="flex items-center gap-1.5 text-[13px] text-stone-500 hover:text-stone-800 mb-8 transition-colors"
+          >
+            <ArrowLeft size={14} /> Back
+          </button>
+          <div className="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center mb-6">
+            <Mail size={26} className="text-blue-600" />
+          </div>
+          <h1 className="text-[28px] font-semibold tracking-[-0.5px] text-stone-900 leading-tight">
+            Check your email
+          </h1>
+          <p className="text-[15px] text-stone-600 mt-3 leading-relaxed">
+            We sent a confirmation link to{' '}
+            <span className="text-stone-900 font-medium">{pendingOtpEmail}</span>. Click the link in the email to activate your account.
+          </p>
+          <p className="text-[13px] text-stone-400 mt-4">
+            Can't find it? Check your spam folder.
+          </p>
+          <Link
+            to="/login"
+            className="mt-8 inline-flex items-center gap-1.5 text-[14px] text-blue-600 hover:text-blue-700 font-medium"
+          >
+            <ArrowLeft size={14} /> Back to login
+          </Link>
+        </div>
+      </div>
     );
   }
 

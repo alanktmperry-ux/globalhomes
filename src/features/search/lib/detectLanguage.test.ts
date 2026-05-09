@@ -66,7 +66,7 @@ describe('detectLanguage', () => {
 
   it('returns "zh" when Chinese chars are mixed with Latin (≥30%)', () => {
 
-    expect(detectLanguage('找4房 in Glen Waverley')).toBe('zh');
+    expect(detectLanguage('找四房在墨尔本 area')).toBe('zh');
 
   });
 

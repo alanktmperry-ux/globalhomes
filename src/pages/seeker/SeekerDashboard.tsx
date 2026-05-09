@@ -24,7 +24,7 @@ export default function SeekerDashboard() {
   const [halos, setHalos] = useState<HaloRow[] | null>(null);
   const [unreadTotal, setUnreadTotal] = useState(0);
   const [filter, setFilter] = useState<'all' | 'buy' | 'rent'>('all');
-  const [profile, setProfile] = useState<{ first_name: string | null; full_name: string | null; language_preference: string | null } | null>(null);
+  const [profile, setProfile] = useState<{ first_name: string | null; full_name: string | null; display_name: string | null; language_preference: string | null } | null>(null);
   const [buyerIntent, setBuyerIntent] = useState<any | null>(null);
   const [matches, setMatches] = useState<any[]>([]);
 
@@ -34,7 +34,7 @@ export default function SeekerDashboard() {
     (async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('first_name, full_name, language_preference')
+        .select('first_name, full_name, display_name, language_preference')
         .eq('id', user.id)
         .maybeSingle();
       if (!cancelled) setProfile(data as any);
@@ -111,12 +111,10 @@ export default function SeekerDashboard() {
   if (!user) return <Navigate to="/login?return_to=/seeker/dashboard" replace />;
   if (isAgent || isAdmin || isPartner || isSupport) return <Navigate to="/" replace />;
 
-  const firstName = (user.user_metadata?.first_name as string)
-    ?? (user.user_metadata?.full_name as string)?.split(' ')[0]
-    ?? profile?.first_name
-    ?? profile?.full_name?.split(' ')[0]
-    ?? user.email?.split('@')[0]
-    ?? 'there';
+  const displayName = (user.user_metadata?.display_name as string)
+    || profile?.display_name
+    || (user.email ? user.email.split('@')[0] : null)
+    || 'there';
 
   const activeHalos = halos?.filter((h) => h.status === 'active') ?? [];
   const isNewUser = halos?.length === 0;

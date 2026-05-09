@@ -141,10 +141,22 @@ Deno.serve(async (req) => {
     });
   }
 
+  const ip = clientIp(req);
+  const ua = req.headers.get("user-agent");
+  const auditBlock = (reason: Reason, extra: Record<string, unknown> = {}) =>
+    logAuth({
+      event_type: REASON_TO_EVENT[reason],
+      email,
+      event_data: { role, ...extra },
+      ip,
+      user_agent: ua,
+    });
+
   // 1. hCaptcha
   const captchaOk = await verifyHCaptcha(hcaptchaToken);
   if (!captchaOk) {
     console.log(`[before-signup] captcha fail role=${role}`);
+    await auditBlock("invalid_captcha");
     return fail("invalid_captcha", cors);
   }
 
@@ -152,6 +164,7 @@ Deno.serve(async (req) => {
   const domain = email.split("@")[1] || "";
   if (disposableSet.has(domain)) {
     console.log(`[before-signup] disposable domain=${domain} role=${role}`);
+    await auditBlock("disposable_email", { domain });
     return fail("disposable_email", cors);
   }
 
@@ -160,9 +173,18 @@ Deno.serve(async (req) => {
     const breached = await isPasswordBreached(password);
     if (breached) {
       console.log(`[before-signup] breached password role=${role}`);
+      await auditBlock("breached_password");
       return fail("breached_password", cors);
     }
   }
+
+  await logAuth({
+    event_type: "signup_attempted",
+    email,
+    event_data: { role },
+    ip,
+    user_agent: ua,
+  });
 
   return new Response(JSON.stringify({ ok: true }), {
     status: 200,

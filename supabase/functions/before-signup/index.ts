@@ -44,6 +44,12 @@ function fail(reason: Reason, cors: Record<string, string>) {
   });
 }
 
+const REASON_TO_EVENT: Record<Reason, AuditEvent> = {
+  invalid_captcha: "signup_blocked_captcha",
+  disposable_email: "signup_blocked_disposable",
+  breached_password: "signup_blocked_breached_password",
+};
+
 async function sha1Hex(input: string): Promise<string> {
   const buf = await crypto.subtle.digest("SHA-1", new TextEncoder().encode(input));
   return Array.from(new Uint8Array(buf))

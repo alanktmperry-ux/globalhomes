@@ -7,6 +7,7 @@ import { useI18n } from '@/shared/lib/i18n';
 import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
 import { autocomplete } from '@/shared/lib/googleMapsService';
 import { useToast } from '@/shared/hooks/use-toast';
+import { detectLanguage } from '@/features/search/lib/detectLanguage';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;

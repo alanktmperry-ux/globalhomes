@@ -389,7 +389,7 @@ const PartnerAuthPage = () => {
                   <label className="text-sm font-medium text-foreground mb-1.5 block">
                     Password<span className="text-destructive">*</span>
                   </label>
-                  <input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
+                  <input type="password" required minLength={10} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 10 characters" className={inputClass} />
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   By registering you agree to the{' '}
@@ -397,6 +397,12 @@ const PartnerAuthPage = () => {
                   {' '}and{' '}
                   <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Privacy Policy</a>.
                 </p>
+                <HCaptcha
+                  sitekey={hcaptchaSiteKey}
+                  size="invisible"
+                  ref={captchaRef}
+                  onVerify={setCaptchaToken}
+                />
                 <button type="submit" disabled={loading} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {loading ? 'Registering…' : 'Register company'}
                 </button>

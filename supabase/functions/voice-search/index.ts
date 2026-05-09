@@ -28,27 +28,52 @@ Deno.serve(async (req) => {
       }
     }
 
-    // ── Required auth ──
+    // ── Optional auth (public endpoint) ──
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    let user: { id: string } | null = null;
+    if (authHeader?.startsWith("Bearer ")) {
+      const anonClient = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: authHeader } } }
       );
+      const { data: { user: u } } = await anonClient.auth.getUser();
+      if (u) user = { id: u.id };
     }
-    const anonClient = createClient(
+
+    // Public endpoint — IP rate-limit instead of auth (Phase 0 multilingual unauth flow)
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+      || req.headers.get('cf-connecting-ip')
+      || 'unknown';
+    const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
-    const { data: { user }, error: authErr } = await anonClient.auth.getUser();
-    if (authErr || !user) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    const nowMinuteBucket = Math.floor(Date.now() / 60000);
+    const nowDayBucket = Math.floor(Date.now() / 86400000);
+    const { count: minuteCount } = await supabaseAdmin
+      .from('api_usage_events')
+      .select('*', { count: 'exact', head: true })
+      .eq('action', 'voice_search')
+      .eq('metadata->>ip', ip)
+      .gte('created_at', new Date(nowMinuteBucket * 60000).toISOString());
+    if ((minuteCount ?? 0) >= 10) {
+      return new Response(JSON.stringify({ error: "Voice search rate limit exceeded — please try again shortly" }), {
+        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
-    const userId: string = user.id;
+    const { count: dayCount } = await supabaseAdmin
+      .from('api_usage_events')
+      .select('*', { count: 'exact', head: true })
+      .eq('action', 'voice_search')
+      .eq('metadata->>ip', ip)
+      .gte('created_at', new Date(nowDayBucket * 86400000).toISOString());
+    if ((dayCount ?? 0) >= 100) {
+      return new Response(JSON.stringify({ error: "Daily voice search limit reached — please sign in to continue" }), {
+        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const userId: string | null = user?.id ?? null;
 
     let transcript = rawTranscript || "";
     let detected_language = detectedLanguage || "en";

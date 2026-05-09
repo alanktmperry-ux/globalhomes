@@ -377,10 +377,10 @@ const SeekerAuthPage = () => {
                       <input
                         type="password"
                         required
-                        minLength={8}
+                        minLength={10}
                         value={password}
                         onChange={(e) => { setPassword(e.target.value); setError(null); }}
-                        placeholder="At least 8 characters"
+                        placeholder="At least 10 characters"
                         className={input}
                         autoComplete="new-password"
                       />
@@ -419,6 +419,13 @@ const SeekerAuthPage = () => {
                         {error}
                       </p>
                     )}
+
+                    <HCaptcha
+                      sitekey={hcaptchaSiteKey}
+                      size="invisible"
+                      ref={captchaRef}
+                      onVerify={setCaptchaToken}
+                    />
 
                     <button
                       type="submit"

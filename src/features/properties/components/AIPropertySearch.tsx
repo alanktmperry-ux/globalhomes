@@ -50,9 +50,11 @@ interface AIPropertySearchProps {
   /** When provided, shows a "Refine in filters" button that hands the parsed
    *  query off to the parent's filter UI. */
   onRefineWithFilters?: (parsed: ParsedFilters) => void;
+  listingType?: 'sale' | 'rent';
 }
 
-export function AIPropertySearch({ onRefineWithFilters }: AIPropertySearchProps = {}) {
+export function AIPropertySearch({ onRefineWithFilters, listingType = 'sale' }: AIPropertySearchProps = {}) {
+  const examplePrompts = listingType === 'rent' ? EXAMPLE_PROMPTS_RENT : EXAMPLE_PROMPTS_SALE;
   const { t, language } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth() ?? { user: null } as any;

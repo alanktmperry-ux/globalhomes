@@ -68,16 +68,12 @@ export default function AgencyOnboardingPage() {
   const [showPw, setShowPw] = useState(false);
   const [showConfirmPw, setShowConfirmPw] = useState(false);
 
-  // Detect if user signed up via email (needs password) vs OAuth
+  // Password is now always set during signup (email + password flow).
+  // The legacy "Create your password" pre-step is removed — verified agents land directly on the Welcome/Agency flow.
   useEffect(() => {
     if (!user) return;
-    const provider = user.app_metadata?.provider;
-    if (provider === 'google' || provider === 'apple') {
-      setNeedsPassword(false);
-      setPasswordDone(true);
-    } else {
-      setNeedsPassword(true);
-    }
+    setNeedsPassword(false);
+    setPasswordDone(true);
   }, [user]);
 
   // Password requirements

@@ -1,9 +1,8 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
-// One-shot bulk backfill. Idempotent — only processes listings where
-// translation_status = 'pending'. Safe to leave open: only effect is
-// generating missing translations.
+// Background bulk backfill. Returns immediately after kicking off the batch;
+// progress is observable via SQL on properties.translation_status.
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get("Origin"));
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -14,10 +13,10 @@ Deno.serve(async (req) => {
 
   const { data: pending, error: queryErr } = await supabase
     .from("properties")
-    .select("id, suburb, title")
+    .select("id, suburb")
     .eq("is_active", true)
     .eq("translation_status", "pending")
-    .limit(2);
+    .limit(15);
 
   if (queryErr) {
     return new Response(JSON.stringify({ error: queryErr.message }), {
@@ -25,41 +24,35 @@ Deno.serve(async (req) => {
     });
   }
 
-  const results: Array<{ id: string; suburb: string; status: string; error?: string }> = [];
+  const batch = pending || [];
 
-  for (const listing of (pending || [])) {
-    try {
-      const resp = await fetch(`${SUPABASE_URL}/functions/v1/generate-translations`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${SERVICE_ROLE}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ listing_id: listing.id }),
-      });
-      if (resp.ok) {
-        results.push({ id: listing.id, suburb: listing.suburb, status: "ok" });
-      } else {
-        const errBody = await resp.text();
-        results.push({ id: listing.id, suburb: listing.suburb, status: "fail", error: errBody.slice(0, 200) });
+  // Run in the background so we can return immediately
+  const work = (async () => {
+    for (const listing of batch) {
+      try {
+        await fetch(`${SUPABASE_URL}/functions/v1/generate-translations`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${SERVICE_ROLE}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ listing_id: listing.id }),
+        });
+      } catch (e) {
+        console.error("backfill listing failed", listing.id, e);
       }
       await new Promise(r => setTimeout(r, 200));
-    } catch (e) {
-      results.push({ id: listing.id, suburb: listing.suburb, status: "exception", error: String(e).slice(0, 200) });
     }
+  })();
+
+  // @ts-ignore — EdgeRuntime is provided by Supabase
+  if (typeof EdgeRuntime !== "undefined" && EdgeRuntime.waitUntil) {
+    // @ts-ignore
+    EdgeRuntime.waitUntil(work);
   }
 
-  const { count: remaining } = await supabase
-    .from("properties")
-    .select("*", { count: "exact", head: true })
-    .eq("is_active", true)
-    .eq("translation_status", "pending");
-
   return new Response(JSON.stringify({
-    processed: results.length,
-    ok: results.filter(r => r.status === "ok").length,
-    failed: results.filter(r => r.status !== "ok").length,
-    remaining: remaining ?? 0,
-    results,
+    queued: batch.length,
+    listing_ids: batch.map(l => l.id),
   }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
 });

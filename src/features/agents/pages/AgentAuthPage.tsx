@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { capture, identify } from '@/shared/lib/posthog';
-import OTPVerificationScreen from '@/features/auth/components/OTPVerificationScreen';
+import { Mail, ArrowLeft } from 'lucide-react';
 import agentAuthHero from '@/assets/agent-auth-hero.jpg';
 import { usePageTitle } from '@/lib/usePageTitle';
 

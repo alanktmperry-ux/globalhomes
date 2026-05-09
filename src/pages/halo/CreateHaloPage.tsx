@@ -184,6 +184,19 @@ export default function CreateHaloPage() {
         });
       } catch { /* non-fatal */ }
 
+      // Touch 3 — first_halo welcome email (only the first one)
+      try {
+        const { count } = await supabase
+          .from('halos' as any)
+          .select('id', { count: 'exact', head: true })
+          .eq('seeker_id', user.id);
+        if (count === 1) {
+          supabase.functions.invoke('send-welcome-email', {
+            body: { user_id: user.id, category: 'first_halo' },
+          }).catch(() => { /* non-fatal */ });
+        }
+      } catch { /* non-fatal */ }
+
       // Save buyer's preferred language to profile for auto-language on property pages
       const LANG_TO_I18N: Record<string, string> = {
         mandarin: 'zh-CN',

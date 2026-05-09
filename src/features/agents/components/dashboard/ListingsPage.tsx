@@ -158,6 +158,28 @@ function StatusMenu({
     } else {
       onStatusChange(listing.id, newStatus);
       toast.success('Listing status updated');
+
+      // Touch 3 — first_listing welcome (fires on first publish only)
+      if (newStatus === 'public') {
+        (async () => {
+          try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+            const { data: agentRow } = await supabase
+              .from('agents' as any).select('id').eq('user_id', user.id).maybeSingle();
+            const agentId = (agentRow as any)?.id;
+            if (!agentId) return;
+            const { count } = await supabase
+              .from('properties').select('id', { count: 'exact', head: true })
+              .eq('agent_id', agentId).eq('status', 'public');
+            if (count === 1) {
+              supabase.functions.invoke('send-welcome-email', {
+                body: { user_id: user.id, category: 'first_listing' },
+              }).catch(() => { /* non-fatal */ });
+            }
+          } catch { /* non-fatal */ }
+        })();
+      }
     }
     setSaving(false);
   }

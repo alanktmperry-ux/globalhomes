@@ -205,6 +205,13 @@ export function AIPropertySearch({ onRefineWithFilters }: AIPropertySearchProps 
         </div>
       )}
 
+      {!loading && properties && properties.length > 0 && language !== 'en' && (
+        <div className="text-xs text-muted-foreground flex items-center gap-1.5 mb-2">
+          <Sparkles className="h-3 w-3 text-primary" />
+          <span>{t('Listings translated by AI — click any listing to see the original')}</span>
+        </div>
+      )}
+
       {!loading && properties && properties.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {properties.map((property, index) => {

@@ -235,6 +235,17 @@ Return valid JSON only, no markdown, no code fences.`,
       console.error("Supabase insert error:", error);
     }
 
+    // Log usage for rate limiter
+    if (searchRecord?.id) {
+      await supabaseAdmin.from('api_usage_events').insert({
+        service: 'voice_search',
+        action: 'voice_search',
+        units: 1,
+        cost_estimate: 0,
+        metadata: { ip, has_user_id: !!userId, audio_duration: audioDuration || 0, detected_language },
+      });
+    }
+
     // Fire concierge in the background
     if (searchRecord?.id) {
       const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;

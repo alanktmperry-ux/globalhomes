@@ -172,11 +172,8 @@ Deno.serve(async (req) => {
       console.error("Failed to parse intent JSON", e);
     }
 
-    // 2. Query properties using extracted filters
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    // 2. Query properties using extracted filters (reuse supabaseAdmin)
+    const supabase = supabaseAdmin;
 
     let q = supabase
       .from("properties")

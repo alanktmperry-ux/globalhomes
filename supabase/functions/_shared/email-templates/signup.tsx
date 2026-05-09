@@ -32,7 +32,6 @@ export const SignupEmail = ({
     <Preview>Welcome to {siteName} — confirm your email</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Text style={brand}>ListHQ</Text>
         <Heading style={h1}>Welcome to {siteName}</Heading>
         <Text style={text}>
           You're moments away from joining Australia's multilingual property platform.

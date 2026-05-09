@@ -17,7 +17,7 @@ const corsHeaders = {
 }
 
 const EMAIL_SUBJECTS: Record<string, string> = {
-  signup: 'Confirm your email',
+  signup: 'Welcome to ListHQ — confirm your email',
   invite: "You've been invited",
   magiclink: 'Your login link',
   recovery: 'Reset your password',
@@ -36,10 +36,10 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "listhq"
-const SENDER_DOMAIN = "notify.listhq.com.au"
-const ROOT_DOMAIN = "listhq.com.au"
-const FROM_DOMAIN = "notify.listhq.com.au" // Domain shown in From address (may be root or sender subdomain)
+const SITE_NAME = 'ListHQ'
+const SENDER_DOMAIN = 'listhq.com.au'
+const ROOT_DOMAIN = 'listhq.com.au'
+const FROM_ADDRESS = 'ListHQ <hello@listhq.com.au>'
 
 // Sample data for preview mode ONLY (not used in actual email sending).
 // URLs are baked in at scaffold time from the project's real data.
@@ -250,6 +250,13 @@ async function handleWebhook(req: Request): Promise<Response> {
     template_name: emailType,
     recipient_email: payload.data.email,
     status: 'pending',
+    metadata: {
+      from: FROM_ADDRESS,
+      sender_domain: SENDER_DOMAIN,
+      run_id,
+      email_type: emailType,
+      source: 'auth-email-hook',
+    },
   })
 
   const { error: enqueueError } = await supabase.rpc('enqueue_email', {
@@ -258,7 +265,7 @@ async function handleWebhook(req: Request): Promise<Response> {
       run_id,
       message_id: messageId,
       to: payload.data.email,
-      from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+      from: FROM_ADDRESS,
       sender_domain: SENDER_DOMAIN,
       subject: EMAIL_SUBJECTS[emailType] || 'Notification',
       html,
@@ -270,13 +277,20 @@ async function handleWebhook(req: Request): Promise<Response> {
   })
 
   if (enqueueError) {
-    console.error('Failed to enqueue auth email', { error: enqueueError, run_id, emailType })
+    console.error('Failed to enqueue auth email', { error: enqueueError, run_id, emailType, from: FROM_ADDRESS })
     await supabase.from('email_send_log').insert({
       message_id: messageId,
       template_name: emailType,
       recipient_email: payload.data.email,
       status: 'failed',
       error_message: 'Failed to enqueue email',
+      metadata: {
+        from: FROM_ADDRESS,
+        sender_domain: SENDER_DOMAIN,
+        run_id,
+        email_type: emailType,
+        source: 'auth-email-hook',
+      },
     })
     return new Response(JSON.stringify({ error: 'Failed to enqueue email' }), {
       status: 500,
@@ -284,7 +298,7 @@ async function handleWebhook(req: Request): Promise<Response> {
     })
   }
 
-  console.log('Auth email enqueued', { emailType, email: payload.data.email, run_id })
+  console.log('Auth email enqueued', { emailType, email: payload.data.email, run_id, from: FROM_ADDRESS, sender_domain: SENDER_DOMAIN, messageId })
 
   return new Response(
     JSON.stringify({ success: true, queued: true }),

@@ -18,6 +18,10 @@ const AuthConfirmPage = () => {
       supabase.functions.invoke('send-welcome-email', {
         body: { user_id: uid, category: 'verified' },
       }).catch(() => { /* non-fatal */ });
+      // Audit log: signup_verified
+      supabase.functions.invoke('log-auth-event', {
+        body: { event_type: 'signup_verified' },
+      }).catch(() => { /* non-fatal */ });
     };
 
     const routeUser = async (userId: string) => {

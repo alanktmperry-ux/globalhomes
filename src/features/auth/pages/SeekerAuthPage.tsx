@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
@@ -9,6 +10,7 @@ import seekerHero from '@/assets/seeker-auth-hero.jpg';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { ArrowLeft, Mail } from 'lucide-react';
 import ResendConfirmationButton from '@/features/auth/components/ResendConfirmationButton';
+import { isDisposableEmail } from '@/shared/lib/disposableEmails';
 
 type Mode = 'signin' | 'signup';
 
@@ -27,6 +29,19 @@ const SeekerAuthPage = () => {
   const [pendingOAuthProvider, setPendingOAuthProvider] = useState<'google' | 'apple' | null>(null);
   const [otpStep, setOtpStep] = useState(false);
   const [pendingOtpEmail, setPendingOtpEmail] = useState('');
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [pendingSignup, setPendingSignup] = useState(false);
+  const captchaRef = useRef<HCaptcha>(null);
+  const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
+
+  // Auto-resubmit signup once the invisible captcha resolves a token.
+  useEffect(() => {
+    if (pendingSignup && captchaToken) {
+      setPendingSignup(false);
+      handleSignUp({ preventDefault: () => {} } as React.FormEvent);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingSignup, captchaToken]);
 
   // Bug Fix 1: password reset emails redirect to /login. If we land here with a
   // recovery token in the URL hash, forward to /reset-password preserving the hash

@@ -333,6 +333,19 @@ Deno.serve(async (req) => {
       console.error("activity insert failed", e);
     }
 
+    // 5. Log to api_usage_events for rate-limit counting
+    try {
+      await supabaseAdmin.from('api_usage_events').insert({
+        service: 'ai_property_search',
+        action: 'ai_property_search',
+        units: 1,
+        cost_estimate: 0,
+        metadata: { ip, has_buyer_id: !!buyer_id, query_length: query.length },
+      });
+    } catch (e) {
+      console.error("api_usage_events insert failed", e);
+    }
+
     return new Response(
       JSON.stringify({
         properties: properties ?? [],

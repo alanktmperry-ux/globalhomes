@@ -185,6 +185,10 @@ Deno.serve(async (req) => {
       role = 'partner';
       const { data: partnerRow } = await admin.from('partners' as any).select('partner_type').eq('user_id', user_id).maybeSingle();
       partnerType = (partnerRow as any)?.partner_type;
+      if (!partnerType) {
+        const { data: brokerRow } = await admin.from('brokers' as any).select('id').eq('auth_user_id', user_id).maybeSingle();
+        if (brokerRow) partnerType = 'mortgage_broker';
+      }
     } else {
       role = normalizeRole((target.user_metadata as any)?.registered_as);
     }

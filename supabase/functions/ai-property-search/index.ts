@@ -56,24 +56,39 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    // ── Auth check ──
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+    // Public endpoint — rate-limit by IP to prevent abuse
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+      || req.headers.get('cf-connecting-ip')
+      || 'unknown';
+    const nowMinuteBucket = Math.floor(Date.now() / 60000);
+    const nowDayBucket = Math.floor(Date.now() / 86400000);
+
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    const { count: minuteCount } = await supabaseAdmin
+      .from('api_usage_events')
+      .select('*', { count: 'exact', head: true })
+      .eq('action', 'ai_property_search')
+      .eq('metadata->>ip', ip)
+      .gte('created_at', new Date(nowMinuteBucket * 60000).toISOString());
+    if ((minuteCount ?? 0) >= 20) {
+      return new Response(JSON.stringify({ error: "Rate limit exceeded — please try again shortly" }), {
+        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const authClient = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-    const { data: userData, error: userErr } = await authClient.auth.getUser();
-    if (userErr || !userData?.user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+
+    const { count: dayCount } = await supabaseAdmin
+      .from('api_usage_events')
+      .select('*', { count: 'exact', head: true })
+      .eq('action', 'ai_property_search')
+      .eq('metadata->>ip', ip)
+      .gte('created_at', new Date(nowDayBucket * 86400000).toISOString());
+    if ((dayCount ?? 0) >= 300) {
+      return new Response(JSON.stringify({ error: "Daily search limit reached — please sign in to continue" }), {
+        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 

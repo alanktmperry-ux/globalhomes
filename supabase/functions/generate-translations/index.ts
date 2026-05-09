@@ -7,6 +7,39 @@ const MODEL = "google/gemini-2.5-pro";
 
 let corsHeaders: Record<string, string> = getCorsHeaders(null);
 
+async function checkIpRateLimit(
+  supabaseAdmin: ReturnType<typeof createClient>,
+  ip: string,
+  action: string,
+  maxPerMinute: number,
+  maxPerDay: number
+): Promise<{ allowed: boolean; reason?: string }> {
+  const nowMinuteBucket = Math.floor(Date.now() / 60000);
+  const nowDayBucket = Math.floor(Date.now() / 86400000);
+
+  const { count: minuteCount } = await supabaseAdmin
+    .from('api_usage_events')
+    .select('*', { count: 'exact', head: true })
+    .eq('action', action)
+    .eq('metadata->>ip', ip)
+    .gte('created_at', new Date(nowMinuteBucket * 60000).toISOString());
+  if ((minuteCount ?? 0) >= maxPerMinute) {
+    return { allowed: false, reason: 'minute_limit' };
+  }
+
+  const { count: dayCount } = await supabaseAdmin
+    .from('api_usage_events')
+    .select('*', { count: 'exact', head: true })
+    .eq('action', action)
+    .eq('metadata->>ip', ip)
+    .gte('created_at', new Date(nowDayBucket * 86400000).toISOString());
+  if ((dayCount ?? 0) >= maxPerDay) {
+    return { allowed: false, reason: 'day_limit' };
+  }
+
+  return { allowed: true };
+}
+
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,

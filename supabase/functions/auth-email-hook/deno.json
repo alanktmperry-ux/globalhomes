@@ -1,5 +1,5 @@
 {
   "imports": {
-    "@lovable.dev/webhooks-js": "npm:@lovable.dev/webhooks-js@^0.1.0"
+    "@lovable.dev/webhooks-js": "npm:@lovable.dev/webhooks-js@0.0.1"
   }
 }

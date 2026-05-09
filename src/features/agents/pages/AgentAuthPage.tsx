@@ -9,6 +9,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { capture, identify } from '@/shared/lib/posthog';
 import { Mail, ArrowLeft } from 'lucide-react';
+import ResendConfirmationButton from '@/features/auth/components/ResendConfirmationButton';
 import agentAuthHero from '@/assets/agent-auth-hero.jpg';
 import { usePageTitle } from '@/lib/usePageTitle';
 
@@ -215,6 +216,9 @@ const AgentAuthPage = () => {
           <p className="text-[13px] text-stone-400 mt-4">
             Can't find it? Check your spam folder.
           </p>
+          <div>
+            <ResendConfirmationButton email={regEmail} />
+          </div>
           <Link
             to="/agents/login"
             className="mt-8 inline-flex items-center gap-1.5 text-[14px] text-blue-600 hover:text-blue-700 font-medium"

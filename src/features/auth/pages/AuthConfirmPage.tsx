@@ -21,10 +21,19 @@ const AuthConfirmPage = () => {
           return;
         }
         const role = (user.user_metadata as { registered_as?: string } | null)?.registered_as;
+        // SECURITY: user_metadata is client-controlled and must NEVER be trusted to grant roles.
+        // We only use it as a routing hint. The actual user_role is granted server-side
+        // (e.g. when the agent completes onboarding and an agent row is created).
         if (role === 'agent') {
           try {
             await supabase.from('profiles').upsert(
-              { user_id: user.id, user_role: 'agent' as any, onboarded: false } as any,
+              {
+                user_id: user.id,
+                terms_accepted_at: new Date().toISOString(),
+                terms_version: '1.0',
+                pending_role_request: 'agent',
+                onboarded: false,
+              } as any,
               { onConflict: 'user_id' },
             );
           } catch { /* non-fatal */ }

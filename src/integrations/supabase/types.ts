@@ -9040,6 +9040,7 @@ export type Database = {
           description_ar: string | null
           description_ja: string | null
           description_ko: string | null
+          description_search_vector: unknown
           description_vi: string | null
           description_zh: string | null
           description_zh_tw: string | null
@@ -9198,6 +9199,7 @@ export type Database = {
           description_ar?: string | null
           description_ja?: string | null
           description_ko?: string | null
+          description_search_vector?: unknown
           description_vi?: string | null
           description_zh?: string | null
           description_zh_tw?: string | null
@@ -9356,6 +9358,7 @@ export type Database = {
           description_ar?: string | null
           description_ja?: string | null
           description_ko?: string | null
+          description_search_vector?: unknown
           description_vi?: string | null
           description_zh?: string | null
           description_zh_tw?: string | null
@@ -15419,6 +15422,7 @@ export type Database = {
               description_ar: string | null
               description_ja: string | null
               description_ko: string | null
+              description_search_vector: unknown
               description_vi: string | null
               description_zh: string | null
               description_zh_tw: string | null
@@ -15592,6 +15596,7 @@ export type Database = {
               description_ar: string | null
               description_ja: string | null
               description_ko: string | null
+              description_search_vector: unknown
               description_vi: string | null
               description_zh: string | null
               description_zh_tw: string | null

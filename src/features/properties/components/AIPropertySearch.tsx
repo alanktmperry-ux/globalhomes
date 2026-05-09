@@ -94,6 +94,7 @@ export function AIPropertySearch({ onRefineWithFilters, listingType = 'sale' }: 
           query: searchQuery,
           session_id: getSessionId(),
           buyer_id: user?.id ?? undefined,
+          listing_type: listingType === 'rent' ? 'rent' : undefined,
         },
       });
       if (error) {

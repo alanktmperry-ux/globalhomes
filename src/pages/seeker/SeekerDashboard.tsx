@@ -147,7 +147,7 @@ export default function SeekerDashboard() {
         {/* Greeting */}
         <header className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-[#1E293B]">
-            {isNewUser ? `Welcome, ${firstName} 👋` : `Welcome back, ${firstName} 👋`}
+            {isNewUser ? `Welcome, ${displayName} 👋` : `Welcome back, ${displayName} 👋`}
           </h1>
           <p className="text-[#64748B] mt-1 text-sm sm:text-base">Here's everything happening with your property search.</p>
         </header>

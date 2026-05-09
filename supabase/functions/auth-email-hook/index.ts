@@ -9,6 +9,7 @@
 
 import "../_shared/email-footer.ts";
 import { Webhook } from "@lovable.dev/webhooks-js";
+import { logAuth, clientIp } from "../_shared/audit.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const FROM_ADDRESS = Deno.env.get("EMAIL_FROM") || "ListHQ <hello@listhq.com.au>";

@@ -374,6 +374,21 @@ const AgentAuthPage = () => {
                     </p>
                   )}
                 </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">
+                    Password<span className="text-destructive">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    minLength={8}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="At least 8 characters"
+                    autoComplete="new-password"
+                    className={inputClass}
+                  />
+                </div>
                 <label className="flex items-start gap-2.5 cursor-pointer select-none">
                   <input
                     type="checkbox"

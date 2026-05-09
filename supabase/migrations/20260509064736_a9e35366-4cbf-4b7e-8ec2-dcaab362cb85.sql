@@ -1,0 +1,1 @@
+UPDATE auth.users SET email_confirmed_at = NOW() WHERE email = 'alanktmperry+seeker1@gmail.com';

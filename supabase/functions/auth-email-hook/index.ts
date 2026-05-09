@@ -9,6 +9,7 @@
 
 import "../_shared/email-footer.ts";
 import { Webhook } from "@lovable.dev/webhooks-js";
+import { logAuth, clientIp } from "../_shared/audit.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const FROM_ADDRESS = Deno.env.get("EMAIL_FROM") || "ListHQ <hello@listhq.com.au>";
@@ -309,6 +310,24 @@ Deno.serve(async (req) => {
       `auth-email-hook sent ${email_action_type} (role=${role}) to ${email} (resend id=${result?.id})`,
     );
 
+    // Audit log: map action to event type
+    const evtMap: Record<string, "signup_succeeded" | "password_reset_requested" | "email_changed" | null> = {
+      signup: "signup_succeeded",
+      recovery: "password_reset_requested",
+      email_change: "email_changed",
+      email_change_new: "email_changed",
+      email_change_current: "email_changed",
+    };
+    const evt = evtMap[email_action_type] ?? null;
+    if (evt) {
+      await logAuth({
+        event_type: evt,
+        email,
+        event_data: { action_type: email_action_type, role, message_id: result?.id ?? null },
+        ip: clientIp(req),
+        user_agent: req.headers.get("user-agent"),
+      });
+    }
     return new Response(JSON.stringify({ success: true, id: result?.id }), {
       status: 200,
       headers: { "Content-Type": "application/json" },

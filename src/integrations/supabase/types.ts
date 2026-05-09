@@ -2159,6 +2159,39 @@ export type Database = {
         }
         Relationships: []
       }
+      auth_audit_log: {
+        Row: {
+          created_at: string
+          email: string | null
+          event_data: Json | null
+          event_type: string
+          id: string
+          ip: unknown
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          ip?: unknown
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          ip?: unknown
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       automation_log: {
         Row: {
           action_taken: string | null
@@ -8883,6 +8916,9 @@ export type Database = {
           bio: string | null
           created_at: string
           display_name: string | null
+          email_bounce_reason: string | null
+          email_delivery_status: string | null
+          email_last_event_at: string | null
           email_unsubscribed: boolean
           email_unsubscribed_at: string | null
           full_name: string | null
@@ -8912,6 +8948,9 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          email_bounce_reason?: string | null
+          email_delivery_status?: string | null
+          email_last_event_at?: string | null
           email_unsubscribed?: boolean
           email_unsubscribed_at?: string | null
           full_name?: string | null
@@ -8941,6 +8980,9 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          email_bounce_reason?: string | null
+          email_delivery_status?: string | null
+          email_last_event_at?: string | null
           email_unsubscribed?: boolean
           email_unsubscribed_at?: string | null
           full_name?: string | null

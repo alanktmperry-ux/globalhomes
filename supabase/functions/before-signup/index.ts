@@ -5,6 +5,7 @@
 // hash leave this function (k-anonymity range API to pwnedpasswords.com).
 
 import disposableDomains from "./disposable-domains.json" with { type: "json" };
+import { logAuth, clientIp, type AuditEvent } from "../_shared/audit.ts";
 
 const HCAPTCHA_SECRET = Deno.env.get("HCAPTCHA_SECRET_KEY") || "";
 
@@ -42,6 +43,12 @@ function fail(reason: Reason, cors: Record<string, string>) {
     headers: { ...cors, "Content-Type": "application/json" },
   });
 }
+
+const REASON_TO_EVENT: Record<Reason, AuditEvent> = {
+  invalid_captcha: "signup_blocked_captcha",
+  disposable_email: "signup_blocked_disposable",
+  breached_password: "signup_blocked_breached_password",
+};
 
 async function sha1Hex(input: string): Promise<string> {
   const buf = await crypto.subtle.digest("SHA-1", new TextEncoder().encode(input));
@@ -134,10 +141,22 @@ Deno.serve(async (req) => {
     });
   }
 
+  const ip = clientIp(req);
+  const ua = req.headers.get("user-agent");
+  const auditBlock = (reason: Reason, extra: Record<string, unknown> = {}) =>
+    logAuth({
+      event_type: REASON_TO_EVENT[reason],
+      email,
+      event_data: { role, ...extra },
+      ip,
+      user_agent: ua,
+    });
+
   // 1. hCaptcha
   const captchaOk = await verifyHCaptcha(hcaptchaToken);
   if (!captchaOk) {
     console.log(`[before-signup] captcha fail role=${role}`);
+    await auditBlock("invalid_captcha");
     return fail("invalid_captcha", cors);
   }
 
@@ -145,6 +164,7 @@ Deno.serve(async (req) => {
   const domain = email.split("@")[1] || "";
   if (disposableSet.has(domain)) {
     console.log(`[before-signup] disposable domain=${domain} role=${role}`);
+    await auditBlock("disposable_email", { domain });
     return fail("disposable_email", cors);
   }
 
@@ -153,9 +173,18 @@ Deno.serve(async (req) => {
     const breached = await isPasswordBreached(password);
     if (breached) {
       console.log(`[before-signup] breached password role=${role}`);
+      await auditBlock("breached_password");
       return fail("breached_password", cors);
     }
   }
+
+  await logAuth({
+    event_type: "signup_attempted",
+    email,
+    event_data: { role },
+    ip,
+    user_agent: ua,
+  });
 
   return new Response(JSON.stringify({ ok: true }), {
     status: 200,

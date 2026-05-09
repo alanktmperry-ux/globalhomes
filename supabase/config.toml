@@ -111,3 +111,10 @@ verify_jwt = false
 
 [functions.reset-demo-user]
 verify_jwt = false
+
+[functions.resend-webhook]
+verify_jwt = false
+
+[functions.log-auth-event]
+verify_jwt = false
+

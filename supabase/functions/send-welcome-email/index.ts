@@ -195,7 +195,8 @@ Deno.serve(async (req) => {
 
     const c = content(category, role, partnerType);
     const token = await buildUnsubscribeToken(user_id, 'welcome');
-    const unsubscribeLink = `${APP_URL}/unsubscribe?t=${token}`;
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
+    const unsubscribeLink = `${SUPABASE_URL}/functions/v1/unsubscribe?t=${token}`;
     const ctaLink = c.ctaPath ? `${APP_URL}${c.ctaPath}` : undefined;
 
     const rendered = renderEmail({

@@ -265,7 +265,7 @@ Return ONLY valid JSON.`;
   });
 }
 
-async function handleSearchTranslation(searchQuery: string) {
+async function handleSearchTranslation(searchQuery: string, ip: string) {
   const systemPrompt = `You are a multilingual search query translator for an Australian real estate platform. Detect the input language, translate to English, and identify search intent. Return valid JSON only.`;
 
   const userPrompt = `Translate this property search query to English and analyse it:
@@ -280,6 +280,14 @@ Return JSON with:
 Return ONLY valid JSON.`;
 
   const result = await callAI(systemPrompt, userPrompt);
+
+  await logApiUsage({
+    service: 'gemini',
+    action: 'translate_search',
+    units: 1,
+    cost_estimate: 0,
+    metadata: { ip, query_length: searchQuery.length, detected_language: result.detected_language },
+  });
 
   return jsonResponse({
     english_query: result.english_query,

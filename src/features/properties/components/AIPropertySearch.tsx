@@ -253,7 +253,7 @@ export function AIPropertySearch({ onRefineWithFilters, listingType = 'sale' }: 
             {t('No exact matches — try describing the lifestyle instead of just the specs')}
           </p>
           <div className="flex flex-wrap justify-center gap-2">
-            {EXAMPLE_PROMPTS.map(p => (
+            {examplePrompts.map((p: string) => (
               <button
                 key={p}
                 onClick={() => { setQuery(p); runSearch(p); }}

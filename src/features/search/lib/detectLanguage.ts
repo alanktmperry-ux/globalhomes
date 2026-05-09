@@ -8,6 +8,8 @@ const RANGES: Array<{ lang: Exclude<DetectedLanguage, 'en' | 'unknown'>; re: Reg
   { lang: 'th', re: /[\u0e00-\u0e7f]/g },
 ];
 
+const NON_LATIN_THRESHOLD = 0.3;
+
 export function detectLanguage(input: string): DetectedLanguage {
   if (!input || !input.trim()) return 'unknown';
 
@@ -22,5 +24,5 @@ export function detectLanguage(input: string): DetectedLanguage {
     if (ratio > best.ratio) best = { lang, ratio };
   }
 
-  return best.ratio >= 0.1 ? best.lang : 'en';
+  return best.ratio >= NON_LATIN_THRESHOLD ? best.lang : 'en';
 }

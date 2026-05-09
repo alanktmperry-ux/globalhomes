@@ -68,7 +68,9 @@ export function AIPropertySearch({ onRefineWithFilters }: AIPropertySearchProps 
       // natural-language query to English first so the AI search edge function
       // (which expects English suburb/property-type extraction) gets clean input.
       let searchQuery = q;
-      if (language !== 'en') {
+      const detectedLang = detectLanguage(q);
+      const shouldTranslate = detectedLang !== 'en' && detectedLang !== 'unknown';
+      if (shouldTranslate) {
         try {
           const { englishQuery } = await translateSearchQuery(q);
           if (englishQuery && englishQuery.trim()) searchQuery = englishQuery;

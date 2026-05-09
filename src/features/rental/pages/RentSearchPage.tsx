@@ -67,7 +67,10 @@ export default function RentSearchPage() {
           </p>
         </div>
 
-        {/* Mobile: filter sheet trigger */}
+        {/* AI-powered rental search (multilingual) */}
+        <AIPropertySearch listingType="rent" />
+
+
         <div className="md:hidden flex items-center gap-2">
           <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
             <SheetTrigger asChild>

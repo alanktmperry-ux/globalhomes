@@ -12,6 +12,7 @@ import { Mail, ArrowLeft } from 'lucide-react';
 import ResendConfirmationButton from '@/features/auth/components/ResendConfirmationButton';
 import agentAuthHero from '@/assets/agent-auth-hero.jpg';
 import { usePageTitle } from '@/lib/usePageTitle';
+import { isDisposableEmail } from '@/shared/lib/disposableEmails';
 
 type Step = 'email' | 'password' | 'register' | 'otp';
 
@@ -30,6 +31,7 @@ const AgentAuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [pendingSignIn, setPendingSignIn] = useState(false);
+  const [pendingSignup, setPendingSignup] = useState(false);
   const [dataLocationConsent, setDataLocationConsent] = useState(false);
   const [policyConsent, setPolicyConsent] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -69,6 +71,15 @@ const AgentAuthPage = () => {
       handleSignIn({ preventDefault: () => {} } as React.FormEvent);
     }
   }, [pendingSignIn, captchaToken]);
+
+  // Auto-submit signup after captcha verification
+  useEffect(() => {
+    if (pendingSignup && captchaToken && step === 'register') {
+      setPendingSignup(false);
+      handleEmailSubmit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingSignup, captchaToken]);
 
   // Redirect already-authenticated agents straight to the dashboard
   useEffect(() => {

@@ -119,14 +119,44 @@ const PartnerAuthPage = () => {
       toast.error('Please fill in all required fields');
       return;
     }
+    if (password.length < 10) {
+      toast.error('Password must be at least 10 characters.');
+      return;
+    }
+    const cleanEmail = email.trim().toLowerCase();
+    if (isDisposableEmail(cleanEmail)) {
+      toast.error('Disposable or temporary email addresses are not accepted. Please use a real email.');
+      return;
+    }
+    if (!captchaToken) {
+      setPendingSignup(true);
+      captchaRef.current?.execute();
+      return;
+    }
     setLoading(true);
     try {
+      const { data: gate, error: gateErr } = await supabase.functions.invoke('before-signup', {
+        body: { email: cleanEmail, password, role: 'partner', hcaptchaToken: captchaToken },
+      });
+      if (gateErr || !gate?.ok) {
+        const messages: Record<string, string> = {
+          invalid_captcha: 'Captcha verification failed. Please refresh and try again.',
+          disposable_email: 'Disposable or temporary email addresses are not accepted. Please use a real email.',
+          breached_password: 'This password appears in known data breaches. For security, please choose a different one.',
+        };
+        toast.error(messages[gate?.reason] || 'Signup failed. Please try again or contact support.');
+        setCaptchaToken(null);
+        captchaRef.current?.resetCaptcha();
+        setLoading(false);
+        return;
+      }
       const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
+        email: cleanEmail,
         password,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { display_name: contactName },
+          captchaToken,
+          data: { display_name: contactName, registered_as: 'partner' },
         },
       });
       if (signUpError) throw signUpError;
@@ -136,7 +166,7 @@ const PartnerAuthPage = () => {
         body: {
           companyName,
           contactName,
-          contactEmail: email,
+          contactEmail: cleanEmail,
           contactPhone: phone || null,
           abn: abn || null,
           website: website || null,
@@ -158,8 +188,11 @@ const PartnerAuthPage = () => {
       setRegistered(true);
     } catch (err: unknown) {
       toast.error(getErrorMessage(err));
+    } finally {
+      setCaptchaToken(null);
+      captchaRef.current?.resetCaptcha();
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   if (registered) {

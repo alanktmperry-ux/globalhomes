@@ -22,5 +22,5 @@ export function detectLanguage(input: string): DetectedLanguage {
     if (ratio > best.ratio) best = { lang, ratio };
   }
 
-  return best.ratio >= 0.3 ? best.lang : 'en';
+  return best.ratio >= 0.1 ? best.lang : 'en';
 }

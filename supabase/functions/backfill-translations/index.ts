@@ -26,9 +26,10 @@ Deno.serve(async (req) => {
 
   const batch = pending || [];
 
-  // Run in the background so we can return immediately
+  // Fan out all listings in parallel — each generate-translations call is its
+  // own independent edge invocation, so we don't block on any of them.
   const work = (async () => {
-    for (const listing of batch) {
+    await Promise.allSettled(batch.map(async (listing) => {
       try {
         await fetch(`${SUPABASE_URL}/functions/v1/generate-translations`, {
           method: "POST",
@@ -41,8 +42,7 @@ Deno.serve(async (req) => {
       } catch (e) {
         console.error("backfill listing failed", listing.id, e);
       }
-      await new Promise(r => setTimeout(r, 200));
-    }
+    }));
   })();
 
   // @ts-ignore — EdgeRuntime is provided by Supabase

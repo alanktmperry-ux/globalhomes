@@ -10,7 +10,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { audio, mimeType, transcript: rawTranscript, detectedLanguage, userLocation, sessionId, audioDuration } = body;
+    const { audio, mimeType, transcript: rawTranscript, detectedLanguage, userLocation, sessionId, audioDuration, language_hint } = body;
 
     // ── Input validation ──
     if (audio && typeof audio === "string") {

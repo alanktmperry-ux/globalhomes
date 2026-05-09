@@ -13504,6 +13504,30 @@ export type Database = {
           },
         ]
       }
+      unsubscribes: {
+        Row: {
+          category: string
+          email: string
+          id: string
+          unsubscribed_at: string
+          user_id: string | null
+        }
+        Insert: {
+          category: string
+          email: string
+          id?: string
+          unsubscribed_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          email?: string
+          id?: string
+          unsubscribed_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_preferences: {
         Row: {
           budget_max: number | null

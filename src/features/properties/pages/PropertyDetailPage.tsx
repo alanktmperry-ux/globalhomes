@@ -192,42 +192,6 @@ export default function PropertyDetailPage() {
 
       // Demo placeholders shown on homepage when DB has 0 residential listings.
       if (id.startsWith('placeholder-')) {
-        const p1Images = [
-          'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600210492493-0946911123ea?w=1200&q=80&auto=format&fit=crop',
-        ];
-        const p2Images = [
-          'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1200&q=80&auto=format&fit=crop',
-        ];
-        const p3Images = [
-          'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=1200&q=80&auto=format&fit=crop',
-        ];
-        const p4Images = [
-          'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600573472556-e636c2acda88?w=1200&q=80&auto=format&fit=crop',
-        ];
-        const p5Images = [
-          'https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=1200&q=80&auto=format&fit=crop',
-        ];
-        const p6Images = [
-          'https://images.unsplash.com/photo-1597047084897-51e81819a499?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=80&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1600210491369-e753d80a41f3?w=1200&q=80&auto=format&fit=crop',
-        ];
         const DEMO_PROPERTIES: Record<string, any> = {
           'placeholder-1': {
             id: 'placeholder-1',
@@ -235,7 +199,7 @@ export default function PropertyDetailPage() {
             address: '14 Maple Street, Auburn NSW 2144',
             suburb: 'Auburn', state: 'NSW', country: 'Australia',
             price: 1200000, beds: 4, baths: 2, parking: 2, sqm: 480,
-            images: p1Images, image_url: p1Images[0],
+            images: [], image_url: '',
             description: 'A beautifully presented family home in the heart of Auburn. Four generous bedrooms, two modern bathrooms, double garage, and a north-facing backyard perfect for entertaining. Walking distance to Auburn Station, Auburn Public School, and the bustling shopping district.',
             property_type: 'House',
             features: ['Air conditioning', 'Solar panels', 'North-facing backyard', 'Double garage', 'Modern kitchen', 'Walk-in wardrobe'],
@@ -250,7 +214,7 @@ export default function PropertyDetailPage() {
             address: '8/22 Box Hill Road, Box Hill VIC 3128',
             suburb: 'Box Hill', state: 'VIC', country: 'Australia',
             price: 680000, beds: 2, baths: 1, parking: 1, sqm: 78,
-            images: p2Images, image_url: p2Images[0],
+            images: [], image_url: '',
             description: 'Stylish two-bedroom apartment in the heart of Box Hill. Open-plan living, modern kitchen with stone benchtops, secure parking, and balcony with city views. Steps from Box Hill Central, Box Hill Station, and the vibrant Asian dining precinct.',
             property_type: 'Apartment',
             features: ['City views', 'Stone benchtops', 'Secure parking', 'Balcony', 'Built-in wardrobes', 'Lift access'],
@@ -265,7 +229,7 @@ export default function PropertyDetailPage() {
             address: '3 Oak Lane, Doncaster VIC 3108',
             suburb: 'Doncaster', state: 'VIC', country: 'Australia',
             price: 895000, beds: 3, baths: 2, parking: 1, sqm: 220,
-            images: p3Images, image_url: p3Images[0],
+            images: [], image_url: '',
             description: 'Architecturally designed townhouse in family-friendly Doncaster. Three spacious bedrooms, two bathrooms plus powder room, double-height living area, private courtyard. Catchment for Doncaster Primary and Doncaster Secondary College. Close to Westfield Doncaster and Eastern Freeway.',
             property_type: 'Townhouse',
             features: ['Architect designed', 'Double-height ceilings', 'Private courtyard', 'Powder room', 'European appliances', 'Floor heating'],
@@ -280,7 +244,7 @@ export default function PropertyDetailPage() {
             address: '12 Harbour Crescent, Mosman NSW 2088',
             suburb: 'Mosman', state: 'NSW', country: 'Australia',
             price: 4250000, beds: 5, baths: 4, parking: 3, sqm: 720,
-            images: p4Images, image_url: p4Images[0],
+            images: [], image_url: '',
             description: 'Architecturally renowned five-bedroom residence with panoramic Sydney Harbour views. Soaring ceilings, four bathrooms, three-car garage, infinity pool, and landscaped gardens. Walking distance to Balmoral Beach and Mosman Junction. Once-in-a-generation address.',
             property_type: 'House',
             features: ['Harbour views', 'Infinity pool', '3-car garage', 'Wine cellar', 'Smart home automation', 'Landscaped gardens'],
@@ -295,7 +259,7 @@ export default function PropertyDetailPage() {
             address: '27 Springfield Avenue, Glen Waverley VIC 3150',
             suburb: 'Glen Waverley', state: 'VIC', country: 'Australia',
             price: 1650000, beds: 4, baths: 3, parking: 2, sqm: 560,
-            images: p5Images, image_url: p5Images[0],
+            images: [], image_url: '',
             description: "Generously proportioned family home in the heart of Glen Waverley's coveted Glen Waverley Secondary College catchment. Four bedrooms plus study, three bathrooms, formal and informal living, large backyard. Walking distance to Glen Waverley Station, The Glen Shopping Centre, and Brentwood Reserve.",
             property_type: 'House',
             features: ['GWSC school zone', 'Study', 'Two living areas', 'Ducted heating & cooling', 'Solar panels', 'Established gardens'],
@@ -310,7 +274,7 @@ export default function PropertyDetailPage() {
             address: '14 Albert Road, Strathfield NSW 2135',
             suburb: 'Strathfield', state: 'NSW', country: 'Australia',
             price: 1395000, beds: 3, baths: 2, parking: 2, sqm: 240,
-            images: p6Images, image_url: p6Images[0],
+            images: [], image_url: '',
             description: 'Striking modern townhouse moments from Strathfield Station. Three bedrooms, two bathrooms, double garage, private rooftop terrace with city views. Premium European appliances, oak floors, secure intercom entry. Catchment for Strathfield Public and Homebush Boys.',
             property_type: 'Townhouse',
             features: ['Rooftop terrace', 'City views', 'Double garage', 'European appliances', 'Oak floors', 'Intercom security'],

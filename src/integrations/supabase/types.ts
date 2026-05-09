@@ -8890,6 +8890,7 @@ export type Database = {
           language_preference: string | null
           onboarded: boolean | null
           onboarding_steps_completed: Json | null
+          pending_role_request: string | null
           phone: string | null
           pre_approval_amount: number | null
           pre_approval_expiry: string | null
@@ -8918,6 +8919,7 @@ export type Database = {
           language_preference?: string | null
           onboarded?: boolean | null
           onboarding_steps_completed?: Json | null
+          pending_role_request?: string | null
           phone?: string | null
           pre_approval_amount?: number | null
           pre_approval_expiry?: string | null
@@ -8946,6 +8948,7 @@ export type Database = {
           language_preference?: string | null
           onboarded?: boolean | null
           onboarding_steps_completed?: Json | null
+          pending_role_request?: string | null
           phone?: string | null
           pre_approval_amount?: number | null
           pre_approval_expiry?: string | null

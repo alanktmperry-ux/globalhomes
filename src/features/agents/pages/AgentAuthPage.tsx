@@ -12,6 +12,7 @@ import { Mail, ArrowLeft } from 'lucide-react';
 import ResendConfirmationButton from '@/features/auth/components/ResendConfirmationButton';
 import agentAuthHero from '@/assets/agent-auth-hero.jpg';
 import { usePageTitle } from '@/lib/usePageTitle';
+import { isDisposableEmail } from '@/shared/lib/disposableEmails';
 
 type Step = 'email' | 'password' | 'register' | 'otp';
 
@@ -30,6 +31,7 @@ const AgentAuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [pendingSignIn, setPendingSignIn] = useState(false);
+  const [pendingSignup, setPendingSignup] = useState(false);
   const [dataLocationConsent, setDataLocationConsent] = useState(false);
   const [policyConsent, setPolicyConsent] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -69,6 +71,15 @@ const AgentAuthPage = () => {
       handleSignIn({ preventDefault: () => {} } as React.FormEvent);
     }
   }, [pendingSignIn, captchaToken]);
+
+  // Auto-submit signup after captcha verification
+  useEffect(() => {
+    if (pendingSignup && captchaToken && step === 'register') {
+      setPendingSignup(false);
+      handleEmailSubmit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingSignup, captchaToken]);
 
   // Redirect already-authenticated agents straight to the dashboard
   useEffect(() => {
@@ -120,8 +131,8 @@ const AgentAuthPage = () => {
       setEmailError('Enter a valid email (e.g. name@agency.com.au)');
       return;
     }
-    if (password.length < 8) {
-      toast.error('Password must be at least 8 characters.');
+    if (password.length < 10) {
+      toast.error('Password must be at least 10 characters.');
       return;
     }
     if (!dataLocationConsent) {
@@ -132,14 +143,39 @@ const AgentAuthPage = () => {
       toast.error('Please agree to the Privacy Policy and Terms of Service to continue.');
       return;
     }
-    const cleaned = regEmail.trim().toLowerCase();
+    const cleaned = trimmed.toLowerCase();
+    if (isDisposableEmail(cleaned)) {
+      toast.error('Disposable or temporary email addresses are not accepted. Please use a real email.');
+      return;
+    }
+    if (!captchaToken) {
+      setPendingSignup(true);
+      captchaRef.current?.execute();
+      return;
+    }
     setEmailSubmitting(true);
     try {
+      const { data: gate, error: gateErr } = await supabase.functions.invoke('before-signup', {
+        body: { email: cleaned, password, role: 'agent', hcaptchaToken: captchaToken },
+      });
+      if (gateErr || !gate?.ok) {
+        const messages: Record<string, string> = {
+          invalid_captcha: 'Captcha verification failed. Please refresh and try again.',
+          disposable_email: 'Disposable or temporary email addresses are not accepted. Please use a real email.',
+          breached_password: 'This password appears in known data breaches. For security, please choose a different one.',
+        };
+        toast.error(messages[gate?.reason] || 'Signup failed. Please try again or contact support.');
+        setCaptchaToken(null);
+        captchaRef.current?.resetCaptcha();
+        setEmailSubmitting(false);
+        return;
+      }
       const { error: signUpErr } = await supabase.auth.signUp({
         email: cleaned,
         password,
         options: {
           emailRedirectTo: window.location.origin + '/auth/confirm',
+          captchaToken,
           data: { registered_as: 'agent', registration_started: true },
         },
       });
@@ -152,6 +188,8 @@ const AgentAuthPage = () => {
       toast.error(getErrorMessage(err) || 'Failed to send confirmation email. Please try again.');
     } finally {
       setEmailSubmitting(false);
+      setCaptchaToken(null);
+      captchaRef.current?.resetCaptcha();
     }
   };
 
@@ -385,10 +423,10 @@ const AgentAuthPage = () => {
                   <input
                     type="password"
                     required
-                    minLength={8}
+                    minLength={10}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="At least 8 characters"
+                    placeholder="At least 10 characters"
                     autoComplete="new-password"
                     className={inputClass}
                   />
@@ -439,6 +477,13 @@ const AgentAuthPage = () => {
                     ))}
                   </div>
                 </div>
+
+                <HCaptcha
+                  sitekey={hcaptchaSiteKey}
+                  size="invisible"
+                  ref={captchaRef}
+                  onVerify={setCaptchaToken}
+                />
 
                 <button type="submit" disabled={emailSubmitting || !(dataLocationConsent && policyConsent)} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {emailSubmitting ? 'Sending confirmation...' : 'Continue — confirm my email'}

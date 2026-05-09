@@ -6,6 +6,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { isDisposableEmail } from '@/shared/lib/disposableEmails';
 const partnerHero = 'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800&q=80';
 
 type Step = 'email' | 'password' | 'register';
@@ -25,6 +26,7 @@ const PartnerAuthPage = () => {
   const [registered, setRegistered] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [pendingSignIn, setPendingSignIn] = useState(false);
+  const [pendingSignup, setPendingSignup] = useState(false);
   const captchaRef = useRef<HCaptcha>(null);
   const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
 
@@ -49,6 +51,15 @@ const PartnerAuthPage = () => {
       handleSignIn({ preventDefault: () => {} } as React.FormEvent);
     }
   }, [pendingSignIn, captchaToken]);
+
+  // Auto-submit register after captcha verification
+  useEffect(() => {
+    if (pendingSignup && captchaToken && step === 'register') {
+      setPendingSignup(false);
+      handleRegister({ preventDefault: () => {} } as React.FormEvent);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingSignup, captchaToken]);
 
   const handleEmailContinue = (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,14 +119,44 @@ const PartnerAuthPage = () => {
       toast.error('Please fill in all required fields');
       return;
     }
+    if (password.length < 10) {
+      toast.error('Password must be at least 10 characters.');
+      return;
+    }
+    const cleanEmail = email.trim().toLowerCase();
+    if (isDisposableEmail(cleanEmail)) {
+      toast.error('Disposable or temporary email addresses are not accepted. Please use a real email.');
+      return;
+    }
+    if (!captchaToken) {
+      setPendingSignup(true);
+      captchaRef.current?.execute();
+      return;
+    }
     setLoading(true);
     try {
+      const { data: gate, error: gateErr } = await supabase.functions.invoke('before-signup', {
+        body: { email: cleanEmail, password, role: 'partner', hcaptchaToken: captchaToken },
+      });
+      if (gateErr || !gate?.ok) {
+        const messages: Record<string, string> = {
+          invalid_captcha: 'Captcha verification failed. Please refresh and try again.',
+          disposable_email: 'Disposable or temporary email addresses are not accepted. Please use a real email.',
+          breached_password: 'This password appears in known data breaches. For security, please choose a different one.',
+        };
+        toast.error(messages[gate?.reason] || 'Signup failed. Please try again or contact support.');
+        setCaptchaToken(null);
+        captchaRef.current?.resetCaptcha();
+        setLoading(false);
+        return;
+      }
       const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
+        email: cleanEmail,
         password,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { display_name: contactName },
+          captchaToken,
+          data: { display_name: contactName, registered_as: 'partner' },
         },
       });
       if (signUpError) throw signUpError;
@@ -125,7 +166,7 @@ const PartnerAuthPage = () => {
         body: {
           companyName,
           contactName,
-          contactEmail: email,
+          contactEmail: cleanEmail,
           contactPhone: phone || null,
           abn: abn || null,
           website: website || null,
@@ -147,8 +188,11 @@ const PartnerAuthPage = () => {
       setRegistered(true);
     } catch (err: unknown) {
       toast.error(getErrorMessage(err));
+    } finally {
+      setCaptchaToken(null);
+      captchaRef.current?.resetCaptcha();
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   if (registered) {
@@ -345,7 +389,7 @@ const PartnerAuthPage = () => {
                   <label className="text-sm font-medium text-foreground mb-1.5 block">
                     Password<span className="text-destructive">*</span>
                   </label>
-                  <input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
+                  <input type="password" required minLength={10} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 10 characters" className={inputClass} />
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   By registering you agree to the{' '}
@@ -353,6 +397,12 @@ const PartnerAuthPage = () => {
                   {' '}and{' '}
                   <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Privacy Policy</a>.
                 </p>
+                <HCaptcha
+                  sitekey={hcaptchaSiteKey}
+                  size="invisible"
+                  ref={captchaRef}
+                  onVerify={setCaptchaToken}
+                />
                 <button type="submit" disabled={loading} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {loading ? 'Registering…' : 'Register company'}
                 </button>

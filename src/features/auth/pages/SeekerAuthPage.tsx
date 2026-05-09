@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
@@ -9,6 +10,7 @@ import seekerHero from '@/assets/seeker-auth-hero.jpg';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { ArrowLeft, Mail } from 'lucide-react';
 import ResendConfirmationButton from '@/features/auth/components/ResendConfirmationButton';
+import { isDisposableEmail } from '@/shared/lib/disposableEmails';
 
 type Mode = 'signin' | 'signup';
 
@@ -27,6 +29,19 @@ const SeekerAuthPage = () => {
   const [pendingOAuthProvider, setPendingOAuthProvider] = useState<'google' | 'apple' | null>(null);
   const [otpStep, setOtpStep] = useState(false);
   const [pendingOtpEmail, setPendingOtpEmail] = useState('');
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [pendingSignup, setPendingSignup] = useState(false);
+  const captchaRef = useRef<HCaptcha>(null);
+  const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
+
+  // Auto-resubmit signup once the invisible captcha resolves a token.
+  useEffect(() => {
+    if (pendingSignup && captchaToken) {
+      setPendingSignup(false);
+      handleSignUp({ preventDefault: () => {} } as React.FormEvent);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingSignup, captchaToken]);
 
   // Bug Fix 1: password reset emails redirect to /login. If we land here with a
   // recovery token in the URL hash, forward to /reset-password preserving the hash
@@ -84,26 +99,53 @@ const SeekerAuthPage = () => {
     e.preventDefault();
     setError(null);
     if (!email.trim()) { setError('Email is required.'); return; }
-    if (password.length < 8) { setError('Password must be at least 8 characters.'); return; }
+    if (password.length < 10) { setError('Password must be at least 10 characters.'); return; }
     if (!dataLocationConsent) { setError('Please acknowledge where your data is stored to continue.'); return; }
     if (!policyConsent) { setError('Please agree to the Privacy Policy and Terms of Service to continue.'); return; }
+    const cleanEmail = email.trim().toLowerCase();
+    if (isDisposableEmail(cleanEmail)) {
+      setError('Disposable or temporary email addresses are not accepted. Please use a real email.');
+      return;
+    }
+    if (!captchaToken) {
+      setPendingSignup(true);
+      captchaRef.current?.execute();
+      return;
+    }
     setLoading(true);
     try {
+      const { data: gate, error: gateErr } = await supabase.functions.invoke('before-signup', {
+        body: { email: cleanEmail, password, role: 'seeker', hcaptchaToken: captchaToken },
+      });
+      if (gateErr || !gate?.ok) {
+        const messages: Record<string, string> = {
+          invalid_captcha: 'Captcha verification failed. Please refresh and try again.',
+          disposable_email: 'Disposable or temporary email addresses are not accepted. Please use a real email.',
+          breached_password: 'This password appears in known data breaches. For security, please choose a different one.',
+        };
+        setError(messages[gate?.reason] || 'Signup failed. Please try again or contact support.');
+        setCaptchaToken(null);
+        captchaRef.current?.resetCaptcha();
+        return;
+      }
       const { error: signUpErr } = await supabase.auth.signUp({
-        email: email.trim().toLowerCase(),
+        email: cleanEmail,
         password,
         options: {
           emailRedirectTo: window.location.origin + '/auth/confirm',
+          captchaToken,
           data: { registered_as: 'seeker', display_name: displayName || undefined },
         },
       });
       if (signUpErr) throw signUpErr;
-      setPendingOtpEmail(email.trim().toLowerCase());
+      setPendingOtpEmail(cleanEmail);
       setOtpStep(true);
     } catch (err) {
       setError(getErrorMessage(err) || 'Could not send confirmation email. Please try again.');
     } finally {
       setLoading(false);
+      setCaptchaToken(null);
+      captchaRef.current?.resetCaptcha();
     }
   };
 
@@ -335,10 +377,10 @@ const SeekerAuthPage = () => {
                       <input
                         type="password"
                         required
-                        minLength={8}
+                        minLength={10}
                         value={password}
                         onChange={(e) => { setPassword(e.target.value); setError(null); }}
-                        placeholder="At least 8 characters"
+                        placeholder="At least 10 characters"
                         className={input}
                         autoComplete="new-password"
                       />
@@ -377,6 +419,13 @@ const SeekerAuthPage = () => {
                         {error}
                       </p>
                     )}
+
+                    <HCaptcha
+                      sitekey={hcaptchaSiteKey}
+                      size="invisible"
+                      ref={captchaRef}
+                      onVerify={setCaptchaToken}
+                    />
 
                     <button
                       type="submit"

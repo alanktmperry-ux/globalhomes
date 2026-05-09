@@ -5,6 +5,7 @@
 // hash leave this function (k-anonymity range API to pwnedpasswords.com).
 
 import disposableDomains from "./disposable-domains.json" with { type: "json" };
+import { logAuth, clientIp, type AuditEvent } from "../_shared/audit.ts";
 
 const HCAPTCHA_SECRET = Deno.env.get("HCAPTCHA_SECRET_KEY") || "";
 

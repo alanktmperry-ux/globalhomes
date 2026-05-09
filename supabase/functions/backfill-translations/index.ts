@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
         const errBody = await resp.text();
         results.push({ id: listing.id, suburb: listing.suburb, status: "fail", error: errBody.slice(0, 200) });
       }
-      await new Promise(r => setTimeout(r, 600));
+      await new Promise(r => setTimeout(r, 200));
     } catch (e) {
       results.push({ id: listing.id, suburb: listing.suburb, status: "exception", error: String(e).slice(0, 200) });
     }

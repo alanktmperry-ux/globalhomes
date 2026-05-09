@@ -29,9 +29,15 @@ async function sendEmail(apiKey: string, intendedTo: string, subject: string, ht
 async function ensureDemoAuthUser(supabase: any, email: string, fullName?: string) {
   const normalizedEmail = email.trim().toLowerCase();
 
-  // Use getUserByEmail instead of full-table scan (fix #6)
-  const { data: userData, error: getUserErr } = await supabase.auth.admin.getUserByEmail(normalizedEmail);
-  let authUser = getUserErr ? null : userData?.user || null;
+  // supabase-js v2 has no getUserByEmail — use listUsers and filter by email.
+  // Page through results so we don't miss the user once the project grows past one page.
+  let authUser: any = null;
+  for (let page = 1; page <= 20 && !authUser; page++) {
+    const { data: list, error: listErr } = await supabase.auth.admin.listUsers({ page, perPage: 1000 });
+    if (listErr) break;
+    authUser = list?.users?.find((u: any) => (u.email || "").toLowerCase() === normalizedEmail) || null;
+    if (!list?.users || list.users.length < 1000) break;
+  }
 
   if (!authUser) {
     const { data: created, error: createErr } = await supabase.auth.admin.createUser({

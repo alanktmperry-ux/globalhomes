@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { translateSearchQuery } from '@/features/properties/lib/translationService';
 import { parsePropertyQuery, filtersToChips, type ParsedFilters } from '@/features/search/lib/parsePropertyQuery';
+import { detectLanguage } from '@/features/search/lib/detectLanguage';
 import { SlidersHorizontal } from 'lucide-react';
 
 const EXAMPLE_PROMPTS = [

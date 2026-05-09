@@ -77,7 +77,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { query, session_id, buyer_id } = await req.json();
+    const body = await req.json();
+    const { query, session_id, buyer_id } = body;
+    const listingTypeFilter = body.listing_type === 'rent' ? 'rent' : null;
 
     if (!query || typeof query !== "string" || query.trim().length === 0) {
       return new Response(JSON.stringify({ error: "query is required" }), {

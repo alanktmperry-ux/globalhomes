@@ -171,6 +171,17 @@ export default function AdminBrokers() {
     } else {
       toast.success(`Broker approved — login link sent to ${broker.email}`);
     }
+
+    // Touch 3 — partner_approved welcome email (broker variant)
+    try {
+      const authUserId = (broker as any).auth_user_id;
+      if (authUserId) {
+        supabase.functions.invoke('send-welcome-email', {
+          body: { user_id: authUserId, category: 'partner_approved' },
+        }).catch(() => { /* non-fatal */ });
+      }
+    } catch { /* non-fatal */ }
+
     setBusyId(null);
     fetchAll();
   };

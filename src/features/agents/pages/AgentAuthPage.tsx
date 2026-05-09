@@ -131,8 +131,8 @@ const AgentAuthPage = () => {
       setEmailError('Enter a valid email (e.g. name@agency.com.au)');
       return;
     }
-    if (password.length < 8) {
-      toast.error('Password must be at least 8 characters.');
+    if (password.length < 10) {
+      toast.error('Password must be at least 10 characters.');
       return;
     }
     if (!dataLocationConsent) {
@@ -143,14 +143,39 @@ const AgentAuthPage = () => {
       toast.error('Please agree to the Privacy Policy and Terms of Service to continue.');
       return;
     }
-    const cleaned = regEmail.trim().toLowerCase();
+    const cleaned = trimmed.toLowerCase();
+    if (isDisposableEmail(cleaned)) {
+      toast.error('Disposable or temporary email addresses are not accepted. Please use a real email.');
+      return;
+    }
+    if (!captchaToken) {
+      setPendingSignup(true);
+      captchaRef.current?.execute();
+      return;
+    }
     setEmailSubmitting(true);
     try {
+      const { data: gate, error: gateErr } = await supabase.functions.invoke('before-signup', {
+        body: { email: cleaned, password, role: 'agent', hcaptchaToken: captchaToken },
+      });
+      if (gateErr || !gate?.ok) {
+        const messages: Record<string, string> = {
+          invalid_captcha: 'Captcha verification failed. Please refresh and try again.',
+          disposable_email: 'Disposable or temporary email addresses are not accepted. Please use a real email.',
+          breached_password: 'This password appears in known data breaches. For security, please choose a different one.',
+        };
+        toast.error(messages[gate?.reason] || 'Signup failed. Please try again or contact support.');
+        setCaptchaToken(null);
+        captchaRef.current?.resetCaptcha();
+        setEmailSubmitting(false);
+        return;
+      }
       const { error: signUpErr } = await supabase.auth.signUp({
         email: cleaned,
         password,
         options: {
           emailRedirectTo: window.location.origin + '/auth/confirm',
+          captchaToken,
           data: { registered_as: 'agent', registration_started: true },
         },
       });
@@ -163,6 +188,8 @@ const AgentAuthPage = () => {
       toast.error(getErrorMessage(err) || 'Failed to send confirmation email. Please try again.');
     } finally {
       setEmailSubmitting(false);
+      setCaptchaToken(null);
+      captchaRef.current?.resetCaptcha();
     }
   };
 

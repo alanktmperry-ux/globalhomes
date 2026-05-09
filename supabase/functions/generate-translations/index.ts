@@ -7,6 +7,39 @@ const MODEL = "google/gemini-2.5-pro";
 
 let corsHeaders: Record<string, string> = getCorsHeaders(null);
 
+async function checkIpRateLimit(
+  supabaseAdmin: ReturnType<typeof createClient>,
+  ip: string,
+  action: string,
+  maxPerMinute: number,
+  maxPerDay: number
+): Promise<{ allowed: boolean; reason?: string }> {
+  const nowMinuteBucket = Math.floor(Date.now() / 60000);
+  const nowDayBucket = Math.floor(Date.now() / 86400000);
+
+  const { count: minuteCount } = await supabaseAdmin
+    .from('api_usage_events')
+    .select('*', { count: 'exact', head: true })
+    .eq('action', action)
+    .eq('metadata->>ip', ip)
+    .gte('created_at', new Date(nowMinuteBucket * 60000).toISOString());
+  if ((minuteCount ?? 0) >= maxPerMinute) {
+    return { allowed: false, reason: 'minute_limit' };
+  }
+
+  const { count: dayCount } = await supabaseAdmin
+    .from('api_usage_events')
+    .select('*', { count: 'exact', head: true })
+    .eq('action', action)
+    .eq('metadata->>ip', ip)
+    .gte('created_at', new Date(nowDayBucket * 86400000).toISOString());
+  if ((dayCount ?? 0) >= maxPerDay) {
+    return { allowed: false, reason: 'day_limit' };
+  }
+
+  return { allowed: true };
+}
+
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -232,7 +265,7 @@ Return ONLY valid JSON.`;
   });
 }
 
-async function handleSearchTranslation(searchQuery: string) {
+async function handleSearchTranslation(searchQuery: string, ip: string) {
   const systemPrompt = `You are a multilingual search query translator for an Australian real estate platform. Detect the input language, translate to English, and identify search intent. Return valid JSON only.`;
 
   const userPrompt = `Translate this property search query to English and analyse it:
@@ -247,6 +280,14 @@ Return JSON with:
 Return ONLY valid JSON.`;
 
   const result = await callAI(systemPrompt, userPrompt);
+
+  await logApiUsage({
+    service: 'gemini',
+    action: 'translate_search',
+    units: 1,
+    cost_estimate: 0,
+    metadata: { ip, query_length: searchQuery.length, detected_language: result.detected_language },
+  });
 
   return jsonResponse({
     english_query: result.english_query,
@@ -263,7 +304,25 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // --- Authentication check ---
+    const body = await req.json();
+
+    // PUBLIC PATH: translate_search is unauthenticated but rate-limited per IP
+    if (body.type === "translate_search" && body.search_query) {
+      const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+        || req.headers.get('cf-connecting-ip')
+        || 'unknown';
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      );
+      const rate = await checkIpRateLimit(supabaseAdmin, ip, 'translate_search', 10, 200);
+      if (!rate.allowed) {
+        return jsonResponse({ error: `Rate limit exceeded (${rate.reason}). Please try again shortly.` }, 429);
+      }
+      return await handleSearchTranslation(body.search_query, ip);
+    }
+
+    // --- Authentication check (required for all other modes) ---
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return jsonResponse({ error: "Authentication required" }, 401);
@@ -279,13 +338,6 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "Unauthorized" }, 401);
     }
     // --- End authentication check ---
-
-    const body = await req.json();
-
-    if (body.type === "translate_search" && body.search_query) {
-      // Any authenticated user can translate search queries
-      return await handleSearchTranslation(body.search_query);
-    }
 
     if (body.type === "translate_template" && typeof body.source_text === "string") {
       // Translate a message-template body (and optional subject) into agent CRM languages.

@@ -423,10 +423,10 @@ const AgentAuthPage = () => {
                   <input
                     type="password"
                     required
-                    minLength={8}
+                    minLength={10}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="At least 8 characters"
+                    placeholder="At least 10 characters"
                     autoComplete="new-password"
                     className={inputClass}
                   />
@@ -477,6 +477,13 @@ const AgentAuthPage = () => {
                     ))}
                   </div>
                 </div>
+
+                <HCaptcha
+                  sitekey={hcaptchaSiteKey}
+                  size="invisible"
+                  ref={captchaRef}
+                  onVerify={setCaptchaToken}
+                />
 
                 <button type="submit" disabled={emailSubmitting || !(dataLocationConsent && policyConsent)} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
                   {emailSubmitting ? 'Sending confirmation...' : 'Continue — confirm my email'}

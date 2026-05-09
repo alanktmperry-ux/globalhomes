@@ -167,9 +167,14 @@ Deno.serve(async (req) => {
       .from("properties")
       .select(PROPERTIES_WITH_AGENTS)
       .eq("is_active", true)
-      .not("listing_type", "eq", "rent")
       .order("created_at", { ascending: false })
       .limit(60);
+
+    if (listingTypeFilter === 'rent') {
+      q = q.eq('listing_type', 'rent');
+    } else {
+      q = q.not('listing_type', 'eq', 'rent');
+    }
 
     // Build a single OR group for (suburb matches OR property_type matches),
     // which is then ANDed with price/bedroom filters by PostgREST.
@@ -192,23 +197,55 @@ Deno.serve(async (req) => {
     if (intent.bedrooms) q = q.gte("beds", intent.bedrooms);
     if (intent.bathrooms) q = q.gte("baths", intent.bathrooms);
 
-    let { data: properties, error: propErr } = await q;
-    if (propErr) {
-      console.error("Property query error", propErr);
+    // Build FTS terms from features + lifestyle_keywords (soft-boost, not hard filter)
+    const ftsTerms: string[] = [];
+    if (Array.isArray(intent.features)) {
+      for (const f of intent.features.slice(0, 10)) {
+        const clean = String(f).replace(/[^\w\s-]/g, '').trim();
+        if (clean && clean.length > 1) ftsTerms.push(clean);
+      }
     }
+    if (Array.isArray(intent.lifestyle_keywords)) {
+      for (const l of intent.lifestyle_keywords.slice(0, 5)) {
+        const clean = String(l).replace(/[^\w\s-]/g, '').trim();
+        if (clean && clean.length > 1) ftsTerms.push(clean);
+      }
+    }
+
+    // Phase 0 strategy: run a primary FTS-boosted query AND a fallback query in parallel.
+    // Merge results so feature-matched listings appear first, but the user always sees results.
+    let { data: primary, error: primaryErr } = await q;
+    if (primaryErr) console.error('Primary query error', primaryErr);
+
+    let ftsBoosted: any[] = [];
+    if (ftsTerms.length > 0 && (primary?.length ?? 0) > 0) {
+      const ftsQuery = ftsTerms.map(t => t.split(/\s+/).join(' & ')).join(' | ');
+      const ftsIds = primary!.map((p: any) => p.id);
+      const { data: ftsData, error: ftsErr } = await supabase
+        .from('properties')
+        .select(PROPERTIES_WITH_AGENTS)
+        .in('id', ftsIds)
+        .textSearch('description_search_vector', ftsQuery, { type: 'websearch' });
+      if (!ftsErr && ftsData) {
+        ftsBoosted = ftsData;
+      } else if (ftsErr) {
+        console.error('FTS boost query error', ftsErr);
+      }
+    }
+
+    // Merge: FTS-matched first, then remaining primary results
+    const ftsIdSet = new Set(ftsBoosted.map(p => p.id));
+    const remaining = (primary ?? []).filter((p: any) => !ftsIdSet.has(p.id));
+    let properties: any[] = [...ftsBoosted, ...remaining];
     console.log(
       "properties result:",
       JSON.stringify({
-        count: properties?.length ?? 0,
+        count: properties.length,
+        fts_boosted: ftsBoosted.length,
+        fts_terms: ftsTerms,
         suburbs_extracted: intent.suburbs,
         property_types_extracted: intent.property_types,
         or_filter: orParts.join(","),
-        first_three: (properties ?? []).slice(0, 3).map((p: any) => ({
-          id: p.id,
-          suburb: p.suburb,
-          property_type: p.property_type,
-          beds: p.beds,
-        })),
       })
     );
 

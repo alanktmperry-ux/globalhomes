@@ -133,8 +133,8 @@ export function AiPicksSection({
       >
         <div className="flex items-center gap-2 mb-1.5">
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10">
-            <Sparkles size={14} className="text-primary" />
-            <span className="text-sm font-display font-bold text-primary">AI Picks for You</span>
+            <TrendingUp size={14} className="text-primary" />
+            <span className="text-sm font-display font-bold text-primary">Similar to listings you've viewed</span>
           </div>
         </div>
         <p className="text-xs text-muted-foreground mb-4 pl-1">{picks.reason}</p>

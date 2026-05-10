@@ -294,7 +294,7 @@ export default function SeekerInbox() {
             {/* Detail pane */}
             <div className="bg-white border border-[#E2E8F0] rounded-lg shadow-sm">
               {!selected ? (
-                <div className="p-12 text-center text-[#64748B]">Select a response to view details</div>
+                <div className="p-12 text-center text-[#64748B]">{t('seeker.inbox.detail.empty')}</div>
               ) : (
                 <div className="flex flex-col h-full">
                   {/* Header */}

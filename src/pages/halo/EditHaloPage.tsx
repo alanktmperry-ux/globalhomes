@@ -189,11 +189,11 @@ export default function EditHaloPage() {
         });
       } catch { /* non-fatal */ }
 
-      toast.success('Your Halo has been updated.');
+      toast.success(t('halo.toast.updated'));
       navigate('/seeker/dashboard');
     } catch (e) {
       console.error(e);
-      toast.error('Something went wrong. Please try again.');
+      toast.error(t('halo.toast.genericError'));
       scrollToError();
     } finally {
       setSubmitting(false);

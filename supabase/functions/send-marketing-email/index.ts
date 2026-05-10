@@ -108,6 +108,30 @@ Deno.serve(async (req) => {
     const from = Deno.env.get('EMAIL_FROM') || `${agent.name} via ListHQ <noreply@listhq.com.au>`;
 
     const htmlBody = email_body.replace(/\n/g, '<br>');
+    const subject = `New Listing Brief — ${listing.address}`;
+    const html = `<div style="font-family:sans-serif;font-size:14px;line-height:1.6;color:#333;max-width:600px;">${htmlBody}</div>`;
+
+    // Phase 2: resolve recipient language by matching supplier email -> auth user -> profile
+    let recipientLanguage = 'en';
+    try {
+      const { data: usersPage } = await serviceClient.auth.admin.listUsers({ page: 1, perPage: 200 });
+      const matched = (usersPage?.users ?? []).find(u => u.email?.toLowerCase() === supplier.email.toLowerCase());
+      if (matched) {
+        const { data: profile } = await serviceClient
+          .from('profiles')
+          .select('language_preference')
+          .eq('id', matched.id)
+          .maybeSingle();
+        if ((profile as any)?.language_preference) recipientLanguage = (profile as any).language_preference;
+      }
+    } catch { /* default to en */ }
+
+    const translated = await translateEmail({
+      subject,
+      bodyHtml: html,
+      bodyText: email_body,
+      targetLanguage: recipientLanguage,
+    });
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -118,8 +142,9 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from,
         to: [supplier.email],
-        subject: `New Listing Brief — ${listing.address}`,
-        html: `<div style="font-family:sans-serif;font-size:14px;line-height:1.6;color:#333;max-width:600px;">${htmlBody}</div>`,
+        subject: translated.subject,
+        html: translated.bodyHtml,
+        text: translated.bodyText,
       }),
     });
 

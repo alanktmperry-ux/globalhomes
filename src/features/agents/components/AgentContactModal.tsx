@@ -468,10 +468,10 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
               {agent.isSubscribed && step < 3 && (
                 <div className="flex gap-2">
                   <a href={`tel:${agent.phone}`} onClick={() => trackEvent('call_click')} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-secondary text-foreground text-xs font-medium hover:bg-accent transition-colors">
-                    <Phone size={14} /> Call
+                    <Phone size={14} /> {t('enquiryForm.callButton')}
                   </a>
                   <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('whatsapp_click')} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-secondary text-foreground text-xs font-medium hover:bg-accent transition-colors">
-                    <MessageCircle size={14} /> WhatsApp
+                    <MessageCircle size={14} /> {t('enquiryForm.whatsappButton')}
                   </a>
                 </div>
               )}
@@ -480,23 +480,23 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
               <AnimatePresence mode="wait">
                 {step === 1 && (
                   <motion.div key="step1" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-3">
-                    <h4 className="font-display font-semibold text-foreground text-sm">Step 1 · Buyer Intent</h4>
+                    <h4 className="font-display font-semibold text-foreground text-sm">{t('enquiryForm.step1Title')}</h4>
 
                     <div>
-                      <input type="text" placeholder="Your name *" value={formData.name}
+                      <input type="text" placeholder={t('enquiryForm.namePlaceholder')} value={formData.name}
                         onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
                         className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" />
                       {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <input type="email" placeholder="Email *" value={formData.email}
+                        <input type="email" placeholder={t('enquiryForm.emailPlaceholder')} value={formData.email}
                           onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
                           className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" />
                         {errors.email && <p className="text-xs text-destructive mt-1">{errors.email}</p>}
                       </div>
                       <div>
-                        <input type="tel" placeholder="Phone *" value={formData.phone}
+                        <input type="tel" placeholder={t('enquiryForm.phonePlaceholder')} value={formData.phone}
                           onChange={e => setFormData(p => ({ ...p, phone: e.target.value }))}
                           className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" />
                         {errors.phone && <p className="text-xs text-destructive mt-1">{errors.phone}</p>}
@@ -505,12 +505,12 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
 
                     {/* Timeframe */}
                     <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-1.5">When are you looking to buy?</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-1.5">{t('enquiryForm.timeframeLabel')}</p>
                       <div className="flex flex-wrap gap-1.5">
                         {TIMEFRAMES.map(tf => (
-                          <button key={tf} type="button" onClick={() => setFormData(p => ({ ...p, timeframe: tf }))}
-                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${formData.timeframe === tf ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'}`}>
-                            {tf}
+                          <button key={tf.value} type="button" onClick={() => setFormData(p => ({ ...p, timeframe: tf.value }))}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${formData.timeframe === tf.value ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'}`}>
+                            {t(tf.key)}
                           </button>
                         ))}
                       </div>
@@ -518,12 +518,12 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
 
                     {/* Purpose */}
                     <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-1.5">Buying for</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-1.5">{t('enquiryForm.purposeLabel')}</p>
                       <div className="flex flex-wrap gap-1.5">
                         {PURPOSES.map(p => (
-                          <button key={p} type="button" onClick={() => setFormData(prev => ({ ...prev, buyingPurpose: p }))}
-                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${formData.buyingPurpose === p ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'}`}>
-                            {p}
+                          <button key={p.value} type="button" onClick={() => setFormData(prev => ({ ...prev, buyingPurpose: p.value }))}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${formData.buyingPurpose === p.value ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'}`}>
+                            {t(p.key)}
                           </button>
                         ))}
                       </div>
@@ -531,48 +531,48 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
 
                     {/* Pre-approval */}
                     <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-1.5">Mortgage pre-approval</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-1.5">{t('enquiryForm.preApprovalLabel')}</p>
                       <div className="flex flex-wrap gap-1.5">
                         {PRE_APPROVALS.map(pa => (
                           <button key={pa.value} type="button" onClick={() => setFormData(p => ({ ...p, preApproval: pa.value }))}
                             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${formData.preApproval === pa.value ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'}`}>
-                            {pa.label}
+                            {t(pa.key)}
                           </button>
                         ))}
                       </div>
                     </div>
 
                     {/* Budget */}
-                    <input type="text" placeholder="Budget range, e.g. $500K – $800K (optional)" value={formData.budgetRange}
+                    <input type="text" placeholder={t('enquiryForm.budgetPlaceholder')} value={formData.budgetRange}
                       onChange={e => setFormData(p => ({ ...p, budgetRange: e.target.value }))}
                       className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" />
 
                     {/* Interests */}
                     <div className="flex flex-wrap gap-1.5">
                       {INTERESTS.map(interest => (
-                        <button key={interest} type="button" onClick={() => toggleInterest(interest)}
-                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${formData.interests.includes(interest) ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'}`}>
-                          {interest}
+                        <button key={interest.value} type="button" onClick={() => toggleInterest(interest.value)}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${formData.interests.includes(interest.value) ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'}`}>
+                          {t(interest.key)}
                         </button>
                       ))}
                     </div>
 
-                    <textarea placeholder="Message (optional)" value={formData.message}
+                    <textarea placeholder={t('enquiryForm.messagePlaceholder')} value={formData.message}
                       onChange={e => setFormData(p => ({ ...p, message: e.target.value }))} rows={2}
                       className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none" />
 
                     {/* Privacy notice */}
                     <p className="text-[11px] text-muted-foreground leading-snug">
-                      Your contact details will be shared with the listing agent in accordance with our{' '}
-                      <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Privacy Policy</a>.
+                      {t('enquiryForm.privacyNoticePrefix')}{' '}
+                      <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{t('enquiryForm.privacyPolicyLink')}</a>.
                     </p>
 
                     <button onClick={handleStep1Next} disabled={submitting}
                       className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors disabled:opacity-50">
                       {submitting ? (
-                        <><Loader2 size={16} className="animate-spin" /> Sending…</>
+                        <><Loader2 size={16} className="animate-spin" /> {t('enquiryForm.sending')}</>
                       ) : (
-                        <>Send Enquiry <ArrowRight size={16} /></>
+                        <>{t('enquiryForm.sendButton')} <ArrowRight size={16} /></>
                       )}
                     </button>
                   </motion.div>
@@ -592,20 +592,20 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
                       <CheckCircle2 size={56} className="text-primary" />
                     </motion.div>
                     <div>
-                      <h4 className="font-display font-bold text-foreground text-lg">Enquiry Sent!</h4>
+                      <h4 className="font-display font-bold text-foreground text-lg">{t('enquiryForm.successTitle')}</h4>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {agent.name} has been notified and will be in touch shortly.
+                        {t('enquiryForm.successMessage', { agentName: agent.name })}
                       </p>
                     </div>
 
                     <div className="w-full p-3 rounded-xl bg-secondary text-center">
-                      <p className="text-[11px] text-muted-foreground uppercase tracking-wider">Lead Score</p>
+                      <p className="text-[11px] text-muted-foreground uppercase tracking-wider">{t('enquiryForm.leadScoreLabel')}</p>
                       <p className={`text-xl font-bold ${scoreColor}`}>{leadScore}/100</p>
                     </div>
 
                     <button onClick={onClose}
                       className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors">
-                      Done
+                      {t('enquiryForm.doneButton')}
                     </button>
                   </motion.div>
                 )}

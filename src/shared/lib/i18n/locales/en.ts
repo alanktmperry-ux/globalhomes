@@ -1459,6 +1459,70 @@ export const en = {
 
   // Step indicator
   'halo.wizard.stepIndicator.short': 'Step {current} of {total}',
+
+  // ──────────────────────────────────────────────────────────────────
+  // Phase 1B-3: Property Search page
+  // ──────────────────────────────────────────────────────────────────
+  'propertySearch.metaTitle': 'Browse properties | ListHQ',
+  'propertySearch.metaDesc': 'Browse properties listed by ListHQ agents — available in 10 languages.',
+  'propertySearch.heading': 'Find your next home',
+  'propertySearch.subheading': 'Browse properties listed by ListHQ agents — available in 10 languages.',
+  'propertySearch.createHaloCta': 'Create a Halo →',
+  'propertySearch.filter.suburbPlaceholder': 'Suburb or address...',
+  'propertySearch.filter.buyOrRent': 'Buy or rent',
+  'propertySearch.filter.any': 'Any',
+  'propertySearch.filter.buy': 'Buy',
+  'propertySearch.filter.rent': 'Rent',
+  'propertySearch.filter.bedrooms': 'Bedrooms',
+  'propertySearch.filter.anyBeds': 'Any beds',
+  'propertySearch.filter.bedsPlus': '{n}+ beds',
+  'propertySearch.filter.propertyType': 'Property type',
+  'propertySearch.filter.anyType': 'Any type',
+  'propertySearch.filter.minPrice': 'Min price',
+  'propertySearch.filter.maxPrice': 'Max price',
+  'propertySearch.filter.priceSeparator': '–',
+  'propertySearch.filter.clear': 'Clear filters',
+  'propertySearch.filter.clearAll': 'Clear all filters',
+  'propertySearch.loading': 'Loading properties…',
+  'propertySearch.resultsCount': 'Showing {count} property',
+  'propertySearch.resultsCountPlural': 'Showing {count} properties',
+  'propertySearch.empty.title': 'No properties found',
+  'propertySearch.empty.desc': 'Try adjusting your filters or broadening your search.',
+  'propertySearch.card.underOffer': 'Under offer',
+  'propertySearch.card.addressFallback': 'Address on enquiry',
+  'propertySearch.card.altFallback': 'Property',
+  'propertySearch.card.poa': 'POA',
+  'propertySearch.card.specs': '{beds}bd · {baths}ba',
+  'propertySearch.card.specsWithParking': '{beds}bd · {baths}ba · {parking}car',
+  'propertySearch.card.multilingual': '🌐 Multilingual',
+
+  // ──────────────────────────────────────────────────────────────────
+  // Phase 1B-3: Property Detail page
+  // ──────────────────────────────────────────────────────────────────
+  'property.weeklyRentAud': '${amount}/wk AUD',
+  'property.priceWithCurrency': '{price} AUD',
+  'property.underOfferBadge': 'Under offer — enquiries still welcome',
+  'property.viewSuburbArrow': 'View {suburb} suburb profile →',
+  'property.socialProof.searchers': '{count} buyer searching in {suburb}',
+  'property.socialProof.searchersPlural': '{count} buyers searching in {suburb}',
+  'property.socialProof.views': '{count} view this week',
+  'property.socialProof.viewsPlural': '{count} views this week',
+  'property.socialProof.separator': '·',
+  'property.socialProof.highDemand': '🔥 High demand suburb',
+  'property.schoolZone.label': 'School Zone',
+  'property.inspection.timeRange': '{start} – {end}',
+  'property.walkthroughVideo': 'Walkthrough Video',
+  'property.translations.generating': 'Generating translations…',
+  'property.translations.generate': 'Generate Translations',
+  'property.agent.reviewCount': '({count})',
+  'property.conveyancer.shortTitle': 'Need a conveyancer?',
+  'property.conveyancer.shortBody': 'Fixed-fee conveyancing from licensed professionals. No hidden costs.',
+  'property.conveyancer.shortCta': 'Get a Quote',
+  'property.buildingPest.title': 'Building & Pest Inspection',
+  'property.buildingPest.body': 'Independent reports for confident buyers. Book before you go unconditional.',
+  'property.buildingPest.cta': 'Book Inspection',
+  'property.offMarketAlert.title': 'Get off-market properties in {suburb} first',
+  'property.offMarketAlert.body': 'Be notified about properties in {suburb}, {state} before they hit the market.',
 } as const;
 
 export type TranslationKey = keyof typeof en;

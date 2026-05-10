@@ -911,7 +911,7 @@ export default function PropertyDetailPage() {
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-foreground">{dayStr}</p>
                             <p className="text-xs text-muted-foreground flex items-center gap-1">
-                              <Clock size={10} /> {slot.start} – {slot.end}
+                              <Clock size={10} /> {tp('property.inspection.timeRange', { start: slot.start, end: slot.end })}
                             </p>
                           </div>
                           <span className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">

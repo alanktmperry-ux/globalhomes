@@ -320,7 +320,7 @@ export default function SeekerInbox() {
                               className="bg-[#059669] hover:bg-[#047857] text-white min-h-[44px]"
                               size="sm"
                             >
-                              <Check className="h-4 w-4 mr-1" /> Accept
+                              <Check className="h-4 w-4 mr-1" /> {t('seeker.inbox.action.accept')}
                             </Button>
                             <Button
                               onClick={handleDismiss}
@@ -328,7 +328,7 @@ export default function SeekerInbox() {
                               className="border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] min-h-[44px]"
                               size="sm"
                             >
-                              <X className="h-4 w-4 mr-1" /> Dismiss
+                              <X className="h-4 w-4 mr-1" /> {t('seeker.inbox.action.dismiss')}
                             </Button>
                           </>
                         )}

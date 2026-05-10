@@ -119,6 +119,9 @@ export function LanguageSwitcher() {
                       localStorage.setItem('i18n-language', LEGACY_CODE_MAP[code] ?? 'en');
                       sessionStorage.setItem('i18n-language', LEGACY_CODE_MAP[code] ?? 'en');
                       localStorage.removeItem('gh-lang');
+                      // Mark explicit user choice so PropertyCard/PropertyDetailPage
+                      // auto-overrides stop fighting this selection.
+                      localStorage.setItem('listhq_lang_user_set', '1');
                     } catch { /* storage unavailable — non-fatal */ }
                     setOpen(false);
                     document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';

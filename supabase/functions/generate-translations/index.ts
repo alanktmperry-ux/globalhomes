@@ -461,6 +461,42 @@ Return ONLY valid JSON. No markdown, no code fences.`;
   });
 }
 
+async function handleReplyTranslation(replyText: string, targetLanguage: string, ip: string) {
+  const systemPrompt = `You are translating an Australian real estate agent's reply to a buyer.
+
+Translate naturally into the buyer's language. Preserve names, addresses, suburb names verbatim.
+
+Keep the tone professional but warm. Return valid JSON only.`;
+
+  const langLabel = targetLanguage; // could expand to full name later
+
+  const userPrompt = `Translate this agent reply to ${langLabel}:
+
+"${replyText}"
+
+Return JSON with:
+
+- translated_message: the natural translation in ${langLabel}
+- target_language: the language code you used (echo back)
+
+Return ONLY valid JSON. No markdown.`;
+
+  const result = await callAI(systemPrompt, userPrompt);
+
+  await logApiUsage({
+    service: 'gemini',
+    action: 'translate_reply',
+    units: 1,
+    cost_estimate: 0,
+    metadata: { ip, message_length: replyText.length, target_language: targetLanguage },
+  });
+
+  return jsonResponse({
+    translated_message: result.translated_message,
+    target_language: result.target_language || targetLanguage,
+  });
+}
+
 Deno.serve(async (req) => {
   corsHeaders = getCorsHeaders(req.headers.get("Origin"));
 
@@ -501,6 +537,22 @@ Deno.serve(async (req) => {
         return jsonResponse({ error: `Rate limit exceeded (${rate.reason})` }, 429);
       }
       return await handleMessageTranslation(body.message, ip);
+    }
+
+    // PUBLIC PATH: translate_reply — for translating agent replies to buyer's language
+    if (body.type === "translate_reply" && typeof body.message === "string" && typeof body.target_language === "string") {
+      const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+        || req.headers.get('cf-connecting-ip')
+        || 'unknown';
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      );
+      const rate = await checkIpRateLimit(supabaseAdmin, ip, 'translate_reply', 30, 500);
+      if (!rate.allowed) {
+        return jsonResponse({ error: `Rate limit exceeded (${rate.reason})` }, 429);
+      }
+      return await handleReplyTranslation(body.message, body.target_language, ip);
     }
 
     // --- Authentication check (required for all other modes) ---

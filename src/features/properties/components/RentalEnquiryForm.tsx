@@ -4,6 +4,7 @@ import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 const enquirySchema = z.object({
   name: z.string().trim().min(1, 'Name is required').max(100),
@@ -20,6 +21,7 @@ interface RentalEnquiryFormProps {
 }
 
 export function RentalEnquiryForm({ property, open, onClose }: RentalEnquiryFormProps) {
+  const { t } = useTranslation();
   const [form, setForm] = useState({ name: '', email: '', phone: '', moveInDate: '', message: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -53,11 +55,11 @@ export function RentalEnquiryForm({ property, open, onClose }: RentalEnquiryForm
 
       if (error) throw error;
 
-      toast.success('Application submitted! — The agent will be in touch shortly.');
+      toast.success(t('rentalEnquiry.successToast'));
       setForm({ name: '', email: '', phone: '', moveInDate: '', message: '' });
       onClose();
     } catch {
-      toast.error('Something went wrong — Please try again.');
+      toast.error(t('rentalEnquiry.errorToast'));
     } finally {
       setSubmitting(false);
     }
@@ -69,48 +71,48 @@ export function RentalEnquiryForm({ property, open, onClose }: RentalEnquiryForm
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-display text-lg">Enquire / Apply</DialogTitle>
+          <DialogTitle className="font-display text-lg">{t('rentalEnquiry.title')}</DialogTitle>
           <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{property.title} — {property.suburb}</p>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div>
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Full Name *</label>
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('rentalEnquiry.nameLabel')}</label>
             <input
               className={inputClass}
               value={form.name}
               onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-              placeholder="Jane Smith"
+              placeholder={t('rentalEnquiry.namePlaceholder')}
             />
             {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
           </div>
 
           <div>
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Email *</label>
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('rentalEnquiry.emailLabel')}</label>
             <input
               type="email"
               className={inputClass}
               value={form.email}
               onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-              placeholder="jane@email.com"
+              placeholder={t('rentalEnquiry.emailPlaceholder')}
             />
             {errors.email && <p className="text-xs text-destructive mt-1">{errors.email}</p>}
           </div>
 
           <div>
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Phone *</label>
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('rentalEnquiry.phoneLabel')}</label>
             <input
               type="tel"
               className={inputClass}
               value={form.phone}
               onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-              placeholder="+61 400 000 000"
+              placeholder={t('rentalEnquiry.phonePlaceholder')}
             />
             {errors.phone && <p className="text-xs text-destructive mt-1">{errors.phone}</p>}
           </div>
 
           <div>
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Preferred Move-in Date *</label>
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('rentalEnquiry.moveInDateLabel')}</label>
             <input
               type="date"
               className={inputClass}
@@ -121,13 +123,13 @@ export function RentalEnquiryForm({ property, open, onClose }: RentalEnquiryForm
           </div>
 
           <div>
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Message</label>
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('rentalEnquiry.messageLabel')}</label>
             <textarea
               className={`${inputClass} resize-none`}
               rows={3}
               value={form.message}
               onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
-              placeholder="Tell the agent about yourself, pets, employment..."
+              placeholder={t('rentalEnquiry.messagePlaceholder')}
             />
           </div>
 
@@ -136,7 +138,7 @@ export function RentalEnquiryForm({ property, open, onClose }: RentalEnquiryForm
             disabled={submitting}
             className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors disabled:opacity-50"
           >
-            {submitting ? 'Submitting…' : 'Submit Application'}
+            {submitting ? t('rentalEnquiry.submitting') : t('rentalEnquiry.submitButton')}
           </button>
         </form>
       </DialogContent>

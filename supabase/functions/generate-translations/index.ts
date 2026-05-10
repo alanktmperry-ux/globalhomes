@@ -217,14 +217,25 @@ async function handleListingTranslation(listingId: string) {
     return jsonResponse({ error: "Listing not found" }, 404);
   }
 
-  const systemPrompt = `You are a multilingual real estate translation specialist for the Australian property market. You produce culturally sensitive, accurate translations. Return valid JSON only.`;
+  // ── Glossary pre-processing: replace AU real-estate terms with sentinels ──
+  // The AI sees `<<G:0>>` instead of "OFI" / "settlement" etc. and is told
+  // to copy them verbatim. After translation we restore them per-language
+  // with curated terminology.
+  const titleSent = applyGlossarySentinels(listing.title || "");
+  const descSent = applyGlossarySentinels(listing.description || "");
+  // Combined replacements list for restoration (sentinels are unique across both).
+  const allReplacements = [...titleSent.replacements, ...descSent.replacements];
+
+  const systemPrompt = `You are a multilingual real estate translation specialist for the Australian property market. You produce culturally sensitive, accurate translations. Return valid JSON only.
+
+GLOSSARY SENTINELS: The input may contain placeholder tokens of the form <<G:N>> (where N is a digit). These are sentinels for domain-specific real-estate terms. You MUST copy each sentinel verbatim into every translated field — do not translate, modify, drop, or reformat them. They will be replaced post-process with curated translations.`;
 
   const userPrompt = `Translate and analyse this Australian property listing. Return a single JSON object with two top-level keys: "translations" and "agent_insights".
 
 LISTING DATA:
-- Title: ${listing.title || "N/A"}
+- Title: ${titleSent.text || "N/A"}
 - Address: ${listing.address || "N/A"}, ${listing.suburb || ""} ${listing.state || ""} ${listing.postcode || ""}
-- Description: ${listing.description || "No description"}
+- Description: ${descSent.text || "No description"}
 - Property Type: ${listing.property_type || "House"}
 - Beds: ${listing.beds || 0}, Baths: ${listing.baths || 0}, Parking: ${listing.parking || 0}
 - Price: ${listing.price ? `$${listing.price.toLocaleString()}` : "Contact agent"}
@@ -248,6 +259,7 @@ For Indian-buyer-relevant features specifically, consider noting (only when genu
 For Tamil buyers specifically, also consider proximity to South Indian temples and Carnatic music/dance schools where genuinely nearby.
 
 CRITICAL: All 20 language keys MUST be present in the "translations" object. For Arabic, ensure right-to-left natural phrasing. For Hindi, Punjabi, Tamil, and Bengali, use natural Indian-Australian property terminology where appropriate. Use 'lakh' and 'crore' phrasing for Indian buyers when prices fit those denominations, alongside the AUD figure.
+REMINDER: Preserve every <<G:N>> sentinel verbatim in every translated title, description, and summary.
 
 AGENT INSIGHTS — in English, under key "agent_insights":
 - multicultural_appeal: string describing the property's appeal to multicultural buyers
@@ -257,6 +269,23 @@ AGENT INSIGHTS — in English, under key "agent_insights":
 Return ONLY valid JSON. No markdown, no code fences.`;
 
   const result = await callAI(systemPrompt, userPrompt);
+
+  // ── Glossary post-processing: restore sentinels per language ──
+  if (result.translations && typeof result.translations === "object" && allReplacements.length > 0) {
+    for (const [langCode, langBlock] of Object.entries(result.translations as Record<string, any>)) {
+      if (!langBlock || typeof langBlock !== "object") continue;
+      for (const field of ["title", "description", "summary"]) {
+        if (typeof langBlock[field] === "string") {
+          langBlock[field] = restoreGlossarySentinels(langBlock[field], allReplacements, langCode);
+        }
+      }
+      if (Array.isArray(langBlock.cultural_highlights)) {
+        langBlock.cultural_highlights = langBlock.cultural_highlights.map((s: unknown) =>
+          typeof s === "string" ? restoreGlossarySentinels(s, allReplacements, langCode) : s,
+        );
+      }
+    }
+  }
 
   // Read existing translations so manually-entered ones are not overwritten
   const { data: existing } = await supabase

@@ -6671,6 +6671,9 @@ export type Database = {
           id: string
           interests: string[] | null
           message: string | null
+          message_en: string | null
+          message_original: string | null
+          original_language: string | null
           pre_approval_status: string | null
           preferred_contact: string | null
           property_id: string
@@ -6698,6 +6701,9 @@ export type Database = {
           id?: string
           interests?: string[] | null
           message?: string | null
+          message_en?: string | null
+          message_original?: string | null
+          original_language?: string | null
           pre_approval_status?: string | null
           preferred_contact?: string | null
           property_id: string
@@ -6725,6 +6731,9 @@ export type Database = {
           id?: string
           interests?: string[] | null
           message?: string | null
+          message_en?: string | null
+          message_original?: string | null
+          original_language?: string | null
           pre_approval_status?: string | null
           preferred_contact?: string | null
           property_id?: string

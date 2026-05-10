@@ -216,7 +216,7 @@ export default function SeekerInbox() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F0F4F8] flex items-center justify-center">
-        <div className="text-[#64748B]">Loading inbox…</div>
+        <div className="text-[#64748B]">{t('seeker.inbox.loading')}</div>
       </div>
     );
   }
@@ -228,21 +228,21 @@ export default function SeekerInbox() {
           onClick={() => navigate('/seeker/dashboard')}
           className="inline-flex items-center gap-2 text-sm text-[#64748B] hover:text-[#1E293B] mb-4 min-h-[44px]"
         >
-          <ArrowLeft className="h-4 w-4" /> Back to dashboard
+          <ArrowLeft className="h-4 w-4" /> {t('seeker.inbox.back')}
         </button>
 
         <div className="flex items-center gap-3 mb-6">
           <InboxIcon className="h-6 w-6 text-[#1E3A5F]" />
-          <h1 className="text-2xl font-semibold text-[#1E293B]">Inbox</h1>
+          <h1 className="text-2xl font-semibold text-[#1E293B]">{t('seeker.inbox.title')}</h1>
           <Badge variant="secondary" className="ml-2">{responses.length}</Badge>
         </div>
 
         {responses.length === 0 ? (
           <div className="bg-white border border-[#E2E8F0] rounded-lg p-12 text-center shadow-sm">
             <InboxIcon className="h-12 w-12 text-[#94A3B8] mx-auto mb-3" />
-            <p className="text-[#1E293B] font-medium mb-1">No responses yet</p>
+            <p className="text-[#1E293B] font-medium mb-1">{t('seeker.inbox.empty.title')}</p>
             <p className="text-[#64748B] text-sm">
-              When agents respond to your Halos, their messages will appear here.
+              {t('seeker.inbox.empty.copy')}
             </p>
           </div>
         ) : (

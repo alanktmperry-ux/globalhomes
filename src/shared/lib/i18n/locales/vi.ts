@@ -667,12 +667,9 @@ export const vi: Partial<Record<TranslationKey, string>> = {
   'agentLanding.headline': 'Tìm người mua tiếp theo của bạn',
   'agentLanding.headlineSub': 'trước khi họ tìm thấy một tin đăng.',
   'agentLanding.body': 'ListHQ là một nền tảng kinh doanh hoàn chỉnh được xây dựng dành riêng cho các đại lý bất động sản Úc — Halo Board, hệ thống tìm kiếm người mua tự động bằng AI, dịch tự động 20 ngôn ngữ, quản lý quỹ tín thác và hệ thống CRM tự vận hành. Tất cả những gì bạn cần. Chỉ với một gói đăng ký.',
-  'agentLanding.stat1Label': 'Người mua đa ngôn ngữ
-không có cổng thông tin nào khác tiếp cận được',
-  'agentLanding.stat2Label': 'Ngôn ngữ, mọi
-danh sách được dịch tự động',
-  'agentLanding.stat3Label': 'Dùng thử miễn phí, không cần thẻ tín dụng
-',
+  'agentLanding.stat1Label': 'Người mua đa ngôn ngữ\nkhông có cổng thông tin nào khác tiếp cận được',
+  'agentLanding.stat2Label': 'Ngôn ngữ, mọi\ndanh sách được dịch tự động',
+  'agentLanding.stat3Label': 'Dùng thử miễn phí, không cần thẻ tín dụng\n',
   'agentLanding.ctaPrimary': 'Start free trial — 3 months free →',
   'agentLanding.ctaLogin': '🔒 Đăng nhập vào tài khoản của bạn',
   'agentLanding.disclaimer': 'Không cần thẻ tín dụng. Truy cập đầy đủ ngay từ ngày đầu tiên. Hủy bỏ bất cứ lúc nào.',

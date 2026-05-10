@@ -667,11 +667,9 @@ export const ar: Partial<Record<TranslationKey, string>> = {
   'agentLanding.headline': 'ابحث عن مشتريك التالي',
   'agentLanding.headlineSub': 'قبل أن يعثروا على إعلان.',
   'agentLanding.body': 'ListHQ منصة أعمال متكاملة مصممة خصيصًا للوكلاء الأستراليين، تشمل لوحة تحكم Halo Board، وميزة مطابقة المشترين بالذكاء الاصطناعي، والترجمة الآلية بـ 20 لغة، ونظام محاسبة الأمانات، ونظام إدارة علاقات العملاء (CRM) ذاتي التشغيل. كل ما تحتاجه باشتراك واحد.',
-  'agentLanding.stat1Label': 'مشترون متعددو اللغات
-لا تصل إليهم أي بوابة أخرى',
+  'agentLanding.stat1Label': 'مشترون متعددو اللغات\nلا تصل إليهم أي بوابة أخرى',
   'agentLanding.stat2Label': 'اللغات، كل قائمة مترجمة تلقائياً',
-  'agentLanding.stat3Label': 'تجربة مجانية، بدون بطاقة ائتمان
-',
+  'agentLanding.stat3Label': 'تجربة مجانية، بدون بطاقة ائتمان\n',
   'agentLanding.ctaPrimary': 'Start free trial — 3 months free →',
   'agentLanding.ctaLogin': '🔒 سجل الدخول إلى حسابك',
   'agentLanding.disclaimer': 'لا حاجة لبطاقة ائتمان. وصول كامل من اليوم الأول. يمكنك الإلغاء في أي وقت.',

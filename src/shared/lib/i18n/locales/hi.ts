@@ -671,12 +671,9 @@ export const hi: Partial<Record<keyof typeof EnBase, string>> = {
   'agentLanding.headline': 'अपना अगला खरीदार ढूंढें',
   'agentLanding.headlineSub': 'उन्हें लिस्टिंग मिलने से पहले ही।',
   'agentLanding.body': 'ListHQ ऑस्ट्रेलियाई एजेंटों के लिए बनाया गया एक संपूर्ण व्यावसायिक प्लेटफॉर्म है — इसमें हेलो बोर्ड, एआई बायर मैचिंग, 20 भाषाओं में ऑटो-ट्रांसलेशन, ट्रस्ट अकाउंटिंग और एक स्वचालित सीआरएम शामिल हैं। आपकी हर ज़रूरत पूरी होती है। सिर्फ़ एक सब्सक्रिप्शन में।',
-  'agentLanding.stat1Label': 'बहुभाषी खरीदार
-जिन तक कोई अन्य पोर्टल नहीं पहुंच पाता',
-  'agentLanding.stat2Label': 'भाषाएँ, प्रत्येक सूची स्वतः अनुवादित
-',
-  'agentLanding.stat3Label': 'निःशुल्क परीक्षण, कोई क्रेडिट कार्ड नहीं
-',
+  'agentLanding.stat1Label': 'बहुभाषी खरीदार\nजिन तक कोई अन्य पोर्टल नहीं पहुंच पाता',
+  'agentLanding.stat2Label': 'भाषाएँ, प्रत्येक सूची स्वतः अनुवादित\n',
+  'agentLanding.stat3Label': 'निःशुल्क परीक्षण, कोई क्रेडिट कार्ड नहीं\n',
   'agentLanding.ctaPrimary': 'Start free trial — 3 months free →',
   'agentLanding.ctaLogin': '🔒 अपने खाते में लॉग इन करें',
   'agentLanding.disclaimer': 'क्रेडिट कार्ड की आवश्यकता नहीं। पहले दिन से ही पूर्ण पहुँच। कभी भी रद्द करें।',

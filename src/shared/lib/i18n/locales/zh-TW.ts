@@ -682,9 +682,7 @@ export const zhTW: Partial<Record<keyof typeof EnBase, string>> = {
   'agentLanding.headline': '尋找你的下一個買家',
   'agentLanding.headlineSub': '在他們找到房源之前。',
   'agentLanding.body': 'ListHQ 是一個專為澳洲經紀人打造的完整商業平台——包括 Halo Board、AI 買家配對、20 種語言自動翻譯、信託帳戶以及自動運行的客戶關係管理系統 (CRM)。您所需的一切，盡在一個訂閱中。',
-  'agentLanding.stat1Label': '多語言買家
-
-其他入口網站無法企及',
+  'agentLanding.stat1Label': '多語言買家\n\n其他入口網站無法企及',
   'agentLanding.stat2Label': '語言，所有清單已自動翻譯',
   'agentLanding.stat3Label': '免費試用，無需信用卡',
   'agentLanding.ctaPrimary': 'Start free trial — 3 months free →',

@@ -124,7 +124,7 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'ListHQ <noreply@listhq.com.au>',
+        from: Deno.env.get('EMAIL_FROM') ?? 'ListHQ <hello@listhq.com.au>',
         to: [recipientEmail],
         subject: 'Your Halo is live — agents can now find you',
         html,

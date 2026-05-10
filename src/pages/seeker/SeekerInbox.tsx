@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Check, X, Send, Inbox as InboxIcon, Home, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
+import { useTranslation } from '@/shared/lib/i18n';
 
 interface HaloResponse {
   id: string;

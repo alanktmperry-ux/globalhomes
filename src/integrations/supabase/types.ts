@@ -4582,7 +4582,11 @@ export type Database = {
           lead_score_updated_at: string | null
           lead_temperature: string
           lost_reason: string | null
+          message: string | null
+          message_en: string | null
+          message_original: string | null
           notes: string | null
+          original_language: string | null
           priority: string
           source_property_id: string | null
           stage: string
@@ -4623,7 +4627,11 @@ export type Database = {
           lead_score_updated_at?: string | null
           lead_temperature?: string
           lost_reason?: string | null
+          message?: string | null
+          message_en?: string | null
+          message_original?: string | null
           notes?: string | null
+          original_language?: string | null
           priority?: string
           source_property_id?: string | null
           stage?: string
@@ -4664,7 +4672,11 @@ export type Database = {
           lead_score_updated_at?: string | null
           lead_temperature?: string
           lost_reason?: string | null
+          message?: string | null
+          message_en?: string | null
+          message_original?: string | null
           notes?: string | null
+          original_language?: string | null
           priority?: string
           source_property_id?: string | null
           stage?: string

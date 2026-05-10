@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Search, Mic, MapPin, Loader2 } from 'lucide-react';
 import { capture } from '@/shared/lib/posthog';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n';
 import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
 import { autocomplete } from '@/shared/lib/googleMapsService';
 import { useToast } from '@/shared/hooks/use-toast';
@@ -23,7 +23,7 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
   const [showSuggestions, setShowSuggestions] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const { t } = useI18n();
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   const handleVoiceResult = useCallback((text: string) => {

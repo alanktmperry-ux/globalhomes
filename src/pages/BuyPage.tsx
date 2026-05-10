@@ -10,7 +10,7 @@ import { Loader2, X, Bell, BellPlus, Sparkles, SlidersHorizontal, Filter, Home, 
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from '@/components/ui/sheet';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n';
 import { AIPropertySearch } from '@/features/properties/components/AIPropertySearch';
 import { PropertyMap } from '@/features/properties/components/PropertyMap';
 import { Switch } from '@/components/ui/switch';
@@ -86,7 +86,7 @@ interface FilterControlsProps {
 }
 
 function FilterControls({ filters, onChange, layout }: FilterControlsProps) {
-  const { t } = useI18n();
+  const { t } = useTranslation();
   const stacked = layout === 'stacked';
   const fieldClass = 'h-9 rounded-md border border-input bg-background px-3 text-sm';
   const wrap = stacked ? 'space-y-3' : 'flex flex-wrap items-center gap-2';
@@ -203,7 +203,7 @@ function FilterControls({ filters, onChange, layout }: FilterControlsProps) {
 /* ---------------- Page ---------------- */
 
 const BuyPage = () => {
-  const { t } = useI18n();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());

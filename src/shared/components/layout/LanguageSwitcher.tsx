@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Globe, ChevronDown } from 'lucide-react';
-import { useI18n, type Language } from '@/shared/lib/i18n';
+import { useTranslation, type Language } from '@/shared/lib/i18n';
 import {
   SUPPORTED_LANGUAGES,
   LANGUAGE_STORAGE_KEY,
@@ -20,7 +20,7 @@ const AVAILABLE_LOCALES: ReadonlySet<SupportedLanguageCode> = new Set<SupportedL
 const INTERACTED_KEY = 'gh-lang-switcher-interacted';
 
 export function LanguageSwitcher() {
-  const { language, setLanguage } = useI18n();
+  const { language, setLanguage } = useTranslation();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);

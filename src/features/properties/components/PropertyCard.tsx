@@ -5,7 +5,7 @@ import { Bed, Bath, Car, Heart, BadgeCheck, Star, Sparkles, Shield, ShieldCheck,
 import { TourBadge } from '@/components/tour/TourBadge';
 import { OffMarketBadge } from '@/features/offmarket/components/OffMarketBadge';
 import { Property, PropertyStatus } from '@/shared/lib/types';
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { AgentContactModal } from '@/features/agents/components/AgentContactModal';
@@ -15,7 +15,7 @@ import { useListingTranslation } from '@/features/properties/hooks/useListingTra
 import { formatAddress } from '@/shared/lib/formatAddress';
 
 function VerificationBadge({ level }: { level?: string }) {
-  const { t } = useI18n();
+  const { t } = useTranslation();
   if (!level || level === 'email') return null;
   const config: Record<string, { icon: typeof Shield; className: string; label: string }> = {
     phone: { icon: Shield, className: 'bg-blue-500', label: t('badge.phoneVerified') },
@@ -54,7 +54,7 @@ interface PropertyCardProps {
 const COLLAB_EMOJIS = ['👍', '👎', '🔥'] as const;
 
 export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index, isCollab, collabReactions = [], onToggleReaction, partnerViewed, currentUserId, priority }: PropertyCardProps) {
-  const { t } = useI18n();
+  const { t } = useTranslation();
   const { formatPrice, currency, listingMode } = useCurrency();
   const { investorMode } = useInvestorMode();
   const { title: translatedTitle, isTranslating: titleTranslating } = useListingTranslation(property);

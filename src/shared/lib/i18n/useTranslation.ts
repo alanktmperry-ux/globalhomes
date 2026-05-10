@@ -1,16 +1,12 @@
 /**
- * useTranslation — buyer-facing i18n hook.
+ * useTranslation — canonical i18n hook.
  *
- * Resolution order (new behavior):
- *   1. New locale dictionary for active language (e.g. LOCALES['zh-CN'])
- *   2. English base (en.ts) — fallback for keys missing in active language
- *   3. Legacy translation table — last-resort for keys not yet migrated
- *   4. Empty string (never expose raw keys)
- *
- * en.ts always wins for keys it has — legacy table is consulted only for
- * keys that haven't been migrated to the new system yet.
+ * Returns the same surface as the legacy useI18n() ({ language, setLanguage, t })
+ * so it's a drop-in replacement, but resolves translations via the new
+ * per-locale dictionaries first, falling back to en.ts and then the legacy
+ * translation table.
  */
-import { useI18n } from '@/shared/lib/i18n';
+import { useI18n } from './legacy-core';
 import { en, type TranslationKey } from './locales/en';
 import { zhCN } from './locales/zh-CN';
 import { zhTW } from './locales/zh-TW';
@@ -31,9 +27,7 @@ import { th } from './locales/th';
 import { fil } from './locales/fil';
 import { ru } from './locales/ru';
 import {
-  LANGUAGE_STORAGE_KEY,
   FROM_LEGACY_CODE_MAP,
-  LEGACY_CODE_MAP,
   type SupportedLanguageCode,
 } from './config';
 
@@ -62,36 +56,24 @@ const LOCALES: Partial<Record<SupportedLanguageCode, Record<string, string>>> = 
 type AnyKey = TranslationKey | (string & {});
 
 export function useTranslation() {
-  const { language: legacyLanguage, setLanguage: setLegacyLanguage, t: legacyT } = useI18n();
-
-  const language: SupportedLanguageCode =
-    FROM_LEGACY_CODE_MAP[legacyLanguage] ?? 'en';
-
-  const setLanguage = (code: SupportedLanguageCode) => {
-    try {
-      localStorage.setItem(LANGUAGE_STORAGE_KEY, code);
-      sessionStorage.setItem(LANGUAGE_STORAGE_KEY, code);
-      localStorage.removeItem('gh-lang');
-    } catch { /* non-fatal */ }
-    const legacy = LEGACY_CODE_MAP[code] ?? 'en';
-    setLegacyLanguage(legacy as Parameters<typeof setLegacyLanguage>[0]);
-  };
+  const { language, setLanguage, t: legacyT } = useI18n();
+  const canonical: SupportedLanguageCode = FROM_LEGACY_CODE_MAP[language] ?? 'en';
 
   const t = (key: AnyKey, vars?: Record<string, string | number>): string => {
     let value: string | undefined;
 
     // 1. New locale dictionary for active language
-    const dict = LOCALES[language];
+    const dict = LOCALES[canonical];
     if (dict && typeof dict[key as string] === 'string') {
       value = dict[key as string];
     }
 
-    // 2. English base (en.ts) — fallback for missing translations in active language
+    // 2. English base (en.ts)
     if (value === undefined && key in en) {
       value = (en as Record<string, string>)[key as string];
     }
 
-    // 3. Legacy translation table — last-resort for legacy-only keys
+    // 3. Legacy translation table — last-resort fallback
     if (value === undefined) {
       const legacy = legacyT(key);
       if (legacy !== key) value = legacy;
@@ -110,5 +92,5 @@ export function useTranslation() {
     return value;
   };
 
-  return { t, language, setLanguage };
+  return { t, language, setLanguage, canonical };
 }

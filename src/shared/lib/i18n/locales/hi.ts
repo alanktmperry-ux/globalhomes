@@ -662,6 +662,7 @@ export const hi: Partial<Record<keyof typeof EnBase, string>> = {
   'nav.myDashboard': 'मेरा डैशबोर्ड',
   'nav.myListings': 'मेरी लिस्टिंग',
   'nav.postHalo': 'Halo पोस्ट करें',
+  'nav.translateListings': 'सूचियों का अनुवाद करें',
   'nav.saleListing': 'बिक्री लिस्टिंग',
   'nav.rentalListing': 'किराया लिस्टिंग',
   'nav.languageCurrency': 'भाषा और मुद्रा',

@@ -1,17 +1,5 @@
 /**
- * Public entry point for the buyer-facing i18n module.
- *
- * Re-exports everything callers need so imports stay tidy:
- *   import { useTranslation, SUPPORTED_LANGUAGES } from '@/shared/lib/i18n';
- *
- * NOTE: the legacy provider/hook still live in src/shared/lib/i18n.tsx and
- * are re-exported from there for backward compatibility. This `index.ts`
- * is resolved AFTER the `.tsx` file by Vite (because i18n.tsx is a file
- * and i18n/ is a folder), so to avoid ambiguity callers should import
- * the new helpers from their explicit paths:
- *
- *   import { useTranslation } from '@/shared/lib/i18n/useTranslation';
- *   import { SUPPORTED_LANGUAGES } from '@/shared/lib/i18n/config';
+ * Public entry point for the i18n module.
  */
 export { useTranslation } from './useTranslation';
 export {
@@ -25,3 +13,12 @@ export {
 export { en, type TranslationKey } from './locales/en';
 export { zhCN } from './locales/zh-CN';
 export { zhTW } from './locales/zh-TW';
+
+// Legacy-compat exports (provider, types). useI18n is internal; prefer
+// useTranslation() from this module.
+export {
+  I18nProvider,
+  useI18n,
+  languageNames,
+  type Language,
+} from './legacy-core';

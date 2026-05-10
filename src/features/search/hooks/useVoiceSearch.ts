@@ -1,12 +1,12 @@
 import { useState, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n';
 
 export function useVoiceSearch(
   onResult: (text: string) => void,
   onError?: (msg: string) => void
 ) {
-  const { language } = useI18n();
+  const { language } = useTranslation();
   const [isListening, setIsListening] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);

@@ -11,7 +11,7 @@ import { autocomplete, getPlaceDetails } from '@/shared/lib/googleMapsService';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 
 type VoiceState = 'idle' | 'listening' | 'processing' | 'results';
@@ -166,7 +166,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
   const navigate = useNavigate();
   const { listingMode, setListingMode } = useCurrency();
   const { user, isAgent } = useAuth();
-  const { t, language, setLanguage } = useI18n();
+  const { t, language, setLanguage } = useTranslation();
 
   const [headlineIndex, setHeadlineIndex] = useState(0);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);

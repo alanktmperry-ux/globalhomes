@@ -662,6 +662,7 @@ export const bn: Partial<Record<keyof typeof EnBase, string>> = {
   'nav.myDashboard': 'আমার ড্যাশবোর্ড',
   'nav.myListings': 'আমার লিস্টিং',
   'nav.postHalo': 'হ্যালো পোস্ট করুন',
+  'nav.translateListings': 'তালিকা অনুবাদ করুন',
   'nav.saleListing': 'বিক্রয় লিস্টিং',
   'nav.rentalListing': 'ভাড়া লিস্টিং',
   'nav.languageCurrency': 'ভাষা ও মুদ্রা',

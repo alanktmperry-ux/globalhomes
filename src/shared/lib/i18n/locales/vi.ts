@@ -658,6 +658,7 @@ export const vi: Partial<Record<TranslationKey, string>> = {
   'nav.myDashboard': 'Bảng điều khiển của tôi',
   'nav.myListings': 'Danh sách của tôi',
   'nav.postHalo': 'Đăng Halo',
+  'nav.translateListings': 'Dịch danh sách',
   'nav.saleListing': 'Bất động sản bán',
   'nav.rentalListing': 'Bất động sản cho thuê',
   'nav.languageCurrency': 'Ngôn ngữ & Tiền tệ',

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useI18n, type Language } from '@/shared/lib/i18n';
+import { useTranslation, type Language } from '@/shared/lib/i18n';
 import { LEGACY_CODE_MAP } from '@/shared/lib/i18n/config';
 import { supabase } from '@/integrations/supabase/client';
 import { translateListing } from '@/features/properties/lib/translationService';
@@ -41,7 +41,7 @@ interface TranslationResult {
  * - Cache miss / pending: triggers translateListing() and refreshes the property.
  */
 export function useListingTranslation(property: any | null | undefined): TranslationResult {
-  const { language, setLanguage } = useI18n();
+  const { language, setLanguage } = useTranslation();
   const [isTranslating, setIsTranslating] = useState(false);
   const [refreshed, setRefreshed] = useState<any | null>(null);
   const requestedRef = useRef<string | null>(null);

@@ -662,6 +662,7 @@ export const ru: Partial<Record<TranslationKey, string>> = {
   'nav.myDashboard': 'Моя панель управления',
   'nav.myListings': 'Мои объявления',
   'nav.postHalo': 'Разместите изображение нимба.',
+  'nav.translateListings': 'Перевести объявления',
   'nav.saleListing': 'Объявление о продаже',
   'nav.rentalListing': 'Объявление об аренде',
   'nav.languageCurrency': 'Язык и валюта',

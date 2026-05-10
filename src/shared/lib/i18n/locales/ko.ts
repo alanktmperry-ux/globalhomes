@@ -658,6 +658,7 @@ export const ko: Partial<Record<TranslationKey, string>> = {
   'nav.myDashboard': '내 대시보드',
   'nav.myListings': '내 매물',
   'nav.postHalo': '할로 게시',
+  'nav.translateListings': '목록 번역',
   'nav.saleListing': '매매 매물',
   'nav.rentalListing': '임대 매물',
   'nav.languageCurrency': '언어 및 통화',

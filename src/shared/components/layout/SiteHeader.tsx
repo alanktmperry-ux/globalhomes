@@ -11,13 +11,12 @@ import { NotificationBell } from '@/features/agents/components/dashboard/Notific
 import { SeekerNotificationBell } from '@/components/halo/SeekerNotificationBell';
 import { LanguageSwitcher } from '@/shared/components/layout/LanguageSwitcher';
 import { SUPPORTED_LANGUAGES, LEGACY_CODE_MAP, FROM_LEGACY_CODE_MAP } from '@/shared/lib/i18n/config';
-import { useI18n, type Language } from '@/shared/lib/i18n';
+import { useTranslation, type Language } from '@/shared/lib/i18n';
 import { CurrencySwitcher } from '@/shared/components/layout/CurrencySwitcher';
 // Lazy-loaded — pulls in framer-motion, only needed when the user opens the
 // "Become an agent" modal. Keeping it static added ~50KB gz to every cold load.
 const AgentRegistrationModal = lazy(() => import('@/features/agents/components/AgentRegistrationModal'));
 
-import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 
@@ -362,7 +361,7 @@ export function SiteHeader() {
  */
 function SettingsMenu() {
   const { t } = useTranslation();
-  const { language, setLanguage } = useI18n();
+  const { language, setLanguage } = useTranslation();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Eye, MousePointerClick, TrendingUp, Crown, Loader2, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useToast } from '@/shared/hooks/use-toast';
@@ -18,7 +18,7 @@ interface PortalListing {
 }
 
 const AgentPortalPage = () => {
-  const { t } = useI18n();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();

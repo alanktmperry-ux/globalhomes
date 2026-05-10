@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Phone, MessageCircle, Mail, Shield, ShieldCheck } from 'lucide-react';
 import { Property } from '@/shared/lib/types';
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { AgentContactModal } from '@/features/agents/components/AgentContactModal';
 import { ShareSheet } from '@/shared/components/ShareSheet';
@@ -66,7 +66,7 @@ interface PropertyDrawerProps {
 }
 
 export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searchContext }: PropertyDrawerProps) {
-  const { t } = useI18n();
+  const { t } = useTranslation();
   const { title: translatedTitle, description: translatedDescription, isTranslating: descTranslating, isTranslated: descIsTranslated } = useListingTranslation(property);
   const { formatPrice, currency } = useCurrency();
   const [contactOpen, setContactOpen] = useState(false);

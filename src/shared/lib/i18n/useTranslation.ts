@@ -1,19 +1,14 @@
 /**
  * useTranslation — buyer-facing i18n hook.
  *
- * Thin wrapper around the existing useI18n() context (src/shared/lib/i18n.tsx).
- * It:
- *   - reads the active language from the I18nProvider, which itself
- *     reads/writes localStorage (legacy key `gh-lang` AND the new
- *     `listhq_language` key written by LanguageSwitcher).
- *   - looks up keys first in the new buyer-page locale (en.ts), then in
- *     the legacy translation table, then falls back to the key itself.
- *   - guarantees an English string is returned for any missing translation
- *     so buyer pages never render a raw key.
+ * Resolution order (new behavior):
+ *   1. New locale dictionary for active language (e.g. LOCALES['zh-CN'])
+ *   2. English base (en.ts) — fallback for keys missing in active language
+ *   3. Legacy translation table — last-resort for keys not yet migrated
+ *   4. Empty string (never expose raw keys)
  *
- * Usage:
- *   const { t, language, setLanguage } = useTranslation();
- *   <h1>{t('exclusive.hero.headline')}</h1>
+ * en.ts always wins for keys it has — legacy table is consulted only for
+ * keys that haven't been migrated to the new system yet.
  */
 import { useI18n } from '@/shared/lib/i18n';
 import { en, type TranslationKey } from './locales/en';
@@ -26,6 +21,15 @@ import { ko } from './locales/ko';
 import { ar } from './locales/ar';
 import { pa } from './locales/pa';
 import { ta } from './locales/ta';
+import { es } from './locales/es';
+import { fr } from './locales/fr';
+import { pt } from './locales/pt';
+import { it } from './locales/it';
+import { id } from './locales/id';
+import { ms } from './locales/ms';
+import { th } from './locales/th';
+import { fil } from './locales/fil';
+import { ru } from './locales/ru';
 import {
   LANGUAGE_STORAGE_KEY,
   FROM_LEGACY_CODE_MAP,
@@ -33,10 +37,6 @@ import {
   type SupportedLanguageCode,
 } from './config';
 
-/**
- * Registry of new-style locale dictionaries keyed by canonical language code.
- * Add new languages here as they're translated.
- */
 const LOCALES: Partial<Record<SupportedLanguageCode, Record<string, string>>> = {
   'en': en,
   'zh-CN': zhCN,
@@ -48,6 +48,15 @@ const LOCALES: Partial<Record<SupportedLanguageCode, Record<string, string>>> = 
   'ar': ar,
   'pa': pa,
   'ta': ta,
+  'es': es,
+  'fr': fr,
+  'pt': pt,
+  'it': it,
+  'id': id,
+  'ms': ms,
+  'th': th,
+  'fil': fil,
+  'ru': ru,
 };
 
 type AnyKey = TranslationKey | (string & {});
@@ -55,54 +64,39 @@ type AnyKey = TranslationKey | (string & {});
 export function useTranslation() {
   const { language: legacyLanguage, setLanguage: setLegacyLanguage, t: legacyT } = useI18n();
 
-  // Map legacy code (`zh`) to canonical (`zh-CN`).
   const language: SupportedLanguageCode =
     FROM_LEGACY_CODE_MAP[legacyLanguage] ?? 'en';
 
   const setLanguage = (code: SupportedLanguageCode) => {
     try {
-      // Persist across browser sessions — user's language choice should stick.
       localStorage.setItem(LANGUAGE_STORAGE_KEY, code);
-      // Mirror to sessionStorage so legacy fallback checks still work.
       sessionStorage.setItem(LANGUAGE_STORAGE_KEY, code);
-      // Clear stale legacy key (the I18nProvider also writes its own `gh-lang`).
       localStorage.removeItem('gh-lang');
-    } catch {
-      // storage may be unavailable (private mode, etc.) — non-fatal
-    }
+    } catch { /* non-fatal */ }
     const legacy = LEGACY_CODE_MAP[code] ?? 'en';
-    // Cast: legacy setter expects the legacy `Language` union.
     setLegacyLanguage(legacy as Parameters<typeof setLegacyLanguage>[0]);
   };
 
-  /**
-   * t(key) — resolve a translation.
-   *
-   * Resolution order:
-   *   1. Legacy translation table (current active language)
-   *   2. New English base (en.ts)
-   *   3. The key itself (last-resort fallback)
-   *
-   * Variable interpolation: {name} placeholders are replaced with values
-   * from the `vars` argument.
-   */
   const t = (key: AnyKey, vars?: Record<string, string | number>): string => {
-    // 1. New locale dictionary for the active canonical language (e.g. zh-CN)
-    const dict = LOCALES[language];
-    let value: string | undefined = dict?.[key as string];
+    let value: string | undefined;
 
-    // 2. Legacy translation table (covers languages not yet migrated)
+    // 1. New locale dictionary for active language
+    const dict = LOCALES[language];
+    if (dict && typeof dict[key as string] === 'string') {
+      value = dict[key as string];
+    }
+
+    // 2. English base (en.ts) — fallback for missing translations in active language
+    if (value === undefined && key in en) {
+      value = (en as Record<string, string>)[key as string];
+    }
+
+    // 3. Legacy translation table — last-resort for legacy-only keys
     if (value === undefined) {
       const legacy = legacyT(key);
       if (legacy !== key) value = legacy;
     }
 
-    // 3. English base
-    if (value === undefined && key in en) {
-      value = en[key as TranslationKey];
-    }
-
-    // 4. Last-resort: empty string (never expose raw key names to users)
     if (typeof value !== 'string') {
       if (import.meta.env.DEV) console.warn('[i18n] Missing translation key:', key);
       return '';

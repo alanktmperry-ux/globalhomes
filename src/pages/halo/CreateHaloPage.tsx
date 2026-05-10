@@ -36,7 +36,7 @@ const initialData: HaloFormData = {
   referral_source: null,
 };
 
-const STEP_LABELS = ['What are you looking for?', 'Where and how much?', 'Tell agents more'];
+
 
 const VALID_SOURCE_TYPES = new Set(['direct','listing_qr','crm_invite','rent_roll','voice_lead','settlement']);
 

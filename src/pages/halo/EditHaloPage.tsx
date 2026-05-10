@@ -211,9 +211,9 @@ export default function EditHaloPage() {
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Update your Halo</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">{t('halo.edit.title')}</h1>
         <p className="text-muted-foreground mb-6">
-          Adjust your search preferences — agents will match against the latest version.
+          {t('halo.edit.subtitle')}
         </p>
 
         <div className="mb-6">
@@ -228,7 +228,7 @@ export default function EditHaloPage() {
 
         {stepError && (
           <Alert variant="destructive" className="mb-4">
-            <AlertDescription>{stepError}</AlertDescription>
+            <AlertDescription>{t(stepError)}</AlertDescription>
           </Alert>
         )}
 
@@ -238,16 +238,16 @@ export default function EditHaloPage() {
             onClick={step === 1 ? () => navigate('/seeker/dashboard') : handleBack}
             disabled={submitting}
           >
-            <ArrowLeft size={16} /> {step === 1 ? 'Cancel' : 'Back'}
+            <ArrowLeft size={16} /> {step === 1 ? t('halo.wizard.nav.cancel') : t('halo.wizard.nav.back')}
           </Button>
           {step < 3 ? (
             <Button onClick={handleNext}>
-              Next <ArrowRight size={16} />
+              {t('halo.wizard.nav.next')} <ArrowRight size={16} />
             </Button>
           ) : (
             <Button onClick={handleSubmit} disabled={submitting}>
               {submitting && <Loader2 size={16} className="animate-spin" />}
-              Save changes
+              {t('halo.wizard.nav.save')}
             </Button>
           )}
         </div>

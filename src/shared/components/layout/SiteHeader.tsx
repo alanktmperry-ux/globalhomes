@@ -17,7 +17,6 @@ import { CurrencySwitcher } from '@/shared/components/layout/CurrencySwitcher';
 // "Become an agent" modal. Keeping it static added ~50KB gz to every cold load.
 const AgentRegistrationModal = lazy(() => import('@/features/agents/components/AgentRegistrationModal'));
 
-import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 

@@ -9,7 +9,6 @@ import {
 import { calculateFirbCosts, FOREIGN_SURCHARGE_RATES } from '@/lib/firb';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useTranslation } from '@/shared/lib/i18n';
-import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 interface Props {
   propertyPrice: number | null;

@@ -4,7 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { MortgageBrokerCard } from './MortgageBrokerCard';
 import { capture } from '@/shared/lib/posthog';
 import { useTranslation, type Language } from '@/shared/lib/i18n';
-import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 type LanguageKey = 'en' | 'zh_simplified' | 'zh_traditional' | 'vi' | 'ko' | 'ar' | 'ja' | 'hi' | 'bn' | 'tl' | 'id';
 

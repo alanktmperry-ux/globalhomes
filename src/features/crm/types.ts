@@ -54,6 +54,12 @@ export interface CRMLead {
   activity_count?: number;
   open_tasks?: number;
 
+  // Phase 3A-UI: multilingual buyer enquiry message
+  message?: string | null;
+  message_original?: string | null;
+  original_language?: string | null;
+  message_en?: string | null;
+
   /**
    * Backward-compatible accessor fields, populated at fetch time by
    * `useCRMLeads` decorate(). These mirror values from the joined contact

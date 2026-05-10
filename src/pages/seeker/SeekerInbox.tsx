@@ -339,7 +339,7 @@ export default function SeekerInbox() {
                   {/* Initial agent message */}
                   {selected.body && (
                     <div className="p-4 sm:p-5 border-b border-[#E2E8F0] bg-[#F8FAFC]">
-                      <p className="text-xs text-[#64748B] mb-2 uppercase tracking-wide">Initial message</p>
+                      <p className="text-xs text-[#64748B] mb-2 uppercase tracking-wide">{t('seeker.inbox.detail.initialMessage')}</p>
                       <p className="text-sm text-[#1E293B] whitespace-pre-wrap">{selected.body}</p>
                     </div>
                   )}

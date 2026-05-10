@@ -220,7 +220,7 @@ export default function CreateHaloPage() {
       navigate('/halo/success');
     } catch (e) {
       console.error(e);
-      toast.error('Something went wrong. Please try again.');
+      toast.error(t('halo.toast.genericError'));
       scrollToError();
     } finally {
       setSubmitting(false);

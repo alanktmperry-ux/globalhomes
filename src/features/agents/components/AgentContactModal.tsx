@@ -12,6 +12,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 /* ── Validation ─────────────────────────────────────────────── */
 

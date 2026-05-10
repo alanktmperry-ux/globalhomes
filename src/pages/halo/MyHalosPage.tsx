@@ -8,11 +8,13 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { HaloCard } from '@/components/halo/HaloCard';
+import { useTranslation } from '@/shared/lib/i18n';
 import type { Halo, HaloStatus } from '@/types/halo';
 
 export default function MyHalosPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [halos, setHalos] = useState<Halo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,15 +47,15 @@ export default function MyHalosPage() {
       .update({ status })
       .eq('id', id);
     if (error) {
-      toast.error('Could not update Halo');
+      toast.error(t('halo.toast.updateFailed'));
       return;
     }
     if (status === 'deleted') {
       setHalos((prev) => prev.filter((h) => h.id !== id));
-      toast.success('Halo deleted');
+      toast.success(t('halo.toast.deleted'));
     } else {
       setHalos((prev) => prev.map((h) => (h.id === id ? { ...h, status } : h)));
-      toast.success(status === 'paused' ? 'Halo paused' : 'Halo resumed');
+      toast.success(status === 'paused' ? t('halo.toast.paused') : t('halo.toast.resumed'));
     }
   };
 
@@ -63,7 +65,7 @@ export default function MyHalosPage() {
       .update({ status: 'fulfilled' })
       .eq('id', id);
     if (error) {
-      toast.error('Could not mark as fulfilled');
+      toast.error(t('halo.toast.fulfilFailed'));
       return;
     }
     setHalos((prev) => prev.map((h) => (h.id === id ? { ...h, status: 'fulfilled' } : h)));
@@ -72,7 +74,7 @@ export default function MyHalosPage() {
     } catch {
       /* non-fatal */
     }
-    toast.success('Halo marked as fulfilled. Agents have been notified.');
+    toast.success(t('halo.toast.fulfilled'));
   };
 
   return (
@@ -80,13 +82,13 @@ export default function MyHalosPage() {
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between gap-3 mb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">My Halos</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold">{t('halo.list.title')}</h1>
             <p className="text-muted-foreground text-sm mt-1">
-              Manage what agents see when they look for you.
+              {t('halo.list.subtitle')}
             </p>
           </div>
           <Button onClick={() => navigate('/halo/new')}>
-            <Plus size={16} /> New Halo
+            <Plus size={16} /> {t('halo.list.new')}
           </Button>
         </div>
 
@@ -102,12 +104,12 @@ export default function MyHalosPage() {
         ) : halos.length === 0 ? (
           <div className="text-center py-16 border rounded-xl bg-card">
             <Sparkles className="mx-auto text-primary mb-3" size={32} />
-            <h2 className="text-lg font-semibold mb-1">You haven't posted a Halo yet.</h2>
+            <h2 className="text-lg font-semibold mb-1">{t('halo.list.empty.title')}</h2>
             <p className="text-muted-foreground mb-5">
-              Create your first Halo to let agents find you.
+              {t('halo.list.empty.body')}
             </p>
             <Button onClick={() => navigate('/halo/new')}>
-              <Plus size={16} /> Create your Halo
+              <Plus size={16} /> {t('halo.list.empty.cta')}
             </Button>
           </div>
         ) : (

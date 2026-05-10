@@ -688,7 +688,7 @@ export default function PropertyDetailPage() {
               {(property as any).status === 'under_offer' && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 mt-2 rounded-full bg-amber-100 text-amber-800 text-sm font-medium">
                   <span className="w-2 h-2 rounded-full bg-amber-500" />
-                  Under offer — enquiries still welcome
+                  {tp('property.underOfferBadge')}
                 </div>
               )}
               {property.suburb && property.state && (
@@ -696,7 +696,7 @@ export default function PropertyDetailPage() {
                   to={`/suburb/${property.state.toLowerCase()}/${property.suburb.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
                   className="inline-block text-xs text-muted-foreground hover:text-primary transition-colors mt-1"
                 >
-                  {tp('property.viewSuburb', { suburb: property.suburb })} →
+                  {tp('property.viewSuburbArrow', { suburb: property.suburb })}
                 </Link>
               )}
               <ListingLanguageSwitcher

@@ -16,24 +16,22 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("Not authenticated");
-
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const supabaseUser = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
-    if (userError || !user) throw new Error("Not authenticated");
-
-    const { companyName, contactName, contactEmail, contactPhone, abn, website } = await req.json();
+    const body = await req.json();
+    const {
+      companyName,
+      contactName,
+      contactEmail,
+      contactPhone,
+      abn,
+      website,
+      partner_type: partnerTypeRaw,
+      userId: bodyUserId,
+    } = body;
 
     if (!companyName || !contactName || !contactEmail) {
       return new Response(
@@ -41,6 +39,43 @@ Deno.serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Resolve user: prefer Authorization header session, fall back to body.userId verified via admin
+    let user: { id: string; email?: string } | null = null;
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader) {
+      const supabaseUser = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: authHeader } } }
+      );
+      const { data: { user: sessionUser } } = await supabaseUser.auth.getUser();
+      if (sessionUser) user = { id: sessionUser.id, email: sessionUser.email ?? undefined };
+    }
+    if (!user && bodyUserId) {
+      const { data: adminUserData } = await supabaseAdmin.auth.admin.getUserById(bodyUserId);
+      if (adminUserData?.user) {
+        // Cross-check: email in body must match the user record
+        if ((adminUserData.user.email ?? "").toLowerCase() !== String(contactEmail).toLowerCase()) {
+          return new Response(
+            JSON.stringify({ error: "Email does not match user record" }),
+            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        user = { id: adminUserData.user.id, email: adminUserData.user.email ?? undefined };
+      }
+    }
+    if (!user) {
+      return new Response(
+        JSON.stringify({ error: "Not authenticated" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const allowedTypes = ["trust_accountant", "mortgage_broker"] as const;
+    const partnerType = allowedTypes.includes(partnerTypeRaw)
+      ? partnerTypeRaw
+      : "trust_accountant";
 
     // Check partner doesn't already exist
     const { data: existing } = await supabaseAdmin
@@ -68,6 +103,7 @@ Deno.serve(async (req) => {
         abn: abn || null,
         website: website || null,
         is_verified: false,
+        partner_type: partnerType,
       })
       .select("id")
       .single();

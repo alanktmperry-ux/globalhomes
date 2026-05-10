@@ -176,6 +176,10 @@ Deno.serve(async (req) => {
       pre_approved: preApprovalStatus === 'approved',
       notes: message || null,
       tags: [],
+      message: storedMessage || null,
+      message_original: messageOriginal,
+      original_language: originalLanguage,
+      message_en: messageEn,
     }]);
 
     // ── Drip: enroll agent in lead follow-up sequence ──────────

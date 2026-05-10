@@ -265,25 +265,27 @@ const Index = () => {
     return () => clearInterval(id);
   }, [language]);
 
-  // Card cycle — crossfade image layer + text inside the static front card
+  // Card cycle — crossfade image layer + text inside the static front card.
+  // Only cycles when 2+ real listings are available; otherwise the static
+  // initial card (gradient + empty-state copy) stays put.
   useEffect(() => {
+    if (heroCards.length < 2) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const id = setInterval(() => {
-      const next = (cardIdxRef.current + 1) % FEAT_LISTINGS.length;
-      const listing = FEAT_LISTINGS[next];
+      const next = (cardIdxRef.current + 1) % heroCards.length;
+      const listing = heroCards[next];
       cardIdxRef.current = next;
-      setBackCardIdx((next + 1) % FEAT_LISTINGS.length);
+      setBackCardIdx((next + 1) % heroCards.length);
 
-      // Preload next image — only swap once it's actually loaded
+      // Preload next image (if any) — only swap once it's loaded
       const pre = new Image();
+      const bg = listing.img ? `url(${listing.img})` : listing.gradient;
       const runSwap = () => {
         const inactive = activeLayerRef.current === 'a' ? layerBRef.current : layerARef.current;
         const active = activeLayerRef.current === 'a' ? layerARef.current : layerBRef.current;
         if (inactive) {
-          inactive.style.backgroundImage = `url(${listing.img})`;
-          // restart ken burns animation on the layer that's about to become active
+          inactive.style.backgroundImage = bg;
           inactive.style.animation = 'none';
-          // force reflow
           void inactive.offsetWidth;
           inactive.style.animation = '';
         }
@@ -293,7 +295,6 @@ const Index = () => {
           activeLayerRef.current = activeLayerRef.current === 'a' ? 'b' : 'a';
         });
 
-        // Text fade in parallel with image crossfade
         const t = titleRef.current;
         const p = priceRef.current;
         if (t) t.classList.add('hcard-text-hidden');
@@ -305,12 +306,16 @@ const Index = () => {
         const m = metaRef.current;
         if (m) m.textContent = listing.meta;
       };
-      pre.onload = runSwap;
-      pre.onerror = runSwap;
-      pre.src = listing.img;
+      if (listing.img) {
+        pre.onload = runSwap;
+        pre.onerror = runSwap;
+        pre.src = listing.img;
+      } else {
+        runSwap();
+      }
     }, 5000);
     return () => clearInterval(id);
-  }, []);
+  }, [heroCards]);
 
 
   const openSearch = useCallback((q: string) => {

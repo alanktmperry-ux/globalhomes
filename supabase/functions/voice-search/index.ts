@@ -78,58 +78,88 @@ Deno.serve(async (req) => {
     let transcript = rawTranscript || "";
     let detected_language = detectedLanguage || "en";
 
-    // ── Path A: audio blob → Deepgram Nova-3 STT ──
+    // ── Path A: audio blob → ElevenLabs Scribe (primary) → Deepgram (fallback) ──
     if (audio && typeof audio === "string") {
+      const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
       const DEEPGRAM_API_KEY = Deno.env.get("DEEPGRAM_API_KEY");
-      if (!DEEPGRAM_API_KEY) {
-        return new Response(
-          JSON.stringify({ error: "DEEPGRAM_API_KEY not configured" }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
 
-      // Decode base64 to binary
+      // Decode base64 to binary (used for both providers)
       const binaryString = atob(audio);
       const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-
+      for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
       const contentType = mimeType || "audio/webm";
 
-      // If a language hint is provided, use it (overrides auto-detect for accuracy).
-      const dgLang = typeof language_hint === "string" && language_hint.length >= 2
-        ? language_hint.split("-")[0]
-        : null;
-      const dgUrl = dgLang
-        ? `https://api.deepgram.com/v1/listen?model=nova-3&language=${encodeURIComponent(dgLang)}&punctuate=true&smart_format=true`
-        : "https://api.deepgram.com/v1/listen?model=nova-3&detect_language=true&punctuate=true&smart_format=true";
+      let scribeOk = false;
 
-      const dgResponse = await fetch(
-        dgUrl,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Token ${DEEPGRAM_API_KEY}`,
-            "Content-Type": contentType,
-          },
-          body: bytes,
+      // Try ElevenLabs Scribe first
+      if (ELEVENLABS_API_KEY) {
+        try {
+          const ext = contentType.includes("mp4") ? "mp4" : (contentType.includes("wav") ? "wav" : "webm");
+          const audioFile = new File([bytes], `audio.${ext}`, { type: contentType });
+          const formData = new FormData();
+          formData.append("file", audioFile);
+          formData.append("model_id", "scribe_v1");
+          if (typeof language_hint === "string" && language_hint.length >= 2) {
+            formData.append("language_code", language_hint.split("-")[0]);
+          }
+
+          const scribeResp = await fetch("https://api.elevenlabs.io/v1/speech-to-text", {
+            method: "POST",
+            headers: { "xi-api-key": ELEVENLABS_API_KEY },
+            body: formData,
+          });
+
+          if (scribeResp.ok) {
+            const scribeData = await scribeResp.json();
+            transcript = scribeData.text || "";
+            detected_language = scribeData.language_code || language_hint?.split("-")[0] || "en";
+            scribeOk = true;
+            console.log("voice-search: ElevenLabs Scribe success", { transcript_length: transcript.length, detected: detected_language });
+          } else {
+            const errText = await scribeResp.text();
+            console.warn("voice-search: ElevenLabs Scribe failed, falling back to Deepgram", { status: scribeResp.status, body: errText.slice(0, 200) });
+          }
+        } catch (err) {
+          console.warn("voice-search: ElevenLabs Scribe exception, falling back to Deepgram", err);
         }
-      );
-
-      if (!dgResponse.ok) {
-        const errText = await dgResponse.text();
-        console.error("Deepgram error:", dgResponse.status, errText);
-        return new Response(
-          JSON.stringify({ error: `Deepgram transcription failed (${dgResponse.status})` }),
-          { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
       }
 
-      const dgData = await dgResponse.json();
-      const channel = dgData.results?.channels?.[0];
-      transcript = channel?.alternatives?.[0]?.transcript || "";
-      detected_language = channel?.detected_language || "en";
+      // Fallback: Deepgram (existing logic)
+      if (!scribeOk) {
+        if (!DEEPGRAM_API_KEY) {
+          return new Response(
+            JSON.stringify({ error: "No transcription provider available" }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        const dgLang = typeof language_hint === "string" && language_hint.length >= 2
+          ? language_hint.split("-")[0]
+          : null;
+        const dgUrl = dgLang
+          ? `https://api.deepgram.com/v1/listen?model=nova-3&language=${encodeURIComponent(dgLang)}&punctuate=true&smart_format=true`
+          : "https://api.deepgram.com/v1/listen?model=nova-3&detect_language=true&punctuate=true&smart_format=true";
+
+        const dgResponse = await fetch(dgUrl, {
+          method: "POST",
+          headers: { Authorization: `Token ${DEEPGRAM_API_KEY}`, "Content-Type": contentType },
+          body: bytes,
+        });
+
+        if (!dgResponse.ok) {
+          const errText = await dgResponse.text();
+          console.error("Deepgram error:", dgResponse.status, errText);
+          return new Response(
+            JSON.stringify({ error: `Transcription failed (${dgResponse.status})` }),
+            { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        const dgData = await dgResponse.json();
+        const channel = dgData.results?.channels?.[0];
+        transcript = channel?.alternatives?.[0]?.transcript || "";
+        detected_language = channel?.detected_language || dgLang || "en";
+      }
 
       if (!transcript) {
         return new Response(

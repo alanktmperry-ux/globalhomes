@@ -91,12 +91,18 @@ export default function PropertyDetailPage() {
     const langParam = searchParams.get('lang');
     if (langParam) {
       setLanguage(langParam as any);
+      try { localStorage.setItem('listhq_lang_user_set', '1'); } catch { /* non-fatal */ }
       const url = new URL(window.location.href);
       url.searchParams.delete('lang');
       window.history.replaceState({}, '', url.toString());
       return;
     }
-    // No URL param — check logged-in buyer's profile preference
+    // No URL param — apply profile preference only if user hasn't already chosen
+    // a language via the in-app switcher this session. Without this guard, every
+    // property-page visit overwrites the user's manual choice.
+    if (typeof window !== 'undefined' && localStorage.getItem('listhq_lang_user_set') === '1') {
+      return;
+    }
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return;
       supabase

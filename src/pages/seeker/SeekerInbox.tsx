@@ -421,7 +421,7 @@ export default function SeekerInbox() {
                           className="bg-[#1E3A5F] hover:bg-[#172E4A] text-white min-h-[44px]"
                         >
                           <Send className="h-4 w-4 mr-2" />
-                          {sending ? 'Sending…' : 'Send reply'}
+                          {sending ? t('seeker.inbox.reply.sending') : t('seeker.inbox.reply.send')}
                         </Button>
                       </div>
                     </div>

@@ -6,6 +6,7 @@ import { useCRMLeads } from '../hooks/useCRMLeads';
 import type { CRMLead, ActivityType, LeadStage, LeadPriority } from '../types';
 import { HaloInviteButton } from '@/components/halo/HaloInviteButton';
 import { BuyerLanguageBadge } from '@/shared/components/BuyerLanguageBadge';
+import { ReplyTranslationPreview } from './ReplyTranslationPreview';
 
 const ACTIVITY_TYPES: { value: ActivityType; label: string; icon: string }[] = [
   { value: 'note', label: 'Note', icon: '📝' },
@@ -280,6 +281,7 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm
                              focus:outline-none resize-none bg-background"
                 />
+                <ReplyTranslationPreview text={actBody} targetLanguage={lead.original_language} />
                 {actType === 'task' && (
                   <input
                     type="datetime-local"
@@ -483,6 +485,7 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
                   autoFocus
                 />
                 <p className="text-xs text-muted-foreground">{smsBody.length} characters · opens your SMS app</p>
+                <ReplyTranslationPreview text={smsBody} targetLanguage={lead.original_language} />
                 {smsSent ? (
                   <div className="text-center text-sm text-green-600 font-medium py-2">✅ SMS sent and logged!</div>
                 ) : (

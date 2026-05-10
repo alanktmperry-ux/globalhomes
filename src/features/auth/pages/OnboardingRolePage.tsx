@@ -76,7 +76,10 @@ const OnboardingRolePage = () => {
         );
       if (pErr) throw pErr;
 
-      const roleToAssign = selected === 'buyer' ? 'buyer' : 'agent';
+      // Map UI role → app_role enum (user_roles.role). Enum has: user, agent, property_manager, etc.
+      // There is no 'buyer' enum value — seekers use 'user'.
+      const roleToAssign: 'user' | 'agent' | 'property_manager' =
+        selected === 'buyer' ? 'user' : selected === 'property_manager' ? 'property_manager' : 'agent';
       const { error: rErr } = await supabase
         .from('user_roles')
         .upsert(

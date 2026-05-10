@@ -429,6 +429,38 @@ Return ONLY valid JSON.`;
   });
 }
 
+async function handleMessageTranslation(message: string, ip: string) {
+  const systemPrompt = `You are a multilingual translator for Australian real estate enquiries.
+Detect the buyer's language and translate their message to natural English.
+Preserve names, addresses, and property references verbatim.
+Return valid JSON only.`;
+
+  const userPrompt = `Translate this real estate enquiry to English and detect the source language:
+
+"${message}"
+
+Return JSON with:
+- english_message: the message translated to natural English (preserve names, addresses, suburbs verbatim)
+- original_language: ISO 639-1 code (e.g. "zh", "ko", "ar", "en", "vi", "ja")
+
+Return ONLY valid JSON. No markdown, no code fences.`;
+
+  const result = await callAI(systemPrompt, userPrompt);
+
+  await logApiUsage({
+    service: 'gemini',
+    action: 'translate_message',
+    units: 1,
+    cost_estimate: 0,
+    metadata: { ip, message_length: message.length, detected_language: result.original_language },
+  });
+
+  return jsonResponse({
+    english_message: result.english_message,
+    original_language: result.original_language,
+  });
+}
+
 Deno.serve(async (req) => {
   corsHeaders = getCorsHeaders(req.headers.get("Origin"));
 

@@ -86,6 +86,14 @@ const HOUSE_PLACEHOLDER_SVG =
     </svg>`
   );
 
+// Currency-naive AU price formatter used by both the hero card and the featured grid.
+function fmtPriceStatic(price?: number | null, listingType?: string | null): string {
+  if (!price) return 'Price on request';
+  if (listingType === 'rent' || listingType === 'rental') return `$${price.toLocaleString()}/wk`;
+  if (price >= 1_000_000) return `$${(price / 1_000_000).toFixed(price % 1_000_000 === 0 ? 0 : 2)}M`;
+  return `$${price.toLocaleString()}`;
+}
+
 const TRANS_MAP = [
   { en:'Spacious 4-bedroom family home near top schools',
     zh:'宽敞的四居室家庭住宅，毗邻顶级学校',

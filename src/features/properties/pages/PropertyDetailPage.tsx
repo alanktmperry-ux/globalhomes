@@ -1211,7 +1211,7 @@ export default function PropertyDetailPage() {
                       <Star size={12} className="fill-yellow-400 text-yellow-400" />
                       <span className="text-[12px] font-medium text-white">{property.agent.rating.toFixed(1)}</span>
                       {property.agent.reviewCount ? (
-                        <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>({property.agent.reviewCount})</span>
+                        <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{tp('property.agent.reviewCount', { count: property.agent.reviewCount })}</span>
                       ) : null}
                     </div>
                   ) : null}

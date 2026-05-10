@@ -6,25 +6,26 @@ import { Home, Building2, Key, Loader2, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { useTranslation } from '@/shared/lib/i18n';
 
 const ROLES = [
   {
     value: 'buyer' as const,
     icon: Home,
-    title: 'Looking to buy or rent',
-    description: 'Search listings, save properties, get alerts',
+    titleKey: 'onboarding.role.cards.buyer.title',
+    descKey: 'onboarding.role.cards.buyer.desc',
   },
   {
     value: 'agent' as const,
     icon: Building2,
-    title: "I'm a real estate agent",
-    description: 'List properties, manage leads, grow your rent roll',
+    titleKey: 'onboarding.role.cards.agent.title',
+    descKey: 'onboarding.role.cards.agent.desc',
   },
   {
     value: 'property_manager' as const,
     icon: Key,
-    title: "I'm a property manager",
-    description: 'Manage rentals, trust accounting, maintenance requests',
+    titleKey: 'onboarding.role.cards.propertyManager.title',
+    descKey: 'onboarding.role.cards.propertyManager.desc',
   },
 ];
 

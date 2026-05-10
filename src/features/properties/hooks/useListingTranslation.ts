@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useI18n, type Language } from '@/shared/lib/i18n';
+import { LEGACY_CODE_MAP } from '@/shared/lib/i18n/config';
 import { supabase } from '@/integrations/supabase/client';
 import { translateListing } from '@/features/properties/lib/translationService';
 

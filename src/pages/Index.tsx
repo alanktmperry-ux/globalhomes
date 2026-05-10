@@ -663,8 +663,19 @@ const Index = () => {
                     ref={layerARef}
                     className="hcard-img hcard-layer hcard-layer-a active"
                     id="hcardLayerA"
-                    style={{ backgroundImage:`url(${initialFront.img})` }}
-                  />
+                    style={{
+                      backgroundImage: initialFront.img ? `url(${initialFront.img})` : initialFront.gradient,
+                    }}
+                  >
+                    {!initialFront.img && (
+                      <img
+                        src={HOUSE_PLACEHOLDER_SVG}
+                        alt=""
+                        aria-hidden="true"
+                        style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'contain', opacity:0.7, pointerEvents:'none' }}
+                      />
+                    )}
+                  </div>
                   <div
                     ref={layerBRef}
                     className="hcard-img hcard-layer hcard-layer-b"

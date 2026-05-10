@@ -88,6 +88,36 @@ Deno.serve(async (req) => {
 
     const score = calculateLeadScore({ urgency, preApprovalStatus, message });
 
+    // Phase 3A: detect + translate non-English buyer messages
+    let messageOriginal: string | null = null;
+    let originalLanguage: string | null = null;
+    let messageEn: string | null = null;
+    let storedMessage = message;
+    if (message && typeof message === "string" && message.trim().length > 0) {
+      // Quick client-side check: skip API call for clearly-English messages
+      const hasNonLatin = /[㐀-鿿가-힯؀-ۿऀ-ॿ฀-๿]/.test(message);
+      if (hasNonLatin) {
+        try {
+          const tResp = await fetch(`${supabaseUrl}/functions/v1/generate-translations`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'translate_message', message }),
+          });
+          if (tResp.ok) {
+            const tData = await tResp.json();
+            if (tData?.english_message && tData?.original_language && tData.original_language !== 'en') {
+              messageOriginal = message;
+              originalLanguage = tData.original_language;
+              messageEn = tData.english_message;
+              storedMessage = tData.english_message; // primary message field gets English
+            }
+          }
+        } catch (err) {
+          console.warn('capture-lead: message translation failed; storing original', err);
+        }
+      }
+    }
+
     const { data: lead, error } = await supabase
       .from("leads")
       .insert([{
@@ -96,7 +126,10 @@ Deno.serve(async (req) => {
         user_email: userEmail,
         user_phone: userPhone || null,
         user_name: userName,
-        message: message || null,
+        message: storedMessage || null,
+        message_original: messageOriginal,
+        original_language: originalLanguage,
+        message_en: messageEn,
         search_context: searchContext || null,
         preferred_contact: preferredContact || "email",
         urgency: urgency || "just_browsing",

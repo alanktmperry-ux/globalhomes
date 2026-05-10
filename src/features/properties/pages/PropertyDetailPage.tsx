@@ -969,7 +969,7 @@ export default function PropertyDetailPage() {
                 <>
                   {isUploadedVideo && (
                     <div className="space-y-3">
-                      <h3 className="text-base font-semibold">Walkthrough Video</h3>
+                      <h3 className="text-base font-semibold">{tp('property.walkthroughVideo')}</h3>
                       <video
                         src={vUrl!}
                         controls

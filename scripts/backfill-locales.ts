@@ -29,6 +29,17 @@ const LOCALES: LocaleSpec[] = [
   { file: 'bn.ts',    exportName: 'bn',   langCode: 'bn',    importStyle: 'EnBase' },
   { file: 'pa.ts',    exportName: 'pa',   langCode: 'pa',    importStyle: 'TranslationKey' },
   { file: 'ta.ts',    exportName: 'ta',   langCode: 'ta',    importStyle: 'TranslationKey' },
+  // Phase 1B — new locales (files created from scratch)
+  { file: 'id.ts',    exportName: 'id',   langCode: 'id',    importStyle: 'TranslationKey' },
+  { file: 'ms.ts',    exportName: 'ms',   langCode: 'ms',    importStyle: 'TranslationKey' },
+  { file: 'th.ts',    exportName: 'th',   langCode: 'th',    importStyle: 'TranslationKey' },
+  { file: 'fil.ts',   exportName: 'fil',  langCode: 'tl',    importStyle: 'TranslationKey' },
+  { file: 'it.ts',    exportName: 'it',   langCode: 'it',    importStyle: 'TranslationKey' },
+  { file: 'es.ts',    exportName: 'es',   langCode: 'es',    importStyle: 'TranslationKey' },
+  { file: 'fr.ts',    exportName: 'fr',   langCode: 'fr',    importStyle: 'TranslationKey' },
+  { file: 'pt.ts',    exportName: 'pt',   langCode: 'pt',    importStyle: 'TranslationKey' },
+  { file: 'ru.ts',    exportName: 'ru',   langCode: 'ru',    importStyle: 'TranslationKey' },
+  { file: 'el.ts',    exportName: 'el',   langCode: 'el',    importStyle: 'TranslationKey' },
 ];
 
 const LOCALES_DIR = resolve(process.cwd(), 'src/shared/lib/i18n/locales');

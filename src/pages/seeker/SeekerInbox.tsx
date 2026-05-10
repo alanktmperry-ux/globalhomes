@@ -43,6 +43,7 @@ const formatPrice = (price: number | null) => {
 
 export default function SeekerInbox() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [responses, setResponses] = useState<HaloResponse[]>([]);

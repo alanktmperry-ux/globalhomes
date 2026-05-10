@@ -6,6 +6,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getCorsHeaders } from '../_shared/cors.ts';
 import { renderEmail, buildUnsubscribeToken } from '../_shared/email-frame.ts';
+import { translateEmail } from '../_shared/translateEmail.ts';
 
 const RESEND_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? 'ListHQ <hello@listhq.com.au>';
@@ -210,10 +211,28 @@ Deno.serve(async (req) => {
       unsubscribeLink,
     });
 
+    // Phase 2: resolve recipient language and translate (no-op for English)
+    let recipientLanguage = 'en';
+    try {
+      const { data: profile } = await admin
+        .from('profiles')
+        .select('language_preference')
+        .eq('id', user_id)
+        .maybeSingle();
+      if ((profile as any)?.language_preference) recipientLanguage = (profile as any).language_preference;
+    } catch { /* default to en */ }
+
+    const translated = await translateEmail({
+      subject: rendered.subject,
+      bodyHtml: rendered.html,
+      bodyText: rendered.text,
+      targetLanguage: recipientLanguage,
+    });
+
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: EMAIL_FROM, to: [email], subject: rendered.subject, html: rendered.html, text: rendered.text }),
+      body: JSON.stringify({ from: EMAIL_FROM, to: [email], subject: translated.subject, html: translated.bodyHtml, text: translated.bodyText }),
     });
 
     if (!res.ok) {
@@ -226,7 +245,7 @@ Deno.serve(async (req) => {
       recipient_email: email,
       recipient_id: user_id,
       template: tplKey,
-      subject: rendered.subject,
+      subject: translated.subject,
       sent_at: new Date().toISOString(),
     } as any);
 

@@ -1,6 +1,7 @@
 import "../_shared/email-footer.ts";
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { translateEmail } from "../_shared/translateEmail.ts";
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -9,6 +10,19 @@ const supabase = createClient(
 const RESEND_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? 'ListHQ Alerts <alerts@listhq.com.au>';
 const APP_URL = Deno.env.get('APP_URL') ?? 'https://listhq.com.au';
+
+// Phase 2: resolve a recipient's language preference, default 'en' on any failure.
+async function resolveLanguage(userId: string | null | undefined): Promise<string> {
+  if (!userId) return 'en';
+  try {
+    const { data } = await supabase
+      .from('profiles')
+      .select('language_preference')
+      .eq('id', userId)
+      .maybeSingle();
+    return (data as any)?.language_preference || 'en';
+  } catch { return 'en'; }
+}
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get("Origin"));
@@ -73,17 +87,13 @@ async function handleNewListing(propertyId: string) {
     const propUrl = `${APP_URL}/property/${propertyId}`;
     const imageUrl = prop.images?.[0] ?? '';
 
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${RESEND_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: EMAIL_FROM,
-        to: [match.buyer_email],
-        subject: `🏡 New match for "${match.search_name}" — ${prop.suburb}, ${prop.state}`,
-        html: `
+    // Phase 2: resolve recipient language via saved_search owner
+    const { data: ssRow } = await supabase
+      .from('saved_searches').select('user_id').eq('id', match.saved_search_id).maybeSingle();
+    const recipientLanguage = await resolveLanguage((ssRow as any)?.user_id);
+
+    const subject = `🏡 New match for "${match.search_name}" — ${prop.suburb}, ${prop.state}`;
+    const bodyHtml = `
           <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px">
             <p>Hi ${match.buyer_name?.split(' ')[0] ?? 'there'},</p>
             <p>A new property matching "<strong>${match.search_name}</strong>" just listed:</p>
@@ -96,7 +106,21 @@ async function handleNewListing(propertyId: string) {
               <a href="${APP_URL}/saved" style="color:#999">Manage alerts</a>
             </p>
           </div>
-        `,
+        `;
+
+    const translated = await translateEmail({ subject, bodyHtml, targetLanguage: recipientLanguage });
+
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${RESEND_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: EMAIL_FROM,
+        to: [match.buyer_email],
+        subject: translated.subject,
+        html: translated.bodyHtml,
       }),
     });
 
@@ -156,17 +180,9 @@ async function handlePriceDrop(
     if (alreadySent) continue;
 
     const drop = oldPrice - newPrice;
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${RESEND_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: EMAIL_FROM,
-        to: [email],
-        subject: `📉 Price drop: ${prop?.address} — now $${newPrice.toLocaleString()}`,
-        html: `
+    const recipientLanguage = await resolveLanguage(watcher.user_id);
+    const subject = `📉 Price drop: ${prop?.address} — now $${newPrice.toLocaleString()}`;
+    const bodyHtml = `
           <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px">
             <p>A property on your watchlist just had its price reduced:</p>
             <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;margin:16px 0">
@@ -178,7 +194,20 @@ async function handlePriceDrop(
             </div>
             <a href="${APP_URL}/property/${propertyId}" style="display:inline-block;background:#1a1a1a;color:white;padding:12px 24px;border-radius:8px;text-decoration:none">View Property →</a>
           </div>
-        `,
+        `;
+    const translated = await translateEmail({ subject, bodyHtml, targetLanguage: recipientLanguage });
+
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${RESEND_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: EMAIL_FROM,
+        to: [email],
+        subject: translated.subject,
+        html: translated.bodyHtml,
       }),
     });
 
@@ -242,17 +271,9 @@ async function handleDigest(mode: 'daily' | 'weekly') {
       </tr>
     `).join('');
 
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${RESEND_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: EMAIL_FROM,
-        to: [email],
-        subject: `🏡 ${matches.length} new propert${matches.length > 1 ? 'ies' : 'y'} for "${(search as any).name}"`,
-        html: `
+    const recipientLanguage = await resolveLanguage((search as any).user_id);
+    const subject = `🏡 ${matches.length} new propert${matches.length > 1 ? 'ies' : 'y'} for "${(search as any).name}"`;
+    const bodyHtml = `
           <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px">
             <p>Hi ${firstName},</p>
             <p>Here's your ${mode} digest for "<strong>${(search as any).name}</strong>":</p>
@@ -262,7 +283,20 @@ async function handleDigest(mode: 'daily' | 'weekly') {
               <a href="${APP_URL}/saved" style="color:#999">Change alert frequency or unsubscribe</a>
             </p>
           </div>
-        `,
+        `;
+    const translated = await translateEmail({ subject, bodyHtml, targetLanguage: recipientLanguage });
+
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${RESEND_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: EMAIL_FROM,
+        to: [email],
+        subject: translated.subject,
+        html: translated.bodyHtml,
       }),
     });
 

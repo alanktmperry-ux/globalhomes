@@ -12,8 +12,8 @@ import { HaloStep2, validateStep2 } from '@/components/halo/HaloStep2';
 import { HaloStep3, validateStep3 } from '@/components/halo/HaloStep3';
 import type { HaloFormData } from '@/types/halo';
 import { usePageTitle } from '@/lib/usePageTitle';
+import { useTranslation } from '@/shared/lib/i18n';
 
-const STEP_LABELS = ['What are you looking for?', 'Where and how much?', 'Tell agents more'];
 
 const LANG_TO_I18N: Record<string, string> = {
   mandarin: 'zh-CN',

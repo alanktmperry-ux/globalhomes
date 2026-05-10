@@ -1,6 +1,7 @@
 import "../_shared/email-footer.ts";
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { translateEmail } from "../_shared/translateEmail.ts";
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -9,6 +10,19 @@ const supabase = createClient(
 const RESEND_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? 'ListHQ Alerts <alerts@listhq.com.au>';
 const APP_URL = Deno.env.get('APP_URL') ?? 'https://listhq.com.au';
+
+// Phase 2: resolve a recipient's language preference, default 'en' on any failure.
+async function resolveLanguage(userId: string | null | undefined): Promise<string> {
+  if (!userId) return 'en';
+  try {
+    const { data } = await supabase
+      .from('profiles')
+      .select('language_preference')
+      .eq('id', userId)
+      .maybeSingle();
+    return (data as any)?.language_preference || 'en';
+  } catch { return 'en'; }
+}
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get("Origin"));

@@ -182,12 +182,12 @@ export default function SeekerInbox() {
       .single();
     setSending(false);
     if (error) {
-      toast.error('Could not send reply');
+      toast.error(t('seeker.inbox.toast.replyError'));
       return;
     }
     setMessages((prev) => [...prev, data as HaloMessage]);
     setReply('');
-    toast.success('Reply sent');
+    toast.success(t('seeker.inbox.toast.replySent'));
   };
 
   const handleAccept = async () => {
@@ -196,8 +196,8 @@ export default function SeekerInbox() {
       .from('halo_responses')
       .update({ accepted: true, accepted_at: new Date().toISOString() })
       .eq('id', selected.id);
-    if (error) return toast.error('Could not accept');
-    toast.success('Marked as accepted — the agent will be notified');
+    if (error) return toast.error(t('seeker.inbox.toast.acceptError'));
+    toast.success(t('seeker.inbox.toast.accepted'));
     loadResponses();
   };
 
@@ -207,8 +207,8 @@ export default function SeekerInbox() {
       .from('halo_responses')
       .update({ dismissed_by_seeker: true, dismissed_at: new Date().toISOString() })
       .eq('id', selected.id);
-    if (error) return toast.error('Could not dismiss');
-    toast.success('Response dismissed');
+    if (error) return toast.error(t('seeker.inbox.toast.dismissError'));
+    toast.success(t('seeker.inbox.toast.dismissed'));
     setSelectedId(null);
     loadResponses();
   };

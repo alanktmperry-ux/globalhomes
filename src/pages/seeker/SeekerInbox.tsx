@@ -263,7 +263,7 @@ export default function SeekerInbox() {
                     >
                       <div className="flex items-start justify-between gap-2 mb-1">
                         <span className="font-medium text-sm text-[#1E293B] truncate">
-                          {r.agent?.full_name || 'Agent'}
+                          {r.agent?.full_name || t('seeker.inbox.agentFallback')}
                         </span>
                         {unread && (
                           <span className="h-2 w-2 rounded-full bg-[#2563EB] mt-1.5 flex-shrink-0" />

@@ -171,19 +171,10 @@ const PartnerAuthPage = () => {
           abn: abn || null,
           website: website || null,
           partner_type: partnerType,
+          userId: data.user.id,
         },
       });
       if (setupError) throw setupError;
-
-      // Best-effort: ensure partner_type is persisted even if the edge function ignores it
-      try {
-        await (supabase as any)
-          .from('partners')
-          .update({ partner_type: partnerType })
-          .eq('user_id', data.user.id);
-      } catch {
-        // non-fatal
-      }
 
       setRegistered(true);
     } catch (err: unknown) {

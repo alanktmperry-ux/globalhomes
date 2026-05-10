@@ -359,7 +359,7 @@ export default function SeekerInbox() {
                               <Home className="h-4 w-4 text-[#2563EB] mt-0.5 flex-shrink-0" />
                               <div className="min-w-0">
                                 <p className="text-sm font-medium text-[#1E293B] truncate">
-                                  {p.title || p.address || 'Property'}
+                                  {p.title || p.address || t('seeker.inbox.propertyFallback')}
                                 </p>
                                 <p className="text-xs text-[#64748B] truncate">{p.suburb}</p>
                                 {formatPrice(p.price) && (

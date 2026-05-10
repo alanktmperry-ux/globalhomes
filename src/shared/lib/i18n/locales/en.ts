@@ -1085,6 +1085,44 @@ export const en = {
 
   // ── Homepage — hero / FAQ / closing (additional keys) ──
   'home.hero.buyersSearching': 'buyers searching right now',
+
+  // ──────────────────────────────────────────────────────────────────
+  // Agent contact / enquiry form (AgentContactModal)
+  // ──────────────────────────────────────────────────────────────────
+  'enquiryForm.step1Title': 'Step 1 · Buyer Intent',
+  'enquiryForm.namePlaceholder': 'Your name *',
+  'enquiryForm.emailPlaceholder': 'Email *',
+  'enquiryForm.phonePlaceholder': 'Phone *',
+  'enquiryForm.timeframeLabel': 'When are you looking to buy?',
+  'enquiryForm.timeframe.thisWeek': 'This week',
+  'enquiryForm.timeframe.1to3Months': '1–3 months',
+  'enquiryForm.timeframe.3to6Months': '3–6 months',
+  'enquiryForm.timeframe.flexible': 'Flexible',
+  'enquiryForm.purposeLabel': 'Buying for',
+  'enquiryForm.purpose.home': 'Home',
+  'enquiryForm.purpose.investment': 'Investment',
+  'enquiryForm.purpose.shortTermRental': 'Short-term rental',
+  'enquiryForm.purpose.other': 'Other',
+  'enquiryForm.preApprovalLabel': 'Mortgage pre-approval',
+  'enquiryForm.preApproval.approved': 'Pre-approved',
+  'enquiryForm.preApproval.inProgress': 'In progress',
+  'enquiryForm.preApproval.notStarted': 'Not started',
+  'enquiryForm.budgetPlaceholder': 'Budget range, e.g. $500K – $800K (optional)',
+  'enquiryForm.interest.viewing': 'Viewing',
+  'enquiryForm.interest.morePhotos': 'More photos',
+  'enquiryForm.interest.priceInfo': 'Price info',
+  'enquiryForm.interest.similarProperties': 'Similar properties',
+  'enquiryForm.messagePlaceholder': 'Message (optional)',
+  'enquiryForm.privacyNoticePrefix': 'Your contact details will be shared with the listing agent in accordance with our',
+  'enquiryForm.privacyPolicyLink': 'Privacy Policy',
+  'enquiryForm.sending': 'Sending…',
+  'enquiryForm.sendButton': 'Send Enquiry',
+  'enquiryForm.callButton': 'Call',
+  'enquiryForm.whatsappButton': 'WhatsApp',
+  'enquiryForm.successTitle': 'Enquiry Sent!',
+  'enquiryForm.successMessage': '{agentName} has been notified and will be in touch shortly.',
+  'enquiryForm.leadScoreLabel': 'Lead Score',
+  'enquiryForm.doneButton': 'Done',
 } as const;
 
 export type TranslationKey = keyof typeof en;

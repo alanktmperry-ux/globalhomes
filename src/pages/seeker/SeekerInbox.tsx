@@ -347,7 +347,7 @@ export default function SeekerInbox() {
                   {/* Suggested properties */}
                   {selected.properties && selected.properties.length > 0 && (
                     <div className="p-4 sm:p-5 border-b border-[#E2E8F0]">
-                      <p className="text-xs text-[#64748B] mb-3 uppercase tracking-wide">Suggested properties</p>
+                      <p className="text-xs text-[#64748B] mb-3 uppercase tracking-wide">{t('seeker.inbox.detail.suggested')}</p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {selected.properties.map((p) => (
                           <button

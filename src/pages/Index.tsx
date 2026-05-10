@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { Mic, Search, Play, X } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
@@ -66,15 +67,32 @@ const TILE_LANGS = [
   { flag:'🇮🇹', name:'Italian',    native:'Italiano',    idx:-1 },
 ];
 
-type Listing = { img: string; title: string; price: string; meta: string; };
-const FEAT_LISTINGS: Listing[] = [
-  { img:'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&h=600&fit=crop', title:'Spacious 4-bed family home, walk to top-ranked schools', price:'$1,250,000', meta:'4 bed · 2 bath · 2 car' },
-  { img:'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop', title:'Modern 3-bed townhouse near transit',                    price:'$985,000',   meta:'3 bed · 2 bath · 1 car' },
-  { img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop', title:'Renovated 3-bed heritage home, walk to cafes',          price:'$1,580,000', meta:'3 bed · 2 bath · 1 car' },
-  { img:'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&h=600&fit=crop', title:'Brand new 5-bed entertainer with pool',                 price:'$2,150,000', meta:'5 bed · 3 bath · 2 car' },
-  { img:'https://images.unsplash.com/photo-1598228723793-52759bba239c?w=800&h=600&fit=crop', title:'City-view 2-bed apartment with parking',                price:'$795,000',   meta:'2 bed · 1 bath · 1 car' },
-  { img:'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=800&h=600&fit=crop', title:'Coastal 4-bed family home minutes from beach',          price:'$1,395,000', meta:'4 bed · 2 bath · 2 car' },
+// Brand-coloured gradient placeholders used when a real listing has no photo,
+// and as the hero card backdrop pre-launch (zero real listings). No stock photos.
+const FALLBACK_GRADIENTS = [
+  'linear-gradient(135deg, #2563EB 0%, #1d4ed8 55%, #0a0f1e 100%)',
+  'linear-gradient(135deg, #3b82f6 0%, #1e40af 60%, #0a0f1e 100%)',
+  'linear-gradient(135deg, #60a5fa 0%, #2563EB 55%, #1e3a8a 100%)',
+  'linear-gradient(135deg, #1e3a8a 0%, #2563EB 50%, #60a5fa 100%)',
 ];
+// Inline SVG house outline (data URL) — neutral placeholder image, no stock photography.
+const HOUSE_PLACEHOLDER_SVG =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 180'>
+      <rect width='240' height='180' fill='none'/>
+      <path d='M40 100 L120 50 L200 100 L200 150 L40 150 Z' fill='none' stroke='rgba(255,255,255,0.55)' stroke-width='3' stroke-linejoin='round'/>
+      <path d='M100 150 L100 110 L140 110 L140 150' fill='none' stroke='rgba(255,255,255,0.55)' stroke-width='3' stroke-linejoin='round'/>
+    </svg>`
+  );
+
+// Currency-naive AU price formatter used by both the hero card and the featured grid.
+function fmtPriceStatic(price?: number | null, listingType?: string | null): string {
+  if (!price) return 'Price on request';
+  if (listingType === 'rent' || listingType === 'rental') return `$${price.toLocaleString()}/wk`;
+  if (price >= 1_000_000) return `$${(price / 1_000_000).toFixed(price % 1_000_000 === 0 ? 0 : 2)}M`;
+  return `$${price.toLocaleString()}`;
+}
 
 const TRANS_MAP = [
   { en:'Spacious 4-bedroom family home near top schools',
@@ -122,7 +140,6 @@ const Index = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalQuery, setModalQuery] = useState('');
   const [propertyCount, setPropertyCount] = useState<number | null>(null);
-  const [featuredListings, setFeaturedListings] = useState<any[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Front card crossfade refs
@@ -145,10 +162,16 @@ const Index = () => {
       .then(({ count }) => setPropertyCount(count ?? null));
   }, []);
 
-  // Featured listings
-  useEffect(() => {
-    const cols = 'id, title, address, suburb, state, price, price_formatted, images, image_url, property_type, beds, baths, parking, listing_type, boost_tier, is_featured';
-    (async () => {
+  // Featured listings — real Supabase data, no fabricated content.
+  // Empty array pre-launch is fine; UI renders an empty state.
+  const { data: featuredListings = [] } = useQuery({
+    queryKey: ['homepage-featured-listings'],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    queryFn: async () => {
+      const cols =
+        'id, title, address, suburb, state, price, price_formatted, images, image_url, property_type, beds, baths, parking, listing_type, boost_tier, is_featured';
+
       const { data: boosted } = await supabase
         .from('properties')
         .select(cols)
@@ -158,12 +181,13 @@ const Index = () => {
         .limit(6);
 
       const seen = new Set<string>();
-      const unique = (boosted ?? []).filter((p: any) => { if (seen.has(p.id)) return false; seen.add(p.id); return true; });
+      const unique: any[] = (boosted ?? []).filter((p: any) => {
+        if (seen.has(p.id)) return false;
+        seen.add(p.id);
+        return true;
+      });
 
-      if (unique.length >= 3) {
-        setFeaturedListings(unique.slice(0, 6));
-        return;
-      }
+      if (unique.length >= 3) return unique.slice(0, 6);
 
       const { data: fallback } = await supabase
         .from('properties')
@@ -178,16 +202,35 @@ const Index = () => {
         if (unique.length >= 6) break;
       }
 
-      if (unique.length > 0) setFeaturedListings(unique);
-    })();
-  }, []);
+      return unique;
+    },
+  });
 
-  const fmtPrice = (price: number, listingType?: string) => {
-    if (!price) return 'Price on request';
-    if (listingType === 'rent' || listingType === 'rental') return `$${price.toLocaleString()}/wk`;
-    if (price >= 1_000_000) return `$${(price / 1_000_000).toFixed(price % 1_000_000 === 0 ? 0 : 2)}M`;
-    return `$${price.toLocaleString()}`;
-  };
+  // Hero rotating card source — derived from real listings.
+  // When no real listings exist yet, the card shows a single static
+  // brand-gradient placeholder; the rotation simply doesn't fire.
+  type HeroCard = { img: string | null; gradient: string; title: string; price: string; meta: string; };
+  const heroCards: HeroCard[] = useMemo(() => {
+    if (!featuredListings.length) return [];
+    return featuredListings.slice(0, 6).map((p: any, i: number) => {
+      const img = (p.images && p.images[0]) || p.image_url || null;
+      const beds = p.beds || 0, baths = p.baths || 0, cars = p.parking || 0;
+      const metaParts: string[] = [];
+      if (beds) metaParts.push(`${beds} bed`);
+      if (baths) metaParts.push(`${baths} bath`);
+      if (cars) metaParts.push(`${cars} car`);
+      return {
+        img,
+        gradient: FALLBACK_GRADIENTS[i % FALLBACK_GRADIENTS.length],
+        title: p.title || p.address || `${p.suburb ?? ''}${p.state ? `, ${p.state}` : ''}`,
+        price: p.price_formatted || fmtPriceStatic(p.price, p.listing_type),
+        meta: metaParts.join(' · ') || (p.property_type ?? ''),
+      };
+    });
+  }, [featuredListings]);
+
+  const fmtPrice = (price: number, listingType?: string) => fmtPriceStatic(price, listingType);
+
   useEffect(() => {
     const map: Record<string, number> = {
       zh: 1, 'zh-CN': 1, 'zh-TW': 1,
@@ -222,25 +265,27 @@ const Index = () => {
     return () => clearInterval(id);
   }, [language]);
 
-  // Card cycle — crossfade image layer + text inside the static front card
+  // Card cycle — crossfade image layer + text inside the static front card.
+  // Only cycles when 2+ real listings are available; otherwise the static
+  // initial card (gradient + empty-state copy) stays put.
   useEffect(() => {
+    if (heroCards.length < 2) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const id = setInterval(() => {
-      const next = (cardIdxRef.current + 1) % FEAT_LISTINGS.length;
-      const listing = FEAT_LISTINGS[next];
+      const next = (cardIdxRef.current + 1) % heroCards.length;
+      const listing = heroCards[next];
       cardIdxRef.current = next;
-      setBackCardIdx((next + 1) % FEAT_LISTINGS.length);
+      setBackCardIdx((next + 1) % heroCards.length);
 
-      // Preload next image — only swap once it's actually loaded
+      // Preload next image (if any) — only swap once it's loaded
       const pre = new Image();
+      const bg = listing.img ? `url(${listing.img})` : listing.gradient;
       const runSwap = () => {
         const inactive = activeLayerRef.current === 'a' ? layerBRef.current : layerARef.current;
         const active = activeLayerRef.current === 'a' ? layerARef.current : layerBRef.current;
         if (inactive) {
-          inactive.style.backgroundImage = `url(${listing.img})`;
-          // restart ken burns animation on the layer that's about to become active
+          inactive.style.backgroundImage = bg;
           inactive.style.animation = 'none';
-          // force reflow
           void inactive.offsetWidth;
           inactive.style.animation = '';
         }
@@ -250,7 +295,6 @@ const Index = () => {
           activeLayerRef.current = activeLayerRef.current === 'a' ? 'b' : 'a';
         });
 
-        // Text fade in parallel with image crossfade
         const t = titleRef.current;
         const p = priceRef.current;
         if (t) t.classList.add('hcard-text-hidden');
@@ -262,12 +306,16 @@ const Index = () => {
         const m = metaRef.current;
         if (m) m.textContent = listing.meta;
       };
-      pre.onload = runSwap;
-      pre.onerror = runSwap;
-      pre.src = listing.img;
+      if (listing.img) {
+        pre.onload = runSwap;
+        pre.onerror = runSwap;
+        pre.src = listing.img;
+      } else {
+        runSwap();
+      }
     }, 5000);
     return () => clearInterval(id);
-  }, []);
+  }, [heroCards]);
 
 
   const openSearch = useCallback((q: string) => {
@@ -385,8 +433,18 @@ const Index = () => {
     navigate(`/buy?q=${encodeURIComponent(q)}`);
   };
 
-  // Initial card content (static — JS handles all subsequent updates via refs)
-  const initialFront = FEAT_LISTINGS[0];
+  // Initial card content (static — JS handles all subsequent updates via refs).
+  // Falls back to a brand-gradient empty-state card pre-launch (no real listings yet).
+  const EMPTY_STATE_TITLE = 'Listings coming soon';
+  const EMPTY_STATE_PRICE = 'First agents are getting their pocket listings ready';
+  const initialFront: { img: string | null; gradient: string; title: string; price: string; meta: string } =
+    heroCards[0] ?? {
+      img: null,
+      gradient: FALLBACK_GRADIENTS[0],
+      title: EMPTY_STATE_TITLE,
+      price: EMPTY_STATE_PRICE,
+      meta: '',
+    };
   const [backCardIdx, setBackCardIdx] = useState(1);
 
   return (
@@ -605,8 +663,19 @@ const Index = () => {
                     ref={layerARef}
                     className="hcard-img hcard-layer hcard-layer-a active"
                     id="hcardLayerA"
-                    style={{ backgroundImage:`url(${initialFront.img})` }}
-                  />
+                    style={{
+                      backgroundImage: initialFront.img ? `url(${initialFront.img})` : initialFront.gradient,
+                    }}
+                  >
+                    {!initialFront.img && (
+                      <img
+                        src={HOUSE_PLACEHOLDER_SVG}
+                        alt=""
+                        aria-hidden="true"
+                        style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'contain', opacity:0.7, pointerEvents:'none' }}
+                      />
+                    )}
+                  </div>
                   <div
                     ref={layerBRef}
                     className="hcard-img hcard-layer hcard-layer-b"
@@ -670,81 +739,111 @@ const Index = () => {
         </div>
 
         {/* ═══ SECTION 4b — Featured Listings ═══ */}
-        {featuredListings.length > 0 && (
-          <section style={{ background: '#fff', padding: '72px 24px' }}>
-            <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 32 }}>
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: T.blue, textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 8 }}>
-                    {t('home.featured.eyebrow')}
-                  </div>
-                  <h2 style={{ fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: 800, letterSpacing: '-1px', lineHeight: 1.1, margin: 0, color: T.ink }}>
-                    {t('home.featured.heading')}
-                  </h2>
+        <section style={{ background: '#fff', padding: '72px 24px' }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 32 }}>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.blue, textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 8 }}>
+                  {t('home.featured.eyebrow')}
                 </div>
+                <h2 style={{ fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: 800, letterSpacing: '-1px', lineHeight: 1.1, margin: 0, color: T.ink }}>
+                  {t('home.featured.heading')}
+                </h2>
+              </div>
+              {featuredListings.length > 0 && (
                 <button
                   onClick={() => navigate('/buy')}
                   style={{ background: 'transparent', border: `1.5px solid ${T.border}`, borderRadius: 100, padding: '10px 20px', fontSize: 13, fontWeight: 700, color: T.blue, cursor: 'pointer', whiteSpace: 'nowrap' }}
                 >
                   {t('home.featured.viewAll')}
                 </button>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }} className="feat-grid">
-                {featuredListings.map((p) => {
-                  const img = (p.images && p.images[0]) || p.image_url;
-                  const isRent = p.listing_type === 'rent' || p.listing_type === 'rental';
-                  return (
-                    <div
-                      key={p.id}
-                      onClick={() => navigate(`/property/${p.id}`)}
-                      style={{ borderRadius: 16, border: `1px solid ${T.border}`, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow .2s ease' }}
-                      onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,.1)')}
-                      onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}
-                    >
-                      <div style={{ height: 180, background: T.off2, position: 'relative', overflow: 'hidden' }}>
-                        {img ? (
-                          <img src={img} alt={p.title || p.address} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        ) : (
-                          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.subtle, fontSize: 32 }}>🏠</div>
-                        )}
-                        {(p.boost_tier || p.is_featured) && (
-                          <span style={{ position: 'absolute', top: 10, left: 10, background: p.boost_tier ? '#f59e0b' : T.blue, color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 100, textTransform: 'uppercase', letterSpacing: '.06em' }}>
-                            {p.boost_tier ? 'Featured' : 'Premier'}
-                          </span>
-                        )}
-                      </div>
-                      <div style={{ padding: '14px 16px' }}>
-                        <div style={{ fontSize: 18, fontWeight: 800, color: T.ink, marginBottom: 4 }}>
-                          {fmtPrice(p.price, p.listing_type)}
-                        </div>
-                        <div style={{ fontSize: 13, color: T.muted, marginBottom: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {p.address || `${p.suburb}${p.state ? `, ${p.state}` : ''}`}
-                        </div>
-                        <div style={{ display: 'flex', gap: 12, fontSize: 12, color: T.subtle }}>
-                          {p.beds > 0 && <span>🛏 {p.beds}</span>}
-                          {p.baths > 0 && <span>🛁 {p.baths}</span>}
-                          {p.parking > 0 && <span>🚗 {p.parking}</span>}
-                          <span style={{ marginLeft: 'auto', textTransform: 'capitalize' }}>{p.property_type || (isRent ? 'rental' : 'sale')}</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div style={{ textAlign: 'center', marginTop: 32 }}>
-                <button
-                  onClick={() => navigate('/buy')}
-                  style={{ background: T.blue, color: '#fff', border: 'none', padding: '14px 36px', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
-                >
-                  {t('home.featured.browseAll')}
-                </button>
-              </div>
+              )}
             </div>
-            <style>{`@media (max-width: 860px) { .feat-grid { grid-template-columns: 1fr !important; } }`}</style>
-          </section>
-        )}
+
+            {featuredListings.length === 0 ? (
+              <div
+                style={{
+                  borderRadius: 20,
+                  border: `1px dashed ${T.border}`,
+                  background: 'linear-gradient(135deg, #F5F8FF 0%, #EFF6FF 100%)',
+                  padding: '56px 24px',
+                  textAlign: 'center',
+                }}
+              >
+                <div
+                  style={{
+                    width: 72, height: 72, margin: '0 auto 18px', borderRadius: 18,
+                    background: FALLBACK_GRADIENTS[0],
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                >
+                  <img src={HOUSE_PLACEHOLDER_SVG} alt="" aria-hidden="true" style={{ width: 44, height: 44, opacity: 0.95 }} />
+                </div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: T.ink, marginBottom: 8 }}>
+                  Listings coming soon
+                </div>
+                <div style={{ fontSize: 14, color: T.muted, maxWidth: 480, margin: '0 auto' }}>
+                  First agents are getting their pocket listings ready. Check back shortly — or join early to be notified when new properties go live.
+                </div>
+              </div>
+            ) : (
+              <>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }} className="feat-grid">
+                  {featuredListings.map((p: any) => {
+                    const img = (p.images && p.images[0]) || p.image_url;
+                    const isRent = p.listing_type === 'rent' || p.listing_type === 'rental';
+                    return (
+                      <div
+                        key={p.id}
+                        onClick={() => navigate(`/property/${p.id}`)}
+                        style={{ borderRadius: 16, border: `1px solid ${T.border}`, overflow: 'hidden', cursor: 'pointer', transition: 'box-shadow .2s ease' }}
+                        onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,.1)')}
+                        onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}
+                      >
+                        <div style={{ height: 180, background: FALLBACK_GRADIENTS[0], position: 'relative', overflow: 'hidden' }}>
+                          {img ? (
+                            <img src={img} alt={p.title || p.address} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          ) : (
+                            <img src={HOUSE_PLACEHOLDER_SVG} alt="" aria-hidden="true" style={{ width: '100%', height: '100%', objectFit: 'contain', opacity: 0.85 }} />
+                          )}
+                          {(p.boost_tier || p.is_featured) && (
+                            <span style={{ position: 'absolute', top: 10, left: 10, background: p.boost_tier ? '#f59e0b' : T.blue, color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 100, textTransform: 'uppercase', letterSpacing: '.06em' }}>
+                              {p.boost_tier ? 'Featured' : 'Premier'}
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ padding: '14px 16px' }}>
+                          <div style={{ fontSize: 18, fontWeight: 800, color: T.ink, marginBottom: 4 }}>
+                            {fmtPrice(p.price, p.listing_type)}
+                          </div>
+                          <div style={{ fontSize: 13, color: T.muted, marginBottom: 10, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {p.address || `${p.suburb}${p.state ? `, ${p.state}` : ''}`}
+                          </div>
+                          <div style={{ display: 'flex', gap: 12, fontSize: 12, color: T.subtle }}>
+                            {p.beds > 0 && <span>🛏 {p.beds}</span>}
+                            {p.baths > 0 && <span>🛁 {p.baths}</span>}
+                            {p.parking > 0 && <span>🚗 {p.parking}</span>}
+                            <span style={{ marginLeft: 'auto', textTransform: 'capitalize' }}>{p.property_type || (isRent ? 'rental' : 'sale')}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div style={{ textAlign: 'center', marginTop: 32 }}>
+                  <button
+                    onClick={() => navigate('/buy')}
+                    style={{ background: T.blue, color: '#fff', border: 'none', padding: '14px 36px', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
+                  >
+                    {t('home.featured.browseAll')}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+          <style>{`@media (max-width: 860px) { .feat-grid { grid-template-columns: 1fr !important; } }`}</style>
+        </section>
 
         {/* ═══ SECTION 5 — Language Proof ═══ */}
         <section style={{ background: T.blueTint, padding:'88px 24px', borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}` }}>
@@ -875,19 +974,35 @@ const Index = () => {
                 </button>
               </div>
               <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-                {FEAT_LISTINGS.slice(0,4).map((l, i) => (
-                  <div key={i} onClick={() => { closeModal(); navigate('/'); }} style={{ display:'flex', gap:14, padding:12, border:`1px solid ${T.border}`, borderRadius:14, cursor:'pointer' }}>
-                    <div style={{ width:96, height:72, borderRadius:10, backgroundImage:`url(${l.img})`, backgroundSize:'cover', flexShrink:0 }} />
-                    <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:4 }}>{l.title}</div>
-                      <div style={{ fontSize:12, color:T.muted, marginBottom:6 }}>{l.meta}</div>
-                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                        <span style={{ background:T.blueL, color:T.blue, fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:100 }}>🌐 20 languages</span>
-                        <span style={{ fontSize:14, fontWeight:800, color:T.ink }}>{l.price}</span>
+                {featuredListings.length === 0 ? (
+                  <div style={{ padding:'28px 16px', textAlign:'center', border:`1px dashed ${T.border}`, borderRadius:14, background:T.off }}>
+                    <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:6 }}>Listings coming soon</div>
+                    <div style={{ fontSize:12, color:T.muted }}>First agents are getting their pocket listings ready.</div>
+                  </div>
+                ) : featuredListings.slice(0, 4).map((p: any) => {
+                  const img = (p.images && p.images[0]) || p.image_url;
+                  const beds = p.beds || 0, baths = p.baths || 0, cars = p.parking || 0;
+                  const metaParts: string[] = [];
+                  if (beds) metaParts.push(`${beds} bed`);
+                  if (baths) metaParts.push(`${baths} bath`);
+                  if (cars) metaParts.push(`${cars} car`);
+                  const meta = metaParts.join(' · ') || (p.property_type ?? '');
+                  return (
+                    <div key={p.id} onClick={() => { closeModal(); navigate(`/property/${p.id}`); }} style={{ display:'flex', gap:14, padding:12, border:`1px solid ${T.border}`, borderRadius:14, cursor:'pointer' }}>
+                      <div style={{ width:96, height:72, borderRadius:10, background: img ? `center/cover no-repeat url(${img})` : FALLBACK_GRADIENTS[0], flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                        {!img && <img src={HOUSE_PLACEHOLDER_SVG} alt="" aria-hidden="true" style={{ width:48, height:48, opacity:0.9 }} />}
+                      </div>
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:4, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{p.title || p.address || `${p.suburb ?? ''}${p.state ? `, ${p.state}` : ''}`}</div>
+                        <div style={{ fontSize:12, color:T.muted, marginBottom:6 }}>{meta}</div>
+                        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                          <span style={{ background:T.blueL, color:T.blue, fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:100 }}>🌐 20 languages</span>
+                          <span style={{ fontSize:14, fontWeight:800, color:T.ink }}>{p.price_formatted || fmtPrice(p.price, p.listing_type)}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               <button onClick={() => { const q = (modalQuery || searchQuery || '').trim(); closeModal(); navigate(q ? `/buy?q=${encodeURIComponent(q)}` : '/buy'); }} style={{ width:'100%', marginTop:16, background:T.blue, color:'#fff', border:'none', padding:'12px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>
                 See all results →

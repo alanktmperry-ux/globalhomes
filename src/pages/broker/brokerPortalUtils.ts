@@ -45,6 +45,9 @@ export interface ReferralLead {
   property_url: string | null;
   agent_id: string | null;
   settled_at: string | null;
+  message_original?: string | null;
+  original_language?: string | null;
+  message_en?: string | null;
 }
 
 export const LANGUAGE_FLAGS: Record<string, { flag: string; label: string; color: string }> = {

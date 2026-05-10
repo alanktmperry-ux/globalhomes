@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { translateEmail } from "../_shared/translateEmail.ts";
 
 function calculateLeadScore({
   urgency,
@@ -221,11 +222,33 @@ Deno.serve(async (req) => {
         </div>
       `;
 
+      // Phase 2: resolve recipient language. Buyers are typically anonymous,
+      // but if they have a registered account, honor their saved preference.
+      let recipientLanguage = 'en';
+      try {
+        const { data: usersPage } = await supabase.auth.admin.listUsers({ page: 1, perPage: 200 });
+        const matched = (usersPage?.users ?? []).find(u => u.email?.toLowerCase() === userEmail.toLowerCase());
+        if (matched) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('language_preference')
+            .eq('id', matched.id)
+            .maybeSingle();
+          if ((profile as any)?.language_preference) recipientLanguage = (profile as any).language_preference;
+        }
+      } catch { /* default to en */ }
+
+      const translated = await translateEmail({
+        subject: `Enquiry received — ${propAddress}`,
+        bodyHtml: html,
+        targetLanguage: recipientLanguage,
+      });
+
       await supabase.functions.invoke('send-notification-email', {
         body: {
           to: userEmail,
-          subject: `Enquiry received — ${propAddress}`,
-          html,
+          subject: translated.subject,
+          html: translated.bodyHtml,
         },
       });
     } catch (replyErr) {

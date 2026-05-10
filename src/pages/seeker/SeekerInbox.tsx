@@ -302,7 +302,7 @@ export default function SeekerInbox() {
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div>
                         <h2 className="text-lg font-semibold text-[#1E293B]">
-                          {selected.agent?.full_name || 'Agent'}
+                          {selected.agent?.full_name || t('seeker.inbox.agentFallback')}
                         </h2>
                         {selected.agent?.agency_name && (
                           <p className="text-sm text-[#64748B]">{selected.agent.agency_name}</p>

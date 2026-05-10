@@ -1123,6 +1123,24 @@ export const en = {
   'enquiryForm.successMessage': '{agentName} has been notified and will be in touch shortly.',
   'enquiryForm.leadScoreLabel': 'Lead Score',
   'enquiryForm.doneButton': 'Done',
+
+  // ──────────────────────────────────────────────────────────────────
+  // Rental enquiry / application form (RentalEnquiryForm)
+  // ──────────────────────────────────────────────────────────────────
+  'rentalEnquiry.title': 'Enquire / Apply',
+  'rentalEnquiry.nameLabel': 'Full Name *',
+  'rentalEnquiry.namePlaceholder': 'Jane Smith',
+  'rentalEnquiry.emailLabel': 'Email *',
+  'rentalEnquiry.emailPlaceholder': 'jane@email.com',
+  'rentalEnquiry.phoneLabel': 'Phone *',
+  'rentalEnquiry.phonePlaceholder': '+61 400 000 000',
+  'rentalEnquiry.moveInDateLabel': 'Preferred Move-in Date *',
+  'rentalEnquiry.messageLabel': 'Message',
+  'rentalEnquiry.messagePlaceholder': 'Tell the agent about yourself, pets, employment...',
+  'rentalEnquiry.submitButton': 'Submit Application',
+  'rentalEnquiry.submitting': 'Submitting…',
+  'rentalEnquiry.successToast': 'Application submitted! — The agent will be in touch shortly.',
+  'rentalEnquiry.errorToast': 'Something went wrong — Please try again.',
 } as const;
 
 export type TranslationKey = keyof typeof en;

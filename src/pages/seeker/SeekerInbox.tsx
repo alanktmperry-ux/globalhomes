@@ -378,7 +378,7 @@ export default function SeekerInbox() {
                   {/* Conversation */}
                   <div className="p-4 sm:p-5 flex-1 overflow-y-auto max-h-[40vh]">
                     {messages.length === 0 ? (
-                      <p className="text-sm text-[#94A3B8] text-center py-6">No messages yet — send the first reply</p>
+                      <p className="text-sm text-[#94A3B8] text-center py-6">{t('seeker.inbox.detail.noMessages')}</p>
                     ) : (
                       <div className="space-y-3">
                         {messages.map((m) => (

@@ -419,6 +419,7 @@ function SettingsMenu() {
                       sessionStorage.setItem('listhq_language', code);
                       localStorage.setItem('i18n-language', LEGACY_CODE_MAP[code] ?? 'en');
                       sessionStorage.setItem('i18n-language', LEGACY_CODE_MAP[code] ?? 'en');
+                      localStorage.setItem('listhq_lang_user_set', '1');
                     } catch { /* non-fatal */ }
                     setOpen(false);
                     document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';

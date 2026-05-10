@@ -7,6 +7,110 @@ const MODEL = "google/gemini-2.5-pro";
 
 let corsHeaders: Record<string, string> = getCorsHeaders(null);
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Real-estate glossary — INLINE COPY of src/shared/lib/i18n/glossary.ts.
+// Edge functions cannot import from src/, so this is intentionally duplicated
+// for Phase 1B. Keep in sync with the source file.
+// ─────────────────────────────────────────────────────────────────────────────
+type GlossarySupportedLanguage =
+  | 'zh_simplified' | 'zh_traditional' | 'vi' | 'ko' | 'ar' | 'hi' | 'bn'
+  | 'pa' | 'ta' | 'ja' | 'id' | 'ms' | 'th' | 'tl' | 'it' | 'es' | 'fr'
+  | 'pt' | 'ru' | 'el';
+
+type GlossaryEntry = {
+  source: string;
+  translations: Partial<Record<GlossarySupportedLanguage, string>>;
+};
+
+const REAL_ESTATE_GLOSSARY: GlossaryEntry[] = [
+  // Sale process
+  { source: 'OFI',                      translations: { zh_simplified: '开放参观', zh_traditional: '開放參觀', vi: 'Mở tham quan', ko: '공개 관람', ar: 'افتح للتفتيش', hi: 'खुला निरीक्षण', bn: 'খোলা পরিদর্শন', ja: '公開内覧', id: 'Buka untuk Inspeksi', ms: 'Buka untuk Pemeriksaan', th: 'เปิดให้ตรวจสอบ', tl: 'Bukas para sa Inspeksiyon', it: 'Apertura per Visita', es: 'Visita Abierta', fr: 'Visite Libre', pt: 'Visita Aberta', ru: 'Открытый осмотр', el: 'Ανοιχτή Επιθεώρηση' } },
+  { source: 'open home',                translations: { zh_simplified: '开放参观', zh_traditional: '開放參觀', vi: 'Mở tham quan nhà', ko: '오픈 하우스', ar: 'منزل مفتوح للزيارة', hi: 'खुला घर', bn: 'খোলা বাড়ি', ja: 'オープンハウス', id: 'Open House', ms: 'Open House', th: 'เปิดบ้านให้ชม', tl: 'Open House', it: 'Casa Aperta', es: 'Casa Abierta', fr: 'Portes Ouvertes', pt: 'Casa Aberta', ru: 'День открытых дверей', el: 'Ανοιχτό Σπίτι' } },
+  { source: 'off-market',               translations: { zh_simplified: '内部销售', zh_traditional: '內部銷售', vi: 'Bán riêng', ko: '비공개 매물', ar: 'خارج السوق', hi: 'ऑफ-मार्केट', bn: 'অফ-মার্কেট', ja: '非公開物件', id: 'Off-market', ms: 'Off-market', th: 'นอกตลาด', tl: 'Off-market', it: 'Fuori Mercato', es: 'Fuera de Mercado', fr: 'Hors Marché', pt: 'Fora do Mercado', ru: 'Вне рынка', el: 'Εκτός Αγοράς' } },
+  { source: 'vendor',                   translations: { zh_simplified: '卖方', zh_traditional: '賣方', vi: 'Người bán', ko: '매도인', ar: 'البائع', hi: 'विक्रेता', bn: 'বিক্রেতা', ja: '売主', id: 'Penjual', ms: 'Penjual', th: 'ผู้ขาย', tl: 'Nagbebenta', it: 'Venditore', es: 'Vendedor', fr: 'Vendeur', pt: 'Vendedor', ru: 'Продавец', el: 'Πωλητής' } },
+  { source: 'EOI',                      translations: { zh_simplified: '意向书', zh_traditional: '意向書', vi: 'Bày tỏ quan tâm', ko: '관심표명', ar: 'تعبير عن الاهتمام', hi: 'रुचि की अभिव्यक्ति', bn: 'আগ্রহ প্রকাশ', ja: '関心表明', id: 'Pernyataan Minat', ms: 'Pernyataan Minat', th: 'การแสดงความสนใจ', tl: 'Pagpapahayag ng Interes', it: "Manifestazione d'Interesse", es: 'Expresión de Interés', fr: "Expression d'Intérêt", pt: 'Expressão de Interesse', ru: 'Выражение интереса', el: 'Εκδήλωση Ενδιαφέροντος' } },
+  { source: 'expressions of interest',  translations: { zh_simplified: '征求意向书', zh_traditional: '徵求意向書', vi: 'Bày tỏ quan tâm', ko: '관심표명 모집', ar: 'طلب تعابير الاهتمام', hi: 'रुचि की अभिव्यक्ति', bn: 'আগ্রহ প্রকাশ', ja: '関心表明募集', id: 'Pernyataan Minat', ms: 'Pernyataan Minat', th: 'การแสดงความสนใจ', tl: 'Pagpapahayag ng Interes', it: "Manifestazioni d'Interesse", es: 'Expresiones de Interés', fr: "Expressions d'Intérêt", pt: 'Expressões de Interesse', ru: 'Выражение интереса', el: 'Εκδηλώσεις Ενδιαφέροντος' } },
+  { source: 'contract of sale',         translations: { zh_simplified: '销售合同', zh_traditional: '銷售合同', vi: 'Hợp đồng mua bán', ko: '매매 계약서', ar: 'عقد البيع', hi: 'बिक्री अनुबंध', bn: 'বিক্রয় চুক্তি', ja: '売買契約書', id: 'Kontrak Jual Beli', ms: 'Kontrak Jualan', th: 'สัญญาซื้อขาย', tl: 'Kontrata sa Pagbebenta', it: 'Contratto di Vendita', es: 'Contrato de Venta', fr: 'Contrat de Vente', pt: 'Contrato de Venda', ru: 'Договор купли-продажи', el: 'Συμβόλαιο Πώλησης' } },
+  { source: 'settlement',               translations: { zh_simplified: '过户结算', zh_traditional: '過戶結算', vi: 'Thanh toán bàn giao', ko: '잔금 정산', ar: 'التسوية', hi: 'सेटलमेंट', bn: 'সেটেলমেন্ট', ja: '決済', id: 'Settlement', ms: 'Penyelesaian', th: 'การชำระบัญชี', tl: 'Settlement', it: 'Rogito', es: 'Liquidación', fr: 'Acte Notarié', pt: 'Liquidação', ru: 'Расчёт', el: 'Διακανονισμός' } },
+  { source: 'settlement period',        translations: { zh_simplified: '过户期', zh_traditional: '過戶期', vi: 'Thời hạn thanh toán', ko: '잔금 정산 기간', ar: 'فترة التسوية', hi: 'सेटलमेंट अवधि', bn: 'সেটেলমেন্ট সময়কাল', ja: '決済期間', id: 'Periode Settlement', ms: 'Tempoh Penyelesaian', th: 'ระยะเวลาการชำระบัญชี', tl: 'Settlement Period', it: 'Periodo di Rogito', es: 'Período de Liquidación', fr: 'Période de Règlement', pt: 'Período de Liquidação', ru: 'Срок расчёта', el: 'Περίοδος Διακανονισμού' } },
+  { source: 'auction',                  translations: { zh_simplified: '拍卖', zh_traditional: '拍賣', vi: 'Đấu giá', ko: '경매', ar: 'مزاد', hi: 'नीलामी', bn: 'নিলাম', ja: 'オークション', id: 'Lelang', ms: 'Lelongan', th: 'ประมูล', tl: 'Auksyon', it: 'Asta', es: 'Subasta', fr: 'Vente aux Enchères', pt: 'Leilão', ru: 'Аукцион', el: 'Δημοπρασία' } },
+  { source: 'private sale',             translations: { zh_simplified: '私人销售', zh_traditional: '私人銷售', vi: 'Bán tư nhân', ko: '개인 매매', ar: 'بيع خاص', hi: 'निजी बिक्री', bn: 'প্রাইভেট সেল', ja: '相対取引', id: 'Penjualan Pribadi', ms: 'Jualan Persendirian', th: 'การขายส่วนตัว', tl: 'Pribadong Pagbebenta', it: 'Vendita Privata', es: 'Venta Privada', fr: 'Vente Privée', pt: 'Venda Privada', ru: 'Частная продажа', el: 'Ιδιωτική Πώληση' } },
+  { source: 'under offer',              translations: { zh_simplified: '已收到报价', zh_traditional: '已收到報價', vi: 'Đã nhận đề nghị', ko: '제안 접수중', ar: 'قيد العرض', hi: 'ऑफर के तहत', bn: 'অফার অধীনে', ja: '申込検討中', id: 'Sedang Ditawarkan', ms: 'Di Bawah Tawaran', th: 'อยู่ระหว่างข้อเสนอ', tl: 'May Alok', it: 'Sotto Offerta', es: 'En Negociación', fr: 'Sous Offre', pt: 'Sob Oferta', ru: 'В процессе сделки', el: 'Υπό Προσφορά' } },
+  { source: 'under contract',           translations: { zh_simplified: '已签约', zh_traditional: '已簽約', vi: 'Đã ký hợp đồng', ko: '계약 체결됨', ar: 'تحت العقد', hi: 'अनुबंध के तहत', bn: 'কন্ট্রাক্টের অধীনে', ja: '契約済み', id: 'Sudah Berkontrak', ms: 'Di Bawah Kontrak', th: 'ทำสัญญาแล้ว', tl: 'May Kontrata Na', it: 'In Contratto', es: 'En Contrato', fr: 'Sous Contrat', pt: 'Sob Contrato', ru: 'По договору', el: 'Σε Συμβόλαιο' } },
+
+  // Strata / legal
+  { source: 'strata',                   translations: { zh_simplified: '业主立案法团', zh_traditional: '業主立案法團', vi: 'Quản lý chung cư', ko: '구분소유', ar: 'الملكية المشتركة', hi: 'स्ट्रेटा', bn: 'স্ট্র্যাটা', ja: '区分所有', id: 'Strata', ms: 'Strata', th: 'นิติบุคคลอาคารชุด', tl: 'Strata', it: 'Condominio', es: 'Régimen de Propiedad Horizontal', fr: 'Copropriété', pt: 'Condomínio', ru: 'Общая собственность', el: 'Συγκυριότητα' } },
+  { source: 'body corporate',           translations: { zh_simplified: '业主立案法团', zh_traditional: '業主立案法團', vi: 'Hội đồng quản trị chung cư', ko: '관리단', ar: 'الاتحاد العقاري', hi: 'सोसाइटी', bn: 'বডি কর্পোরেট', ja: '管理組合', id: 'Body Corporate', ms: 'Body Corporate', th: 'นิติบุคคล', tl: 'Body Corporate', it: 'Amministrazione Condominiale', es: 'Comunidad de Propietarios', fr: 'Syndicat de Copropriété', pt: 'Condomínio', ru: 'Товарищество собственников', el: 'Διαχείριση Πολυκατοικίας' } },
+  { source: 'owners corporation',       translations: { zh_simplified: '业主立案法团', zh_traditional: '業主立案法團', vi: 'Hội đồng chủ sở hữu', ko: '구분소유자 조합', ar: 'اتحاد الملاك', hi: 'मालिक निगम', bn: 'মালিক কর্পোরেশন', ja: '所有者組合', id: 'Owners Corporation', ms: 'Pertubuhan Pemilik', th: 'นิติบุคคลเจ้าของ', tl: 'Owners Corporation', it: 'Amministrazione Condominiale', es: 'Comunidad de Propietarios', fr: 'Syndicat de Copropriété', pt: 'Associação de Proprietários', ru: 'Товарищество собственников', el: 'Σωματείο Ιδιοκτητών' } },
+  { source: 'FIRB',                     translations: { zh_simplified: 'FIRB（澳洲外国投资审查委员会）', zh_traditional: 'FIRB（澳洲外國投資審查委員會）', vi: 'FIRB (Hội đồng Xét duyệt Đầu tư Nước ngoài)', ko: 'FIRB (외국인투자심사위원회)', ar: 'FIRB (مجلس مراجعة الاستثمار الأجنبي)', hi: 'FIRB (विदेशी निवेश समीक्षा बोर्ड)', bn: 'FIRB (বিদেশী বিনিয়োগ পর্যালোচনা বোর্ড)', ja: 'FIRB (外国投資審査委員会)', id: 'FIRB (Dewan Tinjauan Investasi Asing)', ms: 'FIRB (Lembaga Kajian Pelaburan Asing)', th: 'FIRB (คณะกรรมการตรวจสอบการลงทุนต่างชาติ)', tl: 'FIRB', it: 'FIRB (Consiglio di Revisione Investimenti Esteri)', es: 'FIRB (Junta de Revisión de Inversión Extranjera)', fr: "FIRB (Conseil d'Examen des Investissements Étrangers)", pt: 'FIRB (Conselho de Revisão de Investimento Estrangeiro)', ru: 'FIRB (Совет по проверке иностранных инвестиций)', el: 'FIRB (Συμβούλιο Ελέγχου Ξένων Επενδύσεων)' } },
+  { source: 'conveyancer',              translations: { zh_simplified: '房产过户师', zh_traditional: '房產過戶師', vi: 'Luật sư bất động sản', ko: '부동산 양도 전문가', ar: 'محامي نقل الملكية', hi: 'कन्वेंसर', bn: 'প্রপার্টি কনভেয়েন্সার', ja: 'コンベヤンサー', id: 'Conveyancer', ms: 'Conveyancer', th: 'นักโอนกรรมสิทธิ์', tl: 'Conveyancer', it: 'Notaio', es: 'Gestor de Traspaso', fr: 'Notaire', pt: 'Despachante Imobiliário', ru: 'Специалист по передаче недвижимости', el: 'Συμβολαιογράφος' } },
+  { source: 'cooling-off period',       translations: { zh_simplified: '冷静期', zh_traditional: '冷靜期', vi: 'Thời gian chờ', ko: '숙려 기간', ar: 'فترة التراجع', hi: 'कूलिंग ऑफ अवधि', bn: 'কুলিং অফ পিরিয়ড', ja: 'クーリングオフ期間', id: 'Periode Cooling-off', ms: 'Tempoh Cooling-off', th: 'ระยะเวลายกเลิก', tl: 'Cooling-off Period', it: 'Diritto di Recesso', es: 'Período de Reflexión', fr: 'Délai de Rétractation', pt: 'Período de Reflexão', ru: 'Период отзыва', el: 'Περίοδος Υπαναχώρησης' } },
+
+  // Cost / government
+  { source: 'stamp duty',               translations: { zh_simplified: '印花税', zh_traditional: '印花稅', vi: 'Thuế trước bạ', ko: '인지세', ar: 'رسم الطابع', hi: 'स्टाम्प शुल्क', bn: 'স্ট্যাম্প ডিউটি', ja: '印紙税', id: 'Bea Materai Properti', ms: 'Duti Setem', th: 'อากรแสตมป์', tl: 'Stamp Duty', it: "Imposta di Registro", es: 'Impuesto de Transmisiones', fr: "Droits d'Enregistrement", pt: 'Imposto de Selo', ru: 'Гербовый сбор', el: 'Φόρος Μεταβίβασης' } },
+  { source: 'transfer duty',            translations: { zh_simplified: '过户税', zh_traditional: '過戶稅', vi: 'Thuế chuyển nhượng', ko: '취득세', ar: 'رسم النقل', hi: 'हस्तांतरण शुल्क', bn: 'ট্রান্সফার ডিউটি', ja: '移転税', id: 'Bea Pengalihan', ms: 'Duti Pemindahan', th: 'อากรการโอน', tl: 'Transfer Duty', it: "Imposta di Trasferimento", es: 'Impuesto de Transmisión', fr: 'Droit de Mutation', pt: 'Imposto de Transferência', ru: 'Налог на передачу', el: 'Φόρος Μεταβίβασης' } },
+  { source: 'foreign buyer surcharge',  translations: { zh_simplified: '海外买家附加税', zh_traditional: '海外買家附加稅', vi: 'Phụ phí người mua nước ngoài', ko: '외국인 추가세', ar: 'الرسم الإضافي للمشتري الأجنبي', hi: 'विदेशी खरीदार अधिभार', bn: 'বিদেশী ক্রেতা সারচার্জ', ja: '外国人購入者追加税', id: 'Pajak Tambahan Pembeli Asing', ms: 'Caj Tambahan Pembeli Asing', th: 'ค่าธรรมเนียมเพิ่มผู้ซื้อต่างชาติ', tl: 'Foreign Buyer Surcharge', it: "Sovrattassa Acquirente Estero", es: 'Recargo Comprador Extranjero', fr: 'Surtaxe Acheteur Étranger', pt: 'Sobretaxa Comprador Estrangeiro', ru: 'Доплата для иностранных покупателей', el: 'Επιπλέον Φόρος Ξένου Αγοραστή' } },
+  { source: 'FHOG',                     translations: { zh_simplified: '首次置业补贴', zh_traditional: '首次置業補貼', vi: 'Trợ cấp Người mua nhà Lần đầu', ko: '첫 주택 구매자 지원금', ar: 'منحة المشتري الأول', hi: 'पहले घर के मालिक का अनुदान', bn: 'প্রথম গৃহকর্তা অনুদান', ja: '初回購入者補助金', id: 'Hibah Pembeli Rumah Pertama', ms: 'Geran Pemilik Rumah Pertama', th: 'เงินช่วยเหลือผู้ซื้อบ้านครั้งแรก', tl: 'First Home Owner Grant', it: "Contributo Primo Acquisto Casa", es: 'Subsidio Primer Comprador', fr: "Aide Premier Acheteur", pt: 'Subsídio Primeiro Comprador', ru: 'Грант первому покупателю жилья', el: 'Επιδότηση Πρώτης Κατοικίας' } },
+
+  // Building / inspection
+  { source: 'building inspection',      translations: { zh_simplified: '房屋检查', zh_traditional: '房屋檢查', vi: 'Kiểm tra công trình', ko: '건물 점검', ar: 'فحص البناء', hi: 'भवन निरीक्षण', bn: 'বিল্ডিং পরিদর্শন', ja: '建物検査', id: 'Inspeksi Bangunan', ms: 'Pemeriksaan Bangunan', th: 'ตรวจสอบอาคาร', tl: 'Building Inspection', it: 'Ispezione Edificio', es: 'Inspección de Edificio', fr: 'Inspection du Bâtiment', pt: 'Inspeção do Edifício', ru: 'Осмотр здания', el: 'Επιθεώρηση Κτιρίου' } },
+  { source: 'pest inspection',          translations: { zh_simplified: '害虫检查', zh_traditional: '害蟲檢查', vi: 'Kiểm tra mối mọt', ko: '해충 점검', ar: 'فحص الآفات', hi: 'कीट निरीक्षण', bn: 'কীটপতঙ্গ পরিদর্শন', ja: '害虫検査', id: 'Inspeksi Hama', ms: 'Pemeriksaan Perosak', th: 'ตรวจสอบแมลง', tl: 'Pest Inspection', it: 'Ispezione Antiparassitaria', es: 'Inspección de Plagas', fr: 'Inspection des Nuisibles', pt: 'Inspeção de Pragas', ru: 'Осмотр на вредителей', el: 'Επιθεώρηση Παρασίτων' } },
+  { source: 'subject to finance',       translations: { zh_simplified: '以贷款审批为条件', zh_traditional: '以貸款審批為條件', vi: 'Tùy thuộc tài chính', ko: '대출 승인 조건부', ar: 'مشروط بالتمويل', hi: 'वित्त के अधीन', bn: 'অর্থায়ন সাপেক্ষে', ja: '融資条件付き', id: 'Tergantung Pembiayaan', ms: 'Tertakluk kepada Pembiayaan', th: 'ขึ้นอยู่กับการเงิน', tl: 'Subject to Finance', it: 'Subordinato a Finanziamento', es: 'Sujeto a Financiación', fr: 'Sous Réserve de Financement', pt: 'Sujeito a Financiamento', ru: 'При условии финансирования', el: 'Υπό Χρηματοδότηση' } },
+  { source: 'section 32',               translations: { zh_simplified: '第32条卖方声明', zh_traditional: '第32條賣方聲明', vi: 'Tuyên bố Mục 32', ko: 'Section 32 (매도인 진술서)', ar: 'بيان القسم 32', hi: 'सेक्शन 32 स्टेटमेंट', bn: 'সেকশন 32 স্টেটমেন্ট', ja: 'セクション32（売主開示）', id: 'Pernyataan Section 32', ms: 'Pernyataan Seksyen 32', th: 'แถลงการณ์ Section 32', tl: 'Section 32 Statement', it: 'Dichiarazione Sezione 32', es: 'Declaración Sección 32', fr: 'Déclaration Section 32', pt: 'Declaração Seção 32', ru: 'Декларация Раздел 32', el: 'Δήλωση Άρθρο 32' } },
+];
+
+/**
+ * Pre-process: replace glossary source terms with sentinels.
+ * Returns { processed text, list of replacements }.
+ */
+function applyGlossarySentinels(
+  text: string,
+): { text: string; replacements: Array<{ sentinel: string; entry: GlossaryEntry }> } {
+  if (!text) return { text: text || '', replacements: [] };
+  let out = text;
+  const replacements: Array<{ sentinel: string; entry: GlossaryEntry }> = [];
+  let counter = 0;
+  // Sort by source length descending so longer phrases match first
+  // ("settlement period" before "settlement").
+  const sortedEntries = [...REAL_ESTATE_GLOSSARY].sort((a, b) => b.source.length - a.source.length);
+  for (const entry of sortedEntries) {
+    const sentinel = `<<G:${counter}>>`;
+    const pattern = new RegExp(
+      `\\b${entry.source.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`,
+      'gi',
+    );
+    if (pattern.test(out)) {
+      replacements.push({ sentinel, entry });
+      out = out.replace(pattern, sentinel);
+      counter++;
+    }
+  }
+  return { text: out, replacements };
+}
+
+/**
+ * Post-process: replace sentinels with curated translations for target language.
+ * Falls back to English source if no translation exists for that language.
+ */
+function restoreGlossarySentinels(
+  translatedText: string,
+  replacements: Array<{ sentinel: string; entry: GlossaryEntry }>,
+  targetLang: string,
+): string {
+  if (!translatedText) return translatedText;
+  let out = translatedText;
+  for (const { sentinel, entry } of replacements) {
+    const replacement =
+      entry.translations[targetLang as GlossarySupportedLanguage] ?? entry.source;
+    out = out.split(sentinel).join(replacement);
+  }
+  if (/<<G:\d+>>/.test(out)) {
+    console.warn('Glossary sentinels leaked:', out.match(/<<G:\d+>>/g));
+  }
+  return out;
+}
+
+
 async function checkIpRateLimit(
   supabaseAdmin: ReturnType<typeof createClient>,
   ip: string,

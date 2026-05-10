@@ -1395,20 +1395,40 @@ const languageUpdatedMessages: Record<Language, string> = {
   pa: 'ਭਾਸ਼ਾ ਅੱਪਡੇਟ ਹੋਈ', ta: 'மொழி புதுப்பிக்கப்பட்டது',
 };
 
+// Canonical (config) language codes that need mapping to legacy codes.
+const CANONICAL_TO_LEGACY: Record<string, Language> = {
+  'zh-CN': 'zh',
+  'zh': 'zh',
+  'zh-TW': 'zh-TW',
+};
+
+function readStoredLanguage(): Language | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    // One-time boot migration: consolidate to `listhq_language`.
+    const canonical = localStorage.getItem('listhq_language');
+    const legacyKey = localStorage.getItem('i18n-language')
+      || sessionStorage.getItem('i18n-language')
+      || localStorage.getItem('gh-lang');
+
+    let raw = canonical || legacyKey;
+    if (!raw) return null;
+
+    // Map canonical (e.g. 'zh-CN') → legacy ('zh') if needed.
+    const mapped = (CANONICAL_TO_LEGACY[raw] ?? raw) as string;
+    if (!(mapped in translations)) return null;
+
+    // Persist canonical-form back to listhq_language and purge legacy keys.
+    localStorage.setItem('listhq_language', mapped);
+    localStorage.removeItem('i18n-language');
+    sessionStorage.removeItem('i18n-language');
+    localStorage.removeItem('gh-lang');
+    return mapped as Language;
+  } catch { return null; }
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(() => {
-    // Always default to English on a new browser session.
-    // Language only persists for the current session via sessionStorage.
-    if (typeof window === 'undefined') return 'en';
-    try {
-      const saved =
-        sessionStorage.getItem(SESSION_LANGUAGE_KEY) ||
-        localStorage.getItem(SESSION_LANGUAGE_KEY) ||
-        localStorage.getItem('listhq_language');
-      if (saved && saved in translations) return saved as Language;
-    } catch { /* sessionStorage may be unavailable — non-fatal */ }
-    return 'en';
-  });
+  const [language, setLanguageState] = useState<Language>(() => readStoredLanguage() ?? 'en');
 
   // Wrap setLanguage to show toast only on active user language changes
   const setLanguage = useCallback((newLang: Language) => {

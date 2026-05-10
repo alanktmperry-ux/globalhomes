@@ -21,7 +21,6 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'bn',    name: 'বাংলা' },
   { code: 'pa',    name: 'ਪੰਜਾਬੀ' },
   { code: 'ta',    name: 'தமிழ்' },
-  { code: 'ja',    name: '日本語' },
   { code: 'id',    name: 'Bahasa Indonesia' },
   { code: 'ms',    name: 'Bahasa Melayu' },
   { code: 'th',    name: 'ภาษาไทย' },

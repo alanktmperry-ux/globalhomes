@@ -41,10 +41,37 @@ interface TranslationResult {
  * - Cache miss / pending: triggers translateListing() and refreshes the property.
  */
 export function useListingTranslation(property: any | null | undefined): TranslationResult {
-  const { language } = useI18n();
+  const { language, setLanguage } = useI18n();
   const [isTranslating, setIsTranslating] = useState(false);
   const [refreshed, setRefreshed] = useState<any | null>(null);
   const requestedRef = useRef<string | null>(null);
+
+  // Phase 2: prefer profile language_preference over localStorage for authenticated users.
+  // Runs once on mount; if the saved profile preference differs from the current i18n
+  // language, push it into the i18n context so the rest of the app follows along.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user || cancelled) return;
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('language_preference')
+          .eq('id', user.id)
+          .maybeSingle();
+        if (error || cancelled) return;
+        const pref = (data as { language_preference?: string } | null)?.language_preference;
+        if (!pref) return;
+        const legacy = (LEGACY_CODE_MAP[pref as keyof typeof LEGACY_CODE_MAP] ?? pref) as Language;
+        if (legacy && legacy !== language) {
+          setLanguage(legacy);
+        }
+      } catch { /* non-fatal */ }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const source = refreshed ?? property;
   const translationKey = mapLanguageToTranslationKey(language);

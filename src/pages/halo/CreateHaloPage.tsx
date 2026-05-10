@@ -156,7 +156,7 @@ export default function CreateHaloPage() {
       return;
     }
     if (!user) {
-      toast.error('You must be signed in');
+      toast.error(t('halo.toast.signinRequired'));
       return;
     }
     setSubmitting(true);

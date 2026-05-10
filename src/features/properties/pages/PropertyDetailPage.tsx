@@ -1343,13 +1343,13 @@ export default function PropertyDetailPage() {
             {property && !rawProperty?.is_off_market && property.suburb && (
               <div className="mt-3 p-4 rounded-xl border border-amber-200 bg-amber-50">
                 <div className="flex gap-3">
-                  <div className="text-2xl shrink-0" aria-hidden>🔔</div>
+                  <div className="text-2xl shrink-0" aria-hidden>{'🔔'}</div>
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-slate-900">
-                      Get off-market properties in {property.suburb} first
+                      {tp('property.offMarketAlert.title', { suburb: property.suburb })}
                     </p>
                     <p className="text-xs text-slate-600 mt-1">
-                      Be notified about properties in {property.suburb}, {property.state} before they hit the market.
+                      {tp('property.offMarketAlert.body', { suburb: property.suburb, state: property.state })}
                     </p>
                     <button
                       onClick={() => {

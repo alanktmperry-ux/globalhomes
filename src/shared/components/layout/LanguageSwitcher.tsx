@@ -12,9 +12,9 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 
 // Locales with complete translation files. Others render as "Coming soon".
-const AVAILABLE_LOCALES: ReadonlySet<SupportedLanguageCode> = new Set([
+const AVAILABLE_LOCALES: ReadonlySet<SupportedLanguageCode> = new Set<SupportedLanguageCode>([
   'en', 'zh-CN', 'zh-TW', 'vi', 'ko', 'ar', 'hi', 'bn', 'pa', 'ta',
-  'ja', 'id', 'ms', 'th', 'fil', 'it', 'es', 'fr', 'pt', 'ru',
+  'id', 'ms', 'th', 'fil', 'it', 'es', 'fr', 'pt', 'ru',
 ]);
 
 const INTERACTED_KEY = 'gh-lang-switcher-interacted';

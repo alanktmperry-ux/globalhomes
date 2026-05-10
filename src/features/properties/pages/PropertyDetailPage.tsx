@@ -1033,9 +1033,9 @@ export default function PropertyDetailPage() {
                       className="gap-2"
                     >
                       {translating ? (
-                        <><Loader2 size={14} className="animate-spin" /> Generating translations…</>
+                        <><Loader2 size={14} className="animate-spin" /> {tp('property.translations.generating')}</>
                       ) : (
-                        <><Globe size={14} /> Generate Translations</>
+                        <><Globe size={14} /> {tp('property.translations.generate')}</>
                       )}
                     </Button>
                   )}

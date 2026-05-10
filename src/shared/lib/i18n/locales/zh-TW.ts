@@ -673,6 +673,7 @@ export const zhTW: Partial<Record<keyof typeof EnBase, string>> = {
   'nav.myDashboard': '我的控制台',
   'nav.myListings': '我的房源',
   'nav.postHalo': '發布Halo',
+  'nav.translateListings': '翻譯房源',
   'nav.saleListing': '出售房源',
   'nav.rentalListing': '出租房源',
   'nav.languageCurrency': '語言和貨幣',

@@ -783,6 +783,7 @@ export const en = {
   'nav.myDashboard': 'My Dashboard',
   'nav.myListings': 'My Listings',
   'nav.postHalo': 'Post a Halo',
+  'nav.translateListings': 'Translate listings',
   'nav.saleListing': 'Sale Listing',
   'nav.rentalListing': 'Rental Listing',
   'nav.languageCurrency': 'Language & Currency',

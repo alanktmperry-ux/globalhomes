@@ -35,12 +35,12 @@ export function SiteHeader() {
   const PUBLIC_NAV: NavItem[] = [
     { label: t('nav.search'), to: '/properties', icon: Search },
     { label: t('nav.findAgent'), to: '/agents', icon: Users },
-    { label: 'Translate listings', to: '/tools/multilingual-generator', icon: Sparkles },
+    { label: t('nav.translateListings'), to: '/tools/multilingual-generator', icon: Sparkles },
   ];
   const SEEKER_NAV: NavItem[] = [
     { label: t('nav.browseProperties'), to: '/properties', icon: Search },
     { label: t('nav.findAgent'), to: '/agents', icon: Users },
-    { label: 'Translate listings', to: '/tools/multilingual-generator', icon: Sparkles },
+    { label: t('nav.translateListings'), to: '/tools/multilingual-generator', icon: Sparkles },
   ];
   const AGENT_NAV: NavItem[] = [
     { label: t('nav.dashboard'), to: '/dashboard', icon: LayoutDashboard },
@@ -419,6 +419,7 @@ function SettingsMenu() {
                       sessionStorage.setItem('listhq_language', code);
                       localStorage.setItem('i18n-language', LEGACY_CODE_MAP[code] ?? 'en');
                       sessionStorage.setItem('i18n-language', LEGACY_CODE_MAP[code] ?? 'en');
+                      localStorage.setItem('listhq_lang_user_set', '1');
                     } catch { /* non-fatal */ }
                     setOpen(false);
                     document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';

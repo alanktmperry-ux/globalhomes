@@ -53,6 +53,12 @@ export default function EditHaloPage() {
   usePageTitle('Edit Your Halo');
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { t } = useTranslation();
+  const STEP_LABELS = [
+    t('halo.wizard.steps.step1'),
+    t('halo.wizard.steps.step2'),
+    t('halo.wizard.steps.step3'),
+  ];
   const [step, setStep] = useState(1);
   const [data, setData] = useState<HaloFormData>(initialData);
   const [haloId, setHaloId] = useState<string | null>(null);

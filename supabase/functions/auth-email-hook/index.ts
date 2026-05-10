@@ -236,72 +236,88 @@ async function handleWebhook(req: Request): Promise<Response> {
     plainText: true,
   })
 
-  // Enqueue email for async processing by the dispatcher (process-email-queue).
+  // Send directly via the user's verified Resend account.
+  // Lovable's managed Resend only has notify.listhq.com.au verified; the user's
+  // own Resend has the bare domain (listhq.com.au) verified — same account used
+  // by send-welcome-email and setup-partner. This keeps bare-domain consistency.
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   )
 
   const messageId = crypto.randomUUID()
+  const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 
-  // Log pending BEFORE enqueue so we have a record even if enqueue crashes
-  await supabase.from('email_send_log').insert({
-    message_id: messageId,
-    template_name: emailType,
-    recipient_email: payload.data.email,
-    status: 'pending',
-    metadata: {
-      from: FROM_ADDRESS,
-      sender_domain: SENDER_DOMAIN,
-      run_id,
-      email_type: emailType,
-      source: 'auth-email-hook',
-    },
-  })
-
-  const { error: enqueueError } = await supabase.rpc('enqueue_email', {
-    queue_name: 'auth_emails',
-    payload: {
-      run_id,
-      message_id: messageId,
-      to: payload.data.email,
-      from: FROM_ADDRESS,
-      sender_domain: SENDER_DOMAIN,
-      subject: EMAIL_SUBJECTS[emailType] || 'Notification',
-      html,
-      text,
-      purpose: 'transactional',
-      label: emailType,
-      queued_at: new Date().toISOString(),
-    },
-  })
-
-  if (enqueueError) {
-    console.error('Failed to enqueue auth email', { error: enqueueError, run_id, emailType, from: FROM_ADDRESS })
+  if (!RESEND_API_KEY) {
+    console.error('RESEND_API_KEY not configured', { run_id, emailType })
     await supabase.from('email_send_log').insert({
       message_id: messageId,
       template_name: emailType,
       recipient_email: payload.data.email,
       status: 'failed',
-      error_message: 'Failed to enqueue email',
-      metadata: {
-        from: FROM_ADDRESS,
-        sender_domain: SENDER_DOMAIN,
-        run_id,
-        email_type: emailType,
-        source: 'auth-email-hook',
-      },
+      error_message: 'RESEND_API_KEY not configured',
+      metadata: { from: FROM_ADDRESS, sender_domain: SENDER_DOMAIN, run_id, email_type: emailType, source: 'auth-email-hook' },
     })
-    return new Response(JSON.stringify({ error: 'Failed to enqueue email' }), {
+    return new Response(JSON.stringify({ error: 'Email provider not configured' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }
 
-  console.log('Auth email enqueued', { emailType, email: payload.data.email, run_id, from: FROM_ADDRESS, sender_domain: SENDER_DOMAIN, messageId })
+  await supabase.from('email_send_log').insert({
+    message_id: messageId,
+    template_name: emailType,
+    recipient_email: payload.data.email,
+    status: 'pending',
+    metadata: { from: FROM_ADDRESS, sender_domain: SENDER_DOMAIN, run_id, email_type: emailType, source: 'auth-email-hook' },
+  })
+
+  const resendRes = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+      'x-email-essential': 'true',
+    },
+    body: JSON.stringify({
+      from: FROM_ADDRESS,
+      to: [payload.data.email],
+      subject: EMAIL_SUBJECTS[emailType] || 'Notification',
+      html,
+      text,
+    }),
+  })
+
+  if (!resendRes.ok) {
+    const errBody = await resendRes.text()
+    console.error('Resend send failed', { status: resendRes.status, body: errBody, run_id, emailType, from: FROM_ADDRESS })
+    await supabase.from('email_send_log').insert({
+      message_id: messageId,
+      template_name: emailType,
+      recipient_email: payload.data.email,
+      status: 'failed',
+      error_message: `Resend ${resendRes.status}: ${errBody.slice(0, 500)}`,
+      metadata: { from: FROM_ADDRESS, sender_domain: SENDER_DOMAIN, run_id, email_type: emailType, source: 'auth-email-hook' },
+    })
+    return new Response(JSON.stringify({ error: 'Failed to send email' }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
+  const resendData = await resendRes.json().catch(() => ({}))
+  await supabase.from('email_send_log').insert({
+    message_id: messageId,
+    template_name: emailType,
+    recipient_email: payload.data.email,
+    status: 'sent',
+    metadata: { from: FROM_ADDRESS, sender_domain: SENDER_DOMAIN, run_id, email_type: emailType, source: 'auth-email-hook', resend_id: resendData?.id },
+  })
+
+  console.log('Auth email sent', { emailType, email: payload.data.email, run_id, from: FROM_ADDRESS, messageId, resend_id: resendData?.id })
 
   return new Response(
-    JSON.stringify({ success: true, queued: true }),
+    JSON.stringify({ success: true, sent: true }),
     { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
   )
 }

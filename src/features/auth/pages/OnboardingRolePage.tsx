@@ -92,7 +92,7 @@ const OnboardingRolePage = () => {
 
       routeForRole(selected);
     } catch (err) {
-      toast.error("Couldn't save your role", { description: getErrorMessage(err) });
+      toast.error(t('onboarding.role.toast.error.title'), { description: getErrorMessage(err) });
       setSaving(false);
     }
   };

@@ -9,7 +9,7 @@
  * Requires env: GOOGLE_TRANSLATE_API_KEY
  */
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 interface LocaleSpec {

@@ -466,33 +466,50 @@ async function handleReplyTranslation(replyText: string, targetLanguage: string,
 
 Translate naturally into the buyer's language. Preserve names, addresses, suburb names verbatim.
 
+Some terms in the source are wrapped in sentinels like <<G:0>>, <<G:1>>. Leave these sentinels EXACTLY as-is in the output — do not translate, remove, or modify them. They will be replaced post-translation with curated industry terms.
+
 Keep the tone professional but warm. Return valid JSON only.`;
 
   const langLabel = targetLanguage; // could expand to full name later
 
+  // Glossary pass: replace AU real-estate terms with sentinels before sending to Gemini
+  const { text: sentineledReply, replacements } = applyGlossarySentinels(replyText);
+
   const userPrompt = `Translate this agent reply to ${langLabel}:
 
-"${replyText}"
+"${sentineledReply}"
 
 Return JSON with:
 
-- translated_message: the natural translation in ${langLabel}
+- translated_message: the natural translation in ${langLabel} (keep <<G:N>> sentinels untouched)
 - target_language: the language code you used (echo back)
 
 Return ONLY valid JSON. No markdown.`;
 
   const result = await callAI(systemPrompt, userPrompt);
 
+  // Restore curated translations for the target language
+  const translatedRestored = restoreGlossarySentinels(
+    result.translated_message || '',
+    replacements,
+    targetLanguage,
+  );
+
   await logApiUsage({
     service: 'gemini',
     action: 'translate_reply',
     units: 1,
     cost_estimate: 0,
-    metadata: { ip, message_length: replyText.length, target_language: targetLanguage },
+    metadata: {
+      ip,
+      message_length: replyText.length,
+      target_language: targetLanguage,
+      glossary_hits: replacements.length,
+    },
   });
 
   return jsonResponse({
-    translated_message: result.translated_message,
+    translated_message: translatedRestored,
     target_language: result.target_language || targetLanguage,
   });
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { User, ChevronRight, Shield, LogIn, LogOut, Settings, Mail, Lock, Eye, EyeOff, Loader2, ShieldCheck, Search, LayoutDashboard, Camera } from 'lucide-react';
 import { BottomNav } from '@/shared/components/layout/BottomNav';
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/dialog';
 
 const ProfilePage = () => {
-  const { t } = useI18n();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, isAgent, isAdmin, signOut, loading } = useAuth();
   const { toast } = useToast();

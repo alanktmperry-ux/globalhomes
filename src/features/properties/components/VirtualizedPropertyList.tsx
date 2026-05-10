@@ -4,7 +4,7 @@ import { FixedSizeList } from 'react-window';
 import { PropertyCard, CollabReaction } from '@/features/properties/components/PropertyCard';
 import { PropertyCardSkeleton } from '@/features/properties/components/PropertyCardSkeleton';
 import { Property } from '@/shared/lib/types';
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n';
 
 const CARD_HEIGHT_MOBILE = 300;
 const CARD_HEIGHT_DESKTOP = 320;
@@ -88,7 +88,7 @@ export function VirtualizedPropertyList(props: VirtualizedPropertyListProps) {
   const { properties, isSearching, isMobile, areaSearch, searchRadius, onClearAreaSearch, listingMode } = props;
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerHeight, setContainerHeight] = useState(600);
-  const { t } = useI18n();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const measure = () => {

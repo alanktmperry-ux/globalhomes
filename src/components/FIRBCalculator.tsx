@@ -8,7 +8,7 @@ import {
 } from '@/lib/stampDuty';
 import { calculateFirbCosts, FOREIGN_SURCHARGE_RATES } from '@/lib/firb';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 interface Props {
@@ -24,7 +24,7 @@ function formatAUD(n: number): string {
 }
 
 export function FIRBCalculator({ propertyPrice, propertyAddress, propertyState }: Props) {
-  const { t } = useI18n();
+  const { t } = useTranslation();
   const { t: tp } = useTranslation();
   const { formatPrice, currency } = useCurrency();
   const [enabled, setEnabled] = useState(false);

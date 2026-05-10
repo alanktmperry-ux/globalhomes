@@ -1,13 +1,13 @@
 import { NavLink } from 'react-router-dom';
 import { Home, Key, Tag } from 'lucide-react';
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n';
 
 /**
  * Top-of-page mode switcher for property search.
  * Lets buyers/renters jump between Buy, Rent, and Sold without going home first.
  */
 export function SearchModeTabs() {
-  const { t } = useI18n();
+  const { t } = useTranslation();
 
   const tabs = [
     { to: '/buy', label: t('Buy'), icon: Home },

@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp, AlertTriangle, Sparkles, Globe } from 'lucide-r
 import { supabase } from '@/integrations/supabase/client';
 import { MortgageBrokerCard } from './MortgageBrokerCard';
 import { capture } from '@/shared/lib/posthog';
-import { useI18n, type Language } from '@/shared/lib/i18n';
+import { useTranslation, type Language } from '@/shared/lib/i18n';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 type LanguageKey = 'en' | 'zh_simplified' | 'zh_traditional' | 'vi' | 'ko' | 'ar' | 'ja' | 'hi' | 'bn' | 'tl' | 'id';
@@ -94,7 +94,7 @@ function i18nLangToListingLang(lang: Language | string): LanguageKey {
 }
 
 const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
-  const { language: i18nLang } = useI18n();
+  const { language: i18nLang } = useTranslation();
   const { t: tp } = useTranslation();
 
   const [liveTranslations, setLiveTranslations] = useState<Record<string, Translation>>(

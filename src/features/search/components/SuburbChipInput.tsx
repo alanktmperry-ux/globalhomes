@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { MapPin, X, Loader2 } from 'lucide-react';
 import { autocomplete } from '@/shared/lib/googleMapsService';
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n';
 
 interface Props {
   values: string[];
@@ -20,7 +20,7 @@ interface Props {
  * the user typed as a free-text suburb.
  */
 export function SuburbChipInput({ values, onChange, placeholder, max = 8, className }: Props) {
-  const { t } = useI18n();
+  const { t } = useTranslation();
   const [input, setInput] = useState('');
   const [suggestions, setSuggestions] = useState<{ description: string; place_id: string }[]>([]);
   const [open, setOpen] = useState(false);

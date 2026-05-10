@@ -4,7 +4,7 @@ import { Heart, Loader2, Bell, FileText, Search, Trash2, ArrowRight, TrendingDow
 import { BottomNav } from '@/shared/components/layout/BottomNav';
 import { PropertyCard } from '@/features/properties/components/PropertyCard';
 import { PropertyDrawer } from '@/features/properties/components/PropertyDrawer';
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n';
 import { useSavedProperties } from '@/features/properties/hooks/useSavedProperties';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
@@ -34,7 +34,7 @@ const STATUS_MAP: Record<string, { label: string; cls: string }> = {
 };
 
 const SavedPage = () => {
-  const { t } = useI18n();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();

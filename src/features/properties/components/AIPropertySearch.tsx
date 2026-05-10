@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { PropertyCard } from '@/components/PropertyCard';
 import { mapDbProperty } from '@/features/properties/api/fetchPublicProperties';
 import { Property } from '@/shared/lib/types';
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n';
 import { useAuth } from '@/features/auth';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -55,7 +55,7 @@ interface AIPropertySearchProps {
 
 export function AIPropertySearch({ onRefineWithFilters, listingType = 'sale' }: AIPropertySearchProps = {}) {
   const examplePrompts = listingType === 'rent' ? EXAMPLE_PROMPTS_RENT : EXAMPLE_PROMPTS_SALE;
-  const { t, language } = useI18n();
+  const { t, language } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth() ?? { user: null } as any;
   const [query, setQuery] = useState('');

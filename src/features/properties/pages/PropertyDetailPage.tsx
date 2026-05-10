@@ -11,7 +11,7 @@ import { OpenHomesCard } from '@/features/properties/components/OpenHomesCard';
 import { ListingChatWidget } from '@/features/properties/components/ListingChatWidget';
 import { Button } from '@/components/ui/button';
 import { Property } from '@/shared/lib/types';
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { AgentContactModal } from '@/features/agents/components/AgentContactModal';
@@ -84,7 +84,7 @@ export default function PropertyDetailPage() {
   // Support both /property/:slug and /property/:uuid for backward compat
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { t, language, setLanguage } = useI18n();
+  const { t, language, setLanguage } = useTranslation();
   const [searchParams] = useSearchParams();
 
   useEffect(() => {

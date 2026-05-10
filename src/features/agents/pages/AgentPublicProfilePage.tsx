@@ -9,7 +9,7 @@ import { AgentPublicPerformanceCard } from '@/features/agents/components/AgentPu
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { PropertyCard } from '@/features/properties/components/PropertyCard';
 import { useSavedProperties } from '@/features/properties/hooks/useSavedProperties';
-import { useI18n } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n';
 import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
 import { StarRating } from '@/features/agents/components/StarRating';
@@ -120,7 +120,7 @@ function ReputationScoreCard({ score }: { score: ReputationResult }) {
 function AgentPublicProfilePageInner() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { t } = useI18n();
+  const { t } = useTranslation();
   const { isSaved, toggleSaved } = useSavedProperties();
   const [searchParams] = useSearchParams();
 

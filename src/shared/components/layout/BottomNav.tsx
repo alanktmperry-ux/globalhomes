@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Search, Heart, MessageCircle, User, LogIn, Building2, Globe, Users, ShieldCheck } from 'lucide-react';
-import { useI18n, languageNames, type Language } from '@/shared/lib/i18n';
+import { useTranslation, languageNames, type Language } from '@/shared/lib/i18n';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useConversations } from '@/features/messaging/hooks/useConversations';
@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 export function BottomNav() {
-  const { t, language, setLanguage } = useI18n();
+  const { t, language, setLanguage } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAdmin, isAgent, loading } = useAuth();

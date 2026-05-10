@@ -280,10 +280,10 @@ export default function SeekerInbox() {
                         {formatDistanceToNow(new Date(r.created_at), { addSuffix: true })}
                       </p>
                       {r.accepted && (
-                        <Badge className="mt-1 bg-[#059669] hover:bg-[#059669] text-white text-[10px]">Accepted</Badge>
+                        <Badge className="mt-1 bg-[#059669] hover:bg-[#059669] text-white text-[10px]">{t('seeker.inbox.badge.accepted')}</Badge>
                       )}
                       {r.dismissed_by_seeker && (
-                        <Badge variant="secondary" className="mt-1 text-[10px]">Dismissed</Badge>
+                        <Badge variant="secondary" className="mt-1 text-[10px]">{t('seeker.inbox.badge.dismissed')}</Badge>
                       )}
                     </button>
                   );

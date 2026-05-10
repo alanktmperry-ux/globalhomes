@@ -12655,6 +12655,36 @@ export type Database = {
           },
         ]
       }
+      translate_email_cache: {
+        Row: {
+          cache_key: string
+          created_at: string
+          expires_at: string
+          language: string
+          translated_body_html: string | null
+          translated_body_text: string | null
+          translated_subject: string | null
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string
+          expires_at?: string
+          language: string
+          translated_body_html?: string | null
+          translated_body_text?: string | null
+          translated_subject?: string | null
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string
+          expires_at?: string
+          language?: string
+          translated_body_html?: string | null
+          translated_body_text?: string | null
+          translated_subject?: string | null
+        }
+        Relationships: []
+      }
       trust_account_balances: {
         Row: {
           closed_at: string | null

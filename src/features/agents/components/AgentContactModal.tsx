@@ -128,6 +128,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [leadScore, setLeadScore] = useState(30);
+  const { t } = useTranslation();
 
   // Recalculate score on form changes
   useEffect(() => {

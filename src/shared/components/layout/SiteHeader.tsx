@@ -187,7 +187,7 @@ export function SiteHeader() {
                         <Settings size={14} className="text-muted-foreground" /> {t('nav.accountSettings')}
                       </button>
                       <button onClick={() => { navigate('/account/settings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <Settings size={14} className="text-muted-foreground" /> Profile & password
+                        <Settings size={14} className="text-muted-foreground" /> {t('nav.profilePassword')}
                       </button>
                     </>
                   )}
@@ -264,7 +264,7 @@ export function SiteHeader() {
                 </button>
                 <button onClick={() => navTo('/exclusive')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
                   <Sparkles size={16} className="text-primary" /> {t('nav.exclusive')}
-                  <span className="ml-auto text-[9px] font-bold uppercase bg-red-500 text-white rounded-full px-1.5 py-0.5">NEW</span>
+                  <span className="ml-auto text-[9px] font-bold uppercase bg-red-500 text-white rounded-full px-1.5 py-0.5">{t('nav.exclusive.badge')}</span>
                 </button>
                 <button onClick={() => navTo('/home-services')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
                   <Wrench size={16} className="text-primary" /> {t('nav.services')}

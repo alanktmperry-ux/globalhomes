@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Check, X, Send, Inbox as InboxIcon, Home, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
+import { useTranslation } from '@/shared/lib/i18n';
 
 interface HaloResponse {
   id: string;
@@ -42,6 +43,7 @@ const formatPrice = (price: number | null) => {
 
 export default function SeekerInbox() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [responses, setResponses] = useState<HaloResponse[]>([]);
@@ -180,12 +182,12 @@ export default function SeekerInbox() {
       .single();
     setSending(false);
     if (error) {
-      toast.error('Could not send reply');
+      toast.error(t('seeker.inbox.toast.replyError'));
       return;
     }
     setMessages((prev) => [...prev, data as HaloMessage]);
     setReply('');
-    toast.success('Reply sent');
+    toast.success(t('seeker.inbox.toast.replySent'));
   };
 
   const handleAccept = async () => {
@@ -194,8 +196,8 @@ export default function SeekerInbox() {
       .from('halo_responses')
       .update({ accepted: true, accepted_at: new Date().toISOString() })
       .eq('id', selected.id);
-    if (error) return toast.error('Could not accept');
-    toast.success('Marked as accepted — the agent will be notified');
+    if (error) return toast.error(t('seeker.inbox.toast.acceptError'));
+    toast.success(t('seeker.inbox.toast.accepted'));
     loadResponses();
   };
 
@@ -205,8 +207,8 @@ export default function SeekerInbox() {
       .from('halo_responses')
       .update({ dismissed_by_seeker: true, dismissed_at: new Date().toISOString() })
       .eq('id', selected.id);
-    if (error) return toast.error('Could not dismiss');
-    toast.success('Response dismissed');
+    if (error) return toast.error(t('seeker.inbox.toast.dismissError'));
+    toast.success(t('seeker.inbox.toast.dismissed'));
     setSelectedId(null);
     loadResponses();
   };
@@ -214,7 +216,7 @@ export default function SeekerInbox() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F0F4F8] flex items-center justify-center">
-        <div className="text-[#64748B]">Loading inbox…</div>
+        <div className="text-[#64748B]">{t('seeker.inbox.loading')}</div>
       </div>
     );
   }
@@ -226,21 +228,21 @@ export default function SeekerInbox() {
           onClick={() => navigate('/seeker/dashboard')}
           className="inline-flex items-center gap-2 text-sm text-[#64748B] hover:text-[#1E293B] mb-4 min-h-[44px]"
         >
-          <ArrowLeft className="h-4 w-4" /> Back to dashboard
+          <ArrowLeft className="h-4 w-4" /> {t('seeker.inbox.back')}
         </button>
 
         <div className="flex items-center gap-3 mb-6">
           <InboxIcon className="h-6 w-6 text-[#1E3A5F]" />
-          <h1 className="text-2xl font-semibold text-[#1E293B]">Inbox</h1>
+          <h1 className="text-2xl font-semibold text-[#1E293B]">{t('seeker.inbox.title')}</h1>
           <Badge variant="secondary" className="ml-2">{responses.length}</Badge>
         </div>
 
         {responses.length === 0 ? (
           <div className="bg-white border border-[#E2E8F0] rounded-lg p-12 text-center shadow-sm">
             <InboxIcon className="h-12 w-12 text-[#94A3B8] mx-auto mb-3" />
-            <p className="text-[#1E293B] font-medium mb-1">No responses yet</p>
+            <p className="text-[#1E293B] font-medium mb-1">{t('seeker.inbox.empty.title')}</p>
             <p className="text-[#64748B] text-sm">
-              When agents respond to your Halos, their messages will appear here.
+              {t('seeker.inbox.empty.copy')}
             </p>
           </div>
         ) : (
@@ -261,7 +263,7 @@ export default function SeekerInbox() {
                     >
                       <div className="flex items-start justify-between gap-2 mb-1">
                         <span className="font-medium text-sm text-[#1E293B] truncate">
-                          {r.agent?.full_name || 'Agent'}
+                          {r.agent?.full_name || t('seeker.inbox.agentFallback')}
                         </span>
                         {unread && (
                           <span className="h-2 w-2 rounded-full bg-[#2563EB] mt-1.5 flex-shrink-0" />
@@ -278,10 +280,10 @@ export default function SeekerInbox() {
                         {formatDistanceToNow(new Date(r.created_at), { addSuffix: true })}
                       </p>
                       {r.accepted && (
-                        <Badge className="mt-1 bg-[#059669] hover:bg-[#059669] text-white text-[10px]">Accepted</Badge>
+                        <Badge className="mt-1 bg-[#059669] hover:bg-[#059669] text-white text-[10px]">{t('seeker.inbox.badge.accepted')}</Badge>
                       )}
                       {r.dismissed_by_seeker && (
-                        <Badge variant="secondary" className="mt-1 text-[10px]">Dismissed</Badge>
+                        <Badge variant="secondary" className="mt-1 text-[10px]">{t('seeker.inbox.badge.dismissed')}</Badge>
                       )}
                     </button>
                   );
@@ -292,7 +294,7 @@ export default function SeekerInbox() {
             {/* Detail pane */}
             <div className="bg-white border border-[#E2E8F0] rounded-lg shadow-sm">
               {!selected ? (
-                <div className="p-12 text-center text-[#64748B]">Select a response to view details</div>
+                <div className="p-12 text-center text-[#64748B]">{t('seeker.inbox.detail.empty')}</div>
               ) : (
                 <div className="flex flex-col h-full">
                   {/* Header */}
@@ -300,7 +302,7 @@ export default function SeekerInbox() {
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div>
                         <h2 className="text-lg font-semibold text-[#1E293B]">
-                          {selected.agent?.full_name || 'Agent'}
+                          {selected.agent?.full_name || t('seeker.inbox.agentFallback')}
                         </h2>
                         {selected.agent?.agency_name && (
                           <p className="text-sm text-[#64748B]">{selected.agent.agency_name}</p>
@@ -318,7 +320,7 @@ export default function SeekerInbox() {
                               className="bg-[#059669] hover:bg-[#047857] text-white min-h-[44px]"
                               size="sm"
                             >
-                              <Check className="h-4 w-4 mr-1" /> Accept
+                              <Check className="h-4 w-4 mr-1" /> {t('seeker.inbox.action.accept')}
                             </Button>
                             <Button
                               onClick={handleDismiss}
@@ -326,7 +328,7 @@ export default function SeekerInbox() {
                               className="border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] min-h-[44px]"
                               size="sm"
                             >
-                              <X className="h-4 w-4 mr-1" /> Dismiss
+                              <X className="h-4 w-4 mr-1" /> {t('seeker.inbox.action.dismiss')}
                             </Button>
                           </>
                         )}
@@ -337,7 +339,7 @@ export default function SeekerInbox() {
                   {/* Initial agent message */}
                   {selected.body && (
                     <div className="p-4 sm:p-5 border-b border-[#E2E8F0] bg-[#F8FAFC]">
-                      <p className="text-xs text-[#64748B] mb-2 uppercase tracking-wide">Initial message</p>
+                      <p className="text-xs text-[#64748B] mb-2 uppercase tracking-wide">{t('seeker.inbox.detail.initialMessage')}</p>
                       <p className="text-sm text-[#1E293B] whitespace-pre-wrap">{selected.body}</p>
                     </div>
                   )}
@@ -345,7 +347,7 @@ export default function SeekerInbox() {
                   {/* Suggested properties */}
                   {selected.properties && selected.properties.length > 0 && (
                     <div className="p-4 sm:p-5 border-b border-[#E2E8F0]">
-                      <p className="text-xs text-[#64748B] mb-3 uppercase tracking-wide">Suggested properties</p>
+                      <p className="text-xs text-[#64748B] mb-3 uppercase tracking-wide">{t('seeker.inbox.detail.suggested')}</p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {selected.properties.map((p) => (
                           <button
@@ -357,7 +359,7 @@ export default function SeekerInbox() {
                               <Home className="h-4 w-4 text-[#2563EB] mt-0.5 flex-shrink-0" />
                               <div className="min-w-0">
                                 <p className="text-sm font-medium text-[#1E293B] truncate">
-                                  {p.title || p.address || 'Property'}
+                                  {p.title || p.address || t('seeker.inbox.propertyFallback')}
                                 </p>
                                 <p className="text-xs text-[#64748B] truncate">{p.suburb}</p>
                                 {formatPrice(p.price) && (
@@ -376,7 +378,7 @@ export default function SeekerInbox() {
                   {/* Conversation */}
                   <div className="p-4 sm:p-5 flex-1 overflow-y-auto max-h-[40vh]">
                     {messages.length === 0 ? (
-                      <p className="text-sm text-[#94A3B8] text-center py-6">No messages yet — send the first reply</p>
+                      <p className="text-sm text-[#94A3B8] text-center py-6">{t('seeker.inbox.detail.noMessages')}</p>
                     ) : (
                       <div className="space-y-3">
                         {messages.map((m) => (
@@ -408,7 +410,7 @@ export default function SeekerInbox() {
                       <Textarea
                         value={reply}
                         onChange={(e) => setReply(e.target.value)}
-                        placeholder="Write a reply…"
+                        placeholder={t('seeker.inbox.reply.placeholder')}
                         className="border-[#E2E8F0] focus-visible:ring-[#2563EB] mb-2 resize-none"
                         rows={3}
                       />
@@ -419,7 +421,7 @@ export default function SeekerInbox() {
                           className="bg-[#1E3A5F] hover:bg-[#172E4A] text-white min-h-[44px]"
                         >
                           <Send className="h-4 w-4 mr-2" />
-                          {sending ? 'Sending…' : 'Send reply'}
+                          {sending ? t('seeker.inbox.reply.sending') : t('seeker.inbox.reply.send')}
                         </Button>
                       </div>
                     </div>

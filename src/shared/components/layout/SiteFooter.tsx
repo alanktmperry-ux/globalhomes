@@ -1,7 +1,33 @@
 import { Link } from 'react-router-dom';
 import { Instagram, Youtube, Linkedin, Globe } from 'lucide-react';
+import { useTranslation } from '@/shared/lib/i18n';
 
 export function SiteFooter() {
+  const { t } = useTranslation();
+
+  const platformLinks = [
+    { key: 'footer.link.searchProperties', to: '/' },
+    { key: 'footer.link.findAgent', to: '/agents' },
+    { key: 'footer.link.stampDuty', to: '/stamp-duty-calculator' },
+    { key: 'footer.link.browseProperties', to: '/buy' },
+    { key: 'footer.link.voiceSearch', to: '/' },
+    { key: 'footer.link.agentPortal', to: '/agents/login' },
+    { key: 'footer.link.partnerPortal', to: '/partner/login' },
+    { key: 'footer.link.brokerPortal', to: '/broker/login' },
+  ];
+
+  const legalLinks = [
+    { key: 'footer.link.terms', to: '/terms' },
+    { key: 'footer.link.privacy', to: '/privacy' },
+  ];
+
+  const supportLinks = [
+    { key: 'footer.link.helpCentre', to: '/help', external: false },
+    { key: 'footer.link.contact', to: 'mailto:support@listhq.com.au', external: true },
+    { key: 'footer.link.agentLogin', to: '/agents/login', external: false },
+    { key: 'footer.link.brokerLogin', to: '/broker/login', external: false },
+  ];
+
   return (
     <footer style={{ background: '#020817' }} className="relative overflow-hidden">
       {/* Top accent line */}
@@ -21,7 +47,7 @@ export function SiteFooter() {
               <span className="text-[15px] font-semibold text-white tracking-tight">ListHQ</span>
             </div>
             <p className="text-[13px] leading-relaxed mb-5 max-w-[200px]" style={{ color: 'rgba(255,255,255,0.55)' }}>
-              List once. Speak every language. Australia's AI-powered property platform.
+              {t('footer.tagline')}
             </p>
             <div className="flex gap-2">
               {[
@@ -48,24 +74,15 @@ export function SiteFooter() {
 
           {/* Platform col */}
           <div>
-            <p className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>Platform</p>
+            <p className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>{t('footer.col.platform')}</p>
             <ul className="space-y-2.5">
-              {[
-                { label: 'Search Properties', to: '/' },
-                { label: 'Find an Agent', to: '/agents' },
-                { label: 'Stamp Duty Calculator', to: '/stamp-duty-calculator' },
-                { label: 'Browse Properties', to: '/buy' },
-                { label: 'Voice Search', to: '/' },
-                { label: 'Agent Portal', to: '/agents/login' },
-                { label: 'Partner Portal', to: '/partner/login' },
-                { label: 'Broker Portal', to: '/broker/login' },
-              ].map(link => (
-                <li key={link.label}>
+              {platformLinks.map(link => (
+                <li key={link.key}>
                   <Link to={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.6)' }}
                     onMouseEnter={e => ((e.target as HTMLElement).style.color = '#fff')}
                     onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.6)')}
                   >
-                    {link.label}
+                    {t(link.key)}
                   </Link>
                 </li>
               ))}
@@ -74,18 +91,15 @@ export function SiteFooter() {
 
           {/* Legal col */}
           <div>
-            <p className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>Legal</p>
+            <p className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>{t('footer.col.legal')}</p>
             <ul className="space-y-2.5">
-              {[
-                { label: 'Terms of Service', to: '/terms' },
-                { label: 'Privacy Policy', to: '/privacy' },
-              ].map(link => (
-                <li key={link.label}>
+              {legalLinks.map(link => (
+                <li key={link.key}>
                   <Link to={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.6)' }}
                     onMouseEnter={e => ((e.target as HTMLElement).style.color = '#fff')}
                     onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.6)')}
                   >
-                    {link.label}
+                    {t(link.key)}
                   </Link>
                 </li>
               ))}
@@ -101,7 +115,7 @@ export function SiteFooter() {
                   onMouseEnter={e => ((e.target as HTMLElement).style.color = '#fff')}
                   onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.6)')}
                 >
-                  Cookie Preferences
+                  {t('footer.link.cookiePrefs')}
                 </button>
               </li>
             </ul>
@@ -109,28 +123,23 @@ export function SiteFooter() {
 
           {/* Support col */}
           <div>
-            <p className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>Support</p>
+            <p className="text-[11px] font-semibold tracking-widest uppercase mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>{t('footer.col.support')}</p>
             <ul className="space-y-2.5">
-              {[
-                { label: 'Help Centre', to: '/help' },
-                { label: 'Contact Us', to: 'mailto:support@listhq.com.au', external: true },
-                { label: 'Agent Login', to: '/agents/login' },
-                { label: 'Broker Login', to: '/broker/login' },
-              ].map(link => (
-                <li key={link.label}>
+              {supportLinks.map(link => (
+                <li key={link.key}>
                   {link.external ? (
                     <a href={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.6)' }}
                       onMouseEnter={e => ((e.target as HTMLElement).style.color = '#fff')}
                       onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.6)')}
                     >
-                      {link.label}
+                      {t(link.key)}
                     </a>
                   ) : (
                     <Link to={link.to} className="text-[13px] transition-colors" style={{ color: 'rgba(255,255,255,0.6)' }}
                       onMouseEnter={e => ((e.target as HTMLElement).style.color = '#fff')}
                       onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.6)')}
                     >
-                      {link.label}
+                      {t(link.key)}
                     </Link>
                   )}
                 </li>
@@ -144,14 +153,14 @@ export function SiteFooter() {
         <div className="flex flex-col gap-3 pt-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
             <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
-              © {new Date().getFullYear()} ListHQ Pty Ltd. All rights reserved. · ABN 65 608 526 781
+              {t('footer.copyright', { year: new Date().getFullYear() })}
             </span>
-<span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
-              Licensed agents only · Australian property law
+            <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
+              {t('footer.licence')}
             </span>
           </div>
           <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            ListHQ is not a licensed financial adviser. All calculators are indicative only.
+            {t('footer.disclaimer')}
           </p>
         </div>
 

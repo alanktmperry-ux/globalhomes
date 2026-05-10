@@ -6,25 +6,26 @@ import { Home, Building2, Key, Loader2, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { useTranslation } from '@/shared/lib/i18n';
 
 const ROLES = [
   {
     value: 'buyer' as const,
     icon: Home,
-    title: 'Looking to buy or rent',
-    description: 'Search listings, save properties, get alerts',
+    titleKey: 'onboarding.role.cards.buyer.title',
+    descKey: 'onboarding.role.cards.buyer.desc',
   },
   {
     value: 'agent' as const,
     icon: Building2,
-    title: "I'm a real estate agent",
-    description: 'List properties, manage leads, grow your rent roll',
+    titleKey: 'onboarding.role.cards.agent.title',
+    descKey: 'onboarding.role.cards.agent.desc',
   },
   {
     value: 'property_manager' as const,
     icon: Key,
-    title: "I'm a property manager",
-    description: 'Manage rentals, trust accounting, maintenance requests',
+    titleKey: 'onboarding.role.cards.propertyManager.title',
+    descKey: 'onboarding.role.cards.propertyManager.desc',
   },
 ];
 
@@ -32,6 +33,7 @@ type Role = (typeof ROLES)[number]['value'];
 
 const OnboardingRolePage = () => {
   const { user, loading } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [selected, setSelected] = useState<Role | null>(null);
   const [saving, setSaving] = useState(false);
@@ -90,7 +92,7 @@ const OnboardingRolePage = () => {
 
       routeForRole(selected);
     } catch (err) {
-      toast.error("Couldn't save your role", { description: getErrorMessage(err) });
+      toast.error(t('onboarding.role.toast.error.title'), { description: getErrorMessage(err) });
       setSaving(false);
     }
   };
@@ -105,15 +107,15 @@ const OnboardingRolePage = () => {
       >
         <div className="text-center mb-10">
           <h1 className="text-[32px] sm:text-[38px] font-semibold tracking-[-1px] text-stone-900 leading-tight">
-            How will you use ListHQ?
+            {t('onboarding.role.title')}
           </h1>
           <p className="text-[15px] text-stone-500 mt-3">
-            Pick the option that best describes you. You can change this later.
+            {t('onboarding.role.subtitle')}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {ROLES.map(({ value, icon: Icon, title, description }) => {
+          {ROLES.map(({ value, icon: Icon, titleKey, descKey }) => {
             const isSelected = selected === value;
             return (
               <button
@@ -139,10 +141,10 @@ const OnboardingRolePage = () => {
                   <Icon size={22} strokeWidth={2} />
                 </div>
                 <h3 className="text-[17px] font-semibold text-stone-900 leading-snug">
-                  {title}
+                  {t(titleKey)}
                 </h3>
                 <p className="text-[14px] text-stone-500 mt-2 leading-relaxed">
-                  {description}
+                  {t(descKey)}
                 </p>
               </button>
             );
@@ -158,10 +160,10 @@ const OnboardingRolePage = () => {
           >
             {saving ? (
               <>
-                <Loader2 size={16} className="animate-spin" /> Setting up…
+                <Loader2 size={16} className="animate-spin" /> {t('onboarding.role.settingUp')}
               </>
             ) : (
-              'Continue'
+              t('onboarding.role.continue')
             )}
           </button>
         </div>

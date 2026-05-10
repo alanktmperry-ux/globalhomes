@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Sparkles, Loader2, Home as HomeIcon, Key, PiggyBank, Wallet, Shield, Zap, Scale, Building2 } from 'lucide-react';
+import { Sparkles, Loader2, Home as HomeIcon, Key, PiggyBank, Wallet, Shield, Zap, Scale } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import type { Halo } from '@/types/halo';
 import { usePageTitle } from '@/lib/usePageTitle';
+import { useTranslation } from '@/shared/lib/i18n';
 
 type HaloRow = Halo & { response_count: number; unread_count: number };
 
@@ -20,6 +21,7 @@ const fmtMoney = (n: number | null | undefined) =>
 export default function SeekerDashboard() {
   usePageTitle('My Dashboard');
   const { user, loading, isAgent, isAdmin, isPartner, isSupport } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [halos, setHalos] = useState<HaloRow[] | null>(null);
   const [unreadTotal, setUnreadTotal] = useState(0);
@@ -127,9 +129,9 @@ export default function SeekerDashboard() {
       unread: unreadTotal,
       languages: Array.from(langs)
         .map((l) => l.charAt(0).toUpperCase() + l.slice(1))
-        .join(', ') || 'English',
+        .join(', ') || t('seeker.dashboard.stats.languagesDefault'),
     };
-  }, [halos, activeHalos.length, unreadTotal]);
+  }, [halos, activeHalos.length, unreadTotal, t]);
 
   const expiringSoon = activeHalos.find((h) => {
     const days = daysBetween(new Date(h.expires_at), new Date());
@@ -140,16 +142,23 @@ export default function SeekerDashboard() {
   const hasRent = activeHalos.some((h) => h.intent === 'rent');
   const hasBuy = activeHalos.some((h) => h.intent === 'buy');
 
+  const noMatchKey =
+    filter === 'buy' ? 'seeker.dashboard.filter.noMatch.buy' :
+    filter === 'rent' ? 'seeker.dashboard.filter.noMatch.rent' :
+    'seeker.dashboard.filter.noMatch.all';
+
   return (
     <div className="min-h-screen bg-[#F0F4F8]">
-      <Helmet><title>My Halos · ListHQ</title></Helmet>
+      <Helmet><title>{t('seeker.dashboard.title')}</title></Helmet>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
         {/* Greeting */}
         <header className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-[#1E293B]">
-            {isNewUser ? `Welcome, ${displayName} 👋` : `Welcome back, ${displayName} 👋`}
+            {isNewUser
+              ? t('seeker.dashboard.welcome.firstTime', { name: displayName })
+              : t('seeker.dashboard.welcome.returning', { name: displayName })}
           </h1>
-          <p className="text-[#64748B] mt-1 text-sm sm:text-base">Here's everything happening with your property search.</p>
+          <p className="text-[#64748B] mt-1 text-sm sm:text-base">{t('seeker.dashboard.subtitle')}</p>
         </header>
 
         {halos === null ? (
@@ -161,11 +170,11 @@ export default function SeekerDashboard() {
             {/* Language preference banner */}
             {profile?.language_preference && profile.language_preference !== 'en' && (
               <div className="mb-6 rounded-xl bg-primary/5 border border-primary/20 p-4 flex items-center gap-3">
-                <span className="text-lg">🌐</span>
+                <span className="text-lg" aria-hidden>{'🌐'}</span>
                 <div>
-                  <p className="text-sm font-medium text-foreground">Listings shown in your language</p>
+                  <p className="text-sm font-medium text-foreground">{t('seeker.dashboard.langBanner.title')}</p>
                   <p className="text-xs text-muted-foreground">
-                    Property details are automatically displayed in your preferred language when available.
+                    {t('seeker.dashboard.langBanner.copy')}
                   </p>
                 </div>
               </div>
@@ -179,40 +188,52 @@ export default function SeekerDashboard() {
 
             {/* Stats */}
             <section className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 mt-8">
-              <StatTile label="Active Halos" value={String(stats.active)} />
-              <StatTile label="Unread Responses" value={String(stats.unread)} highlight={stats.unread > 0} />
-              <StatTile label="Languages" value={stats.languages} small />
+              <StatTile label={t('seeker.dashboard.stats.activeHalos')} value={String(stats.active)} />
+              <StatTile label={t('seeker.dashboard.stats.unreadResponses')} value={String(stats.unread)} highlight={stats.unread > 0} />
+              <StatTile label={t('seeker.dashboard.stats.languages')} value={stats.languages} small />
             </section>
 
             {/* Expiry banner */}
-            {expiringSoon && (
-              <div className="mb-6 rounded-xl border border-[#FCD34D] bg-[#FEF3C7] p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
-                <p className="text-sm text-[#92400E]">
-                  Your <strong>{expiringSoon.suburbs?.[0] ?? 'Halo'}</strong>{' '}
-                  {expiringSoon.intent === 'buy' ? 'Buy' : 'Rent'} Halo expires in{' '}
-                  <strong>{Math.max(0, daysBetween(new Date(expiringSoon.expires_at), new Date()))} days</strong>{' '}
-                  with no responses yet. Consider updating your requirements.
-                </p>
-                <Button
-                  size="sm"
-                  className="bg-[#D97706] hover:bg-[#B45309] text-white shrink-0"
-                  onClick={() => navigate(`/halo/new?edit=${expiringSoon.id}`)}
-                >
-                  Update Halo
-                </Button>
-              </div>
-            )}
+            {expiringSoon && (() => {
+              const dayCount = Math.max(0, daysBetween(new Date(expiringSoon.expires_at), new Date()));
+              const daysLabel = t(
+                dayCount === 1 ? 'seeker.dashboard.expiry.days.singular' : 'seeker.dashboard.expiry.days.plural',
+                { count: dayCount },
+              );
+              const intentLabel = t(
+                expiringSoon.intent === 'buy' ? 'seeker.dashboard.expiry.intent.buy' : 'seeker.dashboard.expiry.intent.rent',
+              );
+              const suburbLabel = expiringSoon.suburbs?.[0] ?? t('seeker.haloCard.suburb.anywhere');
+              return (
+                <div className="mb-6 rounded-xl border border-[#FCD34D] bg-[#FEF3C7] p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+                  <p className="text-sm text-[#92400E]">
+                    {t('seeker.dashboard.expiry.body', {
+                      suburb: suburbLabel,
+                      intent: intentLabel,
+                      days: daysLabel,
+                    })}
+                  </p>
+                  <Button
+                    size="sm"
+                    className="bg-[#D97706] hover:bg-[#B45309] text-white shrink-0"
+                    onClick={() => navigate(`/halo/new?edit=${expiringSoon.id}`)}
+                  >
+                    {t('seeker.dashboard.expiry.cta')}
+                  </Button>
+                </div>
+              );
+            })()}
 
             {/* Tabs */}
             <div className="flex items-center gap-2 mb-4 border-b border-[#E2E8F0]">
               <button className="px-4 py-2.5 text-sm font-semibold text-[#1A2E4A] border-b-2 border-[#1A2E4A] -mb-px">
-                My Halos
+                {t('seeker.dashboard.tabs.myHalos')}
               </button>
               <button
                 onClick={() => navigate('/seeker/inbox')}
                 className="px-4 py-2.5 text-sm font-medium text-[#64748B] hover:text-[#1E293B] transition-colors flex items-center gap-2"
               >
-                Inbox
+                {t('seeker.dashboard.tabs.inbox')}
                 {unreadTotal > 0 && (
                   <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full text-[10px] font-bold bg-[#DC2626] text-white">
                     {unreadTotal}
@@ -234,7 +255,11 @@ export default function SeekerDashboard() {
                         : 'bg-white text-[#64748B] border border-[#E2E8F0] hover:bg-[#F8FAFC]'
                     }`}
                   >
-                    {f === 'all' ? 'All' : f === 'buy' ? '🏡 Buying' : '🔑 Renting'}
+                    {f === 'all'
+                      ? t('seeker.dashboard.filter.all')
+                      : f === 'buy'
+                        ? t('seeker.dashboard.filter.buying')
+                        : t('seeker.dashboard.filter.renting')}
                   </button>
                 ))}
               </div>
@@ -245,7 +270,7 @@ export default function SeekerDashboard() {
               <EmptyState onCreate={() => navigate('/halo/new')} />
             ) : filtered.length === 0 ? (
               <div className="bg-white rounded-xl border border-[#E2E8F0] p-8 text-center text-sm text-[#64748B]">
-                No {filter} Halos. Switch filter or post a new one.
+                {t(noMatchKey)}
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-3 sm:gap-4">
@@ -280,66 +305,85 @@ function StatTile({ label, value, highlight, small }: { label: string; value: st
 
 function HaloCard({ halo }: { halo: HaloRow }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const days = daysBetween(new Date(halo.expires_at), new Date());
-  const suburb = halo.suburbs?.[0] ?? 'Anywhere';
-  const propType = halo.property_types?.[0] ?? 'Property';
+  const suburb = halo.suburbs?.[0] ?? t('seeker.haloCard.suburb.anywhere');
+  const propType = halo.property_types?.[0] ?? t('seeker.haloCard.type.default');
   const beds = halo.bedrooms_min ?? halo.bedrooms_max;
   const isBuy = halo.intent === 'buy';
   const score = halo.quality_score ?? 0;
   const scoreColour = score >= 75 ? 'bg-[#D1FAE5] text-[#059669]' : score >= 50 ? 'bg-[#DBEAFE] text-[#2563EB]' : 'bg-[#F1F5F9] text-[#64748B]';
-  const scoreLabel = score >= 75 ? 'Strong' : score >= 50 ? 'Good' : 'Fair';
+  const scoreLabelKey = score >= 75 ? 'seeker.haloCard.score.strong' : score >= 50 ? 'seeker.haloCard.score.good' : 'seeker.haloCard.score.fair';
   const statusColour = halo.status === 'active' ? 'bg-[#D1FAE5] text-[#059669]' : halo.status === 'fulfilled' ? 'bg-[#DBEAFE] text-[#2563EB]' : 'bg-[#F1F5F9] text-[#64748B]';
   const ageDays = daysBetween(new Date(), new Date(halo.created_at));
+
+  const title = beds
+    ? t('seeker.haloCard.title.withBeds', { beds, type: propType, suburb })
+    : t('seeker.haloCard.title.withoutBeds', { type: propType, suburb });
+
+  const budgetLabel = halo.budget_min == null
+    ? t('seeker.haloCard.budget.upTo', { max: fmtMoney(halo.budget_max) })
+    : t('seeker.haloCard.budget.range', { min: fmtMoney(halo.budget_min), max: fmtMoney(halo.budget_max) });
+
+  const postedLabel = ageDays === 0
+    ? t('seeker.haloCard.posted.today')
+    : t(ageDays === 1 ? 'seeker.haloCard.posted.daysAgo.singular' : 'seeker.haloCard.posted.daysAgo.plural', { count: ageDays });
+
+  const responsesLabel = halo.response_count > 0
+    ? t(halo.response_count === 1 ? 'seeker.haloCard.responses.count.singular' : 'seeker.haloCard.responses.count.plural', { count: halo.response_count })
+    : t('seeker.haloCard.responses.none');
+
+  const safeDays = Math.max(0, days);
+  const daysLeftLabel = t(safeDays === 1 ? 'seeker.haloCard.daysLeft.singular' : 'seeker.haloCard.daysLeft.plural', { count: safeDays });
+
+  const statusKey = `seeker.haloCard.status.${halo.status}`;
 
   return (
     <article className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-5">
       <div className="flex items-start justify-between gap-3 mb-2">
         <h3 className="font-semibold text-[#1E293B] text-base sm:text-lg leading-snug">
-          {beds ? `${beds} Bedroom ` : ''}{propType} · {suburb}
+          {title}
         </h3>
         <Badge className={isBuy ? 'bg-[#DBEAFE] text-[#1D4ED8] hover:bg-[#DBEAFE]' : 'bg-[#D1FAE5] text-[#059669] hover:bg-[#D1FAE5]'}>
-          {isBuy ? '🏡 BUY' : '🔑 RENT'}
+          {isBuy ? t('seeker.haloCard.badge.buy') : t('seeker.haloCard.badge.rent')}
         </Badge>
       </div>
 
       <p className="text-sm text-[#64748B] mb-3">
-        {halo.budget_min == null
-          ? `Up to ${fmtMoney(halo.budget_max)}`
-          : `${fmtMoney(halo.budget_min)} – ${fmtMoney(halo.budget_max)}`}
-        {' · Posted '}{ageDays === 0 ? 'today' : `${ageDays} day${ageDays === 1 ? '' : 's'} ago`}
+        {budgetLabel}{postedLabel}
       </p>
 
       <div className="flex flex-wrap gap-2 mb-4">
         <Badge variant="secondary" className={statusColour + ' hover:' + statusColour}>
-          {halo.status[0].toUpperCase() + halo.status.slice(1)}
+          {t(statusKey)}
         </Badge>
         {halo.quality_score != null && (
           <Badge variant="secondary" className={scoreColour + ' hover:' + scoreColour}>
-            ⭐ Score {halo.quality_score} · {scoreLabel}
+            {t('seeker.haloCard.score', { score: halo.quality_score, label: t(scoreLabelKey) })}
           </Badge>
         )}
         <Badge variant="secondary" className={halo.response_count > 0 ? 'bg-[#DBEAFE] text-[#1D4ED8] hover:bg-[#DBEAFE]' : 'bg-[#F1F5F9] text-[#64748B] hover:bg-[#F1F5F9]'}>
-          💬 {halo.response_count > 0 ? `${halo.response_count} responses` : 'No responses yet'}
+          {responsesLabel}
         </Badge>
         <Badge variant="secondary" className={days < 7 ? 'bg-[#FEE2E2] text-[#DC2626] hover:bg-[#FEE2E2]' : 'bg-[#F1F5F9] text-[#64748B] hover:bg-[#F1F5F9]'}>
-          📅 {Math.max(0, days)} days left
+          {daysLeftLabel}
         </Badge>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2">
         {halo.response_count > 0 ? (
           <>
-            <Button onClick={() => navigate('/seeker/inbox')} className="bg-[#2563EB] hover:bg-[#1D4ED8]">View Responses</Button>
-            <Button variant="ghost" onClick={() => navigate(`/halo/new?edit=${halo.id}`)}>Edit</Button>
+            <Button onClick={() => navigate('/seeker/inbox')} className="bg-[#2563EB] hover:bg-[#1D4ED8]">{t('seeker.haloCard.cta.viewResponses')}</Button>
+            <Button variant="ghost" onClick={() => navigate(`/halo/new?edit=${halo.id}`)}>{t('seeker.haloCard.cta.edit')}</Button>
           </>
         ) : (
           <>
-            <Button variant="ghost" onClick={() => navigate(`/halo/new?edit=${halo.id}`)}>Edit</Button>
+            <Button variant="ghost" onClick={() => navigate(`/halo/new?edit=${halo.id}`)}>{t('seeker.haloCard.cta.edit')}</Button>
             <Button
               className="bg-[#1E3A5F] hover:bg-[#1A2E4A] text-white"
-              onClick={() => toast.info('Boost visibility — coming soon')}
+              onClick={() => toast.info(t('seeker.haloCard.toast.boost'))}
             >
-              Boost visibility
+              {t('seeker.haloCard.cta.boost')}
             </Button>
           </>
         )}
@@ -349,21 +393,23 @@ function HaloCard({ halo }: { halo: HaloRow }) {
 }
 
 function EmptyState({ onCreate }: { onCreate: () => void }) {
+  const { t } = useTranslation();
   return (
     <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-8 sm:p-12 text-center">
-      <div className="text-5xl mb-4">🏡</div>
-      <h2 className="text-xl font-bold text-[#1E293B] mb-2">You haven't posted a Halo yet</h2>
+      <div className="text-5xl mb-4" aria-hidden>{'🏡'}</div>
+      <h2 className="text-xl font-bold text-[#1E293B] mb-2">{t('seeker.empty.title')}</h2>
       <p className="text-[#64748B] max-w-md mx-auto mb-6 text-sm sm:text-base">
-        Tell agents exactly what you're looking for — suburb, budget, timeline, in your language. Agents come to you.
+        {t('seeker.empty.copy')}
       </p>
       <Button onClick={onCreate} className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white">
-        Post your first Halo →
+        {t('seeker.empty.cta')}
       </Button>
     </div>
   );
 }
 
 function PropertyJourney({ hasRent, hasBuy }: { hasRent: boolean; hasBuy: boolean }) {
+  const { t } = useTranslation();
   const Step = ({ icon: Icon, label, active }: { icon: any; label: string; active: boolean }) => (
     <div className="flex flex-col items-center gap-1.5 flex-1">
       <div className={`w-12 h-12 rounded-full flex items-center justify-center ${active ? 'bg-[#2563EB] text-white' : 'bg-[#E2E8F0] text-[#94A3B8]'}`}>
@@ -374,17 +420,17 @@ function PropertyJourney({ hasRent, hasBuy }: { hasRent: boolean; hasBuy: boolea
   );
   return (
     <section className="mt-10">
-      <h2 className="text-lg font-semibold text-[#1E293B] mb-4">Your property journey</h2>
+      <h2 className="text-lg font-semibold text-[#1E293B] mb-4">{t('seeker.journey.title')}</h2>
       <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-5 sm:p-6">
         <div className="flex items-center gap-2">
-          <Step icon={Key} label="Renting" active={hasRent} />
+          <Step icon={Key} label={t('seeker.journey.step.renting')} active={hasRent} />
           <div className="h-0.5 flex-1 bg-[#E2E8F0] -mt-6" />
-          <Step icon={PiggyBank} label="Saving" active={false} />
+          <Step icon={PiggyBank} label={t('seeker.journey.step.saving')} active={false} />
           <div className="h-0.5 flex-1 bg-[#E2E8F0] -mt-6" />
-          <Step icon={HomeIcon} label="Buying" active={hasBuy} />
+          <Step icon={HomeIcon} label={t('seeker.journey.step.buying')} active={hasBuy} />
         </div>
         <div className="mt-5 rounded-lg bg-[#DBEAFE] border border-[#BFDBFE] p-4 text-sm text-[#1E40AF]">
-          💡 Many renters on ListHQ go on to buy their first home through us. When you're ready, your preferences and suburb history are already saved — your Buy Halo will take 2 minutes.
+          {t('seeker.journey.tip')}
         </div>
       </div>
     </section>
@@ -392,24 +438,25 @@ function PropertyJourney({ hasRent, hasBuy }: { hasRent: boolean; hasBuy: boolea
 }
 
 function RenterServices() {
+  const { t } = useTranslation();
   return (
     <section className="mt-8">
-      <h2 className="text-lg font-semibold text-[#1E293B] mb-4">Services for renters</h2>
+      <h2 className="text-lg font-semibold text-[#1E293B] mb-4">{t('seeker.renterServices.title')}</h2>
       <div className="rounded-xl bg-gradient-to-br from-[#1A2E4A] to-[#0E7490] text-white p-5 sm:p-6 mb-3">
         <div className="flex items-start gap-3">
           <Shield className="shrink-0" />
           <div className="flex-1">
-            <h3 className="font-bold text-base sm:text-lg">🔐 Rental bond guarantee</h3>
+            <h3 className="font-bold text-base sm:text-lg">{t('seeker.renterServices.bond.title')}</h3>
             <p className="text-sm text-white/85 mt-1 mb-4">
-              No 4-weeks bond upfront needed. Pay a small weekly fee instead. Available in English, 中文, Tiếng Việt.
+              {t('seeker.renterServices.bond.copy')}
             </p>
-            <Button className="bg-white text-[#1A2E4A] hover:bg-white/90">Get bond guarantee → From $8/week</Button>
+            <Button className="bg-white text-[#1A2E4A] hover:bg-white/90">{t('seeker.renterServices.bond.cta')}</Button>
           </div>
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <SmallServiceCard icon={Zap} title="Connect utilities" body="Electricity, gas, internet in one step" />
-        <SmallServiceCard icon={Shield} title="Contents insurance" body="From $8/month" />
+        <SmallServiceCard icon={Zap} title={t('seeker.renterServices.utilities.title')} body={t('seeker.renterServices.utilities.body')} />
+        <SmallServiceCard icon={Shield} title={t('seeker.renterServices.insurance.title')} body={t('seeker.renterServices.insurance.body')} />
       </div>
     </section>
   );
@@ -417,27 +464,28 @@ function RenterServices() {
 
 function BuyerServices() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   return (
     <section className="mt-8">
-      <h2 className="text-lg font-semibold text-[#1E293B] mb-4">Services for buyers</h2>
+      <h2 className="text-lg font-semibold text-[#1E293B] mb-4">{t('seeker.buyerServices.title')}</h2>
       <div className="rounded-xl bg-gradient-to-br from-[#1A2E4A] to-[#2563EB] text-white p-5 sm:p-6 mb-3">
         <div className="flex items-start gap-3">
           <Wallet className="shrink-0" />
           <div className="flex-1">
-            <h3 className="font-bold text-base sm:text-lg">🏦 Get pre-approved before you inspect</h3>
+            <h3 className="font-bold text-base sm:text-lg">{t('seeker.buyerServices.preapproval.title')}</h3>
             <p className="text-sm text-white/85 mt-1 mb-4">
-              Know your real budget. We'll connect you with a multilingual mortgage broker — English, 中文, Tiếng Việt available.
+              {t('seeker.buyerServices.preapproval.copy')}
             </p>
             <Button onClick={() => navigate('/brokers')} className="bg-white text-[#1A2E4A] hover:bg-white/90">
-              Find a broker → Free, no obligation
+              {t('seeker.buyerServices.preapproval.cta')}
             </Button>
           </div>
         </div>
       </div>
       <SmallServiceCard
         icon={Scale}
-        title="Need a conveyancer?"
-        body="Fixed-fee settlement from $990. Multilingual available in NSW, VIC, QLD."
+        title={t('seeker.buyerServices.conveyancer.title')}
+        body={t('seeker.buyerServices.conveyancer.body')}
         onClick={() => navigate('/conveyancing')}
       />
     </section>
@@ -463,22 +511,23 @@ function SmallServiceCard({ icon: Icon, title, body, onClick }: { icon: any; tit
 
 function PlanningToBuy() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   return (
     <section className="mt-8">
       <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-5 sm:p-6">
-        <h2 className="font-bold text-[#1E293B] text-base sm:text-lg mb-1">Planning to buy one day? Start now.</h2>
+        <h2 className="font-bold text-[#1E293B] text-base sm:text-lg mb-1">{t('seeker.planningToBuy.title')}</h2>
         <p className="text-sm text-[#64748B] mb-4">
-          Talk to a multilingual mortgage broker — they'll tell you exactly how much deposit you need and when you'll be ready. No commitment, no cost.
+          {t('seeker.planningToBuy.copy')}
         </p>
         <div className="flex flex-col sm:flex-row gap-2">
           <Button onClick={() => navigate('/brokers?lang=zh')} variant="outline" className="border-[#E2E8F0]">
-            🏦 Find a Mandarin-speaking broker
+            {t('seeker.planningToBuy.findMandarin')}
           </Button>
           <Button onClick={() => navigate('/brokers?lang=vi')} variant="outline" className="border-[#E2E8F0]">
-            🏦 Find a Vietnamese-speaking broker
+            {t('seeker.planningToBuy.findVietnamese')}
           </Button>
         </div>
-        <p className="text-xs text-[#94A3B8] mt-3">Also available in Korean, Arabic, Hindi — free, no obligation.</p>
+        <p className="text-xs text-[#94A3B8] mt-3">{t('seeker.planningToBuy.alsoAvailable')}</p>
       </div>
     </section>
   );
@@ -490,13 +539,14 @@ function fmtAud(n: number | null | undefined) {
 }
 
 function HaloSummaryCard({ intent }: { intent: any | null }) {
+  const { t } = useTranslation();
   if (!intent) {
     return (
       <div className="rounded-xl border border-border bg-card p-5 space-y-3 mb-4">
-        <h2 className="font-semibold text-sm text-foreground">Your Halo</h2>
-        <p className="text-sm text-muted-foreground">Create your Halo to start receiving matches.</p>
+        <h2 className="font-semibold text-sm text-foreground">{t('seeker.summary.title')}</h2>
+        <p className="text-sm text-muted-foreground">{t('seeker.summary.empty')}</p>
         <Button asChild size="sm">
-          <Link to="/halo/new">Create your Halo →</Link>
+          <Link to="/halo/new">{t('seeker.summary.cta')}</Link>
         </Button>
       </div>
     );
@@ -505,7 +555,13 @@ function HaloSummaryCard({ intent }: { intent: any | null }) {
   const types = (intent.property_types ?? []) as string[];
   const minP = fmtAud(intent.min_price);
   const maxP = fmtAud(intent.max_price);
-  const priceLabel = minP && maxP ? `${minP} – ${maxP}` : maxP ? `Up to ${maxP}` : minP ? `From ${minP}` : null;
+  const priceLabel = minP && maxP
+    ? t('seeker.summary.price.range', { min: minP, max: maxP })
+    : maxP
+      ? t('seeker.summary.price.upTo', { max: maxP })
+      : minP
+        ? t('seeker.summary.price.from', { min: minP })
+        : null;
 
   const Chip = ({ children }: { children: React.ReactNode }) => (
     <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-foreground">
@@ -516,39 +572,41 @@ function HaloSummaryCard({ intent }: { intent: any | null }) {
   return (
     <div className="rounded-xl border border-border bg-card p-5 space-y-3 mb-4">
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-sm text-foreground">Your Halo</h2>
-        <Link to="/halo/new" className="text-xs text-primary hover:underline">Edit</Link>
+        <h2 className="font-semibold text-sm text-foreground">{t('seeker.summary.title')}</h2>
+        <Link to="/halo/new" className="text-xs text-primary hover:underline">{t('seeker.summary.edit')}</Link>
       </div>
       <div className="flex flex-wrap gap-2">
-        <Chip>🏡 Buy</Chip>
+        <Chip>{t('seeker.summary.chip.buy')}</Chip>
         {suburbs.length > 0 && <Chip>{suburbs.join(', ')}</Chip>}
         {priceLabel && <Chip>{priceLabel}</Chip>}
-        {intent.bedrooms != null && <Chip>{intent.bedrooms}+ bed</Chip>}
-        {types.map((t) => <Chip key={t}>{t}</Chip>)}
+        {intent.bedrooms != null && <Chip>{t('seeker.summary.chip.beds', { count: intent.bedrooms })}</Chip>}
+        {types.map((t2) => <Chip key={t2}>{t2}</Chip>)}
       </div>
     </div>
   );
 }
 
 function MatchedListings({ matches }: { matches: any[] }) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-3 mb-4">
       <h2 className="font-semibold text-sm text-foreground">
-        Properties matched to you
+        {t('seeker.matches.title')}
         {matches.length > 0 && (
-          <span className="ml-2 text-xs font-normal text-muted-foreground">({matches.length} found)</span>
+          <span className="ml-2 text-xs font-normal text-muted-foreground">{t('seeker.matches.found', { count: matches.length })}</span>
         )}
       </h2>
       {matches.length === 0 ? (
         <div className="rounded-xl border border-border bg-card p-5">
           <p className="text-sm text-muted-foreground">
-            No matches yet — we'll notify you by email when a property matches your Halo.
+            {t('seeker.matches.empty')}
           </p>
         </div>
       ) : (
         matches.map((match) => {
           const p = match.properties;
           const price = p.price_formatted ?? (p.price ? `$${Number(p.price).toLocaleString('en-AU')}` : '—');
+          const specs = `${p.suburb}${p.beds != null ? t('seeker.matches.specs.bed', { count: p.beds }) : ''}${p.baths != null ? t('seeker.matches.specs.bath', { count: p.baths }) : ''}`;
           return (
             <Link
               key={match.id}
@@ -559,13 +617,13 @@ function MatchedListings({ matches }: { matches: any[] }) {
                 <div className="min-w-0">
                   <p className="font-medium text-sm text-foreground line-clamp-1">{p.address}</p>
                   <p className="text-xs text-muted-foreground">
-                    {p.suburb}{p.beds != null ? ` · ${p.beds} bed` : ''}{p.baths != null ? ` · ${p.baths} bath` : ''}
+                    {specs}
                   </p>
                 </div>
                 <div className="shrink-0 text-right">
                   <p className="text-sm font-semibold text-foreground">{price}</p>
                   {match.match_score != null && (
-                    <p className="text-xs text-primary font-medium">{match.match_score}% match</p>
+                    <p className="text-xs text-primary font-medium">{t('seeker.matches.score', { score: match.match_score })}</p>
                   )}
                 </div>
               </div>

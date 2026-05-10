@@ -83,7 +83,10 @@ Deno.test("glossary sentinels survive a real AI roundtrip and restore curated zh
       ],
     }),
   });
-  assertEquals(resp.status, 200, `AI gateway returned ${resp.status}: ${await resp.text()}`);
+  if (resp.status !== 200) {
+    const errBody = await resp.text();
+    throw new Error(`AI gateway returned ${resp.status}: ${errBody}`);
+  }
   const data = await resp.json();
   const translated: string = data.choices?.[0]?.message?.content ?? "";
   console.log("Sentinelled translation:", translated);

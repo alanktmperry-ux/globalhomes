@@ -12,6 +12,7 @@ import { HaloStep2, validateStep2 } from '@/components/halo/HaloStep2';
 import { HaloStep3, validateStep3 } from '@/components/halo/HaloStep3';
 import type { HaloFormData } from '@/types/halo';
 import { usePageTitle } from '@/lib/usePageTitle';
+import { useTranslation } from '@/shared/lib/i18n';
 
 const DRAFT_KEY = 'halo_draft';
 

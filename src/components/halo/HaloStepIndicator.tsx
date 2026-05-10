@@ -1,5 +1,6 @@
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/shared/lib/i18n';
 
 interface Props {
   current: number;
@@ -8,10 +9,11 @@ interface Props {
 }
 
 export function HaloStepIndicator({ current, total, labels }: Props) {
+  const { t } = useTranslation();
   return (
     <div className="w-full">
       <p className="text-sm text-muted-foreground mb-2">
-        Step {current} of {total}
+        {t('halo.wizard.stepIndicator', { current, total })}
       </p>
       <div className="flex items-center gap-2">
         {Array.from({ length: total }).map((_, i) => {

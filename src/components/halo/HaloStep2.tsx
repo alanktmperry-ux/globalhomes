@@ -8,6 +8,7 @@ import { SuburbAutocomplete } from '@/components/ui/SuburbAutocomplete';
 import { cn } from '@/lib/utils';
 import type { HaloFormData, HaloTimeframe, HaloFinanceStatus } from '@/types/halo';
 import { TIMEFRAME_LABELS, FINANCE_LABELS } from '@/types/halo';
+import { useTranslation } from '@/shared/lib/i18n';
 
 interface Props {
   data: HaloFormData;
@@ -24,6 +25,7 @@ const parseAUD = (s: string): number | null => {
 };
 
 export function HaloStep2({ data, update }: Props) {
+  const { t } = useTranslation();
   const [suburbInput, setSuburbInput] = useState('');
 
   const addSuburb = useCallback((raw: string) => {
@@ -47,7 +49,7 @@ export function HaloStep2({ data, update }: Props) {
   return (
     <div className="space-y-8">
       <div>
-        <Label className="text-base font-semibold mb-3 block">Suburbs *</Label>
+        <Label className="text-base font-semibold mb-3 block">{t('halo.wizard.step2.suburbs.label')}</Label>
         <div className="flex flex-wrap gap-2 mb-2">
           {data.suburbs.map((s) => (
             <span
@@ -59,7 +61,7 @@ export function HaloStep2({ data, update }: Props) {
                 type="button"
                 onClick={() => update({ suburbs: data.suburbs.filter((x) => x !== s) })}
                 className="hover:text-primary/70"
-                aria-label={`Remove ${s}`}
+                aria-label={t('halo.wizard.step2.suburbs.removeAria', { suburb: s })}
               >
                 <X size={14} />
               </button>
@@ -72,18 +74,26 @@ export function HaloStep2({ data, update }: Props) {
           onSelect={addSuburb}
           onKeyDown={handleSuburbKey}
           disabled={data.suburbs.length >= 5}
-          placeholder={data.suburbs.length >= 5 ? 'Maximum reached' : 'Start typing a suburb…'}
+          placeholder={
+            data.suburbs.length >= 5
+              ? t('halo.wizard.step2.suburbs.maxReached')
+              : t('halo.wizard.step2.suburbs.placeholder')
+          }
         />
         <p className="text-xs text-muted-foreground mt-1">
-          {data.suburbs.length >= 5 ? 'Maximum 5 suburbs' : `${data.suburbs.length}/5 suburbs`}
+          {data.suburbs.length >= 5
+            ? t('halo.wizard.step2.suburbs.maxNote')
+            : t('halo.wizard.step2.suburbs.counter', { count: data.suburbs.length })}
         </p>
       </div>
 
       <div className="flex items-start justify-between gap-4 p-4 rounded-lg border">
         <div>
-          <Label className="text-base font-semibold">Suburb flexibility</Label>
+          <Label className="text-base font-semibold">{t('halo.wizard.step2.flexibility.label')}</Label>
           <p className="text-sm text-muted-foreground mt-1">
-            {data.suburb_flexibility ? 'Willing to consider nearby areas' : 'Exact suburbs only'}
+            {data.suburb_flexibility
+              ? t('halo.wizard.step2.flexibility.on')
+              : t('halo.wizard.step2.flexibility.off')}
           </p>
         </div>
         <Switch
@@ -95,7 +105,7 @@ export function HaloStep2({ data, update }: Props) {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="budget_min" className="text-base font-semibold mb-2 block">
-            Min budget (AUD)
+            {t('halo.wizard.step2.budget.min')}
           </Label>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
@@ -105,13 +115,13 @@ export function HaloStep2({ data, update }: Props) {
               className="pl-7"
               value={formatAUD(data.budget_min)}
               onChange={(e) => update({ budget_min: parseAUD(e.target.value) })}
-              placeholder="500,000"
+              placeholder={t('halo.wizard.step2.budget.minPlaceholder')}
             />
           </div>
         </div>
         <div>
           <Label htmlFor="budget_max" className="text-base font-semibold mb-2 block">
-            Max budget (AUD) *
+            {t('halo.wizard.step2.budget.max')}
           </Label>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
@@ -121,14 +131,14 @@ export function HaloStep2({ data, update }: Props) {
               className="pl-7"
               value={formatAUD(data.budget_max)}
               onChange={(e) => update({ budget_max: parseAUD(e.target.value) ?? 0 })}
-              placeholder="900,000"
+              placeholder={t('halo.wizard.step2.budget.maxPlaceholder')}
             />
           </div>
         </div>
       </div>
 
       <div>
-        <Label className="text-base font-semibold mb-3 block">Timeframe *</Label>
+        <Label className="text-base font-semibold mb-3 block">{t('halo.wizard.step2.timeframe.label')}</Label>
         <RadioGroup
           value={data.timeframe}
           onValueChange={(v) => update({ timeframe: v as HaloTimeframe })}
@@ -144,14 +154,14 @@ export function HaloStep2({ data, update }: Props) {
               )}
             >
               <RadioGroupItem value={key} id={`tf-${key}`} />
-              <span className="text-sm font-medium">{TIMEFRAME_LABELS[key]}</span>
+              <span className="text-sm font-medium">{t(`halo.wizard.step2.timeframe.${key}`)}</span>
             </label>
           ))}
         </RadioGroup>
       </div>
 
       <div>
-        <Label className="text-base font-semibold mb-3 block">Finance status *</Label>
+        <Label className="text-base font-semibold mb-3 block">{t('halo.wizard.step2.finance.label')}</Label>
         <RadioGroup
           value={data.finance_status}
           onValueChange={(v) => update({ finance_status: v as HaloFinanceStatus })}
@@ -167,7 +177,7 @@ export function HaloStep2({ data, update }: Props) {
               )}
             >
               <RadioGroupItem value={key} id={`fin-${key}`} />
-              <span className="text-sm font-medium">{FINANCE_LABELS[key]}</span>
+              <span className="text-sm font-medium">{t(`halo.wizard.step2.finance.${key}`)}</span>
             </label>
           ))}
         </RadioGroup>
@@ -176,13 +186,14 @@ export function HaloStep2({ data, update }: Props) {
   );
 }
 
+/** Returns a translation key (or null if valid). */
 export function validateStep2(data: HaloFormData): string | null {
-  if (data.suburbs.length === 0) return 'Please add at least one suburb';
-  if (!data.budget_max || data.budget_max <= 0) return 'Please enter a maximum budget';
+  if (data.suburbs.length === 0) return 'halo.validation.suburbs';
+  if (!data.budget_max || data.budget_max <= 0) return 'halo.validation.budgetMax';
   if (data.budget_min != null && data.budget_min >= data.budget_max) {
-    return 'Max budget must be higher than min budget';
+    return 'halo.validation.budgetRange';
   }
-  if (!data.timeframe) return 'Please choose a timeframe';
-  if (!data.finance_status) return 'Please choose your finance status';
+  if (!data.timeframe) return 'halo.validation.timeframe';
+  if (!data.finance_status) return 'halo.validation.finance';
   return null;
 }

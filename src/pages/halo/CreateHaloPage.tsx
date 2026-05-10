@@ -12,6 +12,7 @@ import { HaloStep2, validateStep2 } from '@/components/halo/HaloStep2';
 import { HaloStep3, validateStep3 } from '@/components/halo/HaloStep3';
 import type { HaloFormData } from '@/types/halo';
 import { usePageTitle } from '@/lib/usePageTitle';
+import { useTranslation } from '@/shared/lib/i18n';
 
 const DRAFT_KEY = 'halo_draft';
 
@@ -35,13 +36,19 @@ const initialData: HaloFormData = {
   referral_source: null,
 };
 
-const STEP_LABELS = ['What are you looking for?', 'Where and how much?', 'Tell agents more'];
+
 
 const VALID_SOURCE_TYPES = new Set(['direct','listing_qr','crm_invite','rent_roll','voice_lead','settlement']);
 
 export default function CreateHaloPage() {
   usePageTitle('Create Your Halo');
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const STEP_LABELS = [
+    t('halo.wizard.steps.step1'),
+    t('halo.wizard.steps.step2'),
+    t('halo.wizard.steps.step3'),
+  ];
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
@@ -149,7 +156,7 @@ export default function CreateHaloPage() {
       return;
     }
     if (!user) {
-      toast.error('You must be signed in');
+      toast.error(t('halo.toast.signinRequired'));
       return;
     }
     setSubmitting(true);
@@ -213,7 +220,7 @@ export default function CreateHaloPage() {
       navigate('/halo/success');
     } catch (e) {
       console.error(e);
-      toast.error('Something went wrong. Please try again.');
+      toast.error(t('halo.toast.genericError'));
       scrollToError();
     } finally {
       setSubmitting(false);
@@ -223,9 +230,9 @@ export default function CreateHaloPage() {
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Create your Halo</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">{t('halo.wizard.create.title')}</h1>
         <p className="text-muted-foreground mb-6">
-          Tell us what you're looking for and let agents find you.
+          {t('halo.wizard.create.subtitle')}
         </p>
 
         <div className="mb-6">
@@ -235,7 +242,7 @@ export default function CreateHaloPage() {
         {prefilled && (
           <Alert className="mb-4">
             <AlertDescription>
-              We've pre-filled some details from the listing you viewed. Check and adjust anything before posting.
+              {t('halo.wizard.create.prefilled')}
             </AlertDescription>
           </Alert>
         )}
@@ -243,7 +250,7 @@ export default function CreateHaloPage() {
         {restored && (
           <Alert className="mb-6">
             <AlertDescription>
-              You have an unsaved draft. Your progress has been restored.
+              {t('halo.wizard.create.restored')}
             </AlertDescription>
           </Alert>
         )}
@@ -256,7 +263,7 @@ export default function CreateHaloPage() {
 
         {stepError && (
           <Alert variant="destructive" className="mb-4">
-            <AlertDescription>{stepError}</AlertDescription>
+            <AlertDescription>{t(stepError)}</AlertDescription>
           </Alert>
         )}
 
@@ -266,16 +273,16 @@ export default function CreateHaloPage() {
             onClick={step === 1 ? () => navigate(-1) : handleBack}
             disabled={submitting}
           >
-            <ArrowLeft size={16} /> {step === 1 ? 'Cancel' : 'Back'}
+            <ArrowLeft size={16} /> {step === 1 ? t('halo.wizard.nav.cancel') : t('halo.wizard.nav.back')}
           </Button>
           {step < 3 ? (
             <Button onClick={handleNext}>
-              Next <ArrowRight size={16} />
+              {t('halo.wizard.nav.next')} <ArrowRight size={16} />
             </Button>
           ) : (
             <Button onClick={handleSubmit} disabled={submitting}>
               {submitting && <Loader2 size={16} className="animate-spin" />}
-              Post my Halo
+              {t('halo.wizard.nav.post')}
             </Button>
           )}
         </div>

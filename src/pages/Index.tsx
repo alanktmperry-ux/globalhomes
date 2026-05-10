@@ -433,8 +433,18 @@ const Index = () => {
     navigate(`/buy?q=${encodeURIComponent(q)}`);
   };
 
-  // Initial card content (static — JS handles all subsequent updates via refs)
-  const initialFront = FEAT_LISTINGS[0];
+  // Initial card content (static — JS handles all subsequent updates via refs).
+  // Falls back to a brand-gradient empty-state card pre-launch (no real listings yet).
+  const EMPTY_STATE_TITLE = 'Listings coming soon';
+  const EMPTY_STATE_PRICE = 'First agents are getting their pocket listings ready';
+  const initialFront: { img: string | null; gradient: string; title: string; price: string; meta: string } =
+    heroCards[0] ?? {
+      img: null,
+      gradient: FALLBACK_GRADIENTS[0],
+      title: EMPTY_STATE_TITLE,
+      price: EMPTY_STATE_PRICE,
+      meta: '',
+    };
   const [backCardIdx, setBackCardIdx] = useState(1);
 
   return (

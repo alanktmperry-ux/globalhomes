@@ -539,6 +539,22 @@ Deno.serve(async (req) => {
       return await handleMessageTranslation(body.message, ip);
     }
 
+    // PUBLIC PATH: translate_reply — for translating agent replies to buyer's language
+    if (body.type === "translate_reply" && typeof body.message === "string" && typeof body.target_language === "string") {
+      const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+        || req.headers.get('cf-connecting-ip')
+        || 'unknown';
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      );
+      const rate = await checkIpRateLimit(supabaseAdmin, ip, 'translate_reply', 30, 500);
+      if (!rate.allowed) {
+        return jsonResponse({ error: `Rate limit exceeded (${rate.reason})` }, 429);
+      }
+      return await handleReplyTranslation(body.message, body.target_language, ip);
+    }
+
     // --- Authentication check (required for all other modes) ---
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {

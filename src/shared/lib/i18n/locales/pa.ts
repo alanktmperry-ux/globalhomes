@@ -671,11 +671,9 @@ export const pa: Partial<Record<TranslationKey, string>> = {
   'agentLanding.headline': 'ਆਪਣਾ ਅਗਲਾ ਖਰੀਦਦਾਰ ਲੱਭੋ',
   'agentLanding.headlineSub': 'ਇਸ ਤੋਂ ਪਹਿਲਾਂ ਕਿ ਉਹ ਸੂਚੀ ਲੱਭ ਲੈਣ।',
   'agentLanding.body': 'ListHQ ਇੱਕ ਪੂਰਾ ਵਪਾਰਕ ਪਲੇਟਫਾਰਮ ਹੈ ਜੋ ਆਸਟ੍ਰੇਲੀਆਈ ਏਜੰਟਾਂ ਲਈ ਬਣਾਇਆ ਗਿਆ ਹੈ — Halo ਬੋਰਡ, AI ਖਰੀਦਦਾਰ ਮੈਚਿੰਗ, 20-ਭਾਸ਼ਾਵਾਂ ਦਾ ਆਟੋ-ਅਨੁਵਾਦ, ਟਰੱਸਟ ਅਕਾਊਂਟਿੰਗ, ਅਤੇ ਇੱਕ CRM ਜੋ ਆਪਣੇ ਆਪ ਚਲਦਾ ਹੈ। ਹਰ ਚੀਜ਼ ਜਿਸਦੀ ਤੁਹਾਨੂੰ ਲੋੜ ਹੈ। ਇੱਕ ਗਾਹਕੀ।',
-  'agentLanding.stat1Label': 'ਬਹੁਭਾਸ਼ਾਈ ਖਰੀਦਦਾਰ
-ਕੋਈ ਹੋਰ ਪੋਰਟਲ ਪਹੁੰਚ ਨਹੀਂ ਹੈ',
+  'agentLanding.stat1Label': 'ਬਹੁਭਾਸ਼ਾਈ ਖਰੀਦਦਾਰ\nਕੋਈ ਹੋਰ ਪੋਰਟਲ ਪਹੁੰਚ ਨਹੀਂ ਹੈ',
   'agentLanding.stat2Label': 'ਭਾਸ਼ਾਵਾਂ, ਹਰੇਕ ਸੂਚੀ ਸਵੈ-ਅਨੁਵਾਦਿਤ',
-  'agentLanding.stat3Label': 'ਮੁਫ਼ਤ ਪਰਖ, ਬਿਨਾਂ
-ਕ੍ਰੈਡਿਟ ਕਾਰਡ',
+  'agentLanding.stat3Label': 'ਮੁਫ਼ਤ ਪਰਖ, ਬਿਨਾਂ\nਕ੍ਰੈਡਿਟ ਕਾਰਡ',
   'agentLanding.ctaPrimary': 'Start free trial — 3 months free →',
   'agentLanding.ctaLogin': '🔒 ਆਪਣੇ ਖਾਤੇ ਵਿੱਚ ਲੌਗਇਨ ਕਰੋ',
   'agentLanding.disclaimer': 'ਕਿਸੇ ਕ੍ਰੈਡਿਟ ਕਾਰਡ ਦੀ ਲੋੜ ਨਹੀਂ ਹੈ। ਪਹਿਲੇ ਦਿਨ ਤੋਂ ਪੂਰੀ ਪਹੁੰਚ। ਕਿਸੇ ਵੀ ਸਮੇਂ ਰੱਦ ਕਰੋ।',

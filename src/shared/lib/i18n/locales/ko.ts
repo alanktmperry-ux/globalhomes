@@ -667,12 +667,9 @@ export const ko: Partial<Record<TranslationKey, string>> = {
   'agentLanding.headline': '다음 구매자를 찾아보세요',
   'agentLanding.headlineSub': '매물을 찾기 전에.',
   'agentLanding.body': 'ListHQ는 호주 부동산 중개인을 위해 설계된 완벽한 비즈니스 플랫폼입니다. Halo Board, AI 기반 구매자 매칭, 20개 언어 자동 번역, 신탁 회계, 자체 운영 CRM 등 필요한 모든 기능을 하나의 구독으로 이용할 수 있습니다.',
-  'agentLanding.stat1Label': '다국어 사용자 구매자
-다른 어떤 포털도 도달할 수 없습니다',
-  'agentLanding.stat2Label': '모든 언어, 목록 자동 번역됨
-',
-  'agentLanding.stat3Label': '무료 체험, 신용카드 필요 없음
-(신용카드 필요 없음)',
+  'agentLanding.stat1Label': '다국어 사용자 구매자\n다른 어떤 포털도 도달할 수 없습니다',
+  'agentLanding.stat2Label': '모든 언어, 목록 자동 번역됨\n',
+  'agentLanding.stat3Label': '무료 체험, 신용카드 필요 없음\n(신용카드 필요 없음)',
   'agentLanding.ctaPrimary': 'Start free trial — 3 months free →',
   'agentLanding.ctaLogin': '🔒 계정에 로그인하세요',
   'agentLanding.disclaimer': '신용카드 정보는 필요하지 않습니다. 첫날부터 모든 기능을 이용할 수 있으며, 언제든지 해지할 수 있습니다.',

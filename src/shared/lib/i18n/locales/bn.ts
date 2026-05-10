@@ -671,8 +671,7 @@ export const bn: Partial<Record<keyof typeof EnBase, string>> = {
   'agentLanding.headline': 'আপনার পরবর্তী ক্রেতা খুঁজুন',
   'agentLanding.headlineSub': 'তারা একটি তালিকা খুঁজে পাওয়ার আগে।',
   'agentLanding.body': 'ListHQ হলো অস্ট্রেলিয়ান এজেন্টদের জন্য তৈরি একটি সম্পূর্ণ ব্যবসায়িক প্ল্যাটফর্ম — হ্যালো বোর্ড, এআই ক্রেতা ম্যাচিং, ২০টি ভাষায় স্বয়ংক্রিয় অনুবাদ, ট্রাস্ট অ্যাকাউন্টিং এবং একটি স্বয়ংক্রিয়ভাবে চালিত সিআরএম। আপনার প্রয়োজনীয় সবকিছুই এখানে আছে। একটিমাত্র সাবস্ক্রিপশন।',
-  'agentLanding.stat1Label': 'বহুভাষী ক্রেতারা
-অন্য কোনো পোর্টালের নাগাল পায় না',
+  'agentLanding.stat1Label': 'বহুভাষী ক্রেতারা\nঅন্য কোনো পোর্টালের নাগাল পায় না',
   'agentLanding.stat2Label': 'ভাষা, প্রতিটি তালিকা স্বয়ংক্রিয়ভাবে অনুবাদ করা হয়েছে',
   'agentLanding.stat3Label': 'বিনামূল্যে ট্রায়াল, কোনো ক্রেডিট কার্ড লাগবে না',
   'agentLanding.ctaPrimary': 'Start free trial — 3 months free →',

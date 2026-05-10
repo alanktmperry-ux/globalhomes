@@ -681,12 +681,9 @@ export const zhCN: Partial<Record<keyof typeof EnBase, string>> = {
   'agentLanding.headline': '在买家找到房源之前',
   'agentLanding.headlineSub': '先找到您的下一个买家。',
   'agentLanding.body': 'ListHQ是专为澳大利亚经纪人打造的完整业务平台——Halo看板、AI买家匹配、20语言自动翻译、信托账户管理和自动化CRM。一切所需，一个订阅。',
-  'agentLanding.stat1Label': '其他平台无法触达的
-多语言买家',
-  'agentLanding.stat2Label': '每个房源
-自动翻译的语言数',
-  'agentLanding.stat3Label': '免费试用
-无需信用卡',
+  'agentLanding.stat1Label': '其他平台无法触达的\n多语言买家',
+  'agentLanding.stat2Label': '每个房源\n自动翻译的语言数',
+  'agentLanding.stat3Label': '免费试用\n无需信用卡',
   'agentLanding.ctaPrimary': '开始免费试用——3个月免费 →',
   'agentLanding.ctaLogin': '🔒 登录账户',
   'agentLanding.disclaimer': '无需信用卡。从第一天起即可完整访问。随时取消。',

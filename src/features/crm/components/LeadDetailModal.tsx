@@ -192,6 +192,29 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
           )}
         </div>
 
+        {/* Buyer's enquiry message (Phase 3A-UI multilingual) */}
+        {lead.message && (
+          <div className="mx-5 mt-4 rounded-lg border border-border bg-muted/30 p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <p className="text-xs font-semibold text-foreground">Buyer's enquiry message</p>
+              {lead.original_language && lead.original_language !== 'en' && (
+                <BuyerLanguageBadge language={lead.original_language} />
+              )}
+            </div>
+            <p className="text-sm text-foreground whitespace-pre-wrap">{lead.message}</p>
+            {lead.message_original && lead.original_language && lead.original_language !== 'en' && (
+              <details className="mt-2">
+                <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
+                  Show original ({lead.original_language})
+                </summary>
+                <p className="mt-2 text-sm text-muted-foreground whitespace-pre-wrap border-l-2 border-border pl-3">
+                  {lead.message_original}
+                </p>
+              </details>
+            )}
+          </div>
+        )}
+
         {/* Tabs */}
         <div className="flex border-b border-border px-5">
           {(['timeline', 'tasks', 'details'] as const).map(t => (

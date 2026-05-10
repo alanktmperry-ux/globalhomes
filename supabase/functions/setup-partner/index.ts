@@ -103,6 +103,7 @@ Deno.serve(async (req) => {
         abn: abn || null,
         website: website || null,
         is_verified: false,
+        partner_type: partnerType,
       })
       .select("id")
       .single();

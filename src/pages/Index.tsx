@@ -132,7 +132,6 @@ const Index = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalQuery, setModalQuery] = useState('');
   const [propertyCount, setPropertyCount] = useState<number | null>(null);
-  const [featuredListings, setFeaturedListings] = useState<any[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Front card crossfade refs
@@ -155,10 +154,16 @@ const Index = () => {
       .then(({ count }) => setPropertyCount(count ?? null));
   }, []);
 
-  // Featured listings
-  useEffect(() => {
-    const cols = 'id, title, address, suburb, state, price, price_formatted, images, image_url, property_type, beds, baths, parking, listing_type, boost_tier, is_featured';
-    (async () => {
+  // Featured listings — real Supabase data, no fabricated content.
+  // Empty array pre-launch is fine; UI renders an empty state.
+  const { data: featuredListings = [] } = useQuery({
+    queryKey: ['homepage-featured-listings'],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    queryFn: async () => {
+      const cols =
+        'id, title, address, suburb, state, price, price_formatted, images, image_url, property_type, beds, baths, parking, listing_type, boost_tier, is_featured';
+
       const { data: boosted } = await supabase
         .from('properties')
         .select(cols)
@@ -168,12 +173,13 @@ const Index = () => {
         .limit(6);
 
       const seen = new Set<string>();
-      const unique = (boosted ?? []).filter((p: any) => { if (seen.has(p.id)) return false; seen.add(p.id); return true; });
+      const unique: any[] = (boosted ?? []).filter((p: any) => {
+        if (seen.has(p.id)) return false;
+        seen.add(p.id);
+        return true;
+      });
 
-      if (unique.length >= 3) {
-        setFeaturedListings(unique.slice(0, 6));
-        return;
-      }
+      if (unique.length >= 3) return unique.slice(0, 6);
 
       const { data: fallback } = await supabase
         .from('properties')
@@ -188,16 +194,35 @@ const Index = () => {
         if (unique.length >= 6) break;
       }
 
-      if (unique.length > 0) setFeaturedListings(unique);
-    })();
-  }, []);
+      return unique;
+    },
+  });
 
-  const fmtPrice = (price: number, listingType?: string) => {
-    if (!price) return 'Price on request';
-    if (listingType === 'rent' || listingType === 'rental') return `$${price.toLocaleString()}/wk`;
-    if (price >= 1_000_000) return `$${(price / 1_000_000).toFixed(price % 1_000_000 === 0 ? 0 : 2)}M`;
-    return `$${price.toLocaleString()}`;
-  };
+  // Hero rotating card source — derived from real listings.
+  // When no real listings exist yet, the card shows a single static
+  // brand-gradient placeholder; the rotation simply doesn't fire.
+  type HeroCard = { img: string | null; gradient: string; title: string; price: string; meta: string; };
+  const heroCards: HeroCard[] = useMemo(() => {
+    if (!featuredListings.length) return [];
+    return featuredListings.slice(0, 6).map((p: any, i: number) => {
+      const img = (p.images && p.images[0]) || p.image_url || null;
+      const beds = p.beds || 0, baths = p.baths || 0, cars = p.parking || 0;
+      const metaParts: string[] = [];
+      if (beds) metaParts.push(`${beds} bed`);
+      if (baths) metaParts.push(`${baths} bath`);
+      if (cars) metaParts.push(`${cars} car`);
+      return {
+        img,
+        gradient: FALLBACK_GRADIENTS[i % FALLBACK_GRADIENTS.length],
+        title: p.title || p.address || `${p.suburb ?? ''}${p.state ? `, ${p.state}` : ''}`,
+        price: p.price_formatted || fmtPriceStatic(p.price, p.listing_type),
+        meta: metaParts.join(' · ') || (p.property_type ?? ''),
+      };
+    });
+  }, [featuredListings]);
+
+  const fmtPrice = (price: number, listingType?: string) => fmtPriceStatic(price, listingType);
+
   useEffect(() => {
     const map: Record<string, number> = {
       zh: 1, 'zh-CN': 1, 'zh-TW': 1,

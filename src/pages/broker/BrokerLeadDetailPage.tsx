@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, ArrowLeft } from "lucide-react";
 import BrokerPortalLayout from "./BrokerPortalLayout";
 import { type BrokerRecord, type ReferralLead } from "./brokerPortalUtils";
+import { BuyerLanguageBadge } from "@/shared/components/BuyerLanguageBadge";
 
 // Re-export the detail panel from BrokerPortal isn't ideal; we'll inline a simpler version that uses shared utils.
 import { Badge } from "@/components/ui/badge";
@@ -146,8 +147,19 @@ export default function BrokerLeadDetailPage() {
 
         {lead.message && isOwnedByMe && (
           <section>
-            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Message from buyer</h3>
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Buyer's enquiry message</h3>
+              {lead.original_language && lead.original_language !== 'en' && (
+                <BuyerLanguageBadge language={lead.original_language} />
+              )}
+            </div>
             <p className="text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-md p-3 whitespace-pre-wrap">{lead.message}</p>
+            {lead.message_original && lead.original_language && lead.original_language !== 'en' && (
+              <details className="mt-2 text-xs text-slate-600">
+                <summary className="cursor-pointer hover:text-slate-900">Show original ({lead.original_language})</summary>
+                <p className="mt-2 whitespace-pre-wrap bg-slate-50 border border-slate-200 rounded-md p-3">{lead.message_original}</p>
+              </details>
+            )}
           </section>
         )}
 

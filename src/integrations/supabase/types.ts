@@ -10101,7 +10101,10 @@ export type Database = {
           id: string
           loan_type: string | null
           message: string | null
+          message_en: string | null
+          message_original: string | null
           notes: string | null
+          original_language: string | null
           platform_fee_amount: number | null
           property_id: string | null
           property_url: string | null
@@ -10134,7 +10137,10 @@ export type Database = {
           id?: string
           loan_type?: string | null
           message?: string | null
+          message_en?: string | null
+          message_original?: string | null
           notes?: string | null
+          original_language?: string | null
           platform_fee_amount?: number | null
           property_id?: string | null
           property_url?: string | null
@@ -10167,7 +10173,10 @@ export type Database = {
           id?: string
           loan_type?: string | null
           message?: string | null
+          message_en?: string | null
+          message_original?: string | null
           notes?: string | null
+          original_language?: string | null
           platform_fee_amount?: number | null
           property_id?: string | null
           property_url?: string | null

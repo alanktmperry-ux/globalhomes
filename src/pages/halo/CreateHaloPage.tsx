@@ -43,6 +43,12 @@ const VALID_SOURCE_TYPES = new Set(['direct','listing_qr','crm_invite','rent_rol
 export default function CreateHaloPage() {
   usePageTitle('Create Your Halo');
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const STEP_LABELS = [
+    t('halo.wizard.steps.step1'),
+    t('halo.wizard.steps.step2'),
+    t('halo.wizard.steps.step3'),
+  ];
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);

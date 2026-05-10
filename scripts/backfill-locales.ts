@@ -39,7 +39,7 @@ const LOCALES: LocaleSpec[] = [
   { file: 'fr.ts',    exportName: 'fr',   langCode: 'fr',    importStyle: 'TranslationKey' },
   { file: 'pt.ts',    exportName: 'pt',   langCode: 'pt',    importStyle: 'TranslationKey' },
   { file: 'ru.ts',    exportName: 'ru',   langCode: 'ru',    importStyle: 'TranslationKey' },
-  { file: 'el.ts',    exportName: 'el',   langCode: 'el',    importStyle: 'TranslationKey' },
+  // el removed — Greek is not in SUPPORTED_LANGUAGES.
 ];
 
 const LOCALES_DIR = resolve(process.cwd(), 'src/shared/lib/i18n/locales');

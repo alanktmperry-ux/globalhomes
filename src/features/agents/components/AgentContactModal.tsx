@@ -75,13 +75,28 @@ function calcLeadScore(data: {
 
 /* ── Constants ──────────────────────────────────────────────── */
 
-const TIMEFRAMES = ['This week', '1–3 months', '3–6 months', 'Flexible'];
-const PURPOSES = ['Home', 'Investment', 'Short-term rental', 'Other'];
-const INTERESTS = ['Viewing', 'More photos', 'Price info', 'Similar properties'];
+const TIMEFRAMES: { value: string; key: string }[] = [
+  { value: 'This week', key: 'enquiryForm.timeframe.thisWeek' },
+  { value: '1–3 months', key: 'enquiryForm.timeframe.1to3Months' },
+  { value: '3–6 months', key: 'enquiryForm.timeframe.3to6Months' },
+  { value: 'Flexible', key: 'enquiryForm.timeframe.flexible' },
+];
+const PURPOSES: { value: string; key: string }[] = [
+  { value: 'Home', key: 'enquiryForm.purpose.home' },
+  { value: 'Investment', key: 'enquiryForm.purpose.investment' },
+  { value: 'Short-term rental', key: 'enquiryForm.purpose.shortTermRental' },
+  { value: 'Other', key: 'enquiryForm.purpose.other' },
+];
+const INTERESTS: { value: string; key: string }[] = [
+  { value: 'Viewing', key: 'enquiryForm.interest.viewing' },
+  { value: 'More photos', key: 'enquiryForm.interest.morePhotos' },
+  { value: 'Price info', key: 'enquiryForm.interest.priceInfo' },
+  { value: 'Similar properties', key: 'enquiryForm.interest.similarProperties' },
+];
 const PRE_APPROVALS = [
-  { value: 'approved', label: 'Pre-approved' },
-  { value: 'in_progress', label: 'In progress' },
-  { value: 'not_started', label: 'Not started' },
+  { value: 'approved', key: 'enquiryForm.preApproval.approved' },
+  { value: 'in_progress', key: 'enquiryForm.preApproval.inProgress' },
+  { value: 'not_started', key: 'enquiryForm.preApproval.notStarted' },
 ];
 const DEPOSIT_AMOUNTS = [1000, 2500, 5000, 10000];
 

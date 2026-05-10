@@ -85,7 +85,11 @@ async function translate(text: string, target: string): Promise<string> {
 
 /** Escape a string for inclusion in a single-quoted TS literal. */
 function escSingle(s: string): string {
-  return s.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  return s
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/\r/g, '\\r')
+    .replace(/\n/g, '\\n');
 }
 
 /** Build the new locale file content preserving header & import style. */

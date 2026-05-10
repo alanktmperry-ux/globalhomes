@@ -92,16 +92,26 @@ function applyGlossarySentinels(
  * Post-process: replace sentinels with curated translations for target language.
  * Falls back to English source if no translation exists for that language.
  */
+function normalizeGlossaryLang(code: string): GlossarySupportedLanguage | string {
+  if (!code) return code;
+  const c = code.toLowerCase().replace('-', '_');
+  // Map common Chinese aliases to our curated keys
+  if (c === 'zh' || c === 'zh_cn' || c === 'zh_hans' || c === 'zh_simplified') return 'zh_simplified';
+  if (c === 'zh_tw' || c === 'zh_hk' || c === 'zh_hant' || c === 'zh_traditional') return 'zh_traditional';
+  return c;
+}
+
 function restoreGlossarySentinels(
   translatedText: string,
   replacements: Array<{ sentinel: string; entry: GlossaryEntry }>,
   targetLang: string,
 ): string {
   if (!translatedText) return translatedText;
+  const normalizedLang = normalizeGlossaryLang(targetLang);
   let out = translatedText;
   for (const { sentinel, entry } of replacements) {
     const replacement =
-      entry.translations[targetLang as GlossarySupportedLanguage] ?? entry.source;
+      entry.translations[normalizedLang as GlossarySupportedLanguage] ?? entry.source;
     out = out.split(sentinel).join(replacement);
   }
   if (/<<G:\d+>>/.test(out)) {

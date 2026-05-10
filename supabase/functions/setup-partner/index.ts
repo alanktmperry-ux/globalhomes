@@ -130,27 +130,8 @@ Deno.serve(async (req) => {
         { onConflict: "user_id,role" }
       );
 
-    // Welcome email to the partner
-    try {
-      const firstName = (contactName || "").split(" ")[0] || "there";
-      const appUrl = Deno.env.get("APP_URL") ?? "https://app.listhq.com.au";
-      const html = buildPartnerWelcome({ firstName, companyName, appUrl });
-      await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${Deno.env.get("RESEND_API_KEY") ?? ""}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: Deno.env.get("EMAIL_FROM") ?? "ListHQ <hello@listhq.com.au>",
-          to: [contactEmail],
-          subject: `Welcome to ListHQ, ${firstName} — your partner account is live`,
-          html,
-        }),
-      });
-    } catch (_) {
-      // Don't fail registration if email fails
-    }
+    // Partner welcome email is sent by send-welcome-email (Touch 2 'verified')
+    // after the user verifies their email — includes proper unsubscribe footer.
 
     // Send notification email to admin
     const adminEmail = Deno.env.get("ADMIN_EMAIL");

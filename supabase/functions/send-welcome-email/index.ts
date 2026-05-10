@@ -1,5 +1,5 @@
 // ListHQ welcome email sender (Touch 2 + Touch 3).
-// Contract: POST { user_id: string, category: 'verified' | 'first_halo' | 'first_listing' | 'partner_approved' }
+// Contract: POST { user_id: string, category: 'verified' | 'first_listing' | 'partner_approved' }
 // Honors the public.unsubscribes table (category='welcome' suppresses all welcome emails).
 // Australian Spam Act 2003: every welcome email includes a working unsubscribe link.
 
@@ -12,7 +12,7 @@ const RESEND_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? 'ListHQ <hello@listhq.com.au>';
 const APP_URL = Deno.env.get('APP_URL') ?? 'https://listhq.com.au';
 
-type Category = 'verified' | 'first_halo' | 'first_listing' | 'partner_approved';
+type Category = 'verified' | 'first_listing' | 'partner_approved';
 type Role = 'seeker' | 'agent' | 'partner';
 
 interface BuildArgs { hero: string; body: string; bullets: string[]; cta?: string; ctaPath?: string; subject: string; disclaimer: string; }
@@ -59,18 +59,6 @@ function content(category: Category, role: Role, partnerType?: string): BuildArg
       disclaimer: baseDisclaimer,
     };
   }
-  if (category === 'first_halo') return {
-    subject: 'Your first Halo is live — agents are looking now',
-    hero: 'Nice work',
-    body: 'Your first Halo is live on ListHQ. Agents across our network can see it now and bring matching properties to you. What to expect:',
-    bullets: [
-      'First match within 48 hours for most active suburbs',
-      'Notifications when an agent responds — no email spam, just real matches',
-      "You're in control — accept, decline, or message agents directly",
-    ],
-    cta: 'View My Halos', ctaPath: '/seeker/dashboard',
-    disclaimer: baseDisclaimer,
-  };
   if (category === 'first_listing') return {
     subject: 'Your first listing is live',
     hero: 'Your listing is live',
@@ -143,7 +131,7 @@ Deno.serve(async (req) => {
       category = 'verified';
     }
     if (!user_id || !category) return json({ error: 'Missing user_id or category' }, 400);
-    if (!['verified', 'first_halo', 'first_listing', 'partner_approved'].includes(category)) {
+    if (!['verified', 'first_listing', 'partner_approved'].includes(category)) {
       return json({ error: 'Invalid category' }, 400);
     }
     if (!RESEND_KEY) return json({ ok: false, reason: 'resend_not_configured' });

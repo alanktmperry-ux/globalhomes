@@ -8,6 +8,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { usePageTitle } from '@/lib/usePageTitle';
+import { useTranslation } from '@/shared/lib/i18n';
 
 type Intent = 'buy' | 'rent' | '';
 
@@ -43,6 +44,7 @@ interface PropertyRow {
 const TYPES = ['House', 'Apartment', 'Townhouse', 'Unit', 'Land', 'Rural', 'Commercial'];
 
 export default function PropertySearchPage() {
+  const { t } = useTranslation();
   usePageTitle('Browse Properties');
   const [filters, setFilters] = useState<Filters>(EMPTY);
   const [debouncedSuburb, setDebouncedSuburb] = useState('');
@@ -51,8 +53,8 @@ export default function PropertySearchPage() {
 
   // Debounce suburb input
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSuburb(filters.suburb.trim()), 300);
-    return () => clearTimeout(t);
+    const tm = setTimeout(() => setDebouncedSuburb(filters.suburb.trim()), 300);
+    return () => clearTimeout(tm);
   }, [filters.suburb]);
 
   useEffect(() => {
@@ -98,19 +100,19 @@ export default function PropertySearchPage() {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Browse properties | ListHQ</title>
-        <meta name="description" content="Browse properties listed by ListHQ agents — available in 10 languages." />
+        <title>{t('propertySearch.metaTitle')}</title>
+        <meta name="description" content={t('propertySearch.metaDesc')} />
       </Helmet>
 
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-6">
         {/* Header */}
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-foreground">Find your next home</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t('propertySearch.heading')}</h1>
           <p className="text-sm text-muted-foreground">
-            Browse properties listed by ListHQ agents — available in 10 languages.
+            {t('propertySearch.subheading')}
           </p>
           <Link to="/halo/new" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
-            <Sparkles size={14} /> Create a Halo →
+            <Sparkles size={14} /> {t('propertySearch.createHaloCta')}
           </Link>
         </div>
 
@@ -118,18 +120,18 @@ export default function PropertySearchPage() {
         <div className="rounded-xl border border-border bg-card p-4">
           <div className="flex flex-wrap gap-3 items-center">
             <Input
-              placeholder="Suburb or address..."
+              placeholder={t('propertySearch.filter.suburbPlaceholder')}
               value={filters.suburb}
               onChange={e => setFilters(f => ({ ...f, suburb: e.target.value }))}
               className="w-full sm:w-48"
             />
 
             <Select value={filters.intent || 'any'} onValueChange={v => setFilters(f => ({ ...f, intent: v === 'any' ? '' : v as Intent }))}>
-              <SelectTrigger className="w-32"><SelectValue placeholder="Buy or rent" /></SelectTrigger>
+              <SelectTrigger className="w-32"><SelectValue placeholder={t('propertySearch.filter.buyOrRent')} /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="any">Any</SelectItem>
-                <SelectItem value="buy">Buy</SelectItem>
-                <SelectItem value="rent">Rent</SelectItem>
+                <SelectItem value="any">{t('propertySearch.filter.any')}</SelectItem>
+                <SelectItem value="buy">{t('propertySearch.filter.buy')}</SelectItem>
+                <SelectItem value="rent">{t('propertySearch.filter.rent')}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -137,10 +139,12 @@ export default function PropertySearchPage() {
               value={filters.bedsMin === '' ? 'any' : String(filters.bedsMin)}
               onValueChange={v => setFilters(f => ({ ...f, bedsMin: v === 'any' ? '' : Number(v) }))}
             >
-              <SelectTrigger className="w-28"><SelectValue placeholder="Bedrooms" /></SelectTrigger>
+              <SelectTrigger className="w-28"><SelectValue placeholder={t('propertySearch.filter.bedrooms')} /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="any">Any beds</SelectItem>
-                {[1, 2, 3, 4, 5].map(n => <SelectItem key={n} value={String(n)}>{n}+ beds</SelectItem>)}
+                <SelectItem value="any">{t('propertySearch.filter.anyBeds')}</SelectItem>
+                {[1, 2, 3, 4, 5].map(n => (
+                  <SelectItem key={n} value={String(n)}>{t('propertySearch.filter.bedsPlus', { n })}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
@@ -148,25 +152,25 @@ export default function PropertySearchPage() {
               value={filters.propertyType || 'any'}
               onValueChange={v => setFilters(f => ({ ...f, propertyType: v === 'any' ? '' : v }))}
             >
-              <SelectTrigger className="w-36"><SelectValue placeholder="Property type" /></SelectTrigger>
+              <SelectTrigger className="w-36"><SelectValue placeholder={t('propertySearch.filter.propertyType')} /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="any">Any type</SelectItem>
-                {TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                <SelectItem value="any">{t('propertySearch.filter.anyType')}</SelectItem>
+                {TYPES.map(ty => <SelectItem key={ty} value={ty}>{ty}</SelectItem>)}
               </SelectContent>
             </Select>
 
             <div className="flex gap-2 items-center">
               <Input
                 type="number"
-                placeholder="Min price"
+                placeholder={t('propertySearch.filter.minPrice')}
                 value={filters.priceMin}
                 onChange={e => setFilters(f => ({ ...f, priceMin: e.target.value ? Number(e.target.value) : '' }))}
                 className="w-28"
               />
-              <span className="text-muted-foreground text-sm">–</span>
+              <span className="text-muted-foreground text-sm">{t('propertySearch.filter.priceSeparator')}</span>
               <Input
                 type="number"
-                placeholder="Max price"
+                placeholder={t('propertySearch.filter.maxPrice')}
                 value={filters.priceMax}
                 onChange={e => setFilters(f => ({ ...f, priceMax: e.target.value ? Number(e.target.value) : '' }))}
                 className="w-28"
@@ -178,7 +182,7 @@ export default function PropertySearchPage() {
                 onClick={clearFilters}
                 className="text-xs text-muted-foreground hover:text-foreground underline"
               >
-                Clear filters
+                {t('propertySearch.filter.clear')}
               </button>
             )}
           </div>
@@ -186,7 +190,9 @@ export default function PropertySearchPage() {
 
         {/* Results count */}
         <p className="text-sm text-muted-foreground">
-          {loading ? 'Loading properties…' : `Showing ${properties.length} ${properties.length === 1 ? 'property' : 'properties'}`}
+          {loading
+            ? t('propertySearch.loading')
+            : t(properties.length === 1 ? 'propertySearch.resultsCount' : 'propertySearch.resultsCountPlural', { count: properties.length })}
         </p>
 
         {/* Grid */}
@@ -203,11 +209,11 @@ export default function PropertySearchPage() {
             ))
           ) : properties.length === 0 ? (
             <div className="col-span-full text-center py-16 space-y-2">
-              <p className="font-semibold text-foreground">No properties found</p>
-              <p className="text-sm text-muted-foreground">Try adjusting your filters or broadening your search.</p>
+              <p className="font-semibold text-foreground">{t('propertySearch.empty.title')}</p>
+              <p className="text-sm text-muted-foreground">{t('propertySearch.empty.desc')}</p>
               {hasActiveFilters && (
                 <button onClick={clearFilters} className="text-sm text-primary underline">
-                  Clear all filters
+                  {t('propertySearch.filter.clearAll')}
                 </button>
               )}
             </div>
@@ -224,13 +230,13 @@ export default function PropertySearchPage() {
                   <div className="aspect-[16/9] bg-muted overflow-hidden relative">
                     {p.status === 'under_offer' && (
                       <span className="absolute top-2 left-2 z-10 bg-amber-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow">
-                        Under offer
+                        {t('propertySearch.card.underOffer')}
                       </span>
                     )}
                     {img ? (
                       <img
                         src={img}
-                        alt={p.address || 'Property'}
+                        alt={p.address || t('propertySearch.card.altFallback')}
                         loading="lazy"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
@@ -242,21 +248,23 @@ export default function PropertySearchPage() {
                   </div>
                   <div className="p-4 space-y-2">
                     <div>
-                      <p className="font-semibold text-sm text-foreground line-clamp-1">{p.address || 'Address on enquiry'}</p>
+                      <p className="font-semibold text-sm text-foreground line-clamp-1">{p.address || t('propertySearch.card.addressFallback')}</p>
                       <p className="text-xs text-muted-foreground">{p.suburb}</p>
                     </div>
                     <div className="flex items-center justify-between">
                       <p className="font-bold text-foreground">
-                        {p.price ? `$${Number(p.price).toLocaleString('en-AU')}` : 'POA'}
+                        {p.price ? `$${Number(p.price).toLocaleString('en-AU')}` : t('propertySearch.card.poa')}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {p.beds ?? 0}bd · {p.baths ?? 0}ba{p.parking ? ` · ${p.parking}car` : ''}
+                        {p.parking
+                          ? t('propertySearch.card.specsWithParking', { beds: p.beds ?? 0, baths: p.baths ?? 0, parking: p.parking })
+                          : t('propertySearch.card.specs', { beds: p.beds ?? 0, baths: p.baths ?? 0 })}
                       </p>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-muted-foreground">{p.property_type}</span>
                       {hasTranslations && (
-                        <span className="text-xs text-primary font-medium">🌐 Multilingual</span>
+                        <span className="text-xs text-primary font-medium">{t('propertySearch.card.multilingual')}</span>
                       )}
                     </div>
                   </div>

@@ -709,25 +709,29 @@ export default function PropertyDetailPage() {
                   {socialProof.suburbSearchers > 0 && (
                     <span className="flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      <strong className="text-foreground">{socialProof.suburbSearchers}</strong>
-                      {' '}buyer{socialProof.suburbSearchers !== 1 ? 's' : ''} searching in {property.suburb}
+                      {tp(
+                        socialProof.suburbSearchers === 1 ? 'property.socialProof.searchers' : 'property.socialProof.searchersPlural',
+                        { count: socialProof.suburbSearchers, suburb: property.suburb },
+                      )}
                     </span>
                   )}
                   {socialProof.suburbSearchers > 0 && socialProof.weeklyViews > 0 && (
-                    <span className="text-border">·</span>
+                    <span className="text-border">{tp('property.socialProof.separator')}</span>
                   )}
                   {socialProof.weeklyViews > 0 && (
                     <span className="flex items-center gap-1.5">
                       <Eye size={12} className="text-primary" />
-                      <strong className="text-foreground">{socialProof.weeklyViews}</strong>
-                      {' '}view{socialProof.weeklyViews !== 1 ? 's' : ''} this week
+                      {tp(
+                        socialProof.weeklyViews === 1 ? 'property.socialProof.views' : 'property.socialProof.viewsPlural',
+                        { count: socialProof.weeklyViews },
+                      )}
                     </span>
                   )}
                   {socialProof.suburbSearchers >= 5 && (
                     <>
-                      <span className="text-border">·</span>
+                      <span className="text-border">{tp('property.socialProof.separator')}</span>
                       <span className="flex items-center gap-1 text-amber-600 font-medium">
-                        🔥 High demand suburb
+                        {tp('property.socialProof.highDemand')}
                       </span>
                     </>
                   )}

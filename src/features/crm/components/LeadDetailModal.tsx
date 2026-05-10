@@ -5,6 +5,7 @@ import { useCRMTasks } from '../hooks/useCRMTasks';
 import { useCRMLeads } from '../hooks/useCRMLeads';
 import type { CRMLead, ActivityType, LeadStage, LeadPriority } from '../types';
 import { HaloInviteButton } from '@/components/halo/HaloInviteButton';
+import { BuyerLanguageBadge } from '@/shared/components/BuyerLanguageBadge';
 
 const ACTIVITY_TYPES: { value: ActivityType; label: string; icon: string }[] = [
   { value: 'note', label: 'Note', icon: '📝' },

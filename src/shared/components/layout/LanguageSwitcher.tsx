@@ -108,7 +108,7 @@ export function LanguageSwitcher() {
                 <button
                   key={code}
                   disabled={!isAvailable}
-                  onClick={() => {
+                  onClick={async () => {
                     if (!isAvailable) return;
                     const legacy = (LEGACY_CODE_MAP[code] ?? 'en') as Language;
                     setLanguage(legacy);
@@ -122,15 +122,19 @@ export function LanguageSwitcher() {
                     } catch { /* storage unavailable — non-fatal */ }
                     setOpen(false);
                     document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
-                    // Persist to profile if logged in (non-blocking — failure is silent)
-                    supabase.auth.getUser().then(({ data }) => {
-                      if (data?.user) {
-                        supabase.from('profiles')
+                    // Phase 2: persist for authenticated users so it follows them across devices
+                    try {
+                      const { data: { user } } = await supabase.auth.getUser();
+                      if (user) {
+                        await supabase
+                          .from('profiles')
                           .update({ language_preference: code })
-                          .eq('user_id', data.user.id)
-                          .then(() => {});
+                          .eq('id', user.id);
                       }
-                    });
+                    } catch (err) {
+                      // Non-fatal — localStorage still has the choice
+                      if (import.meta.env.DEV) console.warn('[LanguageSwitcher] persist failed', err);
+                    }
                   }}
                   className={`text-sm px-3 py-2 rounded-lg text-left transition-colors flex items-center justify-between ${
                     !isAvailable

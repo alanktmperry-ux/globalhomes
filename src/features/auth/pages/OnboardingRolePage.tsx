@@ -33,6 +33,7 @@ type Role = (typeof ROLES)[number]['value'];
 
 const OnboardingRolePage = () => {
   const { user, loading } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [selected, setSelected] = useState<Role | null>(null);
   const [saving, setSaving] = useState(false);

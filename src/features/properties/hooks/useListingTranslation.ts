@@ -47,12 +47,15 @@ export function useListingTranslation(property: any | null | undefined): Transla
   const requestedRef = useRef<string | null>(null);
 
   // Phase 2: prefer profile language_preference over localStorage for authenticated users.
-  // Runs once on mount; if the saved profile preference differs from the current i18n
-  // language, push it into the i18n context so the rest of the app follows along.
+  // Only run if the user has NOT explicitly picked a language via the in-app switcher.
+  // Otherwise every PropertyCard mount fights the user's choice and the UI silently flips.
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
+        if (typeof window !== 'undefined' && localStorage.getItem('listhq_lang_user_set') === '1') {
+          return;
+        }
         const { data: { user } } = await supabase.auth.getUser();
         if (!user || cancelled) return;
         const { data, error } = await supabase
@@ -62,7 +65,7 @@ export function useListingTranslation(property: any | null | undefined): Transla
           .maybeSingle();
         if (error || cancelled) return;
         const pref = (data as { language_preference?: string } | null)?.language_preference;
-        if (!pref) return;
+        if (!pref || pref === 'en') return;
         const legacy = (LEGACY_CODE_MAP[pref as keyof typeof LEGACY_CODE_MAP] ?? pref) as Language;
         if (legacy && legacy !== language) {
           setLanguage(legacy);

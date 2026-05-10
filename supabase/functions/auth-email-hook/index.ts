@@ -37,9 +37,9 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 
 // Configuration
 const SITE_NAME = 'ListHQ'
-const SENDER_DOMAIN = 'notify.listhq.com.au'
+const SENDER_DOMAIN = 'listhq.com.au'
 const ROOT_DOMAIN = 'listhq.com.au'
-const FROM_ADDRESS = 'ListHQ <hello@notify.listhq.com.au>'
+const FROM_ADDRESS = Deno.env.get('EMAIL_FROM') ?? 'ListHQ <hello@listhq.com.au>'
 
 // Sample data for preview mode ONLY (not used in actual email sending).
 // URLs are baked in at scaffold time from the project's real data.

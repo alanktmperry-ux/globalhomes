@@ -410,7 +410,7 @@ export default function SeekerInbox() {
                       <Textarea
                         value={reply}
                         onChange={(e) => setReply(e.target.value)}
-                        placeholder="Write a reply…"
+                        placeholder={t('seeker.inbox.reply.placeholder')}
                         className="border-[#E2E8F0] focus-visible:ring-[#2563EB] mb-2 resize-none"
                         rows={3}
                       />

@@ -658,14 +658,14 @@ export default function PropertyDetailPage() {
                     <span className="text-lg text-muted-foreground font-medium">{tp('property.perWeek')}</span>
                   </div>
                   {currency.code !== 'AUD' && (
-                    <p className="text-sm text-muted-foreground mt-0.5">${weeklyRent.toLocaleString()}/wk AUD</p>
+                    <p className="text-sm text-muted-foreground mt-0.5">{tp('property.weeklyRentAud', { amount: weeklyRent.toLocaleString() })}</p>
                   )}
                 </>
               ) : (
                 <>
                   <p className="font-display text-3xl md:text-4xl font-bold text-foreground">{formatPrice(property.price)}</p>
                   {currency.code !== 'AUD' && (
-                    <p className="text-sm text-muted-foreground mt-0.5">{property.priceFormatted} AUD</p>
+                    <p className="text-sm text-muted-foreground mt-0.5">{tp('property.priceWithCurrency', { price: property.priceFormatted })}</p>
                   )}
                 </>
               )}
@@ -688,7 +688,7 @@ export default function PropertyDetailPage() {
               {(property as any).status === 'under_offer' && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 mt-2 rounded-full bg-amber-100 text-amber-800 text-sm font-medium">
                   <span className="w-2 h-2 rounded-full bg-amber-500" />
-                  Under offer — enquiries still welcome
+                  {tp('property.underOfferBadge')}
                 </div>
               )}
               {property.suburb && property.state && (
@@ -696,7 +696,7 @@ export default function PropertyDetailPage() {
                   to={`/suburb/${property.state.toLowerCase()}/${property.suburb.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
                   className="inline-block text-xs text-muted-foreground hover:text-primary transition-colors mt-1"
                 >
-                  {tp('property.viewSuburb', { suburb: property.suburb })} →
+                  {tp('property.viewSuburbArrow', { suburb: property.suburb })}
                 </Link>
               )}
               <ListingLanguageSwitcher
@@ -709,25 +709,29 @@ export default function PropertyDetailPage() {
                   {socialProof.suburbSearchers > 0 && (
                     <span className="flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      <strong className="text-foreground">{socialProof.suburbSearchers}</strong>
-                      {' '}buyer{socialProof.suburbSearchers !== 1 ? 's' : ''} searching in {property.suburb}
+                      {tp(
+                        socialProof.suburbSearchers === 1 ? 'property.socialProof.searchers' : 'property.socialProof.searchersPlural',
+                        { count: socialProof.suburbSearchers, suburb: property.suburb },
+                      )}
                     </span>
                   )}
                   {socialProof.suburbSearchers > 0 && socialProof.weeklyViews > 0 && (
-                    <span className="text-border">·</span>
+                    <span className="text-border">{tp('property.socialProof.separator')}</span>
                   )}
                   {socialProof.weeklyViews > 0 && (
                     <span className="flex items-center gap-1.5">
                       <Eye size={12} className="text-primary" />
-                      <strong className="text-foreground">{socialProof.weeklyViews}</strong>
-                      {' '}view{socialProof.weeklyViews !== 1 ? 's' : ''} this week
+                      {tp(
+                        socialProof.weeklyViews === 1 ? 'property.socialProof.views' : 'property.socialProof.viewsPlural',
+                        { count: socialProof.weeklyViews },
+                      )}
                     </span>
                   )}
                   {socialProof.suburbSearchers >= 5 && (
                     <>
-                      <span className="text-border">·</span>
+                      <span className="text-border">{tp('property.socialProof.separator')}</span>
                       <span className="flex items-center gap-1 text-amber-600 font-medium">
-                        🔥 High demand suburb
+                        {tp('property.socialProof.highDemand')}
                       </span>
                     </>
                   )}
@@ -773,9 +777,9 @@ export default function PropertyDetailPage() {
             {/* School zone feature row */}
             {property.schoolZoneTop && (
               <div className="flex items-center gap-3 border border-slate-200 rounded-2xl px-4 py-3 bg-white">
-                <span className="text-xl leading-none" aria-hidden>🏫</span>
+                <span className="text-xl leading-none" aria-hidden>{'🏫'}</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[11px] uppercase tracking-wide text-slate-400 font-medium">School Zone</p>
+                  <p className="text-[11px] uppercase tracking-wide text-slate-400 font-medium">{tp('property.schoolZone.label')}</p>
                   <p className="text-sm font-semibold text-slate-900 truncate">
                     {property.schoolZoneName || 'Top school catchment — confirmed by agent'}
                   </p>
@@ -907,7 +911,7 @@ export default function PropertyDetailPage() {
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-foreground">{dayStr}</p>
                             <p className="text-xs text-muted-foreground flex items-center gap-1">
-                              <Clock size={10} /> {slot.start} – {slot.end}
+                              <Clock size={10} /> {tp('property.inspection.timeRange', { start: slot.start, end: slot.end })}
                             </p>
                           </div>
                           <span className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
@@ -965,7 +969,7 @@ export default function PropertyDetailPage() {
                 <>
                   {isUploadedVideo && (
                     <div className="space-y-3">
-                      <h3 className="text-base font-semibold">Walkthrough Video</h3>
+                      <h3 className="text-base font-semibold">{tp('property.walkthroughVideo')}</h3>
                       <video
                         src={vUrl!}
                         controls
@@ -1029,9 +1033,9 @@ export default function PropertyDetailPage() {
                       className="gap-2"
                     >
                       {translating ? (
-                        <><Loader2 size={14} className="animate-spin" /> Generating translations…</>
+                        <><Loader2 size={14} className="animate-spin" /> {tp('property.translations.generating')}</>
                       ) : (
-                        <><Globe size={14} /> Generate Translations</>
+                        <><Globe size={14} /> {tp('property.translations.generate')}</>
                       )}
                     </Button>
                   )}
@@ -1207,7 +1211,7 @@ export default function PropertyDetailPage() {
                       <Star size={12} className="fill-yellow-400 text-yellow-400" />
                       <span className="text-[12px] font-medium text-white">{property.agent.rating.toFixed(1)}</span>
                       {property.agent.reviewCount ? (
-                        <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>({property.agent.reviewCount})</span>
+                        <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{tp('property.agent.reviewCount', { count: property.agent.reviewCount })}</span>
                       ) : null}
                     </div>
                   ) : null}
@@ -1272,16 +1276,16 @@ export default function PropertyDetailPage() {
                     <ScrollText className="h-5 w-5 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-foreground">Need a conveyancer?</h3>
+                    <h3 className="font-semibold text-foreground">{tp('property.conveyancer.shortTitle')}</h3>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Fixed-fee conveyancing from licensed professionals. No hidden costs.
+                      {tp('property.conveyancer.shortBody')}
                     </p>
                     <Button
                       variant="outline"
                       className="mt-3"
                       onClick={() => setConveyancingOpen(true)}
                     >
-                      Get a Quote
+                      {tp('property.conveyancer.shortCta')}
                     </Button>
                   </div>
                 </div>
@@ -1295,16 +1299,16 @@ export default function PropertyDetailPage() {
                     <HardHat className="h-5 w-5 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-foreground">Building & Pest Inspection</h3>
+                    <h3 className="font-semibold text-foreground">{tp('property.buildingPest.title')}</h3>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Independent reports for confident buyers. Book before you go unconditional.
+                      {tp('property.buildingPest.body')}
                     </p>
                     <Button
                       variant="outline"
                       className="mt-3"
                       onClick={() => navigate('/home-services?category=building_inspection')}
                     >
-                      Book Inspection
+                      {tp('property.buildingPest.cta')}
                     </Button>
                   </div>
                 </div>
@@ -1339,13 +1343,13 @@ export default function PropertyDetailPage() {
             {property && !rawProperty?.is_off_market && property.suburb && (
               <div className="mt-3 p-4 rounded-xl border border-amber-200 bg-amber-50">
                 <div className="flex gap-3">
-                  <div className="text-2xl shrink-0" aria-hidden>🔔</div>
+                  <div className="text-2xl shrink-0" aria-hidden>{'🔔'}</div>
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-slate-900">
-                      Get off-market properties in {property.suburb} first
+                      {tp('property.offMarketAlert.title', { suburb: property.suburb })}
                     </p>
                     <p className="text-xs text-slate-600 mt-1">
-                      Be notified about properties in {property.suburb}, {property.state} before they hit the market.
+                      {tp('property.offMarketAlert.body', { suburb: property.suburb, state: property.state })}
                     </p>
                     <button
                       onClick={() => {

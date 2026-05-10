@@ -107,15 +107,15 @@ const OnboardingRolePage = () => {
       >
         <div className="text-center mb-10">
           <h1 className="text-[32px] sm:text-[38px] font-semibold tracking-[-1px] text-stone-900 leading-tight">
-            How will you use ListHQ?
+            {t('onboarding.role.title')}
           </h1>
           <p className="text-[15px] text-stone-500 mt-3">
-            Pick the option that best describes you. You can change this later.
+            {t('onboarding.role.subtitle')}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {ROLES.map(({ value, icon: Icon, title, description }) => {
+          {ROLES.map(({ value, icon: Icon, titleKey, descKey }) => {
             const isSelected = selected === value;
             return (
               <button
@@ -141,10 +141,10 @@ const OnboardingRolePage = () => {
                   <Icon size={22} strokeWidth={2} />
                 </div>
                 <h3 className="text-[17px] font-semibold text-stone-900 leading-snug">
-                  {title}
+                  {t(titleKey)}
                 </h3>
                 <p className="text-[14px] text-stone-500 mt-2 leading-relaxed">
-                  {description}
+                  {t(descKey)}
                 </p>
               </button>
             );
@@ -160,10 +160,10 @@ const OnboardingRolePage = () => {
           >
             {saving ? (
               <>
-                <Loader2 size={16} className="animate-spin" /> Setting up…
+                <Loader2 size={16} className="animate-spin" /> {t('onboarding.role.settingUp')}
               </>
             ) : (
-              'Continue'
+              t('onboarding.role.continue')
             )}
           </button>
         </div>

@@ -662,6 +662,7 @@ export const fr: Partial<Record<TranslationKey, string>> = {
   'nav.myDashboard': 'Mon tableau de bord',
   'nav.myListings': 'Mes annonces',
   'nav.postHalo': 'Publie un halo',
+  'nav.translateListings': 'Traduire les annonces',
   'nav.saleListing': 'Annonce de vente',
   'nav.rentalListing': 'Annonce de location',
   'nav.languageCurrency': 'Langue et monnaie',

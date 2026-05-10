@@ -662,6 +662,7 @@ export const ms: Partial<Record<TranslationKey, string>> = {
   'nav.myDashboard': 'Papan Pemuka Saya',
   'nav.myListings': 'Penyenaraian Saya',
   'nav.postHalo': 'Siarkan Halo',
+  'nav.translateListings': 'Terjemahkan penyenaraian',
   'nav.saleListing': 'Penyenaraian Jualan',
   'nav.rentalListing': 'Penyenaraian Sewaan',
   'nav.languageCurrency': 'Bahasa & Mata Wang',

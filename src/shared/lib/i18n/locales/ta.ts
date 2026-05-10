@@ -658,6 +658,7 @@ export const ta: Partial<Record<TranslationKey, string>> = {
   'nav.myDashboard': 'என் டாஷ்போர்டு',
   'nav.myListings': 'என் பட்டியல்கள்',
   'nav.postHalo': 'ஹேலோ பதிவிடுங்கள்',
+  'nav.translateListings': 'பட்டியல்களை மொழிபெயர்க்கவும்',
   'nav.saleListing': 'விற்பனை பட்டியல்',
   'nav.rentalListing': 'வாடகை பட்டியல்',
   'nav.languageCurrency': 'மொழி மற்றும் நாணயம்',

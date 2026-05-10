@@ -662,6 +662,7 @@ export const pa: Partial<Record<TranslationKey, string>> = {
   'nav.myDashboard': 'ਮੇਰਾ ਡੈਸ਼ਬੋਰਡ',
   'nav.myListings': 'ਮੇਰੀਆਂ ਲਿਸਟਿੰਗਾਂ',
   'nav.postHalo': 'ਹੈਲੋ ਪੋਸਟ ਕਰੋ',
+  'nav.translateListings': 'ਸੂਚੀਆਂ ਦਾ ਅਨੁਵਾਦ ਕਰੋ',
   'nav.saleListing': 'ਵਿਕਰੀ ਲਿਸਟਿੰਗ',
   'nav.rentalListing': 'ਕਿਰਾਏ ਦੀ ਲਿਸਟਿੰਗ',
   'nav.languageCurrency': 'ਭਾਸ਼ਾ ਅਤੇ ਮੁਦਰਾ',

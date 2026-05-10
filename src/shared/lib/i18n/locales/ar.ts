@@ -658,6 +658,7 @@ export const ar: Partial<Record<TranslationKey, string>> = {
   'nav.myDashboard': 'لوحتي',
   'nav.myListings': 'قوائمي',
   'nav.postHalo': 'نشر هالو',
+  'nav.translateListings': 'ترجمة القوائم',
   'nav.saleListing': 'قائمة للبيع',
   'nav.rentalListing': 'قائمة للإيجار',
   'nav.languageCurrency': 'اللغة والعملة',

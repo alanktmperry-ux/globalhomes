@@ -974,19 +974,35 @@ const Index = () => {
                 </button>
               </div>
               <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-                {FEAT_LISTINGS.slice(0,4).map((l, i) => (
-                  <div key={i} onClick={() => { closeModal(); navigate('/'); }} style={{ display:'flex', gap:14, padding:12, border:`1px solid ${T.border}`, borderRadius:14, cursor:'pointer' }}>
-                    <div style={{ width:96, height:72, borderRadius:10, backgroundImage:`url(${l.img})`, backgroundSize:'cover', flexShrink:0 }} />
-                    <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:4 }}>{l.title}</div>
-                      <div style={{ fontSize:12, color:T.muted, marginBottom:6 }}>{l.meta}</div>
-                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                        <span style={{ background:T.blueL, color:T.blue, fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:100 }}>🌐 20 languages</span>
-                        <span style={{ fontSize:14, fontWeight:800, color:T.ink }}>{l.price}</span>
+                {featuredListings.length === 0 ? (
+                  <div style={{ padding:'28px 16px', textAlign:'center', border:`1px dashed ${T.border}`, borderRadius:14, background:T.off }}>
+                    <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:6 }}>Listings coming soon</div>
+                    <div style={{ fontSize:12, color:T.muted }}>First agents are getting their pocket listings ready.</div>
+                  </div>
+                ) : featuredListings.slice(0, 4).map((p: any) => {
+                  const img = (p.images && p.images[0]) || p.image_url;
+                  const beds = p.beds || 0, baths = p.baths || 0, cars = p.parking || 0;
+                  const metaParts: string[] = [];
+                  if (beds) metaParts.push(`${beds} bed`);
+                  if (baths) metaParts.push(`${baths} bath`);
+                  if (cars) metaParts.push(`${cars} car`);
+                  const meta = metaParts.join(' · ') || (p.property_type ?? '');
+                  return (
+                    <div key={p.id} onClick={() => { closeModal(); navigate(`/property/${p.id}`); }} style={{ display:'flex', gap:14, padding:12, border:`1px solid ${T.border}`, borderRadius:14, cursor:'pointer' }}>
+                      <div style={{ width:96, height:72, borderRadius:10, background: img ? `center/cover no-repeat url(${img})` : FALLBACK_GRADIENTS[0], flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                        {!img && <img src={HOUSE_PLACEHOLDER_SVG} alt="" aria-hidden="true" style={{ width:48, height:48, opacity:0.9 }} />}
+                      </div>
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:4, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{p.title || p.address || `${p.suburb ?? ''}${p.state ? `, ${p.state}` : ''}`}</div>
+                        <div style={{ fontSize:12, color:T.muted, marginBottom:6 }}>{meta}</div>
+                        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                          <span style={{ background:T.blueL, color:T.blue, fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:100 }}>🌐 20 languages</span>
+                          <span style={{ fontSize:14, fontWeight:800, color:T.ink }}>{p.price_formatted || fmtPrice(p.price, p.listing_type)}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               <button onClick={() => { const q = (modalQuery || searchQuery || '').trim(); closeModal(); navigate(q ? `/buy?q=${encodeURIComponent(q)}` : '/buy'); }} style={{ width:'100%', marginTop:16, background:T.blue, color:'#fff', border:'none', padding:'12px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer' }}>
                 See all results →

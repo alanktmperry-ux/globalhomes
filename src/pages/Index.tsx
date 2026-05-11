@@ -11,7 +11,7 @@ import FeaturedListings from '@/features/marketing/FeaturedListings';
 import ReplaceFiveTools from '@/features/marketing/ReplaceFiveTools';
 import VoiceListingShowcase from '@/features/marketing/VoiceListingShowcase';
 import HaloBoardPreview from '@/features/marketing/HaloBoardPreview';
-import PricingSectionNew from '@/features/marketing/PricingSection';
+// PricingSection removed from homepage; lives on /for-agents/pricing
 import FinalCTA from '@/features/marketing/FinalCTA';
 import HeroSearchPreview from '@/components/home/HeroSearchPreview';
 

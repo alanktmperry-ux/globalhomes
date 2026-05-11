@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 type SeekingType = 'buy' | 'rent';
 

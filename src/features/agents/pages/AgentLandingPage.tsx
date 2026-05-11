@@ -279,8 +279,26 @@ export default function AgentLandingPage() {
         </div>
       </section>
 
-      {/* ─── PRICING (reused from homepage) ─── */}
-      <PricingSection />
+      {/* ─── SEE PRICING CTA ─── */}
+      <section className="bg-white px-6 md:px-8 py-[80px] md:py-[120px]">
+        <div className="max-w-[720px] mx-auto text-center">
+          <h3 className="text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.05] tracking-[-0.03em] text-black">
+            See full pricing
+          </h3>
+          <p className="text-[15px] md:text-[16px] text-[#4a4a4a] mt-3 leading-[1.55]">
+            Solo, Agency, and Agency Pro tiers. Founding rates locked for 24 months.
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate('/for-agents/pricing')}
+            className="mt-7 inline-flex items-center gap-2 text-white font-bold hover:-translate-y-0.5 transition-all"
+            style={{ background: GRAD, padding: '16px 28px', borderRadius: 14, fontSize: 15 }}
+          >
+            See pricing
+            <ArrowRight size={16} strokeWidth={2.2} />
+          </button>
+        </div>
+      </section>
 
       {/* ─── FINAL CTA (reused from homepage) ─── */}
       <FinalCTA />

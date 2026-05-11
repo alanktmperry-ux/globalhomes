@@ -8,19 +8,11 @@ import { WelcomeModal } from './WelcomeModal';
 import { AgentOnboardingProgress } from '@/features/agents/components/onboarding/AgentOnboardingProgress';
 import { differenceInDays, formatDistanceToNow } from 'date-fns';
 
-// Allow <iconify-icon> web component (script loaded in index.html)
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace JSX {
-    interface IntrinsicElements {
-      'iconify-icon': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
-        icon: string;
-        width?: string | number;
-        height?: string | number;
-      }, HTMLElement>;
-    }
-  }
-}
+// iconify-icon is a globally loaded web component (see index.html)
+const Ico = ({ icon, size = 18, color, className }: { icon: string; size?: number; color?: string; className?: string }) => (
+  // @ts-expect-error — iconify-icon is a web component
+  <iconify-icon icon={icon} class={className} style={{ fontSize: `${size}px`, color, display: 'inline-flex', lineHeight: 1 }} />
+);
 
 interface RecentActivity {
   id: string;

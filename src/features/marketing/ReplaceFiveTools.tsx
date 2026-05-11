@@ -79,7 +79,7 @@ export default function ReplaceFiveTools() {
               animationDelay: "0ms",
             }}
           >
-            <CalloutCard number="20" label="Languages, auto-translated" />
+            <CalloutCard number="Any" label="Language, auto-translated" />
             <CalloutLine direction="horizontal" dotSide="right" />
           </div>
 

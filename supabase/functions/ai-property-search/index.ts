@@ -93,7 +93,16 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { query, session_id, buyer_id } = body;
+    // Accept both `query` (legacy) and `rawQuery` (new). Prefer rawQuery if present.
+    const rawQuery: string | undefined = body.rawQuery ?? body.query;
+    const query = rawQuery; // legacy alias used downstream
+    const { session_id, buyer_id } = body;
+    const userLocale: string = (
+      body.userLocale
+      || req.headers.get('x-user-locale')
+      || req.headers.get('accept-language')?.split(',')[0]?.split('-')[0]
+      || 'en'
+    ).toLowerCase().slice(0, 5);
     const listingTypeFilter = body.listing_type === 'rent' ? 'rent' : null;
 
     if (!query || typeof query !== "string" || query.trim().length === 0) {

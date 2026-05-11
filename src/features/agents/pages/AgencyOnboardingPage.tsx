@@ -1463,7 +1463,7 @@ export default function AgencyOnboardingPage() {
           <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-1 pb-2 shrink-0">
             {showBackButton ? (
               <Button variant="ghost" size="sm" onClick={() => setStep(s => s - 1)} disabled={loading} className="w-full sm:w-auto">
-                <ArrowLeft size={14} className="mr-1" /> Back
+                <ArrowLeft size={14} className="mr-1" /> {t('agentOnboarding.nav.back')}
               </Button>
             ) : <div />}
             {showNextButton && (

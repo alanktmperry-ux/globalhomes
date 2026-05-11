@@ -40,24 +40,19 @@ function StatCard({
 }: { label: string; value: number; sublabel?: string; href?: string; highlight?: boolean }) {
   const inner = (
     <div
-      className="rounded-[16px] p-6 relative overflow-hidden flex flex-col justify-between min-h-[130px] transition-all hover:bg-white/[0.09]"
-      style={{
-        background: 'rgba(255,255,255,0.07)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255,255,255,0.15)',
-      }}
+      className="bg-white rounded-[12px] p-6 relative overflow-hidden flex flex-col justify-between min-h-[130px] transition-all hover:bg-[#F9FAFB]"
+      style={{ border: '1px solid #E5E7EB' }}
     >
       <p
-        className="text-[10px] uppercase font-medium"
-        style={{ letterSpacing: '0.12em', color: 'rgba(255,255,255,0.35)' }}
+        className="text-[10px] uppercase font-semibold text-[#6B7280]"
+        style={{ letterSpacing: '0.10em' }}
       >
         {label}
       </p>
       <div>
-        <p className="text-5xl tracking-tight font-extralight text-white tabular-nums mt-4">{value}</p>
+        <p className="text-5xl font-extralight text-[#0a0f1e] tabular-nums mt-3">{value}</p>
         {sublabel && (
-          <p className="text-xs font-light mt-1" style={{ color: 'rgba(255,255,255,0.40)' }}>{sublabel}</p>
+          <p className="text-xs font-light text-[#9CA3AF] mt-1">{sublabel}</p>
         )}
       </div>
     </div>
@@ -140,16 +135,11 @@ export default function DashboardHomeStats({ agentId }: Props) {
           Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="rounded-[16px] p-6 min-h-[130px] space-y-3"
-              style={{
-                background: 'rgba(255,255,255,0.07)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255,255,255,0.15)',
-              }}
+              className="bg-white rounded-[12px] p-6 min-h-[130px] space-y-3"
+              style={{ border: '1px solid #E5E7EB' }}
             >
-              <SkeletonBar className="h-2 w-20 bg-white/15" />
-              <SkeletonBar className="h-10 w-16 bg-white/15" />
+              <SkeletonBar className="h-2 w-20" />
+              <SkeletonBar className="h-10 w-16" />
             </div>
           ))
         ) : (

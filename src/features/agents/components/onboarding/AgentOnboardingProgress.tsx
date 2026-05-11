@@ -136,28 +136,23 @@ export function AgentOnboardingProgress() {
 
   return (
     <div
-      className="rounded-[16px] p-6 mb-8 space-y-4"
-      style={{
-        background: 'rgba(255,255,255,0.07)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255,255,255,0.15)',
-      }}
+      className="bg-white rounded-[12px] p-6 mb-8 space-y-4"
+      style={{ border: '1px solid #E5E7EB' }}
     >
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-base font-medium text-white">Getting started</h3>
-          <p className="text-sm font-light mt-0.5" style={{ color: 'rgba(255,255,255,0.55)' }}>
+          <h3 className="text-base font-semibold text-[#0a0f1e]">Getting started</h3>
+          <p className="text-sm font-light text-[#6B7280] mt-0.5">
             {completedCount} of {steps.length} steps complete
           </p>
         </div>
-        <span className="text-sm font-medium text-white">{pct}%</span>
+        <span className="text-sm font-semibold text-[#2563EB]">{pct}%</span>
       </div>
 
-      <div className="h-1.5 w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.15)' }}>
+      <div className="h-1.5 w-full rounded-full overflow-hidden" style={{ background: '#E5E7EB' }}>
         <div
           className="h-full transition-all duration-500"
-          style={{ width: `${pct}%`, background: '#FFFFFF' }}
+          style={{ width: `${pct}%`, background: '#2563EB' }}
         />
       </div>
 
@@ -167,7 +162,7 @@ export function AgentOnboardingProgress() {
             <Link
               to={step.href}
               className={cn(
-                'flex items-start gap-3 p-3 rounded-[10px] transition-colors hover:bg-white/5',
+                'flex items-start gap-3 p-3 rounded-[10px] transition-colors hover:bg-[#F3F4F6]',
                 step.done && 'opacity-70',
               )}
             >
@@ -176,18 +171,17 @@ export function AgentOnboardingProgress() {
               ) : (
                 <span
                   className="h-[18px] w-[18px] rounded-full shrink-0 mt-0.5"
-                  style={{ border: '1px solid rgba(255,255,255,0.30)' }}
+                  style={{ border: '2px solid #E5E7EB' }}
                 />
               )}
               <div className="min-w-0 flex-1">
                 <p
-                  className={cn('text-sm font-light text-white', step.done && 'line-through')}
-                  style={step.done ? { color: 'rgba(255,255,255,0.55)' } : undefined}
+                  className={cn('text-sm font-medium text-[#0a0f1e]', step.done && 'line-through text-[#6B7280]')}
                 >
                   {step.label}
                 </p>
                 {!step.done && (
-                  <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.55)' }}>{step.description}</p>
+                  <p className="text-xs mt-0.5 text-[#6B7280]">{step.description}</p>
                 )}
               </div>
             </Link>

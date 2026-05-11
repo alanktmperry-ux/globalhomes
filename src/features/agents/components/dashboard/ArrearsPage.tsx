@@ -1,14 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { AlertTriangle, FileText, ExternalLink, Copy } from 'lucide-react';
-import DashboardHeader from './DashboardHeader';
-import { Card } from '@/components/ui/card';
+import { FileText, ExternalLink, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
+  APlusPageHeader, APlusStatCard, APlusTable, APlusTHead, APlusTh, APlusTBody, APlusTr, APlusTd,
+  APlusBadge, APlusArrearsBanner, type APlusBadgeTone,
+} from '@/components/ui/data-table-aplus';
+import { EmptyState } from '@/components/ui/empty-state';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';

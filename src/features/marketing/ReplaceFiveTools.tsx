@@ -116,7 +116,7 @@ export default function ReplaceFiveTools() {
 
         {/* Mobile simplified stat row (visible <1024px) */}
         <div className="replace-mobile-stats hidden grid-cols-3 gap-3 max-w-[640px] mx-auto mt-8">
-          <MobileStat number="20" label="Languages" />
+          <MobileStat number="Any" label="Language" />
           <MobileStat number="AI" label="Voice listing" />
           <MobileStat number="7M+" label="Buyers reached" />
         </div>

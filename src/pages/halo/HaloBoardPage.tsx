@@ -21,6 +21,7 @@ import {
 } from '@/components/halo/HaloBoardFilters';
 import type { Halo } from '@/types/halo';
 import { usePageTitle } from '@/lib/usePageTitle';
+import { useTranslation } from '@/shared/lib/i18n';
 
 type BoardTab = 'all' | 'pocket';
 

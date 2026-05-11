@@ -47,7 +47,7 @@ export function AffordabilityCalculator({ property }: AffordabilityCalculatorPro
     return { requiredWeeklyGross, requiredAnnualGross, bondEstimate };
   }, [weeklyRent]);
 
-  const fmt = (n: number) => `$${Math.round(n).toLocaleString()}`;
+  const fmt = (n: number) => formatCurrency(Math.round(n), language);
 
   if (isRental) {
     return (

@@ -653,29 +653,62 @@ const ListingsPage = () => {
   activeListings.forEach(l => { counts[l._status] = (counts[l._status] || 0) + 1; });
 
   const viewToggle = (
-    <div className="inline-flex rounded-lg border border-border bg-card p-0.5" role="tablist" aria-label="Listings view">
+    <div className="flex items-center bg-white rounded-[10px] p-0.5" style={{ border: '1px solid #E5E7EB' }} role="tablist" aria-label="Listings view">
       <button
         type="button"
         role="tab"
         aria-selected={view === 'list'}
         onClick={() => setView('list')}
-        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
-          view === 'list' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
-        }`}
+        className={
+          view === 'list'
+            ? 'flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[#EFF6FF] text-[#2563EB] text-xs font-medium transition-all'
+            : 'flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-[#6B7280] hover:text-[#374151] text-xs font-medium transition-all'
+        }
       >
-        <ListIcon size={12} /> List
+        <ListIcon size={14} /> List
       </button>
       <button
         type="button"
         role="tab"
         aria-selected={view === 'pipeline'}
         onClick={() => setView('pipeline')}
-        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
-          view === 'pipeline' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
-        }`}
+        className={
+          view === 'pipeline'
+            ? 'flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[#EFF6FF] text-[#2563EB] text-xs font-medium transition-all'
+            : 'flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-[#6B7280] hover:text-[#374151] text-xs font-medium transition-all'
+        }
       >
-        <Kanban size={12} /> Pipeline
+        <Kanban size={14} /> Pipeline
       </button>
+    </div>
+  );
+
+  const portfolioHeader = (
+    <div className="flex items-start justify-between gap-4 flex-wrap p-4 sm:p-6 pb-0 max-w-5xl">
+      <div>
+        <h1 className="text-2xl font-bold text-[#0a0f1e] tracking-tight">Portfolio</h1>
+        <p className="text-sm font-light text-[#6B7280] mt-1 mb-8">
+          {listings.length} {listings.length === 1 ? 'property' : 'properties'}
+        </p>
+      </div>
+      <div className="flex items-center gap-2">
+        {viewToggle}
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => navigate('/')}
+          className="gap-1.5 text-xs"
+        >
+          <Globe size={14} /> Browse Market
+        </Button>
+        <button
+          type="button"
+          onClick={() => navigate('/pocket-listing')}
+          className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold rounded-[10px] px-4 py-2.5 text-sm flex items-center gap-2 transition-all"
+        >
+          <Plus size={16} /> Add to Portfolio
+        </button>
+      </div>
     </div>
   );
 

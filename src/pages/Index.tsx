@@ -9,6 +9,8 @@ import LiveActivityTicker from '@/components/LiveActivityTicker';
 import HomeCountUp from '@/components/HomeCountUp';
 import FeaturedListings from '@/features/marketing/FeaturedListings';
 import ReplaceFiveTools from '@/features/marketing/ReplaceFiveTools';
+import VoiceListingShowcase from '@/features/marketing/VoiceListingShowcase';
+import HaloBoardPreview from '@/features/marketing/HaloBoardPreview';
 
 // ============================================================
 // Wave 17 V8 — Buyer-first multilingual homepage

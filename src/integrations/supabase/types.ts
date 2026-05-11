@@ -2434,6 +2434,114 @@ export type Database = {
           },
         ]
       }
+      boost_subscriptions: {
+        Row: {
+          agent_id: string
+          cancelled_at: string | null
+          created_at: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          featured_listing_id: string | null
+          id: string
+          listing_id: string
+          status: string
+          stripe_customer_id: string
+          stripe_price_id: string
+          stripe_subscription_id: string
+          tier: string
+          updated_at: string | null
+        }
+        Insert: {
+          agent_id: string
+          cancelled_at?: string | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          featured_listing_id?: string | null
+          id?: string
+          listing_id: string
+          status: string
+          stripe_customer_id: string
+          stripe_price_id: string
+          stripe_subscription_id: string
+          tier: string
+          updated_at?: string | null
+        }
+        Update: {
+          agent_id?: string
+          cancelled_at?: string | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          featured_listing_id?: string | null
+          id?: string
+          listing_id?: string
+          status?: string
+          stripe_customer_id?: string
+          stripe_price_id?: string
+          stripe_subscription_id?: string
+          tier?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "boost_subscriptions_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "boost_subscriptions_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "boost_subscriptions_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "boost_subscriptions_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances_view"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "boost_subscriptions_featured_listing_id_fkey"
+            columns: ["featured_listing_id"]
+            isOneToOne: false
+            referencedRelation: "featured_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "boost_subscriptions_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "boost_subscriptions_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "boost_subscriptions_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       broadcast_campaigns: {
         Row: {
           audience: string

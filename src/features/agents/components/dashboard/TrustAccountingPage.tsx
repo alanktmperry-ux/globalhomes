@@ -687,35 +687,84 @@ const TrustAccountingPage = () => {
   }
 
 
+  const Ico = ({ icon, size = 16, color }: { icon: string; size?: number; color?: string }) =>
+    // @ts-expect-error iconify web component
+    <iconify-icon icon={icon} width={size} height={size} style={{ color, display: 'inline-block' }} />;
+
   return (
-    <div>
-      <div className="px-4 sm:px-6 pt-4">
-        <nav className="text-sm text-muted-foreground mb-2">
-          <span>Dashboard</span>
-          {filteredPropertyAddress && (
-            <>
-              <span className="mx-2">→</span>
-              <span>Rent Roll</span>
-              <span className="mx-2">→</span>
-              <span>{filteredPropertyAddress}</span>
-            </>
-          )}
-          <span className="mx-2">→</span>
-          <span className="font-medium text-foreground">Trust Accounting</span>
-        </nav>
+    <div className="max-w-[1480px] mx-auto px-6 md:px-10 py-10">
+      <nav className="text-[12px] text-[#6a6a6a] mb-4">
+        <span>Dashboard</span>
+        {filteredPropertyAddress && (
+          <>
+            <span className="mx-2">/</span>
+            <span>Rent Roll</span>
+            <span className="mx-2">/</span>
+            <span>{filteredPropertyAddress}</span>
+          </>
+        )}
+        <span className="mx-2">/</span>
+        <span className="font-semibold text-[#0a0f1e]">Finance</span>
+      </nav>
+
+      <div className="flex items-center justify-between gap-6 flex-wrap mb-8">
+        <div>
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1
+              className="font-extrabold tracking-[-0.04em] text-[#0a0f1e]"
+              style={{ fontSize: 'clamp(32px,4vw,48px)', lineHeight: 1.05 }}
+            >
+              Finance
+            </h1>
+            {lastReconciledDate && (
+              <span className="bg-[#ECFDF5] border border-[#34D399]/20 text-[#065F46] rounded-full px-3 py-1 text-[12px] font-bold inline-flex items-center gap-1.5">
+                <Ico icon="solar:check-circle-bold" size={12} color="#065F46" />
+                Reconciled to {new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'short' }).format(new Date(lastReconciledDate))}
+              </span>
+            )}
+            {periodClosed && (
+              <span className="bg-[#F3F4F6] border border-[#E5E5E5] text-[#374151] rounded-full px-3 py-1 text-[12px] font-bold inline-flex items-center gap-1.5">
+                <Ico icon="solar:lock-keyhole-minimalistic-bold" size={12} color="#374151" />
+                {periodLabel} closed
+              </span>
+            )}
+          </div>
+          <p className="text-[14px] text-[#6a6a6a] font-medium mt-2">
+            Trust accounting, reconciliation, and reports — AFA-compliant, immutable.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => navigate('/dashboard/reconciliation')}
+            className="bg-white border border-[#E5E5E5] text-[#0a0f1e] rounded-full px-4 py-2.5 text-[13px] font-semibold inline-flex items-center gap-2 hover:bg-[#F9FAFB] transition"
+          >
+            <Ico icon="solar:document-linear" size={16} color="#0a0f1e" />
+            <span className="hidden sm:inline">Reconciliation</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowNewAccount(true)}
+            className="bg-white border border-[#E5E5E5] text-[#0a0f1e] rounded-full px-4 py-2.5 text-[13px] font-semibold inline-flex items-center gap-2 hover:bg-[#F9FAFB] transition"
+          >
+            <Ico icon="solar:wallet-2-linear" size={16} color="#0a0f1e" />
+            <span className="hidden sm:inline">New account</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowNewReceipt(true)}
+            className="text-white rounded-full px-5 py-2.5 text-[13px] font-extrabold inline-flex items-center gap-2 transition hover:opacity-95"
+            style={{ background: 'linear-gradient(135deg,#2563EB,#1D4ED8)' }}
+          >
+            <Ico icon="solar:add-square-bold" size={16} color="#fff" />
+            New transaction
+          </button>
+        </div>
       </div>
-      <DashboardHeader
-        title={filteredPropertyAddress ? `Trust transactions for ${filteredPropertyAddress}` : 'Trust Dashboard'}
-        subtitle="Australian trust account management"
-        actions={
-          <Button size="sm" variant="outline" onClick={() => setShowNewAccount(true)} className="gap-1.5 text-xs">
-            <Plus size={13} /> New Account
-          </Button>
-        }
-      />
 
       {urlPropertyId && filteredPropertyAddress && (
-        <div className="mx-4 mt-3 sm:mx-6 flex items-center gap-2 text-xs bg-primary/10 text-primary rounded-md px-3 py-2">
+        <div className="bg-[#EFF6FF] border border-[#2563EB]/15 text-[#1E40AF] rounded-2xl px-4 py-2.5 mb-6 flex items-center gap-2 text-[13px] font-semibold">
+          <Ico icon="solar:filter-bold" size={14} color="#1E40AF" />
           <span>Filtered by property: <strong>{filteredPropertyAddress}</strong></span>
           <button
             onClick={() => {
@@ -724,7 +773,7 @@ const TrustAccountingPage = () => {
               setSearchParams(next, { replace: true });
               setFilterProperty('all');
             }}
-            className="ml-auto underline"
+            className="ml-auto underline font-bold hover:text-[#1E3A8A]"
           >
             Clear filter
           </button>
@@ -732,178 +781,173 @@ const TrustAccountingPage = () => {
       )}
 
       {overdrawnLedgers.length > 0 && (
-        <div className="mx-4 mt-4 sm:mx-6">
-          <div
-            className="bg-[#FEF2F2] rounded-[12px] p-4 flex items-start gap-3"
-            style={{ border: '1px solid rgba(248,113,113,0.30)' }}
-          >
-            {/* @ts-expect-error iconify */}
-            <iconify-icon icon="solar:danger-triangle-linear" style={{ fontSize: '24px', color: '#DC2626' }}></iconify-icon>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[#991B1B]">
-                Trust ledger overdrawn — immediate action required
-              </p>
-              <p className="text-xs text-[#991B1B]/80 mt-1">
-                The following client ledger{overdrawnLedgers.length > 1 ? 's have' : ' has'} a debit balance.
-                Under Australian trust accounting law, a trust ledger must never go into debit.
-                You must remedy the shortfall immediately and notify your state regulator in writing.
-              </p>
-              <div className="mt-2 space-y-1">
-                {overdrawnLedgers.map(l => (
-                  <div key={l.name} className="flex items-center justify-between text-xs bg-white/60 rounded px-2 py-1">
-                    <span className="font-semibold text-[#0a0f1e]">{l.name}</span>
-                    <span className="tabular-nums font-bold text-[#991B1B]">−${safeAmount(l.balance)}</span>
-                  </div>
-                ))}
-              </div>
-              <p className="text-xs text-[#6B7280] mt-2">
-                Remedy: Transfer funds from your trading account to cover the shortfall, then notify your state regulator
-                in writing with the date, amount, reason, and corrective action taken.
-                Use Journal Adjustment in the Trust Ledger to record the correction.
-              </p>
+        <div className="bg-[#FEF2F2] border border-[#DC2626]/20 rounded-3xl p-5 mb-8 flex items-start gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shrink-0">
+            <Ico icon="solar:danger-triangle-bold" size={24} color="#DC2626" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[15px] font-extrabold text-[#991B1B]">
+              Trust ledger overdrawn — immediate action required
+            </p>
+            <p className="text-[13px] text-[#991B1B]/85 mt-1 leading-[1.55]">
+              The following client ledger{overdrawnLedgers.length > 1 ? 's have' : ' has'} a debit balance.
+              Under Australian trust accounting law, a trust ledger must never go into debit.
+              You must remedy the shortfall immediately and notify your state regulator in writing.
+            </p>
+            <div className="mt-3 space-y-1">
+              {overdrawnLedgers.map(l => (
+                <div key={l.name} className="flex items-center justify-between text-[12px] bg-white rounded-xl px-3 py-1.5 border border-[#FECACA]">
+                  <span className="font-semibold text-[#0a0f1e]">{l.name}</span>
+                  <span className="tabular-nums font-extrabold text-[#991B1B]">−${safeAmount(l.balance)}</span>
+                </div>
+              ))}
             </div>
+            <p className="text-[12px] text-[#6B7280] mt-2 leading-[1.55]">
+              Remedy: Transfer funds from your trading account to cover the shortfall, then notify your state regulator
+              in writing with the date, amount, reason, and corrective action taken.
+              Use Journal Adjustment in the Trust Ledger to record the correction.
+            </p>
           </div>
         </div>
       )}
 
-      <div className="p-4 sm:p-6 max-w-[1600px]">
-        {/* ── 3-Panel Dashboard Cards ── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          {/* Receipts Card */}
-          <Card className="border-l-4 border-l-primary">
-            <CardContent className="p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Receipt size={16} className="text-primary" />
-                  <h3 className="text-sm font-bold">Receipts</h3>
-                  {newReceiptsCount > 0 && (
-                    <Badge className="text-[10px]">{newReceiptsCount} New</Badge>
-                  )}
-                </div>
-                <Button size="sm" className="h-7 text-xs gap-1.5" onClick={() => setShowNewReceipt(true)}>
-                  <Plus size={12} /> New Receipt
-                </Button>
+      <div>
+        {/* Balance / Activity cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="bg-white rounded-3xl border border-[#E5E5E5] p-6">
+            <div className="flex items-start justify-between">
+              <div className="w-10 h-10 rounded-2xl bg-[#ECFDF5] flex items-center justify-center">
+                <Ico icon="solar:wallet-bold" size={20} color="#065F46" />
               </div>
-              <div className="space-y-1.5 pt-1 border-t border-border">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Balance:</span>
-                  <span className="text-sm font-bold">{AUD.format(totalInTrust)}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Last receipt:</span>
-                  <span className="text-xs font-semibold font-mono">{lastReceiptNumber}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Payments Card */}
-          <Card className="border-l-4 border-l-orange-500">
-            <CardContent className="p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CreditCard size={16} className="text-orange-500" />
-                  <h3 className="text-sm font-bold">Payments</h3>
-                  {pendingPayments.length > 0 && (
-                    <Badge variant="outline" className="text-[10px]">{pendingPayments.length} Ready</Badge>
-                  )}
-                </div>
-                <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5"
-                  disabled={pendingPayments.length === 0}
-                  onClick={() => {
-                    setSelectedPaymentIds(new Set(pendingPayments.map(p => p.id)));
-                    document.getElementById('bulk-payments-section')?.scrollIntoView({ behavior: 'smooth' });
-                  }}>
-                  <FileDown size={12} /> Download ABA
-                </Button>
-              </div>
-              <div className="space-y-1.5 pt-1 border-t border-border">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Unpaid:</span>
-                  <span className="text-sm font-bold">{AUD.format(pendingPayments.reduce((s, p) => s + p.amount, 0))}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Next ABA:</span>
-                  <span className="text-xs font-semibold">
-                    {pendingPayments.length > 0
-                      ? new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: '2-digit' }).format(new Date(Date.now() + 86400000))
-                      : '—'}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Reconciliation Card */}
-          <Card className="border-l-4 border-l-green-500">
-            <CardContent className="p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <BarChart3 size={16} className="text-green-500" />
-                  <h3 className="text-sm font-bold">Reconciliation</h3>
-                  {unmatchedCount > 0 && (
-                    <Badge variant="destructive" className="text-[10px]">{unmatchedCount}</Badge>
-                  )}
-                </div>
-                <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5"
-                  onClick={() => navigate('/dashboard/reconciliation')}>
-                  <Upload size={12} /> Upload CSV
-                </Button>
-              </div>
-              <div className="space-y-1.5 pt-1 border-t border-border">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Last reconciled:</span>
-                  <span className="text-xs font-semibold flex items-center gap-1">
-                    {lastReconciledDate
-                      ? <>
-                          {new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: '2-digit' }).format(new Date(lastReconciledDate))}
-                          <CheckCircle2 size={12} className="text-green-500" />
-                        </>
-                      : '—'}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* ── Month-End Close ── */}
-        <Card className="mb-6 border-l-4 border-l-amber-500">
-          <CardContent className="p-4 space-y-3">
-            <div className="flex items-center justify-between flex-wrap gap-3">
-              <div className="flex items-center gap-2">
-                <Lock size={16} className="text-amber-500" />
-                <h3 className="text-sm font-bold">Month-End Close</h3>
-                <Badge variant="outline" className="text-[10px]">{periodLabel}</Badge>
-              </div>
-              {periodClosed ? (
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-emerald-500/10 text-emerald-700 gap-1">
-                    <CheckCircle2 size={12} /> {periodLabel} — Closed ✓
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">
-                    {AUD.format(periodClosed.closing_balance)} · closed {DATE_FMT.format(new Date(periodClosed.closed_at))}
-                  </span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-muted-foreground">
-                    Current balance: <strong className="text-foreground">{AUD.format(periodBalance)}</strong>
-                  </span>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-8 text-xs gap-1.5"
-                    onClick={() => setShowCloseConfirm(true)}
-                    disabled={!agent?.id}
-                  >
-                    <Lock size={12} /> Close {periodLabel}
-                  </Button>
-                </div>
+              {newReceiptsCount > 0 && (
+                <span className="bg-[#EFF6FF] text-[#1E40AF] rounded-full px-2.5 py-0.5 text-[10px] font-bold">
+                  {newReceiptsCount} new
+                </span>
               )}
             </div>
-          </CardContent>
-        </Card>
+            <div className="text-[11px] uppercase tracking-[0.12em] text-[#6a6a6a] font-bold mt-4">
+              AVAILABLE BALANCE
+            </div>
+            <div className="font-extrabold tabular-nums mt-2 text-[#0a0f1e]" style={{ fontSize: 36, lineHeight: 1.05 }}>
+              {AUD.format(totalInTrust)}
+            </div>
+            <div className="text-[12px] text-[#6a6a6a] mt-1">
+              Last receipt <span className="font-semibold text-[#0a0f1e] font-mono">{lastReceiptNumber}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowNewReceipt(true)}
+              className="text-[12px] font-bold text-[#2563EB] hover:underline mt-4"
+            >
+              Record receipt →
+            </button>
+          </div>
+
+          <div className="bg-white rounded-3xl border border-[#E5E5E5] p-6">
+            <div className="flex items-start justify-between">
+              <div className="w-10 h-10 rounded-2xl bg-[#FFFBEB] flex items-center justify-center">
+                <Ico icon="solar:arrow-up-bold" size={20} color="#D97706" />
+              </div>
+              {pendingPayments.length > 0 && (
+                <span className="bg-[#FFFBEB] text-[#92400E] rounded-full px-2.5 py-0.5 text-[10px] font-bold">
+                  {pendingPayments.length} ready
+                </span>
+              )}
+            </div>
+            <div className="text-[11px] uppercase tracking-[0.12em] text-[#6a6a6a] font-bold mt-4">
+              PENDING OUT
+            </div>
+            <div className="font-extrabold tabular-nums mt-2 text-[#0a0f1e]" style={{ fontSize: 36, lineHeight: 1.05 }}>
+              {AUD.format(pendingPayments.reduce((s, p) => s + p.amount, 0))}
+            </div>
+            <div className="text-[12px] text-[#6a6a6a] mt-1">
+              {pendingPayments.length} disbursement{pendingPayments.length === 1 ? '' : 's'} scheduled
+            </div>
+            <button
+              type="button"
+              disabled={pendingPayments.length === 0}
+              onClick={() => {
+                setSelectedPaymentIds(new Set(pendingPayments.map(p => p.id)));
+                document.getElementById('bulk-payments-section')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-[12px] font-bold text-[#2563EB] hover:underline disabled:text-[#9CA3AF] disabled:no-underline mt-4"
+            >
+              Download ABA →
+            </button>
+          </div>
+
+          <div className="bg-white rounded-3xl border border-[#E5E5E5] p-6">
+            <div className="flex items-start justify-between">
+              <div className="w-10 h-10 rounded-2xl bg-[#EFF6FF] flex items-center justify-center">
+                <Ico icon="solar:graph-bold" size={20} color="#2563EB" />
+              </div>
+              {unmatchedCount > 0 && (
+                <span className="bg-[#FEF2F2] text-[#DC2626] rounded-full px-2.5 py-0.5 text-[10px] font-bold">
+                  {unmatchedCount} unmatched
+                </span>
+              )}
+            </div>
+            <div className="text-[11px] uppercase tracking-[0.12em] text-[#6a6a6a] font-bold mt-4">
+              RECONCILIATION
+            </div>
+            <div className="font-extrabold tabular-nums mt-2 text-[#0a0f1e]" style={{ fontSize: 24, lineHeight: 1.1 }}>
+              {lastReconciledDate
+                ? new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(lastReconciledDate))
+                : 'Not reconciled'}
+            </div>
+            <div className="text-[12px] text-[#6a6a6a] mt-1">
+              {lastReconciledDate ? 'Last reconciled date' : 'Upload a bank statement to begin'}
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate('/dashboard/reconciliation')}
+              className="text-[12px] font-bold text-[#2563EB] hover:underline mt-4"
+            >
+              Open reconciliation →
+            </button>
+          </div>
+        </div>
+
+        {/* Month-End Close */}
+        <div className="bg-white rounded-3xl border border-[#E5E5E5] p-5 mb-8">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-[#FFFBEB] flex items-center justify-center">
+                <Ico icon="solar:lock-keyhole-minimalistic-bold" size={18} color="#D97706" />
+              </div>
+              <div>
+                <div className="text-[14px] font-extrabold text-[#0a0f1e]">Month-End Close</div>
+                <div className="text-[12px] text-[#6a6a6a] mt-0.5">Period: <strong className="text-[#0a0f1e]">{periodLabel}</strong></div>
+              </div>
+            </div>
+            {periodClosed ? (
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="bg-[#ECFDF5] text-[#065F46] rounded-full px-3 py-1 text-[12px] font-bold inline-flex items-center gap-1.5">
+                  <Ico icon="solar:check-circle-bold" size={12} color="#065F46" />
+                  {periodLabel} closed
+                </span>
+                <span className="text-[12px] text-[#6a6a6a]">
+                  {AUD.format(periodClosed.closing_balance)} · closed {DATE_FMT.format(new Date(periodClosed.closed_at))}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="text-[12px] text-[#6a6a6a]">
+                  Current balance: <strong className="text-[#0a0f1e] tabular-nums">{AUD.format(periodBalance)}</strong>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowCloseConfirm(true)}
+                  disabled={!agent?.id}
+                  className="bg-white border border-[#E5E5E5] text-[#0a0f1e] rounded-full px-4 py-2 text-[12px] font-bold inline-flex items-center gap-2 hover:bg-[#F9FAFB] disabled:opacity-50 disabled:cursor-not-allowed transition"
+                >
+                  <Ico icon="solar:lock-keyhole-minimalistic-bold" size={14} color="#0a0f1e" />
+                  Close {periodLabel}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
 
         <Dialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
           <DialogContent>

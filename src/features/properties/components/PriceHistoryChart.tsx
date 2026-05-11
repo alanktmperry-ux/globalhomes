@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianG
 import { TrendingUp, BarChart3 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
+import { useTranslation, formatDate } from '@/shared/lib/i18n';
 
 interface PriceHistoryChartProps {
   propertyId: string;

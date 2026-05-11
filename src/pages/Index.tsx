@@ -764,6 +764,9 @@ const Index = () => {
           `}</style>
         </section>
 
+        {/* ═══ Live Activity Ticker ═══ */}
+        <LiveActivityTicker />
+
         {/* ═══ SECTION 3 — Language Marquee ═══ */}
         <div style={{ background:T.ink, padding:'14px 0', overflow:'hidden' }}>
           <div className="marquee-track" style={{ display:'flex', whiteSpace:'nowrap', width:'max-content' }}>
@@ -775,30 +778,42 @@ const Index = () => {
           </div>
         </div>
 
-        {/* ═══ SECTION 4 — Trust Strip ═══ */}
-        <div style={{ background:T.off, borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}`, padding:'20px 16px' }}>
-          <div className="trust-strip" style={{ maxWidth:1200, margin:'0 auto' }}>
+        {/* ═══ SECTION 4 — Trust Strip (count-up) ═══ */}
+        <div style={{ background:'#fff', borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}`, padding:'72px 24px' }}>
+          <div className="trust-strip" style={{ maxWidth:1280, margin:'0 auto' }}>
             {[
-              { n: propertyCount && propertyCount > 0 ? `${propertyCount.toLocaleString()}+` : '—', l: t('home.trust.listings') },
-              { n:'20', l: t('home.trust.languages') },
-              { n:'Free', l: t('home.trust.free') },
-            ].map((s) => (
-              <div key={s.l} className="trust-cell" style={{ textAlign:'center', padding:'8px 16px' }}>
-                <div style={{ fontSize:22, fontWeight:800, color:T.ink, lineHeight:1 }}>{s.n}</div>
-                <div style={{ fontSize:13, fontWeight:600, color:T.mid, marginTop:4 }}>{s.l}</div>
+              { type:'count' as const, target: 50000, format: (v:number)=>v.toLocaleString(), label:'ACTIVE LISTINGS' },
+              { type:'count' as const, target: 20,    format: (v:number)=>v.toString(),       label:'LANGUAGES, AUTO' },
+              { type:'count' as const, target: 7,     format: (v:number)=>`${v}M+`,           label:'MULTILINGUAL BUYERS' },
+              { type:'static' as const, text:'Free',                                          label:'COST FOR BUYERS' },
+            ].map((s, i) => (
+              <div key={i} className="trust-cell" style={{ textAlign:'center', padding:'12px 16px' }}>
+                <HomeCountUp
+                  target={s.type === 'count' ? s.target : 0}
+                  format={s.type === 'count' ? s.format : undefined}
+                  staticText={s.type === 'static' ? s.text : undefined}
+                  className="text-[clamp(48px,6vw,88px)] font-extrabold leading-[0.95] tracking-[-0.05em] tabular-nums"
+                  style={{
+                    background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)',
+                    WebkitBackgroundClip: 'text',
+                    backgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    color: 'transparent',
+                    display: 'inline-block',
+                  }}
+                />
+                <div className="text-[13px] font-bold tracking-wider uppercase mt-3.5" style={{ color:'#4a4a4a' }}>{s.label}</div>
               </div>
             ))}
           </div>
           <style>{`
-            .trust-strip { display:grid; grid-template-columns: repeat(3, 1fr); align-items:center; }
-            .trust-cell + .trust-cell { border-left:1px solid ${T.border}; }
-            @media (max-width: 640px) {
-              .trust-strip { grid-template-columns: repeat(2, 1fr); row-gap: 16px; }
-              .trust-cell + .trust-cell { border-left: none; }
-              .trust-cell:nth-child(even) { border-left: 1px solid ${T.border}; }
+            .trust-strip { display:grid; grid-template-columns: repeat(4, 1fr); align-items:end; gap: 24px; }
+            @media (max-width: 768px) {
+              .trust-strip { grid-template-columns: repeat(2, 1fr); row-gap: 32px; }
             }
           `}</style>
         </div>
+
 
         {/* ═══ SECTION 4b — Featured Listings ═══ */}
         <section style={{ background: '#fff', padding: '72px 24px' }}>

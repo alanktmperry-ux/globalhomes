@@ -90,14 +90,14 @@ const StatCard = ({ icon, iconColor = '#2563EB', label, value, trendDir, trendVa
   return (
     <div className="bg-white rounded-3xl border border-[#E5E5E5] p-6 transition-all hover:border-[#2563EB]/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.04)]">
       <div className="flex items-center gap-2">
-        <iconify-icon icon={icon} style={{ color: iconColor, fontSize: '18px' }} />
+        <Ico icon={icon} size={18} color=iconColor />
         <span className="text-[11px] uppercase tracking-[0.12em] text-[#6a6a6a] font-bold">{label}</span>
       </div>
       <div className="text-[44px] font-extrabold text-[#0a0f1e] tabular-nums leading-none mt-3">{value}</div>
       {trendDir && (
         <div className="mt-4 flex items-center gap-2">
           <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-bold ${trendStyles.bg} ${trendStyles.text}`}>
-            <iconify-icon icon={trendStyles.arrow} style={{ fontSize: '12px' }} />
+            <Ico icon={trendStyles.arrow} size={12} />
             {trendValue || ''}
           </span>
           <span className="text-[11px] text-[#6a6a6a]">vs last month</span>
@@ -295,7 +295,7 @@ const DashboardOverview = () => {
             {recentActivities.length === 0 ? (
               <div className="py-10 text-center">
                 <div className="flex justify-center mb-3">
-                  <iconify-icon icon="solar:bell-linear" style={{ fontSize: '40px', color: '#E5E7EB' }} />
+                  <Ico icon="solar:bell-linear" size={40} color='#E5E7EB' />
                 </div>
                 <div className="text-[15px] font-bold text-[#0a0f1e]">No recent activity</div>
                 <div className="text-[13px] text-[#6a6a6a] mt-1 max-w-sm mx-auto">
@@ -307,7 +307,7 @@ const DashboardOverview = () => {
                 {recentActivities.map((a) => (
                   <div key={a.id} className="flex items-center gap-3 py-4 border-b border-[#F3F4F6] last:border-0">
                     <div className="w-9 h-9 rounded-full bg-[#EFF6FF] flex items-center justify-center text-[#2563EB] shrink-0">
-                      <iconify-icon icon={activityIconFor(a)} style={{ fontSize: '18px' }} />
+                      <Ico icon={activityIconFor(a)} size={18} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-[14px] text-[#0a0f1e] font-medium truncate">{activityLabel(a)}</div>
@@ -338,14 +338,14 @@ const DashboardOverview = () => {
                   className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
                   style={{ background: a.iconBg, color: a.iconColor }}
                 >
-                  <iconify-icon icon={a.icon} style={{ fontSize: '22px' }} />
+                  <Ico icon={a.icon} size={22} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-[15px] font-bold text-[#0a0f1e]">{a.title}</div>
                   <div className="text-[12px] text-[#6a6a6a] mt-1">{a.subtitle}</div>
                 </div>
                 <span className="text-[#6a6a6a] transition-transform group-hover:translate-x-1 shrink-0">
-                  <iconify-icon icon="solar:arrow-right-linear" style={{ fontSize: '20px' }} />
+                  <Ico icon="solar:arrow-right-linear" size={20} />
                 </span>
               </button>
             ))}
@@ -361,7 +361,7 @@ const DashboardOverview = () => {
               className="min-w-[280px] w-full sm:w-[320px] bg-white rounded-3xl border border-dashed border-[#D1D5DB] p-8 text-center hover:border-[#2563EB] transition-all block"
             >
               <div className="flex justify-center mb-3">
-                <iconify-icon icon="solar:bolt-bold" style={{ fontSize: '32px', color: '#9CA3AF' }} />
+                <Ico icon="solar:bolt-bold" size={32} color='#9CA3AF' />
               </div>
               <div className="text-[14px] font-bold text-[#0a0f1e]">No active boosts yet</div>
               <div className="text-[13px] text-[#2563EB] font-bold mt-2">Boost a listing →</div>
@@ -387,7 +387,7 @@ const DashboardOverview = () => {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <iconify-icon icon="solar:buildings-linear" style={{ fontSize: '40px', color: '#D1D5DB' }} />
+                          <Ico icon="solar:buildings-linear" size={40} color='#D1D5DB' />
                         </div>
                       )}
                     </div>
@@ -398,7 +398,7 @@ const DashboardOverview = () => {
                       <div className="text-[14px] font-bold text-[#0a0f1e] mt-2 truncate">{b.display_address}</div>
                       <div className="text-[14px] text-[#0a0f1e] tabular-nums mt-1">{b.display_price}</div>
                       <div className="flex items-center gap-2 mt-3 text-[12px] text-[#6a6a6a]">
-                        <iconify-icon icon="solar:bolt-bold" style={{ fontSize: '14px', color: '#2563EB' }} />
+                        <Ico icon="solar:bolt-bold" size={14} color='#2563EB' />
                         <span>Boosted in {b.display_suburb}</span>
                         <span className="ml-auto font-bold text-[#0a0f1e]">{daysRemaining}d left</span>
                       </div>

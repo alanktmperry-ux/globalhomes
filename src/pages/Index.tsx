@@ -502,9 +502,9 @@ const Index = () => {
         .mic-spin { width:18px; height:18px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation: spin .8s linear infinite; }
         @keyframes errFade { from { opacity:0; transform:translateY(-4px) } to { opacity:1; transform:translateY(0) } }
         .voice-err { animation: errFade .25s ease-out; }
-        .hero-headline { font-size: clamp(44px, 5vw, 76px); font-weight: 800; letter-spacing: -2px; line-height: 1.05; color: #0a0f1e; margin-bottom: 0; }
-        .hero-headline .line1 { display: block; line-height: 1.1; }
-        .hero-headline .line2 { display: block; color: #2563EB; font-style: italic; font-weight: 700; line-height: 1.15; margin-top: 6px; min-height: 1.2em; font-size: clamp(28px, 3.5vw, 58px); }
+        .hero-headline { font-size: clamp(48px, 7vw, 110px); font-weight: 800; letter-spacing: -0.05em; line-height: 1.05; color: #000; margin-bottom: 0; max-width: 1100px; }
+        .hero-headline .line1 { display: block; line-height: 1.05; color: #000; }
+        .hero-headline .line2 { display: block; margin-top: 0.18em; padding-bottom: 0.08em; font-weight: 800; font-style: normal; line-height: 1.05; min-height: 1.2em; font-size: 1em; background: linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
         .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
         @media (prefers-reduced-motion: reduce) {
           .marquee-track { animation: none; }

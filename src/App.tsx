@@ -163,6 +163,7 @@ const MaintenancePage = React.lazy(() => import("@/features/agents/components/da
 const VacanciesPage = React.lazy(() => import("@/features/agents/components/dashboard/VacanciesPage"));
 const InboxPage = React.lazy(() => import("@/features/inbox/pages/InboxPage"));
 const AgentEOIPage = React.lazy(() => import("@/features/offmarket/pages/AgentEOIPage"));
+const MarketToolsPage = React.lazy(() => import("@/features/market/MarketToolsPage"));
 const AgencyOnboardingPage = React.lazy(() => import("@/features/agents/pages/AgencyOnboardingPage"));
 const PartnerAuthPage = React.lazy(() => import("./features/partners/pages/PartnerAuthPage"));
 const PartnerDashboardLayout = React.lazy(() => import("./features/partners/pages/PartnerDashboardLayout"));

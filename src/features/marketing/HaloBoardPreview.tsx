@@ -15,10 +15,13 @@ type Brief = {
   posted: string;
 };
 
-const FALLBACK_BRIEFS: Brief[] = [
-  { initial: "W", flag: "🇨🇳", language: "Mandarin", intent: "Buy", property: "House · 4+ bed", budget: "$1.2M – $1.6M", suburbs: "Auburn, Strathfield", posted: "Posted 2 hours ago" },
-  { initial: "M", flag: "🇻🇳", language: "Vietnamese", intent: "Buy", property: "Townhouse · 3 bed", budget: "$850K – $1.1M", suburbs: "Cabramatta, Bankstown", posted: "Posted yesterday" },
-  { initial: "P", flag: "🇮🇳", language: "Hindi", intent: "Buy", property: "House · 3+ bed", budget: "$900K – $1.3M", suburbs: "Parramatta, Westmead", posted: "Posted 3 days ago" },
+type BriefWithMeta = Brief & { isFallback?: boolean };
+
+// Fallback briefs — only rendered to fill grid slots when fewer than 3 real halos exist.
+const FALLBACK_BRIEFS: BriefWithMeta[] = [
+  { isFallback: true, initial: "W", flag: "🇨🇳", language: "Mandarin", intent: "Buy", property: "House · 4+ bed", budget: "$1.2M – $1.6M", suburbs: "Auburn, Strathfield", posted: "Posted 2 hours ago" },
+  { isFallback: true, initial: "M", flag: "🇻🇳", language: "Vietnamese", intent: "Buy", property: "Townhouse · 3 bed", budget: "$850K – $1.1M", suburbs: "Cabramatta, Bankstown", posted: "Posted yesterday" },
+  { isFallback: true, initial: "P", flag: "🇮🇳", language: "Hindi", intent: "Buy", property: "House · 3+ bed", budget: "$900K – $1.3M", suburbs: "Parramatta, Westmead", posted: "Posted 3 days ago" },
 ];
 
 const LANG_MAP: Record<string, { flag: string; name: string }> = {

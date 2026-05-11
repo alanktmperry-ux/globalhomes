@@ -73,7 +73,7 @@ const SeekerAuthPage = () => {
     e.preventDefault();
     setError(null);
     if (!email.trim() || !password) {
-      setError('Please enter your email and password.');
+      setError(t('auth.error.emailPasswordRequired'));
       return;
     }
     setLoading(true);
@@ -83,13 +83,13 @@ const SeekerAuthPage = () => {
         password,
       });
       if (signErr) {
-        setError('Invalid email or password.');
+        setError(t('auth.error.invalidCredentials'));
         return;
       }
-      toast.success('Welcome back!');
+      toast.success(t('auth.toast.welcomeBack'));
       await routeAfterSignIn();
     } catch (err) {
-      setError(getErrorMessage(err) || 'Could not sign in. Please try again.');
+      setError(getErrorMessage(err) || t('auth.error.signInFailed'));
     } finally {
       setLoading(false);
     }

@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Loader2, AlertTriangle, X, Sparkles, Plus, Lightbulb } from 'lucide-react';
-import { EmptyState } from '@/components/ui/empty-state';
+import { Loader2, AlertTriangle, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -10,10 +9,8 @@ import { useHaloCreditsBalance } from '@/features/halo/hooks/useHaloCreditsBalan
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HaloPreviewCard } from '@/components/halo/HaloPreviewCard';
 import { HaloUnlockDialog } from '@/components/halo/HaloUnlockDialog';
-import { AgentCreditBadge } from '@/components/halo/AgentCreditBadge';
 import {
   HaloBoardFilters,
   applyFilters,
@@ -222,126 +219,164 @@ export default function HaloBoardPage() {
     }
   };
 
+  const Ico = ({ icon, size = 16, color }: { icon: string; size?: number; color?: string }) =>
+    // @ts-expect-error iconify web component
+    <iconify-icon icon={icon} width={size} height={size} style={{ color, display: 'inline-block' }} />;
+
+  const activeCount = cleanHalos.length;
+  const hasFilters =
+    filters.intent !== 'all' ||
+    filters.language !== 'all' ||
+    filters.propertyTypes.length > 0 ||
+    filters.suburb.trim() !== '' ||
+    filters.budget !== 'any';
+
   return (
-    <div className="max-w-5xl mx-auto p-4 sm:p-6">
-      <div className="flex items-start justify-between mb-6 gap-3 flex-wrap">
+    <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-10">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-6 flex-wrap mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-[#0a0f1e] tracking-tight">{t('halo.board.title')}</h1>
-          <p className="text-sm font-light text-[#6B7280] mt-1 mb-0">
-            {t('halo.board.subtitle')}
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1
+              className="font-extrabold tracking-[-0.04em] text-[#0a0f1e]"
+              style={{ fontSize: 'clamp(32px,4vw,48px)', lineHeight: 1.05 }}
+            >
+              Halo Board
+            </h1>
+            {!loading && (
+              <span className="bg-[#EFF6FF] border border-[#2563EB]/15 text-[#1E40AF] rounded-full px-3 py-1 text-[12px] font-bold">
+                {activeCount} active brief{activeCount === 1 ? '' : 's'}
+              </span>
+            )}
+            {tab === 'pocket' && pocketMatchIds.size > 0 && (
+              <span className="bg-[#FEF3C7] border border-[#F59E0B]/30 text-[#92400E] rounded-full px-3 py-1 text-[12px] font-bold">
+                {pocketMatchIds.size} pocket
+              </span>
+            )}
+          </div>
+          <p className="text-[14px] text-[#6a6a6a] font-medium mt-2">
+            Buyers who told you what they want. Unlock the ones that match your listings.
           </p>
         </div>
-        <div
-          className="flex items-center gap-3 bg-white rounded-[12px] px-4 py-2.5"
-          style={{ border: '1px solid #E5E7EB' }}
-        >
-          <div className="flex flex-col">
-            <span
-              className="text-[10px] uppercase font-semibold text-[#6B7280]"
-              style={{ letterSpacing: '0.10em' }}
-            >
-              Halo Credits
-            </span>
-            <span className="text-xl font-bold text-[#0a0f1e] tabular-nums leading-tight">
-              {balance}
-            </span>
+
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="bg-white border border-[#E5E5E5] rounded-full px-4 py-2 inline-flex items-center gap-2.5">
+            <Ico icon="solar:bolt-bold" size={18} color="#2563EB" />
+            <span className="text-[16px] font-extrabold text-[#0a0f1e] tabular-nums">{balance}</span>
+            <span className="text-[12px] text-[#6a6a6a] font-medium">credits</span>
           </div>
           <button
             type="button"
             onClick={() => navigate('/dashboard/buy-credits')}
-            className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold rounded-[10px] px-3 py-1.5 text-xs flex items-center gap-1 transition-all"
+            className="text-white rounded-full px-5 py-2.5 text-[13px] font-extrabold inline-flex items-center gap-2 transition hover:opacity-95"
+            style={{ background: 'linear-gradient(135deg,#2563EB,#1D4ED8)' }}
           >
-            <Plus size={14} /> Top up
+            <Ico icon="solar:add-square-bold" size={16} />
+            <span className="hidden sm:inline">Buy credits</span>
           </button>
         </div>
       </div>
 
+      {/* Tab toggle (All / Pocket) */}
+      <div className="inline-flex items-center gap-1 bg-[#F9FAFB] border border-[#E5E5E5] rounded-full p-1 mb-5">
+        {(['all', 'pocket'] as BoardTab[]).map((tk) => {
+          const active = tab === tk;
+          return (
+            <button
+              key={tk}
+              type="button"
+              onClick={() => setTab(tk)}
+              className={`px-4 py-1.5 rounded-full text-[12px] font-semibold transition ${
+                active ? 'bg-white text-[#0a0f1e] shadow-sm' : 'text-[#6a6a6a] hover:text-[#0a0f1e]'
+              }`}
+            >
+              {tk === 'all' ? t('halo.board.tabs.all') : t('halo.board.tabs.pocket')}
+              {tk === 'pocket' && pocketMatchIds.size > 0 && (
+                <span className="ms-1.5 bg-[#FEF3C7] text-[#92400E] rounded-full px-1.5 py-0.5 text-[10px] font-bold">
+                  {pocketMatchIds.size}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Low credit banner */}
+      {!loading && showLowCreditBanner && (
+        <div
+          className={`mb-6 flex items-start gap-3 rounded-2xl border px-5 py-4 ${
+            persistentBanner
+              ? 'border-red-200 bg-red-50 text-red-900'
+              : 'border-amber-200 bg-amber-50 text-amber-900'
+          }`}
+        >
+          <AlertTriangle size={18} className="shrink-0 mt-0.5" />
+          <div className="flex-1 text-sm">
+            <p className="font-semibold">
+              {t(balance === 1 ? 'halo.board.lowCredit.one' : 'halo.board.lowCredit.other', { count: balance })}
+            </p>
+            <p className="text-xs opacity-90 mt-0.5">{t('halo.board.lowCredit.topUp')}</p>
+          </div>
+          <Button
+            size="sm"
+            onClick={() => navigate('/dashboard/buy-credits')}
+            className={
+              persistentBanner
+                ? 'bg-red-600 hover:bg-red-700 text-white rounded-full'
+                : 'bg-amber-600 hover:bg-amber-700 text-white rounded-full'
+            }
+          >
+            {t('halo.board.lowCredit.buy')}
+          </Button>
+          {!persistentBanner && (
+            <button
+              type="button"
+              onClick={() => setBannerDismissed(true)}
+              aria-label={t('halo.board.lowCredit.dismiss')}
+              className="text-current opacity-60 hover:opacity-100"
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Body */}
       {error ? (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="rounded-2xl">
           <AlertDescription>{t('halo.board.error')}</AlertDescription>
         </Alert>
       ) : loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-48 w-full" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-72 w-full rounded-3xl" />
           ))}
         </div>
       ) : (
         <>
-          {showLowCreditBanner && (
-            <div
-              className={`mb-4 flex items-start gap-3 rounded-lg border px-4 py-3 ${
-                persistentBanner
-                  ? 'border-red-300 bg-red-50 text-red-900'
-                  : 'border-amber-300 bg-amber-50 text-amber-900'
-              }`}
-            >
-              <AlertTriangle size={18} className="shrink-0 mt-0.5" />
-              <div className="flex-1 text-sm">
-                <p className="font-medium">
-                  {t(balance === 1 ? 'halo.board.lowCredit.one' : 'halo.board.lowCredit.other', { count: balance })}
-                </p>
-                <p className="text-xs opacity-90">
-                  {t('halo.board.lowCredit.topUp')}
-                </p>
+          <HaloBoardFilters value={filters} onChange={setFilters} resultCount={filtered.length} />
+
+          {filtered.length === 0 ? (
+            <div className="bg-white rounded-3xl border border-[#E5E5E5] py-20 px-8 text-center">
+              <div className="flex justify-center">
+                <Ico icon="solar:streets-linear" size={56} color="#E5E7EB" />
               </div>
-              <Button
-                size="sm"
-                onClick={() => navigate('/dashboard/buy-credits')}
-                className={
-                  persistentBanner
-                    ? 'bg-red-600 hover:bg-red-700 text-white'
-                    : 'bg-amber-600 hover:bg-amber-700 text-white'
-                }
-              >
-                {t('halo.board.lowCredit.buy')}
-              </Button>
-              {!persistentBanner && (
+              <h3 className="text-[22px] font-bold text-[#0a0f1e] mt-6">No buyer briefs match</h3>
+              <p className="text-[14px] text-[#6a6a6a] max-w-[480px] mx-auto leading-[1.55] mt-3">
+                Try widening your filters or check back soon. New briefs are posted every day from buyers in 20 languages.
+              </p>
+              {hasFilters && (
                 <button
                   type="button"
-                  onClick={() => setBannerDismissed(true)}
-                  aria-label={t('halo.board.lowCredit.dismiss')}
-                  className="text-current opacity-60 hover:opacity-100"
+                  onClick={() => setFilters(DEFAULT_FILTERS)}
+                  className="mt-6 bg-white border border-[#E5E5E5] rounded-full px-5 py-2.5 text-[13px] font-bold text-[#0a0f1e] hover:bg-[#F9FAFB] transition"
                 >
-                  <X size={16} />
+                  Clear filters
                 </button>
               )}
             </div>
-          )}
-          <Tabs value={tab} onValueChange={(v) => setTab(v as BoardTab)} className="mb-4">
-            <TabsList>
-              <TabsTrigger value="all">{t('halo.board.tabs.all')}</TabsTrigger>
-              <TabsTrigger value="pocket">
-                {t('halo.board.tabs.pocket')}
-                {pocketMatchIds.size > 0 && (
-                  <span className="ms-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] text-[10px] rounded-full bg-amber-500 text-white px-1">
-                    {pocketMatchIds.size}
-                  </span>
-                )}
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-          <HaloBoardFilters value={filters} onChange={setFilters} resultCount={filtered.length} />
-          {filtered.length === 0 ? (
-            cleanHalos.length === 0 ? (
-              <EmptyState
-                icon="solar:streets-linear"
-                title="No active buyer briefs"
-                body="New briefs are posted daily. Check back soon, or broaden your filters."
-                ctaLabel={t('halo.board.empty.cta')}
-                onCtaClick={() => navigate('/dashboard/listings/new')}
-              />
-            ) : (
-              <EmptyState
-                icon="solar:magnifer-linear"
-                title="No active buyer briefs match your filters"
-                body={tab === 'pocket'
-                  ? t('halo.board.empty.filtered.pocket')
-                  : t('halo.board.empty.filtered.all')}
-              />
-            )
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {filtered.map((h) => (
                 <HaloPreviewCard
                   key={h.id}
@@ -351,6 +386,21 @@ export default function HaloBoardPage() {
                   pocketMatch={pocketMatchIds.has(h.id)}
                 />
               ))}
+            </div>
+          )}
+
+          {/* How Halo works callout — only when zero filters and zero briefs */}
+          {!hasFilters && cleanHalos.length === 0 && (
+            <div className="mt-8 bg-[#EFF6FF] border border-[#2563EB]/15 rounded-3xl p-6 flex items-center gap-5">
+              <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shrink-0">
+                <Ico icon="solar:lightbulb-bolt-bold" size={24} color="#2563EB" />
+              </div>
+              <div>
+                <div className="text-[16px] font-extrabold text-[#1E40AF]">How Halo works</div>
+                <div className="text-[13px] text-[#1E40AF]/85 mt-1 leading-[1.55]">
+                  Buyers post structured briefs in their own language. You unlock the ones that match your listings. No cold calling, no chasing.
+                </div>
+              </div>
             </div>
           )}
         </>
@@ -365,7 +415,7 @@ export default function HaloBoardPage() {
       />
 
       {busy && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
           <Loader2 className="animate-spin text-white" size={32} />
         </div>
       )}

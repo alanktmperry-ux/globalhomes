@@ -1,10 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { CheckCircle2, Languages, Star, Mail, Loader2, BedDouble, LockKeyhole } from 'lucide-react';
-import HaloQualityBadge from '@/components/halo/HaloQualityBadge';
 import { supabase } from '@/integrations/supabase/client';
 import type { Halo } from '@/types/halo';
 import { TIMEFRAME_LABELS, FINANCE_LABELS } from '@/types/halo';
@@ -16,7 +11,11 @@ interface Props {
   pocketMatch?: boolean;
 }
 
-const fmtMoney = (n: number) => `$${n.toLocaleString('en-AU')}`;
+const fmtMoney = (n: number) => {
+  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
+  if (n >= 1_000) return `$${Math.round(n / 1_000)}K`;
+  return `$${n.toLocaleString('en-AU')}`;
+};
 
 const formatBudget = (min: number | null | undefined, max: number | null | undefined) => {
   const hasMin = min != null && min > 0;
@@ -27,72 +26,68 @@ const formatBudget = (min: number | null | undefined, max: number | null | undef
   return 'Any budget';
 };
 
-const capitalise = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-
 const timeAgo = (iso: string) => {
   const diff = Date.now() - new Date(iso).getTime();
-  const days = Math.floor(diff / 86400000);
-  if (days <= 0) return 'today';
-  if (days === 1) return '1 day ago';
-  if (days < 30) return `${days} days ago`;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${Math.max(1, mins)}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days}d ago`;
   const months = Math.floor(days / 30);
-  return months === 1 ? '1 month ago' : `${months} months ago`;
+  return `${months}mo ago`;
 };
 
-const formatBedrooms = (h: Halo) => {
-  const min = h.bedrooms_min;
-  const max = h.bedrooms_max;
-  if (min == null && max == null) return null;
-  if (min != null && max != null && min !== max) return `${min}–${max} bedrooms`;
-  const v = min ?? max!;
-  return `${v}+ bedroom${v === 1 ? '' : 's'}`;
+const LANG_META: Record<string, { flag: string; label: string }> = {
+  en: { flag: '🇬🇧', label: 'English' },
+  zh: { flag: '🇨🇳', label: 'Mandarin' },
+  zh_simplified: { flag: '🇨🇳', label: 'Mandarin' },
+  zh_traditional: { flag: '🇭🇰', label: 'Cantonese' },
+  yue: { flag: '🇭🇰', label: 'Cantonese' },
+  vi: { flag: '🇻🇳', label: 'Vietnamese' },
+  ko: { flag: '🇰🇷', label: 'Korean' },
+  hi: { flag: '🇮🇳', label: 'Hindi' },
+  pa: { flag: '🇮🇳', label: 'Punjabi' },
+  ar: { flag: '🇸🇦', label: 'Arabic' },
 };
 
-const maskEmail = (email: string) => {
-  const [user, domain] = email.split('@');
-  if (!user || !domain) return email;
-  const visible = user.slice(0, Math.min(2, user.length));
-  return `${visible}${'*'.repeat(Math.max(3, user.length - 2))}@${domain}`;
-};
-
-const previewText = (h: Halo) => {
-  const src = (h.description || '').trim() || (h.must_haves || []).join(', ');
-  if (!src) return null;
-  return src.length > 80 ? `${src.slice(0, 80).trim()}…` : src;
-};
+const Ico = ({ icon, size = 16, color }: { icon: string; size?: number; color?: string }) =>
+  // @ts-expect-error iconify web component
+  <iconify-icon icon={icon} width={size} height={size} style={{ color, display: 'inline-block' }} />;
 
 export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Props) {
   const navigate = useNavigate();
   const [revealing, setRevealing] = useState(false);
-  const [revealed, setRevealed] = useState<{ email: string | null } | null>(null);
+  const [revealed, setRevealed] = useState<{ email: string | null; name?: string | null } | null>(null);
+
+  const lang = (halo.preferred_language || 'en').toLowerCase();
+  const langKey = lang.startsWith('zh') && lang !== 'zh_traditional' ? 'zh' : lang;
+  const langMeta = LANG_META[langKey] ?? LANG_META[lang] ?? { flag: '🌐', label: lang };
+
+  const isHot = halo.finance_status === 'cash_buyer' || (halo as any).finance_status === 'pre_approved';
 
   const intentLabel = halo.intent === 'buy' ? 'Buy' : 'Rent';
-  const intentClass =
-    halo.intent === 'buy'
-      ? 'bg-blue-100 text-blue-800 hover:bg-blue-100'
-      : 'bg-purple-100 text-purple-800 hover:bg-purple-100';
+  const bedPart = halo.bedrooms_min ? `${halo.bedrooms_min}+ bed` : null;
+  const typePart = halo.property_types[0] ?? null;
+  const intentString = [intentLabel, bedPart, typePart].filter(Boolean).join(' · ');
 
-  const daysLeft = Math.max(
-    0,
-    Math.ceil((new Date(halo.expires_at).getTime() - Date.now()) / 86400000),
-  );
+  const suburbs = halo.suburbs || [];
+  const suburbsLabel =
+    suburbs.length <= 2
+      ? suburbs.join(', ') || '—'
+      : `${suburbs.slice(0, 2).join(', ')} and ${suburbs.length - 2} more`;
 
-  const budgetLabel = `AUD ${formatBudget(halo.budget_min, halo.budget_max)}`;
-  const showLanguageBadge = halo.preferred_language && halo.preferred_language !== 'en';
-  const bedroomsLabel = formatBedrooms(halo);
-  const preview = previewText(halo);
+  const initial = revealed?.name ? revealed.name.charAt(0).toUpperCase() : unlocked ? 'S' : '?';
 
   const handleReveal = async () => {
     if (revealing || revealed) return;
     setRevealing(true);
     try {
-      const { data, error } = await supabase.functions.invoke('get-halo-contact', {
+      const { data } = await supabase.functions.invoke('get-halo-contact', {
         body: { halo_id: halo.id },
       });
-      if (error) throw error;
-      setRevealed({ email: (data as any)?.email ?? null });
-    } catch (e) {
-      console.warn('[HaloPreviewCard] reveal failed', e);
+      setRevealed({ email: (data as any)?.email ?? null, name: (data as any)?.name ?? null });
+    } catch {
       setRevealed({ email: null });
     } finally {
       setRevealing(false);
@@ -101,122 +96,126 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
 
   return (
     <div
-      className="bg-white rounded-[12px] p-5 cursor-pointer hover:shadow-lg hover:border-[#2563EB]/30 transition-all"
-      style={{ border: '1px solid #E5E7EB' }}
+      className="bg-white rounded-3xl border border-[#E5E5E5] p-6 transition-all hover:border-[#2563EB]/40 hover:-translate-y-0.5 relative overflow-hidden cursor-pointer"
+      style={{ transition: 'all 0.2s ease' }}
+      onMouseEnter={(e) => (e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.06)')}
+      onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'none')}
+      onClick={() => unlocked && navigate(`/dashboard/halo-board/${halo.id}`)}
     >
-      <div className="pr-9 sm:pr-0 space-y-4">
-        <div className="flex items-start justify-between gap-3 flex-wrap">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge className={intentClass} variant="secondary">
-              {intentLabel}
-            </Badge>
-            {unlocked && (
-              <Badge
-                variant="secondary"
-                className="bg-green-100 text-green-800 hover:bg-green-100 gap-1"
-              >
-                <CheckCircle2 size={12} /> Unlocked
-              </Badge>
-            )}
-            {showLanguageBadge && (
-              <Badge variant="outline" className="gap-1">
-                <Languages size={12} /> {capitalise(halo.preferred_language)}
-              </Badge>
-            )}
-            {pocketMatch && (
-              <Badge
-                variant="secondary"
-                className="bg-amber-100 text-amber-800 hover:bg-amber-100 gap-1 border border-amber-300"
-              >
-                <Star size={12} className="fill-amber-500 text-amber-500" /> Pocket Match
-              </Badge>
-            )}
-          </div>
-          <div className="flex flex-col items-end gap-1 shrink-0">
-            <HaloQualityBadge score={halo.quality_score} variant="agent" />
-            <span className="text-xs text-muted-foreground whitespace-nowrap">
-              Posted {timeAgo(halo.created_at)} · Expires in {daysLeft}d
-            </span>
-          </div>
+      {/* Hot pill */}
+      {isHot && (
+        <div className="absolute top-4 left-4 bg-[#FEF2F2] text-[#DC2626] rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.10em] inline-flex items-center gap-1">
+          <Ico icon="solar:flame-bold" size={12} color="#DC2626" />
+          Pre-approved
         </div>
-
-        <div className="space-y-1">
-          {halo.property_types.length > 0 && (
-            <p className="text-sm text-muted-foreground">
-              {halo.property_types.join(', ')}
-            </p>
-          )}
-          {bedroomsLabel && (
-            <p className="text-sm text-muted-foreground flex items-center gap-1.5">
-              <BedDouble size={13} /> {bedroomsLabel}
-            </p>
-          )}
-          <p className="font-semibold text-base break-words">
-            {halo.suburbs.join(', ') || '—'}
-          </p>
-          <p className="text-sm">{budgetLabel}</p>
-          <p className="text-xs text-muted-foreground">
-            {TIMEFRAME_LABELS[halo.timeframe]} · {FINANCE_LABELS[halo.finance_status]}
-          </p>
-          {preview && (
-            <p className="text-xs italic text-muted-foreground pt-1 break-words">
-              "{preview}"
-            </p>
-          )}
+      )}
+      {pocketMatch && !isHot && (
+        <div className="absolute top-4 left-4 bg-[#FEF3C7] text-[#92400E] rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.10em] inline-flex items-center gap-1">
+          <Ico icon="solar:star-bold" size={12} color="#92400E" />
+          Pocket match
         </div>
+      )}
 
+      {/* Initial circle */}
+      <div className="absolute top-5 right-5 w-12 h-12 rounded-full bg-gradient-to-br from-[#EFF6FF] to-[#DBEAFE] text-[#1E40AF] flex items-center justify-center font-extrabold text-[16px]">
+        {initial}
+      </div>
+
+      {/* Language pill */}
+      <div className="absolute right-5 top-[68px] bg-[#EFF6FF] text-[#1E40AF] rounded-full px-2.5 py-1 text-[11px] font-bold inline-flex items-center gap-1">
+        <span>{langMeta.flag}</span>
+        {langMeta.label}
+      </div>
+
+      {/* Intent section */}
+      <div className={isHot || pocketMatch ? 'pt-8' : ''} style={{ paddingRight: '90px' }}>
+        <div className="text-[10px] uppercase tracking-[0.12em] text-[#6a6a6a] font-bold">
+          Intent
+        </div>
+        <div className="text-[20px] font-extrabold text-[#0a0f1e] tracking-[-0.02em] mt-1 leading-tight">
+          {intentString}
+        </div>
+      </div>
+
+      {/* Details */}
+      <div className="mt-5 space-y-3">
+        <DetailRow icon="solar:wallet-2-linear" label="Budget" value={`AUD ${formatBudget(halo.budget_min, halo.budget_max)}`} />
+        <DetailRow icon="solar:map-point-linear" label="Suburbs" value={suburbsLabel} />
+        <DetailRow icon="solar:calendar-linear" label="Timeframe" value={TIMEFRAME_LABELS[halo.timeframe] || '—'} />
+        {halo.bathrooms_min != null && halo.bathrooms_min > 0 && (
+          <DetailRow icon="solar:bath-linear" label="Bathrooms" value={`${halo.bathrooms_min}+`} />
+        )}
+        {halo.car_spaces_min != null && halo.car_spaces_min > 0 && (
+          <DetailRow icon="solar:car-linear" label="Parking" value={`${halo.car_spaces_min} car${halo.car_spaces_min === 1 ? '' : 's'}`} />
+        )}
+        <DetailRow icon="solar:check-circle-linear" label="Finance" value={FINANCE_LABELS[halo.finance_status] || '—'} />
+      </div>
+
+      {/* Footer */}
+      <div className="mt-5 pt-5 border-t border-[#F3F4F6] flex items-center justify-between gap-3">
+        <div className="text-[11px] text-[#6a6a6a] font-medium">
+          Posted {timeAgo(halo.created_at)}
+        </div>
         {unlocked ? (
-          <div className="rounded-md border border-green-200 bg-green-50 px-3 py-2 space-y-2">
+          <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
             {revealed?.email ? (
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <a
-                  href={`mailto:${revealed.email}`}
-                  className="text-sm font-medium text-green-900 hover:underline break-all flex items-center gap-1.5"
-                >
-                  <Mail size={14} /> {revealed.email}
-                </a>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => navigate(`/dashboard/halo-board/${halo.id}`)}
-                >
-                  Open
-                </Button>
-              </div>
-            ) : revealed ? (
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <span className="text-xs text-muted-foreground">Contact unavailable.</span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => navigate(`/dashboard/halo-board/${halo.id}`)}
-                >
-                  View details
-                </Button>
-              </div>
+              <a
+                href={`mailto:${revealed.email}`}
+                aria-label="Email seeker"
+                className="w-9 h-9 rounded-full bg-[#EFF6FF] text-[#2563EB] hover:bg-[#2563EB] hover:text-white flex items-center justify-center transition"
+              >
+                <Ico icon="solar:letter-bold" size={16} />
+              </a>
             ) : (
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <span className="text-xs text-green-900 flex items-center gap-1.5 break-all">
-                  <Mail size={14} /> Seeker · {maskEmail('contact@example.com')}
-                </span>
-                <Button size="sm" onClick={handleReveal} disabled={revealing}>
-                  {revealing ? <Loader2 size={14} className="animate-spin" /> : 'Reveal contact'}
-                </Button>
-              </div>
+              <button
+                type="button"
+                onClick={handleReveal}
+                disabled={revealing}
+                aria-label="Reveal contact"
+                className="w-9 h-9 rounded-full bg-[#EFF6FF] text-[#2563EB] hover:bg-[#2563EB] hover:text-white flex items-center justify-center transition"
+              >
+                <Ico icon={revealing ? 'solar:refresh-bold' : 'solar:chat-line-bold'} size={16} />
+              </button>
             )}
-          </div>
-        ) : (
-          <div className="flex justify-end">
             <button
               type="button"
-              onClick={() => onRespond(halo)}
-              className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold rounded-[10px] px-4 py-2 text-sm flex items-center gap-1.5 transition-all"
+              onClick={() => navigate(`/dashboard/halo-board/${halo.id}`)}
+              aria-label="Open"
+              className="w-9 h-9 rounded-full bg-[#EFF6FF] text-[#2563EB] hover:bg-[#2563EB] hover:text-white flex items-center justify-center transition"
             >
-              <LockKeyhole size={14} /> Unlock for 1 credit
+              <Ico icon="solar:phone-bold" size={16} />
             </button>
+            <span className="bg-[#ECFDF5] text-[#065F46] rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.10em] inline-flex items-center gap-1">
+              <Ico icon="solar:check-circle-bold" size={12} color="#065F46" />
+              Unlocked
+            </span>
           </div>
+        ) : (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRespond(halo);
+            }}
+            className="bg-[#0a0f1e] text-white rounded-full px-5 py-2.5 text-[13px] font-bold inline-flex items-center gap-2 hover:bg-[#2563EB] transition"
+          >
+            <Ico icon="solar:lock-keyhole-bold" size={14} />
+            Unlock · 1 credit
+          </button>
         )}
       </div>
+    </div>
+  );
+}
+
+function DetailRow({ icon, label, value }: { icon: string; label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-3 text-[13px]">
+      <span className="text-[#6a6a6a] shrink-0">
+        <Ico icon={icon} size={16} color="#6a6a6a" />
+      </span>
+      <span className="font-medium text-[#6a6a6a] w-[90px] shrink-0 hidden sm:block">{label}</span>
+      <span className="font-bold text-[#0a0f1e] flex-1 truncate">{value}</span>
     </div>
   );
 }

@@ -161,7 +161,7 @@ const AgentLandingPage = () => {
               </p>
               {themKeys.map((k) => (
                 <div key={k} className="flex items-start gap-3 mb-4 text-sm leading-snug" style={{ color: '#64748b' }}>
-                  <span className="shrink-0 mt-0.5">✗</span>
+                  <span className="shrink-0 mt-0.5">{'✗'}</span>
                   {t(k)}
                 </div>
               ))}
@@ -187,39 +187,39 @@ const AgentLandingPage = () => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
             <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#2563EB', letterSpacing: '1.5px' }}>
-              Pricing — no contracts, cancel anytime
+              {t('agentLanding.pricing2.eyebrow')}
             </p>
             <h2 className="font-black tracking-tight" style={{ color: '#0a0f1e', fontSize: '38px', letterSpacing: '-1.5px' }}>
-              Built for the way you work.
+              {t('agentLanding.pricing2.heading')}
             </h2>
             <p className="mt-3 text-sm" style={{ color: '#6B7280' }}>
-              All plans include 20 languages · trust accounting · AI matching
+              {t('agentLanding.pricing2.includes')}
             </p>
           </div>
 
           {/* Value prop callout */}
           <div className="mx-auto mb-10" style={{ maxWidth: 760, background: '#EFF6FF', border: '1px solid #DBEAFE', borderRadius: 16, padding: '20px 24px' }}>
             <div className="font-extrabold mb-1.5" style={{ color: '#0a0f1e', fontSize: 15 }}>
-              Why $299/mo is a no-brainer for agents
+              {t('agentLanding.pricing2.callout.heading')}
             </div>
             <p className="text-sm" style={{ color: '#374151', lineHeight: 1.55 }}>
-              REA.com.au and Domain charge $1,500–$7,000 per listing. A CRM costs $300–$600/mo. Property management software another $200–$400/mo. ListHQ replaces all three — CRM, PM platform, and multilingual listing portal — in one subscription, reaching 7M+ multilingual buyers no other portal can find.
+              {t('agentLanding.pricing2.callout.body')}
             </p>
           </div>
 
           <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
             {[
-              { name: 'Solo', price: '$299/mo', desc: 'Independent agents running their own shop',
-                feats: ['1 agent seat · up to 10 active listings','Full CRM — pipeline, contacts, deal tracking','Full trust accounting (complete ledger)','20-language auto-translation on every listing','AI buyer matching + voice search','Halo™ buyer matching board','Email support'],
-                cta: 'Start 30-day free trial →', sub: 'Credit card required · auto-charges $299 on day 31 · cancel anytime',
+              { name: t('agentLanding.pricing2.solo.name'), price: '$299/mo', desc: t('agentLanding.pricing2.solo.desc'),
+                feats: [t('agentLanding.pricing2.solo.feat1'),t('agentLanding.pricing2.solo.feat2'),t('agentLanding.pricing2.solo.feat3'),t('agentLanding.pricing2.solo.feat4'),t('agentLanding.pricing2.solo.feat5'),t('agentLanding.pricing2.solo.feat6'),t('agentLanding.pricing2.solo.feat7')],
+                cta: t('agentLanding.pricing2.solo.cta'), sub: t('agentLanding.pricing2.solo.sub'),
                 action: () => setShowModal(true), filled: true, popular: false },
-              { name: 'Agency', price: '$599/mo', desc: 'For growing agencies ready to scale',
-                feats: ['Up to 5 agent seats','Unlimited listings','Full CRM for the whole team','Full PM automation + trust accounting','20-language auto-translation','Priority AI matching + lead analytics','Agency-branded profile page','Phone & email support'],
-                cta: 'Book a demo →', sub: 'No free trial · talk to us first · onboarding included',
+              { name: t('agentLanding.pricing2.agency.name'), price: '$599/mo', desc: t('agentLanding.pricing2.agency.desc'),
+                feats: [t('agentLanding.pricing2.agency.feat1'),t('agentLanding.pricing2.agency.feat2'),t('agentLanding.pricing2.agency.feat3'),t('agentLanding.pricing2.agency.feat4'),t('agentLanding.pricing2.agency.feat5'),t('agentLanding.pricing2.agency.feat6'),t('agentLanding.pricing2.agency.feat7'),t('agentLanding.pricing2.agency.feat8')],
+                cta: t('agentLanding.pricing2.agency.cta'), sub: t('agentLanding.pricing2.agency.sub'),
                 action: () => navigate('/contact'), filled: true, popular: true },
-              { name: 'Agency Pro', price: '$1,199/mo', desc: 'Established multi-office agencies',
-                feats: ['Up to 15 agent seats','Unlimited everything','Full PM automation + trust accounting','Multi-branch dashboard','White-label option','API access + custom integrations','Dedicated account manager'],
-                cta: 'Talk to sales →', sub: 'Custom onboarding · SLA available',
+              { name: t('agentLanding.pricing2.agencyPro.name'), price: '$1,199/mo', desc: t('agentLanding.pricing2.agencyPro.desc'),
+                feats: [t('agentLanding.pricing2.agencyPro.feat1'),t('agentLanding.pricing2.agencyPro.feat2'),t('agentLanding.pricing2.agencyPro.feat3'),t('agentLanding.pricing2.agencyPro.feat4'),t('agentLanding.pricing2.agencyPro.feat5'),t('agentLanding.pricing2.agencyPro.feat6'),t('agentLanding.pricing2.agencyPro.feat7')],
+                cta: t('agentLanding.pricing2.agencyPro.cta'), sub: t('agentLanding.pricing2.agencyPro.sub'),
                 action: () => navigate('/contact'), filled: false, popular: false },
             ].map((p) => (
               <div key={p.name} style={{
@@ -230,12 +230,12 @@ const AgentLandingPage = () => {
               }}>
                 {p.popular && (
                   <div style={{ position: 'absolute', top: -12, right: 20, background: '#2563EB', color: '#fff', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', padding: '5px 12px', borderRadius: 100 }}>
-                    Most popular
+                    {t('agentLanding.pricing2.mostPopular')}
                   </div>
                 )}
                 <div style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 12 }}>{p.name}</div>
                 <div style={{ fontSize: 36, fontWeight: 800, color: '#0a0f1e', letterSpacing: '-1px', marginBottom: 4 }}>{p.price}</div>
-                <div className="text-xs text-muted-foreground" style={{ marginBottom: 8 }}>Founding member — locked for life</div>
+                <div className="text-xs text-muted-foreground" style={{ marginBottom: 8 }}>{t('agentLanding.pricing2.foundingMember')}</div>
                 <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px', lineHeight: 1.5 }}>{p.desc}</p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 22px' }}>
                   {p.feats.map((f) => (

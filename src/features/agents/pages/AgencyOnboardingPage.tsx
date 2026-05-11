@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import DOMPurify from 'dompurify';
 import { ArrowLeft, ArrowRight, Building2, Upload, CheckCircle2, Landmark, Calendar, Loader2, Download, Settings2, BookOpen, ChevronDown, Lock, Eye, EyeOff, PlusCircle, Globe, Users, HelpCircle } from 'lucide-react';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,6 +50,7 @@ const DATE_AU = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'long'
 export default function AgencyOnboardingPage() {
   const navigate = useNavigate();
   const { user, refreshRoles } = useAuth();
+  const { t } = useTranslation();
 
   const [step, setStep] = useState(0);
   const [path, setPath] = useState<OnboardingPath | null>(null);
@@ -78,10 +80,10 @@ export default function AgencyOnboardingPage() {
 
   // Password requirements
   const pwReqs = [
-    { label: 'At least 8 characters', met: newPassword.length >= 8 },
-    { label: 'At least one uppercase letter (A–Z)', met: /[A-Z]/.test(newPassword) },
-    { label: 'At least one number (0–9)', met: /[0-9]/.test(newPassword) },
-    { label: 'At least one special character (!@#$%^&*)', met: /[!@#$%^&*]/.test(newPassword) },
+    { label: t('agentOnboarding.password.rule.length'), met: newPassword.length >= 8 },
+    { label: t('agentOnboarding.password.rule.uppercase'), met: /[A-Z]/.test(newPassword) },
+    { label: t('agentOnboarding.password.rule.number'), met: /[0-9]/.test(newPassword) },
+    { label: t('agentOnboarding.password.rule.special'), met: /[!@#$%^&*]/.test(newPassword) },
   ];
   const allPwReqsMet = pwReqs.every(r => r.met);
 
@@ -810,7 +812,7 @@ export default function AgencyOnboardingPage() {
         <ul className="mt-3 space-y-1.5">
           {items.map((item, i) => (
             <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-              <span className="text-primary mt-0.5 shrink-0">·</span>
+              <span className="text-primary mt-0.5 shrink-0">{'·'}</span>
               <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item, { ALLOWED_TAGS: ['strong','em','a','br'], ALLOWED_ATTR: ['href','target','rel'], ADD_ATTR: ['target'] }) }} />
             </li>
           ))}
@@ -830,17 +832,17 @@ export default function AgencyOnboardingPage() {
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
               <Lock size={28} className="text-primary" />
             </div>
-            <h2 className="text-xl font-bold">Create your password</h2>
-            <p className="text-sm text-muted-foreground">Set a password so you can sign in anytime</p>
+            <h2 className="text-xl font-bold">{t('agentOnboarding.password.heading')}</h2>
+            <p className="text-sm text-muted-foreground">{t('agentOnboarding.password.sub')}</p>
           </div>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="new-password" className="text-xs font-semibold">Password</Label>
+              <Label htmlFor="new-password" className="text-xs font-semibold">{t('agentOnboarding.password.label')}</Label>
               <div className="relative">
                 <Input
                   id="new-password"
                   type={showPw ? 'text' : 'password'}
-                  placeholder="Minimum 8 characters"
+                  placeholder={t('agentOnboarding.password.placeholder')}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   autoFocus
@@ -861,12 +863,12 @@ export default function AgencyOnboardingPage() {
               </ul>
             </div>
             <div className="scroll-mt-4">
-              <Label htmlFor="confirm-password" className="text-xs font-semibold">Confirm password</Label>
+              <Label htmlFor="confirm-password" className="text-xs font-semibold">{t('agentOnboarding.password.confirmLabel')}</Label>
               <div className="relative">
                 <Input
                   id="confirm-password"
                   type={showConfirmPw ? 'text' : 'password'}
-                  placeholder="Re-enter your password"
+                  placeholder={t('agentOnboarding.password.confirmPlaceholder')}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   onFocus={(e) => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' })}
@@ -887,7 +889,7 @@ export default function AgencyOnboardingPage() {
             onClick={handleSetPassword}
           >
             {passwordLoading && <Loader2 size={14} className="mr-1 animate-spin" />}
-            Set password & continue
+            {t('agentOnboarding.password.cta')}
           </Button>
         </div>
       );
@@ -901,8 +903,8 @@ export default function AgencyOnboardingPage() {
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
               <Building2 size={28} className="text-primary" />
             </div>
-            <h2 className="text-xl font-bold">Welcome — let's get your agency set up</h2>
-            <p className="text-sm text-muted-foreground">Choose how you'd like to get started</p>
+            <h2 className="text-xl font-bold">{t('agentOnboarding.welcome.heading')}</h2>
+            <p className="text-sm text-muted-foreground">{t('agentOnboarding.welcome.sub')}</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <Card
@@ -912,10 +914,10 @@ export default function AgencyOnboardingPage() {
               <CardContent className="p-6 space-y-3">
                 <div className="flex items-center justify-between">
                   <Settings2 size={24} className="text-primary" />
-                  <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-[10px]">Quickest setup — 5 mins</Badge>
+                  <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-[10px]">{t('agentOnboarding.welcome.fresh.badge')}</Badge>
                 </div>
-                <h3 className="font-bold">Starting fresh</h3>
-                <p className="text-xs text-muted-foreground">New agency, no trust history to import. Create your trust account with a $0 opening balance.</p>
+                <h3 className="font-bold">{t('agentOnboarding.welcome.fresh.title')}</h3>
+                <p className="text-xs text-muted-foreground">{t('agentOnboarding.welcome.fresh.body')}</p>
               </CardContent>
             </Card>
             <Card
@@ -925,10 +927,10 @@ export default function AgencyOnboardingPage() {
               <CardContent className="p-6 space-y-3">
                 <div className="flex items-center justify-between">
                   <Upload size={24} className="text-primary" />
-                  <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[10px]">Allow 15–20 mins</Badge>
+                  <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[10px]">{t('agentOnboarding.welcome.migration.badge')}</Badge>
                 </div>
-                <h3 className="font-bold">Migrating from another system</h3>
-                <p className="text-xs text-muted-foreground">Moving from PropertyMe, Console Cloud, Reapit, or TrustSoft. Import your opening balances and ledger.</p>
+                <h3 className="font-bold">{t('agentOnboarding.welcome.migration.title')}</h3>
+                <p className="text-xs text-muted-foreground">{t('agentOnboarding.welcome.migration.body')}</p>
               </CardContent>
             </Card>
           </div>
@@ -955,14 +957,14 @@ export default function AgencyOnboardingPage() {
             <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
               <Building2 size={26} className="text-primary" />
             </div>
-            <h3 className="text-lg font-bold text-foreground">Agency & Licence Details</h3>
-            <p className="text-sm text-muted-foreground">Required for compliance and trust account setup</p>
+            <h3 className="text-lg font-bold text-foreground">{t('agentOnboarding.agency.heading')}</h3>
+            <p className="text-sm text-muted-foreground">{t('agentOnboarding.agency.sub')}</p>
           </div>
           <div className="space-y-4">
             {/* Country selector — first */}
             <div>
               <Label className="text-xs font-semibold text-foreground">
-                Country <span className="text-destructive ml-0.5">*</span>
+                {t('agentOnboarding.agency.country')} <span className="text-destructive ml-0.5">{'*'}</span>
               </Label>
               <Select value={country} onValueChange={setCountry}>
                 <SelectTrigger className="mt-1.5">
@@ -981,29 +983,29 @@ export default function AgencyOnboardingPage() {
               {/* Agency name */}
               <div className="sm:col-span-2">
                 <Label className="text-xs font-semibold text-foreground">
-                  Agency or Trading Name <span className="text-destructive ml-0.5">*</span>
+                  {t('agentOnboarding.agency.name')} <span className="text-destructive ml-0.5">{'*'}</span>
                 </Label>
                 <Input value={agencyName} onChange={e => setAgencyName(e.target.value)} placeholder="e.g. Smith Property Group" className="mt-1.5" />
                 {agencyName && (
-                  <p className="text-[11px] text-muted-foreground mt-1">Pre-filled from your registration — edit if needed</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">{t('agentOnboarding.agency.prefilled')}</p>
                 )}
               </div>
 
               {/* Principal name */}
               <div className="sm:col-span-2">
                 <Label className="text-xs font-semibold text-foreground">
-                  Principal's Full Name <span className="text-destructive ml-0.5">*</span>
+                  {t('agentOnboarding.agency.principal')} <span className="text-destructive ml-0.5">{'*'}</span>
                 </Label>
                 <Input value={principalName} onChange={e => setPrincipalName(e.target.value)} placeholder="e.g. Sarah Mitchell" className="mt-1.5" />
                 {principalName && (
-                  <p className="text-[11px] text-muted-foreground mt-1">Pre-filled from your registration — edit if needed</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">{t('agentOnboarding.agency.prefilled')}</p>
                 )}
               </div>
 
               {/* Business registration — label adapts by country */}
               <div>
                 <Label className="text-xs font-semibold text-foreground">
-                  {isAustralia ? 'ABN' : 'Business Reg. No.'} <span className="text-destructive ml-0.5">*</span>
+                  {isAustralia ? 'ABN' : t('agentOnboarding.agency.businessRegOther')} <span className="text-destructive ml-0.5">{'*'}</span>
                 </Label>
                 {isAustralia ? (
                   <>
@@ -1019,11 +1021,11 @@ export default function AgencyOnboardingPage() {
                     />
                     {abn.length > 0 && abn.length < 11 && (
                       <p className="text-[11px] text-muted-foreground mt-1">
-                        {11 - abn.length} more digit{11 - abn.length !== 1 ? 's' : ''} to go
+                        {t(11 - abn.length === 1 ? 'agentOnboarding.agency.abnRemaining' : 'agentOnboarding.agency.abnRemainingPlural', { count: 11 - abn.length })}
                       </p>
                     )}
                     {abn.length === 11 && (
-                      <p className="text-[11px] text-emerald-600 font-medium mt-1">✓ ABN complete</p>
+                      <p className="text-[11px] text-emerald-600 font-medium mt-1">{t('agentOnboarding.agency.abnComplete')}</p>
                     )}
                   </>
                 ) : (
@@ -1044,7 +1046,7 @@ export default function AgencyOnboardingPage() {
               {/* Licence number */}
               <div>
                 <Label className="text-xs font-semibold text-foreground">
-                  {isAustralia ? 'Real Estate Licence No.' : 'Licence / Registration No.'} <span className="text-destructive ml-0.5">*</span>
+                  {isAustralia ? t('agentOnboarding.agency.licence') : t('agentOnboarding.agency.licenceOther')} <span className="text-destructive ml-0.5">{'*'}</span>
                 </Label>
                 <Input value={licenceNumber} onChange={e => setLicenceNumber(e.target.value)} placeholder="e.g. 074356" className="mt-1.5" />
               </div>
@@ -1053,10 +1055,10 @@ export default function AgencyOnboardingPage() {
               {isAustralia && (
                 <div>
                   <Label className="text-xs font-semibold text-foreground">
-                    State of Operation <span className="text-destructive ml-0.5">*</span>
+                    {t('agentOnboarding.agency.state')} <span className="text-destructive ml-0.5">{'*'}</span>
                   </Label>
                   <Select value={operatingState} onValueChange={setOperatingState}>
-                    <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select state" /></SelectTrigger>
+                    <SelectTrigger className="mt-1.5"><SelectValue placeholder={t('agentOnboarding.agency.statePlaceholder')} /></SelectTrigger>
                     <SelectContent>
                       {STATES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                     </SelectContent>
@@ -1067,7 +1069,7 @@ export default function AgencyOnboardingPage() {
               {/* Agency phone */}
               <div>
                 <Label className="text-xs font-semibold text-foreground">
-                  Agency Phone <span className="text-destructive ml-0.5">*</span>
+                  {t('agentOnboarding.agency.phone')} <span className="text-destructive ml-0.5">{'*'}</span>
                 </Label>
                 <Input value={agencyPhone} onChange={e => setAgencyPhone(e.target.value)} placeholder={isAustralia ? '(03) 9123 4567' : 'Office phone number'} className="mt-1.5" />
               </div>
@@ -1075,7 +1077,7 @@ export default function AgencyOnboardingPage() {
               {/* Agency street address */}
               <div className="sm:col-span-2">
                 <Label className="text-xs font-semibold text-foreground">
-                  Agency Street Address <span className="text-destructive ml-0.5">*</span>
+                  {t('agentOnboarding.agency.address')} <span className="text-destructive ml-0.5">{'*'}</span>
                 </Label>
                 <AddressAutocomplete
                   value={agencyAddress}
@@ -1085,14 +1087,14 @@ export default function AgencyOnboardingPage() {
                   className="mt-1.5"
                 />
                 {agencyAddress && (
-                  <p className="text-[11px] text-muted-foreground mt-1">Pre-filled from your registration — edit if needed</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">{t('agentOnboarding.agency.prefilled')}</p>
                 )}
               </div>
 
               {/* Agency email */}
               <div className="sm:col-span-2">
                 <Label className="text-xs font-semibold text-foreground">
-                  Agency Email <span className="text-destructive ml-0.5">*</span>
+                  {t('agentOnboarding.agency.email')} <span className="text-destructive ml-0.5">{'*'}</span>
                 </Label>
                 <Input value={agencyEmail} onChange={e => setAgencyEmail(e.target.value)} placeholder="office@smithproperty.com.au" className="mt-1.5" />
               </div>
@@ -1119,44 +1121,43 @@ export default function AgencyOnboardingPage() {
         <div className="space-y-5">
           <div className="text-center space-y-1 mb-4">
             <Landmark size={32} className="mx-auto text-primary" />
-            <h3 className="text-base font-bold">Trust Account Bank Details</h3>
-            <p className="text-xs text-muted-foreground">Your statutory trust account for holding client funds</p>
+            <h3 className="text-base font-bold">{t('agentOnboarding.trust.heading')}</h3>
+            <p className="text-xs text-muted-foreground">{t('agentOnboarding.trust.sub')}</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <Label className="text-xs font-medium">Account name</Label>
+              <Label className="text-xs font-medium">{t('agentOnboarding.trust.accountName')}</Label>
               <Input value={trustAccountName} onChange={e => setTrustAccountName(e.target.value)} placeholder="Agency Name Trust Account" className="mt-1.5" />
             </div>
             <div>
-              <Label className="text-xs font-medium">Bank name *</Label>
+              <Label className="text-xs font-medium">{t('agentOnboarding.trust.bankName')}</Label>
               <Select value={bankName} onValueChange={setBankName}>
-                <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select bank" /></SelectTrigger>
+                <SelectTrigger className="mt-1.5"><SelectValue placeholder={t('agentOnboarding.trust.bankPlaceholder')} /></SelectTrigger>
                 <SelectContent>
                   {BANKS.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label className="text-xs font-medium">Account type</Label>
+              <Label className="text-xs font-medium">{t('agentOnboarding.trust.accountType')}</Label>
               <div className="mt-1.5">
-                <Badge variant="secondary" className="text-xs px-3 py-1.5">Trust Account</Badge>
+                <Badge variant="secondary" className="text-xs px-3 py-1.5">{t('agentOnboarding.trust.accountTypeBadge')}</Badge>
               </div>
             </div>
             <div>
-              <Label className="text-xs font-medium">BSB *</Label>
+              <Label className="text-xs font-medium">{t('agentOnboarding.trust.bsb')}</Label>
               <Input value={bsb} onChange={e => setBsb(e.target.value)} placeholder="062-000" className="mt-1.5 font-mono" maxLength={7} />
-              {bsb && bsb.replace(/-/g, '').length !== 6 && <p className="text-[10px] text-destructive mt-1">BSB must be 6 digits</p>}
+              {bsb && bsb.replace(/-/g, '').length !== 6 && <p className="text-[10px] text-destructive mt-1">{t('agentOnboarding.trust.bsbInvalid')}</p>}
             </div>
             <div>
-              <Label className="text-xs font-medium">Account number *</Label>
+              <Label className="text-xs font-medium">{t('agentOnboarding.trust.accountNumber')}</Label>
               <Input value={accountNumber} onChange={e => setAccountNumber(e.target.value)} placeholder="12345678" className="mt-1.5 font-mono" />
             </div>
           </div>
           <div className="bg-muted/50 border border-border rounded-lg p-3 flex items-start gap-2">
             <Landmark size={14} className="text-muted-foreground shrink-0 mt-0.5" />
             <p className="text-xs text-muted-foreground">
-              Your trust account must be held with an approved Australian ADI (Authorised Deposit-taking Institution).
-              The account name must include the word 'Trust'.
+              {t('agentOnboarding.trust.disclaimer')}
             </p>
           </div>
           <GuideCard
@@ -1183,14 +1184,14 @@ export default function AgencyOnboardingPage() {
               <CheckCircle2 className="w-8 h-8 text-green-600" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold">You're all set!</h2>
-              <p className="text-muted-foreground mt-1">Your agency is set up. Here's what to do next.</p>
+              <h2 className="text-2xl font-bold">{t('agentOnboarding.ready.heading')}</h2>
+              <p className="text-muted-foreground mt-1">{t('agentOnboarding.ready.sub')}</p>
             </div>
             <ul className="text-left space-y-3 w-full">
-              <li className="flex items-start gap-3"><PlusCircle className="mt-0.5 shrink-0 text-primary" size={18} /><span>Create your first listing — go to <strong>Dashboard → New Listing</strong></span></li>
-              <li className="flex items-start gap-3"><Globe className="mt-0.5 shrink-0 text-primary" size={18} /><span>Enable multilingual translation — publish any listing and translations generate automatically</span></li>
-              <li className="flex items-start gap-3"><Users className="mt-0.5 shrink-0 text-primary" size={18} /><span>Invite your team — go to <strong>Dashboard → Team</strong></span></li>
-              <li className="flex items-start gap-3"><HelpCircle className="mt-0.5 shrink-0 text-primary" size={18} /><span>Get help anytime — go to <strong>Dashboard → Help</strong></span></li>
+              <li className="flex items-start gap-3"><PlusCircle className="mt-0.5 shrink-0 text-primary" size={18} /><span>{t('agentOnboarding.ready.next1')}</span></li>
+              <li className="flex items-start gap-3"><Globe className="mt-0.5 shrink-0 text-primary" size={18} /><span>{t('agentOnboarding.ready.next2')}</span></li>
+              <li className="flex items-start gap-3"><Users className="mt-0.5 shrink-0 text-primary" size={18} /><span>{t('agentOnboarding.ready.next3')}</span></li>
+              <li className="flex items-start gap-3"><HelpCircle className="mt-0.5 shrink-0 text-primary" size={18} /><span>{t('agentOnboarding.ready.next4')}</span></li>
             </ul>
             <Button
               className="w-full py-5 text-base font-bold"
@@ -1199,7 +1200,7 @@ export default function AgencyOnboardingPage() {
                 navigate('/dashboard');
               }}
             >
-              Go to Dashboard →
+              {t('agentOnboarding.ready.cta')}
             </Button>
           </div>
         );
@@ -1209,24 +1210,24 @@ export default function AgencyOnboardingPage() {
         <div className="space-y-5">
           <div className="text-center space-y-1 mb-4">
             <Calendar size={32} className="mx-auto text-primary" />
-            <h3 className="text-base font-bold">When are you switching to ListHQ?</h3>
-            <p className="text-xs text-muted-foreground">All transactions from this date will be recorded in ListHQ</p>
+            <h3 className="text-base font-bold">{t('agentOnboarding.cutover.heading')}</h3>
+            <p className="text-xs text-muted-foreground">{t('agentOnboarding.cutover.sub')}</p>
           </div>
           <div>
-            <Label className="text-xs font-medium">Cut-over date *</Label>
+            <Label className="text-xs font-medium">{t('agentOnboarding.cutover.label')}</Label>
             <Input type="date" value={cutoverDate} onChange={e => setCutoverDate(e.target.value)} className="mt-1.5" />
           </div>
           <div className="bg-muted/50 border border-border rounded-lg p-4 space-y-2">
-            <p className="text-xs font-medium text-foreground">Before proceeding, your trust account must be reconciled to this date in your current system. You will need:</p>
+            <p className="text-xs font-medium text-foreground">{t('agentOnboarding.cutover.needs')}</p>
             <ul className="text-xs text-muted-foreground space-y-1.5 list-disc list-inside">
-              <li>Trust Trial Balance as at cut-over date</li>
-              <li>Client Ledger Summary (from Reports in your current system)</li>
-              <li>Last bank statement showing the closing balance</li>
-              <li>Active matters list (clients with funds in trust)</li>
+              <li>{t('agentOnboarding.cutover.need1')}</li>
+              <li>{t('agentOnboarding.cutover.need2')}</li>
+              <li>{t('agentOnboarding.cutover.need3')}</li>
+              <li>{t('agentOnboarding.cutover.need4')}</li>
             </ul>
           </div>
           <Button variant="outline" size="sm" onClick={generateImportChecklist} className="w-full gap-2">
-            <Download size={14} /> Download import checklist
+            <Download size={14} /> {t('agentOnboarding.cutover.downloadChecklist')}
           </Button>
           <GuideCard
             title="Choosing your cut-over date"
@@ -1251,10 +1252,9 @@ export default function AgencyOnboardingPage() {
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
                 <CheckCircle2 size={32} className="text-primary" />
               </div>
-              <h3 className="text-base font-bold">Your trust account is ready</h3>
+              <h3 className="text-base font-bold">{t('agentOnboarding.import.fresh.heading')}</h3>
               <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                Your trust account has been created with a $0.00 opening balance.
-                You can start recording trust transactions immediately.
+                {t('agentOnboarding.import.fresh.body')}
               </p>
             </div>
             <Button
@@ -1264,7 +1264,7 @@ export default function AgencyOnboardingPage() {
                 navigate('/dashboard');
               }}
             >
-              Continue to Dashboard <ArrowRight size={14} className="ml-1" />
+              {t('agentOnboarding.import.continueCta')} <ArrowRight size={14} className="ml-1" />
             </Button>
             <GuideCard
               title="You're all set — what's next"
@@ -1284,9 +1284,9 @@ export default function AgencyOnboardingPage() {
         <div className="space-y-5">
           <div className="text-center space-y-1 mb-4">
             <Upload size={32} className="mx-auto text-primary" />
-            <h3 className="text-base font-bold">Import from your old system</h3>
+            <h3 className="text-base font-bold">{t('agentOnboarding.import.heading')}</h3>
             <p className="text-xs text-muted-foreground">
-              Choose how much you want to migrate
+              {t('agentOnboarding.import.sub')}
             </p>
           </div>
           <div className="space-y-3">
@@ -1295,25 +1295,25 @@ export default function AgencyOnboardingPage() {
               className="w-full text-left rounded-lg border-2 border-primary bg-primary/5 p-4 hover:bg-primary/10 transition-colors"
             >
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-sm font-bold">Full Rent Roll Migration</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary text-primary-foreground font-semibold">RECOMMENDED</span>
+                <span className="text-sm font-bold">{t('agentOnboarding.import.fullTitle')}</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary text-primary-foreground font-semibold">{t('agentOnboarding.import.recommended')}</span>
               </div>
-              <p className="text-xs text-muted-foreground">Properties, tenancies, owners, tenants, bonds, fees and trust balances — everything in one go.</p>
+              <p className="text-xs text-muted-foreground">{t('agentOnboarding.import.fullBody')}</p>
             </button>
             <button
               onClick={() => setShowWizard(true)}
               className="w-full text-left rounded-lg border p-4 hover:border-primary/50 transition-colors"
             >
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-sm font-bold">Trust Ledger Only</span>
+                <span className="text-sm font-bold">{t('agentOnboarding.import.ledgerTitle')}</span>
               </div>
-              <p className="text-xs text-muted-foreground">Just the opening trust balance and transaction ledger — for if you'll add properties manually later.</p>
+              <p className="text-xs text-muted-foreground">{t('agentOnboarding.import.ledgerBody')}</p>
             </button>
           </div>
           <Separator />
           <div className="text-center space-y-2">
             <p className="text-xs text-muted-foreground">
-              Not ready to import yet? You can skip this for now and import your opening balance later from Trust Dashboard → Import Existing Account.
+              {t('agentOnboarding.import.skipNote')}
             </p>
             <Button
               variant="ghost"
@@ -1324,7 +1324,7 @@ export default function AgencyOnboardingPage() {
                 navigate('/dashboard');
               }}
             >
-              Skip for now
+              {t('agentOnboarding.import.skip')}
             </Button>
           </div>
           <GuideCard
@@ -1348,10 +1348,10 @@ export default function AgencyOnboardingPage() {
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
               <CheckCircle2 size={32} className="text-primary" />
             </div>
-            <h2 className="text-xl font-bold">Your agency is live on ListHQ</h2>
+            <h2 className="text-xl font-bold">{t('agentOnboarding.complete.heading')}</h2>
           </div>
           <div className="space-y-2">
-            {['Agency created', 'Trust account set up', 'Opening balance imported'].map((item) => (
+            {[t('agentOnboarding.complete.item1'), t('agentOnboarding.complete.item2'), t('agentOnboarding.complete.item3')].map((item) => (
               <div key={item} className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 border border-border">
                 <CheckCircle2 size={16} className="text-primary shrink-0" />
                 <span className="text-sm font-medium">{item}</span>
@@ -1360,10 +1360,10 @@ export default function AgencyOnboardingPage() {
           </div>
           <div className="grid gap-3 sm:grid-cols-2 pt-2">
             <Button onClick={() => navigate('/dashboard/trust')} className="gap-2">
-              <Landmark size={14} /> Go to Trust Dashboard
+              <Landmark size={14} /> {t('agentOnboarding.complete.trustCta')}
             </Button>
             <Button variant="outline" onClick={() => navigate('/dashboard/rent-roll')} className="gap-2">
-              <Building2 size={14} /> Go to Rent Roll
+              <Building2 size={14} /> {t('agentOnboarding.complete.rentRollCta')}
             </Button>
           </div>
           <GuideCard
@@ -1408,8 +1408,8 @@ export default function AgencyOnboardingPage() {
   const showNextButton = !showPasswordStep && (step < 3 || (path === 'migration' && step === 3));
 
   const stepLabels = path === 'migration'
-    ? ['Welcome', 'Agency', 'Trust Account', 'Cut-over', 'Import', 'Complete']
-    : ['Welcome', 'Agency', 'Trust Account', 'Ready'];
+    ? [t('agentOnboarding.nav.label.welcome'), t('agentOnboarding.nav.label.agency'), t('agentOnboarding.nav.label.trust'), t('agentOnboarding.nav.label.cutover'), t('agentOnboarding.nav.label.import'), t('agentOnboarding.nav.label.complete')]
+    : [t('agentOnboarding.nav.label.welcome'), t('agentOnboarding.nav.label.agency'), t('agentOnboarding.nav.label.trust'), t('agentOnboarding.nav.label.ready')];
 
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden">
@@ -1417,18 +1417,18 @@ export default function AgencyOnboardingPage() {
         {/* Brand */}
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground text-xs font-bold">L</span>
+            <span className="text-primary-foreground text-xs font-bold">{'L'}</span>
           </div>
-          <span className="font-display text-lg font-bold text-foreground">ListHQ</span>
+          <span className="font-display text-lg font-bold text-foreground">{'ListHQ'}</span>
         </div>
         {/* Progress */}
         <div className="space-y-2">
           <div>
             <h1 className="text-lg font-bold text-foreground">
-              Agency Setup
+              {t('agentOnboarding.nav.heading')}
             </h1>
             <p className="text-xs text-muted-foreground">
-              {showPasswordStep ? 'Secure your account' : `Step ${step + 1} of ${totalSteps}`}
+              {showPasswordStep ? t('agentOnboarding.nav.securing') : t('agentOnboarding.nav.stepXofY', { current: step + 1, total: totalSteps })}
             </p>
           </div>
           <Progress value={progressPct} className="h-1.5" />
@@ -1463,14 +1463,14 @@ export default function AgencyOnboardingPage() {
           <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-1 pb-2 shrink-0">
             {showBackButton ? (
               <Button variant="ghost" size="sm" onClick={() => setStep(s => s - 1)} disabled={loading} className="w-full sm:w-auto">
-                <ArrowLeft size={14} className="mr-1" /> Back
+                <ArrowLeft size={14} className="mr-1" /> {t('agentOnboarding.nav.back')}
               </Button>
             ) : <div />}
             {showNextButton && (
               <div className="flex flex-col w-full sm:w-auto gap-1">
                 <Button type="button" size="sm" disabled={!canNext() || loading} onClick={handleNext} className="w-full sm:w-auto">
                   {loading && <Loader2 size={14} className="mr-1 animate-spin" />}
-                  Next <ArrowRight size={14} className="ml-1" />
+                  {t('agentOnboarding.nav.next')} <ArrowRight size={14} className="ml-1" />
                 </Button>
                 {step === 2 && (
                   <Button
@@ -1479,7 +1479,7 @@ export default function AgencyOnboardingPage() {
                     onClick={handleSkipTrustAccount}
                     disabled={loading}
                   >
-                    Skip for now — I'll add this later
+                    {t('agentOnboarding.nav.skipTrust')}
                   </Button>
                 )}
               </div>

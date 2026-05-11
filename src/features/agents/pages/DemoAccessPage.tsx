@@ -105,8 +105,8 @@ const DemoAccessPage = () => {
 
         <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
           <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 mb-5 flex items-start gap-2">
-            <Sparkles className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-            <p className="text-xs text-amber-700 dark:text-amber-300">
+            <Sparkles className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-700">
               You are about to access a demo environment. To go live, subscribe after exploring.
             </p>
           </div>

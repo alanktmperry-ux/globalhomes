@@ -233,7 +233,7 @@ export default function HaloBoardPreview() {
               <div className="mt-5 pt-4 border-t border-[#E5E5E5] flex items-center justify-between">
                 <span className="text-[11px] text-[#6a6a6a] font-semibold">{b.posted}</span>
                 <Link
-                  to={b.id ? `/halo/${b.id}` : "/dashboard/halo-board"}
+                  to={b.isFallback ? "/halo/about" : b.id ? `/halo/${b.id}` : "/dashboard/halo-board"}
                   className="px-4 py-2 text-white text-[12px] font-bold rounded-full flex items-center gap-1.5 cursor-pointer"
                   style={{ background: GRAD }}
                 >

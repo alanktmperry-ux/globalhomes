@@ -6,15 +6,27 @@ import { PipelineKPIBar } from '../components/PipelineKPIBar';
 import { CRMTasksWidget } from '../components/CRMTasksWidget';
 import { DailyCallList } from '../components/DailyCallList';
 import { LeadDetailModal } from '../components/LeadDetailModal';
-import { LayoutList, Kanban, Upload } from 'lucide-react';
+import LeadContactForm from '@/shared/components/LeadContactForm';
+import { useAgentId } from '../hooks/useAgentId';
+import { useCRMLeads } from '../hooks/useCRMLeads';
 import { Link } from 'react-router-dom';
 import type { UrgencyTier } from '../lib/urgency';
 import type { CRMLead } from '../types';
 
+// iconify-icon web component (loaded in index.html)
+const Ico = ({ icon, size = 16, color, className }: { icon: string; size?: number; color?: string; className?: string }) => (
+  // @ts-expect-error iconify-icon is a web component
+  <iconify-icon icon={icon} class={className} style={{ fontSize: `${size}px`, color, display: 'inline-flex', lineHeight: 1 }} />
+);
+
 export default function CRMPage() {
-  const [view, setView] = useState<'board' | 'list'>('board');
+  const [view, setView] = useState<'board' | 'list'>('list');
   const [urgencyFilter, setUrgencyFilter] = useState<UrgencyTier[]>([]);
   const [selectedLead, setSelectedLead] = useState<CRMLead | null>(null);
+  const [showAddLead, setShowAddLead] = useState(false);
+  const agentId = useAgentId();
+  const { leads } = useCRMLeads({ stage: 'all' });
+  const activeCount = leads.filter((l) => !['settled', 'lost'].includes(l.stage)).length;
 
   const handleUrgencyTileClick = (tier: UrgencyTier) => {
     setUrgencyFilter([tier]);
@@ -27,54 +39,87 @@ export default function CRMPage() {
         <title>Buyer Pipeline — ListHQ</title>
       </Helmet>
 
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-10">
+        {/* Header */}
+        <div className="flex items-center justify-between gap-6 flex-wrap mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-[#0a0f1e] tracking-tight mb-1">Buyer Pipeline</h1>
-            <p className="text-sm font-light text-[#6B7280] mb-8">
-              All leads auto-synced from enquiries, open homes, and EOIs
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1
+                className="font-extrabold tracking-[-0.04em] text-[#0a0f1e]"
+                style={{ fontSize: 'clamp(32px, 4vw, 48px)', lineHeight: 1.05 }}
+              >
+                Buyer Pipeline
+              </h1>
+              <span className="bg-[#EFF6FF] border border-[#2563EB]/15 text-[#1E40AF] rounded-full px-3 py-1 text-[12px] font-bold">
+                {activeCount} active {activeCount === 1 ? 'buyer' : 'buyers'}
+              </span>
+            </div>
+            <p className="text-[14px] text-[#6a6a6a] font-medium mt-2 max-w-[640px]">
+              Every buyer who's interacted with your listings, scored and ranked by intent.
             </p>
           </div>
-          <div className="flex items-center gap-2">
+
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* View toggle */}
+            <div className="bg-[#F9FAFB] rounded-full p-1 flex items-center">
+              <button
+                type="button"
+                onClick={() => setView('list')}
+                aria-label="List view"
+                className={
+                  view === 'list'
+                    ? 'w-9 h-9 rounded-full flex items-center justify-center bg-white shadow-[0_2px_6px_rgba(0,0,0,0.08)] text-[#0a0f1e]'
+                    : 'w-9 h-9 rounded-full flex items-center justify-center text-[#6a6a6a]'
+                }
+              >
+                <Ico icon="solar:list-linear" size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={() => setView('board')}
+                aria-label="Kanban view"
+                className={
+                  view === 'board'
+                    ? 'w-9 h-9 rounded-full flex items-center justify-center bg-white shadow-[0_2px_6px_rgba(0,0,0,0.08)] text-[#0a0f1e]'
+                    : 'w-9 h-9 rounded-full flex items-center justify-center text-[#6a6a6a]'
+                }
+              >
+                <Ico icon="solar:widget-5-linear" size={16} />
+              </button>
+            </div>
+
             <Link
               to="/dashboard/crm/import"
-              className="inline-flex items-center gap-1.5 px-3 h-9 rounded-[10px] text-sm font-medium text-[#374151] hover:bg-[#F3F4F6] transition"
-              style={{ background: '#FFFFFF', border: '1px solid #E5E7EB' }}
+              className="text-[#374151] border border-[#E5E5E5] bg-white rounded-full px-4 py-2 text-[13px] font-bold hover:border-[#2563EB] hover:text-[#2563EB] transition-all inline-flex items-center gap-2"
             >
-              <Upload size={14} /> Import contacts
+              <Ico icon="solar:upload-linear" size={14} /> Import contacts
             </Link>
+
             <button
-              onClick={() => setView('board')}
-              className={`p-2 rounded-[10px] transition ${
-                view === 'board'
-                  ? 'bg-[#2563EB] text-white border border-[#2563EB]'
-                  : 'bg-white text-[#6B7280] border border-[#E5E7EB] hover:text-[#0a0f1e]'
-              }`}
-              title="Kanban view"
+              type="button"
+              onClick={() => setShowAddLead(true)}
+              className="rounded-full px-5 py-2.5 text-[14px] font-bold text-white inline-flex items-center gap-2 transition-all hover:shadow-[0_8px_24px_rgba(37,99,235,0.3)]"
+              style={{ background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)' }}
             >
-              <Kanban size={16} />
-            </button>
-            <button
-              onClick={() => setView('list')}
-              className={`p-2 rounded-[10px] transition ${
-                view === 'list'
-                  ? 'bg-[#2563EB] text-white border border-[#2563EB]'
-                  : 'bg-white text-[#6B7280] border border-[#E5E7EB] hover:text-[#0a0f1e]'
-              }`}
-              title="List view"
-            >
-              <LayoutList size={16} />
+              <Ico icon="solar:user-plus-bold" size={16} color="#fff" /> Add buyer
             </button>
           </div>
         </div>
 
+        {/* Heat summary cards */}
         <PipelineKPIBar onUrgencyClick={handleUrgencyTileClick} />
 
-        <div className="flex gap-6 flex-col lg:flex-row">
+        {/* Main content + sidebar */}
+        <div className="flex gap-6 flex-col lg:flex-row mt-8">
           <div className="flex-1 min-w-0">
-            {view === 'board'
-              ? <PipelineBoard />
-              : <CRMListView urgencyFilter={urgencyFilter} onUrgencyFilterChange={setUrgencyFilter} />}
+            {view === 'board' ? (
+              <PipelineBoard />
+            ) : (
+              <CRMListView
+                urgencyFilter={urgencyFilter}
+                onUrgencyFilterChange={setUrgencyFilter}
+              />
+            )}
           </div>
           <div className="w-full lg:w-72 flex-shrink-0 space-y-4">
             <DailyCallList onSelectLead={(lead) => setSelectedLead(lead)} />
@@ -82,11 +127,21 @@ export default function CRMPage() {
           </div>
         </div>
       </div>
+
       {selectedLead && (
         <LeadDetailModal
           lead={selectedLead}
           onClose={() => setSelectedLead(null)}
           onUpdate={() => setSelectedLead(null)}
+        />
+      )}
+
+      {showAddLead && agentId && (
+        <LeadContactForm
+          context="lead"
+          agentId={agentId}
+          onClose={() => setShowAddLead(false)}
+          onSaved={() => setShowAddLead(false)}
         />
       )}
     </>

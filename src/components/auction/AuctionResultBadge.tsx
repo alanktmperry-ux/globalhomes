@@ -1,6 +1,7 @@
 import { Trophy, Gavel, XCircle, ArrowRight } from 'lucide-react';
 import { useAuctionResult } from '@/hooks/useAuctionResult';
 import { Link } from 'react-router-dom';
+import { useTranslation, formatCurrency, formatDate } from '@/shared/lib/i18n';
 
 interface Props {
   propertyId: string;

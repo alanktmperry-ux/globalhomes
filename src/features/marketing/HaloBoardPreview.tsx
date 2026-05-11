@@ -15,10 +15,13 @@ type Brief = {
   posted: string;
 };
 
-const FALLBACK_BRIEFS: Brief[] = [
-  { initial: "W", flag: "🇨🇳", language: "Mandarin", intent: "Buy", property: "House · 4+ bed", budget: "$1.2M – $1.6M", suburbs: "Auburn, Strathfield", posted: "Posted 2 hours ago" },
-  { initial: "M", flag: "🇻🇳", language: "Vietnamese", intent: "Buy", property: "Townhouse · 3 bed", budget: "$850K – $1.1M", suburbs: "Cabramatta, Bankstown", posted: "Posted yesterday" },
-  { initial: "P", flag: "🇮🇳", language: "Hindi", intent: "Buy", property: "House · 3+ bed", budget: "$900K – $1.3M", suburbs: "Parramatta, Westmead", posted: "Posted 3 days ago" },
+type BriefWithMeta = Brief & { isFallback?: boolean };
+
+// Fallback briefs — only rendered to fill grid slots when fewer than 3 real halos exist.
+const FALLBACK_BRIEFS: BriefWithMeta[] = [
+  { isFallback: true, initial: "W", flag: "🇨🇳", language: "Mandarin", intent: "Buy", property: "House · 4+ bed", budget: "$1.2M – $1.6M", suburbs: "Auburn, Strathfield", posted: "Posted 2 hours ago" },
+  { isFallback: true, initial: "M", flag: "🇻🇳", language: "Vietnamese", intent: "Buy", property: "Townhouse · 3 bed", budget: "$850K – $1.1M", suburbs: "Cabramatta, Bankstown", posted: "Posted yesterday" },
+  { isFallback: true, initial: "P", flag: "🇮🇳", language: "Hindi", intent: "Buy", property: "House · 3+ bed", budget: "$900K – $1.3M", suburbs: "Parramatta, Westmead", posted: "Posted 3 days ago" },
 ];
 
 const LANG_MAP: Record<string, { flag: string; name: string }> = {
@@ -67,18 +70,21 @@ function relativeTime(iso: string): string {
   return `Posted ${months} month${months === 1 ? "" : "s"} ago`;
 }
 
-function mapRow(row: {
-  id: string;
-  intent: string | null;
-  property_types: string[] | null;
-  bedrooms_min: number | null;
-  bedrooms_max: number | null;
-  suburbs: string[] | null;
-  budget_min: number | null;
-  budget_max: number | null;
-  preferred_language: string | null;
-  created_at: string;
-}): Brief {
+function mapRow(
+  row: {
+    id: string;
+    intent: string | null;
+    property_types: string[] | null;
+    bedrooms_min: number | null;
+    bedrooms_max: number | null;
+    suburbs: string[] | null;
+    budget_min: number | null;
+    budget_max: number | null;
+    preferred_language: string | null;
+    created_at: string;
+  },
+  seekerName?: string | null,
+): BriefWithMeta {
   const lang = LANG_MAP[row.preferred_language ?? "en"] ?? { flag: "🌐", name: row.preferred_language ?? "English" };
   const propType = (row.property_types?.[0] ?? "Property").replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
   const beds =
@@ -88,11 +94,18 @@ function mapRow(row: {
       ? `${row.bedrooms_min}+ bed`
       : null;
   const property = beds ? `${propType} · ${beds}` : propType;
-  const suburbs = (row.suburbs ?? []).slice(0, 2).join(", ") || "Any suburb";
+  const suburbsArr = row.suburbs ?? [];
+  const suburbs =
+    suburbsArr.length === 0
+      ? "Any suburb"
+      : suburbsArr.length <= 2
+      ? suburbsArr.join(", ")
+      : `${suburbsArr.slice(0, 2).join(", ")} and ${suburbsArr.length - 2} more`;
   const intent = row.intent ? row.intent.charAt(0).toUpperCase() + row.intent.slice(1) : "Buy";
+  const initial = seekerName && seekerName.trim() ? seekerName.trim().charAt(0).toUpperCase() : "?";
   return {
     id: row.id,
-    initial: "?",
+    initial,
     flag: lang.flag,
     language: lang.name,
     intent,
@@ -110,21 +123,35 @@ const GRAD = "linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)";
  * Three buyer brief cards demonstrating the reverse marketplace.
  */
 export default function HaloBoardPreview() {
-  const [briefs, setBriefs] = useState<Brief[]>(FALLBACK_BRIEFS);
+  const [briefs, setBriefs] = useState<BriefWithMeta[]>(FALLBACK_BRIEFS);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const { data, error } = await supabase
         .from("halos")
-        .select("id, intent, property_types, bedrooms_min, bedrooms_max, suburbs, budget_min, budget_max, preferred_language, created_at")
+        .select("id, intent, property_types, bedrooms_min, bedrooms_max, suburbs, budget_min, budget_max, preferred_language, created_at, seeker_id")
         .eq("status", "active")
         .order("created_at", { ascending: false })
         .limit(3);
-      if (cancelled) return;
-      if (!error && data && data.length > 0) {
-        setBriefs(data.map(mapRow));
+      if (cancelled || error || !data || data.length === 0) return;
+
+      const seekerIds = Array.from(new Set(data.map((d) => d.seeker_id).filter(Boolean))) as string[];
+      const nameMap: Record<string, string> = {};
+      if (seekerIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, display_name, full_name")
+          .in("id", seekerIds);
+        (profiles ?? []).forEach((p: any) => {
+          nameMap[p.id] = p.display_name || p.full_name || "";
+        });
       }
+      if (cancelled) return;
+
+      const real: BriefWithMeta[] = data.map((row) => mapRow(row, nameMap[row.seeker_id as string]));
+      const filled: BriefWithMeta[] = [...real, ...FALLBACK_BRIEFS.slice(real.length, 3)];
+      setBriefs(filled);
     })();
     return () => {
       cancelled = true;
@@ -206,7 +233,7 @@ export default function HaloBoardPreview() {
               <div className="mt-5 pt-4 border-t border-[#E5E5E5] flex items-center justify-between">
                 <span className="text-[11px] text-[#6a6a6a] font-semibold">{b.posted}</span>
                 <Link
-                  to={b.id ? `/halo/${b.id}` : "/dashboard/halo-board"}
+                  to={b.isFallback ? "/halo/about" : b.id ? `/halo/${b.id}` : "/dashboard/halo-board"}
                   className="px-4 py-2 text-white text-[12px] font-bold rounded-full flex items-center gap-1.5 cursor-pointer"
                   style={{ background: GRAD }}
                 >

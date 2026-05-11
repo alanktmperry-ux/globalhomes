@@ -14,6 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
+        sans: ['Plus Jakarta Sans', 'sans-serif'],
+        jakarta: ['Plus Jakarta Sans', 'sans-serif'],
         display: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
         body: ['DM Sans', 'system-ui', 'sans-serif'],
       },
@@ -76,6 +78,23 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        brand: {
+          blue: "#2563EB",
+          "blue-hover": "#1D4ED8",
+          "blue-light": "#EFF6FF",
+          "blue-mid": "#DBEAFE",
+          ink: "#0a0f1e",
+          mid: "#374151",
+          muted: "#6B7280",
+          subtle: "#9CA3AF",
+          border: "#E5E7EB",
+          off: "#F9FAFB",
+        },
+        status: {
+          green: "#34D399",
+          amber: "#FBBF24",
+          red: "#F87171",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -83,6 +102,10 @@ export default {
         sm: "calc(var(--radius) - 4px)",
         xl: "calc(var(--radius) + 4px)",
         "2xl": "calc(var(--radius) + 8px)",
+        card: "16px",
+        "card-sm": "12px",
+        btn: "10px",
+        modal: "24px",
       },
       keyframes: {
         "accordion-down": {

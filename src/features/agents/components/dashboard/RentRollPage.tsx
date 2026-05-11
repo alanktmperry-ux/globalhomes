@@ -1106,9 +1106,9 @@ const RentRollPage = () => {
                     </TableBody>
                   </Table>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
           </motion.div>
+
         </>
       )}
 

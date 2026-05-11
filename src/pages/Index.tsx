@@ -537,17 +537,77 @@ const Index = () => {
           <div style={{ maxWidth: 1240, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 460px', gap:48, alignItems:'center' }} className="hero-grid">
             {/* Left */}
             <div>
-              <div style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'6px 12px', borderRadius:100, background:T.blueL, border:`1px solid ${T.blueMid}`, color:T.blue, fontSize:11, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:24, maxWidth:'100%', whiteSpace:'normal', textAlign:'left', lineHeight:1.3 }} className="hero-eyebrow">
-                <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:T.blue, flexShrink:0 }} />
-                <span>{t('hero.eyebrow')}</span>
+              <div
+                className="opacity-0 animate-fade-up"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  marginBottom: 32, animationDelay: '0.1s',
+                  fontSize: 12, fontWeight: 600, letterSpacing: '0.16em',
+                  textTransform: 'uppercase', color: '#6a6a6a',
+                }}
+              >
+                <span>Australia's multilingual property platform</span>
               </div>
 
-              <h1 className="hero-headline" style={{ margin:'0 0 12px' }}>
-                <span className="line1">{seq.line1}</span>
-                <span className={`line2 ${blur ? 'blur-out' : 'blur-in'}`} style={{ fontFamily: "'DM Serif Display', serif" }}>{seq.line2}</span>
+              <h1
+                className="hero-headline opacity-0 animate-fade-up"
+                style={{ margin: '0 0 12px', animationDelay: '0.25s' }}
+              >
+                <span className="line1">Find your home.</span>
+                <span className={`line2 ${blur ? 'blur-out' : 'blur-in'}`}>{seq.line2}</span>
               </h1>
 
-              <div className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:14, fontWeight:500, color:T.mid, marginBottom:16, display:'flex', alignItems:'center', gap:6 }}>
+              <p
+                className="opacity-0 animate-fade-up"
+                style={{
+                  fontSize: 19, lineHeight: 1.55, color: '#4a4a4a',
+                  maxWidth: 620, marginTop: 32, marginBottom: 0,
+                  animationDelay: '0.4s',
+                }}
+              >
+                Twenty languages. Seven million multicultural Australians. The only property platform that speaks every buyer's language.
+              </p>
+
+              <div
+                className="opacity-0 animate-fade-up"
+                style={{
+                  display: 'flex', gap: 14, marginTop: 40, marginBottom: 12,
+                  flexWrap: 'wrap', animationDelay: '0.55s',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    const el = document.getElementById('heroSearch');
+                    if (el) { (el as HTMLInputElement).focus(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+                  }}
+                  style={{
+                    background: '#000', color: '#fff', border: '1px solid #000',
+                    borderRadius: 9999, padding: '16px 32px', fontSize: 14, fontWeight: 600,
+                    display: 'inline-flex', alignItems: 'center', gap: 10, cursor: 'pointer',
+                    transition: 'all .15s ease',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#000'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = '#000'; e.currentTarget.style.color = '#fff'; }}
+                >
+                  Start searching <ArrowRight size={16} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/agents/landing')}
+                  style={{
+                    background: '#fff', color: '#000', border: '1px solid #000',
+                    borderRadius: 9999, padding: '16px 32px', fontSize: 14, fontWeight: 600,
+                    cursor: 'pointer', transition: 'all .15s ease',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = '#000'; e.currentTarget.style.color = '#fff'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#000'; }}
+                >
+                  For agents
+                </button>
+              </div>
+
+              <div className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:14, fontWeight:500, color:T.mid, marginTop:24, marginBottom:16, display:'flex', alignItems:'center', gap:6 }}>
                 <span style={{ fontSize:20, lineHeight:1 }}>{seq.flag}</span> {seq.sub} · {t('home.hero.langSwitch')}
               </div>
 

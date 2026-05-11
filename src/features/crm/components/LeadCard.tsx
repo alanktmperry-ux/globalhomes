@@ -80,8 +80,8 @@ export function LeadCard({ lead, onClick, onDragStart, onDragEnd }: Props) {
             {lead.first_name} {lead.last_name ?? ''}
           </span>
         </div>
-        <span className="text-xs flex-shrink-0">
-          {SOURCE_ICON[lead.source] ?? '✏️'}
+        <span className="text-[10px] uppercase font-semibold text-[#6B7280] flex-shrink-0" style={{ letterSpacing: '0.06em' }}>
+          {SOURCE_LABEL[lead.source] ?? 'Manual'}
         </span>
       </div>
 

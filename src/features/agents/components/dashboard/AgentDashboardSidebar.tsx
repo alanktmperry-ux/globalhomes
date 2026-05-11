@@ -537,11 +537,21 @@ const AgentDashboardSidebar = () => {
         {!collapsed ? (
           <div className="flex flex-col gap-3">
             {/* ListHQ brand wordmark — anchors brand inside the dashboard */}
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center shrink-0">
-                <span className="text-primary-foreground font-bold text-[10px] tracking-tight">LHQ</span>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-md bg-white/15 backdrop-blur flex items-center justify-center shrink-0">
+                  <span className="text-white font-bold text-[10px] tracking-tight">LHQ</span>
+                </div>
+                <span className="font-display text-white text-lg font-semibold tracking-tight">ListHQ</span>
               </div>
-              <span className="font-display text-sm font-bold tracking-tight">ListHQ</span>
+              <a
+                href="/"
+                className="flex items-center gap-1.5 text-xs font-light hover:text-white transition-colors mt-2"
+                style={{ color: 'rgba(255,255,255,0.55)' }}
+              >
+                <iconify-icon icon="solar:arrow-left-linear" style={{ fontSize: '12px' }}></iconify-icon>
+                Back to homepage
+              </a>
             </div>
             <div className="flex items-center gap-2.5">
              {agentLogo ? (

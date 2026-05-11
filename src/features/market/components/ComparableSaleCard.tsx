@@ -1,11 +1,6 @@
 import { Bed, Bath, Car, Ruler, CheckCircle } from 'lucide-react';
 import type { ComparableSaleRecord } from '@/types/market';
-
-const formatAUD = (n: number) =>
-  new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 }).format(n);
-
-const formatDate = (d: string) =>
-  new Date(d).toLocaleDateString('en-AU', { month: 'short', year: 'numeric' });
+import { useTranslation, formatCurrency, formatDate as fmtDate, formatNumber } from '@/shared/lib/i18n';
 
 const methodLabel: Record<string, { label: string; className: string }> = {
   auction: { label: 'Auction', className: 'bg-orange-100 text-orange-700' },

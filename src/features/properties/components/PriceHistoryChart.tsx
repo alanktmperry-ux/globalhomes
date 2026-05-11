@@ -93,7 +93,7 @@ export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceF
             return {
               month: r.month,
               medianPrice: Number(r.median_sale_price),
-              label: d.toLocaleDateString('en-AU', { month: 'short', year: '2-digit' }),
+              label: formatDate(d, language, { month: 'short', year: '2-digit' }),
             };
           }));
         }

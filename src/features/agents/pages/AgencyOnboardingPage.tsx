@@ -1077,7 +1077,7 @@ export default function AgencyOnboardingPage() {
               {/* Agency street address */}
               <div className="sm:col-span-2">
                 <Label className="text-xs font-semibold text-foreground">
-                  Agency Street Address <span className="text-destructive ml-0.5">*</span>
+                  {t('agentOnboarding.agency.address')} <span className="text-destructive ml-0.5">{'*'}</span>
                 </Label>
                 <AddressAutocomplete
                   value={agencyAddress}
@@ -1087,7 +1087,7 @@ export default function AgencyOnboardingPage() {
                   className="mt-1.5"
                 />
                 {agencyAddress && (
-                  <p className="text-[11px] text-muted-foreground mt-1">Pre-filled from your registration — edit if needed</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">{t('agentOnboarding.agency.prefilled')}</p>
                 )}
               </div>
 

@@ -56,7 +56,7 @@ export function InspectionBookingModal({ property, inspectionTimes, open, onClos
 
     setSubmitting(true);
     const slot = upcomingSlots[selectedSlot];
-    const slotStr = `${new Date(slot.date).toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' })} ${slot.start}–${slot.end}`;
+    const slotStr = `${formatDate(slot.date, language, { weekday: 'short', day: 'numeric', month: 'short' })} ${slot.start}–${slot.end}`;
 
     try {
       // Create lead with inspection type

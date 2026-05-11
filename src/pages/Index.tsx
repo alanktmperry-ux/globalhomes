@@ -11,6 +11,8 @@ import FeaturedListings from '@/features/marketing/FeaturedListings';
 import ReplaceFiveTools from '@/features/marketing/ReplaceFiveTools';
 import VoiceListingShowcase from '@/features/marketing/VoiceListingShowcase';
 import HaloBoardPreview from '@/features/marketing/HaloBoardPreview';
+import PricingSectionNew from '@/features/marketing/PricingSection';
+import FinalCTA from '@/features/marketing/FinalCTA';
 
 // ============================================================
 // Wave 17 V8 — Buyer-first multilingual homepage
@@ -1069,10 +1071,11 @@ const Index = () => {
 
         <FAQSection />
 
-        {/* ═══ SECTION 9 — Pricing ═══ */}
-        <PricingSection navigate={navigate} T={T} />
+        {/* ═══ SECTION 9 — Pricing (Bose × Blue) ═══ */}
+        <PricingSectionNew />
 
-        <ClosingCTA navigate={navigate} T={T} />
+        {/* ═══ Final CTA — dark ink with blue glow ═══ */}
+        <FinalCTA />
 
         {/* ═══ Search modal ═══ */}
         {modalOpen && (

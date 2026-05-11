@@ -792,7 +792,6 @@ const ProfilePage = () => {
             </div>
           </TabsContent>
         </Tabs>
-      </div>
     </div>
   );
 };

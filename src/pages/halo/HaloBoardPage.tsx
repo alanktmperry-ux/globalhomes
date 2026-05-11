@@ -181,7 +181,7 @@ export default function HaloBoardPage() {
         p_halo_id: target.id,
       });
       if (rpcErr) {
-        toast.error('Insufficient credits or already unlocked.');
+        toast.error(t('halo.board.toast.insufficient'));
         setTarget(null);
         return;
       }

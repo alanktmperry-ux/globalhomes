@@ -1360,10 +1360,10 @@ export default function AgencyOnboardingPage() {
           </div>
           <div className="grid gap-3 sm:grid-cols-2 pt-2">
             <Button onClick={() => navigate('/dashboard/trust')} className="gap-2">
-              <Landmark size={14} /> Go to Trust Dashboard
+              <Landmark size={14} /> {t('agentOnboarding.complete.trustCta')}
             </Button>
             <Button variant="outline" onClick={() => navigate('/dashboard/rent-roll')} className="gap-2">
-              <Building2 size={14} /> Go to Rent Roll
+              <Building2 size={14} /> {t('agentOnboarding.complete.rentRollCta')}
             </Button>
           </div>
           <GuideCard

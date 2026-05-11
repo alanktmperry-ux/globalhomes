@@ -15,6 +15,7 @@ interface Props {
 }
 
 export function ComparableSaleCard({ sale, compact }: Props) {
+  const { language } = useTranslation();
   const method = methodLabel[sale.sale_method] ?? methodLabel.private_treaty;
 
   return (

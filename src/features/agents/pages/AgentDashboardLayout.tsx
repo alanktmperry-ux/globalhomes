@@ -1,6 +1,7 @@
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useMemo } from 'react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
+import { Search } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useIsMobile } from '@/shared/hooks/use-mobile';
 import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';

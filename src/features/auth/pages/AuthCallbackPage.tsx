@@ -73,7 +73,7 @@ const AuthCallbackPage = () => {
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="text-center space-y-4">
         <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-        <p className="text-sm text-muted-foreground">Signing you in…</p>
+        <p className="text-sm text-muted-foreground">{t('auth.callback.signingIn')}</p>
       </div>
     </div>
   );

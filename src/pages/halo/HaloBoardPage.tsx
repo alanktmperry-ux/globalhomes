@@ -256,10 +256,10 @@ export default function HaloBoardPage() {
               <AlertTriangle size={18} className="shrink-0 mt-0.5" />
               <div className="flex-1 text-sm">
                 <p className="font-medium">
-                  You have {balance} credit{balance === 1 ? '' : 's'} left.
+                  {t(balance === 1 ? 'halo.board.lowCredit.one' : 'halo.board.lowCredit.other', { count: balance })}
                 </p>
                 <p className="text-xs opacity-90">
-                  Top up to keep responding to seekers.
+                  {t('halo.board.lowCredit.topUp')}
                 </p>
               </div>
               <Button

@@ -108,93 +108,107 @@ const SmokeAlarmsPage = () => {
     return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" size={28} /></div>;
   }
 
+  const dueSoonCount = useMemo(
+    () => rows.filter(r => {
+      if (!r.latest) return false;
+      const d = differenceInDays(parseISO(r.latest.next_service_due), today);
+      return d >= 0 && d <= 60;
+    }).length,
+    [rows]
+  );
+
   return (
-    <div className="space-y-4 pb-20">
-      <DashboardHeader title="Smoke Alarm Compliance" subtitle="Portfolio-wide smoke alarm servicing and compliance status" />
+    <div className="p-4 sm:p-6 pb-20">
+      <APlusPageHeader
+        title="Compliance"
+        subtitle="Smoke alarms, pool safety, gas/electrical, lease compliance — all tracked here"
+      />
 
-      <div className="px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <Card><CardContent className="p-4">
-          <p className="text-xs text-muted-foreground">Total Properties</p>
-          <p className="text-2xl font-semibold">{rows.length}</p>
-        </CardContent></Card>
-        <Card className={cn(overdueCount > 0 && 'border-red-500/30')}>
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Overdue</p>
-            <p className={cn('text-2xl font-semibold', overdueCount > 0 && 'text-red-700')}>{overdueCount}</p>
-          </CardContent>
-        </Card>
-        <Card><CardContent className="p-4">
-          <p className="text-xs text-muted-foreground">No Records</p>
-          <p className="text-2xl font-semibold">{noRecordCount}</p>
-        </CardContent></Card>
+      {dueSoonCount > 0 && overdueCount === 0 && (
+        <APlusDueSoonBanner
+          title={`${dueSoonCount} compliance item${dueSoonCount === 1 ? '' : 's'} due in the next 60 days`}
+          body="Schedule inspections to stay ahead of expiry."
+        />
+      )}
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        <APlusStatCard label="Compliant" value={rows.length - overdueCount - noRecordCount} />
+        <APlusStatCard label="Due Soon" value={dueSoonCount} />
+        <APlusStatCard label="Overdue" value={overdueCount} urgent={overdueCount > 0} icon="solar:danger-triangle-linear" />
+        <APlusStatCard label="No Record" value={noRecordCount} />
       </div>
 
-      <div className="px-4 sm:px-6">
-        {rows.length === 0 ? (
-          <Card><CardContent className="p-10 text-center text-muted-foreground">
-            <Flame className="mx-auto mb-2" size={28} />
-            <p className="text-sm">No properties found.</p>
-          </CardContent></Card>
-        ) : (
-          <Card>
-            <CardContent className="p-0 overflow-x-auto">
-              <table className="w-full text-xs min-w-[760px]">
-                <thead>
-                  <tr className="border-b border-border text-muted-foreground">
-                    <th className="text-left font-medium py-3 px-3">Property</th>
-                    <th className="text-left font-medium py-3 px-3">Last Service</th>
-                    <th className="text-left font-medium py-3 px-3">Next Due</th>
-                    <th className="text-left font-medium py-3 px-3">Status</th>
-                    <th className="text-left font-medium py-3 px-3">Certificate</th>
-                    <th className="text-left font-medium py-3 px-3">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map(p => {
-                    const due = p.latest ? differenceInDays(parseISO(p.latest.next_service_due), today) : null;
-                    const overdue = due !== null && due < 0;
-                    const dueSoon = due !== null && due >= 0 && due <= 60;
-                    return (
-                      <tr key={p.id} className={cn('border-b border-border/50', overdue && 'bg-red-500/5')}>
-                        <td className="py-3 px-3">
-                          <p className="font-medium text-foreground">{p.address}</p>
-                          <p className="text-muted-foreground">{[p.suburb, p.state].filter(Boolean).join(', ')}</p>
-                        </td>
-                        <td className="py-3 px-3">
-                          {p.latest ? format(parseISO(p.latest.service_date), 'dd MMM yyyy') : <span className="text-muted-foreground">—</span>}
-                        </td>
-                        <td className="py-3 px-3">
-                          {p.latest ? (
-                            <span className={cn(overdue && 'text-red-700 font-medium', dueSoon && 'text-amber-700 font-medium')}>
-                              {format(parseISO(p.latest.next_service_due), 'dd MMM yyyy')}
-                              {overdue && <span className="ml-1 text-[10px]">(overdue)</span>}
-                            </span>
-                          ) : <span className="text-muted-foreground">—</span>}
-                        </td>
-                        <td className="py-3 px-3">
-                          {p.latest ? (
-                            <Badge className={cn('border-0', STATUS_COLORS[p.latest.compliance_status] || 'bg-muted')}>
-                              {STATUS_LABEL[p.latest.compliance_status] || p.latest.compliance_status}
-                            </Badge>
-                          ) : (
-                            <Badge className="border-0 bg-amber-500/15 text-amber-700">No Record</Badge>
-                          )}
-                        </td>
-                        <td className="py-3 px-3">{p.latest?.certificate_number || '—'}</td>
-                        <td className="py-3 px-3">
-                          <Button size="sm" variant="outline" onClick={() => setOpenProp(p)}>
-                            {p.latest ? 'Manage' : 'Add Record'}
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+      {rows.length === 0 ? (
+        <div className="bg-white rounded-[12px] p-10" style={{ border: '1px solid #E5E7EB' }}>
+          <EmptyState
+            icon="solar:shield-check-linear"
+            title="No properties found"
+            body="Add properties to your portfolio to track smoke alarm compliance."
+            variant="compact"
+          />
+        </div>
+      ) : (
+        <APlusTable>
+          <APlusTHead>
+            <APlusTh>Property</APlusTh>
+            <APlusTh>Last Service</APlusTh>
+            <APlusTh>Next Due</APlusTh>
+            <APlusTh>Status</APlusTh>
+            <APlusTh>Certificate</APlusTh>
+            <APlusTh align="right">Action</APlusTh>
+          </APlusTHead>
+          <APlusTBody>
+            {rows.map(p => {
+              const due = p.latest ? differenceInDays(parseISO(p.latest.next_service_due), today) : null;
+              const overdue = due !== null && due < 0;
+              const dueSoon = due !== null && due >= 0 && due <= 60;
+              const nextColor = overdue ? 'text-[#991B1B] font-bold' : dueSoon ? 'text-[#92400E] font-semibold' : 'text-[#0a0f1e] font-semibold';
+              return (
+                <APlusTr key={p.id}>
+                  <APlusTd>
+                    <div className="font-semibold text-[#0a0f1e]">{p.address}</div>
+                    <div className="text-xs text-[#6B7280] mt-0.5">{[p.suburb, p.state].filter(Boolean).join(', ')}</div>
+                  </APlusTd>
+                  <APlusTd>
+                    {p.latest ? (
+                      <span className="text-xs text-[#6B7280] tabular-nums whitespace-nowrap">
+                        {format(parseISO(p.latest.service_date), 'dd MMM yyyy')}
+                      </span>
+                    ) : <span className="text-[#6B7280]">—</span>}
+                  </APlusTd>
+                  <APlusTd>
+                    {p.latest ? (
+                      <span className={cn('text-xs tabular-nums whitespace-nowrap', nextColor)}>
+                        {format(parseISO(p.latest.next_service_due), 'dd MMM yyyy')}
+                        {overdue && <span className="ml-1 text-[10px]">(overdue)</span>}
+                      </span>
+                    ) : <span className="text-[#6B7280]">—</span>}
+                  </APlusTd>
+                  <APlusTd>
+                    {p.latest ? (
+                      <APlusBadge
+                        tone={STATUS_TONE[p.latest.compliance_status] || 'grey'}
+                        label={STATUS_LABEL[p.latest.compliance_status] || p.latest.compliance_status}
+                        icon={p.latest.compliance_status === 'non_compliant' ? 'solar:danger-triangle-linear' : undefined}
+                      />
+                    ) : (
+                      <APlusBadge tone="amber" label="No Record" />
+                    )}
+                  </APlusTd>
+                  <APlusTd>
+                    <span className="text-xs text-[#374151] font-medium">{p.latest?.certificate_number || '—'}</span>
+                  </APlusTd>
+                  <APlusTd align="right">
+                    <Button size="sm" variant="outline" onClick={() => setOpenProp(p)} className="h-8">
+                      {p.latest ? 'Manage' : 'Add Record'}
+                    </Button>
+                  </APlusTd>
+                </APlusTr>
+              );
+            })}
+          </APlusTBody>
+        </APlusTable>
+      )}
 
       {/* Per-property panel modal */}
       <Dialog open={!!openProp} onOpenChange={(o) => !o && setOpenProp(null)}>

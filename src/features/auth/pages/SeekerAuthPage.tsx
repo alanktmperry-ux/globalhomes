@@ -379,7 +379,7 @@ const SeekerAuthPage = () => {
                         minLength={10}
                         value={password}
                         onChange={(e) => { setPassword(e.target.value); setError(null); }}
-                        placeholder="At least 10 characters"
+                        placeholder={t('auth.passwordMinPlaceholder')}
                         className={input}
                         autoComplete="new-password"
                       />

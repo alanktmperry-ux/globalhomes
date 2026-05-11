@@ -11,7 +11,7 @@ import { OpenHomesCard } from '@/features/properties/components/OpenHomesCard';
 import { ListingChatWidget } from '@/features/properties/components/ListingChatWidget';
 import { Button } from '@/components/ui/button';
 import { Property } from '@/shared/lib/types';
-import { useTranslation } from '@/shared/lib/i18n';
+import { useTranslation, formatCurrency, formatDate, formatNumber } from '@/shared/lib/i18n';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { AgentContactModal } from '@/features/agents/components/AgentContactModal';
 import { InvestmentInsightsCard } from '@/features/properties/components/InvestmentInsightsCard';

@@ -538,11 +538,14 @@ const AgentDashboardSidebar = () => {
           <div className="flex flex-col gap-3">
             {/* ListHQ brand wordmark — anchors brand inside the dashboard */}
             <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-md bg-white/15 backdrop-blur flex items-center justify-center shrink-0">
-                  <span className="text-white font-bold text-[10px] tracking-tight">LHQ</span>
+              <div className="flex items-center">
+                <div
+                  className="flex items-center justify-center rounded-[8px] font-bold text-[11px]"
+                  style={{ background: '#FFFFFF', color: '#2563EB', width: '28px', height: '28px' }}
+                >
+                  LHQ
                 </div>
-                <span className="font-display text-white text-lg font-semibold tracking-tight">ListHQ</span>
+                <span className="text-white text-lg font-semibold tracking-tight ml-2">ListHQ</span>
               </div>
               <a
                 href="/"

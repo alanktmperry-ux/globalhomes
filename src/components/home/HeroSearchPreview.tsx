@@ -86,29 +86,12 @@ export default function HeroSearchPreview() {
   return (
     <section
       id="main-content"
-      style={{
-        background: '#fff',
-        minHeight: '100vh',
-        paddingTop: 120,
-        paddingBottom: 80,
-        paddingLeft: 'max(28px, env(safe-area-inset-left))',
-        paddingRight: 'max(28px, env(safe-area-inset-right))',
-        overflowX: 'hidden',
-      }}
+      className="bg-white min-h-screen pt-32 pb-20"
+      style={{ overflowX: 'hidden' }}
     >
-      <div
-        className="hsp-grid"
-        style={{
-          maxWidth: 1280,
-          margin: '0 auto',
-          display: 'grid',
-          gridTemplateColumns: '1.2fr 0.8fr',
-          gap: 64,
-          alignItems: 'center',
-        }}
-      >
+      <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 max-w-[1400px] mx-auto px-8 lg:px-12 items-center">
         {/* ── LEFT ─────────────────────────── */}
-        <div>
+        <div className="flex flex-col">
           {/* Eyebrow pill */}
           <div
             style={{
@@ -269,7 +252,7 @@ export default function HeroSearchPreview() {
         </div>
 
         {/* ── RIGHT ─────────────────────────── */}
-        <div className="hsp-right" style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+        <div className="hsp-right relative flex justify-center">
           <div
             style={{
               position: 'relative',
@@ -381,8 +364,7 @@ export default function HeroSearchPreview() {
           border-color: #2563EB !important;
           box-shadow: 0 0 0 4px rgba(37,99,235,0.15), 0 8px 24px rgba(37,99,235,0.12);
         }
-        @media (max-width: 980px) {
-          .hsp-grid { grid-template-columns: 1fr !important; gap: 48px !important; }
+        @media (max-width: 1023px) {
           .hsp-enq { display: none !important; }
         }
       `}</style>

@@ -19,6 +19,7 @@ const formatCurrency = (raw: string) => {
 export default function OnboardingBuyerPrefsPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [seekingType, setSeekingType] = useState<SeekingType | null>(null);
   const [suburbs, setSuburbs] = useState('');
   const [budget, setBudget] = useState('');

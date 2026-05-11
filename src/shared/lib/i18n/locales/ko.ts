@@ -1691,4 +1691,6 @@ export const ko: Partial<Record<TranslationKey, string>> = {
   'halo.credits.loadError': '크레딧 패키지를 불러오는 데 실패했습니다.',
   'halo.credits.stripeNotConfigured': 'Stripe가 아직 설정되지 않았습니다. 잠시 후 다시 시도해 주세요.',
   'halo.credits.checkoutError': '결제를 시작할 수 없습니다. 다시 시도해 주세요.',
+  'hero.headline.line1': "집을 찾으세요.",
+  'hero.headline.line2': "어떤 언어로든.",
 };

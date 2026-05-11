@@ -1691,4 +1691,6 @@ export const vi: Partial<Record<TranslationKey, string>> = {
   'halo.credits.loadError': 'Không thể tải gói tín dụng.',
   'halo.credits.stripeNotConfigured': 'Stripe chưa được cấu hình. Vui lòng thử lại sau.',
   'halo.credits.checkoutError': 'Không thể bắt đầu thanh toán. Vui lòng thử lại.',
+  'hero.headline.line1': "Tìm nhà của bạn.",
+  'hero.headline.line2': "Bằng bất kỳ ngôn ngữ.",
 };

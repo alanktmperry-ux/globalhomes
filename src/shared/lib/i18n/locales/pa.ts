@@ -1695,4 +1695,6 @@ export const pa: Partial<Record<TranslationKey, string>> = {
   'halo.credits.loadError': 'ਕ੍ਰੈਡਿਟ ਪੈਕੇਜ ਲੋਡ ਕਰਨ ਵਿੱਚ ਅਸਫਲ।',
   'halo.credits.stripeNotConfigured': 'ਸਟ੍ਰਾਈਪ ਅਜੇ ਸੰਰੂਪਿਤ ਨਹੀਂ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਜਲਦੀ ਹੀ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
   'halo.credits.checkoutError': 'ਚੈੱਕਆਉਟ ਸ਼ੁਰੂ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਿਆ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
+  'hero.headline.line1': "ਆਪਣਾ ਘਰ ਲੱਭੋ।",
+  'hero.headline.line2': "ਕਿਸੇ ਵੀ ਭਾਸ਼ਾ ਵਿੱਚ।",
 };

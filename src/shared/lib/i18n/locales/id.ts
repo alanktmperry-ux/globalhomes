@@ -1695,4 +1695,6 @@ export const id: Partial<Record<TranslationKey, string>> = {
   'halo.credits.loadError': 'Gagal memuat paket kredit.',
   'halo.credits.stripeNotConfigured': 'Stripe belum dikonfigurasi. Silakan coba lagi nanti.',
   'halo.credits.checkoutError': 'Proses pembayaran tidak dapat dimulai. Silakan coba lagi.',
+  'hero.headline.line1': "Temukan rumah Anda.",
+  'hero.headline.line2': "Dalam bahasa apa pun.",
 };

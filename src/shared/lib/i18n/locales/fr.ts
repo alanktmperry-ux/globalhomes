@@ -1695,4 +1695,6 @@ export const fr: Partial<Record<TranslationKey, string>> = {
   'halo.credits.loadError': 'Échec du chargement des forfaits de crédits.',
   'halo.credits.stripeNotConfigured': 'Stripe n\'est pas encore configuré. Veuillez réessayer ultérieurement.',
   'halo.credits.checkoutError': 'Impossible de lancer le paiement. Veuillez réessayer.',
+  'hero.headline.line1': "Trouvez votre maison.",
+  'hero.headline.line2': "Dans n'importe quelle langue.",
 };

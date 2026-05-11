@@ -1695,4 +1695,6 @@ export const pt: Partial<Record<TranslationKey, string>> = {
   'halo.credits.loadError': 'Falha ao carregar os pacotes de crédito.',
   'halo.credits.stripeNotConfigured': 'O Stripe ainda não está configurado. Tente novamente em breve.',
   'halo.credits.checkoutError': 'Não foi possível iniciar o processo de finalização da compra. Tente novamente.',
+  'hero.headline.line1': "Encontre a sua casa.",
+  'hero.headline.line2': "Em qualquer idioma.",
 };

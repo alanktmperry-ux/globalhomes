@@ -59,7 +59,7 @@ export function InvestmentInsightsCard({ property, compact }: Props) {
     property.councilRatesAnnual != null && {
       icon: Receipt,
       label: 'Council Rates',
-      value: `$${property.councilRatesAnnual.toLocaleString()}/yr`,
+      value: `${formatCurrency(property.councilRatesAnnual, language)}/yr`,
       highlight: false,
     },
     property.strataFeesQuarterly != null && {

@@ -13,6 +13,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { differenceInDays, format, isPast, parseISO } from 'date-fns';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface Settlement {
   id: string;

@@ -33,8 +33,8 @@ type Filter = 'all' | 'hot' | 'warm' | 'watch';
 
 const FILTERS: { key: Filter; label: string; min: number }[] = [
   { key: 'all', label: 'All', min: 50 },
-  { key: 'hot', label: ' Hot', min: 80 },
-  { key: 'warm', label: ' Warm', min: 65 },
+  { key: 'hot', label: 'Hot', min: 80 },
+  { key: 'warm', label: 'Warm', min: 65 },
   { key: 'watch', label: '👀 Watch', min: 50 },
 ];
 

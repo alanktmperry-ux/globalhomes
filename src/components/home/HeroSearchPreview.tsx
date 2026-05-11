@@ -91,8 +91,9 @@ export default function HeroSearchPreview() {
         minHeight: '100vh',
         paddingTop: 120,
         paddingBottom: 80,
-        paddingLeft: 24,
-        paddingRight: 24,
+        paddingLeft: 'max(28px, env(safe-area-inset-left))',
+        paddingRight: 'max(28px, env(safe-area-inset-right))',
+        overflowX: 'hidden',
       }}
     >
       <div
@@ -281,10 +282,11 @@ export default function HeroSearchPreview() {
           >
             <div style={{ position: 'relative', aspectRatio: '4 / 5', width: '100%' }}>
               <img
-                src={heroImg ?? '/placeholder.svg'}
-                alt="Featured multilingual property"
+                src="/hero-fallback-auburn.jpg"
+                alt="Renovated north-facing family home in Auburn, NSW"
                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placeholder.svg'; }}
+                loading="eager"
+                {...({ fetchpriority: 'high' } as any)}
               />
               {/* Gradient overlay */}
               <div style={{

@@ -393,8 +393,8 @@ const SeekerAuthPage = () => {
                         className="mt-0.5 h-4 w-4 rounded border-stone-300 text-primary focus:ring-primary cursor-pointer shrink-0"
                       />
                       <span className="text-[12px] text-stone-500 leading-relaxed">
-                        I understand that my data is processed and stored by Supabase (AWS ap-southeast-2, Sydney) in accordance with the ListHQ{' '}
-                        <a href="/privacy" className="underline underline-offset-2 hover:text-stone-700">Privacy Policy</a>.
+                        {t('auth.consent.dataLocation')}{' '}
+                        <a href="/privacy" className="underline underline-offset-2 hover:text-stone-700">{t('auth.privacyLink')}</a>.
                       </span>
                     </label>
 

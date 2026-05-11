@@ -406,10 +406,10 @@ const SeekerAuthPage = () => {
                         className="mt-0.5 h-4 w-4 rounded border-stone-300 text-primary focus:ring-primary cursor-pointer shrink-0"
                       />
                       <span className="text-[12px] text-stone-500 leading-relaxed">
-                        I agree to the{' '}
-                        <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-stone-700">Privacy Policy</a>
-                        {' '}and{' '}
-                        <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-stone-700">Terms of Service</a>.
+                        {t('auth.consent.agreement')}{' '}
+                        <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-stone-700">{t('auth.privacyLink')}</a>
+                        {' '}{t('auth.and')}{' '}
+                        <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-stone-700">{t('auth.termsLink')}</a>.
                       </span>
                     </label>
 

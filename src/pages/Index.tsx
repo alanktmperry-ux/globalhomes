@@ -814,6 +814,8 @@ const Index = () => {
           `}</style>
         </div>
 
+        {/* ═══ Featured in [Location] — boosted listings (static seed) ═══ */}
+        <FeaturedListings />
 
         {/* ═══ SECTION 4b — Featured Listings ═══ */}
         <section style={{ background: '#fff', padding: '72px 24px' }}>

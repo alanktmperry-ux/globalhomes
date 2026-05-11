@@ -106,7 +106,7 @@ export function SiteHeader() {
           </Link>
 
           {/* Left-side primary nav (desktop only) — role-aware with active pill */}
-          <div className="hidden md:flex items-center gap-1 pl-3 ml-1 border-l border-border/60">
+          <div className="hidden md:flex items-center gap-1 ps-3 ms-1 border-l border-border/60">
             {leftNav.map(item => {
               const Icon = item.icon;
               const active = isActiveRoute(location.pathname, item.to);
@@ -264,7 +264,7 @@ export function SiteHeader() {
                 </button>
                 <button onClick={() => navTo('/exclusive')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
                   <Sparkles size={16} className="text-primary" /> {t('nav.exclusive')}
-                  <span className="ml-auto text-[9px] font-bold uppercase bg-red-500 text-white rounded-full px-1.5 py-0.5">{t('nav.exclusive.badge')}</span>
+                  <span className="ms-auto text-[9px] font-bold uppercase bg-red-500 text-white rounded-full px-1.5 py-0.5">{t('nav.exclusive.badge')}</span>
                 </button>
                 <button onClick={() => navTo('/home-services')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
                   <Wrench size={16} className="text-primary" /> {t('nav.services')}
@@ -423,7 +423,7 @@ function SettingsMenu() {
                     setOpen(false);
                     document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
                   }}
-                  className={`text-sm px-3 py-1.5 rounded-lg text-left transition-colors ${
+                  className={`text-sm px-3 py-1.5 rounded-lg text-start transition-colors ${
                     isActive
                       ? 'bg-accent font-medium text-foreground'
                       : 'text-foreground hover:bg-accent'

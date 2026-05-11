@@ -180,7 +180,7 @@ const AuthLandingPage = () => {
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-20">
         <div className="flex items-center gap-1.5 text-xs text-slate-400 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full border border-slate-200 shadow-sm whitespace-nowrap">
           {t('auth.landing.alreadyAccount')}{' '}
-          <Link to="/login" className="text-blue-600 font-medium hover:underline ml-1">{t('auth.landing.buyerSignIn')}</Link>
+          <Link to="/login" className="text-blue-600 font-medium hover:underline ms-1">{t('auth.landing.buyerSignIn')}</Link>
           <span className="mx-1">·</span>
           <Link to="/agents/login" className="text-blue-600 font-medium hover:underline">{t('auth.landing.agentSignIn')}</Link>
         </div>

@@ -52,7 +52,7 @@ const ForgotPasswordPage = () => {
                 <input
                   type="email" placeholder={t('auth.forgotPassword.placeholder')} required value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-secondary text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full ps-10 pe-4 py-3 rounded-xl bg-secondary text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
               <button type="submit" disabled={loading}

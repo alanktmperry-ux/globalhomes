@@ -234,7 +234,7 @@ export default function SeekerInbox() {
         <div className="flex items-center gap-3 mb-6">
           <InboxIcon className="h-6 w-6 text-[#1E3A5F]" />
           <h1 className="text-2xl font-semibold text-[#1E293B]">{t('seeker.inbox.title')}</h1>
-          <Badge variant="secondary" className="ml-2">{responses.length}</Badge>
+          <Badge variant="secondary" className="ms-2">{responses.length}</Badge>
         </div>
 
         {responses.length === 0 ? (
@@ -257,7 +257,7 @@ export default function SeekerInbox() {
                     <button
                       key={r.id}
                       onClick={() => setSelectedId(r.id)}
-                      className={`w-full text-left px-4 py-3 min-h-[44px] hover:bg-[#F8FAFC] transition-colors ${
+                      className={`w-full text-start px-4 py-3 min-h-[44px] hover:bg-[#F8FAFC] transition-colors ${
                         isSelected ? 'bg-[#EFF6FF]' : ''
                       }`}
                     >
@@ -320,7 +320,7 @@ export default function SeekerInbox() {
                               className="bg-[#059669] hover:bg-[#047857] text-white min-h-[44px]"
                               size="sm"
                             >
-                              <Check className="h-4 w-4 mr-1" /> {t('seeker.inbox.action.accept')}
+                              <Check className="h-4 w-4 me-1" /> {t('seeker.inbox.action.accept')}
                             </Button>
                             <Button
                               onClick={handleDismiss}
@@ -328,7 +328,7 @@ export default function SeekerInbox() {
                               className="border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] min-h-[44px]"
                               size="sm"
                             >
-                              <X className="h-4 w-4 mr-1" /> {t('seeker.inbox.action.dismiss')}
+                              <X className="h-4 w-4 me-1" /> {t('seeker.inbox.action.dismiss')}
                             </Button>
                           </>
                         )}
@@ -353,7 +353,7 @@ export default function SeekerInbox() {
                           <button
                             key={p.id}
                             onClick={() => navigate(`/property/${p.id}`)}
-                            className="text-left border border-[#E2E8F0] rounded-lg p-3 hover:border-[#2563EB] hover:bg-[#F8FAFC] transition-colors"
+                            className="text-start border border-[#E2E8F0] rounded-lg p-3 hover:border-[#2563EB] hover:bg-[#F8FAFC] transition-colors"
                           >
                             <div className="flex items-start gap-2">
                               <Home className="h-4 w-4 text-[#2563EB] mt-0.5 flex-shrink-0" />
@@ -420,7 +420,7 @@ export default function SeekerInbox() {
                           disabled={!reply.trim() || sending}
                           className="bg-[#1E3A5F] hover:bg-[#172E4A] text-white min-h-[44px]"
                         >
-                          <Send className="h-4 w-4 mr-2" />
+                          <Send className="h-4 w-4 me-2" />
                           {sending ? t('seeker.inbox.reply.sending') : t('seeker.inbox.reply.send')}
                         </Button>
                       </div>

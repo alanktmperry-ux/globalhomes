@@ -188,7 +188,7 @@ const ListingDocumentsTab = ({ listing }: Props) => {
 
       {/* DocuSign placeholder notice */}
       <div className="bg-muted/50 border border-border rounded-xl p-4 text-xs text-muted-foreground">
-        <p className="font-semibold mb-1">📝 E-Signature Integration</p>
+        <p className="font-semibold mb-1"> E-Signature Integration</p>
         <p>The "Request Signature" button is a placeholder for DocuSign API integration. Connect your DocuSign account to enable real e-signature workflows.</p>
       </div>
     </div>

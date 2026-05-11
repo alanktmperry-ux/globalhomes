@@ -107,7 +107,7 @@ export function PaymentStatusBanner({ onVisibleChange }: { onVisibleChange?: (vi
       <div className="sticky top-0 z-40 w-full bg-amber-500 text-white px-4 py-3 text-sm">
         <div className="max-w-5xl mx-auto flex items-center justify-between gap-2">
           <span className="flex-1 text-center">
-            ⚠️ Payment issue detected. Your account is active but listings may be hidden if not resolved.{' '}
+             Payment issue detected. Your account is active but listings may be hidden if not resolved.{' '}
             <Link to="/dashboard/billing" className="underline font-semibold hover:text-white/90">
               Update payment method →
             </Link>
@@ -174,7 +174,7 @@ function TrialBanner({ daysLeft }: { daysLeft: number }) {
     <div className="sticky top-0 z-40 w-full bg-blue-600 text-white px-4 py-3 text-sm">
       <div className="max-w-5xl mx-auto flex items-center justify-between gap-2">
         <span className="flex-1 text-center">
-          🎉 You're on a free trial — <strong>{daysLeft} days remaining</strong>. Upgrade to keep your listings live.{' '}
+           You're on a free trial — <strong>{daysLeft} days remaining</strong>. Upgrade to keep your listings live.{' '}
           <Link to="/dashboard/billing" className="underline font-semibold hover:text-white/90">
             Upgrade now →
           </Link>

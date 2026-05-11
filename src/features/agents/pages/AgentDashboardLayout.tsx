@@ -112,14 +112,14 @@ const AgentDashboardLayout = () => {
           <PaymentStatusBanner onVisibleChange={setPaymentBannerVisible} />
           {!paymentBannerVisible && trustPending && (
             <div className="bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-sm px-4 py-3 flex items-center justify-between">
-              <span>⚠️ Complete your trust account setup to enable rent roll and disbursements.</span>
+              <span> Complete your trust account setup to enable rent roll and disbursements.</span>
               <a href="/dashboard/onboarding" className="underline font-semibold ml-4 shrink-0">Set up now →</a>
             </div>
           )}
           {!paymentBannerVisible && !trustPending && showMfaPromo && (
             <div className="bg-primary/10 border-b border-primary/20 text-sm px-4 py-3 flex items-center justify-between gap-4">
               <span className="text-foreground">
-                🔒 Protect your account — enable two-factor authentication.
+                 Protect your account — enable two-factor authentication.
               </span>
               <div className="flex items-center gap-2 shrink-0">
                 <a

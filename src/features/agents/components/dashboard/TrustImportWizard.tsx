@@ -375,7 +375,7 @@ ${matterRows.length > 0 ? `
 </style></head><body>
 <div class="header">
   <div>
-    <h1>🔒 Trust Account Migration Checklist</h1>
+    <h1> Trust Account Migration Checklist</h1>
     <p style="font-size:9pt;color:#666;margin-top:4px">Compliance Record — Agents Financial Administration Act 2014</p>
   </div>
   <div class="meta">

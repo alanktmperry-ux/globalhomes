@@ -9,11 +9,11 @@ import { BuyerLanguageBadge } from '@/shared/components/BuyerLanguageBadge';
 import { ReplyTranslationPreview } from './ReplyTranslationPreview';
 
 const ACTIVITY_TYPES: { value: ActivityType; label: string; icon: string }[] = [
-  { value: 'note', label: 'Note', icon: '📝' },
-  { value: 'call', label: 'Call', icon: '📞' },
+  { value: 'note', label: 'Note', icon: '' },
+  { value: 'call', label: 'Call', icon: '' },
   { value: 'email', label: 'Email', icon: '✉️' },
-  { value: 'meeting', label: 'Meeting', icon: '🤝' },
-  { value: 'task', label: 'Task', icon: '✅' },
+  { value: 'meeting', label: 'Meeting', icon: '' },
+  { value: 'task', label: 'Task', icon: '' },
 ];
 
 const SMS_TEMPLATES = [
@@ -33,7 +33,7 @@ const fmtLabel = (s: string) =>
   s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
 const ACT_ICON: Record<string, string> = {
-  note: '📝', call: '📞', email: '✉️', meeting: '🤝', task: '✅'
+  note: '', call: '', email: '✉️', meeting: '', task: ''
 };
 
 interface Props { lead: CRMLead; onClose: () => void; onUpdate: () => void; }
@@ -120,7 +120,7 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
                         : 'bg-green-500 hover:bg-green-600 text-white'
                       }`}
                   >
-                    📞 Call
+                     Call
                   </button>
                   <button
                     onClick={e => { e.stopPropagation(); if (!(lead as any).do_not_contact) handleSMSNow(); }}
@@ -131,7 +131,7 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
                         : 'bg-blue-500 hover:bg-blue-600 text-white'
                       }`}
                   >
-                    💬 SMS
+                     SMS
                   </button>
                 </div>
               )}
@@ -155,7 +155,7 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
 
         {(lead as any).do_not_contact && (
           <div className="mx-5 mt-3 flex items-center gap-2 bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2">
-            <span className="text-destructive text-xs font-semibold">🚫 Do Not Contact — calling and SMS are disabled for this lead.</span>
+            <span className="text-destructive text-xs font-semibold"> Do Not Contact — calling and SMS are disabled for this lead.</span>
           </div>
         )}
 
@@ -244,7 +244,7 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
             <div className="space-y-4">
               {showCallLogger && (
                 <div className="mb-3 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl">
-                  <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-2">📞 Calling {lead.phone} — log the outcome below</p>
+                  <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-2"> Calling {lead.phone} — log the outcome below</p>
                   <button
                     onClick={() => setShowCallLogger(false)}
                     className="text-xs text-muted-foreground hover:text-foreground float-right -mt-5"
@@ -455,7 +455,7 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
             <div className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl">
               <div className="flex items-center justify-between p-4 border-b border-border">
                 <div>
-                  <h3 className="text-sm font-bold text-foreground">💬 SMS to {lead.first_name}</h3>
+                  <h3 className="text-sm font-bold text-foreground"> SMS to {lead.first_name}</h3>
                   <p className="text-xs text-muted-foreground">{lead.phone}</p>
                 </div>
                 <button onClick={() => { setShowSMSComposer(false); setSmsBody(''); }}
@@ -487,7 +487,7 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
                 <p className="text-xs text-muted-foreground">{smsBody.length} characters · opens your SMS app</p>
                 <ReplyTranslationPreview text={smsBody} targetLanguage={lead.original_language} />
                 {smsSent ? (
-                  <div className="text-center text-sm text-green-600 font-medium py-2">✅ SMS sent and logged!</div>
+                  <div className="text-center text-sm text-green-600 font-medium py-2"> SMS sent and logged!</div>
                 ) : (
                   <div className="flex gap-2">
                     <button

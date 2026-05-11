@@ -282,7 +282,7 @@ export default function SuppliersPage() {
               {(s.email || s.phone) && (
                 <div className="text-xs text-muted-foreground space-y-0.5">
                   {s.email && <p className="truncate">✉ {s.email}</p>}
-                  {s.phone && <p>📞 {s.phone}</p>}
+                  {s.phone && <p> {s.phone}</p>}
                 </div>
               )}
               <div className="flex gap-1.5 pt-1 flex-wrap">

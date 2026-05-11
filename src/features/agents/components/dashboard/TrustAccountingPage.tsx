@@ -254,7 +254,7 @@ const TrustAccountingPage = () => {
     setOverdrawnLedgers(overdrawn);
     if (overdrawn.length > 0) {
       toast.error(
-        `⚠️ ${overdrawn.length} client ledger${overdrawn.length > 1 ? 's are' : ' is'} overdrawn`,
+        ` ${overdrawn.length} client ledger${overdrawn.length > 1 ? 's are' : ' is'} overdrawn`,
         {
           description: 'A trust account ledger must never have a debit balance. Notify your regulator immediately and remedy the shortfall.',
           duration: 12000,
@@ -736,7 +736,7 @@ const TrustAccountingPage = () => {
           <AlertTriangle size={18} className="text-destructive flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-sm font-bold text-destructive">
-              ⚠️ Trust ledger overdrawn — immediate action required
+               Trust ledger overdrawn — immediate action required
             </p>
             <p className="text-xs text-destructive/80 mt-1">
               The following client ledger{overdrawnLedgers.length > 1 ? 's have' : ' has'} a debit balance.

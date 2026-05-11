@@ -718,7 +718,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
     return (
       <div className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
         <div className="max-w-sm w-full space-y-6">
-          <div className="text-5xl mb-2">🎉</div>
+          <div className="text-5xl mb-2"></div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">Listing is live!</h1>
             <p className="text-muted-foreground mt-1 text-sm">{publishedListing.address}</p>

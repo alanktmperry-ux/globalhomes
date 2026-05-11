@@ -328,7 +328,7 @@ export default function DedupTelemetryPage() {
         </CardHeader>
         <CardContent>
           {offenders.length === 0 ? (
-            <p className="text-sm text-muted-foreground italic">No agents over the 20% threshold. 👍</p>
+            <p className="text-sm text-muted-foreground italic">No agents over the 20% threshold. </p>
           ) : (
             <div className="space-y-2">
               {offenders.map(o => (

@@ -33,8 +33,8 @@ type Filter = 'all' | 'hot' | 'warm' | 'watch';
 
 const FILTERS: { key: Filter; label: string; min: number }[] = [
   { key: 'all', label: 'All', min: 50 },
-  { key: 'hot', label: '🔥 Hot', min: 80 },
-  { key: 'warm', label: '⚡ Warm', min: 65 },
+  { key: 'hot', label: 'Hot', min: 80 },
+  { key: 'warm', label: 'Warm', min: 65 },
   { key: 'watch', label: '👀 Watch', min: 50 },
 ];
 
@@ -74,16 +74,16 @@ const ScoreRing = ({ score, size = 48 }: { score: number; size?: number }) => {
 
 function renderSignalChips(signals: Record<string, any>) {
   const chips: { label: string; emoji: string }[] = [];
-  if (signals.dom_ratio && signals.dom_ratio > 0) chips.push({ emoji: '📅', label: `${signals.dom_ratio}x median DOM` });
-  if (signals.price_cuts && signals.price_cuts > 0) chips.push({ emoji: '📉', label: `${signals.price_cuts} price cut${signals.price_cuts > 1 ? 's' : ''}` });
-  if (signals.suburb_growth_pct != null && signals.suburb_growth_pct < 0) chips.push({ emoji: '📊', label: `Suburb ${signals.suburb_growth_pct}%` });
+  if (signals.dom_ratio && signals.dom_ratio > 0) chips.push({ emoji: '', label: `${signals.dom_ratio}x median DOM` });
+  if (signals.price_cuts && signals.price_cuts > 0) chips.push({ emoji: '', label: `${signals.price_cuts} price cut${signals.price_cuts > 1 ? 's' : ''}` });
+  if (signals.suburb_growth_pct != null && signals.suburb_growth_pct < 0) chips.push({ emoji: '', label: `Suburb ${signals.suburb_growth_pct}%` });
   if (signals.listing_refreshes && signals.listing_refreshes > 0) chips.push({ emoji: '🔄', label: `${signals.listing_refreshes} relists` });
-  if (signals.vendor_motivation) chips.push({ emoji: '🏷️', label: signals.vendor_motivation });
-  if (signals.equity_position) chips.push({ emoji: '💰', label: signals.equity_position });
+  if (signals.vendor_motivation) chips.push({ emoji: '', label: signals.vendor_motivation });
+  if (signals.equity_position) chips.push({ emoji: '', label: signals.equity_position });
   // Fallback: show any remaining numeric signals > 0
   for (const [k, v] of Object.entries(signals)) {
     if (typeof v === 'number' && v > 0 && !['dom_ratio', 'price_cuts', 'suburb_growth_pct', 'listing_refreshes'].includes(k)) {
-      chips.push({ emoji: '📌', label: `${k.replace(/_/g, ' ')}: ${v}` });
+      chips.push({ emoji: '', label: `${k.replace(/_/g, ' ')}: ${v}` });
     }
   }
   return chips;

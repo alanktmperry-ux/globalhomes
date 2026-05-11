@@ -245,8 +245,8 @@ ${agencyName || ''}`.trim();
   };
 
   const daysPrefix = (d: number) => {
-    if (d >= 14) return '🔴 ';
-    if (d >= 7) return '⚠️ ';
+    if (d >= 14) return ' ';
+    if (d >= 7) return ' ';
     return '';
   };
 
@@ -280,7 +280,7 @@ ${agencyName || ''}`.trim();
           <div className="p-10 text-center text-sm text-muted-foreground">Loading arrears…</div>
         ) : items.length === 0 ? (
           <div className="p-10 text-center text-sm text-muted-foreground">
-            🎉 No tenants currently in arrears.
+             No tenants currently in arrears.
           </div>
         ) : (
           <div className="overflow-x-auto">

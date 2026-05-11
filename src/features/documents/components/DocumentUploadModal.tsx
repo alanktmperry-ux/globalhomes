@@ -190,19 +190,19 @@ export function DocumentUploadModal({ propertyId, open, onClose, onUpload, prese
               <RadioGroup value={accessLevel} onValueChange={(v) => setAccessLevel(v as DocumentAccessLevel)} className="space-y-1.5">
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="public" id="al-public" />
-                  <Label htmlFor="al-public" className="text-xs cursor-pointer">🌐 Public — anyone can see</Label>
+                  <Label htmlFor="al-public" className="text-xs cursor-pointer"> Public — anyone can see</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="registered_buyers" id="al-buyers" />
-                  <Label htmlFor="al-buyers" className="text-xs cursor-pointer">👤 Registered Buyers — signed-in users</Label>
+                  <Label htmlFor="al-buyers" className="text-xs cursor-pointer"> Registered Buyers — signed-in users</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="agent_only" id="al-agent" />
-                  <Label htmlFor="al-agent" className="text-xs cursor-pointer">🔒 Agent Only — only you and co-agents</Label>
+                  <Label htmlFor="al-agent" className="text-xs cursor-pointer"> Agent Only — only you and co-agents</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="parties_only" id="al-parties" />
-                  <Label htmlFor="al-parties" className="text-xs cursor-pointer">🤝 Parties Only — buyer, vendor, agent</Label>
+                  <Label htmlFor="al-parties" className="text-xs cursor-pointer"> Parties Only — buyer, vendor, agent</Label>
                 </div>
               </RadioGroup>
             </div>

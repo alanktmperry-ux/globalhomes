@@ -399,7 +399,7 @@ const StepBasics = ({ draft, update }: Props) => {
           />
           <p className="text-xs text-muted-foreground">
             {isListening
-              ? '🎙 Recording — tap Stop when done'
+              ? ' Recording — tap Stop when done'
               : isTranscribing
                 ? '⏳ Transcribing your recording…'
                 : draft.voiceTranscript.length > 0

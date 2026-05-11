@@ -20,10 +20,10 @@ interface Props {
 }
 
 const TONES = [
-  { key: 'standard', label: 'Standard', emoji: '🏡' },
-  { key: 'luxury', label: 'Luxury', emoji: '✨' },
-  { key: 'family', label: 'Family', emoji: '👨‍👩‍👧‍👦' },
-  { key: 'investment', label: 'Investment', emoji: '📈' },
+  { key: 'standard', label: 'Standard', emoji: '' },
+  { key: 'luxury', label: 'Luxury', emoji: '' },
+  { key: 'family', label: 'Family', emoji: '' },
+  { key: 'investment', label: 'Investment', emoji: '' },
 ] as const;
 
 type Tone = typeof TONES[number]['key'];
@@ -364,7 +364,7 @@ const StepVoice = ({ draft, update }: Props) => {
           ) : aiGenerated ? (
             <><RefreshCw size={15} /> Regenerate description</>
           ) : (
-            <><Sparkles size={15} /> Generate listing description ✨</>
+            <><Sparkles size={15} /> Generate listing description </>
           )}
         </Button>
 

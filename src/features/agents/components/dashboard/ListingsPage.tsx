@@ -393,7 +393,7 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
             <DropdownMenuContent align="end" className="w-52">
               <DropdownMenuItem onClick={() => onSendReport(l)} className="gap-2 text-xs cursor-pointer">
                 <FileBarChart2 size={14} className="text-primary" />
-                Send vendor report 📊
+                Send vendor report 
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -99,7 +99,7 @@ export function ReputationExplainerModal({ agentId, open, onOpenChange }: Props)
                     <Progress value={(c.score / c.max) * 100} className="h-2" />
                     <p className="text-xs text-muted-foreground mt-1">{c.reason}</p>
                     {c.score < c.max * 0.7 && (
-                      <p className="text-xs text-primary mt-0.5">💡 {c.tip}</p>
+                      <p className="text-xs text-primary mt-0.5"> {c.tip}</p>
                     )}
                   </div>
                 );

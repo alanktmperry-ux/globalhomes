@@ -439,7 +439,7 @@ function AddRuleDialog({
           </div>
           {SOURCE_UNAVAILABLE[trigger] && (
             <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2">
-              ⚠️ {SOURCE_UNAVAILABLE[trigger]} The rule will be created in disabled state.
+               {SOURCE_UNAVAILABLE[trigger]} The rule will be created in disabled state.
             </div>
           )}
         </div>

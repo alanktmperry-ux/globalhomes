@@ -310,7 +310,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
       similarityScore: match.match_method === 'name_fuzzy' ? (match.confidence ?? null) : null,
     });
     toast({
-      title: '✅ Using existing contact',
+      title: ' Using existing contact',
       description: `Form populated from ${match.first_name} ${match.last_name ?? ''}`.trim(),
     });
     // Close — the parent will re-open to edit if it wants. For now we treat
@@ -351,7 +351,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
     if (fuzzy.length > 0) {
       const f = fuzzy[0];
       toast({
-        title: '⚠️ Heads up — similar contact exists',
+        title: ' Heads up — similar contact exists',
         description: `${f.first_name} ${f.last_name ?? ''}`.trim() + ' looks similar. Saving anyway.',
       });
       void logDuplicateEvent({
@@ -400,7 +400,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
         estimated_value: form.estimated_value ? Math.max(0, Number(form.estimated_value)) : null,
         communication_preferences: prefsToSave,
       } as any);
-      toast({ title: '✅ Contact saved', description: `${form.first_name} ${form.last_name}`.trim() });
+      toast({ title: ' Contact saved', description: `${form.first_name} ${form.last_name}`.trim() });
       onClose();
     } catch (err: unknown) {
       toast({
@@ -473,9 +473,9 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
               <Select value={form.ranking} onValueChange={v => setForm(f => ({...f, ranking: v}))}>
                 <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="hot">🔥 Hot</SelectItem>
+                  <SelectItem value="hot"> Hot</SelectItem>
                   <SelectItem value="warm">🌡️ Warm</SelectItem>
-                  <SelectItem value="cold">❄️ Cold</SelectItem>
+                  <SelectItem value="cold"> Cold</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -548,7 +548,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
           {isBuyer && (
             <div className="border-t border-border pt-3">
               <p className="text-xs font-semibold text-muted-foreground mb-2">
-                <span className="mr-1">🏠</span>
+                <span className="mr-1"></span>
                 Buyer Preferences
               </p>
 

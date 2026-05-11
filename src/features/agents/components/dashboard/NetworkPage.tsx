@@ -532,7 +532,7 @@ const NetworkPage = () => {
                                 onClick={() => { setMatchModalBriefs(matches); setMatchModalProperty(l.address); setShowMatchModal(true); }}
                                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 text-[10px] font-semibold hover:bg-amber-500/25 transition-colors cursor-pointer"
                               >
-                                🎯 {matches.length} match{matches.length !== 1 ? 'es' : ''}
+                                 {matches.length} match{matches.length !== 1 ? 'es' : ''}
                               </button>
                             ) : (
                               <span className="text-xs text-muted-foreground">—</span>
@@ -582,7 +582,7 @@ const NetworkPage = () => {
                     <div key={l.share_id} className="border-2 border-success/40 bg-success/5 rounded-xl p-3 flex items-center justify-between">
                       <div>
                         <div className="flex items-center gap-2 mb-0.5">
-                          <Badge className="bg-success/15 text-success text-[10px] border-0">✅ Matched</Badge>
+                          <Badge className="bg-success/15 text-success text-[10px] border-0"> Matched</Badge>
                           <span className="text-xs font-semibold">{l.address}</span>
                         </div>
                         <p className="text-[10px] text-muted-foreground">{l.suburb}, {l.state} · {AUD.format(l.price)} · by {l.sharing_agent_name}</p>
@@ -658,7 +658,7 @@ const NetworkPage = () => {
                                 onClick={() => { setMatchModalBriefs(matches); setMatchModalProperty(l.address); setShowMatchModal(true); }}
                                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 text-[10px] font-semibold hover:bg-amber-500/25 transition-colors cursor-pointer"
                               >
-                                🎯 {matches.length} match{matches.length !== 1 ? 'es' : ''}
+                                 {matches.length} match{matches.length !== 1 ? 'es' : ''}
                               </button>
                             ) : (
                               <span className="text-xs text-muted-foreground">—</span>
@@ -735,7 +735,7 @@ const NetworkPage = () => {
                         </div>
                         {matched.length > 0 && (
                           <Badge className="bg-success/15 text-success text-[10px] border-0 gap-1">
-                            🎯 {matched.length} listing match{matched.length !== 1 ? 'es' : ''}
+                             {matched.length} listing match{matched.length !== 1 ? 'es' : ''}
                           </Badge>
                         )}
                       </div>
@@ -822,7 +822,7 @@ const NetworkPage = () => {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              🎯 Matching Buyer Briefs
+               Matching Buyer Briefs
             </DialogTitle>
             <DialogDescription>
               {matchModalBriefs.length} buyer brief{matchModalBriefs.length !== 1 ? 's' : ''} match {matchModalProperty}

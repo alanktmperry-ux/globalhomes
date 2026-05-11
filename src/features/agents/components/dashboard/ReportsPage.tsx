@@ -888,7 +888,7 @@ const ReportsPage = () => {
                   </TableHeader>
                   <TableBody>
                     {arrearsRows.length === 0 ? (
-                      <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8 text-xs">No tenancies currently in arrears 🎉</TableCell></TableRow>
+                      <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8 text-xs">No tenancies currently in arrears </TableCell></TableRow>
                     ) : arrearsRows.map(r => (
                       <TableRow key={r.id}>
                         <TableCell className="text-xs font-medium">{r.tenant_name}</TableCell>

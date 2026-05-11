@@ -21,7 +21,7 @@ const SOURCES: { value: LeadSource; label: string }[] = [
 const PRIORITIES: { value: LeadPriority; label: string; color: string }[] = [
   { value: 'low', label: 'Cold', color: 'border-blue-400 text-blue-500' },
   { value: 'medium', label: 'Warm', color: 'border-amber-400 text-amber-500' },
-  { value: 'high', label: 'Hot 🔥', color: 'border-red-400 text-red-500' },
+  { value: 'high', label: 'Hot ', color: 'border-red-400 text-red-500' },
 ];
 
 export function AddLeadModal({ onClose, onSave }: Props) {

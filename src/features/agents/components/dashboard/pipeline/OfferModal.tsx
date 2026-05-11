@@ -109,7 +109,7 @@ const OfferModal = ({ open, onOpenChange, card, propertyId, agentId, onSent }: O
 
         <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 mb-3">
           <p className="text-[11px] text-amber-700 dark:text-amber-400 leading-relaxed">
-            ⚠️ This offer letter is generated as an administrative aid only and does not constitute
+             This offer letter is generated as an administrative aid only and does not constitute
             legal advice. Agents must hold a current real estate licence to use this platform.
             All offer letters must be reviewed before submission. ListHQ is not a licensed real estate agency.
           </p>

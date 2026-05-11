@@ -56,7 +56,7 @@ export function LiveAuctionConsole({ propertyId, auctionId }: Props) {
     const winningBid = bids.find(b => b.is_winning);
     const { data } = await concludeAuction(auctionId, concludeOutcome, soldPrice, winningBid?.registration_id ?? undefined);
     if (data && typeof data === 'object' && 'success' in data && (data as any).success) {
-      toast.success(concludeOutcome === 'sold' ? 'SOLD! 🎉' : 'Auction passed in');
+      toast.success(concludeOutcome === 'sold' ? 'SOLD! ' : 'Auction passed in');
       setShowConclude(false);
     }
   };
@@ -84,7 +84,7 @@ export function LiveAuctionConsole({ propertyId, auctionId }: Props) {
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 animate-pulse">AT RESERVE</span>
             )}
             {reserveStatus === 'met' && (
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">🟢 ON THE MARKET</span>
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700"> ON THE MARKET</span>
             )}
           </div>
         </div>
@@ -180,7 +180,7 @@ export function LiveAuctionConsole({ propertyId, auctionId }: Props) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-card rounded-2xl shadow-lg w-full max-w-sm border border-border p-6 space-y-4">
             <h3 className="font-semibold text-lg text-foreground">
-              {concludeOutcome === 'sold' ? '🎉 Confirm Sale' : '⚠️ Confirm Passed In'}
+              {concludeOutcome === 'sold' ? ' Confirm Sale' : ' Confirm Passed In'}
             </h3>
             <p className="text-sm text-muted-foreground">
               {concludeOutcome === 'sold'

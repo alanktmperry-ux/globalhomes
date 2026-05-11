@@ -60,7 +60,7 @@ export function LeadCard({ lead, onClick, onDragStart, onDragEnd }: Props) {
   const urgency = (lead as any).urgency as UrgencyTier | undefined;
   const cfg = urgency ? URGENCY_CONFIG[urgency] : null;
   const lang = lead.original_language && lead.original_language !== 'en'
-    ? LANGUAGE_META[lead.original_language] ?? { flag: '🌐', name: lead.original_language.toUpperCase() }
+    ? LANGUAGE_META[lead.original_language] ?? { flag: '', name: lead.original_language.toUpperCase() }
     : null;
   const wasTranslated = !!(lang && lead.message_en && lead.message_original && lead.message_en !== lead.message_original);
 
@@ -134,7 +134,7 @@ export function LeadCard({ lead, onClick, onDragStart, onDragEnd }: Props) {
         </div>
         <div className="flex items-center gap-1.5">
           {(lead as any).do_not_contact && (
-            <span className="text-[10px] text-[#991B1B] font-medium">🚫 DNC</span>
+            <span className="text-[10px] text-[#991B1B] font-medium"> DNC</span>
           )}
           {cfg && (
             <span className={`text-[10px] px-1.5 py-0.5 rounded-full border inline-flex items-center gap-1 ${cfg.chip}`}>

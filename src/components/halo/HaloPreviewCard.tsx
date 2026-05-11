@@ -100,8 +100,11 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
   };
 
   return (
-    <Card>
-      <CardContent className="p-5 pr-14 sm:pr-5 space-y-4">
+    <div
+      className="bg-white rounded-[12px] p-5 cursor-pointer hover:shadow-lg hover:border-[#2563EB]/30 transition-all"
+      style={{ border: '1px solid #E5E7EB' }}
+    >
+      <div className="pr-9 sm:pr-0 space-y-4">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div className="flex flex-wrap items-center gap-2">
             <Badge className={intentClass} variant="secondary">

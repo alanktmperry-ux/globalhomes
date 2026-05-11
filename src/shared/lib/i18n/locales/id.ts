@@ -1190,7 +1190,7 @@ export const id: Partial<Record<TranslationKey, string>> = {
   'halo.wizard.step1.iSpeak': 'Saya berbicara',
   'halo.wizard.step1.lang.english': '🇦🇺 Bahasa Inggris',
   'halo.wizard.step1.lang.mandarin': 'CNY Mandarin (普通话)',
-  'halo.wizard.step1.lang.cantonese': '❤Kanton (廣東話)',
+  'halo.wizard.step1.lang.cantonese': 'Kanton (廣東話)',
   'halo.wizard.step1.lang.vietnamese': '🇻€ Vietnam (Tiếng Việt)',
   'halo.wizard.step1.lang.korean': 'Korea Selatan (한국어)',
   'halo.wizard.step1.lang.arabic': 'Arab Saudi (العربية)',

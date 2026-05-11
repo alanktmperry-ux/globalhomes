@@ -388,7 +388,7 @@ export const zhCN: Partial<Record<keyof typeof EnBase, string>> = {
   'home.agents.feature2': '内置CRM与销售管道',
   'home.agents.feature3': '触达多语言买家群体',
   'home.agents.feature4': '非公开房源网络',
-  'home.sliver.agents': '🏆 房产中介：触达700万+其他门户无法覆盖的多语言买家',
+  'home.sliver.agents': '房产中介：触达700万+其他门户无法覆盖的多语言买家',
   'home.sliver.translation': '房源自动翻译成20种语言',
   'home.sliver.price': '起价 $299/月',
   'home.sliver.free': '免费60天',

@@ -230,7 +230,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
               🔍 Searching for a property? Start here
             </a>
             <a
-              href="/auth?mode=agent"
+              href="/signup?role=agent"
               className="text-sm text-slate-500 underline underline-offset-2 hover:text-slate-800 transition-colors"
             >
                Are you an agent? List for free →

@@ -84,7 +84,7 @@ export function OpenHomesCard({ propertyId }: { propertyId: string }) {
   const handleRegister = async (oh: OpenHome) => {
     if (!user) {
       toast.info('Please sign in to register for an open home');
-      navigate('/auth');
+      navigate('/login');
       return;
     }
     setRegistering(oh.id);

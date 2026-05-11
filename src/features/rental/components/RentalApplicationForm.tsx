@@ -92,13 +92,13 @@ export function RentalApplicationForm({ propertyId, rentPw }: Props) {
             </p>
             <div className="flex gap-2">
               <a
-                href="/auth?tab=signup"
+                href="/login?mode=signup"
                 className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:opacity-90 transition"
               >
                 Sign Up
               </a>
               <a
-                href="/auth?tab=login"
+                href="/login"
                 className="px-4 py-2 border border-border rounded-xl text-sm font-medium text-foreground hover:border-foreground/30 transition"
               >
                 Log In

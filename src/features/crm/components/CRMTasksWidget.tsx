@@ -39,7 +39,7 @@ export function CRMTasksWidget() {
       )}
 
       {upcoming.length === 0 && overdue.length === 0 && (
-        <p className="text-sm text-muted-foreground text-center py-4">All caught up! 🎉</p>
+        <p className="text-sm text-muted-foreground text-center py-4">All caught up</p>
       )}
 
       <div className="space-y-1.5">

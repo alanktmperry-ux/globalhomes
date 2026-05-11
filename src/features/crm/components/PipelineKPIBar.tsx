@@ -60,17 +60,22 @@ export function PipelineKPIBar({ onUrgencyClick }: Props) {
               type="button"
               disabled={!interactive}
               onClick={() => onUrgencyClick?.(tier)}
-              className={`bg-card border rounded-xl p-4 text-left transition
-                ${cfg.tile}
-                ${interactive ? 'hover:shadow-md hover:-translate-y-0.5 cursor-pointer' : 'cursor-default'}
-              `}
+              className={`bg-white rounded-[12px] p-5 text-left transition ${
+                interactive ? 'hover:shadow-md hover:-translate-y-0.5 cursor-pointer' : 'cursor-default'
+              }`}
+              style={{ border: '1px solid #E5E7EB' }}
             >
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2">
                 <span className={`w-2 h-2 rounded-full ${cfg.dot}`} />
-                <p className="text-xs font-medium text-foreground">{cfg.label}</p>
+                <p
+                  className="text-xs font-semibold uppercase text-[#6B7280]"
+                  style={{ letterSpacing: '0.08em' }}
+                >
+                  {cfg.label}
+                </p>
               </div>
-              <p className="text-2xl font-bold text-foreground">{count}</p>
-              <p className="text-[10px] text-muted-foreground">{cfg.sub}</p>
+              <p className="text-4xl font-extralight text-[#0a0f1e] tabular-nums mt-2">{count}</p>
+              <p className="text-xs text-[#9CA3AF] mt-1">{cfg.sub}</p>
             </button>
           );
         })}

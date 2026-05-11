@@ -235,7 +235,7 @@ export default function HaloBoardPage() {
 
       {error ? (
         <Alert variant="destructive">
-          <AlertDescription>Unable to load Halo Board. Please refresh.</AlertDescription>
+          <AlertDescription>{t('halo.board.error')}</AlertDescription>
         </Alert>
       ) : loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

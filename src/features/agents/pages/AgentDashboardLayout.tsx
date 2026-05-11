@@ -92,22 +92,31 @@ const AgentDashboardLayout = () => {
     return <MFAChallenge />;
   }
 
+  // Breadcrumbs: derive from path segments after /dashboard
+  const breadcrumbs = useMemo(() => {
+    const segments = location.pathname.split('/').filter(Boolean);
+    return segments.map((seg, i) => ({
+      label: seg
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, (c) => c.toUpperCase()),
+      href: '/' + segments.slice(0, i + 1).join('/'),
+    }));
+  }, [location.pathname]);
+
+  const agentInitials = (agent?.name || user?.email || 'A')
+    .split(/\s+/)
+    .map((s) => s[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
-    <SidebarProvider>
+    <SidebarProvider style={{ ['--sidebar-width' as string]: '260px' }}>
       <div
         data-aplus-shell="1"
         className="h-screen flex w-full text-foreground relative"
-        style={{ background: 'linear-gradient(160deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%)' }}
+        style={{ background: '#F9FAFB' }}
       >
-        {/* Subtle vertical grid overlay — purely decorative */}
-        <div
-          className="fixed inset-0 pointer-events-none z-0 flex justify-between"
-          style={{ padding: '0 25%' }}
-          aria-hidden="true"
-        >
-          <div className="w-px h-full" style={{ background: 'rgba(255,255,255,0.05)' }} />
-          <div className="w-px h-full" style={{ background: 'rgba(255,255,255,0.05)' }} />
-        </div>
         <AgentDashboardSidebar />
         <main id="main-content" className="relative z-10 flex-1 flex flex-col min-w-0 overflow-y-auto pb-[env(safe-area-inset-bottom)]" style={{ background: '#F9FAFB' }}>
           <PaymentStatusBanner onVisibleChange={setPaymentBannerVisible} />
@@ -139,12 +148,53 @@ const AgentDashboardLayout = () => {
               </div>
             </div>
           )}
-          {isMobile && (
+          {isMobile ? (
             <div className="sticky top-0 z-30 flex items-center justify-between px-3 h-12 border-b border-border bg-background/95 backdrop-blur-sm">
               <SidebarTrigger />
               <span className="text-sm font-bold tracking-tight">ListHQ</span>
               <NotificationBell />
             </div>
+          ) : (
+            <header
+              className="sticky top-0 z-30 h-16 bg-white border-b flex items-center justify-between px-8"
+              style={{ borderColor: '#E5E5E5' }}
+            >
+              <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[14px] min-w-0">
+                {breadcrumbs.map((b, i) => {
+                  const isLast = i === breadcrumbs.length - 1;
+                  return (
+                    <span key={b.href} className="flex items-center gap-2 min-w-0">
+                      {i > 0 && <span className="text-[#9CA3AF]">/</span>}
+                      {isLast ? (
+                        <span className="font-bold text-[#0a0f1e] truncate">{b.label}</span>
+                      ) : (
+                        <Link to={b.href} className="text-[#6a6a6a] hover:text-[#0a0f1e] truncate">
+                          {b.label}
+                        </Link>
+                      )}
+                    </span>
+                  );
+                })}
+              </nav>
+              <div className="flex items-center gap-3 shrink-0">
+                <label className="relative hidden md:flex items-center">
+                  <Search size={14} className="absolute left-3 text-[#9CA3AF]" />
+                  <input
+                    type="search"
+                    placeholder="Search…"
+                    className="rounded-full bg-[#F9FAFB] border border-[#E5E5E5] w-72 h-9 pl-9 pr-4 text-[13px] text-[#0a0f1e] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#2563EB] transition-colors"
+                  />
+                </label>
+                <NotificationBell />
+                <Link
+                  to="/dashboard/profile"
+                  className="w-11 h-11 rounded-full bg-gradient-to-br from-[#2563EB] to-[#1E40AF] flex items-center justify-center text-white text-[13px] font-bold hover:opacity-90 transition-opacity"
+                  aria-label="View profile"
+                >
+                  {agentInitials}
+                </Link>
+              </div>
+            </header>
           )}
           <div className="p-4 md:p-6 flex-1 pb-20 lg:pb-6">
             <Suspense fallback={<PageSkeleton />}>

@@ -1380,7 +1380,7 @@ export default function PropertyDetailPage() {
             {!isRental && (
               <div className="mt-3 p-4 rounded-xl border border-primary/20 bg-primary/5">
                 <p className="text-sm font-medium">{tp('property.conveyancer.title')}</p>
-                <p className="text-xs text-muted-foreground mb-2">{tp('property.conveyancer.body')}</p>
+                <p className="text-xs text-muted-foreground mb-2">{tp('property.conveyancer.body', { price: formatCurrency(990, language) })}</p>
                 <Button size="sm" variant="outline" onClick={() => navigate('/conveyancing')}>{tp('property.conveyancer.cta')}</Button>
               </div>
             )}

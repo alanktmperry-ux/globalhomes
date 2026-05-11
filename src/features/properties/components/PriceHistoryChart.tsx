@@ -29,7 +29,7 @@ interface SuburbPoint {
 
 export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceFormatted, suburb, state, propertyType }: PriceHistoryChartProps) {
   const { formatPrice } = useCurrency();
-  const { language } = useTranslation();
+  const { language, t } = useTranslation();
   const [data, setData] = useState<PricePoint[]>([]);
   const [suburbData, setSuburbData] = useState<SuburbPoint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -130,8 +130,10 @@ export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceF
             No price history available yet.
           </p>
           <p className="text-sm text-muted-foreground mt-1">
-            Listed at <span className="font-semibold text-foreground">{priceFormatted || formatPrice(currentPrice)}</span> on{' '}
-            <span className="font-semibold text-foreground">{listedStr}</span>
+            {t('priceHistory.listedAtOn', {
+              price: priceFormatted || formatPrice(currentPrice),
+              date: listedStr,
+            })}
           </p>
         </div>
       </div>
@@ -153,8 +155,10 @@ export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceF
               No price changes since listing.
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              Listed at <span className="font-semibold text-foreground">{priceFormatted || formatPrice(currentPrice)}</span> on{' '}
-              <span className="font-semibold text-foreground">{listedStr}</span>
+              {t('priceHistory.listedAtOn', {
+                price: priceFormatted || formatPrice(currentPrice),
+                date: listedStr,
+              })}
             </p>
           </div>
         ) : (
@@ -169,7 +173,7 @@ export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceF
                 width={55}
               />
               <Tooltip
-                formatter={(value: number) => [formatPrice(value), 'Price']}
+                formatter={(value: number) => [formatPrice(value), t('priceHistory.tooltip.price')]}
                 labelFormatter={(label: string) => label}
                 contentStyle={{ borderRadius: '0.75rem', border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}
               />
@@ -205,7 +209,7 @@ export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceF
                 width={50}
               />
               <Tooltip
-                formatter={(value: number) => [formatPrice(value), 'Suburb Median']}
+                formatter={(value: number) => [formatPrice(value), t('priceHistory.tooltip.suburbMedian')]}
                 labelFormatter={(label: string) => label}
                 contentStyle={{ borderRadius: '0.75rem', border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}
               />
@@ -221,7 +225,10 @@ export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceF
             </LineChart>
           </ResponsiveContainer>
           <p className="text-[11px] text-muted-foreground mt-1.5 text-center">
-            Based on recorded sales in {suburb}. This property is listed at {formatPrice(currentPrice)}.
+            {t('priceHistory.basedOnSales', {
+              suburb: suburb ?? '',
+              price: formatPrice(currentPrice),
+            })}
           </p>
         </div>
       )}

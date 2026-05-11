@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import type { Halo } from '@/types/halo';
 import { usePageTitle } from '@/lib/usePageTitle';
-import { useTranslation } from '@/shared/lib/i18n';
+import { useTranslation, formatCurrency } from '@/shared/lib/i18n';
 
 type HaloRow = Halo & { response_count: number; unread_count: number };
 
@@ -464,7 +464,7 @@ function RenterServices() {
 
 function BuyerServices() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   return (
     <section className="mt-8">
       <h2 className="text-lg font-semibold text-[#1E293B] mb-4">{t('seeker.buyerServices.title')}</h2>
@@ -485,7 +485,7 @@ function BuyerServices() {
       <SmallServiceCard
         icon={Scale}
         title={t('seeker.buyerServices.conveyancer.title')}
-        body={t('seeker.buyerServices.conveyancer.body')}
+        body={t('seeker.buyerServices.conveyancer.body', { price: formatCurrency(990, language) })}
         onClick={() => navigate('/conveyancing')}
       />
     </section>

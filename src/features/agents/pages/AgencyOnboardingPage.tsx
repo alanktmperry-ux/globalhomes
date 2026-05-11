@@ -983,11 +983,11 @@ export default function AgencyOnboardingPage() {
               {/* Agency name */}
               <div className="sm:col-span-2">
                 <Label className="text-xs font-semibold text-foreground">
-                  Agency or Trading Name <span className="text-destructive ml-0.5">*</span>
+                  {t('agentOnboarding.agency.name')} <span className="text-destructive ml-0.5">{'*'}</span>
                 </Label>
                 <Input value={agencyName} onChange={e => setAgencyName(e.target.value)} placeholder="e.g. Smith Property Group" className="mt-1.5" />
                 {agencyName && (
-                  <p className="text-[11px] text-muted-foreground mt-1">Pre-filled from your registration — edit if needed</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">{t('agentOnboarding.agency.prefilled')}</p>
                 )}
               </div>
 

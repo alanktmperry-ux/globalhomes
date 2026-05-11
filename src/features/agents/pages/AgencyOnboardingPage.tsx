@@ -1470,7 +1470,7 @@ export default function AgencyOnboardingPage() {
               <div className="flex flex-col w-full sm:w-auto gap-1">
                 <Button type="button" size="sm" disabled={!canNext() || loading} onClick={handleNext} className="w-full sm:w-auto">
                   {loading && <Loader2 size={14} className="mr-1 animate-spin" />}
-                  Next <ArrowRight size={14} className="ml-1" />
+                  {t('agentOnboarding.nav.next')} <ArrowRight size={14} className="ml-1" />
                 </Button>
                 {step === 2 && (
                   <Button

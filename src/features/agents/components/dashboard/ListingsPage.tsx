@@ -2,7 +2,7 @@ import { useState, useEffect, lazy, Suspense } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Info, Loader2, Pencil, Globe, Home, Building, MoreHorizontal, FileBarChart2, Copy, Mail, List as ListIcon, Kanban, ExternalLink, ChevronDown, MessageSquare, ImageIcon } from 'lucide-react';
+import { Plus, Eye, EyeOff, Zap, CheckCircle2, Clock, Sparkles, TrendingUp, Info, Loader2, Pencil, Globe, Home, Building, MoreHorizontal, FileBarChart2, Copy, Mail, List as ListIcon, Kanban, ExternalLink, ChevronDown, MessageSquare, ImageIcon, Search } from 'lucide-react';
 import { getListingImage, LISTING_PLACEHOLDER_CLASS } from '@/shared/lib/listingImage';
 import { cn } from '@/shared/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -284,7 +284,10 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
   const daysColor = days < 7 ? 'text-success' : days < 15 ? 'text-primary' : 'text-destructive';
 
   return (
-    <div className="bg-card border border-border rounded-xl p-4 flex flex-col sm:flex-row gap-4">
+    <div
+      className="bg-white rounded-[12px] flex flex-col sm:flex-row gap-4 p-4 mb-2 cursor-pointer hover:shadow-md transition-all"
+      style={{ border: '1px solid #E5E7EB' }}
+    >
       {(() => {
         const thumb = getListingThumb(l);
         return thumb ? (
@@ -411,34 +414,40 @@ const StatusTabs = ({
   activeTab: string;
   setActiveTab: (v: string) => void;
   counts: Record<string, number>;
-}) => (
-  <Tabs value={activeTab} onValueChange={setActiveTab}>
-    <TabsList className="bg-secondary mb-4 flex-wrap h-auto gap-1 p-1">
-      <TooltipProvider delayDuration={300}>
-        {[
-          { key: 'all', label: 'All', tip: 'View all listings' },
-          { key: 'pending', label: 'Pending', tip: 'Awaiting publish' },
-          { key: 'whisper', label: 'Whisper', tip: 'Private — only visible to you and your network' },
-          { key: 'coming-soon', label: 'Coming Soon', tip: 'Teaser — not yet searchable' },
-          { key: 'public', label: 'Public', tip: 'Live — visible in search results' },
-          { key: 'sold', label: 'Sold', tip: 'Archived' },
-        ].map((t) => (
-          <Tooltip key={t.key}>
-            <TooltipTrigger asChild>
-              <TabsTrigger value={t.key} className="text-xs gap-1">
-                {t.label}
-                {t.key !== 'all' && counts[t.key] && (
-                  <Badge variant="secondary" className="text-[9px] px-1 h-4 ml-0.5">{counts[t.key]}</Badge>
-                )}
-              </TabsTrigger>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="text-xs max-w-[200px]">{t.tip}</TooltipContent>
-          </Tooltip>
-        ))}
-      </TooltipProvider>
-    </TabsList>
-  </Tabs>
-);
+}) => {
+  const items = [
+    { key: 'all', label: 'All' },
+    { key: 'pending', label: 'Pending' },
+    { key: 'whisper', label: 'Whisper' },
+    { key: 'coming-soon', label: 'Coming Soon' },
+    { key: 'public', label: 'Public' },
+    { key: 'sold', label: 'Sold' },
+  ];
+  return (
+    <div className="flex items-center gap-2 mb-6 flex-wrap">
+      {items.map((t) => {
+        const active = activeTab === t.key;
+        const count = t.key !== 'all' ? counts[t.key] : undefined;
+        return (
+          <button
+            key={t.key}
+            type="button"
+            onClick={() => setActiveTab(t.key)}
+            className={
+              active
+                ? 'px-4 py-2 rounded-full text-sm font-semibold bg-[#2563EB] text-white transition-all'
+                : 'px-4 py-2 rounded-full text-sm font-medium text-[#374151] hover:bg-[#E5E7EB] transition-all'
+            }
+            style={active ? undefined : { background: '#F3F4F6' }}
+          >
+            {t.label}
+            {count ? <span className="ml-1.5 opacity-70">· {count}</span> : null}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 const ARCHIVED_STATUSES = new Set(['sold', 'leased']);
 
@@ -647,46 +656,69 @@ const ListingsPage = () => {
   activeListings.forEach(l => { counts[l._status] = (counts[l._status] || 0) + 1; });
 
   const viewToggle = (
-    <div className="inline-flex rounded-lg border border-border bg-card p-0.5" role="tablist" aria-label="Listings view">
+    <div className="flex items-center bg-white rounded-[10px] p-0.5" style={{ border: '1px solid #E5E7EB' }} role="tablist" aria-label="Listings view">
       <button
         type="button"
         role="tab"
         aria-selected={view === 'list'}
         onClick={() => setView('list')}
-        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
-          view === 'list' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
-        }`}
+        className={
+          view === 'list'
+            ? 'flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[#EFF6FF] text-[#2563EB] text-xs font-medium transition-all'
+            : 'flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-[#6B7280] hover:text-[#374151] text-xs font-medium transition-all'
+        }
       >
-        <ListIcon size={12} /> List
+        <ListIcon size={14} /> List
       </button>
       <button
         type="button"
         role="tab"
         aria-selected={view === 'pipeline'}
         onClick={() => setView('pipeline')}
-        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
-          view === 'pipeline' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
-        }`}
+        className={
+          view === 'pipeline'
+            ? 'flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[#EFF6FF] text-[#2563EB] text-xs font-medium transition-all'
+            : 'flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-[#6B7280] hover:text-[#374151] text-xs font-medium transition-all'
+        }
       >
-        <Kanban size={12} /> Pipeline
+        <Kanban size={14} /> Pipeline
       </button>
+    </div>
+  );
+
+  const portfolioHeader = (
+    <div className="flex items-start justify-between gap-4 flex-wrap p-4 sm:p-6 pb-0 max-w-5xl">
+      <div>
+        <h1 className="text-2xl font-bold text-[#0a0f1e] tracking-tight">Portfolio</h1>
+        <p className="text-sm font-light text-[#6B7280] mt-1 mb-8">
+          {listings.length} {listings.length === 1 ? 'property' : 'properties'}
+        </p>
+      </div>
+      <div className="flex items-center gap-2">
+        {viewToggle}
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => navigate('/')}
+          className="gap-1.5 text-xs"
+        >
+          <Globe size={14} /> Browse Market
+        </Button>
+        <button
+          type="button"
+          onClick={() => navigate('/pocket-listing')}
+          className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold rounded-[10px] px-4 py-2.5 text-sm flex items-center gap-2 transition-all"
+        >
+          <Plus size={16} /> Add to Portfolio
+        </button>
+      </div>
     </div>
   );
 
   if (view === 'pipeline') {
     return (
       <div>
-        <DashboardHeader
-          title="Listings"
-          actions={
-            <div className="flex items-center gap-2">
-              {viewToggle}
-              <Button size="sm" onClick={() => navigate('/pocket-listing')} className="gap-1.5 text-xs">
-                <Plus size={12} /> New Listing
-              </Button>
-            </div>
-          }
-        />
+        {portfolioHeader}
         <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Loading pipeline…</div>}>
           {/* PipelinePage renders its own DashboardHeader; we hide it via wrapper */}
           <div className="[&>div>:first-child]:hidden">
@@ -700,20 +732,7 @@ const ListingsPage = () => {
   return (
     <>
       <div>
-        <DashboardHeader
-          title="Listings"
-          actions={
-            <div className="flex items-center gap-2">
-              {viewToggle}
-              <Button size="sm" variant="outline" onClick={() => navigate('/')} className="gap-1.5 text-xs">
-                <Globe size={14} /> Browse Market
-              </Button>
-              <Button size="sm" onClick={() => navigate('/pocket-listing')} className="gap-1.5 text-xs">
-                <Plus size={14} /> New Listing
-              </Button>
-            </div>
-          }
-        />
+        {portfolioHeader}
 
         <div className="p-4 sm:p-6 max-w-5xl">
           {isMockData && (
@@ -792,40 +811,52 @@ const ListingsPage = () => {
             <ListingsSkeleton />
           ) : filtered.length === 0 ? (
             lifecycleTab === 'archived' ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
-                <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center">
-                  <CheckCircle2 size={28} className="text-muted-foreground" />
-                </div>
-                <h3 className="font-semibold text-foreground">No archived listings</h3>
-                <p className="text-sm text-muted-foreground max-w-xs">
+              <div
+                className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-[12px]"
+                style={{ border: '1px solid #E5E7EB' }}
+              >
+                <CheckCircle2 size={64} style={{ color: '#E5E7EB' }} />
+                <h3 className="text-xl font-bold text-[#0a0f1e] mt-6 mb-2">No archived listings</h3>
+                <p className="text-sm font-light text-[#6B7280] max-w-md">
                   Listings marked as Sold or Leased will appear here.
                 </p>
               </div>
             ) : withStatus.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                  <Home size={28} className="text-primary" />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="font-semibold text-foreground">No listings yet</h3>
-                  <p className="text-sm text-muted-foreground max-w-xs">
-                    Add your first property and generate multilingual translations in under 60 seconds.
-                  </p>
-                </div>
-                <Button onClick={() => navigate('/dashboard/listings/new')}>
-                  Add your first listing →
-                </Button>
+              <div
+                className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-[12px]"
+                style={{ border: '1px solid #E5E7EB' }}
+              >
+                <Building size={64} style={{ color: '#E5E7EB' }} />
+                <h3 className="text-xl font-bold text-[#0a0f1e] mt-6 mb-2">Your portfolio is empty</h3>
+                <p className="text-sm font-light text-[#6B7280] mb-8 max-w-md">
+                  Add your first property to start building your portfolio. ListHQ will translate it into 6 languages automatically.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => navigate('/pocket-listing')}
+                  className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold rounded-[10px] px-6 py-3 text-sm flex items-center gap-2 transition-all"
+                >
+                  <Plus size={16} /> Add to Portfolio
+                </button>
               </div>
             ) : (
-              <div className="text-center py-16 text-muted-foreground">
-                <div className="mb-3">
-                  {listingMode === 'rent' ? <Building size={32} className="mx-auto opacity-40" /> : <Home size={32} className="mx-auto opacity-40" />}
-                </div>
-                <p className="text-sm font-medium">No {listingMode === 'rent' ? 'rental' : 'sale'} listings{activeStatusTab !== 'all' ? ` with status "${activeStatusTab}"` : ''}</p>
-                <p className="text-xs mt-1">Create a new listing to get started.</p>
-                <Button size="sm" className="mt-4 gap-1.5 text-xs" onClick={() => navigate('/pocket-listing')}>
-                  <Plus size={14} /> New {listingMode === 'rent' ? 'Rental' : 'Sale'} Listing
-                </Button>
+              <div
+                className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-[12px]"
+                style={{ border: '1px solid #E5E7EB' }}
+              >
+                <Search size={64} style={{ color: '#E5E7EB' }} />
+                <h3 className="text-xl font-bold text-[#0a0f1e] mt-6 mb-2">No listings match</h3>
+                <p className="text-sm font-light text-[#6B7280] mb-6 max-w-md">
+                  Try adjusting your filters or search.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => { setSaleStatusTab('all'); setRentStatusTab('all'); }}
+                  className="px-4 py-2 rounded-[10px] text-sm font-medium text-[#374151] bg-white hover:bg-[#F9FAFB] transition-all"
+                  style={{ border: '1px solid #E5E7EB' }}
+                >
+                  Clear filters
+                </button>
               </div>
             )
           ) : (

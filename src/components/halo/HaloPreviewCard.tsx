@@ -64,10 +64,7 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
   const langKey = lang.startsWith('zh') && lang !== 'zh_traditional' ? 'zh' : lang;
   const langMeta = LANG_META[langKey] ?? LANG_META[lang] ?? { flag: '🌐', label: lang };
 
-  const isHot =
-    halo.finance_status === 'pre_approved' ||
-    halo.finance_status === 'cash' ||
-    (halo as any).finance_status === 'confirmed';
+  const isHot = halo.finance_status === 'cash_buyer' || (halo as any).finance_status === 'pre_approved';
 
   const intentLabel = halo.intent === 'buy' ? 'Buy' : 'Rent';
   const bedPart = halo.bedrooms_min ? `${halo.bedrooms_min}+ bed` : null;

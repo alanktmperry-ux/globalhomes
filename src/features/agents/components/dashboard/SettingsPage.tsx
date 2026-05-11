@@ -171,143 +171,193 @@ const SettingsPage = () => {
   }
 
   return (
-    <div>
-      <DashboardHeader title="Settings" subtitle="Manage your agent profile and preferences" />
-
-      <div className="p-4 sm:p-6 max-w-2xl">
-        <Tabs value={activeTab} onValueChange={handleTabChange}>
-          <TabsList className="bg-secondary mb-6 gap-1 p-1">
-            <TabsTrigger value="profile" className="text-xs">Profile</TabsTrigger>
-            <TabsTrigger value="pipeline" className="text-xs gap-1.5">
-              <GitBranch size={12} /> Pipeline
-            </TabsTrigger>
-            <TabsTrigger value="suppliers" className="text-xs gap-1.5">
-              <Package size={12} /> Suppliers
-            </TabsTrigger>
-            <TabsTrigger value="templates" className="text-xs gap-1.5">
-              <Languages size={12} /> Templates
-            </TabsTrigger>
-            <TabsTrigger value="security" className="text-xs gap-1.5">
-              <ShieldCheck size={12} /> Security
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="profile" className="space-y-6">
-            {/* Profile */}
-            <div className="bg-card border border-border rounded-xl p-5 space-y-4">
-              <h3 className="font-display text-sm font-bold flex items-center gap-1.5"><User size={14} /> Agent Profile</h3>
-              
-              {/* Avatar Upload */}
-              <div className="flex items-center gap-4">
-                <div className="relative group">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleAvatarUpload}
-                  />
-                  <div className="w-16 h-16 rounded-full overflow-hidden bg-primary/10 flex items-center justify-center border border-border">
-                    {agentData.avatar_url ? (
-                      <img src={agentData.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
-                    ) : (
-                      <User size={24} className="text-primary" />
-                    )}
-                  </div>
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploadingAvatar}
-                    className="absolute inset-0 rounded-full bg-foreground/0 group-hover:bg-foreground/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
-                  >
-                    {uploadingAvatar ? (
-                      <Loader2 size={18} className="text-background animate-spin" />
-                    ) : (
-                      <Camera size={18} className="text-background" />
-                    )}
-                  </button>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">Profile Photo</p>
-                  <p className="text-xs text-muted-foreground">Click to upload a new avatar</p>
-                </div>
-              </div>
-
-              <div className="grid sm:grid-cols-2 gap-3">
-                <div>
-                  <Label className="text-xs">Full Name</Label>
-                  <Input 
-                    value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    className="bg-secondary border-border" 
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">Agency</Label>
-                  <Input 
-                    value={formData.agency}
-                    onChange={(e) => setFormData(prev => ({ ...prev, agency: e.target.value }))}
-                    className="bg-secondary border-border" 
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">Email</Label>
-                  <Input 
-                    value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    className="bg-secondary border-border" 
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">Phone</Label>
-                  <Input 
-                    value={formData.phone}
-                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                    className="bg-secondary border-border" 
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Notifications — granular per-event preferences */}
-            <NotificationPreferencesSettings />
-
-            {/* Lead urgency thresholds */}
-            <LeadUrgencySettings />
-
-            {/* Territory */}
-            <div className="bg-card border border-border rounded-xl p-5 space-y-3">
-              <h3 className="font-display text-sm font-bold flex items-center gap-1.5"><Globe size={14} /> Territory</h3>
-              <p className="text-xs text-muted-foreground">Your primary suburbs for voice lead matching</p>
-              <div className="flex flex-wrap gap-1.5">
-                {['Berwick', 'Narre Warren', 'Officer', 'Clyde North', 'Pakenham'].map((s) => (
-                  <span key={s} className="px-3 py-1 bg-primary/10 text-primary text-xs rounded-full font-medium">{s}</span>
-                ))}
-              </div>
-              <Button variant="outline" size="sm" className="text-xs">Edit Suburbs</Button>
-            </div>
-
-            <Button onClick={handleSave} disabled={saving} className="w-full">
-              {saving ? <><Loader2 size={16} className="animate-spin mr-2" /> Saving...</> : 'Save Changes'}
-            </Button>
-          </TabsContent>
-
-          <TabsContent value="pipeline">
-            <PipelineStagesSettings />
-          </TabsContent>
-
-          <TabsContent value="suppliers">
-            <SuppliersSettings />
-          </TabsContent>
-
-          <TabsContent value="templates">
-            <MessageTemplatesSettings />
-          </TabsContent>
-
-          <TabsContent value="security">
-            <MFAManager />
-          </TabsContent>
-        </Tabs>
+    <div className="p-4 sm:p-6 max-w-3xl">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-[#0a0f1e] tracking-tight">Settings</h1>
+        <p className="text-sm font-light text-[#6B7280] mt-1">Manage your agent profile and preferences</p>
       </div>
+
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
+        <TabsList
+          className="bg-white mb-6 gap-1 p-1 rounded-[10px] h-auto"
+          style={{ border: '1px solid #E5E7EB' }}
+        >
+          <TabsTrigger
+            value="profile"
+            className="text-sm px-4 py-2 rounded-[8px] data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium"
+          >
+            Profile
+          </TabsTrigger>
+          <TabsTrigger
+            value="pipeline"
+            className="text-sm px-4 py-2 rounded-[8px] gap-1.5 data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium"
+          >
+            <GitBranch size={14} /> Pipeline
+          </TabsTrigger>
+          <TabsTrigger
+            value="suppliers"
+            className="text-sm px-4 py-2 rounded-[8px] gap-1.5 data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium"
+          >
+            <Package size={14} /> Suppliers
+          </TabsTrigger>
+          <TabsTrigger
+            value="templates"
+            className="text-sm px-4 py-2 rounded-[8px] gap-1.5 data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium"
+          >
+            <Languages size={14} /> Templates
+          </TabsTrigger>
+          <TabsTrigger
+            value="security"
+            className="text-sm px-4 py-2 rounded-[8px] gap-1.5 data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium"
+          >
+            <ShieldCheck size={14} /> Security
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="profile" className="space-y-6">
+          {/* Profile */}
+          <div className="bg-white rounded-[12px] p-6" style={{ border: '1px solid #E5E7EB' }}>
+            <div className="mb-5">
+              <h3 className="text-base font-bold text-[#0a0f1e] flex items-center gap-2">
+                <User size={16} /> Agent Profile
+              </h3>
+              <p className="text-xs text-[#6B7280] mt-1 font-light">
+                Your public-facing identity for buyers and across the platform.
+              </p>
+            </div>
+
+            {/* Avatar Upload */}
+            <div className="flex items-center gap-5 mb-6">
+              <div className="relative group">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarUpload}
+                />
+                <div
+                  className="w-20 h-20 rounded-full overflow-hidden bg-[#EFF6FF] flex items-center justify-center"
+                  style={{ border: '2px solid #FFFFFF', boxShadow: '0 0 0 1px #E5E7EB' }}
+                >
+                  {agentData.avatar_url ? (
+                    <img src={agentData.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-[#2563EB] font-bold text-xl">
+                      {(agentData.name || '?').slice(0, 1).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingAvatar}
+                  className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                >
+                  {uploadingAvatar ? (
+                    <Loader2 size={20} className="text-white animate-spin" />
+                  ) : (
+                    <Camera size={20} className="text-white" />
+                  )}
+                </button>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-[#0a0f1e]">Profile Photo</p>
+                <p className="text-xs text-[#6B7280] mt-0.5 font-light">PNG, JPG up to 5MB. Click photo to upload.</p>
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <Label className="text-xs font-semibold text-[#374151]">Full Name</Label>
+                <Input
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  className="mt-1.5"
+                />
+              </div>
+              <div>
+                <Label className="text-xs font-semibold text-[#374151]">Agency</Label>
+                <Input
+                  value={formData.agency}
+                  onChange={(e) => setFormData(prev => ({ ...prev, agency: e.target.value }))}
+                  className="mt-1.5"
+                />
+              </div>
+              <div>
+                <Label className="text-xs font-semibold text-[#374151]">Email</Label>
+                <Input
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  className="mt-1.5"
+                />
+              </div>
+              <div>
+                <Label className="text-xs font-semibold text-[#374151]">Phone</Label>
+                <Input
+                  value={formData.phone}
+                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                  className="mt-1.5"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Notifications — granular per-event preferences */}
+          <NotificationPreferencesSettings />
+
+          {/* Lead urgency thresholds */}
+          <LeadUrgencySettings />
+
+          {/* Territory */}
+          <div className="bg-white rounded-[12px] p-6" style={{ border: '1px solid #E5E7EB' }}>
+            <h3 className="text-base font-bold text-[#0a0f1e] flex items-center gap-2 mb-1">
+              <Globe size={16} /> Territory
+            </h3>
+            <p className="text-xs text-[#6B7280] mb-4 font-light">
+              Your primary suburbs for voice lead matching.
+            </p>
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {['Berwick', 'Narre Warren', 'Officer', 'Clyde North', 'Pakenham'].map((s) => (
+                <span
+                  key={s}
+                  className="px-3 py-1 bg-[#EFF6FF] text-[#1E40AF] text-xs font-semibold rounded-full"
+                >
+                  {s}
+                </span>
+              ))}
+            </div>
+            <button
+              className="bg-white border border-[#E5E7EB] text-[#374151] hover:bg-[#F9FAFB] font-semibold rounded-[10px] px-4 py-2 text-sm transition-all"
+            >
+              Edit Suburbs
+            </button>
+          </div>
+
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="w-full rounded-[10px] px-4 py-3 text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+          >
+            {saving ? <><Loader2 size={16} className="animate-spin" /> Saving…</> : 'Save Changes'}
+          </button>
+        </TabsContent>
+
+        <TabsContent value="pipeline">
+          <PipelineStagesSettings />
+        </TabsContent>
+
+        <TabsContent value="suppliers">
+          <SuppliersSettings />
+        </TabsContent>
+
+        <TabsContent value="templates">
+          <MessageTemplatesSettings />
+        </TabsContent>
+
+        <TabsContent value="security">
+          <MFAManager />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

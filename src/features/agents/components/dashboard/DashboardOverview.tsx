@@ -90,7 +90,7 @@ const StatCard = ({ icon, iconColor = '#2563EB', label, value, trendDir, trendVa
   return (
     <div className="bg-white rounded-3xl border border-[#E5E5E5] p-6 transition-all hover:border-[#2563EB]/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.04)]">
       <div className="flex items-center gap-2">
-        <Ico icon={icon} size={18} color=iconColor />
+        <Ico icon={icon} size={18} color={iconColor} />
         <span className="text-[11px] uppercase tracking-[0.12em] text-[#6a6a6a] font-bold">{label}</span>
       </div>
       <div className="text-[44px] font-extrabold text-[#0a0f1e] tabular-nums leading-none mt-3">{value}</div>

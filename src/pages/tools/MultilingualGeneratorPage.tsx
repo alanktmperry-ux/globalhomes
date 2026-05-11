@@ -1,55 +1,31 @@
 import { useEffect, useState } from 'react';
-import { Loader2, Copy, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { Icon } from '@iconify/react';
 import { usePageTitle } from '@/lib/usePageTitle';
+import { cn } from '@/lib/utils';
 
 type TranslationMap = Record<string, { title?: string; description?: string }>;
 
 const LANGS: { key: string; flag: string; label: string; rtl?: boolean }[] = [
-  { key: 'zh_simplified', flag: '🇨🇳', label: '普通话' },
-  { key: 'zh_traditional', flag: '🇭🇰', label: '廣東話' },
-  { key: 'vi', flag: '🇻🇳', label: 'Tiếng Việt' },
-  { key: 'ko', flag: '🇰🇷', label: '한국어' },
-  { key: 'ar', flag: '🇸🇦', label: 'العربية', rtl: true },
-  { key: 'ja', flag: '🇯🇵', label: '日本語' },
-  { key: 'hi', flag: '🇮🇳', label: 'हिन्दी' },
-  { key: 'bn', flag: '🇧🇩', label: 'বাংলা' },
-  { key: 'tl', flag: '🇵🇭', label: 'Filipino' },
-  { key: 'id', flag: '🇮🇩', label: 'Bahasa' },
+  { key: 'zh_simplified', flag: '🇨🇳', label: 'Mandarin' },
+  { key: 'vi', flag: '🇻🇳', label: 'Vietnamese' },
+  { key: 'ko', flag: '🇰🇷', label: 'Korean' },
+  { key: 'ar', flag: '🇸🇦', label: 'Arabic', rtl: true },
+  { key: 'hi', flag: '🇮🇳', label: 'Hindi' },
+  { key: 'zh_traditional', flag: '🇭🇰', label: 'Cantonese' },
 ];
 
-const LOADING_MESSAGES = [
-  'Translating into Mandarin...',
-  'Translating into Vietnamese...',
-  'Translating into Korean...',
-  'Translating into Arabic...',
-  'Translating into Japanese...',
-  'Almost done...',
-];
+const PROPERTY_TYPES = ['House', 'Apartment', 'Townhouse', 'Land', 'Acreage'];
 
 export default function MultilingualGeneratorPage() {
-  usePageTitle('Free Multilingual Generator');
-  const [title, setTitle] = useState('');
+  usePageTitle('Free Multilingual Listing Translator');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<TranslationMap | null>(null);
   const [activeTab, setActiveTab] = useState<string>('zh_simplified');
-  const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
+  const [listingType, setListingType] = useState<'sale' | 'rent'>('sale');
+  const [propType, setPropType] = useState<string>('House');
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    if (!loading) return;
-    setLoadingMsgIdx(0);
-    const id = setInterval(() => {
-      setLoadingMsgIdx((i) => (i + 1) % LOADING_MESSAGES.length);
-    }, 1500);
-    return () => clearInterval(id);
-  }, [loading]);
 
   const handleGenerate = async () => {
     setError(null);
@@ -61,165 +37,246 @@ export default function MultilingualGeneratorPage() {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, description }),
+          body: JSON.stringify({ title: '', description }),
         }
       );
       const data = await res.json();
-      if (!res.ok || !data?.translations) {
-        throw new Error(data?.error || 'Translation failed');
-      }
+      if (!res.ok || !data?.translations) throw new Error(data?.error || 'Translation failed');
       setResults(data.translations as TranslationMap);
       const first = LANGS.find((l) => data.translations[l.key]);
       if (first) setActiveTab(first.key);
-    } catch (e) {
+    } catch {
       setError('Translation failed. Please check your description and try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCopy = async (key: string) => {
-    if (!results?.[key]) return;
-    const text = `${results[key].title || ''}\n\n${results[key].description || ''}`.trim();
+  const handleCopy = async () => {
+    if (!results?.[activeTab]) return;
+    const text = `${results[activeTab].title || ''}\n\n${results[activeTab].description || ''}`.trim();
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      /* ignore */
+    } catch { /* ignore */ }
+  };
+
+  const handleShare = async () => {
+    if (!results?.[activeTab]) return;
+    const text = `${results[activeTab].title || ''}\n\n${results[activeTab].description || ''}`.trim();
+    if (navigator.share) {
+      try { await navigator.share({ text }); } catch { /* ignore */ }
+    } else {
+      handleCopy();
     }
   };
 
-  const availableLangs = results ? LANGS.filter((l) => results[l.key]) : [];
   const active = LANGS.find((l) => l.key === activeTab);
   const activeContent = results?.[activeTab];
+  const charCount = description.length;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
-        <header className="text-center space-y-3 mb-10">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
-            Generate your listing in 10 languages — free
-          </h1>
-          <p className="text-muted-foreground text-base sm:text-lg">
-            Paste your English listing below. We'll translate it into Mandarin, Vietnamese,
-            Korean, Arabic, Japanese and more — instantly.
-          </p>
-          <p className="text-xs text-muted-foreground">No sign-up required.</p>
-        </header>
-
-        <div className="rounded-xl border border-border bg-card p-6 space-y-4 shadow-sm">
-          <div className="space-y-2">
-            <Label htmlFor="ml-title">Property title</Label>
-            <Input
-              id="ml-title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Stunning 4-bedroom family home in Glen Waverley"
-              disabled={loading}
-            />
+    <div className="bg-white text-black min-h-screen">
+      {/* Hero */}
+      <section className="pt-[140px] pb-12 px-8 bg-white text-center">
+        <div className="max-w-[920px] mx-auto">
+          <div className="inline-flex items-center gap-2 bg-[#EFF6FF] text-[#2563EB] rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em]">
+            <Icon icon="solar:gift-linear" width={14} />
+            Free tool · No login
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="ml-desc">Property description</Label>
-            <Textarea
-              id="ml-desc"
-              rows={6}
+          <h1 className="text-[clamp(48px,7vw,100px)] font-extrabold leading-[0.95] tracking-[-0.05em] text-black mt-6">
+            Translate any listing into
+            <br />
+            <span className="bg-gradient-to-r from-[#2563EB] to-[#60A5FA] bg-clip-text text-transparent">six languages.</span>
+          </h1>
+          <p className="text-[18px] text-[#4a4a4a] mt-6 max-w-[640px] mx-auto leading-[1.55]">
+            Paste your listing description. AI rewrites it in Mandarin, Vietnamese, Korean, Arabic, Hindi, and Cantonese — with Australian real-estate context. Free. No sign-up.
+          </p>
+        </div>
+      </section>
+
+      {/* Translator interface */}
+      <section className="max-w-[1200px] mx-auto px-8 pb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-12">
+          {/* LEFT — Input */}
+          <div className="bg-white border border-[#E5E5E5] rounded-3xl p-7">
+            <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
+              <div className="inline-flex items-center gap-1 bg-[#F3F4F6] rounded-full p-1">
+                {(['sale', 'rent'] as const).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setListingType(t)}
+                    className={cn(
+                      'rounded-full px-4 py-2 text-[13px] transition-colors',
+                      listingType === t
+                        ? 'bg-[#0a0f1e] text-white font-bold'
+                        : 'text-[#374151] font-semibold'
+                    )}
+                  >
+                    {t === 'sale' ? 'For Sale' : 'For Rent'}
+                  </button>
+                ))}
+              </div>
+              <select
+                value={propType}
+                onChange={(e) => setPropType(e.target.value)}
+                className="bg-white border border-[#E5E5E5] rounded-full px-4 py-2 text-[13px] font-semibold text-[#374151] cursor-pointer focus:outline-none focus:border-[#2563EB]"
+              >
+                {PROPERTY_TYPES.map(p => <option key={p}>{p}</option>)}
+              </select>
+            </div>
+
+            <label className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#6a6a6a] block mb-2">
+              Paste your listing description
+            </label>
+            <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Paste your full listing description here..."
+              placeholder="e.g. Renovated 4-bedroom family home in Auburn. North-facing aspect..."
               disabled={loading}
+              className="w-full min-h-[280px] bg-white border-2 border-[#E5E5E5] rounded-2xl px-5 py-4 text-[15px] text-[#0a0f1e] leading-[1.6] focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 transition-all resize-y"
             />
-          </div>
-          <Button
-            className="w-full"
-            onClick={handleGenerate}
-            disabled={loading || (!title.trim() && !description.trim())}
-          >
-            {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                {LOADING_MESSAGES[loadingMsgIdx]}
-              </>
-            ) : (
-              <>Generate translations →</>
-            )}
-          </Button>
-          {error && (
-            <p className="text-sm text-destructive text-center">{error}</p>
-          )}
-        </div>
 
-        {results && availableLangs.length > 0 && (
-          <div className="mt-8 rounded-xl border border-border bg-card p-4 sm:p-6 shadow-sm">
-            <div className="flex flex-wrap gap-2 mb-5 border-b border-border pb-3">
-              {availableLangs.map((l) => (
+            <div className="flex items-center justify-between mt-4">
+              <span className="text-[12px] text-[#9CA3AF]">{charCount} characters</span>
+              <button
+                onClick={handleGenerate}
+                disabled={loading || !description.trim()}
+                className="bg-black text-white rounded-full px-7 py-3.5 text-[14px] font-bold inline-flex items-center gap-2.5 hover:bg-white hover:text-black border border-black transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <>
+                    <Icon icon="solar:refresh-linear" width={16} className="animate-spin" />
+                    Translating...
+                  </>
+                ) : (
+                  <>
+                    <Icon icon="solar:translation-linear" width={16} />
+                    Translate
+                  </>
+                )}
+              </button>
+            </div>
+            {error && <p className="text-sm text-red-600 text-center mt-3">{error}</p>}
+          </div>
+
+          {/* RIGHT — Output */}
+          <div className="bg-white border border-[#E5E5E5] rounded-3xl p-7">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-[15px] font-bold text-[#0a0f1e]">Translations</h2>
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.10em] bg-[#EFF6FF] text-[#2563EB]">
+                AI Translated
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1 bg-[#F9FAFB] rounded-full p-1 mb-5 overflow-x-auto">
+              {LANGS.map(l => (
                 <button
                   key={l.key}
                   onClick={() => setActiveTab(l.key)}
                   className={cn(
-                    'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                    'rounded-full px-4 py-2 text-[13px] whitespace-nowrap inline-flex items-center gap-1.5',
                     activeTab === l.key
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-foreground hover:bg-accent'
+                      ? 'bg-white text-[#0a0f1e] font-bold shadow-sm'
+                      : 'text-[#6a6a6a] hover:text-[#374151] font-semibold'
                   )}
                 >
-                  <span className="mr-1.5">{l.flag}</span>
+                  <span>{l.flag}</span>
                   {l.label}
                 </button>
               ))}
             </div>
 
-            {activeContent && (
+            {activeContent ? (
               <div
                 dir={active?.rtl ? 'rtl' : 'ltr'}
-                className="space-y-3"
+                className="min-h-[280px] text-[15px] text-[#374151] leading-[1.6] whitespace-pre-line p-5 bg-[#F9FAFB] rounded-2xl"
               >
-                <h2 className="text-xl font-bold text-foreground">{activeContent.title}</h2>
-                <p className="text-foreground/90 whitespace-pre-wrap leading-relaxed">
-                  {activeContent.description}
+                {activeContent.title && <div className="font-bold text-[#0a0f1e] mb-3">{activeContent.title}</div>}
+                {activeContent.description}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-16 text-center min-h-[280px] bg-[#F9FAFB] rounded-2xl">
+                <Icon icon="solar:translation-linear" width={48} color="#E5E7EB" />
+                <p className="text-[14px] text-[#6a6a6a] mt-4 max-w-[280px]">
+                  Paste a description and click Translate to see the output here
                 </p>
-                <div className={cn('pt-2', active?.rtl ? 'text-left' : 'text-right')}>
-                  <Button variant="outline" size="sm" onClick={() => handleCopy(activeTab)}>
-                    {copied ? (
-                      <>
-                        <Check className="h-4 w-4 mr-1.5" /> Copied!
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-4 w-4 mr-1.5" /> Copy
-                      </>
-                    )}
-                  </Button>
-                </div>
               </div>
             )}
-          </div>
-        )}
 
-        {results && (
-          <div className="rounded-xl bg-primary/5 border border-primary p-6 text-center space-y-3 mt-8">
-            <p className="font-semibold text-foreground">Want this in your listings automatically?</p>
-            <p className="text-sm text-muted-foreground">
-              ListHQ agents generate multilingual listings in 60 seconds — directly from their dashboard.
-              Reach Mandarin, Vietnamese and Korean buyers without hiring a translator.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <a
-                href="/register?role=agent"
-                className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors"
+            <div className="flex items-center justify-between mt-4 flex-wrap gap-3">
+              <button
+                onClick={handleCopy}
+                disabled={!activeContent}
+                className="text-[13px] font-semibold text-[#374151] inline-flex items-center gap-1.5 hover:text-[#2563EB] disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                Start free trial →
-              </a>
-              <a
-                href="/dashboard/billing"
-                className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl border border-border text-foreground font-semibold text-sm hover:bg-accent transition-colors"
+                <Icon icon="solar:copy-linear" width={16} />
+                {copied ? 'Copied!' : 'Copy translation'}
+              </button>
+              <button
+                onClick={handleShare}
+                disabled={!activeContent}
+                className="text-[13px] font-semibold text-[#374151] inline-flex items-center gap-1.5 hover:text-[#2563EB] disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                See pricing
-              </a>
+                <Icon icon="solar:share-linear" width={16} />
+                Share with team
+              </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      </section>
+
+      {/* Trojan Horse CTA */}
+      <section className="bg-[#0a0f1e] text-white py-[120px] px-8">
+        <div className="max-w-[1100px] mx-auto text-center">
+          <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#93C5FD]">
+            Want this on every listing?
+          </div>
+          <h2 className="text-[clamp(48px,6vw,88px)] font-extrabold leading-[0.95] tracking-[-0.04em] text-white mt-6">
+            Auto-translate every listing
+            <br />
+            <span className="bg-gradient-to-r from-[#93C5FD] to-[#60A5FA] bg-clip-text text-transparent">in twenty languages.</span>
+          </h2>
+          <p className="text-[18px] text-white/65 mt-6 max-w-[600px] mx-auto leading-[1.55]">
+            ListHQ translates your listings into 20 languages the moment you publish — Mandarin, Vietnamese, Arabic, Hindi, and 16 more. With Australian real-estate terminology built in.
+          </p>
+          <div className="flex gap-3 justify-center mt-10 flex-wrap">
+            <a
+              href="/register?role=agent"
+              className="bg-white text-[#2563EB] rounded-full px-8 py-4 font-bold text-[15px] inline-flex items-center gap-2 hover:bg-[#EFF6FF] transition-colors"
+            >
+              Start free trial
+              <Icon icon="solar:arrow-right-linear" width={16} />
+            </a>
+            <a
+              href="/for-agents"
+              className="border border-white/40 text-white rounded-full px-8 py-4 font-bold text-[15px] inline-flex items-center hover:bg-white/10 transition-colors"
+            >
+              See how it works
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust strip */}
+      <section className="bg-white py-14 px-8 border-y border-[#E5E5E5]">
+        <div className="max-w-[1100px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          {[
+            { value: '20', label: 'Languages' },
+            { value: '45K', label: 'Agents' },
+            { value: '50K', label: 'Listings' },
+            { value: '60d', label: 'Free trial' },
+          ].map((s) => (
+            <div key={s.label}>
+              <div className="text-[clamp(36px,5vw,56px)] font-extrabold leading-none tabular-nums bg-gradient-to-r from-[#2563EB] to-[#60A5FA] bg-clip-text text-transparent">
+                {s.value}
+              </div>
+              <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#6a6a6a] mt-2">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

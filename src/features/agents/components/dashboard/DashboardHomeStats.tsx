@@ -36,16 +36,30 @@ function formatTimeAgo(iso: string): string {
 }
 
 function StatCard({
-  label, value, sublabel, href, highlight,
+  label, value, sublabel, href,
 }: { label: string; value: number; sublabel?: string; href?: string; highlight?: boolean }) {
   const inner = (
-    <div className={cn(
-      'rounded-xl border bg-card p-5 space-y-1 transition-colors h-full',
-      highlight ? 'border-primary bg-primary/5 hover:bg-primary/10' : 'border-border hover:bg-accent',
-    )}>
-      <p className="text-2xl font-bold text-foreground">{value}</p>
-      <p className="text-sm font-medium text-foreground">{label}</p>
-      {sublabel && <p className="text-xs text-muted-foreground">{sublabel}</p>}
+    <div
+      className="rounded-[16px] p-6 relative overflow-hidden flex flex-col justify-between min-h-[130px] transition-all hover:bg-white/[0.09]"
+      style={{
+        background: 'rgba(255,255,255,0.07)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255,255,255,0.15)',
+      }}
+    >
+      <p
+        className="text-[10px] uppercase font-medium"
+        style={{ letterSpacing: '0.12em', color: 'rgba(255,255,255,0.35)' }}
+      >
+        {label}
+      </p>
+      <div>
+        <p className="text-5xl tracking-tight font-extralight text-white tabular-nums mt-4">{value}</p>
+        {sublabel && (
+          <p className="text-xs font-light mt-1" style={{ color: 'rgba(255,255,255,0.40)' }}>{sublabel}</p>
+        )}
+      </div>
     </div>
   );
   return href ? <Link to={href} className="block">{inner}</Link> : inner;

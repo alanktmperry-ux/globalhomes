@@ -24,42 +24,43 @@ export default function CRMPage() {
   return (
     <>
       <Helmet>
-        <title>Lead Pipeline — ListHQ</title>
+        <title>Buyer Pipeline — ListHQ</title>
       </Helmet>
 
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-foreground">Lead Pipeline</h1>
-            <p className="text-sm text-muted-foreground">
+            <h1 className="text-2xl font-bold text-[#0a0f1e] tracking-tight mb-1">Buyer Pipeline</h1>
+            <p className="text-sm font-light text-[#6B7280] mb-8">
               All leads auto-synced from enquiries, open homes, and EOIs
             </p>
           </div>
           <div className="flex items-center gap-2">
             <Link
               to="/dashboard/crm/import"
-              className="inline-flex items-center gap-1.5 px-3 h-9 rounded-lg border border-border bg-background text-sm font-medium hover:border-primary/50 hover:text-primary transition"
+              className="inline-flex items-center gap-1.5 px-3 h-9 rounded-[10px] text-sm font-medium text-[#374151] hover:bg-[#F3F4F6] transition"
+              style={{ background: '#FFFFFF', border: '1px solid #E5E7EB' }}
             >
               <Upload size={14} /> Import contacts
             </Link>
             <button
               onClick={() => setView('board')}
-              className={`p-2 rounded-lg border transition
-                ${view === 'board'
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'bg-background text-muted-foreground border-border hover:border-primary/50'
-                }`}
+              className={`p-2 rounded-[10px] transition ${
+                view === 'board'
+                  ? 'bg-[#2563EB] text-white border border-[#2563EB]'
+                  : 'bg-white text-[#6B7280] border border-[#E5E7EB] hover:text-[#0a0f1e]'
+              }`}
               title="Kanban view"
             >
               <Kanban size={16} />
             </button>
             <button
               onClick={() => setView('list')}
-              className={`p-2 rounded-lg border transition
-                ${view === 'list'
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'bg-background text-muted-foreground border-border hover:border-primary/50'
-                }`}
+              className={`p-2 rounded-[10px] transition ${
+                view === 'list'
+                  ? 'bg-[#2563EB] text-white border border-[#2563EB]'
+                  : 'bg-white text-[#6B7280] border border-[#E5E7EB] hover:text-[#0a0f1e]'
+              }`}
               title="List view"
             >
               <LayoutList size={16} />

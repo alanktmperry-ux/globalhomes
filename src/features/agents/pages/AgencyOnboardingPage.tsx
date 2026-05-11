@@ -1121,44 +1121,43 @@ export default function AgencyOnboardingPage() {
         <div className="space-y-5">
           <div className="text-center space-y-1 mb-4">
             <Landmark size={32} className="mx-auto text-primary" />
-            <h3 className="text-base font-bold">Trust Account Bank Details</h3>
-            <p className="text-xs text-muted-foreground">Your statutory trust account for holding client funds</p>
+            <h3 className="text-base font-bold">{t('agentOnboarding.trust.heading')}</h3>
+            <p className="text-xs text-muted-foreground">{t('agentOnboarding.trust.sub')}</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <Label className="text-xs font-medium">Account name</Label>
+              <Label className="text-xs font-medium">{t('agentOnboarding.trust.accountName')}</Label>
               <Input value={trustAccountName} onChange={e => setTrustAccountName(e.target.value)} placeholder="Agency Name Trust Account" className="mt-1.5" />
             </div>
             <div>
-              <Label className="text-xs font-medium">Bank name *</Label>
+              <Label className="text-xs font-medium">{t('agentOnboarding.trust.bankName')}</Label>
               <Select value={bankName} onValueChange={setBankName}>
-                <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select bank" /></SelectTrigger>
+                <SelectTrigger className="mt-1.5"><SelectValue placeholder={t('agentOnboarding.trust.bankPlaceholder')} /></SelectTrigger>
                 <SelectContent>
                   {BANKS.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label className="text-xs font-medium">Account type</Label>
+              <Label className="text-xs font-medium">{t('agentOnboarding.trust.accountType')}</Label>
               <div className="mt-1.5">
-                <Badge variant="secondary" className="text-xs px-3 py-1.5">Trust Account</Badge>
+                <Badge variant="secondary" className="text-xs px-3 py-1.5">{t('agentOnboarding.trust.accountTypeBadge')}</Badge>
               </div>
             </div>
             <div>
-              <Label className="text-xs font-medium">BSB *</Label>
+              <Label className="text-xs font-medium">{t('agentOnboarding.trust.bsb')}</Label>
               <Input value={bsb} onChange={e => setBsb(e.target.value)} placeholder="062-000" className="mt-1.5 font-mono" maxLength={7} />
-              {bsb && bsb.replace(/-/g, '').length !== 6 && <p className="text-[10px] text-destructive mt-1">BSB must be 6 digits</p>}
+              {bsb && bsb.replace(/-/g, '').length !== 6 && <p className="text-[10px] text-destructive mt-1">{t('agentOnboarding.trust.bsbInvalid')}</p>}
             </div>
             <div>
-              <Label className="text-xs font-medium">Account number *</Label>
+              <Label className="text-xs font-medium">{t('agentOnboarding.trust.accountNumber')}</Label>
               <Input value={accountNumber} onChange={e => setAccountNumber(e.target.value)} placeholder="12345678" className="mt-1.5 font-mono" />
             </div>
           </div>
           <div className="bg-muted/50 border border-border rounded-lg p-3 flex items-start gap-2">
             <Landmark size={14} className="text-muted-foreground shrink-0 mt-0.5" />
             <p className="text-xs text-muted-foreground">
-              Your trust account must be held with an approved Australian ADI (Authorised Deposit-taking Institution).
-              The account name must include the word 'Trust'.
+              {t('agentOnboarding.trust.disclaimer')}
             </p>
           </div>
           <GuideCard

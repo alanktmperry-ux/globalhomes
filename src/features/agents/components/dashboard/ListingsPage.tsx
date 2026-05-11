@@ -715,17 +715,7 @@ const ListingsPage = () => {
   if (view === 'pipeline') {
     return (
       <div>
-        <DashboardHeader
-          title="Listings"
-          actions={
-            <div className="flex items-center gap-2">
-              {viewToggle}
-              <Button size="sm" onClick={() => navigate('/pocket-listing')} className="gap-1.5 text-xs">
-                <Plus size={12} /> New Listing
-              </Button>
-            </div>
-          }
-        />
+        {portfolioHeader}
         <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Loading pipeline…</div>}>
           {/* PipelinePage renders its own DashboardHeader; we hide it via wrapper */}
           <div className="[&>div>:first-child]:hidden">

@@ -410,7 +410,7 @@ const TrustLedgerPage = () => {
       .from('agents')
       .select('name, agency, license_number')
       .eq('id', receipt.agent_id)
-      .single();
+      .maybeSingle();
 
     const dateRecFmt = receipt.date_received ? DATE_FMT.format(new Date(receipt.date_received + 'T00:00:00')) : '—';
     const dateDepFmt = receipt.date_deposited ? DATE_FMT.format(new Date(receipt.date_deposited + 'T00:00:00')) : 'Pending';

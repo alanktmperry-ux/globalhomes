@@ -23,6 +23,7 @@ interface InspectionBookingProps {
 }
 
 export function InspectionBookingModal({ property, inspectionTimes, open, onClose }: InspectionBookingProps) {
+  const { language } = useTranslation();
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});

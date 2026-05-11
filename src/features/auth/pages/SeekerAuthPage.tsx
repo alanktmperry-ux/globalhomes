@@ -321,7 +321,7 @@ const SeekerAuthPage = () => {
 
                   <div className="flex items-center gap-3 my-7">
                     <div className="flex-1 h-px bg-stone-100" />
-                    <span className="text-[11px] text-stone-300 tracking-[0.08em] uppercase">or</span>
+                    <span className="text-[11px] text-stone-300 tracking-[0.08em] uppercase">{t('auth.or')}</span>
                     <div className="flex-1 h-px bg-stone-100" />
                   </div>
 

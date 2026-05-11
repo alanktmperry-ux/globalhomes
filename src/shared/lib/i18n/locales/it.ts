@@ -1695,4 +1695,6 @@ export const it: Partial<Record<TranslationKey, string>> = {
   'halo.credits.loadError': 'Impossibile caricare i pacchetti di credito.',
   'halo.credits.stripeNotConfigured': 'Stripe non è ancora configurato. Riprova più tardi.',
   'halo.credits.checkoutError': 'Impossibile avviare la procedura di pagamento. Riprova.',
+  'hero.headline.line1': "Trova la tua casa.",
+  'hero.headline.line2': "In qualsiasi lingua.",
 };

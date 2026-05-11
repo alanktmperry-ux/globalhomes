@@ -1691,4 +1691,6 @@ export const ta: Partial<Record<TranslationKey, string>> = {
   'halo.credits.loadError': 'கடன் தொகுப்புகளை ஏற்ற முடியவில்லை.',
   'halo.credits.stripeNotConfigured': 'ஸ்ட்ரைப் இன்னும் உள்ளமைக்கப்படவில்லை. தயவுசெய்து விரைவில் மீண்டும் முயற்சிக்கவும்.',
   'halo.credits.checkoutError': 'பணம் செலுத்தும் செயல்முறையைத் தொடங்க முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.',
+  'hero.headline.line1': "உங்கள் வீட்டைக் கண்டுபிடியுங்கள்.",
+  'hero.headline.line2': "எந்த மொழியிலும்.",
 };

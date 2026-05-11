@@ -1695,4 +1695,6 @@ export const ru: Partial<Record<TranslationKey, string>> = {
   'halo.credits.loadError': 'Не удалось загрузить кредитные пакеты.',
   'halo.credits.stripeNotConfigured': 'Stripe пока не настроен. Пожалуйста, попробуйте позже.',
   'halo.credits.checkoutError': 'Не удалось начать оформление заказа. Пожалуйста, попробуйте еще раз.',
+  'hero.headline.line1': "Найдите свой дом.",
+  'hero.headline.line2': "На любом языке.",
 };

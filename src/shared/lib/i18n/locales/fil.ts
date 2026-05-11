@@ -1695,4 +1695,6 @@ export const fil: Partial<Record<TranslationKey, string>> = {
   'halo.credits.loadError': 'Nabigong i-load ang mga pakete ng kredito.',
   'halo.credits.stripeNotConfigured': 'Hindi pa na-configure ang Stripe. Pakisubukang muli sa lalong madaling panahon.',
   'halo.credits.checkoutError': 'Hindi masimulan ang pag-checkout. Pakisubukang muli.',
+  'hero.headline.line1': "Hanapin ang iyong bahay.",
+  'hero.headline.line2': "Sa anumang wika.",
 };

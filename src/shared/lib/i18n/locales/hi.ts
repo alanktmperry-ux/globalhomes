@@ -1695,4 +1695,6 @@ export const hi: Partial<Record<keyof typeof EnBase, string>> = {
   'halo.credits.loadError': 'क्रेडिट पैकेज लोड करने में विफल।',
   'halo.credits.stripeNotConfigured': 'स्ट्राइप अभी तक कॉन्फ़िगर नहीं किया गया है। कृपया कुछ देर बाद पुनः प्रयास करें।',
   'halo.credits.checkoutError': 'चेकआउट शुरू नहीं हो सका। कृपया पुनः प्रयास करें।',
+  'hero.headline.line1': "अपना घर खोजें।",
+  'hero.headline.line2': "किसी भी भाषा में।",
 };

@@ -1925,6 +1925,8 @@ export const en = {
   'halo.credits.loadError': 'Failed to load credit packages.',
   'halo.credits.stripeNotConfigured': 'Stripe is not configured yet. Please try again soon.',
   'halo.credits.checkoutError': 'Could not start checkout. Please try again.',
+  'hero.headline.line1': 'Find your home.',
+  'hero.headline.line2': 'In any language.',
 } as const;
 
 export type TranslationKey = keyof typeof en;

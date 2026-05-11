@@ -1705,4 +1705,6 @@ export const zhCN: Partial<Record<keyof typeof EnBase, string>> = {
   'halo.credits.loadError': '加载信用额度包失败。',
   'halo.credits.stripeNotConfigured': 'Stripe尚未配置，请稍后再试。',
   'halo.credits.checkoutError': '结账失败，请重试。',
+  'hero.headline.line1': "找到您的家。",
+  'hero.headline.line2': "任何语言。",
 };

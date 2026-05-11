@@ -1691,4 +1691,6 @@ export const ar: Partial<Record<TranslationKey, string>> = {
   'halo.credits.loadError': 'فشل تحميل حزم الرصيد.',
   'halo.credits.stripeNotConfigured': 'لم يتم إعداد Stripe بعد. يرجى المحاولة مرة أخرى قريباً.',
   'halo.credits.checkoutError': 'تعذر بدء عملية الدفع. يرجى المحاولة مرة أخرى.',
+  'hero.headline.line1': "اعثر على منزلك.",
+  'hero.headline.line2': "بأي لغة.",
 };

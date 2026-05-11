@@ -1695,4 +1695,6 @@ export const th: Partial<Record<TranslationKey, string>> = {
   'halo.credits.loadError': 'ไม่สามารถโหลดแพ็กเกจเครดิตได้',
   'halo.credits.stripeNotConfigured': 'ยังไม่ได้ตั้งค่า Stripe โปรดลองใหม่อีกครั้งในภายหลัง',
   'halo.credits.checkoutError': 'ไม่สามารถเริ่มขั้นตอนการชำระเงินได้ โปรดลองอีกครั้ง',
+  'hero.headline.line1': "ค้นหาบ้านของคุณ.",
+  'hero.headline.line2': "ในภาษาใดก็ได้.",
 };

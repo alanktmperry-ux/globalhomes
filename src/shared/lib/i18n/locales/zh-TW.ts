@@ -1706,4 +1706,6 @@ export const zhTW: Partial<Record<keyof typeof EnBase, string>> = {
   'halo.credits.loadError': '加載信用額度包失敗。',
   'halo.credits.stripeNotConfigured': 'Stripe尚未配置，請稍後再試。',
   'halo.credits.checkoutError': '結帳失敗，請重試。',
+  'hero.headline.line1': "尋找您的家。",
+  'hero.headline.line2': "任何語言。",
 };

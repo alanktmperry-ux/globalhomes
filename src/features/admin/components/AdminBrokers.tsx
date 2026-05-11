@@ -471,7 +471,7 @@ function PendingCard({
             autoFocus
           />
           <div className="flex gap-2">
-            <Button size="sm" variant="ghost" onClick={onCancelReject}>Cancel</Button>
+            <Button size="sm" variant="ghost" onClick={onCancelReject}>Discard</Button>
             <Button size="sm" variant="destructive" onClick={onConfirmReject} disabled={busy}>
               {busy ? <Loader2 size={14} className="animate-spin" /> : 'Confirm reject'}
             </Button>
@@ -654,7 +654,7 @@ function AddBrokerModal({
         </div>
 
         <DialogFooter>
-          <Button variant="ghost" onClick={() => { reset(); onClose(); }}>Cancel</Button>
+          <Button variant="ghost" onClick={() => { reset(); onClose(); }}>Discard</Button>
           <Button onClick={handleSave} disabled={!canSave}>
             {saving ? <Loader2 size={14} className="animate-spin mr-2" /> : null}
             Save & send login link

@@ -66,7 +66,7 @@ export function InspectionBookingModal({ property, inspectionTimes, open, onClos
         user_name: result.data.name,
         user_email: result.data.email,
         user_phone: result.data.phone,
-        message: `🏠 Inspection booking: ${slotStr}${result.data.message ? `\n\n${result.data.message}` : ''}`,
+        message: ` Inspection booking: ${slotStr}${result.data.message ? `\n\n${result.data.message}` : ''}`,
         buying_purpose: 'inspection',
         urgency: 'ready_to_inspect',
         status: 'new',

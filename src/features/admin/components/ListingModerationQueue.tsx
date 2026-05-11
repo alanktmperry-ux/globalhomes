@@ -219,7 +219,7 @@ export default function ListingModerationQueue({ onPendingCountChange }: Props) 
                           onClick={() => { setRejectingId(null); setRejectReason(''); }}
                           className="h-7 text-xs"
                         >
-                          Cancel
+                          Discard
                         </Button>
                       </div>
                     </div>

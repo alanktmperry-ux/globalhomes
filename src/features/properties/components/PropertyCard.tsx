@@ -51,7 +51,7 @@ interface PropertyCardProps {
   priority?: boolean;
 }
 
-const COLLAB_EMOJIS = ['👍', '👎', '🔥'] as const;
+const COLLAB_EMOJIS = ['', '👎', ''] as const;
 
 export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index, isCollab, collabReactions = [], onToggleReaction, partnerViewed, currentUserId, priority }: PropertyCardProps) {
   const { t } = useTranslation();

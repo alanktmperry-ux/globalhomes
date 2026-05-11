@@ -1343,7 +1343,7 @@ export default function PropertyDetailPage() {
             {property && !rawProperty?.is_off_market && property.suburb && (
               <div className="mt-3 p-4 rounded-xl border border-amber-200 bg-amber-50">
                 <div className="flex gap-3">
-                  <div className="text-2xl shrink-0" aria-hidden>{'🔔'}</div>
+                  <div className="text-2xl shrink-0" aria-hidden>{''}</div>
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-slate-900">
                       {tp('property.offMarketAlert.title', { suburb: property.suburb })}

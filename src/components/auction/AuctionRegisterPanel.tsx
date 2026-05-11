@@ -103,7 +103,7 @@ export function AuctionRegisterPanel({ propertyId, auctionDate, registrationCoun
                 onClick={() => setExpanded(false)}
                 className="px-4 py-2.5 text-primary text-sm hover:underline"
               >
-                Cancel
+                Discard
               </button>
             </div>
             <p className="text-[11px] text-muted-foreground">

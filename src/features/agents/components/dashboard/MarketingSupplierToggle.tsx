@@ -277,7 +277,7 @@ const MarketingSupplierToggle = ({ listing, onSent }: Props) => {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowModal(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setShowModal(false)}>Discard</Button>
             <Button
               onClick={handleSend}
               disabled={!confirmed || !emailBody.trim() || !selectedSupplierId || sending}

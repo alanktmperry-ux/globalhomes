@@ -620,7 +620,7 @@ export default function KeyRegisterPage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAddEdit(null)} disabled={savingAddEdit}>Cancel</Button>
+            <Button variant="outline" onClick={() => setAddEdit(null)} disabled={savingAddEdit}>Discard</Button>
             <Button onClick={saveAddEdit} disabled={savingAddEdit}>
               {savingAddEdit && <Loader2 size={14} className="mr-1 animate-spin" />}
               Save
@@ -684,7 +684,7 @@ export default function KeyRegisterPage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIssueTarget(null)} disabled={savingIssue}>Cancel</Button>
+            <Button variant="outline" onClick={() => setIssueTarget(null)} disabled={savingIssue}>Discard</Button>
             <Button onClick={submitIssue} disabled={savingIssue}>
               {savingIssue && <Loader2 size={14} className="mr-1 animate-spin" />}
               Issue Key
@@ -723,7 +723,7 @@ export default function KeyRegisterPage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setReturnTarget(null)} disabled={savingReturn}>Cancel</Button>
+            <Button variant="outline" onClick={() => setReturnTarget(null)} disabled={savingReturn}>Discard</Button>
             <Button onClick={submitReturn} disabled={savingReturn}>
               {savingReturn && <Loader2 size={14} className="mr-1 animate-spin" />}
               Mark Returned
@@ -742,7 +742,7 @@ export default function KeyRegisterPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Discard</AlertDialogCancel>
             <AlertDialogAction onClick={confirmLost} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Mark Lost
             </AlertDialogAction>

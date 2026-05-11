@@ -260,7 +260,7 @@ export default function AgentProfilePage() {
                       </div>
                       {hasTranslations && (
                         <p className="text-xs text-primary font-medium pt-1">
-                          🌐 Available in multiple languages
+                           Available in multiple languages
                         </p>
                       )}
                     </div>

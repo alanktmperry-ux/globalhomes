@@ -290,7 +290,7 @@ const AutomationSettingsPage = () => {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setEditing(null)}>Discard</Button>
             <Button onClick={saveEdit} disabled={savingEdit}>
               {savingEdit && <Loader2 className="h-4 w-4 animate-spin" />} Save
             </Button>

@@ -623,7 +623,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={onClose}>Cancel</Button>
+            <Button variant="outline" onClick={onClose}>Discard</Button>
             <Button onClick={handleSave} disabled={!form.first_name.trim() || saving}>
               {saving ? 'Saving…' : (saveLabel ?? 'Save Contact')}
             </Button>
@@ -655,7 +655,7 @@ const ContactFormModal = ({ onClose, onSave, initialData, title, saveLabel, lead
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>Discard</AlertDialogCancel>
           <AlertDialogAction onClick={handleConfirmCreateAnyway}>
             Create anyway
           </AlertDialogAction>

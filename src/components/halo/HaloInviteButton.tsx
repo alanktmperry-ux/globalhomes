@@ -61,7 +61,7 @@ export function HaloInviteButton({ contactName, contactEmail }: Props) {
             </p>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)} disabled={busy}>Cancel</Button>
+            <Button variant="outline" onClick={() => setOpen(false)} disabled={busy}>Discard</Button>
             <Button onClick={handleSend} disabled={busy}>{busy ? 'Sending…' : 'Send Invite'}</Button>
           </DialogFooter>
         </DialogContent>

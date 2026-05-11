@@ -138,7 +138,7 @@ export function OpenHomeCard({ session, propertyAddress }: Props) {
               {loading ? 'Registering…' : session.is_full ? 'Join waitlist' : 'Confirm registration'}
             </Button>
             <button onClick={() => setExpanded(false)} className="px-4 text-sm text-muted-foreground hover:underline">
-              Cancel
+              Discard
             </button>
           </div>
           <p className="text-[10px] text-muted-foreground">

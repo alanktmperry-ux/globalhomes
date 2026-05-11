@@ -86,7 +86,7 @@ export function WatchlistPanel() {
       {priceDrops.length > 0 && (
         <div className="rounded-2xl bg-emerald-500/5 border border-emerald-500/20 p-4">
           <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400 mb-2">
-            🎉 {priceDrops.length} price drop{priceDrops.length > 1 ? 's' : ''} on your watchlist!
+             {priceDrops.length} price drop{priceDrops.length > 1 ? 's' : ''} on your watchlist!
           </p>
           {priceDrops.map(s => {
             const drop = s.saved_price! - s.property!.price;

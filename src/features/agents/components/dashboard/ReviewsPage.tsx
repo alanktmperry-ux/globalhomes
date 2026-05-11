@@ -264,7 +264,7 @@ const ReviewsPage = () => {
                         Send reply
                       </Button>
                       <Button size="sm" variant="ghost" className="text-xs" onClick={() => { setReplyingTo(null); setReplyText(''); }}>
-                        Cancel
+                        Discard
                       </Button>
                     </div>
                   </div>

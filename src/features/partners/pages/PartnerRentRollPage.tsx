@@ -320,7 +320,7 @@ const PartnerRentRollPage = () => {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setPayTenancy(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setPayTenancy(null)}>Discard</Button>
             <Button onClick={handleRecordPayment} disabled={saving}>
               {saving ? <><Loader2 className="animate-spin mr-1" size={14} /> Saving…</> : 'Record Payment'}
             </Button>

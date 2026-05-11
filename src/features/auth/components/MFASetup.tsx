@@ -78,7 +78,7 @@ export function MFASetup({ onEnrolled, onCancel }: Props) {
             Set up authenticator app
           </Button>
           {onCancel && (
-            <Button variant="ghost" onClick={onCancel} disabled={loading}>Cancel</Button>
+            <Button variant="ghost" onClick={onCancel} disabled={loading}>Discard</Button>
           )}
         </div>
       </div>
@@ -111,7 +111,7 @@ export function MFASetup({ onEnrolled, onCancel }: Props) {
         <Button onClick={verifyCode} disabled={loading || code.length !== 6}>
           {loading ? <Loader2 className="animate-spin" /> : 'Verify & enable'}
         </Button>
-        <Button variant="ghost" onClick={cancel} disabled={loading}>Cancel</Button>
+        <Button variant="ghost" onClick={cancel} disabled={loading}>Discard</Button>
       </div>
     </div>
   );

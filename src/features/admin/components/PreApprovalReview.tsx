@@ -171,7 +171,7 @@ const PreApprovalReview = () => {
                     onClick={() => { setShowRejectFor(null); setRejectionNote(''); }}
                     className="px-4 py-2 text-muted-foreground text-sm hover:underline"
                   >
-                    Cancel
+                    Discard
                   </button>
                 </div>
               </div>

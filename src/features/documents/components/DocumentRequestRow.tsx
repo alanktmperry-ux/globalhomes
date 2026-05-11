@@ -65,7 +65,7 @@ export function DocumentRequestRow({ request, onUpload, onCancel, isRequester }:
             onClick={() => onCancel(request.id)}
             className="gap-1 text-xs h-7 text-muted-foreground"
           >
-            <X size={12} /> Cancel
+            <X size={12} /> Discard
           </Button>
         )}
       </div>

@@ -216,7 +216,7 @@ export function StampDutyCalculator({ propertyPrice, propertyAddress, propertySt
 
                   {result.fhbGrant > 0 && (
                     <div className="flex items-center justify-between p-3 rounded-xl bg-primary/10 border border-primary/20">
-                      <span className="text-sm text-primary">🏠 First Home Owner Grant</span>
+                      <span className="text-sm text-primary"> First Home Owner Grant</span>
                       <span className="font-semibold text-primary">+{formatDollars(result.fhbGrant)}</span>
                     </div>
                   )}

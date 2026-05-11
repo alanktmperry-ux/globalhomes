@@ -179,7 +179,7 @@ export function HaloCard({ halo, onStatusChange, onFulfil }: Props) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={busy}>Discard</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} disabled={busy}>
               Delete
             </AlertDialogAction>

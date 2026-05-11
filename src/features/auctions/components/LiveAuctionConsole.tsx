@@ -188,7 +188,7 @@ export function LiveAuctionConsole({ propertyId, auctionId }: Props) {
                 : `Passed in at $${currentBid.toLocaleString('en-AU')}. The highest bidder gets first right of negotiation.`}
             </p>
             <div className="flex gap-2">
-              <button onClick={() => setShowConclude(false)} className="flex-1 py-2.5 rounded-xl text-sm bg-secondary text-secondary-foreground">Cancel</button>
+              <button onClick={() => setShowConclude(false)} className="flex-1 py-2.5 rounded-xl text-sm bg-secondary text-secondary-foreground">Discard</button>
               <button onClick={handleConclude}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-semibold text-white ${concludeOutcome === 'sold' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-amber-500 hover:bg-amber-600'}`}>
                 Confirm

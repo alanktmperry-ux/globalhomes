@@ -989,7 +989,7 @@ const TeamPage = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Discard</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeactivateAgent} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Deactivate
             </AlertDialogAction>

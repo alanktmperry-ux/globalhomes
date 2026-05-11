@@ -135,7 +135,7 @@ export function AuctionRegistrationModal({ auctionId, isOnline, open, onClose }:
                 <input value={form.id_expiry} onChange={e => update('id_expiry', e.target.value)} placeholder="Expiry date" type="date"
                   className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 <div className="p-3 rounded-xl bg-primary/5 border border-primary/10 text-xs text-muted-foreground">
-                  🔒 Your ID is securely stored and only visible to the listing agent.
+                   Your ID is securely stored and only visible to the listing agent.
                 </div>
               </>
             )}

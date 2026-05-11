@@ -422,7 +422,7 @@ export default function OwnerPortalPage() {
                           <Button size="sm" variant="destructive" onClick={() => decide(j.id, 'declined', declineReason)} disabled={acting === j.id}>
                             {acting === j.id ? <Loader2 size={12} className="animate-spin mr-1" /> : null}Confirm decline
                           </Button>
-                          <Button size="sm" variant="ghost" onClick={() => { setDeclineReasonForId(null); setDeclineReason(''); }}>Cancel</Button>
+                          <Button size="sm" variant="ghost" onClick={() => { setDeclineReasonForId(null); setDeclineReason(''); }}>Discard</Button>
                         </div>
                       </div>
                     ) : (

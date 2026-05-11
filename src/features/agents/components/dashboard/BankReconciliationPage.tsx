@@ -864,7 +864,7 @@ const BankReconciliationPage = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAdd(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setShowAdd(false)}>Discard</Button>
             <Button onClick={handleAddEntry} disabled={!addAmount || !addDesc.trim() || addSaving}>
               {addSaving ? 'Adding…' : 'Add Entry'}
             </Button>
@@ -953,7 +953,7 @@ const BankReconciliationPage = () => {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowMatch(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setShowMatch(false)}>Discard</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -982,7 +982,7 @@ const BankReconciliationPage = () => {
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowImport(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setShowImport(false)}>Discard</Button>
             <Button onClick={handleCsvImport} disabled={!csvText.trim() || importSaving} className="gap-1.5">
               <Upload size={13} />
               {importSaving ? 'Importing…' : 'Import'}

@@ -29,7 +29,7 @@ export function HaloUnlockDialog({ open, onOpenChange, balance, busy, onConfirm 
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={busy}>Discard</AlertDialogCancel>
           <AlertDialogAction
             disabled={busy}
             onClick={onConfirm}

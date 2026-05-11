@@ -321,7 +321,7 @@ export default function SupplierPortalPage() {
             <div><Label className="text-xs">Time</Label><Input type="time" value={schedTime} onChange={e=>setSchedTime(e.target.value)}/></div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={()=>setScheduleJob(null)}>Cancel</Button>
+            <Button variant="outline" onClick={()=>setScheduleJob(null)}>Discard</Button>
             <Button onClick={submitSchedule} disabled={busy || !schedDate}>Submit</Button>
           </DialogFooter>
         </DialogContent>
@@ -356,7 +356,7 @@ export default function SupplierPortalPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={()=>{ setCompleteJob(null); setInvoiceUrl(null); setInvoiceName(null); }}>Cancel</Button>
+            <Button variant="outline" onClick={()=>{ setCompleteJob(null); setInvoiceUrl(null); setInvoiceName(null); }}>Discard</Button>
             <Button onClick={submitComplete} disabled={busy || uploadingInvoice}>Mark Complete</Button>
           </DialogFooter>
         </DialogContent>

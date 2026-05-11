@@ -170,7 +170,7 @@ export default function SeekerDashboard() {
             {/* Language preference banner */}
             {profile?.language_preference && profile.language_preference !== 'en' && (
               <div className="mb-6 rounded-xl bg-primary/5 border border-primary/20 p-4 flex items-center gap-3">
-                <span className="text-lg" aria-hidden>{'🌐'}</span>
+                <span className="text-lg" aria-hidden>{''}</span>
                 <div>
                   <p className="text-sm font-medium text-foreground">{t('seeker.dashboard.langBanner.title')}</p>
                   <p className="text-xs text-muted-foreground">
@@ -396,7 +396,7 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
   const { t } = useTranslation();
   return (
     <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-8 sm:p-12 text-center">
-      <div className="text-5xl mb-4" aria-hidden>{'🏡'}</div>
+      <div className="text-5xl mb-4" aria-hidden>{''}</div>
       <h2 className="text-xl font-bold text-[#1E293B] mb-2">{t('seeker.empty.title')}</h2>
       <p className="text-[#64748B] max-w-md mx-auto mb-6 text-sm sm:text-base">
         {t('seeker.empty.copy')}

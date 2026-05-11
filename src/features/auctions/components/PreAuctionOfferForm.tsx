@@ -69,7 +69,7 @@ export function PreAuctionOfferForm({ propertyId, auctionId }: Props) {
   return (
     <div className="rounded-2xl border border-border bg-card overflow-hidden">
       <button onClick={() => setExpanded(!expanded)} className="w-full p-4 flex items-center justify-between text-left">
-        <span className="font-semibold text-foreground text-sm">💰 Submit a Pre-Auction Offer</span>
+        <span className="font-semibold text-foreground text-sm"> Submit a Pre-Auction Offer</span>
         {expanded ? <ChevronUp size={16} className="text-muted-foreground" /> : <ChevronDown size={16} className="text-muted-foreground" />}
       </button>
 

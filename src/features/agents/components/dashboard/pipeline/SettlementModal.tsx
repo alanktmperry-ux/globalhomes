@@ -201,7 +201,7 @@ const SettlementModal = ({
 
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={handleCancel} disabled={submitting}>
-            Cancel
+            Discard
           </Button>
           <Button onClick={handleConfirm} disabled={submitting}>
             {submitting ? 'Saving…' : 'Confirm Settlement'}

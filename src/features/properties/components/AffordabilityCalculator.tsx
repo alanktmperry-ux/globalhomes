@@ -81,7 +81,7 @@ export function AffordabilityCalculator({ property }: AffordabilityCalculatorPro
         </div>
 
         <p className="text-[10px] text-muted-foreground leading-relaxed">
-          💡 Most landlords require your gross weekly income to be at least 3× the rent. This property needs {fmt(rentalCalc.requiredWeeklyGross)}/wk before tax.
+           Most landlords require your gross weekly income to be at least 3× the rent. This property needs {fmt(rentalCalc.requiredWeeklyGross)}/wk before tax.
         </p>
       </div>
     );
@@ -157,7 +157,7 @@ export function AffordabilityCalculator({ property }: AffordabilityCalculatorPro
       </div>
 
       <p className="text-[10px] text-muted-foreground leading-relaxed">
-        💡 Estimates only. Adjust the deposit slider to see how it affects your weekly cost. Actual rates and fees may vary.
+         Estimates only. Adjust the deposit slider to see how it affects your weekly cost. Actual rates and fees may vary.
       </p>
     </div>
   );

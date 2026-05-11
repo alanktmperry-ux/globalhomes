@@ -357,7 +357,7 @@ export default function TenancyContactsPanel({ tenancyId, readOnly = false }: Pr
               </div>
             )}
             <DialogFooter>
-              <Button variant="outline" onClick={() => setEditing(null)} disabled={saving}>Cancel</Button>
+              <Button variant="outline" onClick={() => setEditing(null)} disabled={saving}>Discard</Button>
               <Button onClick={save} disabled={saving}>
                 {saving && <Loader2 size={14} className="mr-1 animate-spin" />}
                 Save
@@ -376,7 +376,7 @@ export default function TenancyContactsPanel({ tenancyId, readOnly = false }: Pr
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>Discard</AlertDialogCancel>
               <AlertDialogAction onClick={remove} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
                 Remove
               </AlertDialogAction>

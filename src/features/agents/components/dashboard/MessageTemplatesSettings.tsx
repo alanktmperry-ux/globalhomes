@@ -338,7 +338,7 @@ function TemplateEditorDialog({ template, onClose, onSave }: EditorProps) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={saving}>Cancel</Button>
+          <Button variant="outline" onClick={onClose} disabled={saving}>Discard</Button>
           <Button onClick={handleSave} disabled={saving}>
             {saving ? <><Loader2 size={14} className="animate-spin mr-2" />Saving...</> : 'Save template'}
           </Button>

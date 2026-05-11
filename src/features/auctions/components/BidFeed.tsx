@@ -51,7 +51,7 @@ export function BidFeed({ auctionId, readOnly }: Props) {
     <div className="space-y-2">
       {reserveMet && (
         <div className="p-2 rounded-lg bg-emerald-100 text-center text-sm font-bold text-emerald-700 animate-in slide-in-from-bottom">
-          🟢 Reserve met — ON THE MARKET!
+           Reserve met — ON THE MARKET!
         </div>
       )}
 

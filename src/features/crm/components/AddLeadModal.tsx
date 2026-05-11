@@ -209,7 +209,7 @@ export function AddLeadModal({ onClose, onSave }: Props) {
 
         {/* Footer */}
         <div className="flex items-center justify-end gap-2 p-5 border-t border-border">
-          <Button variant="ghost" onClick={onClose} disabled={saving}>Cancel</Button>
+          <Button variant="ghost" onClick={onClose} disabled={saving}>Discard</Button>
           <Button onClick={handleSave} disabled={saving || !form.first_name.trim()}>
             {saving ? 'Saving…' : 'Add Lead'}
           </Button>

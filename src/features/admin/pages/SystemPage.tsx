@@ -696,7 +696,7 @@ function DatabaseTab() {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>Discard</AlertDialogCancel>
               <AlertDialogAction onClick={clearSessions}>Continue</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

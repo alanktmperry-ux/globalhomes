@@ -634,9 +634,9 @@ const Index = () => {
 
               {/* Filter chips */}
               <div style={{ display:'flex', flexWrap:'wrap', gap:8, maxWidth:560, marginTop:14 }}>
-                {['📍 Auburn','📍 Box Hill','📍 Hurstville', t('home.hero.chip.budget'), t('home.hero.chip.beds'), t('home.hero.chip.schools')].map((c) => (
-                  <button key={c} className="chip" onClick={() => navigate(`/buy?q=${encodeURIComponent(c.replace(/^📍\s*/, ''))}`)}>
-                    {c.startsWith('📍') ? <><span aria-hidden="true">📍 </span>{c.slice(3)}</> : c}
+                {[' Auburn',' Box Hill',' Hurstville', t('home.hero.chip.budget'), t('home.hero.chip.beds'), t('home.hero.chip.schools')].map((c) => (
+                  <button key={c} className="chip" onClick={() => navigate(`/buy?q=${encodeURIComponent(c.replace(/^\s*/, ''))}`)}>
+                    {c.startsWith('') ? <><span aria-hidden="true"> </span>{c.slice(3)}</> : c}
                   </button>
                 ))}
               </div>
@@ -688,7 +688,7 @@ const Index = () => {
                   <div ref={priceRef} className="hcard-price" id="hcardPrice" style={{ fontSize:22, fontWeight:800, color:T.ink, marginBottom:8 }}>{initialFront.price}</div>
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:12, color:T.muted, marginBottom:12 }}>
                     <span ref={metaRef}>{initialFront.meta}</span>
-                    <span style={{ background:T.blueL, color:T.blue, padding:'3px 8px', borderRadius:100, fontWeight:700 }}>🌐 20 langs</span>
+                    <span style={{ background:T.blueL, color:T.blue, padding:'3px 8px', borderRadius:100, fontWeight:700 }}> 20 langs</span>
                   </div>
                 </div>
               </div>
@@ -996,7 +996,7 @@ const Index = () => {
                         <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:4, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{p.title || p.address || `${p.suburb ?? ''}${p.state ? `, ${p.state}` : ''}`}</div>
                         <div style={{ fontSize:12, color:T.muted, marginBottom:6 }}>{meta}</div>
                         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                          <span style={{ background:T.blueL, color:T.blue, fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:100 }}>🌐 20 languages</span>
+                          <span style={{ background:T.blueL, color:T.blue, fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:100 }}> 20 languages</span>
                           <span style={{ fontSize:14, fontWeight:800, color:T.ink }}>{p.price_formatted || fmtPrice(p.price, p.listing_type)}</span>
                         </div>
                       </div>
@@ -1107,7 +1107,7 @@ function AgentBand() {
                   ))}
                 </div>
                 <div style={{ flex:1, background:'linear-gradient(135deg, #1a2540, #0f3460)', borderRadius:6, position:'relative', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <span style={{ fontSize:18 }}>📍</span>
+                  <span style={{ fontSize:18 }}></span>
                   <div style={{ position:'absolute', bottom:6, right:6, background:T.blue, color:'#fff', fontSize:8, fontWeight:700, padding:'2px 6px', borderRadius:100 }}>20 langs</div>
                 </div>
               </div>
@@ -1502,8 +1502,8 @@ function ClosingCTA({ navigate, T }: { navigate: NavFn; T: Theme }) {
 function SliverBar() {
   const { t } = useTranslation();
   const messages = [
-    `🏆 ${t('home.sliver.agents')}`,
-    `🌐 ${t('home.sliver.translation')}`,
+    ` ${t('home.sliver.agents')}`,
+    ` ${t('home.sliver.translation')}`,
     `${t('home.sliver.price')} · ${t('home.sliver.free')}`,
   ];
   const [idx, setIdx] = useState(0);

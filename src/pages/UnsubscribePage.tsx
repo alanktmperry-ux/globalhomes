@@ -113,7 +113,7 @@ export default function UnsubscribePage() {
                 Confirm unsubscribe
               </Button>
               <Link to="/" className="inline-block mt-4 text-xs text-slate-500 hover:underline">
-                Cancel
+                Discard
               </Link>
             </>
           )}

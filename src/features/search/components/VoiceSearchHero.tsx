@@ -117,9 +117,9 @@ const getPlaceholders = (lang: string) =>
   SEARCH_PLACEHOLDERS_BY_LANG[lang] || SEARCH_PLACEHOLDERS_BY_LANG['en-AU'];
 
 const EXAMPLE_CHIPS = [
-  { label: '🏠 House in Doncaster', query: 'house in Doncaster Victoria' },
-  { label: '🏢 Apartment Sydney CBD', query: 'apartment in Sydney CBD under $800k' },
-  { label: '🔑 Rentals under $500pw', query: 'rental property under $500 per week Melbourne' },
+  { label: ' House in Doncaster', query: 'house in Doncaster Victoria' },
+  { label: ' Apartment Sydney CBD', query: 'apartment in Sydney CBD under $800k' },
+  { label: ' Rentals under $500pw', query: 'rental property under $500 per week Melbourne' },
   { label: '🌿 4 bed family home', query: '4 bedroom family home under $1.2M' },
   { label: '🏗️ Land for sale', query: 'land for sale Victoria' },
   { label: 'Office in Sydney CBD', query: 'office in Sydney CBD' },
@@ -418,7 +418,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
 
     if (!SpeechRecognition) {
       toast({
-        title: '🎙️ Voice search',
+        title: '️ Voice search',
         description: 'Voice search works in Chrome and Safari. Try opening the site in Chrome.',
       });
       return;
@@ -458,13 +458,13 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
       syncVoiceState('idle');
       if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
         toast({
-          title: '🎙️ Microphone blocked',
+          title: '️ Microphone blocked',
           description: 'Please allow microphone access in your browser settings, then try again.',
           variant: 'destructive',
         });
       } else if (e.error !== 'aborted' && e.error !== 'no-speech') {
         toast({
-          title: '🎙️ Voice search',
+          title: '️ Voice search',
           description: 'Nothing heard. Please try again.',
         });
       }
@@ -687,7 +687,7 @@ export function VoiceSearchHero({ onSearch, onLocationSelect, onRadiusChange, se
               {textDetectedLang && (
                 <div className="mt-2 flex justify-center">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
-                    🌐 Detected {textDetectedLang.toUpperCase()} — searching in English
+                     Detected {textDetectedLang.toUpperCase()} — searching in English
                   </span>
                 </div>
               )}

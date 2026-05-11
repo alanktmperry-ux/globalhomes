@@ -63,7 +63,7 @@ export const LANGUAGE_FLAGS: Record<string, { flag: string; label: string; color
 export function getLanguageMeta(lang: string | null | undefined) {
   if (!lang) return null;
   const key = lang.toLowerCase();
-  return LANGUAGE_FLAGS[key] ?? { flag: "🌐", label: lang, color: "bg-slate-100 text-slate-700 border-slate-200" };
+  return LANGUAGE_FLAGS[key] ?? { flag: "", label: lang, color: "bg-slate-100 text-slate-700 border-slate-200" };
 }
 
 export function initialsFromName(name: string | null | undefined): string {

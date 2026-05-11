@@ -162,10 +162,10 @@ const SuburbsIndex = () => (
             {/* Price pills */}
             <div className="flex flex-wrap gap-2 mb-4">
               <span className="text-xs px-2 py-1 rounded bg-muted text-foreground">
-                🏠 House {s.medianHouse}
+                 House {s.medianHouse}
               </span>
               <span className="text-xs px-2 py-1 rounded bg-muted text-foreground">
-                🏢 Unit {s.medianUnit}
+                 Unit {s.medianUnit}
               </span>
             </div>
 

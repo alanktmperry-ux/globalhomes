@@ -629,7 +629,7 @@ function WelcomeCard({ broker }: { broker: BrokerRecord }) {
           </div>
         )}
         <p className="text-sm text-slate-600 mt-6 px-4 py-3 bg-blue-50/60 border border-blue-100 rounded-md">
-          💡 New leads appear here in real time.
+           New leads appear here in real time.
         </p>
       </div>
     </div>
@@ -729,7 +729,7 @@ function LeadDetail({
       await (supabase.from("notifications") as any).insert({
         agent_id: lead.referral_agent_id,
         type: "referral_settled",
-        title: "💰 Referral fee earned",
+        title: " Referral fee earned",
         message: `Your referral ${lead.buyer_name || "buyer"} has settled. Your referral fee of ${formatAud(referralFee)} is now due. Download your invoice from the Broker Referrals page.`,
       } as any);
     }

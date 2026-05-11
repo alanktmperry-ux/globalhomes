@@ -495,7 +495,7 @@ ${agencyName || ''}`.trim();
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setScheduleFor(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setScheduleFor(null)}>Discard</Button>
             <Button onClick={submitSchedule} disabled={saving || !newRent || !effectiveDate}>
               {saving ? 'Saving…' : 'Schedule Increase'}
             </Button>

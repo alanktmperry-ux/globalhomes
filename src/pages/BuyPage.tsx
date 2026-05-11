@@ -597,7 +597,7 @@ const BuyPage = () => {
                 {hasActiveFilters && (
                   <div className="flex flex-wrap items-center gap-1.5 mt-2">
                     {filters.suburbs.map(s => (
-                      <span key={s} className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">📍 {s}</span>
+                      <span key={s} className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full"> {s}</span>
                     ))}
                     {filters.minBeds && (
                       <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{filters.minBeds}+ {t('beds')}</span>

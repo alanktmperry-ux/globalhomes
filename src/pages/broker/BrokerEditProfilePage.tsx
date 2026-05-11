@@ -298,7 +298,7 @@ export default function BrokerEditProfilePage() {
             {saving ? 'Saving…' : 'Save Profile'}
           </Button>
           <Button variant="outline" onClick={() => navigate('/broker/portal')}>
-            Cancel
+            Discard
           </Button>
         </div>
 

@@ -306,7 +306,7 @@ const ExportDialog = ({ onExport, onClose }: {
         </div>
 
         <div className="flex gap-2 pt-1">
-          <Button variant="outline" className="flex-1" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" className="flex-1" onClick={onClose}>Discard</Button>
           <Button className="flex-1 gap-2" onClick={() => { onExport(format, scope); onClose(); }}>
             <Download size={14} /> Download
           </Button>
@@ -692,7 +692,7 @@ const AdminReports = ({ isAdmin, currentAgentId }: Props) => {
                       <td className="px-4 py-3 text-xs whitespace-nowrap">
                         <span className={isExpiring ? 'text-destructive font-semibold' : 'text-muted-foreground'}>
                           {days !== null ? `${days}d` : '—'}
-                          {isExpiring && ' ⚠️'}
+                          {isExpiring && ' '}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">

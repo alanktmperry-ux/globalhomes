@@ -72,29 +72,26 @@ export default function FeaturedListings() {
 
     (async () => {
       try {
-        // 1. Map city → region via suburb_region_map
-        let region: string | null = null;
+        // 1. Map city → region via suburb_region_map (fallback: Melbourne East)
+        let region = "Melbourne East";
         if (geo.city) {
           const { data: regionRow } = await supabase
             .from("suburb_region_map")
             .select("region")
             .ilike("suburb", geo.city)
             .maybeSingle();
-          region = regionRow?.region || null;
+          if (regionRow?.region) region = regionRow.region;
         }
 
         // 2. Query featured_listings by region
-        let rows: FeaturedRow[] = [];
-        if (region) {
-          const { data } = await supabase
-            .from("featured_listings")
-            .select(SELECT_COLS)
-            .eq("status", "active")
-            .eq("region", region)
-            .order("display_priority", { ascending: false })
-            .limit(6);
-          rows = (data as FeaturedRow[]) || [];
-        }
+        const { data: regionData } = await supabase
+          .from("featured_listings")
+          .select(SELECT_COLS)
+          .eq("status", "active")
+          .eq("region", region)
+          .order("display_priority", { ascending: false })
+          .limit(6);
+        let rows: FeaturedRow[] = (regionData as FeaturedRow[]) || [];
 
         // 3. Fall back to any active listings
         if (rows.length === 0) {

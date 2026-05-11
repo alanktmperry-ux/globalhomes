@@ -1,1 +1,4 @@
 project_id = "ngrkbohpmkzjonaofgbb"
+
+[functions.get-geo]
+verify_jwt = false

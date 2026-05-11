@@ -284,7 +284,10 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
   const daysColor = days < 7 ? 'text-success' : days < 15 ? 'text-primary' : 'text-destructive';
 
   return (
-    <div className="bg-card border border-border rounded-xl p-4 flex flex-col sm:flex-row gap-4">
+    <div
+      className="bg-white rounded-[12px] flex flex-col sm:flex-row gap-4 p-4 mb-2 cursor-pointer hover:shadow-md transition-all"
+      style={{ border: '1px solid #E5E7EB' }}
+    >
       {(() => {
         const thumb = getListingThumb(l);
         return thumb ? (

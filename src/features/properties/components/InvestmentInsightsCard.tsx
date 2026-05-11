@@ -1,5 +1,6 @@
 import { TrendingUp, Home, Globe, CalendarDays, Receipt, Building2 } from 'lucide-react';
 import { Property } from '@/shared/lib/types';
+import { useTranslation, formatCurrency } from '@/shared/lib/i18n';
 
 function calcGrade(p: Property): { grade: 'A' | 'B' | 'C'; score: number } {
   let score = 0;

@@ -207,17 +207,17 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
           </div>
         ) : (
           <div className="flex justify-end">
-            <Button
-              size="sm"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+            <button
+              type="button"
               onClick={() => onRespond(halo)}
+              className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold rounded-[10px] px-4 py-2 text-sm flex items-center gap-1.5 transition-all"
             >
-              Respond — 1 credit
-            </Button>
+              <Lock size={14} /> Unlock for 1 credit
+            </button>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 

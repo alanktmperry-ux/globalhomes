@@ -244,7 +244,7 @@ export default function MultilingualGeneratorPage() {
             <span className="bg-gradient-to-r from-[#93C5FD] to-[#60A5FA] bg-clip-text text-transparent">in twenty languages.</span>
           </h2>
           <p className="text-[18px] text-white/65 mt-6 max-w-[600px] mx-auto leading-[1.55]">
-            ListHQ translates your listings into any language the moment you publish — Mandarin, Vietnamese, Arabic, Hindi, and 16 more. With Australian real-estate terminology built in.
+            ListHQ translates your listings into any language the moment you publish — Mandarin, Vietnamese, Arabic, Hindi, and dozens more. With Australian real-estate terminology built in.
           </p>
           <div className="flex gap-3 justify-center mt-10 flex-wrap">
             <a

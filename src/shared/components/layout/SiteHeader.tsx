@@ -96,10 +96,9 @@ export function SiteHeader() {
   if (!user && !loading) {
     return (
       <header
-        className="fixed top-0 left-0 right-0 z-10 flex items-center justify-between"
+        className="fixed top-0 left-0 right-0 z-10 flex items-center justify-between px-6 md:px-10"
         style={{
           height: 72,
-          padding: '0 24px',
           background: 'rgba(255,255,255,0.85)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',

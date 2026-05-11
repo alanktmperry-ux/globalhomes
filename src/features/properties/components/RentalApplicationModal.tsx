@@ -58,6 +58,7 @@ interface Props {
 }
 
 export function RentalApplicationModal({ property, open, onClose }: Props) {
+  const { language } = useTranslation();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);

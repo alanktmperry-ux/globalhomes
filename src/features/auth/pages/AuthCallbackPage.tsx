@@ -7,6 +7,7 @@ import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 const AuthCallbackPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const handle = async () => {

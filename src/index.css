@@ -188,3 +188,45 @@ body {
 .lang-toast-blue [data-icon] {
   color: #2563EB !important;
 }
+
+/* ============================================================
+   Version A+ Shell — Dashboard gradient scope
+   Overrides shadcn Sidebar primitive to render as a glass panel
+   on top of the blue gradient. Scoped to [data-aplus-shell].
+   ============================================================ */
+[data-aplus-shell] [data-sidebar="sidebar"] {
+  background: rgba(255, 255, 255, 0.03) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.10);
+  color: #ffffff;
+}
+[data-aplus-shell] [data-sidebar="sidebar"] [data-sidebar="header"],
+[data-aplus-shell] [data-sidebar="sidebar"] [data-sidebar="footer"] {
+  border-color: rgba(255, 255, 255, 0.10);
+}
+[data-aplus-shell] [data-sidebar="sidebar"] [data-sidebar="group-label"] {
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10px;
+}
+[data-aplus-shell] [data-sidebar="sidebar"] [data-sidebar="separator"] {
+  background: rgba(255, 255, 255, 0.10);
+}
+/* Brand wordmark in sidebar header */
+[data-aplus-shell] [data-sidebar="header"] .font-display,
+[data-aplus-shell] [data-sidebar="footer"] .text-muted-foreground {
+  color: rgba(255, 255, 255, 0.85);
+}
+[data-aplus-shell] [data-sidebar="header"] p,
+[data-aplus-shell] [data-sidebar="header"] span {
+  color: rgba(255, 255, 255, 0.85);
+}
+[data-aplus-shell] [data-sidebar="footer"] button {
+  color: rgba(255, 255, 255, 0.65);
+}
+[data-aplus-shell] [data-sidebar="footer"] button:hover {
+  color: #ffffff;
+}

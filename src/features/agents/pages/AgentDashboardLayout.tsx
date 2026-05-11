@@ -93,9 +93,22 @@ const AgentDashboardLayout = () => {
 
   return (
     <SidebarProvider>
-      <div className="h-screen flex w-full bg-background text-foreground">
+      <div
+        data-aplus-shell="1"
+        className="h-screen flex w-full text-foreground relative"
+        style={{ background: 'linear-gradient(160deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%)' }}
+      >
+        {/* Subtle vertical grid overlay — purely decorative */}
+        <div
+          className="fixed inset-0 pointer-events-none z-0 flex justify-between"
+          style={{ padding: '0 25%' }}
+          aria-hidden="true"
+        >
+          <div className="w-px h-full" style={{ background: 'rgba(255,255,255,0.05)' }} />
+          <div className="w-px h-full" style={{ background: 'rgba(255,255,255,0.05)' }} />
+        </div>
         <AgentDashboardSidebar />
-        <main id="main-content" className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
+        <main id="main-content" className="relative z-10 flex-1 flex flex-col min-w-0 overflow-y-auto pb-[env(safe-area-inset-bottom)] bg-[#F9FAFB] md:rounded-tl-[24px] md:my-2 md:mr-2 md:shadow-xl">
           <PaymentStatusBanner onVisibleChange={setPaymentBannerVisible} />
           {!paymentBannerVisible && trustPending && (
             <div className="bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-sm px-4 py-3 flex items-center justify-between">

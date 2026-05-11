@@ -38,7 +38,7 @@ interface NavSection {
 // Six top-level sections. Each top-level item is clickable AND expands to show its sub-items.
 const NAV_SECTIONS: NavSection[] = [
   {
-    title: 'Dashboard',
+    title: 'Intelligence',
     url: '/dashboard',
     icon: LayoutDashboard,
   },
@@ -53,14 +53,14 @@ const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
-    title: 'Listings',
+    title: 'Portfolio',
     url: '',
     icon: Briefcase,
     children: [
       { title: 'All Listings', url: '/dashboard/listings', icon: Briefcase },
       { title: 'Inbox', url: '/dashboard/inbox', icon: Mail, badgeKey: 'inbox', alertWhenBadge: true },
       { title: 'Contacts', url: '/dashboard/contacts', icon: Contact },
-      { title: 'Leads', url: '/dashboard/crm', icon: Flame },
+      { title: 'Buyer Pipeline', url: '/dashboard/crm', icon: Flame },
       { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badgeKey: 'leads' },
       { title: 'Open Homes', url: '/dashboard/open-homes', icon: CalendarDays },
       { title: 'Settlement', url: '/dashboard/settlements', icon: PartyPopper },
@@ -335,7 +335,7 @@ const AgentDashboardSidebar = () => {
     const Icon = section.icon;
     const badgeVal = section.badgeKey ? badgeValues[section.badgeKey] : '';
 
-    const toggleOnlySections = ['Listings', 'Finance', 'Tenancies', 'Compliance', 'Market Tools', 'Halo Board'];
+    const toggleOnlySections = ['Portfolio', 'Finance', 'Tenancies', 'Compliance', 'Market Tools', 'Halo Board'];
     const isToggleOnly = toggleOnlySections.includes(section.title);
     const canNavigate = !!section.url && !isToggleOnly;
 
@@ -361,10 +361,10 @@ const AgentDashboardSidebar = () => {
             <SidebarMenu>
               <SidebarMenuItem>
                 <div
-                  className={`flex items-center w-full rounded-lg transition-colors ${
+                  className={`flex items-center w-full rounded-[10px] transition-all ${
                     sectionActive
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-foreground hover:bg-accent'
+                      ? 'bg-white text-[#2563EB] shadow-sm'
+                      : 'text-white/55 hover:bg-white/10 hover:text-white'
                   }`}
                 >
                   <button
@@ -425,10 +425,10 @@ const AgentDashboardSidebar = () => {
                             if (isMobile) setOpenMobile(false);
                           }}
                           onMouseEnter={() => prefetchRoute(item.url)}
-                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg text-[13px] transition-colors ${
+                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-[10px] text-[13px] transition-all ${
                             isActive(item.url)
-                              ? 'bg-primary/10 text-primary font-medium'
-                              : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                              ? 'bg-white text-[#2563EB] font-medium'
+                              : 'text-white/55 hover:text-white hover:bg-white/10'
                           }`}
                         >
                           <item.icon
@@ -484,12 +484,12 @@ const AgentDashboardSidebar = () => {
                   }}
                   onMouseEnter={() => !item.comingSoon && prefetchRoute(item.url)}
                   onFocus={() => !item.comingSoon && prefetchRoute(item.url)}
-                  className={`flex items-center gap-2 w-full px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                  className={`flex items-center gap-2 w-full px-3 py-2.5 rounded-[10px] text-sm transition-all ${
                     item.comingSoon
-                      ? 'text-muted-foreground/50 cursor-default'
+                      ? 'text-white/30 cursor-default'
                       : isActive(item.url)
-                        ? 'bg-primary/10 text-primary font-medium'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                        ? 'bg-white text-[#2563EB] font-medium'
+                        : 'text-white/55 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   <item.icon

@@ -38,7 +38,8 @@ const FOREIGN_SURCHARGE: Record<AustralianState, number> = {
 };
 
 export function StampDutyCalculator({ propertyPrice, propertyAddress, propertyState }: Props) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const formatDollars = (n: number) => formatCurrency(Math.round(n), language);
   const [price, setPrice] = useState(propertyPrice ? String(propertyPrice) : '');
   const [state, setState] = useState<AustralianState>(() => {
     if (propertyState) return propertyState;

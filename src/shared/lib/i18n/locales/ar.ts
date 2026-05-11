@@ -389,6 +389,10 @@ export const ar: Partial<Record<TranslationKey, string>> = {
   'home.hero.chip.schools': 'أفضل المدارس',
   'home.hero.cardLangBadge': '🌐 ٢٠ لغة · مترجمة تلقائياً',
   'home.hero.enquiredLastHour': 'استفسر الناس في الساعة الماضية',
+  'home.hero.searchInputLabel': 'ابحث حسب العنوان أو الضاحية أو منطقة المدرسة',
+  'home.hero.searchSubmit': 'بحث ←',
+
+  'home.stickyBar.freeTrialCta': 'ابدأ التجربة المجانية لمدة 60 يومًا',
   'home.trust.listings': 'قوائم المنتجات المتاحة',
   'home.trust.languages': 'اللغات مترجمة تلقائياً',
   'home.trust.buyers': 'الأستراليون متعددو اللغات',

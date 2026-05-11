@@ -610,7 +610,7 @@ const Index = () => {
 
                 {/* Right half — Text */}
                 <div style={{ display:'flex', alignItems:'center', padding:'6px 6px 6px 8px', gap:6, flex:1 }}>
-                  <label htmlFor="heroSearch" className="sr-only">Search by address, suburb or school zone</label>
+                  <label htmlFor="heroSearch" className="sr-only">{t('home.hero.searchInputLabel')}</label>
                   <input
                     id="heroSearch"
                     ref={inputRef}
@@ -621,7 +621,7 @@ const Index = () => {
                     style={{ flex:1, border:'none', outline:'none', fontSize:14, padding:'12px 10px', background:'transparent', minWidth:120, color:T.ink }}
                   />
                   <button type="submit" style={{ background:T.blue, color:'#fff', border:'none', padding:'10px 16px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap', flexShrink:0 }}>
-                    Search →
+                    {t('home.hero.searchSubmit')}
                   </button>
                 </div>
               </form>
@@ -1570,7 +1570,7 @@ function StickyAcquisitionBar() {
         onClick={() => navigate('/agents/login')}
         style={{ background: '#2563EB', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
       >
-        Start 60-day free trial
+        {t('home.stickyBar.freeTrialCta')}
       </button>
       <style>{`@media (max-width: 768px) { .sticky-acq-bar { display: none !important; } }`}</style>
     </div>

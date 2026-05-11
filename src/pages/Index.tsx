@@ -567,12 +567,16 @@ const Index = () => {
               { type:'count' as const, target: 7,     format: (v:number)=>`${v}M+`,           label:'MULTILINGUAL BUYERS' },
               { type:'static' as const, text:'Free',                                          label:'COST FOR BUYERS' },
             ].map((s, i) => (
-              <div key={i} className="trust-cell" style={{ textAlign:'center', padding:'12px 16px' }}>
+              <div
+                key={i}
+                className={`trust-cell ${s.label === 'AUTO-TRANSLATED' ? 'trust-cell--auto-translated' : ''}`}
+                style={{ textAlign:'center', padding:'12px 16px' }}
+              >
                 <HomeCountUp
                   target={s.type === 'count' ? s.target : 0}
                   format={s.type === 'count' ? s.format : undefined}
                   staticText={s.type === 'static' ? s.text : undefined}
-                  className={`${s.label === 'AUTO-TRANSLATED' ? '' : 'text-[clamp(48px,6vw,88px)]'} font-extrabold tabular-nums`}
+                  className={`${s.label === 'AUTO-TRANSLATED' ? 'trust-value--auto-translated' : 'text-[clamp(48px,6vw,88px)]'} font-extrabold tabular-nums`}
                   style={{
                     background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)',
                     WebkitBackgroundClip: 'text',
@@ -580,10 +584,23 @@ const Index = () => {
                     WebkitTextFillColor: 'transparent',
                     color: 'transparent',
                     display: 'inline-block',
-                    whiteSpace: 'nowrap',
-                    lineHeight: 1,
-                    letterSpacing: '-0.02em',
-                    ...(s.label === 'AUTO-TRANSLATED' ? { fontSize: 'clamp(20px, 2.4vw, 36px)' } : { letterSpacing: '-0.05em' }),
+                    fontFamily: '"Plus Jakarta Sans", sans-serif',
+                    fontWeight: 800,
+                    ...(s.label === 'AUTO-TRANSLATED'
+                      ? {
+                          fontSize: 'clamp(20px, 2.4vw, 36px)',
+                          whiteSpace: 'nowrap',
+                          lineHeight: 1,
+                          letterSpacing: '-0.02em',
+                          maxWidth: 'none',
+                          width: 'max-content',
+                          marginInline: 'auto',
+                        }
+                      : {
+                          whiteSpace: 'nowrap',
+                          lineHeight: 1,
+                          letterSpacing: '-0.05em',
+                        }),
                   }}
                 />
                 <div className="text-[13px] font-bold tracking-wider uppercase mt-3.5" style={{ color:'#4a4a4a' }}>{s.label}</div>
@@ -592,6 +609,14 @@ const Index = () => {
           </div>
           <style>{`
             .trust-strip { display:grid; grid-template-columns: repeat(4, 1fr); align-items:end; gap: 24px; }
+            .trust-cell--auto-translated { min-width: 0; }
+            .trust-value--auto-translated {
+              font-size: clamp(20px, 2.4vw, 36px) !important;
+              white-space: nowrap !important;
+              line-height: 1 !important;
+              letter-spacing: -0.02em;
+              max-width: none !important;
+            }
             @media (max-width: 768px) {
               .trust-strip { grid-template-columns: repeat(2, 1fr); row-gap: 32px; }
             }

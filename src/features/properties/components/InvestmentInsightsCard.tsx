@@ -65,7 +65,7 @@ export function InvestmentInsightsCard({ property, compact }: Props) {
     property.strataFeesQuarterly != null && {
       icon: Building2,
       label: 'Strata Fees',
-      value: `$${property.strataFeesQuarterly.toLocaleString()}/qtr`,
+      value: `${formatCurrency(property.strataFeesQuarterly, language)}/qtr`,
       highlight: false,
     },
   ].filter(Boolean) as { icon: any; label: string; value: string; highlight: boolean }[];

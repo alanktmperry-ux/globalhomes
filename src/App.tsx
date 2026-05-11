@@ -383,7 +383,9 @@ const App = () => (
                 <Route path="/auctions/:id/live" element={<LiveAuctionPage />} />
 
                 {/* Auth pages (no shared layout) */}
-                <Route path="/auth" element={<AuthLandingPage />} />
+                <Route path="/auth" element={<SignupRedirect />} />
+                <Route path="/auth/role-select" element={<SignupRedirect />} />
+                <Route path="/signup" element={<SignupRedirect />} />
                 <Route path="/login" element={<SeekerAuthPage />} />
                 <Route path="/agents/login" element={<AgentAuthPage />} />
                 {/* Legacy URL — older notification emails link to /agent-auth */}

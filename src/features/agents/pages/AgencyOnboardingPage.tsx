@@ -914,10 +914,10 @@ export default function AgencyOnboardingPage() {
               <CardContent className="p-6 space-y-3">
                 <div className="flex items-center justify-between">
                   <Settings2 size={24} className="text-primary" />
-                  <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-[10px]">Quickest setup — 5 mins</Badge>
+                  <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-[10px]">{t('agentOnboarding.welcome.fresh.badge')}</Badge>
                 </div>
-                <h3 className="font-bold">Starting fresh</h3>
-                <p className="text-xs text-muted-foreground">New agency, no trust history to import. Create your trust account with a $0 opening balance.</p>
+                <h3 className="font-bold">{t('agentOnboarding.welcome.fresh.title')}</h3>
+                <p className="text-xs text-muted-foreground">{t('agentOnboarding.welcome.fresh.body')}</p>
               </CardContent>
             </Card>
             <Card

@@ -163,15 +163,26 @@ export function SiteHeader() {
             </button>
           )}
 
+          {/* Dashboard quick-access button — logged-in users only */}
+          {user && (
+            <button
+              onClick={() => navigate(isAdmin ? '/admin' : isAgentLike ? '/dashboard' : '/seeker/dashboard')}
+              className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold rounded-[10px] px-4 py-2 text-sm flex items-center gap-2 transition-all"
+            >
+              <LayoutDashboard size={16} />
+              Dashboard
+            </button>
+          )}
+
           {/* User avatar — opens dropdown when signed in, otherwise goes to auth */}
           {user ? (
             <div ref={userMenuRef} className="relative">
               <button
                 onClick={() => setShowUserMenu(o => !o)}
-                className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                className="w-9 h-9 rounded-full bg-[#EFF6FF] border border-[#E5E7EB] flex items-center justify-center text-[#2563EB] font-semibold text-sm cursor-pointer hover:border-[#2563EB] transition-all"
                 aria-label="Account menu"
               >
-                <User size={18} />
+                {(user.email?.[0] || 'U').toUpperCase()}
               </button>
               {showUserMenu && (
                 <div className="absolute right-0 top-full mt-1 w-56 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150">
@@ -227,6 +238,15 @@ export function SiteHeader() {
 
         {/* ─── Mobile hamburger (visible below md) ─── */}
         <div className="flex md:hidden items-center gap-1 shrink-0">
+          {user && (
+            <button
+              onClick={() => navigate(isAdmin ? '/admin' : isAgentLike ? '/dashboard' : '/seeker/dashboard')}
+              className="w-9 h-9 rounded-full bg-[#2563EB] flex items-center justify-center text-white"
+              aria-label="Dashboard"
+            >
+              <LayoutDashboard size={16} />
+            </button>
+          )}
           {user && isAgent && <NotificationBell />}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>

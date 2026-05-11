@@ -5529,6 +5529,146 @@ export type Database = {
           },
         ]
       }
+      featured_listings: {
+        Row: {
+          agent_agency: string | null
+          agent_id: string | null
+          agent_initials: string | null
+          agent_name: string | null
+          boost_ends_at: string | null
+          boost_starts_at: string | null
+          created_at: string | null
+          display_address: string
+          display_baths: number | null
+          display_beds: number | null
+          display_cars: number | null
+          display_image_url: string | null
+          display_languages: string[] | null
+          display_price: string
+          display_priority: number | null
+          display_state: string
+          display_suburb: string
+          id: string
+          is_seeded: boolean | null
+          listing_id: string | null
+          region: string
+          state: string
+          status: string
+          stripe_subscription_id: string | null
+          suburb: string
+          tier: string
+          updated_at: string | null
+        }
+        Insert: {
+          agent_agency?: string | null
+          agent_id?: string | null
+          agent_initials?: string | null
+          agent_name?: string | null
+          boost_ends_at?: string | null
+          boost_starts_at?: string | null
+          created_at?: string | null
+          display_address: string
+          display_baths?: number | null
+          display_beds?: number | null
+          display_cars?: number | null
+          display_image_url?: string | null
+          display_languages?: string[] | null
+          display_price: string
+          display_priority?: number | null
+          display_state: string
+          display_suburb: string
+          id?: string
+          is_seeded?: boolean | null
+          listing_id?: string | null
+          region: string
+          state: string
+          status?: string
+          stripe_subscription_id?: string | null
+          suburb: string
+          tier: string
+          updated_at?: string | null
+        }
+        Update: {
+          agent_agency?: string | null
+          agent_id?: string | null
+          agent_initials?: string | null
+          agent_name?: string | null
+          boost_ends_at?: string | null
+          boost_starts_at?: string | null
+          created_at?: string | null
+          display_address?: string
+          display_baths?: number | null
+          display_beds?: number | null
+          display_cars?: number | null
+          display_image_url?: string | null
+          display_languages?: string[] | null
+          display_price?: string
+          display_priority?: number | null
+          display_state?: string
+          display_suburb?: string
+          id?: string
+          is_seeded?: boolean | null
+          listing_id?: string | null
+          region?: string
+          state?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          suburb?: string
+          tier?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "featured_listings_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "featured_listings_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "featured_listings_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "featured_listings_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances_view"
+            referencedColumns: ["agent_id"]
+          },
+          {
+            foreignKeyName: "featured_listings_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "featured_listings_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "featured_listings_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       halo_credit_packages: {
         Row: {
           active: boolean
@@ -11741,6 +11881,24 @@ export type Database = {
           month?: string
           property_type?: string
           sample_size?: number | null
+          state?: string
+          suburb?: string
+        }
+        Relationships: []
+      }
+      suburb_region_map: {
+        Row: {
+          region: string
+          state: string
+          suburb: string
+        }
+        Insert: {
+          region: string
+          state: string
+          suburb: string
+        }
+        Update: {
+          region?: string
           state?: string
           suburb?: string
         }

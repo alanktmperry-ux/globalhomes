@@ -3,18 +3,124 @@ import { Link } from "react-router-dom";
 import { Bed, Bath, Car, Sparkles, ArrowRight, MapPin } from "lucide-react";
 import { resolveFeaturedListings } from "./featuredListingsData";
 import { useGeoLocation } from "./useGeoLocation";
+import { supabase } from "@/integrations/supabase/client";
 
-/**
- * "Featured in [Location]" — boosted-listing grid (3×2 on desktop).
- * Static placeholder data resolved by suburb → region map.
- * Swap `resolveFeaturedListings` for a Supabase query when the
- * featured_listings table + Halo Boost billing ship.
- */
+interface FeaturedRow {
+  id: string;
+  display_image_url: string | null;
+  display_address: string;
+  display_suburb: string;
+  display_state: string;
+  display_price: string;
+  display_beds: number | null;
+  display_baths: number | null;
+  display_cars: number | null;
+  display_languages: string[] | null;
+  agent_name: string | null;
+  agent_initials: string | null;
+  agent_agency: string | null;
+}
+
+interface DisplayListing {
+  id: string;
+  imageUrl: string;
+  address: string;
+  suburb: string;
+  state: string;
+  price: string;
+  beds: number;
+  baths: number;
+  cars: number;
+  buyerLanguages: string[];
+  agentName: string;
+  agentInitials: string;
+  agency: string;
+}
+
+const PLACEHOLDER_IMG =
+  "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&q=85&w=900";
+
 export default function FeaturedListings() {
   const geo = useGeoLocation();
-  const listings = resolveFeaturedListings(geo.suburb);
+  const fallback = resolveFeaturedListings(geo.suburb);
+  const [listings, setListings] = useState<DisplayListing[]>(fallback);
   const sectionRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+
+  // Fetch live featured listings for the visitor's region with a graceful
+  // fallback so the section is never empty. Order: region → state → any.
+  useEffect(() => {
+    let cancelled = false;
+
+    const map = (rows: FeaturedRow[]): DisplayListing[] =>
+      rows.map((r) => ({
+        id: r.id,
+        imageUrl: r.display_image_url || PLACEHOLDER_IMG,
+        address: r.display_address,
+        suburb: r.display_suburb,
+        state: r.display_state,
+        price: r.display_price,
+        beds: r.display_beds || 0,
+        baths: r.display_baths || 0,
+        cars: r.display_cars || 0,
+        buyerLanguages: r.display_languages || [],
+        agentName: r.agent_name || "",
+        agentInitials: r.agent_initials || "",
+        agency: r.agent_agency || "",
+      }));
+
+    (async () => {
+      try {
+        // 1. Match by region
+        let { data } = await supabase
+          .from("featured_listings")
+          .select(
+            "id, display_image_url, display_address, display_suburb, display_state, display_price, display_beds, display_baths, display_cars, display_languages, agent_name, agent_initials, agent_agency"
+          )
+          .eq("status", "active")
+          .eq("region", geo.region)
+          .order("display_priority", { ascending: false })
+          .limit(6);
+
+        // 2. Fall back to same state
+        if (!data || data.length < 3) {
+          const { data: stateData } = await supabase
+            .from("featured_listings")
+            .select(
+              "id, display_image_url, display_address, display_suburb, display_state, display_price, display_beds, display_baths, display_cars, display_languages, agent_name, agent_initials, agent_agency"
+            )
+            .eq("status", "active")
+            .eq("state", geo.state)
+            .order("display_priority", { ascending: false })
+            .limit(6);
+          if (stateData && stateData.length > (data?.length || 0)) data = stateData;
+        }
+
+        // 3. Final fallback: any active listing
+        if (!data || data.length < 3) {
+          const { data: anyData } = await supabase
+            .from("featured_listings")
+            .select(
+              "id, display_image_url, display_address, display_suburb, display_state, display_price, display_beds, display_baths, display_cars, display_languages, agent_name, agent_initials, agent_agency"
+            )
+            .eq("status", "active")
+            .order("display_priority", { ascending: false })
+            .limit(6);
+          if (anyData && anyData.length > (data?.length || 0)) data = anyData;
+        }
+
+        if (!cancelled && data && data.length > 0) {
+          setListings(map(data as FeaturedRow[]));
+        }
+      } catch {
+        /* keep fallback */
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [geo.region, geo.state]);
 
   useEffect(() => {
     const node = sectionRef.current;
@@ -33,6 +139,7 @@ export default function FeaturedListings() {
     obs.observe(node);
     return () => obs.disconnect();
   }, []);
+
 
   return (
     <section ref={sectionRef} className="bg-white px-6 md:px-8 py-20 md:py-24">

@@ -832,8 +832,8 @@ export default function AgencyOnboardingPage() {
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
               <Lock size={28} className="text-primary" />
             </div>
-            <h2 className="text-xl font-bold">Create your password</h2>
-            <p className="text-sm text-muted-foreground">Set a password so you can sign in anytime</p>
+            <h2 className="text-xl font-bold">{t('agentOnboarding.password.heading')}</h2>
+            <p className="text-sm text-muted-foreground">{t('agentOnboarding.password.sub')}</p>
           </div>
           <div className="space-y-4">
             <div>

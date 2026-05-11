@@ -837,12 +837,12 @@ export default function AgencyOnboardingPage() {
           </div>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="new-password" className="text-xs font-semibold">Password</Label>
+              <Label htmlFor="new-password" className="text-xs font-semibold">{t('agentOnboarding.password.label')}</Label>
               <div className="relative">
                 <Input
                   id="new-password"
                   type={showPw ? 'text' : 'password'}
-                  placeholder="Minimum 8 characters"
+                  placeholder={t('agentOnboarding.password.placeholder')}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   autoFocus

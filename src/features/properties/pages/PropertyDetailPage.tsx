@@ -700,11 +700,22 @@ export default function PropertyDetailPage() {
                   {tp('property.viewSuburbArrow', { suburb: property.suburb })}
                 </Link>
               )}
-              <ListingLanguageSwitcher
-                translations={(property as any).translations}
-                currentLang={language === 'zh' ? 'zh-CN' : language}
-                onChange={(code) => setLanguage((code === 'zh-CN' ? 'zh' : code) as any)}
-              />
+              <div className="mt-4 bg-[#EFF6FF] border border-[#2563EB]/15 rounded-2xl p-4 flex items-center gap-3 flex-wrap">
+                <iconify-icon icon="solar:earth-linear" style={{ fontSize: '20px', color: '#2563EB', display: 'inline-flex', lineHeight: 1 }} />
+                <span className="text-[13px] font-semibold text-[#1E40AF]">
+                  {tp('property.translatedIn') || 'Currently showing in your language'}
+                </span>
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.10em] bg-white text-[#2563EB] border border-[#2563EB]/20">
+                  AI TRANSLATED
+                </span>
+                <div className="ml-auto">
+                  <ListingLanguageSwitcher
+                    translations={(property as any).translations}
+                    currentLang={language === 'zh' ? 'zh-CN' : language}
+                    onChange={(code) => setLanguage((code === 'zh-CN' ? 'zh' : code) as any)}
+                  />
+                </div>
+              </div>
               {socialProof && (
                 <div className="flex flex-wrap items-center gap-3 mt-3 py-2.5 px-4 bg-primary/5 rounded-xl border border-primary/10 text-xs text-muted-foreground">
                   {socialProof.suburbSearchers > 0 && (

@@ -170,7 +170,7 @@ const SeekerAuthPage = () => {
       redirect_uri: window.location.origin + '/auth/callback',
     });
     if (oErr) {
-      toast.error('Something went wrong. Please try again.');
+      toast.error(t('auth.error.oauthGeneric'));
     }
     setPendingOAuthProvider(null);
   };

@@ -898,7 +898,7 @@ export default function PropertyDetailPage() {
                 return (
                   <div className="space-y-2">
                     {upcoming.map((slot, i) => {
-                      const dayStr = new Date(slot.date).toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+                      const dayStr = formatDate(slot.date, language, { weekday: 'short', day: 'numeric', month: 'short' });
                       return (
                         <button
                           key={`${slot.date}-${slot.start}`}

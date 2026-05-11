@@ -22,7 +22,9 @@ type Mode = 'signin' | 'signup';
 const SeekerAuthPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<Mode>('signin');
+  const [searchParams] = useSearchParams();
+  const initialMode: Mode = searchParams.get('mode') === 'signup' ? 'signup' : 'signin';
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);

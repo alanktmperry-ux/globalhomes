@@ -222,15 +222,37 @@ export default function HaloBoardPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+    <div className="max-w-5xl mx-auto p-4 sm:p-6">
+      <div className="flex items-start justify-between mb-6 gap-3 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold">{t('halo.board.title')}</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <h1 className="text-2xl font-bold text-[#0a0f1e] tracking-tight">{t('halo.board.title')}</h1>
+          <p className="text-sm font-light text-[#6B7280] mt-1 mb-0">
             {t('halo.board.subtitle')}
           </p>
         </div>
-        <AgentCreditBadge />
+        <div
+          className="flex items-center gap-3 bg-white rounded-[12px] px-4 py-2.5"
+          style={{ border: '1px solid #E5E7EB' }}
+        >
+          <div className="flex flex-col">
+            <span
+              className="text-[10px] uppercase font-semibold text-[#6B7280]"
+              style={{ letterSpacing: '0.10em' }}
+            >
+              Halo Credits
+            </span>
+            <span className="text-xl font-bold text-[#0a0f1e] tabular-nums leading-tight">
+              {balance}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate('/dashboard/buy-credits')}
+            className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold rounded-[10px] px-3 py-1.5 text-xs flex items-center gap-1 transition-all"
+          >
+            <Plus size={14} /> Top up
+          </button>
+        </div>
       </div>
 
       {error ? (

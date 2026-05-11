@@ -44,24 +44,29 @@ interface Supplier { id: string; business_name: string; trade_category: string; 
 
 const STATUSES = ['all', 'new', 'acknowledged', 'assigned', 'in_progress', 'completed', 'cancelled'];
 
-const statusBadge = (s: string) => {
-  const map: Record<string,string> = {
-    new: 'bg-blue-500/15 text-blue-700',
-    acknowledged: 'bg-amber-500/15 text-amber-700',
-    assigned: 'bg-amber-500/15 text-amber-700',
-    in_progress: 'bg-primary/15 text-primary',
-    completed: 'bg-emerald-500/15 text-emerald-700',
-    cancelled: 'bg-muted text-muted-foreground',
-  };
-  return <Badge className={`border-0 ${map[s] || ''}`}>{s.replace('_',' ')}</Badge>;
-};
+import { APlusBadge, type APlusBadgeTone } from '@/components/ui/data-table-aplus';
 
+const STATUS_TONE: Record<string, APlusBadgeTone> = {
+  new: 'blue',
+  acknowledged: 'amber',
+  assigned: 'amber',
+  in_progress: 'blue',
+  completed: 'green',
+  cancelled: 'grey',
+  quoted: 'cyan',
+};
+const statusBadge = (s: string) => (
+  <APlusBadge tone={STATUS_TONE[s] || 'grey'} label={s.replace('_', ' ')} />
+);
+
+const PRIORITY_TONE: Record<string, APlusBadgeTone> = {
+  urgent: 'red',
+  low: 'blue',
+  standard: 'amber',
+  cosmetic: 'grey',
+};
 const priorityBadge = (p: string) => (
-  <Badge className={`border-0 ${
-    p === 'urgent' ? 'bg-red-500/15 text-red-700' :
-    p === 'low' ? 'bg-blue-500/15 text-blue-700' :
-    'bg-amber-500/15 text-amber-700'
-  }`}>{p}</Badge>
+  <APlusBadge tone={PRIORITY_TONE[p] || 'amber'} label={p} icon={p === 'urgent' ? 'solar:danger-triangle-linear' : undefined} />
 );
 
 export default function MaintenancePage() {

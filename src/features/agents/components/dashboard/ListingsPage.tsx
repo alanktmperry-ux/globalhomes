@@ -278,129 +278,146 @@ interface ListingCardProps {
   stats: ListingStatsMaps;
 }
 
+// iconify-icon helper (script loaded in index.html)
+const Ico = ({ icon, size = 16, color, className }: { icon: string; size?: number; color?: string; className?: string }) => (
+  // @ts-expect-error — iconify-icon is a web component
+  <iconify-icon icon={icon} class={className} style={{ fontSize: `${size}px`, color, display: 'inline-flex', lineHeight: 1 }} />
+);
+
+const STATUS_OVERLAY: Record<string, { label: string; className: string }> = {
+  public: { label: 'For Sale', className: 'bg-[#0a0f1e]/85 backdrop-blur text-white' },
+  rent: { label: 'For Rent', className: 'bg-[#1E40AF]/85 backdrop-blur text-white' },
+  sold: { label: 'Sold', className: 'bg-[#34D399]/95 text-[#065F46]' },
+  leased: { label: 'Leased', className: 'bg-[#34D399]/95 text-[#065F46]' },
+  under_offer: { label: 'Under Offer', className: 'bg-[#FBBF24]/95 text-[#92400E]' },
+  pending: { label: 'Pending', className: 'bg-[#FBBF24]/95 text-[#92400E]' },
+  whisper: { label: 'Off-market', className: 'bg-white/95 text-[#0a0f1e] border border-[#E5E5E5]' },
+  draft: { label: 'Draft', className: 'bg-white/95 text-[#0a0f1e] border border-[#E5E5E5]' },
+  'coming-soon': { label: 'Coming Soon', className: 'bg-white/95 text-[#0a0f1e] border border-[#E5E5E5]' },
+};
+
 const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSendReport, navigate, isRental, onStatusChange, onDelete, stats }: ListingCardProps) => {
-  const s = STATUS_CONFIG[l._status] || STATUS_CONFIG.public;
-  const days = getListingDays(l);
-  const leads = getListingLeads(l);
-  const daysColor = days < 7 ? 'text-success' : days < 15 ? 'text-primary' : 'text-destructive';
+  const thumb = getListingThumb(l);
+  const enquiries = stats.enquiries[l.id] ?? l.contact_clicks ?? 0;
+  const views = stats.views[l.id] ?? l.views ?? 0;
+  const langCount = Array.isArray(l.images) ? 20 : 20; // listings auto-translate into 20 languages
+  const overlayKey = isRental && l._status === 'public' ? 'rent' : l._status;
+  const overlay = STATUS_OVERLAY[overlayKey] || STATUS_OVERLAY.public;
+  const isBoosted = (l as any).is_featured === true || (l as any).boost_ends_at;
 
   return (
     <div
-      className="bg-white rounded-[12px] flex flex-col sm:flex-row gap-4 p-4 mb-2 cursor-pointer hover:shadow-md transition-all"
-      style={{ border: '1px solid #E5E7EB' }}
+      className="group bg-white rounded-3xl border border-[#E5E5E5] overflow-hidden cursor-pointer transition-all hover:border-[#2563EB]/40 hover:shadow-[0_12px_32px_rgba(0,0,0,0.06)] hover:-translate-y-0.5"
+      onClick={() => onSelect(toProperty(l))}
     >
-      {(() => {
-        const thumb = getListingThumb(l);
-        return thumb ? (
-          <img
-            src={thumb}
-            alt=""
-            className="w-full sm:w-28 h-20 rounded-lg object-cover shrink-0 cursor-pointer transition-transform duration-200 hover:scale-105"
-            onClick={() => onSelect(toProperty(l))}
-          />
+      {/* Image area */}
+      <div className="aspect-[16/10] relative overflow-hidden bg-[#F3F4F6]">
+        {thumb ? (
+          <img src={thumb} alt={l.address} className="w-full h-full object-cover" loading="lazy" />
         ) : (
-          <div
-            className={`w-full sm:w-28 h-20 rounded-lg shrink-0 cursor-pointer ${LISTING_PLACEHOLDER_CLASS}`}
-            onClick={() => onSelect(toProperty(l))}
-          >
-            <ImageIcon size={20} />
+          <div className="w-full h-full flex items-center justify-center text-[#D1D5DB]">
+            <Ico icon="solar:buildings-linear" size={40} />
           </div>
-        );
-      })()}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1 flex-wrap">
-          {l._source === 'db' ? (
+        )}
+        {/* Status pill top-left */}
+        <span className={`absolute top-3 left-3 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] ${overlay.className}`}>
+          {overlay.label}
+        </span>
+        {/* Boost indicator top-right */}
+        {isBoosted && (
+          <div
+            className="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center text-white shadow-[0_4px_12px_rgba(37,99,235,0.4)]"
+            style={{ background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)' }}
+            title="Boosted listing"
+          >
+            <Ico icon="solar:bolt-bold" size={16} color="#fff" />
+          </div>
+        )}
+        {/* Language pill bottom-left */}
+        <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 bg-white/95 backdrop-blur rounded-full px-2.5 py-1 text-[11px] font-bold text-[#0a0f1e]">
+          <Ico icon="solar:earth-bold" size={12} color="#2563EB" />
+          {langCount} languages
+        </span>
+      </div>
+
+      {/* Body */}
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="text-[16px] font-bold text-[#0a0f1e] leading-tight truncate flex-1">{l.address}</h3>
+          <div onClick={(e) => e.stopPropagation()} className="shrink-0 -mt-1 -mr-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" variant="ghost" className="h-8 w-8 p-0 rounded-full hover:bg-[#F3F4F6]" aria-label="More actions">
+                  <MoreHorizontal size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                {l._source === 'db' && (
+                  <DropdownMenuItem onClick={() => navigate(`/dashboard/listings/${l.id}/edit`)} className="gap-2 text-xs cursor-pointer">
+                    <Pencil size={14} /> Edit listing
+                  </DropdownMenuItem>
+                )}
+                {l._source === 'db' && l._status === 'public' && (
+                  <DropdownMenuItem onClick={() => window.open(`/property/${l.id}`, '_blank')} className="gap-2 text-xs cursor-pointer">
+                    <ExternalLink size={14} /> View public page
+                  </DropdownMenuItem>
+                )}
+                {l._source === 'db' && (
+                  <DropdownMenuItem onClick={() => navigate(`/dashboard/listings/${l.id}`)} className="gap-2 text-xs cursor-pointer">
+                    <Eye size={14} /> Manage
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={() => onSendReport(l)} className="gap-2 text-xs cursor-pointer">
+                  <FileBarChart2 size={14} /> Send vendor report
+                </DropdownMenuItem>
+                {l._status === 'pending' && (
+                  <DropdownMenuItem onClick={() => onPublish(l)} disabled={actionLoading === l.id} className="gap-2 text-xs cursor-pointer">
+                    <Zap size={14} /> Publish listing
+                  </DropdownMenuItem>
+                )}
+                {l._status !== 'sold' && l._status !== 'leased' && (
+                  <DropdownMenuItem onClick={() => onMarkSold(l)} disabled={actionLoading === l.id} className="gap-2 text-xs cursor-pointer">
+                    <CheckCircle2 size={14} /> Mark {isRental ? 'leased' : 'sold'}
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+        <p className="text-[12px] text-[#6a6a6a] font-medium mt-1 truncate">{l.suburb}{l.state ? `, ${l.state}` : ''}</p>
+        <p className="text-[22px] font-extrabold text-[#0a0f1e] tabular-nums mt-3">{l.price_formatted}</p>
+
+        {/* Meta row */}
+        <div className="flex items-center gap-4 mt-3 text-[12px] text-[#6a6a6a] font-medium">
+          <span className="inline-flex items-center gap-1"><Ico icon="solar:bed-linear" size={14} />{l.beds ?? 0}</span>
+          <span className="inline-flex items-center gap-1"><Ico icon="solar:bath-linear" size={14} />{l.baths ?? 0}</span>
+          <span className="inline-flex items-center gap-1"><Ico icon="solar:car-linear" size={14} />{l.parking ?? 0}</span>
+          <span className="inline-flex items-center gap-1 ml-auto"><Ico icon="solar:eye-linear" size={14} />{views}</span>
+        </div>
+
+        {/* Inline status menu (preserves existing status-change + delete mutation) */}
+        {l._source === 'db' && (
+          <div className="mt-4" onClick={(e) => e.stopPropagation()}>
             <StatusMenu
               listing={{ id: l.id, status: l._status, listing_type: l.listing_type }}
               onStatusChange={onStatusChange}
               onDelete={onDelete}
             />
-          ) : (
-            <Badge className={`${s.color} text-[10px] gap-0.5 border-0`}>{s.icon} {s.label}</Badge>
-          )}
-          {isRental && <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">Rental</Badge>}
-          <span className={`text-xs font-bold ${daysColor}`}>{days}d</span>
-        </div>
-        <h3 className="font-display text-sm font-bold truncate">{l.title}</h3>
-        <p className="text-xs text-muted-foreground truncate">{l.address}</p>
-        <p className="text-sm font-display font-bold text-primary mt-1">{l.price_formatted}</p>
-        <ListingStats listingId={l.id} stats={stats} />
-      </div>
-      <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1 shrink-0">
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/performance?listing=${l.id}`); }}
-          className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-border bg-background hover:bg-accent hover:border-primary/40 cursor-pointer transition"
-          aria-label="View performance"
-          title="View performance"
-        >
-          {l.views === 0 && leads === 0 ? (
-            <span className="text-xs text-muted-foreground">—</span>
-          ) : (
-            <>
-              <span className="text-xs font-semibold text-foreground flex items-center gap-1">
-                <Eye size={10} /> {l.views} views
-              </span>
-              <span className="text-xs text-muted-foreground">·</span>
-              <span className="text-xs font-semibold text-primary flex items-center gap-1">
-                <Sparkles size={10} /> {leads} {leads === 1 ? 'enquiry' : 'enquiries'}
-              </span>
-            </>
-          )}
-        </button>
-        <div className="flex gap-1 mt-1">
-          {l._source === 'db' && (
-            <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" onClick={() => navigate(`/dashboard/listings/${l.id}`)}>
-              <Eye size={10} /> Manage
-            </Button>
-          )}
-          {l._source === 'db' && l._status === 'public' && (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="text-[10px] h-6 px-2 gap-0.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open(`/property/${l.id}`, '_blank');
-              }}
-              title="View buyer-facing listing in a new tab"
-            >
-              <ExternalLink size={10} /> View live
-            </Button>
-          )}
-          <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" disabled={actionLoading === l.id} onClick={() => {
-            if (l._source === 'db') navigate(`/dashboard/listings/${l.id}/edit`);
-          }}>
-            <Pencil size={10} /> Edit
-          </Button>
-          {l._status === 'pending' && (
-            <Button size="sm" className="text-[10px] h-6 px-2.5 gap-0.5 bg-green-600 hover:bg-green-700 text-white" disabled={actionLoading === l.id} onClick={() => onPublish(l)}>
-              {actionLoading === l.id ? <Loader2 size={10} className="animate-spin" /> : <Zap size={10} />} Publish Listing
-            </Button>
-          )}
-          {l._source === 'db' && l._status === 'public' && (
-            <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50" onClick={() => navigate(`/dashboard/listings/${l.id}?tab=marketing`)}>
-              <Zap size={10} /> Featured
-            </Button>
-          )}
-          {l._status !== 'sold' && (
-            <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 text-success" disabled={actionLoading === l.id} onClick={() => onMarkSold(l)}>
-              {actionLoading === l.id ? <Loader2 size={10} className="animate-spin" /> : null} Mark Sold
-            </Button>
-          )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="sm" variant="ghost" className="h-6 w-6 p-0" aria-label="More actions">
-                <MoreHorizontal size={14} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuItem onClick={() => onSendReport(l)} className="gap-2 text-xs cursor-pointer">
-                <FileBarChart2 size={14} className="text-primary" />
-                Send vendor report 
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          </div>
+        )}
+
+        {/* Bottom action row */}
+        <div className="mt-4 pt-4 border-t border-[#F3F4F6] flex items-center justify-between gap-2">
+          <span className="text-[11px] text-[#6a6a6a]">
+            {enquiries} {enquiries === 1 ? 'enquiry' : 'enquiries'} · {views} {views === 1 ? 'view' : 'views'}
+          </span>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/listings/${l.id}?tab=marketing`); }}
+            className="text-[13px] font-bold text-[#2563EB] hover:underline"
+          >
+            Boost →
+          </button>
         </div>
       </div>
     </div>
@@ -425,7 +442,7 @@ const StatusTabs = ({
     { key: 'sold', label: 'Sold' },
   ];
   return (
-    <div className="flex items-center gap-2 mb-6 flex-wrap">
+    <div className="flex items-center gap-2 flex-wrap">
       {items.map((t) => {
         const active = activeTab === t.key;
         const count = t.key !== 'all' ? counts[t.key] : undefined;
@@ -436,13 +453,12 @@ const StatusTabs = ({
             onClick={() => setActiveTab(t.key)}
             className={
               active
-                ? 'px-4 py-2 rounded-full text-sm font-semibold bg-[#2563EB] text-white transition-all'
-                : 'px-4 py-2 rounded-full text-sm font-medium text-[#374151] hover:bg-[#E5E7EB] transition-all'
+                ? 'px-4 py-2 rounded-full text-[13px] font-semibold bg-[#0a0f1e] text-white transition-all'
+                : 'px-4 py-2 rounded-full text-[13px] font-semibold bg-[#F9FAFB] text-[#6a6a6a] hover:bg-[#EFF6FF] hover:text-[#1E40AF] transition-all'
             }
-            style={active ? undefined : { background: '#F3F4F6' }}
           >
             {t.label}
-            {count ? <span className="ml-1.5 opacity-70">· {count}</span> : null}
+            {count ? <span className={active ? 'ml-1.5 opacity-70 font-normal' : 'ml-1.5 text-[#9CA3AF] font-normal'}>· {count}</span> : null}
           </button>
         );
       })}
@@ -490,6 +506,9 @@ const ListingsPage = () => {
   const [statusOverrides, setStatusOverrides] = useState<Record<string, string>>({});
   const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
   const [stats, setStats] = useState<ListingStatsMaps>({ views: {}, enquiries: {}, matches: {} });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'price_high' | 'price_low'>('newest');
+  const [gridView, setGridView] = useState<'grid' | 'list'>('grid');
 
   useEffect(() => {
     if (!agent?.id) return;
@@ -687,30 +706,44 @@ const ListingsPage = () => {
     </div>
   );
 
+  const totalCount = listings.filter((l) => !deletedIds.has(l.id)).length;
+
+  const SORT_LABELS: Record<typeof sortBy, string> = {
+    newest: 'Newest first',
+    oldest: 'Oldest first',
+    price_high: 'Price · High to low',
+    price_low: 'Price · Low to high',
+  };
+
   const portfolioHeader = (
-    <div className="flex items-start justify-between gap-4 flex-wrap p-4 sm:p-6 pb-0 max-w-5xl">
+    <div className="flex items-center justify-between gap-6 flex-wrap mb-8">
       <div>
-        <h1 className="text-2xl font-bold text-[#0a0f1e] tracking-tight">Portfolio</h1>
-        <p className="text-sm font-light text-[#6B7280] mt-1 mb-8">
-          {listings.length} {listings.length === 1 ? 'property' : 'properties'}
-        </p>
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="font-extrabold tracking-[-0.04em] text-[#0a0f1e]" style={{ fontSize: 'clamp(32px, 4vw, 48px)', lineHeight: 1.05 }}>
+            Portfolio
+          </h1>
+          <span className="bg-[#EFF6FF] border border-[#2563EB]/15 text-[#1E40AF] rounded-full px-3 py-1 text-[12px] font-bold">
+            {totalCount} {totalCount === 1 ? 'listing' : 'listings'}
+          </span>
+        </div>
+        <p className="text-[14px] text-[#6a6a6a] font-medium mt-2">Manage every property you list</p>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         {viewToggle}
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => navigate('/')}
-          className="gap-1.5 text-xs"
+        <button
+          type="button"
+          onClick={() => navigate('/dashboard/listings/import')}
+          className="text-[#374151] border border-[#E5E5E5] rounded-full px-4 py-2 text-[13px] font-bold hover:border-[#2563EB] hover:text-[#2563EB] transition-all bg-white"
         >
-          <Globe size={14} /> Browse Market
-        </Button>
+          Import from CSV
+        </button>
         <button
           type="button"
           onClick={() => navigate('/pocket-listing')}
-          className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold rounded-[10px] px-4 py-2.5 text-sm flex items-center gap-2 transition-all"
+          className="rounded-full px-5 py-2.5 text-[14px] font-bold text-white flex items-center gap-2 transition-all hover:shadow-[0_8px_24px_rgba(37,99,235,0.3)]"
+          style={{ background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)' }}
         >
-          <Plus size={16} /> Add to Portfolio
+          <Ico icon="solar:add-square-bold" size={16} color="#fff" /> Add new listing
         </button>
       </div>
     </div>
@@ -718,7 +751,7 @@ const ListingsPage = () => {
 
   if (view === 'pipeline') {
     return (
-      <div>
+      <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-10">
         {portfolioHeader}
         <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Loading pipeline…</div>}>
           {/* PipelinePage renders its own DashboardHeader; we hide it via wrapper */}
@@ -730,131 +763,283 @@ const ListingsPage = () => {
     );
   }
 
+  // Apply search + sort over the existing filtered set
+  const searchedFiltered = (() => {
+    const q = searchQuery.trim().toLowerCase();
+    let arr = !q ? filtered : filtered.filter((l) =>
+      [l.address, l.suburb, l.title, (l as any).reference_code]
+        .filter(Boolean).some((s: string) => s.toLowerCase().includes(q))
+    );
+    arr = [...arr].sort((a, b) => {
+      if (sortBy === 'newest') return new Date(b.listed_date || 0).getTime() - new Date(a.listed_date || 0).getTime();
+      if (sortBy === 'oldest') return new Date(a.listed_date || 0).getTime() - new Date(b.listed_date || 0).getTime();
+      if (sortBy === 'price_high') return (b.price ?? 0) - (a.price ?? 0);
+      if (sortBy === 'price_low') return (a.price ?? 0) - (b.price ?? 0);
+      return 0;
+    });
+    return arr;
+  })();
+
   return (
     <>
-      <div>
+      <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-10">
         {portfolioHeader}
 
-        <div className="p-4 sm:p-6 max-w-5xl">
-          {isMockData && (
-            <div className="flex items-center gap-2 mb-4 p-3 rounded-xl bg-primary/5 border border-primary/10 text-xs text-muted-foreground">
-              <Info size={14} className="text-primary shrink-0" />
-              <span>Showing demo listings. Create your first listing to see real data here.</span>
-            </div>
-          )}
+        {isMockData && (
+          <div className="flex items-center gap-2 mb-6 p-3 rounded-2xl bg-[#EFF6FF] border border-[#2563EB]/10 text-xs text-[#1E40AF]">
+            <Info size={14} className="shrink-0" />
+            <span>Showing demo listings. Create your first listing to see real data here.</span>
+          </div>
+        )}
 
-          {/* Solo plan listing-cap nudge — non-blocking. Triggers at >= 3 active listings on Solo,
-              and stays visible until the agent upgrades. Uses the live plan limit from useSubscription. */}
-          {sub.plan === 'solo' && activeListings.length >= 3 && sub.listingLimit !== Infinity && (
-            <div className="flex items-center gap-3 mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700">
-              <Info size={14} className="shrink-0" />
-              <p className="text-xs flex-1">
-                You're using <strong>{activeListings.length}/{sub.listingLimit}</strong> listings on your Solo plan. Upgrade to Pro for unlimited listings.
-              </p>
-              <Button size="sm" variant="default" onClick={() => navigate('/dashboard/billing')} className="text-xs h-7">
-                Upgrade
-              </Button>
-            </div>
-          )}
+        {sub.plan === 'solo' && activeListings.length >= 3 && sub.listingLimit !== Infinity && (
+          <div className="flex items-center gap-3 mb-6 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-700">
+            <Info size={14} className="shrink-0" />
+            <p className="text-xs flex-1">
+              You're using <strong>{activeListings.length}/{sub.listingLimit}</strong> listings on your Solo plan. Upgrade to Pro for unlimited listings.
+            </p>
+            <Button size="sm" variant="default" onClick={() => navigate('/dashboard/billing')} className="text-xs h-7">
+              Upgrade
+            </Button>
+          </div>
+        )}
 
-          {/* Active / Archived lifecycle tabs */}
-          <div className="inline-flex bg-muted rounded-lg p-1 mb-4 gap-1">
-            {(['active', 'archived'] as const).map((tab) => (
+        {/* Lifecycle + Sale/Rent sub-toggle row */}
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
+          {(['active', 'archived'] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setLifecycleTab(tab)}
+              className={cn(
+                'px-4 py-2 rounded-full text-[12px] font-bold transition-all',
+                lifecycleTab === tab
+                  ? 'bg-[#0a0f1e] text-white'
+                  : 'bg-white border border-[#E5E5E5] text-[#6a6a6a] hover:border-[#2563EB] hover:text-[#2563EB]',
+              )}
+            >
+              {tab === 'active' ? `Active · ${activeWithStatus.length}` : `Archived · ${archivedWithStatus.length}`}
+            </button>
+          ))}
+          <span className="w-px h-6 bg-[#E5E5E5] mx-1" />
+          <button
+            type="button"
+            onClick={() => setListingMode('sale')}
+            className={cn(
+              'px-4 py-2 rounded-full text-[12px] font-bold inline-flex items-center gap-1.5 transition-all',
+              listingMode === 'sale'
+                ? 'bg-[#0a0f1e] text-white'
+                : 'bg-white border border-[#E5E5E5] text-[#6a6a6a] hover:border-[#2563EB] hover:text-[#2563EB]',
+            )}
+          >
+            <Home size={12} /> Sales · {salesListings.length}
+          </button>
+          <button
+            type="button"
+            onClick={() => setListingMode('rent')}
+            className={cn(
+              'px-4 py-2 rounded-full text-[12px] font-bold inline-flex items-center gap-1.5 transition-all',
+              listingMode === 'rent'
+                ? 'bg-[#0a0f1e] text-white'
+                : 'bg-white border border-[#E5E5E5] text-[#6a6a6a] hover:border-[#2563EB] hover:text-[#2563EB]',
+            )}
+          >
+            <Building size={12} /> Rentals · {rentalListings.length}
+          </button>
+        </div>
+
+        {/* Filter + search bar */}
+        <div className="bg-white border border-[#E5E5E5] rounded-3xl p-3 flex items-center gap-3 mb-6 flex-wrap">
+          <div className="flex-1 min-w-0 overflow-x-auto">
+            <StatusTabs activeTab={activeStatusTab} setActiveTab={setActiveStatusTab} counts={counts} />
+          </div>
+
+          <div className="flex-1 relative min-w-[220px] max-w-[420px]">
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9CA3AF] pointer-events-none">
+              <Ico icon="solar:magnifer-linear" size={16} />
+            </span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by address, suburb, or reference..."
+              className="w-full bg-[#F9FAFB] border-0 rounded-full pl-10 pr-4 py-2.5 text-[14px] text-[#0a0f1e] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20"
+            />
+          </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <button
-                key={tab}
                 type="button"
-                onClick={() => setLifecycleTab(tab)}
-                className={cn(
-                  'px-4 py-1.5 rounded-lg text-xs font-medium transition-colors',
-                  lifecycleTab === tab
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
+                className="bg-white border border-[#E5E5E5] rounded-full px-4 py-2.5 text-[13px] font-bold text-[#374151] inline-flex items-center gap-2 hover:border-[#2563EB] hover:text-[#2563EB] transition-all"
               >
-                {tab === 'active'
-                  ? `Active (${activeWithStatus.length})`
-                  : `Sold / Archived (${archivedWithStatus.length})`}
+                {SORT_LABELS[sortBy]}
+                <Ico icon="solar:alt-arrow-down-linear" size={12} />
               </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              {(Object.keys(SORT_LABELS) as (keyof typeof SORT_LABELS)[]).map((k) => (
+                <DropdownMenuItem key={k} onClick={() => setSortBy(k)} className="text-xs cursor-pointer">
+                  {SORT_LABELS[k]}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <div className="bg-[#F9FAFB] rounded-full p-1 flex items-center">
+            <button
+              type="button"
+              onClick={() => setGridView('grid')}
+              aria-label="Grid view"
+              className={cn(
+                'w-9 h-9 rounded-full flex items-center justify-center transition-all',
+                gridView === 'grid' ? 'bg-white shadow-[0_2px_6px_rgba(0,0,0,0.08)] text-[#0a0f1e]' : 'text-[#6a6a6a]',
+              )}
+            >
+              <Ico icon="solar:widget-2-linear" size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setGridView('list')}
+              aria-label="List view"
+              className={cn(
+                'w-9 h-9 rounded-full flex items-center justify-center transition-all',
+                gridView === 'list' ? 'bg-white shadow-[0_2px_6px_rgba(0,0,0,0.08)] text-[#0a0f1e]' : 'text-[#6a6a6a]',
+              )}
+            >
+              <Ico icon="solar:list-linear" size={16} />
+            </button>
+          </div>
+        </div>
+
+        {loading ? (
+          <ListingsSkeleton />
+        ) : searchedFiltered.length === 0 ? (
+          withStatus.length === 0 ? (
+            <div className="bg-white rounded-3xl border border-[#E5E5E5] py-20 px-8 text-center">
+              <div className="flex justify-center"><Ico icon="solar:buildings-linear" size={56} color="#E5E7EB" /></div>
+              <h2 className="text-[22px] font-bold text-[#0a0f1e] mt-6">You haven't listed any properties yet</h2>
+              <p className="text-[14px] text-[#6a6a6a] max-w-[420px] mx-auto leading-[1.55] mt-3">
+                Add your first listing in 90 seconds. It auto-translates into 20 languages the moment it's live.
+              </p>
+              <button
+                type="button"
+                onClick={() => navigate('/pocket-listing')}
+                className="mt-8 rounded-full px-5 py-2.5 text-[14px] font-bold text-white inline-flex items-center gap-2 transition-all hover:shadow-[0_8px_24px_rgba(37,99,235,0.3)]"
+                style={{ background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)' }}
+              >
+                <Ico icon="solar:add-square-bold" size={16} color="#fff" /> Add your first listing
+              </button>
+            </div>
+          ) : (
+            <div className="bg-white rounded-3xl border border-[#E5E5E5] py-12 px-8 text-center">
+              <div className="flex justify-center"><Ico icon="solar:magnifer-square-linear" size={56} color="#E5E7EB" /></div>
+              <h2 className="text-[22px] font-bold text-[#0a0f1e] mt-6">Nothing matches that filter</h2>
+              <p className="text-[14px] text-[#6a6a6a] max-w-[420px] mx-auto leading-[1.55] mt-3">
+                Try clearing some filters or change your search term.
+              </p>
+              <button
+                type="button"
+                onClick={() => { setSaleStatusTab('all'); setRentStatusTab('all'); setSearchQuery(''); }}
+                className="mt-6 text-[#374151] border border-[#E5E5E5] rounded-full px-4 py-2 text-[13px] font-bold hover:border-[#2563EB] hover:text-[#2563EB] transition-all bg-white"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )
+        ) : gridView === 'grid' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+            {searchedFiltered.map((l) => (
+              <ListingCard
+                key={l.id}
+                l={l}
+                actionLoading={actionLoading}
+                onSelect={setSelectedProperty}
+                onPublish={handlePublish}
+                onMarkSold={handleMarkSold}
+                onSendReport={handleSendReport}
+                navigate={navigate}
+                isRental={listingMode === 'rent'}
+                onStatusChange={handleStatusChange}
+                onDelete={handleDelete}
+                stats={stats}
+              />
             ))}
           </div>
-
-          {/* Sale / Rent toggle */}
-          <div className="flex items-center gap-2 mb-4">
-            <Button
-              size="sm"
-              variant={listingMode === 'sale' ? 'default' : 'outline'}
-              onClick={() => setListingMode('sale')}
-              className="gap-1.5 text-xs"
-            >
-              <Home size={14} />
-              Sales
-              <Badge variant="secondary" className="text-[9px] px-1.5 h-4 ml-1 bg-background/20">
-                {salesListings.length}
-              </Badge>
-            </Button>
-            <Button
-              size="sm"
-              variant={listingMode === 'rent' ? 'default' : 'outline'}
-              onClick={() => setListingMode('rent')}
-              className="gap-1.5 text-xs"
-            >
-              <Building size={14} />
-              Rentals
-              <Badge variant="secondary" className="text-[9px] px-1.5 h-4 ml-1 bg-background/20">
-                {rentalListings.length}
-              </Badge>
-            </Button>
-          </div>
-
-          <StatusTabs activeTab={activeStatusTab} setActiveTab={setActiveStatusTab} counts={counts} />
-
-          {loading ? (
-            <ListingsSkeleton />
-          ) : filtered.length === 0 ? (
-            lifecycleTab === 'archived' ? (
-              <EmptyState
-                icon="solar:check-circle-linear"
-                title="No archived listings"
-                body="Listings marked as Sold or Leased will appear here."
-              />
-            ) : withStatus.length === 0 ? (
-              <EmptyState
-                icon="solar:buildings-linear"
-                title="Your portfolio is empty"
-                body="Add your first property to start building your portfolio. ListHQ will translate it into 6 languages automatically."
-                ctaLabel="Add to Portfolio"
-                onCtaClick={() => navigate('/pocket-listing')}
-              />
-            ) : (
-              <EmptyState
-                icon="solar:magnifer-linear"
-                title="No listings match"
-                body="Try adjusting your filters or search terms."
-                ctaLabel="Clear filters"
-                onCtaClick={() => { setSaleStatusTab('all'); setRentStatusTab('all'); }}
-              />
-            )
-          ) : (
-            <div className="space-y-3">
-              {filtered.map((l) => (
-                <ListingCard
+        ) : (
+          <div className="space-y-3">
+            {searchedFiltered.map((l) => {
+              const thumb = getListingThumb(l);
+              const overlayKey = listingMode === 'rent' && l._status === 'public' ? 'rent' : l._status;
+              const overlay = STATUS_OVERLAY[overlayKey] || STATUS_OVERLAY.public;
+              return (
+                <div
                   key={l.id}
-                  l={l}
-                  actionLoading={actionLoading}
-                  onSelect={setSelectedProperty}
-                  onPublish={handlePublish}
-                  onMarkSold={handleMarkSold}
-                  onSendReport={handleSendReport}
-                  navigate={navigate}
-                  isRental={listingMode === 'rent'}
-                  onStatusChange={handleStatusChange}
-                  onDelete={handleDelete}
-                  stats={stats}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+                  onClick={() => setSelectedProperty(toProperty(l))}
+                  className="bg-white rounded-2xl border border-[#E5E5E5] p-4 flex items-center gap-5 cursor-pointer hover:border-[#2563EB]/40 transition-all"
+                >
+                  {thumb ? (
+                    <img src={thumb} alt="" className="w-32 h-24 rounded-xl object-cover shrink-0" loading="lazy" />
+                  ) : (
+                    <div className="w-32 h-24 rounded-xl bg-[#F3F4F6] flex items-center justify-center text-[#D1D5DB] shrink-0">
+                      <Ico icon="solar:buildings-linear" size={28} />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-[15px] font-bold text-[#0a0f1e] truncate">{l.address}</h3>
+                    <p className="text-[12px] text-[#6a6a6a] truncate">{l.suburb}{l.state ? `, ${l.state}` : ''}</p>
+                    <div className="flex items-center gap-4 mt-2 text-[12px] text-[#6a6a6a]">
+                      <span className="inline-flex items-center gap-1"><Ico icon="solar:bed-linear" size={12} />{l.beds ?? 0}</span>
+                      <span className="inline-flex items-center gap-1"><Ico icon="solar:bath-linear" size={12} />{l.baths ?? 0}</span>
+                      <span className="inline-flex items-center gap-1"><Ico icon="solar:car-linear" size={12} />{l.parking ?? 0}</span>
+                      <span className="inline-flex items-center gap-1"><Ico icon="solar:eye-linear" size={12} />{stats.views[l.id] ?? l.views ?? 0}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="text-[15px] font-extrabold text-[#0a0f1e] tabular-nums hidden sm:inline">{l.price_formatted}</span>
+                    <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] hidden md:inline ${overlay.className}`}>
+                      {overlay.label}
+                    </span>
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="sm" variant="ghost" className="h-8 w-8 p-0 rounded-full" aria-label="More actions">
+                            <MoreHorizontal size={16} />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-52">
+                          {l._source === 'db' && (
+                            <DropdownMenuItem onClick={() => navigate(`/dashboard/listings/${l.id}/edit`)} className="gap-2 text-xs cursor-pointer">
+                              <Pencil size={14} /> Edit listing
+                            </DropdownMenuItem>
+                          )}
+                          {l._source === 'db' && l._status === 'public' && (
+                            <DropdownMenuItem onClick={() => window.open(`/property/${l.id}`, '_blank')} className="gap-2 text-xs cursor-pointer">
+                              <ExternalLink size={14} /> View public page
+                            </DropdownMenuItem>
+                          )}
+                          {l._source === 'db' && (
+                            <DropdownMenuItem onClick={() => navigate(`/dashboard/listings/${l.id}`)} className="gap-2 text-xs cursor-pointer">
+                              <Eye size={14} /> Manage
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem onClick={() => handleSendReport(l)} className="gap-2 text-xs cursor-pointer">
+                            <FileBarChart2 size={14} /> Send vendor report
+                          </DropdownMenuItem>
+                          {l._status !== 'sold' && l._status !== 'leased' && (
+                            <DropdownMenuItem onClick={() => handleMarkSold(l)} disabled={actionLoading === l.id} className="gap-2 text-xs cursor-pointer">
+                              <CheckCircle2 size={14} /> Mark {listingMode === 'rent' ? 'leased' : 'sold'}
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <PropertyDrawer

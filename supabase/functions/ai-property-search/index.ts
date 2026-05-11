@@ -121,6 +121,72 @@ Deno.serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
+    // 0. Detect source language + translate to English (if needed).
+    // Hints: userLocale + script-range heuristic. Skip translation when English.
+    const hasNonLatin = /[\u3400-\u9fff\uac00-\ud7af\u0600-\u06ff\u0900-\u097f\u0e00-\u0e7f\u0400-\u04ff]/.test(query);
+    let detectedLang = 'en';
+    let translatedQuery = query;
+    const localeHint = userLocale.split('_')[0].split('-')[0];
+    const looksNonEnglishByLocale = !!localeHint && !['en'].includes(localeHint);
+
+    if (hasNonLatin || looksNonEnglishByLocale) {
+      try {
+        const detectTranslateRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "google/gemini-3-flash-preview",
+            messages: [
+              {
+                role: "system",
+                content:
+                  "You translate Australian real estate search queries to English. PRESERVE all proper nouns exactly (suburb names like Box Hill, Cabramatta, Parramatta, Auburn; agent/agency names; street names). PRESERVE numbers and currency (e.g. 100万 -> 1,000,000). Also detect the source ISO 639-1 language code. Respond ONLY with the JSON tool call.",
+              },
+              { role: "user", content: `User locale hint: ${userLocale}\nQuery: ${query}` },
+            ],
+            tools: [{
+              type: "function",
+              function: {
+                name: "detect_and_translate",
+                description: "Detect language and translate to English.",
+                parameters: {
+                  type: "object",
+                  properties: {
+                    detected_lang: { type: "string", description: "ISO 639-1 2-letter code" },
+                    english_query: { type: "string", description: "English translation; if already English, return as-is" },
+                  },
+                  required: ["detected_lang", "english_query"],
+                  additionalProperties: false,
+                },
+              },
+            }],
+            tool_choice: { type: "function", function: { name: "detect_and_translate" } },
+          }),
+        });
+        if (detectTranslateRes.ok) {
+          const dtJson = await detectTranslateRes.json();
+          const tc = dtJson?.choices?.[0]?.message?.tool_calls?.[0];
+          if (tc?.function?.arguments) {
+            const parsed = JSON.parse(tc.function.arguments);
+            detectedLang = (parsed.detected_lang || 'en').toLowerCase().slice(0, 2);
+            if (detectedLang !== 'en' && parsed.english_query) {
+              translatedQuery = parsed.english_query;
+            }
+          }
+        } else {
+          console.warn('Detect/translate non-OK status', detectTranslateRes.status);
+        }
+      } catch (e) {
+        console.warn('Detect/translate failed, falling back to raw query', e);
+      }
+    }
+    console.log('[lang]', {
+      detectedLang,
+      userLocale,
+      raw: query.slice(0, 50),
+      translated: translatedQuery.slice(0, 50),
+    });
+
     // 1. Extract intent via Lovable AI (tool calling)
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

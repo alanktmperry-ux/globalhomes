@@ -30,6 +30,7 @@ interface MarketInsightsCardProps {
 
 export function MarketInsightsCard({ property }: MarketInsightsCardProps) {
   const { formatPrice } = useCurrency();
+  const { language } = useTranslation();
   const [rentalStats, setRentalStats] = useState<RentalStats | null>(null);
   const [snapshot, setSnapshot] = useState<SuburbSnapshot | null>(null);
   const [history, setHistory] = useState<PricePoint[]>([]);

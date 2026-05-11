@@ -98,10 +98,10 @@ export default function OnboardingBuyerPrefsPage() {
 
         <div className="text-center mb-8">
           <h1 className="text-[28px] sm:text-[32px] font-semibold tracking-[-0.5px] text-stone-900 leading-tight">
-            What are you looking for?
+            {t('onboarding.buyerPrefs.heading')}
           </h1>
           <p className="text-[14px] text-stone-500 mt-2">
-            We'll personalise your search — you can change this anytime.
+            {t('onboarding.buyerPrefs.sub')}
           </p>
         </div>
 
@@ -109,7 +109,7 @@ export default function OnboardingBuyerPrefsPage() {
           {/* Q1 — Seeking type */}
           <div>
             <label className="block text-[13px] font-medium text-stone-700 mb-2">
-              I'm looking to…
+              {t('onboarding.buyerPrefs.lookingTo')}
             </label>
             <div className="grid grid-cols-2 gap-3">
               {(['buy', 'rent'] as SeekingType[]).map((opt) => {
@@ -125,7 +125,7 @@ export default function OnboardingBuyerPrefsPage() {
                         : 'bg-white text-stone-700 border-stone-200 hover:border-stone-400'
                     }`}
                   >
-                    {opt === 'buy' ? 'Buy a property' : 'Rent a property'}
+                    {opt === 'buy' ? t('onboarding.buyerPrefs.buy') : t('onboarding.buyerPrefs.rent')}
                   </button>
                 );
               })}
@@ -135,17 +135,17 @@ export default function OnboardingBuyerPrefsPage() {
           {/* Q2 — Suburbs */}
           <div>
             <label className="block text-[13px] font-medium text-stone-700 mb-2">
-              Preferred suburb(s)
+              {t('onboarding.buyerPrefs.suburbsLabel')}
             </label>
             <input
               type="text"
               value={suburbs}
               onChange={(e) => setSuburbs(e.target.value)}
-              placeholder="e.g. Fitzroy, Richmond, Collingwood"
+              placeholder={t('onboarding.buyerPrefs.suburbsPlaceholder')}
               className="w-full h-11 px-3 rounded-xl border border-stone-200 bg-white text-[14px] text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             />
             <p className="text-[12px] text-stone-400 mt-1.5">
-              Separate multiple suburbs with commas
+              {t('onboarding.buyerPrefs.suburbsHint')}
             </p>
           </div>
 

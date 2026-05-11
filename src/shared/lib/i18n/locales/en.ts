@@ -1240,7 +1240,7 @@ export const en = {
   'seeker.buyerServices.preapproval.copy': "Know your real budget. We'll connect you with a multilingual mortgage broker — English, 中文, Tiếng Việt available.",
   'seeker.buyerServices.preapproval.cta': 'Find a broker → Free, no obligation',
   'seeker.buyerServices.conveyancer.title': 'Need a conveyancer?',
-  'seeker.buyerServices.conveyancer.body': 'Fixed-fee settlement from $990. Multilingual available in NSW, VIC, QLD.',
+  'seeker.buyerServices.conveyancer.body': 'Fixed-fee settlement from {price}. Multilingual available in NSW, VIC, QLD.',
 
   'seeker.planningToBuy.title': 'Planning to buy one day? Start now.',
   'seeker.planningToBuy.copy': "Talk to a multilingual mortgage broker — they'll tell you exactly how much deposit you need and when you'll be ready. No commitment, no cost.",

@@ -9,7 +9,7 @@ type Feature = { icon: string; title: string; desc: string };
 
 const buyerFeatures: Feature[] = [
   { icon: 'solar:streets-linear', title: 'Post a Halo', desc: 'Tell agents what you want — they come to you' },
-  { icon: 'solar:microphone-3-linear', title: 'Voice search', desc: 'Speak in 20 languages' },
+  { icon: 'solar:microphone-3-linear', title: 'Voice search', desc: 'Speak in any language' },
   { icon: 'solar:earth-linear', title: 'Listings in your language', desc: 'Every property auto-translated' },
   { icon: 'solar:dollar-linear', title: 'Prices in your currency', desc: 'Live conversion, 20+ currencies' },
   { icon: 'solar:shield-check-linear', title: 'Rental bond guarantee', desc: 'No 4-week bond upfront — from $8/week' },
@@ -19,7 +19,7 @@ const buyerFeatures: Feature[] = [
 const agentFeatures: Feature[] = [
   { icon: 'solar:streets-linear', title: 'Halo Board', desc: 'See buyers before they look at a listing' },
   { icon: 'solar:magic-stick-3-linear', title: 'AI Buyer Concierge', desc: 'Matched leads arrive automatically' },
-  { icon: 'solar:earth-linear', title: '20-language translation', desc: 'Reach 1.2M buyers no other portal reaches' },
+  { icon: 'solar:earth-linear', title: 'multilingual translation', desc: 'Reach 1.2M buyers no other portal reaches' },
   { icon: 'solar:lock-keyhole-linear', title: 'Pocket listings', desc: 'No public days-on-market counter' },
   { icon: 'solar:microphone-3-linear', title: 'Voice-qualified leads', desc: 'Transcript with every enquiry' },
   { icon: 'solar:clock-circle-linear', title: '14-day exclusive window', desc: 'Your listing, before any other portal' },

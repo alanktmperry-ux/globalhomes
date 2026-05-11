@@ -26,6 +26,8 @@ import { ms } from './locales/ms';
 import { th } from './locales/th';
 import { fil } from './locales/fil';
 import { ru } from './locales/ru';
+import { ne } from './locales/ne';
+import { pl } from './locales/pl';
 import {
   FROM_LEGACY_CODE_MAP,
   type SupportedLanguageCode,
@@ -51,6 +53,8 @@ const LOCALES: Partial<Record<SupportedLanguageCode, Record<string, string>>> = 
   'th': th,
   'fil': fil,
   'ru': ru,
+  'ne': ne as any,
+  'pl': pl as any,
 };
 
 type AnyKey = TranslationKey | (string & {});

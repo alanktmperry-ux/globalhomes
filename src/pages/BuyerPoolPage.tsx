@@ -252,7 +252,7 @@ export default function BuyerPoolPage() {
                     <Card className="p-5">
                       <Languages className="h-6 w-6 text-primary mb-3" />
                       <h4 className="font-semibold text-foreground mb-2">
-                        ListHQ translates your listings into 20 languages
+                        ListHQ translates your listings into any language
                         automatically
                       </h4>
                       <Link

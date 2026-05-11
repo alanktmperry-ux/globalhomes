@@ -1577,7 +1577,7 @@ function SimilarPropertiesSection({ suburb, state, excludeId }: { suburb: string
               <div className="aspect-[16/10] bg-[#F3F4F6] overflow-hidden relative">
                 {hasTranslations && (
                   <span className="absolute top-3 right-3 z-10 px-2.5 py-1 rounded-full text-[10px] font-bold bg-white/95 text-[#0a0f1e] backdrop-blur">
-                    20 languages
+                    any language
                   </span>
                 )}
                 {img && (

@@ -61,7 +61,7 @@ export default function AgentLandingPage() {
     <div className="min-h-screen bg-white text-black overflow-x-hidden">
       <SEO
         title="Real Estate Agent Software Australia | ListHQ"
-        description="Halo Board, AI buyer matching, 20-language translation, trust accounting, and CRM — built for Australian agents."
+        description="Halo Board, AI buyer matching, multilingual translation, trust accounting, and CRM — built for Australian agents."
         path="/for-agents"
       />
 

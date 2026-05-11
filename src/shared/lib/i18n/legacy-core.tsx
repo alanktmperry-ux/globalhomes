@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { toast } from 'sonner';
 
-export type Language = 'en' | 'zh' | 'zh-TW' | 'ko' | 'ms' | 'es' | 'ar' | 'hi' | 'fr' | 'pt' | 'bn' | 'ru' | 'ja' | 'de' | 'id' | 'nl' | 'pl' | 'vi' | 'th' | 'tr' | 'sv' | 'da' | 'no' | 'fil' | 'it' | 'pa' | 'ta';
+export type Language = 'en' | 'zh' | 'zh-TW' | 'ko' | 'ms' | 'es' | 'ar' | 'hi' | 'fr' | 'pt' | 'bn' | 'ru' | 'ja' | 'de' | 'id' | 'nl' | 'pl' | 'vi' | 'th' | 'tr' | 'sv' | 'da' | 'no' | 'fil' | 'it' | 'pa' | 'ta' | 'ne';
 
-const translations: Record<Language, Record<string, string>> = {
+const translations: Record<Exclude<Language, 'ne'>, Record<string, string>> & { ne?: Record<string, string> } = {
   en: {
     'app.name': 'ListHQ',
     'search.placeholder': 'e.g. family home with pool in Brisbane',
@@ -91,7 +91,7 @@ const translations: Record<Language, Record<string, string>> = {
     'hero.eyebrow': 'Australia\'s AI-powered property platform',
     'hero.headline': 'Find your home.',
     'hero.headline2': 'In your language.',
-    'hero.subheadline': 'Search in 20 languages. See prices in your currency. Powered by AI voice search.',
+    'hero.subheadline': 'Search in any language. See prices in your currency. Powered by AI voice search.',
     'hero.forSale': 'For Sale',
     'hero.forRent': 'For Rent',
     'hero.search': 'Search',
@@ -113,7 +113,7 @@ const translations: Record<Language, Record<string, string>> = {
     'hero.step3Title': 'Connect with an agent',
     'hero.step3Desc': 'Multilingual agents ready to help you through the whole process',
     'hero.agentCTA': 'Are you a real estate agent?',
-    'hero.agentCTASub': 'Reach buyers from China, India, Vietnam and 21 more markets. List your properties in 20 languages today.',
+    'hero.agentCTASub': 'Reach buyers from China, India, Vietnam and 21 more markets. List your properties in any language today.',
     'hero.startTrial': 'Start free 60-day trial',
     'hero.seeHow': 'See how it works',
     'hero.agentStrip': 'For real estate professionals',
@@ -126,7 +126,7 @@ const translations: Record<Language, Record<string, string>> = {
     'hero.headlineLine2Now': 'Now',
     'hero.headlineLine2Rest': 'in your language.',
     'hero.subTagline': 'Every listing. Every suburb. Every language.',
-    'hero.searchInLanguages': 'Search in Mandarin, Vietnamese, Cantonese, Arabic or any of 20 languages.',
+    'hero.searchInLanguages': 'Search in Mandarin, Vietnamese, Cantonese, Arabic or any language.',
     'hero.browseProperties': 'Browse properties',
     'hero.searchPlaceholderLabel': 'Search properties',
     'card.beds': 'bed',
@@ -1346,6 +1346,7 @@ export const languageNames: Record<Language, string> = {
   bn: 'বাংলা',
   pa: 'ਪੰਜਾਬੀ',
   ta: 'தமிழ்',
+  ne: 'नेपाली',
 };
 
 interface I18nContextType {
@@ -1366,7 +1367,7 @@ const BROWSER_LANG_MAP: Record<string, Language> = {
   'ar': 'ar', 'pt': 'pt', 'it': 'it', 'id': 'id', 'nl': 'nl', 'pl': 'pl',
   'vi': 'vi', 'ko': 'ko', 'hi': 'hi', 'th': 'th', 'tr': 'tr', 'sv': 'sv',
   'da': 'da', 'no': 'no', 'nb': 'no', 'nn': 'no',
-  'ms': 'ms', 'bn': 'bn', 'pa': 'pa', 'ta': 'ta',
+  'ms': 'ms', 'bn': 'bn', 'pa': 'pa', 'ta': 'ta', 'ne': 'ne',
   // Filipino / Tagalog
   'fil': 'fil', 'tl': 'fil',
 };
@@ -1397,6 +1398,7 @@ const languageUpdatedMessages: Record<Language, string> = {
   tr: 'Dil güncellendi', sv: 'Språk uppdaterat', da: 'Sprog opdateret',
   no: 'Språk oppdatert', fil: 'Na-update ang wika', bn: 'ভাষা আপডেট হয়েছে',
   pa: 'ਭਾਸ਼ਾ ਅੱਪਡੇਟ ਹੋਈ', ta: 'மொழி புதுப்பிக்கப்பட்டது',
+  ne: 'भाषा अद्यावधिक गरियो',
 };
 
 // Canonical (config) language codes that need mapping to legacy codes.

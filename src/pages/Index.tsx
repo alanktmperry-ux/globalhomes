@@ -460,7 +460,7 @@ const Index = () => {
     <>
       <Helmet>
         <title>ListHQ — Find your home in any language. Multilingual property search Australia</title>
-        <meta name="description" content="Australia's only multilingual property platform. Listings auto-translated into 20 languages. Free for buyers, always." />
+        <meta name="description" content="Australia's only multilingual property platform. Listings auto-translated into any language. Free for buyers, always." />
         <link rel="canonical" href="https://listhq.com.au/" />
         <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,700;1,800&display=swap" rel="stylesheet" />
       </Helmet>
@@ -864,7 +864,7 @@ const Index = () => {
                         <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:4, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{p.title || p.address || `${p.suburb ?? ''}${p.state ? `, ${p.state}` : ''}`}</div>
                         <div style={{ fontSize:12, color:T.muted, marginBottom:6 }}>{meta}</div>
                         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                          <span style={{ background:T.blueL, color:T.blue, fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:100 }}> 20 languages</span>
+                          <span style={{ background:T.blueL, color:T.blue, fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:100 }}> any language</span>
                           <span style={{ fontSize:14, fontWeight:800, color:T.ink }}>{p.price_formatted || fmtPrice(p.price, p.listing_type)}</span>
                         </div>
                       </div>
@@ -976,7 +976,7 @@ function AgentBand() {
                 </div>
                 <div style={{ flex:1, background:'linear-gradient(135deg, #1a2540, #0f3460)', borderRadius:6, position:'relative', display:'flex', alignItems:'center', justifyContent:'center' }}>
                   <span style={{ fontSize:18 }}></span>
-                  <div style={{ position:'absolute', bottom:6, right:6, background:T.blue, color:'#fff', fontSize:8, fontWeight:700, padding:'2px 6px', borderRadius:100 }}>20 langs</div>
+                  <div style={{ position:'absolute', bottom:6, right:6, background:T.blue, color:'#fff', fontSize:8, fontWeight:700, padding:'2px 6px', borderRadius:100 }}>ANY LANG</div>
                 </div>
               </div>
               <button onClick={() => setVideoOpen(true)} aria-label="Play demo video" style={{ position:'relative', zIndex:1, width:54, height:54, borderRadius:'50%', background:'#fff', border:'none', cursor:'pointer', boxShadow:'0 8px 24px rgba(0,0,0,.3)', display:'flex', alignItems:'center', justifyContent:'center' }}>
@@ -984,7 +984,7 @@ function AgentBand() {
               </button>
             </div>
             <div style={{ fontSize:10, fontWeight:700, color:'rgba(255,255,255,.5)', textTransform:'uppercase', letterSpacing:'.08em', marginBottom:6 }}>Watch · 90 seconds</div>
-            <div style={{ fontSize:15, fontWeight:700, color:'#fff', marginBottom:6 }}>From upload to 20-language listing live</div>
+            <div style={{ fontSize:15, fontWeight:700, color:'#fff', marginBottom:6 }}>From upload to multilingual listing live</div>
             <div style={{ fontSize:13, color:'rgba(255,255,255,.5)' }}>No signup required · See the full agent platform</div>
           </div>
           </div>
@@ -1110,7 +1110,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
         '1 agent seat · up to 10 active listings',
         'Full CRM — pipeline, contacts, deal tracking',
         'Full trust accounting (complete ledger)',
-        '20-language auto-translation on every listing',
+        'multilingual auto-translation on every listing',
         'AI buyer matching + voice search',
         'Halo™ buyer matching board',
         'Email support',
@@ -1132,7 +1132,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
         'Unlimited listings',
         'Full CRM for the whole team',
         'Full PM automation + trust accounting',
-        '20-language auto-translation',
+        'multilingual auto-translation',
         'Priority AI matching + lead analytics',
         'Agency-branded profile page',
         'Phone & email support',

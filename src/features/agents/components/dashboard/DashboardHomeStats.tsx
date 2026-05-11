@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface Props {
   agentId: string | null;
@@ -170,9 +171,12 @@ export default function DashboardHomeStats({ agentId }: Props) {
               {[0, 1, 2].map(i => <SkeletonBar key={i} className="h-10" />)}
             </div>
           ) : recentEnquiries.length === 0 ? (
-            <p className="text-sm text-[#6B7280] font-light py-4 text-center">
-              No enquiries yet — buyer enquiries will appear here.
-            </p>
+            <EmptyState
+              variant="compact"
+              icon="solar:inbox-linear"
+              title="No enquiries yet"
+              body="When buyers reach out about your listings, they'll appear here."
+            />
           ) : (
             <div className="space-y-0">
               {recentEnquiries.map(e => (
@@ -212,9 +216,12 @@ export default function DashboardHomeStats({ agentId }: Props) {
               {[0, 1, 2].map(i => <SkeletonBar key={i} className="h-10" />)}
             </div>
           ) : recentMatches.length === 0 ? (
-            <p className="text-sm text-[#6B7280] font-light py-4 text-center">
-              No buyer matches yet — publish a listing to start matching.
-            </p>
+            <EmptyState
+              variant="compact"
+              icon="solar:users-group-rounded-linear"
+              title="No buyer matches yet"
+              body="Our AI will surface buyers actively searching for your listings."
+            />
           ) : (
             <div className="space-y-0">
               {recentMatches.map(m => (

@@ -1,8 +1,14 @@
+import { EmptyState } from '@/components/ui/empty-state';
+
 export default function AdminSystemPage() {
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       <h1 className="text-2xl font-bold text-foreground">System</h1>
-      <p className="text-sm text-muted-foreground">Coming soon — database, reports, compliance, and pre-launch checklist will live here.</p>
+      <EmptyState
+        icon="solar:shield-check-linear"
+        title="System tools are in progress"
+        body="Database, reports, compliance, and pre-launch checklist will live here."
+      />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Sparkles, ChevronDown, ChevronUp, X, Flame, Snowflake, Clock, Mail, CalendarClock, Loader2, PartyPopper, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useTodayPriorities, type PriorityItem, type PrioritySourceKey } from '@/features/agents/hooks/useTodayPriorities';
 import TemplatePicker, { type TemplatePickerContact, type TemplatePickerProperty } from '@/features/messaging/components/TemplatePicker';
@@ -116,11 +117,12 @@ export default function TodayPrioritiesPanel() {
               <Loader2 size={14} className="animate-spin" /> Loading priorities…
             </div>
           ) : items.length === 0 ? (
-            <div className="px-5 py-8 text-center">
-              <PartyPopper size={28} className="mx-auto text-primary mb-2" />
-              <p className="text-sm font-medium">You're all caught up </p>
-              <p className="text-xs text-muted-foreground mt-1">No urgent actions right now. Good work.</p>
-            </div>
+            <EmptyState
+              variant="compact"
+              icon="solar:bell-linear"
+              title="You're all caught up"
+              body="We'll let you know when something needs your attention."
+            />
           ) : (
             <ul className="divide-y divide-border">
               {items.map(item => (

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Bell, X, Check, CheckCheck, MessageSquare, MousePointerClick, Mic, Zap } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { formatDistanceToNow } from 'date-fns';
@@ -167,11 +168,12 @@ export function NotificationBell() {
               {/* List */}
               <div className="max-h-80 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <div className="py-12 text-center">
-                    <Bell size={24} className="mx-auto text-muted-foreground/40 mb-2" />
-                    <p className="text-sm text-muted-foreground">No notifications yet</p>
-                    <p className="text-xs text-muted-foreground/60 mt-1">You'll be notified when buyers enquire</p>
-                  </div>
+                  <EmptyState
+                    variant="compact"
+                    icon="solar:bell-linear"
+                    title="You're all caught up"
+                    body="We'll let you know when something needs your attention."
+                  />
                 ) : (
                   notifications.map((n) => (
                     <button

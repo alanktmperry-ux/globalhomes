@@ -608,104 +608,124 @@ const Index = () => {
                 </button>
               </div>
 
-              <div className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:14, fontWeight:500, color:T.mid, marginTop:24, marginBottom:16, display:'flex', alignItems:'center', gap:6 }}>
-                <span style={{ fontSize:20, lineHeight:1 }}>{seq.flag}</span> {seq.sub} · {t('home.hero.langSwitch')}
+              <div
+                className={blur ? 'blur-out' : 'blur-in'}
+                style={{ marginTop: 24, marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 8, fontSize: 14, color: '#6a6a6a' }}
+              >
+                <span style={{ fontSize: 20, lineHeight: 1 }}>{seq.flag}</span>
+                <span>{seq.sub} · {t('home.hero.langSwitch')}</span>
               </div>
 
-              {/* Search block */}
-              <form onSubmit={handleSubmit} style={{ maxWidth:680, background:'#fff', border:`1.5px solid ${T.border}`, borderRadius:14, boxShadow:'0 4px 24px rgba(0,0,0,.07)', display:'grid', gridTemplateColumns:'auto auto 1fr', alignItems:'stretch', padding:0, gap:0, overflow:'hidden' }}>
-                {/* Left half — Voice */}
-                <div
-                  style={{
-                    display:'flex', flexDirection:'row', alignItems:'center',
-                    gap:12, padding:'14px 16px',
-                    background: voiceState === 'listening' ? 'rgba(239,68,68,0.08)' : 'transparent',
-                    transition:'background 0.2s ease',
-                    cursor:'pointer', position:'relative',
-                  }}
+              {/* Unified search pill */}
+              <form
+                onSubmit={handleSubmit}
+                className="hero-pill"
+                style={{
+                  display: 'flex', alignItems: 'center', width: '100%', maxWidth: 640,
+                  background: '#fff', border: '2px solid #000', borderRadius: 18,
+                  padding: '6px 6px 6px 20px',
+                  boxShadow: '0 8px 32px rgba(37,99,235,0.10)',
+                  transition: 'all .2s ease', position: 'relative',
+                }}
+              >
+                <button
+                  type="button"
                   onClick={startVoice}
+                  aria-label={voiceState === 'listening' ? 'Stop listening' : 'Start voice search'}
+                  style={{
+                    width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: voiceState === 'listening' ? '#dc2626' : '#6a6a6a',
+                    background: 'transparent', border: 'none', cursor: 'pointer',
+                    marginRight: 12, transition: 'color .15s ease', flexShrink: 0,
+                  }}
+                  onMouseEnter={(e) => { if (voiceState !== 'listening') e.currentTarget.style.color = '#2563EB'; }}
+                  onMouseLeave={(e) => { if (voiceState !== 'listening') e.currentTarget.style.color = '#6a6a6a'; }}
                 >
-                  <button
-                    type="button"
-                    onClick={startVoice}
-                    aria-label={voiceState === 'listening' ? 'Stop listening' : 'Start voice search'}
+                  {voiceState === 'processing' ? <span className="mic-spin" style={{ borderTopColor: '#2563EB' }} /> : <Mic size={22} strokeWidth={1.6} />}
+                </button>
+
+                <label htmlFor="heroSearch" className="sr-only">{t('home.hero.searchInputLabel')}</label>
+                <input
+                  id="heroSearch"
+                  ref={inputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={seq.ph}
+                  style={{
+                    flex: 1, background: 'transparent', border: 0, outline: 0,
+                    padding: '16px 0', fontSize: 15, color: '#1a1a1a', fontWeight: 500,
+                    fontFamily: 'inherit', minWidth: 0,
+                  }}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => { const el = document.querySelector<HTMLElement>('[data-language-trigger]') || document.querySelector<HTMLElement>('header [aria-haspopup]'); el?.click(); }}
+                  aria-label="Change language"
+                  style={{ fontSize: 22, padding: '0 14px', background: 'transparent', border: 0, cursor: 'pointer', lineHeight: 1, flexShrink: 0 }}
+                >
+                  {seq.flag}
+                </button>
+
+                <button
+                  type="submit"
+                  style={{
+                    padding: '14px 28px', color: '#fff', fontSize: 14, fontWeight: 700,
+                    borderRadius: 14, display: 'inline-flex', alignItems: 'center', gap: 8,
+                    border: 0, cursor: 'pointer',
+                    background: 'linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%)',
+                    boxShadow: '0 6px 20px rgba(37,99,235,0.30), inset 0 1px 0 rgba(255,255,255,0.20)',
+                    transition: 'transform .15s ease', flexShrink: 0, whiteSpace: 'nowrap',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.04)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                >
+                  {t('home.hero.searchSubmit')} <ArrowRight size={14} />
+                </button>
+
+                {voiceUnsupportedTip && (
+                  <span
+                    role="tooltip"
                     style={{
-                      position:'relative', width:40, height:40, borderRadius:'50%', flexShrink:0,
-                      background: voiceState === 'processing' ? '#9ca3af' : 'linear-gradient(135deg,#ef4444,#dc2626)',
-                      display:'flex', alignItems:'center', justifyContent:'center', color:'#fff',
-                      border:'none', cursor:'pointer', boxShadow:'0 4px 14px rgba(220,38,38,.35)',
+                      position: 'absolute', bottom: 'calc(100% + 8px)', left: 20,
+                      background: T.ink, color: '#fff', fontSize: 12, fontWeight: 500, lineHeight: 1.4,
+                      padding: 12, borderRadius: 10, maxWidth: 280, boxShadow: '0 6px 20px rgba(0,0,0,.18)', zIndex: 20,
                     }}
                   >
-                    {voiceState === 'listening' && <span className="mic-ring" />}
-                    {voiceState === 'processing' ? <span className="mic-spin" /> : <Mic size={18} />}
-                  </button>
-                  <div style={{ display:'flex', flexDirection:'column', gap:2 }}>
-                    <div style={{ fontSize:13, fontWeight:600, color: voiceState === 'listening' ? '#dc2626' : T.ink, lineHeight:1.2 }}>
-                      {voiceState === 'listening' ? '🎤 Listening…' : voiceState === 'processing' ? 'Processing…' : seq.mic}
-                    </div>
-                    <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.1em', textTransform:'uppercase', color:T.muted }}>
-                      {t('home.hero.tapToTalk')}
-                    </div>
-                  </div>
-                  {voiceUnsupportedTip && (
-                    <span
-                      role="tooltip"
-                      className="voice-tip"
-                      style={{
-                        position:'absolute', bottom:'calc(100% + 8px)', left:'50%', transform:'translateX(-50%)',
-                        background:T.ink, color:'#fff', fontSize:12, fontWeight:500, lineHeight:1.4,
-                        padding:12, borderRadius:10, maxWidth:260, width:'max-content',
-                        boxShadow:'0 6px 20px rgba(0,0,0,.18)', zIndex:20, textAlign:'left',
-                        whiteSpace:'normal',
-                      }}
-                    >
-                      🎤 Voice search works in Chrome and Safari. Type your search above, or switch browsers.
-                    </span>
-                  )}
-                </div>
-
-                {/* Divider with "or" */}
-                <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'0 6px', position:'relative' }}>
-                  <div style={{ width:1, flex:1, background:T.border }} />
-                  <div style={{ fontSize:10, fontWeight:700, color:T.muted, textTransform:'uppercase', padding:'4px 0', background:'#fff' }}>or</div>
-                  <div style={{ width:1, flex:1, background:T.border }} />
-                </div>
-
-                {/* Right half — Text */}
-                <div style={{ display:'flex', alignItems:'center', padding:'6px 6px 6px 8px', gap:6, flex:1 }}>
-                  <label htmlFor="heroSearch" className="sr-only">{t('home.hero.searchInputLabel')}</label>
-                  <input
-                    id="heroSearch"
-                    ref={inputRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={seq.ph}
-                    style={{ flex:1, border:'none', outline:'none', fontSize:14, padding:'12px 10px', background:'transparent', minWidth:120, color:T.ink }}
-                  />
-                  <button type="submit" style={{ background:T.blue, color:'#fff', border:'none', padding:'10px 16px', borderRadius:12, fontSize:14, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap', flexShrink:0 }}>
-                    {t('home.hero.searchSubmit')}
-                  </button>
-                </div>
+                    🎤 Voice search works in Chrome and Safari. Type your search above, or switch browsers.
+                  </span>
+                )}
               </form>
 
               {voiceError && (
-                <div className="voice-err" style={{ marginTop:10, maxWidth:560, display:'inline-flex', alignItems:'center', gap:8, background:'rgba(220,38,38,.08)', border:'1px solid rgba(220,38,38,.25)', color:'#b91c1c', fontSize:12, fontWeight:600, padding:'8px 14px', borderRadius:100 }}>
+                <div className="voice-err" style={{ marginTop: 10, maxWidth: 640, display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(220,38,38,.08)', border: '1px solid rgba(220,38,38,.25)', color: '#b91c1c', fontSize: 12, fontWeight: 600, padding: '8px 14px', borderRadius: 100 }}>
                   ⚠ {voiceError}
                 </div>
               )}
 
               {/* Filter chips */}
-              <div style={{ display:'flex', flexWrap:'wrap', gap:8, maxWidth:560, marginTop:14 }}>
-                {[' Auburn',' Box Hill',' Hurstville', t('home.hero.chip.budget'), t('home.hero.chip.beds'), t('home.hero.chip.schools')].map((c) => (
-                  <button key={c} className="chip" onClick={() => navigate(`/buy?q=${encodeURIComponent(c.replace(/^\s*/, ''))}`)}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'flex-start', maxWidth: 640, marginTop: 20 }}>
+                {[' Auburn', ' Box Hill', ' Hurstville', t('home.hero.chip.budget'), t('home.hero.chip.beds'), t('home.hero.chip.schools')].map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => navigate(`/buy?q=${encodeURIComponent(c.replace(/^\s*/, ''))}`)}
+                    style={{
+                      padding: '6px 14px', background: '#FAFAFA', border: '1px solid #E5E5E5',
+                      borderRadius: 9999, fontSize: 13, fontWeight: 500, color: '#4a4a4a',
+                      cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
+                      transition: 'all .15s ease',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#EFF6FF'; e.currentTarget.style.borderColor = 'rgba(37,99,235,.30)'; e.currentTarget.style.color = '#1E40AF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = '#FAFAFA'; e.currentTarget.style.borderColor = '#E5E5E5'; e.currentTarget.style.color = '#4a4a4a'; }}
+                  >
                     {c.startsWith('') ? <><span aria-hidden="true"> </span>{c.slice(3)}</> : c}
                   </button>
                 ))}
               </div>
 
-
-              <div style={{ marginTop:16, maxWidth:560, fontSize:13, color:T.muted, textAlign:'center' }}>
+              <div style={{ marginTop: 20, fontSize: 13, color: '#9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 6 }}>
+                <Unlock size={13} strokeWidth={1.6} />
                 {t('home.hero.freeForBuyers')}
               </div>
             </div>

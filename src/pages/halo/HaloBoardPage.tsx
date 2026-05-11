@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Loader2, AlertTriangle, X, Sparkles } from 'lucide-react';
+import { Loader2, AlertTriangle, X, Sparkles, Plus, Lightbulb } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -222,15 +222,37 @@ export default function HaloBoardPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+    <div className="max-w-5xl mx-auto p-4 sm:p-6">
+      <div className="flex items-start justify-between mb-6 gap-3 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold">{t('halo.board.title')}</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <h1 className="text-2xl font-bold text-[#0a0f1e] tracking-tight">{t('halo.board.title')}</h1>
+          <p className="text-sm font-light text-[#6B7280] mt-1 mb-0">
             {t('halo.board.subtitle')}
           </p>
         </div>
-        <AgentCreditBadge />
+        <div
+          className="flex items-center gap-3 bg-white rounded-[12px] px-4 py-2.5"
+          style={{ border: '1px solid #E5E7EB' }}
+        >
+          <div className="flex flex-col">
+            <span
+              className="text-[10px] uppercase font-semibold text-[#6B7280]"
+              style={{ letterSpacing: '0.10em' }}
+            >
+              Halo Credits
+            </span>
+            <span className="text-xl font-bold text-[#0a0f1e] tabular-nums leading-tight">
+              {balance}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate('/dashboard/buy-credits')}
+            className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold rounded-[10px] px-3 py-1.5 text-xs flex items-center gap-1 transition-all"
+          >
+            <Plus size={14} /> Top up
+          </button>
+        </div>
       </div>
 
       {error ? (
@@ -301,26 +323,36 @@ export default function HaloBoardPage() {
           <HaloBoardFilters value={filters} onChange={setFilters} resultCount={filtered.length} />
           {filtered.length === 0 ? (
             cleanHalos.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                  <Sparkles size={28} className="text-primary" />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="font-semibold text-foreground">{t('halo.board.empty.title')}</h3>
-                  <p className="text-sm text-muted-foreground max-w-xs">
-                    {t('halo.board.empty.body')}
-                  </p>
-                </div>
-                <Button onClick={() => navigate('/dashboard/listings/new')}>
+              <div
+                className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-[12px]"
+                style={{ border: '1px solid #E5E7EB' }}
+              >
+                <Lightbulb size={64} style={{ color: '#E5E7EB' }} />
+                <h3 className="text-xl font-bold text-[#0a0f1e] mt-6 mb-2">{t('halo.board.empty.title')}</h3>
+                <p className="text-sm font-light text-[#6B7280] mb-8 max-w-md">
+                  {t('halo.board.empty.body')}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => navigate('/dashboard/listings/new')}
+                  className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold rounded-[10px] px-6 py-3 text-sm transition-all"
+                >
                   {t('halo.board.empty.cta')}
-                </Button>
+                </button>
               </div>
             ) : (
-              <p className="text-center text-muted-foreground py-12">
-                {tab === 'pocket'
-                  ? t('halo.board.empty.filtered.pocket')
-                  : t('halo.board.empty.filtered.all')}
-              </p>
+              <div
+                className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-[12px]"
+                style={{ border: '1px solid #E5E7EB' }}
+              >
+                <Sparkles size={64} style={{ color: '#E5E7EB' }} />
+                <h3 className="text-xl font-bold text-[#0a0f1e] mt-6 mb-2">No active buyer briefs match your filters</h3>
+                <p className="text-sm font-light text-[#6B7280] mb-8 max-w-md">
+                  {tab === 'pocket'
+                    ? t('halo.board.empty.filtered.pocket')
+                    : t('halo.board.empty.filtered.all')}
+                </p>
+              </div>
             )
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

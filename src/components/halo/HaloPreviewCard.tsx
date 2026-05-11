@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, Languages, Star, Mail, Loader2, BedDouble } from 'lucide-react';
+import { CheckCircle2, Languages, Star, Mail, Loader2, BedDouble, LockKeyhole } from 'lucide-react';
 import HaloQualityBadge from '@/components/halo/HaloQualityBadge';
 import { supabase } from '@/integrations/supabase/client';
 import type { Halo } from '@/types/halo';
@@ -100,8 +100,11 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
   };
 
   return (
-    <Card>
-      <CardContent className="p-5 pr-14 sm:pr-5 space-y-4">
+    <div
+      className="bg-white rounded-[12px] p-5 cursor-pointer hover:shadow-lg hover:border-[#2563EB]/30 transition-all"
+      style={{ border: '1px solid #E5E7EB' }}
+    >
+      <div className="pr-9 sm:pr-0 space-y-4">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div className="flex flex-wrap items-center gap-2">
             <Badge className={intentClass} variant="secondary">
@@ -204,17 +207,17 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
           </div>
         ) : (
           <div className="flex justify-end">
-            <Button
-              size="sm"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+            <button
+              type="button"
               onClick={() => onRespond(halo)}
+              className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold rounded-[10px] px-4 py-2 text-sm flex items-center gap-1.5 transition-all"
             >
-              Respond — 1 credit
-            </Button>
+              <LockKeyhole size={14} /> Unlock for 1 credit
+            </button>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 

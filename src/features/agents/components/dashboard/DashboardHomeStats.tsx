@@ -135,45 +135,52 @@ export default function DashboardHomeStats({ agentId }: Props) {
   return (
     <div className="space-y-6">
       {/* Stats row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {loading ? (
           Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="rounded-xl border border-border bg-card p-5 space-y-2">
-              <SkeletonBar className="h-6 w-12" />
-              <SkeletonBar className="w-24" />
-              <SkeletonBar className="h-2 w-16" />
+            <div
+              key={i}
+              className="rounded-[16px] p-6 min-h-[130px] space-y-3"
+              style={{
+                background: 'rgba(255,255,255,0.07)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,255,255,0.15)',
+              }}
+            >
+              <SkeletonBar className="h-2 w-20 bg-white/15" />
+              <SkeletonBar className="h-10 w-16 bg-white/15" />
             </div>
           ))
         ) : (
           <>
-            <StatCard label="Live listings" value={listingCount} href="/dashboard/listings" />
-            <StatCard label="Total enquiries" value={enquiryCount} href="/dashboard/inbox" />
-            <StatCard label="Buyer matches" value={matchCount} href="/dashboard/halo-board" />
+            <StatCard label="LIVE LISTINGS" value={listingCount} href="/dashboard/listings" />
+            <StatCard label="TOTAL ENQUIRIES" value={enquiryCount} href="/dashboard/inbox" />
+            <StatCard label="BUYER MATCHES" value={matchCount} href="/dashboard/halo-board" />
             <StatCard
-              label="Unread enquiries"
+              label="UNREAD ENQUIRIES"
               value={unreadCount}
               sublabel={unreadCount ? 'Needs your attention' : 'All caught up'}
               href="/dashboard/inbox"
-              highlight={unreadCount > 0}
             />
           </>
         )}
       </div>
 
-      {/* Two-column activity */}
+      {/* Two-column activity — white canvas cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Recent enquiries */}
-        <div className="rounded-xl border border-border bg-card p-5">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-foreground">Recent enquiries</h2>
-            <Link to="/dashboard/inbox" className="text-xs text-primary hover:underline">View all →</Link>
+        <div className="bg-white rounded-[12px] p-5" style={{ border: '1px solid #E5E7EB' }}>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-normal" style={{ color: '#0a0f1e' }}>Recent enquiries</h2>
+            <Link to="/dashboard/inbox" className="text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8]">View all →</Link>
           </div>
           {loading ? (
             <div className="space-y-3">
               {[0, 1, 2].map(i => <SkeletonBar key={i} className="h-10" />)}
             </div>
           ) : recentEnquiries.length === 0 ? (
-            <p className="text-xs text-muted-foreground py-4 text-center">
+            <p className="text-sm text-[#6B7280] font-light py-4 text-center">
               No enquiries yet — buyer enquiries will appear here.
             </p>
           ) : (
@@ -182,21 +189,22 @@ export default function DashboardHomeStats({ agentId }: Props) {
                 <Link
                   key={e.id}
                   to="/dashboard/inbox"
-                  className="flex items-center gap-3 py-3 border-b border-border last:border-0 hover:bg-accent -mx-2 px-2 rounded-lg transition-colors"
+                  className="flex items-center gap-3 py-3 border-b last:border-0 hover:bg-[#F9FAFB] -mx-2 px-2 rounded-lg transition-colors"
+                  style={{ borderColor: '#E5E7EB' }}
                 >
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <span className="text-xs font-semibold text-primary">{initials(e.user_name || '?')}</span>
+                  <div className="w-8 h-8 rounded-full bg-[#2563EB]/10 flex items-center justify-center shrink-0">
+                    <span className="text-xs font-semibold text-[#2563EB]">{initials(e.user_name || '?')}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className={cn('text-sm truncate', !e.read && 'font-semibold')}>{e.user_name}</p>
-                      {!e.read && <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />}
+                      <p className={cn('text-sm truncate', !e.read && 'font-semibold')} style={{ color: '#0a0f1e' }}>{e.user_name}</p>
+                      {!e.read && <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] shrink-0" />}
                     </div>
-                    <p className="text-xs text-muted-foreground truncate">
+                    <p className="text-xs truncate" style={{ color: '#6B7280' }}>
                       {e.property?.address || 'Property enquiry'}
                     </p>
                   </div>
-                  <p className="text-xs text-muted-foreground shrink-0">{formatTimeAgo(e.created_at)}</p>
+                  <p className="text-xs shrink-0" style={{ color: '#6B7280' }}>{formatTimeAgo(e.created_at)}</p>
                 </Link>
               ))}
             </div>
@@ -204,32 +212,36 @@ export default function DashboardHomeStats({ agentId }: Props) {
         </div>
 
         {/* Recent buyer matches */}
-        <div className="rounded-xl border border-border bg-card p-5">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-foreground">Recent buyer matches</h2>
-            <Link to="/dashboard/halo-board" className="text-xs text-primary hover:underline">View all →</Link>
+        <div className="bg-white rounded-[12px] p-5" style={{ border: '1px solid #E5E7EB' }}>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-normal" style={{ color: '#0a0f1e' }}>Recent buyer matches</h2>
+            <Link to="/dashboard/halo-board" className="text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8]">View all →</Link>
           </div>
           {loading ? (
             <div className="space-y-3">
               {[0, 1, 2].map(i => <SkeletonBar key={i} className="h-10" />)}
             </div>
           ) : recentMatches.length === 0 ? (
-            <p className="text-xs text-muted-foreground py-4 text-center">
+            <p className="text-sm text-[#6B7280] font-light py-4 text-center">
               No buyer matches yet — publish a listing to start matching.
             </p>
           ) : (
             <div className="space-y-0">
               {recentMatches.map(m => (
-                <div key={m.id} className="flex items-center justify-between py-3 border-b border-border last:border-0">
+                <div
+                  key={m.id}
+                  className="flex items-center justify-between py-3 border-b last:border-0"
+                  style={{ borderColor: '#E5E7EB' }}
+                >
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">
+                    <p className="text-sm font-medium truncate" style={{ color: '#0a0f1e' }}>
                       {m.property?.address || 'Listing'}
                     </p>
-                    <p className="text-xs text-muted-foreground truncate">
+                    <p className="text-xs truncate" style={{ color: '#6B7280' }}>
                       {m.property?.suburb ? `${m.property.suburb} · ` : ''}{formatTimeAgo(m.created_at)}
                     </p>
                   </div>
-                  <span className="text-sm font-semibold text-primary shrink-0 ml-3">
+                  <span className="text-sm font-semibold text-[#2563EB] shrink-0 ml-3">
                     {m.match_score ?? 0}% match
                   </span>
                 </div>

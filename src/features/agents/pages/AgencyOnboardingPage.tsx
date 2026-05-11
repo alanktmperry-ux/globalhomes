@@ -1021,11 +1021,11 @@ export default function AgencyOnboardingPage() {
                     />
                     {abn.length > 0 && abn.length < 11 && (
                       <p className="text-[11px] text-muted-foreground mt-1">
-                        {11 - abn.length} more digit{11 - abn.length !== 1 ? 's' : ''} to go
+                        {t(11 - abn.length === 1 ? 'agentOnboarding.agency.abnRemaining' : 'agentOnboarding.agency.abnRemainingPlural', { count: 11 - abn.length })}
                       </p>
                     )}
                     {abn.length === 11 && (
-                      <p className="text-[11px] text-emerald-600 font-medium mt-1">✓ ABN complete</p>
+                      <p className="text-[11px] text-emerald-600 font-medium mt-1">{t('agentOnboarding.agency.abnComplete')}</p>
                     )}
                   </>
                 ) : (

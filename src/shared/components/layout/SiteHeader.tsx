@@ -333,7 +333,7 @@ export function SiteHeader() {
                 <button onClick={() => navTo('/brokers')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
                   <Banknote size={16} className="text-primary" /> {t('nav.findBroker')}
                 </button>
-                <button onClick={() => navTo('/pricing')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
+                <button onClick={() => navTo('/for-agents/pricing')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">
                   <Sparkles size={16} className="text-primary" /> {t('nav.pricing')}
                 </button>
                 <button onClick={() => navTo('/exclusive')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-accent transition-colors">

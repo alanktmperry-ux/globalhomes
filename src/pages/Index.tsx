@@ -11,7 +11,7 @@ import FeaturedListings from '@/features/marketing/FeaturedListings';
 import ReplaceFiveTools from '@/features/marketing/ReplaceFiveTools';
 import VoiceListingShowcase from '@/features/marketing/VoiceListingShowcase';
 import HaloBoardPreview from '@/features/marketing/HaloBoardPreview';
-import PricingSectionNew from '@/features/marketing/PricingSection';
+// PricingSection removed from homepage; lives on /for-agents/pricing
 import FinalCTA from '@/features/marketing/FinalCTA';
 import HeroSearchPreview from '@/components/home/HeroSearchPreview';
 
@@ -823,8 +823,7 @@ const Index = () => {
 
         <FAQSection />
 
-        {/* ═══ SECTION 9 — Pricing (Bose × Blue) ═══ */}
-        <PricingSectionNew />
+        {/* Agent pricing moved to /for-agents/pricing */}
 
         {/* ═══ Final CTA — dark ink with blue glow ═══ */}
         <FinalCTA />
@@ -937,7 +936,7 @@ function AgentBand() {
             </div>
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-            <button onClick={() => navigate('/pricing')} style={{ background:'#fff', color:T.ink, border:'none', padding:'14px 28px', borderRadius:12, fontSize:15, fontWeight:700, cursor:'pointer' }}>{t('home.agents.cta')} →</button>
+            <button onClick={() => navigate('/for-agents/pricing')} style={{ background:'#fff', color:T.ink, border:'none', padding:'14px 28px', borderRadius:12, fontSize:15, fontWeight:700, cursor:'pointer' }}>{t('home.agents.cta')} →</button>
             <p style={{ fontSize:11, color:'rgba(255,255,255,.4)', margin:'10px 0 0', fontWeight:500 }}>
               {t('home.agentBand.finePrint')}
             </p>

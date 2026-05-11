@@ -10,7 +10,7 @@ const COLUMNS: { title: string; links: { label: string; to: string; external?: b
       { label: 'Search', to: '/' },
       { label: 'Translate', to: '/tools/translate' },
       { label: 'Find an Agent', to: '/agents' },
-      { label: 'Pricing', to: '/#pricing' },
+      { label: 'Pricing', to: '/for-agents/pricing' },
     ],
   },
   {

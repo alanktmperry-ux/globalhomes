@@ -1180,15 +1180,48 @@ export default function PropertyDetailPage() {
               propertyType={property.propertyType}
             />
 
-            {/* Features */}
+            {/* Property features */}
+            {(() => {
+              const rows: { icon: string; label: string; value: string }[] = [];
+              if (property.beds) rows.push({ icon: 'solar:bed-linear', label: 'BEDROOMS', value: String(property.beds) });
+              if (property.baths) rows.push({ icon: 'solar:bath-linear', label: 'BATHROOMS', value: String(property.baths) });
+              if (property.parking) rows.push({ icon: 'solar:card-linear', label: 'PARKING', value: `${property.parking} ${property.parking === 1 ? 'space' : 'spaces'}` });
+              if (property.sqm) rows.push({ icon: 'solar:ruler-linear', label: 'LAND SIZE', value: `${property.sqm} m²` });
+              if (property.propertyType) rows.push({ icon: 'solar:home-linear', label: 'PROPERTY TYPE', value: property.propertyType });
+              if ((property as any).yearBuilt) rows.push({ icon: 'solar:calendar-linear', label: 'YEAR BUILT', value: String((property as any).yearBuilt) });
+              if (rows.length === 0) return null;
+              return (
+                <div className="bg-white border border-[#E5E5E5] rounded-2xl p-7 mt-2">
+                  <h2 className="text-[20px] font-bold text-[#0a0f1e] mb-6">{tp('property.section.features') || 'Property features'}</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-5">
+                    {rows.map((r) => (
+                      <div key={r.label} className="flex items-start gap-3.5">
+                        <div className="w-10 h-10 rounded-xl bg-[#EFF6FF] flex items-center justify-center flex-shrink-0">
+                          {/* @ts-expect-error iconify-icon is a web component */}
+                          <iconify-icon icon={r.icon} style={{ fontSize: '20px', color: '#2563EB' }} />
+                        </div>
+                        <div className="flex flex-col">
+                          <p className="text-[11px] font-bold uppercase tracking-[0.10em] text-[#6a6a6a]">{r.label}</p>
+                          <p className="text-[15px] font-bold text-[#0a0f1e] mt-0.5">{r.value}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* What's included */}
             {property.features.length > 0 && (
-              <div>
-                <h2 className="text-[15px] font-bold text-slate-900 mb-3 flex items-center gap-2.5 before:content-[''] before:w-[3px] before:h-4 before:rounded-full before:bg-blue-600 before:shrink-0">{tp('property.section.features')}</h2>
-                <div className="flex flex-wrap gap-2">
-                  {property.features.map(f => (
-                    <span key={f} className="px-3 py-1.5 rounded-full border border-slate-200 bg-slate-50 text-sm font-medium text-slate-600">
-                      {f}
-                    </span>
+              <div className="bg-white border border-[#E5E5E5] rounded-2xl p-7 mt-6">
+                <h2 className="text-[20px] font-bold text-[#0a0f1e] mb-5">What's included</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
+                  {property.features.map((f) => (
+                    <div key={f} className="flex items-center gap-3 text-[14px] text-[#374151]">
+                      {/* @ts-expect-error iconify-icon is a web component */}
+                      <iconify-icon icon="solar:check-circle-linear" style={{ fontSize: '18px', color: '#34D399', flexShrink: 0 }} />
+                      <span>{f}</span>
+                    </div>
                   ))}
                 </div>
               </div>

@@ -225,7 +225,10 @@ export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceF
             </LineChart>
           </ResponsiveContainer>
           <p className="text-[11px] text-muted-foreground mt-1.5 text-center">
-            Based on recorded sales in {suburb}. This property is listed at {formatPrice(currentPrice)}.
+            {t('priceHistory.basedOnSales', {
+              suburb: suburb ?? '',
+              price: formatPrice(currentPrice),
+            })}
           </p>
         </div>
       )}

@@ -105,7 +105,7 @@ export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceF
   }, [propertyId, currentPrice, listedDate, suburb, state, propertyType]);
 
   const listedStr = listedDate
-    ? new Date(listedDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
+    ? formatDate(listedDate, language, { day: 'numeric', month: 'short', year: 'numeric' })
     : 'listing date';
 
   if (loading) {

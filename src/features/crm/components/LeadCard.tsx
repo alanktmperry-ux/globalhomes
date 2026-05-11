@@ -8,14 +8,14 @@ const PRIORITY_DOT: Record<string, string> = {
   low: 'bg-[#9CA3AF]',
 };
 
-const SOURCE_ICON: Record<string, string> = {
-  enquiry_form: '💬',
-  open_home: '🏠',
-  eoi: '📋',
-  pre_approval: '✅',
-  referral: '🤝',
-  portal: '🌐',
-  manual: '✏️',
+const SOURCE_LABEL: Record<string, string> = {
+  enquiry_form: 'Enquiry',
+  open_home: 'Open Home',
+  eoi: 'EOI',
+  pre_approval: 'Pre-approved',
+  referral: 'Referral',
+  portal: 'Portal',
+  manual: 'Manual',
 };
 
 // Language code → flag + display name for the prominent ListHQ language badge.

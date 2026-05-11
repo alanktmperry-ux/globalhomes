@@ -1348,10 +1348,10 @@ export default function AgencyOnboardingPage() {
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
               <CheckCircle2 size={32} className="text-primary" />
             </div>
-            <h2 className="text-xl font-bold">Your agency is live on ListHQ</h2>
+            <h2 className="text-xl font-bold">{t('agentOnboarding.complete.heading')}</h2>
           </div>
           <div className="space-y-2">
-            {['Agency created', 'Trust account set up', 'Opening balance imported'].map((item) => (
+            {[t('agentOnboarding.complete.item1'), t('agentOnboarding.complete.item2'), t('agentOnboarding.complete.item3')].map((item) => (
               <div key={item} className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 border border-border">
                 <CheckCircle2 size={16} className="text-primary shrink-0" />
                 <span className="text-sm font-medium">{item}</span>

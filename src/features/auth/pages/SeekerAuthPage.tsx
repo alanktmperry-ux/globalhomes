@@ -240,7 +240,7 @@ const SeekerAuthPage = () => {
             <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
               <span className="text-white text-[11px] font-bold">L</span>
             </div>
-            <span className="text-[15px] font-semibold text-stone-900 tracking-[-0.3px]">ListHQ</span>
+            <span className="text-[15px] font-semibold text-stone-900 tracking-[-0.3px]">{'ListHQ'}</span>
           </Link>
         </div>
 

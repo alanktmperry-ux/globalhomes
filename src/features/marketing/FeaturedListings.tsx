@@ -1,5 +1,6 @@
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Bed, Bath, Car, Sparkles, ArrowRight } from "lucide-react";
+import { Bed, Bath, Car, Sparkles, ArrowRight, MapPin } from "lucide-react";
 import { resolveFeaturedListings } from "./featuredListingsData";
 import { useGeoLocation } from "./useGeoLocation";
 
@@ -12,14 +13,37 @@ import { useGeoLocation } from "./useGeoLocation";
 export default function FeaturedListings() {
   const geo = useGeoLocation();
   const listings = resolveFeaturedListings(geo.suburb);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            setVisible(true);
+            obs.disconnect();
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+    obs.observe(node);
+    return () => obs.disconnect();
+  }, []);
 
   return (
-    <section className="bg-white px-6 md:px-8 py-20 md:py-24">
+    <section ref={sectionRef} className="bg-white px-6 md:px-8 py-20 md:py-24">
       <div className="max-w-[1280px] mx-auto">
-        <div className="flex flex-wrap items-end justify-between gap-6 mb-10">
+        <div className="flex justify-between items-end mb-12 flex-wrap gap-6">
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#2563EB] mb-3 inline-flex items-center gap-1.5">
-              <Sparkles size={12} /> Boosted listings
+            <div className="text-[11px] font-bold tracking-[0.16em] uppercase text-[#2563EB] flex items-center gap-2 mb-3">
+              <span className="w-2 h-2 rounded-full bg-[#2563EB] relative inline-block">
+                <span className="absolute inset-0 rounded-full bg-[#2563EB] animate-ping" />
+              </span>
+              BOOSTED LISTINGS · NEAR YOU
             </div>
             <h2 className="text-[clamp(28px,4vw,44px)] font-extrabold tracking-[-0.03em] leading-[1.1] text-black">
               Featured in{" "}
@@ -39,12 +63,13 @@ export default function FeaturedListings() {
               Hand-picked homes near you, presented by multilingual agents.
             </p>
           </div>
-          <Link
-            to="/buy"
-            className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#1a1a1a] hover:text-[#2563EB] transition-colors"
+          <button
+            type="button"
+            className="text-[13px] font-semibold text-[#4a4a4a] inline-flex items-center gap-1.5 border border-[#E5E5E5] px-4 py-2.5 rounded-full bg-white hover:border-[#2563EB] hover:text-[#2563EB] transition-all cursor-pointer"
           >
-            View all listings <ArrowRight size={14} />
-          </Link>
+            <MapPin size={14} />
+            Change location
+          </button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -52,8 +77,13 @@ export default function FeaturedListings() {
             <Link
               key={l.id}
               to="/buy"
-              className="group block rounded-2xl border border-[#E5E5E5] bg-white overflow-hidden hover:border-[#2563EB] hover:shadow-[0_12px_40px_rgba(37,99,235,0.12)] transition-all opacity-0 animate-fade-up"
-              style={{ animationDelay: `${0.1 + i * 0.08}s` }}
+              className={`group block rounded-2xl border border-[#E5E5E5] bg-white overflow-hidden hover:border-[#2563EB] hover:shadow-[0_12px_40px_rgba(37,99,235,0.12)] transition-all ${
+                visible ? "animate-fade-up-stagger" : ""
+              }`}
+              style={{
+                animationDelay: `${i * 100}ms`,
+                opacity: visible ? undefined : 0,
+              }}
             >
               <div className="relative h-[220px] w-full overflow-hidden bg-[#F3F4F6]">
                 <img
@@ -102,6 +132,21 @@ export default function FeaturedListings() {
               </div>
             </Link>
           ))}
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-[#E5E5E5] flex justify-between items-center flex-wrap gap-4">
+          <p className="text-xs text-[#6a6a6a] font-medium max-w-[540px] leading-relaxed">
+            <strong>Boosted listings</strong> are paid placements by agents in your area, ranked by recency and relevance. Want your listing here?{" "}
+            <Link to="/dashboard/listings" className="text-[#2563EB] font-bold hover:underline">
+              Boost a listing →
+            </Link>
+          </p>
+          <Link
+            to="/buy"
+            className="text-[13px] font-bold text-[#2563EB] inline-flex items-center gap-1.5 hover:gap-2.5 transition-all"
+          >
+            See all {geo.display} listings <ArrowRight size={14} />
+          </Link>
         </div>
       </div>
     </section>

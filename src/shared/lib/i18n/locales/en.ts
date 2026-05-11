@@ -467,6 +467,10 @@ export const en = {
   'home.hero.chip.schools': 'Top schools',
   'home.hero.cardLangBadge': '🌐 20 languages · auto-translated',
   'home.hero.enquiredLastHour': 'people enquired in the last hour',
+  'home.hero.searchInputLabel': 'Search by address, suburb or school zone',
+  'home.hero.searchSubmit': 'Search →',
+
+  'home.stickyBar.freeTrialCta': 'Start 60-day free trial',
 
   // ── Trust strip ──
   'home.trust.listings': 'live listings',

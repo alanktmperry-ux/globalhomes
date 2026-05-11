@@ -181,7 +181,7 @@ export function ImportListingDialog({ open, onClose, onImport }: Props) {
         </div>
 
         <div className="flex justify-end gap-2 pt-2">
-          <Button variant="outline" size="sm" onClick={handleClose}>Cancel</Button>
+          <Button variant="outline" size="sm" onClick={handleClose}>Discard</Button>
           {preview && (
             <Button size="sm" onClick={handleImport} className="gap-1.5">
               Use these details

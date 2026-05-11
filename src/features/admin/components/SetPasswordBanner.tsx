@@ -131,7 +131,7 @@ export default function SetPasswordBanner() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>
-              Cancel
+              Discard
             </Button>
             <Button onClick={handleSave} disabled={saving}>
               {saving ? 'Saving…' : 'Save password'}

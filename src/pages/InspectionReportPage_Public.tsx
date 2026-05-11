@@ -526,7 +526,7 @@ export default function InspectionReportPublic() {
                           Submit Concerns
                         </Button>
                         <Button variant="ghost" onClick={() => setShowConcernForm(false)} disabled={submitting}>
-                          Cancel
+                          Discard
                         </Button>
                       </div>
                     </div>

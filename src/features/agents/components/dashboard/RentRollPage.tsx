@@ -1432,7 +1432,7 @@ const RentRollPage = () => {
               )}
 
               <div className="flex gap-2">
-                <Button variant="outline" className="flex-1" onClick={() => setShowBulkInspectionModal(false)}>Cancel</Button>
+                <Button variant="outline" className="flex-1" onClick={() => setShowBulkInspectionModal(false)}>Discard</Button>
                 <Button
                   className="flex-1"
                   onClick={handleSaveBulkInspections}

@@ -407,7 +407,7 @@ const AdminDashboard = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Discard</AlertDialogCancel>
             <AlertDialogAction onClick={performRoleChange}>Confirm</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -406,7 +406,7 @@ export default function WaterBillingPanel({ tenancyId, propertyState }: Props) {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setModalOpen(false)}>
-              Cancel
+              Discard
             </Button>
             <Button onClick={handleSave} disabled={saving}>
               {saving ? 'Saving…' : 'Save Bill'}
@@ -422,7 +422,7 @@ export default function WaterBillingPanel({ tenancyId, propertyState }: Props) {
             <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Discard</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

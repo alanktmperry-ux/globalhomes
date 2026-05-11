@@ -342,7 +342,7 @@ export default function TICACheckPanel({ applicationId, applicantName }: Props) 
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>
-              Cancel
+              Discard
             </Button>
             <Button onClick={handleSave} disabled={saving}>
               {saving ? 'Saving…' : 'Save Check'}

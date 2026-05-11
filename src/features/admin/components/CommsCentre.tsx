@@ -409,7 +409,7 @@ function TemplatesPanel({ templates, onRefresh }: { templates: Template[]; onRef
             <Textarea value={form.body} onChange={e => setForm(f => ({ ...f, body: e.target.value }))} placeholder="Message body — use {{name}} for first name" className="text-sm min-h-[120px] resize-none" />
           </div>
           <div className="flex gap-2 justify-end">
-            <Button variant="ghost" size="sm" onClick={() => setShowNew(false)} className="text-xs">Cancel</Button>
+            <Button variant="ghost" size="sm" onClick={() => setShowNew(false)} className="text-xs">Discard</Button>
             <Button size="sm" onClick={save} disabled={saving} className="text-xs gap-1.5">
               {saving ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
               {editId ? 'Save changes' : 'Create template'}

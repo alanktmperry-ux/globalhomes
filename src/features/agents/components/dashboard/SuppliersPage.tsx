@@ -387,7 +387,7 @@ export default function SuppliersPage() {
               <Textarea rows={3} value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}/></div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={()=>setShowForm(false)}>Cancel</Button>
+            <Button variant="outline" onClick={()=>setShowForm(false)}>Discard</Button>
             <Button onClick={save} disabled={saving}>
               {saving && <Loader2 size={14} className="animate-spin mr-1.5"/>}
               {editing ? 'Save Changes' : 'Add Supplier'}

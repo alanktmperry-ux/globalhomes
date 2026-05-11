@@ -311,7 +311,7 @@ export default function MaintenancePage() {
             </Select>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAssignFor(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setAssignFor(null)}>Discard</Button>
             <Button onClick={submitAssign} disabled={!assignSupplierId}>Assign</Button>
           </DialogFooter>
         </DialogContent>
@@ -328,7 +328,7 @@ export default function MaintenancePage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setQuoteFor(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setQuoteFor(null)}>Discard</Button>
             <Button onClick={submitQuote} disabled={!quoteAmount}>Save quote</Button>
           </DialogFooter>
         </DialogContent>

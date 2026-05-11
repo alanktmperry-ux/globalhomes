@@ -629,7 +629,7 @@ export default function AdminListingsPage() {
               </DialogHeader>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setConfirm(null)}>
-                  Cancel
+                  Discard
                 </Button>
                 <Button
                   variant={

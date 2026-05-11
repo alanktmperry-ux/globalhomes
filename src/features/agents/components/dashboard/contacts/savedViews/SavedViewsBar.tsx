@@ -236,7 +236,7 @@ const SavedViewsBar = ({ activeViewId, filters, sort, columns, onSelectView }: P
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setShowSaveDialog(false)}>Cancel</Button>
+            <Button variant="outline" size="sm" onClick={() => setShowSaveDialog(false)}>Discard</Button>
             <Button size="sm" onClick={handleSave} disabled={!saveName.trim() || saving}>
               {saving ? 'Saving...' : 'Save view'}
             </Button>
@@ -263,7 +263,7 @@ const SavedViewsBar = ({ activeViewId, filters, sort, columns, onSelectView }: P
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setEditingView(null)}>Cancel</Button>
+            <Button variant="outline" size="sm" onClick={() => setEditingView(null)}>Discard</Button>
             <Button size="sm" onClick={handleEdit} disabled={!editName.trim()}>Save</Button>
           </DialogFooter>
         </DialogContent>
@@ -281,7 +281,7 @@ const SavedViewsBar = ({ activeViewId, filters, sort, columns, onSelectView }: P
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Discard</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Delete
             </AlertDialogAction>

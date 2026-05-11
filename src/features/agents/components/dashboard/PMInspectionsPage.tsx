@@ -1075,7 +1075,7 @@ ${agencyName || ''}`.trim();
                               )}
                               {i.status === 'scheduled' && (
                                 <Button size="sm" variant="ghost" className="text-red-700 hover:text-red-800" onClick={() => setCancelTarget(i)}>
-                                  <XCircle size={12} className="mr-1" /> Cancel
+                                  <XCircle size={12} className="mr-1" /> Discard
                                 </Button>
                               )}
                               {i.tenancy_id && (
@@ -1181,7 +1181,7 @@ ${agencyName || ''}`.trim();
             </div>
           )}
           <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={() => setScheduleForm(null)} disabled={savingSchedule}>Cancel</Button>
+            <Button variant="outline" onClick={() => setScheduleForm(null)} disabled={savingSchedule}>Discard</Button>
             <Button variant="secondary" onClick={() => submitSchedule()} disabled={savingSchedule}>
               {savingSchedule && <Loader2 size={14} className="mr-1 animate-spin" />}
               Schedule Only
@@ -1290,7 +1290,7 @@ ${agencyName || ''}`.trim();
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCompleteFor(null)} disabled={savingComplete}>Cancel</Button>
+            <Button variant="outline" onClick={() => setCompleteFor(null)} disabled={savingComplete}>Discard</Button>
             <Button onClick={submitComplete} disabled={savingComplete}>
               {savingComplete && <Loader2 size={14} className="mr-1 animate-spin" />}
               Record
@@ -1329,7 +1329,7 @@ ${agencyName || ''}`.trim();
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setResolveFor(null)} disabled={savingResolve}>Cancel</Button>
+            <Button variant="outline" onClick={() => setResolveFor(null)} disabled={savingResolve}>Discard</Button>
             <Button onClick={submitResolve} disabled={savingResolve}>
               {savingResolve && <Loader2 size={14} className="mr-1 animate-spin" />}
               Mark Resolved
@@ -1378,7 +1378,7 @@ ${agencyName || ''}`.trim();
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAutoScheduleOpen(false)} disabled={autoScheduling}>Cancel</Button>
+            <Button variant="outline" onClick={() => setAutoScheduleOpen(false)} disabled={autoScheduling}>Discard</Button>
             <Button onClick={confirmAutoSchedule} disabled={autoScheduling || autoSchedulePlan.length === 0}>
               {autoScheduling && <Loader2 size={14} className="mr-1 animate-spin" />}
               Confirm & Schedule All

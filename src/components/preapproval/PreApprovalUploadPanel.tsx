@@ -190,7 +190,7 @@ export function PreApprovalUploadPanel() {
               onClick={() => { setFile(null); setShowForm(false); }}
               className="px-4 py-2.5 text-muted-foreground text-sm hover:underline"
             >
-              Cancel
+              Discard
             </button>
           </div>
 

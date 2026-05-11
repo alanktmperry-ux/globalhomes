@@ -203,7 +203,7 @@ export default function VacanciesPage() {
             <p className="text-xs text-muted-foreground flex items-start gap-1.5"><AlertTriangle size={12} className="mt-0.5 text-amber-600"/>This sets vacancy status to <strong>notice given</strong>.</p>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setNoticeFor(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setNoticeFor(null)}>Discard</Button>
             <Button onClick={submitNotice}>Save</Button>
           </DialogFooter>
         </DialogContent>

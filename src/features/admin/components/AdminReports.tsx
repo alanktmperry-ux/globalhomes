@@ -306,7 +306,7 @@ const ExportDialog = ({ onExport, onClose }: {
         </div>
 
         <div className="flex gap-2 pt-1">
-          <Button variant="outline" className="flex-1" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" className="flex-1" onClick={onClose}>Discard</Button>
           <Button className="flex-1 gap-2" onClick={() => { onExport(format, scope); onClose(); }}>
             <Download size={14} /> Download
           </Button>

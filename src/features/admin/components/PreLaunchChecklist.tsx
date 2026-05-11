@@ -492,7 +492,7 @@ const PreLaunchChecklist = () => {
 
           <DialogFooter>
             <Button variant="ghost" size="sm" onClick={() => setDetailItem(null)}>
-              Cancel
+              Discard
             </Button>
             <Button size="sm" onClick={saveDetail}>
               Save Changes

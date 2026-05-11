@@ -180,7 +180,7 @@ export const GetQuoteModal = ({
         </div>
 
         <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>Cancel</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>Discard</Button>
           <Button onClick={handleSubmit} disabled={submitting}>
             {submitting ? 'Submitting…' : 'Connect me with a conveyancer'}
           </Button>

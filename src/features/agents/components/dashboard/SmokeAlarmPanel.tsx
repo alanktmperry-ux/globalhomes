@@ -334,7 +334,7 @@ const SmokeAlarmPanel = ({ propertyId, propertyState, agentId }: Props) => {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="ghost" onClick={() => setShowAdd(false)} disabled={saving}>Cancel</Button>
+              <Button variant="ghost" onClick={() => setShowAdd(false)} disabled={saving}>Discard</Button>
               <Button onClick={saveRecord} disabled={saving}>
                 {saving ? <Loader2 className="animate-spin mr-1" size={14} /> : <ShieldCheck size={14} className="mr-1" />}
                 Save Record

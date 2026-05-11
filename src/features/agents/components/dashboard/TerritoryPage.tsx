@@ -313,7 +313,7 @@ const TerritoryPage = () => {
                 Save Location
               </Button>
               <Button variant="ghost" onClick={() => { setShowForm(false); setForm(emptyLocation); setSearchQuery(''); setSuggestions([]); }}>
-                Cancel
+                Discard
               </Button>
             </div>
           </div>

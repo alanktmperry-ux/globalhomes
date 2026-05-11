@@ -363,7 +363,7 @@ const DocumentsPage = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={resetNewSigForm}>Cancel</Button>
+            <Button variant="outline" onClick={resetNewSigForm}>Discard</Button>
             <Button onClick={handleSendForSignatures} disabled={sending || !newDocName.trim()}>
               {sending ? <><Loader2 size={14} className="animate-spin mr-2" /> Sending...</> : 'Send for Signatures'}
             </Button>

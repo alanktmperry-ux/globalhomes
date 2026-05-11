@@ -370,7 +370,7 @@ const TenantPortalPage = () => {
                   />
                 </div>
                 <div className="flex gap-2 justify-end">
-                  <Button variant="outline" size="sm" onClick={() => setShowForm(false)}>Cancel</Button>
+                  <Button variant="outline" size="sm" onClick={() => setShowForm(false)}>Discard</Button>
                   <Button size="sm" onClick={submitMaintenance} disabled={submitting}>
                     {submitting ? <Loader2 size={14} className="animate-spin mr-1" /> : null} Submit
                   </Button>

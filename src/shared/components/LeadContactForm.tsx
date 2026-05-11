@@ -148,7 +148,7 @@ function ExistingContactPrompt({
             Create as new contact anyway
           </Button>
           <Button onClick={onCancel} variant="ghost" size="sm">
-            Cancel
+            Discard
           </Button>
         </div>
       </DialogContent>

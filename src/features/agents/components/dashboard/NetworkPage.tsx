@@ -808,7 +808,7 @@ const NetworkPage = () => {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowContact(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setShowContact(false)}>Discard</Button>
             <Button onClick={handleContact} disabled={contactSending} className="gap-1.5">
               {contactSending && <Loader2 size={13} className="animate-spin" />}
               Send & Create Trust Entry
@@ -928,7 +928,7 @@ const NetworkPage = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowBriefForm(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setShowBriefForm(false)}>Discard</Button>
             <Button onClick={handleSubmitBrief} disabled={briefSubmitting} className="gap-1.5">
               {briefSubmitting && <Loader2 size={13} className="animate-spin" />}
               Post Brief

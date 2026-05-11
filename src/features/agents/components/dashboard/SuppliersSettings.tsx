@@ -243,7 +243,7 @@ const SuppliersSettings = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setShowForm(false)}>Discard</Button>
             <Button onClick={handleSave} disabled={saving}>
               {saving && <Loader2 size={14} className="animate-spin mr-1.5" />}
               {editing ? 'Save Changes' : 'Add Supplier'}

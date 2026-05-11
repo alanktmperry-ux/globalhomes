@@ -171,7 +171,7 @@ const OfferModal = ({ open, onOpenChange, card, propertyId, agentId, onSent }: O
                 {marking ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
                 Mark as Sent
               </Button>
-              <Button variant="ghost" onClick={() => onOpenChange(false)} className="text-xs">Cancel</Button>
+              <Button variant="ghost" onClick={() => onOpenChange(false)} className="text-xs">Discard</Button>
             </div>
 
             <div className="mt-4 pt-3 border-t border-border">

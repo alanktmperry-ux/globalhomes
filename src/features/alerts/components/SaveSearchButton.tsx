@@ -109,7 +109,7 @@ export function SaveSearchButton({ criteria, onSaved }: Props) {
               className="px-4 py-2.5 text-sm text-muted-foreground border border-border
                          rounded-xl hover:border-primary/30 transition"
             >
-              Cancel
+              Discard
             </button>
           </div>
         </div>

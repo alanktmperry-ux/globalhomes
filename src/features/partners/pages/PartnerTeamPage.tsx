@@ -253,7 +253,7 @@ const PartnerTeamPage = () => {
             </p>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowInvite(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setShowInvite(false)}>Discard</Button>
             <Button onClick={handleInvite} disabled={inviting || !inviteEmail.trim()}>
               {inviting ? <><Loader2 className="animate-spin mr-1" size={14} /> Sending…</> : 'Send invite'}
             </Button>
@@ -271,7 +271,7 @@ const PartnerTeamPage = () => {
             This person will lose access to all client agencies managed by your team. This cannot be undone.
           </p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeletingId(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setDeletingId(null)}>Discard</Button>
             <Button variant="destructive" onClick={() => deletingId && handleRemove(deletingId)}>
               Remove
             </Button>

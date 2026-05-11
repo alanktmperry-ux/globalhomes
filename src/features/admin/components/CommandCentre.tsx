@@ -1041,7 +1041,7 @@ export default function CommandCentre() {
                 disabled={ccDeleting}
                 className="px-4 py-2 rounded-xl border border-border text-sm font-medium hover:bg-accent transition-colors"
               >
-                Cancel
+                Discard
               </button>
               <button
                 onClick={() => handleCCDelete(ccDeleteTarget)}

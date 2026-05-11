@@ -290,7 +290,7 @@ export default function PipelineStagesSettings() {
           <div className="flex items-center gap-2">
             {isDirty && (
               <Button variant="ghost" size="sm" onClick={() => setDraft(null)}>
-                Cancel
+                Discard
               </Button>
             )}
             <Button size="sm" onClick={save} disabled={!isDirty || saving}>

@@ -678,7 +678,7 @@ const TrustAccountingPage = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowNewAccount(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setShowNewAccount(false)}>Discard</Button>
             <Button onClick={handleCreateAccount} disabled={!isFormValid}>Create Account</Button>
           </DialogFooter>
         </DialogContent>
@@ -908,7 +908,7 @@ const TrustAccountingPage = () => {
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setShowCloseConfirm(false)} disabled={closingPeriod}>Cancel</Button>
+              <Button variant="outline" onClick={() => setShowCloseConfirm(false)} disabled={closingPeriod}>Discard</Button>
               <Button onClick={handleCloseMonth} disabled={closingPeriod}>
                 {closingPeriod ? <Clock size={14} className="animate-spin mr-1" /> : <Lock size={14} className="mr-1" />}
                 Close period
@@ -1322,7 +1322,7 @@ const TrustAccountingPage = () => {
           </DialogHeader>
           {renderTxFormFields()}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowNewTx(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setShowNewTx(false)}>Discard</Button>
             <Button onClick={handleCreateTx} disabled={!txAccountId || !txAmount}>Record</Button>
           </DialogFooter>
         </DialogContent>
@@ -1338,7 +1338,7 @@ const TrustAccountingPage = () => {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>Discard</Button>
             <Button variant="destructive" onClick={handleVoidTx}>Void Transaction</Button>
           </DialogFooter>
         </DialogContent>

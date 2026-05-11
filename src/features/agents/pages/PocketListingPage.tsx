@@ -296,7 +296,7 @@ const PocketListingPage = () => {
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setShowLimitDialog(false)}>Cancel</Button>
+                <Button variant="outline" onClick={() => setShowLimitDialog(false)}>Discard</Button>
                 <Button onClick={() => navigate('/dashboard/billing')}>View Plans</Button>
               </DialogFooter>
             </DialogContent>

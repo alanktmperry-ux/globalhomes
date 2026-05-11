@@ -938,7 +938,7 @@ const TrustLedgerPage = () => {
           </div>
 
           <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setShowJournal(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setShowJournal(false)}>Discard</Button>
             <Button onClick={saveJournal} disabled={journalSaving} className="gap-1.5">
               <ArrowLeftRight size={14} />
               {journalSaving ? 'Recording…' : 'Record Adjustment'}

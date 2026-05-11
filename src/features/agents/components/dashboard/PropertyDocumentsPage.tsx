@@ -383,7 +383,7 @@ const PropertyDocumentsPage = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setUploadOpen(false)} disabled={uploading}>Cancel</Button>
+            <Button variant="outline" onClick={() => setUploadOpen(false)} disabled={uploading}>Discard</Button>
             <Button onClick={submitUpload} disabled={uploading || !uFile}>
               {uploading ? 'Uploading…' : 'Upload'}
             </Button>
@@ -401,7 +401,7 @@ const PropertyDocumentsPage = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Discard</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
               Delete
             </AlertDialogAction>

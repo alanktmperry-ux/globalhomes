@@ -210,7 +210,7 @@ export default function BrokerReferralsPage() {
             </div>
 
             <SheetFooter>
-              <Button variant="outline" onClick={() => setOpen(false)} disabled={submitting}>Cancel</Button>
+              <Button variant="outline" onClick={() => setOpen(false)} disabled={submitting}>Discard</Button>
               <Button onClick={handleSubmit} disabled={submitting}>
                 {submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Submit referral

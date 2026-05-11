@@ -412,7 +412,7 @@ const BondClaimsPage = () => {
                       <td className="py-2 px-2">
                         <div className="flex gap-1">
                           <Button size="sm" className="h-7 px-2 text-xs" onClick={addItem}>Save</Button>
-                          <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={() => setItemForm(null)}>Cancel</Button>
+                          <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={() => setItemForm(null)}>Discard</Button>
                         </div>
                       </td>
                     </tr>
@@ -636,7 +636,7 @@ const BondClaimsPage = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setShowNew(false)} disabled={creating}>Cancel</Button>
+            <Button variant="ghost" onClick={() => setShowNew(false)} disabled={creating}>Discard</Button>
             <Button onClick={createClaim} disabled={creating || !newTenancyId}>
               {creating ? <Loader2 className="animate-spin mr-1" size={14} /> : null}
               Create Claim

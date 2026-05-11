@@ -621,7 +621,7 @@ const BuyerConciergePage = () => {
               </div>
               <Textarea defaultValue={contactMessage} rows={6} className="text-sm" />
               <DialogFooter>
-                <Button variant="outline" onClick={() => setContactMatch(null)}>Cancel</Button>
+                <Button variant="outline" onClick={() => setContactMatch(null)}>Discard</Button>
                 <Button onClick={async () => {
                   if (introLimit !== null && introsUsed >= introLimit) {
                     toast.error('Monthly intro limit reached', {

@@ -411,7 +411,7 @@ export default function TrustReceiptModal({ open, onOpenChange, onCreated, agent
         <DialogFooter className="gap-2 sm:gap-0">
           {!showPreview ? (
             <>
-              <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+              <Button variant="outline" onClick={() => onOpenChange(false)}>Discard</Button>
               <Button variant="secondary" onClick={() => setShowPreview(true)} disabled={!canSubmit}>
                 Preview Receipt
               </Button>

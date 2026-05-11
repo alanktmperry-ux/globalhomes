@@ -149,7 +149,7 @@ export function AgentEOIDashboard({ propertyId, propertyAddress, guidePrice }: P
               >
                 Save
               </button>
-              <button onClick={() => setActiveId(null)} className="text-xs text-muted-foreground">Cancel</button>
+              <button onClick={() => setActiveId(null)} className="text-xs text-muted-foreground">Discard</button>
             </div>
           ) : (
             <button

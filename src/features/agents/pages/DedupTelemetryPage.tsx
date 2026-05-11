@@ -360,7 +360,7 @@ export default function DedupTelemetryPage() {
             <p className="text-xs text-muted-foreground">This change will be logged in the audit trail.</p>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setConfirmOpen(false)}>Discard</Button>
             <Button onClick={handleSaveThreshold}>Confirm</Button>
           </DialogFooter>
         </DialogContent>

@@ -240,7 +240,7 @@ export default function OwnerPortalCard({ propertyId }: Props) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Discard</AlertDialogCancel>
             <AlertDialogAction onClick={() => generate(true)}>
               Regenerate
             </AlertDialogAction>

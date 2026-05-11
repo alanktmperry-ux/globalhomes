@@ -27,7 +27,7 @@ export function HaloFulfilmentDialog({ open, busy, onOpenChange, onConfirm }: Pr
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={busy}>Discard</AlertDialogCancel>
           <AlertDialogAction onClick={onConfirm} disabled={busy}>
             Yes, I found my property
           </AlertDialogAction>

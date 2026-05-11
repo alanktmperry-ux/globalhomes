@@ -512,7 +512,7 @@ function SeekerRoster() {
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogCancel>Discard</AlertDialogCancel>
                               <AlertDialogAction
                                 onClick={() => handleDelete(s.id)}
                                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"

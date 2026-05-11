@@ -237,7 +237,7 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
                             className="h-8 text-xs"
                             onClick={() => { setRejectingId(null); setRejectionReason(''); }}
                           >
-                            Cancel
+                            Discard
                           </Button>
                         </div>
                       ) : (
@@ -283,7 +283,7 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Discard</AlertDialogCancel>
             <AlertDialogAction onClick={performApprove}>Approve</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

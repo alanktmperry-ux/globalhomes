@@ -106,7 +106,7 @@ const AdminRoles = ({ users, searchQuery, onSearchChange, onRoleChange }: Props)
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Discard</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmAdminGrant}
               className="bg-red-500 text-white hover:bg-red-600"

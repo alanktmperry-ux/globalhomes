@@ -531,7 +531,7 @@ const AgentAuthPage = () => {
                 onClick={() => { setShowOAuthConsentModal(false); setPendingOAuthProvider(null); }}
                 className="flex-1 h-11 rounded-xl border border-stone-200 text-stone-600 text-sm font-medium hover:bg-stone-50 transition-colors"
               >
-                Cancel
+                Discard
               </button>
               <button
                 onClick={confirmOAuthConsent}

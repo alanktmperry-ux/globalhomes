@@ -1156,7 +1156,7 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={deleting}>Discard</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => deleteTarget && performDelete(deleteTarget)}
             disabled={deleting}

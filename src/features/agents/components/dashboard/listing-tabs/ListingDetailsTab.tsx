@@ -284,7 +284,7 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
                 Save Inspection
               </Button>
               <Button size="sm" variant="ghost" className="h-8 text-xs" onClick={() => setShowAddSlot(false)}>
-                Cancel
+                Discard
               </Button>
             </div>
           </div>

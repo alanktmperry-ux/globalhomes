@@ -306,20 +306,20 @@ export default function HaloBoardPage() {
                   <Sparkles size={28} className="text-primary" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="font-semibold text-foreground">No buyer matches yet</h3>
+                  <h3 className="font-semibold text-foreground">{t('halo.board.empty.title')}</h3>
                   <p className="text-sm text-muted-foreground max-w-xs">
-                    Once you publish a listing, ListHQ automatically matches it to buyers with a matching Halo. They'll appear here.
+                    {t('halo.board.empty.body')}
                   </p>
                 </div>
                 <Button onClick={() => navigate('/dashboard/listings/new')}>
-                  Publish a listing to start matching →
+                  {t('halo.board.empty.cta')}
                 </Button>
               </div>
             ) : (
               <p className="text-center text-muted-foreground py-12">
                 {tab === 'pocket'
-                  ? 'No Halos match any of your pocket listings yet.'
-                  : 'No active Halos match your filters.'}
+                  ? t('halo.board.empty.filtered.pocket')
+                  : t('halo.board.empty.filtered.all')}
               </p>
             )
           ) : (

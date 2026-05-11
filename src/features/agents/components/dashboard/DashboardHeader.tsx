@@ -8,13 +8,16 @@ interface Props {
 }
 
 const DashboardHeader = ({ title, subtitle, actions }: Props) => (
-  <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b border-border">
-    <div className="flex items-center justify-between px-4 sm:px-6 py-3">
+  <header
+    className="sticky top-0 z-20 backdrop-blur-xl border-b"
+    style={{ background: 'rgba(255,255,255,0.85)', borderColor: 'rgba(15,23,42,0.06)' }}
+  >
+    <div className="h-[68px] flex items-center justify-between px-4 sm:px-6 md:px-10">
       <div className="flex items-center gap-3">
         <SidebarTrigger className="lg:hidden" />
         <div>
-          <h1 className="font-display text-lg font-bold">{title}</h1>
-          {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+          <h1 className="font-display text-lg font-semibold tracking-tight text-[#0F172A]">{title}</h1>
+          {subtitle && <p className="text-xs font-light text-[#64748B]">{subtitle}</p>}
         </div>
       </div>
       <div className="flex items-center gap-2">

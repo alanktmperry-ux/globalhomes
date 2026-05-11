@@ -38,6 +38,8 @@ const DISPLAY_LANGUAGES: DisplayLang[] = [
   { code: 'pt',    legacy: 'pt',    short: 'PT', flag: '🇵🇹', name: 'Português',          available: true },
   { code: 'fr',    legacy: 'fr',    short: 'FR', flag: '🇫🇷', name: 'Français',           available: true },
   { code: 'ru',    legacy: 'ru',    short: 'RU', flag: '🇷🇺', name: 'Русский',            available: true },
+  { code: 'ne',    legacy: 'ne' as Language, short: 'NE', flag: '🇳🇵', name: 'नेपाली · Nepali',  available: true },
+  { code: 'pl',    legacy: 'pl',    short: 'PL', flag: '🇵🇱', name: 'Polski',              available: true },
 ];
 
 const MANUAL_SET_KEY = 'listhq_language_manually_set';

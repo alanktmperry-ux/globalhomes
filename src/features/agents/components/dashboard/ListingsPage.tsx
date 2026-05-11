@@ -811,53 +811,27 @@ const ListingsPage = () => {
             <ListingsSkeleton />
           ) : filtered.length === 0 ? (
             lifecycleTab === 'archived' ? (
-              <div
-                className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-[12px]"
-                style={{ border: '1px solid #E5E7EB' }}
-              >
-                <CheckCircle2 size={64} style={{ color: '#E5E7EB' }} />
-                <h3 className="text-xl font-bold text-[#0a0f1e] mt-6 mb-2">No archived listings</h3>
-                <p className="text-sm font-light text-[#6B7280] max-w-md">
-                  Listings marked as Sold or Leased will appear here.
-                </p>
-              </div>
+              <EmptyState
+                icon="solar:check-circle-linear"
+                title="No archived listings"
+                body="Listings marked as Sold or Leased will appear here."
+              />
             ) : withStatus.length === 0 ? (
-              <div
-                className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-[12px]"
-                style={{ border: '1px solid #E5E7EB' }}
-              >
-                <Building size={64} style={{ color: '#E5E7EB' }} />
-                <h3 className="text-xl font-bold text-[#0a0f1e] mt-6 mb-2">Your portfolio is empty</h3>
-                <p className="text-sm font-light text-[#6B7280] mb-8 max-w-md">
-                  Add your first property to start building your portfolio. ListHQ will translate it into 6 languages automatically.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => navigate('/pocket-listing')}
-                  className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold rounded-[10px] px-6 py-3 text-sm flex items-center gap-2 transition-all"
-                >
-                  <Plus size={16} /> Add to Portfolio
-                </button>
-              </div>
+              <EmptyState
+                icon="solar:buildings-linear"
+                title="Your portfolio is empty"
+                body="Add your first property to start building your portfolio. ListHQ will translate it into 6 languages automatically."
+                ctaLabel="Add to Portfolio"
+                onCtaClick={() => navigate('/pocket-listing')}
+              />
             ) : (
-              <div
-                className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-[12px]"
-                style={{ border: '1px solid #E5E7EB' }}
-              >
-                <Search size={64} style={{ color: '#E5E7EB' }} />
-                <h3 className="text-xl font-bold text-[#0a0f1e] mt-6 mb-2">No listings match</h3>
-                <p className="text-sm font-light text-[#6B7280] mb-6 max-w-md">
-                  Try adjusting your filters or search.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => { setSaleStatusTab('all'); setRentStatusTab('all'); }}
-                  className="px-4 py-2 rounded-[10px] text-sm font-medium text-[#374151] bg-white hover:bg-[#F9FAFB] transition-all"
-                  style={{ border: '1px solid #E5E7EB' }}
-                >
-                  Clear filters
-                </button>
-              </div>
+              <EmptyState
+                icon="solar:magnifer-linear"
+                title="No listings match"
+                body="Try adjusting your filters or search terms."
+                ctaLabel="Clear filters"
+                onCtaClick={() => { setSaleStatusTab('all'); setRentStatusTab('all'); }}
+              />
             )
           ) : (
             <div className="space-y-3">

@@ -479,8 +479,8 @@ const DashboardOverview = () => {
       <div className="p-4 sm:p-6 md:px-10 md:pt-8 space-y-6 max-w-7xl">
         <div className="flex items-start justify-between gap-4 mb-2">
           <div>
-            <h1 className="text-2xl tracking-tight font-normal text-white mb-1">Market Intelligence</h1>
-            <p className="text-sm font-light mb-2" style={{ color: 'rgba(255,255,255,0.55)' }}>
+            <h1 className="text-2xl font-bold text-[#0a0f1e] tracking-tight mb-1">Market Intelligence</h1>
+            <p className="text-sm font-light text-[#6B7280] mb-8">
               {`Welcome back, ${(() => {
                 const first = onboardingAgent?.name?.trim().split(/\s+/)[0];
                 if (!first) return 'Agent';
@@ -493,8 +493,7 @@ const DashboardOverview = () => {
               to={`/agents/${agentId}`}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: 'rgba(255,255,255,0.70)' }}
-              className="text-sm hover:text-white transition-colors shrink-0 mt-1"
+              className="text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8] shrink-0 mt-1"
             >
               Your public profile →
             </Link>

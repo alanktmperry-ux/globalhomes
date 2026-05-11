@@ -79,7 +79,7 @@ const AuthConfirmPage = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setStatus('success');
-        setMessage('Email confirmed! Setting up your account...');
+        setMessage(t('auth.confirm.body.success'));
         setTimeout(() => routeUser(session.user.id), 1200);
         return;
       }
@@ -88,7 +88,7 @@ const AuthConfirmPage = () => {
           subscription?.unsubscribe();
           if (timeout) clearTimeout(timeout);
           setStatus('success');
-          setMessage('Email confirmed! Setting up your account...');
+          setMessage(t('auth.confirm.body.success'));
           setTimeout(() => routeUser(newSession.user.id), 1200);
         }
       });
@@ -96,7 +96,7 @@ const AuthConfirmPage = () => {
       timeout = setTimeout(() => {
         subscription?.unsubscribe();
         setStatus('error');
-        setMessage('Confirmation link has expired or already been used. Please sign up again.');
+        setMessage(t('auth.confirm.body.expired'));
       }, 8000);
     };
 

@@ -86,29 +86,12 @@ export default function HeroSearchPreview() {
   return (
     <section
       id="main-content"
-      style={{
-        background: '#fff',
-        minHeight: '100vh',
-        paddingTop: 120,
-        paddingBottom: 80,
-        paddingLeft: 'max(28px, env(safe-area-inset-left))',
-        paddingRight: 'max(28px, env(safe-area-inset-right))',
-        overflowX: 'hidden',
-      }}
+      className="bg-white min-h-screen pt-32 pb-20"
+      style={{ overflowX: 'hidden' }}
     >
-      <div
-        className="hsp-grid"
-        style={{
-          maxWidth: 1280,
-          margin: '0 auto',
-          display: 'grid',
-          gridTemplateColumns: '1.2fr 0.8fr',
-          gap: 64,
-          alignItems: 'center',
-        }}
-      >
+      <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 max-w-[1400px] mx-auto px-8 lg:px-12 items-center">
         {/* ── LEFT ─────────────────────────── */}
-        <div>
+        <div className="flex flex-col">
           {/* Eyebrow pill */}
           <div
             style={{

@@ -286,7 +286,7 @@ export function MortgageBrokerCard({
                     key={lang}
                     className="inline-flex items-center gap-1 text-[11px] font-medium bg-background border border-border rounded-full px-2 py-0.5 text-muted-foreground"
                   >
-                    {LANGUAGE_FLAG[lang] ?? "🌐"} {lang}
+                    {LANGUAGE_FLAG[lang] ?? ""} {lang}
                   </span>
                 ))}
               </div>

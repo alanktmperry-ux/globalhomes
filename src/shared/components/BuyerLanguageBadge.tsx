@@ -29,7 +29,7 @@ const LANGUAGE_DISPLAY: Record<string, { flag: string; name: string }> = {
 
 export function BuyerLanguageBadge({ language, className }: { language: string; className?: string }) {
   const lang = language.toLowerCase();
-  const display = LANGUAGE_DISPLAY[lang] ?? { flag: '🌐', name: lang.toUpperCase() };
+  const display = LANGUAGE_DISPLAY[lang] ?? { flag: '', name: lang.toUpperCase() };
   return (
     <span
       className={cn(

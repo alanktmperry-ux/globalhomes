@@ -11,9 +11,9 @@ interface Props {
 }
 
 const FREQ_OPTIONS: { value: AlertFrequency; label: string; desc: string }[] = [
-  { value: 'instant', label: '⚡ Instant', desc: 'Email as soon as a match is listed' },
-  { value: 'daily', label: '📅 Daily', desc: 'Morning digest of new matches' },
-  { value: 'weekly', label: '📆 Weekly', desc: 'Monday morning roundup' },
+  { value: 'instant', label: ' Instant', desc: 'Email as soon as a match is listed' },
+  { value: 'daily', label: ' Daily', desc: 'Morning digest of new matches' },
+  { value: 'weekly', label: ' Weekly', desc: 'Monday morning roundup' },
   { value: 'off', label: '🔕 Save only', desc: "No email — I'll check manually" },
 ];
 

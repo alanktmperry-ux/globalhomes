@@ -28,7 +28,7 @@ export function RentalCard({ property: p }: Props) {
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-3xl">🏠</div>
+          <div className="w-full h-full flex items-center justify-center text-3xl"></div>
         )}
         {p.pets_allowed && (
           <span className="absolute top-2 left-2 bg-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">

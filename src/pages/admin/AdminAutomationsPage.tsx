@@ -55,7 +55,7 @@ function timeAgo(iso: string): string {
 
 function ChannelBadge({ channel }: { channel: string }) {
   if (channel === 'sms') {
-    return <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-100 border-purple-200">💬 SMS</Badge>;
+    return <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-100 border-purple-200"> SMS</Badge>;
   }
   return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200">📧 Email</Badge>;
 }
@@ -278,7 +278,7 @@ export default function AdminAutomationsPage() {
                               {l.error && <TooltipContent>{l.error}</TooltipContent>}
                             </Tooltip>
                           ) : (
-                            <span className="text-green-600 font-medium">✅ sent</span>
+                            <span className="text-green-600 font-medium"> sent</span>
                           )}
                         </td>
                       </tr>

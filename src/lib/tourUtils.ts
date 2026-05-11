@@ -120,11 +120,11 @@ export function isVideoProvider(provider: TourProvider): boolean {
 }
 
 export const PROVIDER_ICONS: Record<TourProvider, string> = {
-  matterport: '🏠',
+  matterport: '',
   inspectrealestate: '🔍',
   iguide: '📐',
   ricoh: '📷',
   youtube: '▶️',
   vimeo: '🎬',
-  generic: '🌐',
+  generic: '',
 };

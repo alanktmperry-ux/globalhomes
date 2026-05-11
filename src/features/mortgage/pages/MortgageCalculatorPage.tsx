@@ -87,7 +87,7 @@ export default function MortgageCalculatorPage() {
           {[
             { href: '/stamp-duty-calculator', icon: '🏛', label: t('mortgage.related.stampDuty'), desc: t('mortgage.related.stampDuty.desc') },
             { href: '/', icon: '🔍', label: t('mortgage.related.browse'), desc: t('mortgage.related.browse.desc') },
-            { href: '/agents', icon: '👤', label: t('mortgage.related.agent'), desc: t('mortgage.related.agent.desc') },
+            { href: '/agents', icon: '', label: t('mortgage.related.agent'), desc: t('mortgage.related.agent.desc') },
           ].map(({ href, icon, label, desc }) => (
             <Link key={href} to={href}
               className="flex items-center gap-3 p-4 bg-card rounded-2xl border border-border hover:border-primary/30 transition">

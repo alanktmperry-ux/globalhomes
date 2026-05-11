@@ -253,9 +253,9 @@ export function PreApprovalUploadPanel() {
 
           <div className="grid grid-cols-3 gap-3">
             {[
-              { icon: '📄', title: 'Upload', desc: 'Your pre-approval letter' },
-              { icon: '✅', title: 'Verified', desc: 'Checked within 1–2 days' },
-              { icon: '🏷️', title: 'Badged', desc: 'Visible to agents' },
+              { icon: '', title: 'Upload', desc: 'Your pre-approval letter' },
+              { icon: '', title: 'Verified', desc: 'Checked within 1–2 days' },
+              { icon: '', title: 'Badged', desc: 'Visible to agents' },
             ].map(step => (
               <div key={step.title} className="text-center">
                 <p className="text-xl mb-1">{step.icon}</p>

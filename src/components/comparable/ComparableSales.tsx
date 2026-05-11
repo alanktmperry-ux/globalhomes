@@ -41,7 +41,7 @@ function CompCard({ comp, subjectPrice }: { comp: ComparableSale; subjectPrice: 
         {coverImage ? (
           <img src={coverImage} alt={comp.address} className="w-full h-full object-cover" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted-foreground text-lg">🏠</div>
+          <div className="w-full h-full flex items-center justify-center text-muted-foreground text-lg"></div>
         )}
       </div>
 

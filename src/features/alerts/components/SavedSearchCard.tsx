@@ -6,9 +6,9 @@ import { supabase } from '@/integrations/supabase/client';
 import type { SavedSearchRecord, AlertFrequency } from '../types';
 
 const FREQ_BADGE: Record<AlertFrequency, string> = {
-  instant: '🔔 Instant',
-  daily: '📅 Daily',
-  weekly: '📆 Weekly',
+  instant: ' Instant',
+  daily: ' Daily',
+  weekly: ' Weekly',
   off: '🔕 Off',
 };
 

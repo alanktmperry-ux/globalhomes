@@ -692,7 +692,7 @@ const AdminReports = ({ isAdmin, currentAgentId }: Props) => {
                       <td className="px-4 py-3 text-xs whitespace-nowrap">
                         <span className={isExpiring ? 'text-destructive font-semibold' : 'text-muted-foreground'}>
                           {days !== null ? `${days}d` : '—'}
-                          {isExpiring && ' ⚠️'}
+                          {isExpiring && ' '}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">

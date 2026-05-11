@@ -243,8 +243,8 @@ export function RentalApplicationForm({ propertyId, rentPw }: Props) {
                 : 'bg-amber-500/10 text-amber-700 border border-amber-500/20'
             }`}>
               {form.annual_income >= rentPw * 52 * 3
-                ? `✅ Income is ${(form.annual_income / (rentPw * 52) * 100).toFixed(0)}% of annual rent (recommended: 3×)`
-                : `⚠️ Lenders recommend income ≥ 3× annual rent ($${(rentPw * 52 * 3).toLocaleString()})`
+                ? ` Income is ${(form.annual_income / (rentPw * 52) * 100).toFixed(0)}% of annual rent (recommended: 3×)`
+                : ` Lenders recommend income ≥ 3× annual rent ($${(rentPw * 52 * 3).toLocaleString()})`
               }
             </p>
           )}

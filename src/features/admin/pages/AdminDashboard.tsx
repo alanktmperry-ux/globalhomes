@@ -334,7 +334,7 @@ const AdminDashboard = () => {
           agent_id: propData.agent_id,
           event_key: 'listing_approved',
           type: 'boost_activated',
-          title: `⚡ Your ${tier} boost is live!`,
+          title: ` Your ${tier} boost is live!`,
           message: `${propData.address} is now in the featured grid near ${propData.suburb}. Live for ${days} days.`,
           property_id: id,
         });

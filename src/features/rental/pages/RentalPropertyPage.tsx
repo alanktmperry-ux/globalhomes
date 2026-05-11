@@ -117,7 +117,7 @@ export default function RentalPropertyPage() {
             className="w-full flex items-center justify-between px-5 py-4 hover:bg-secondary/50 transition"
           >
             <span className="font-semibold text-foreground">
-              📋 Apply for this Rental
+               Apply for this Rental
             </span>
             {showApp ? <ChevronUp className="w-5 h-5 text-muted-foreground" /> : <ChevronDown className="w-5 h-5 text-muted-foreground" />}
           </button>

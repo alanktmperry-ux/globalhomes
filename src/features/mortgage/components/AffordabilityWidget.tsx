@@ -65,7 +65,7 @@ export function AffordabilityWidget({ propertyPrice, suburb, state }: Props) {
             canAfford ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'
           }`}>
             {canAfford
-              ? `✅ You can afford this property (max: ${formatCurrency(borrowing.maxPropertyPrice, true)})`
+              ? ` You can afford this property (max: ${formatCurrency(borrowing.maxPropertyPrice, true)})`
               : `❌ You need ${formatCurrency(requiredIncome, true)} income to afford this`
             }
           </div>

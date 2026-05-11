@@ -6,7 +6,7 @@ import { CheckCircle, AlertCircle } from 'lucide-react';
 
 const FINANCE_LABELS: Record<FinanceStatus, string> = {
   cash: '💵 Cash buyer',
-  pre_approved: '✅ Pre-approved finance',
+  pre_approved: ' Pre-approved finance',
   conditional: '⏳ Finance to be arranged',
   not_arranged: '❓ Finance not arranged',
 };
@@ -50,10 +50,10 @@ export function EOISubmitPanel({ propertyId, listingMode, guidePrice, closeDate,
       declined: 'bg-red-50 border-red-200',
     };
     const statusLabels: Record<string, string> = {
-      submitted: '📋 EOI Received — the agent will be in touch',
+      submitted: ' EOI Received — the agent will be in touch',
       under_review: '🔍 Under Review — agent is reviewing your offer',
-      shortlisted: '⭐ Shortlisted — you\'re in the running',
-      accepted: '🎉 Accepted — congratulations!',
+      shortlisted: ' Shortlisted — you\'re in the running',
+      accepted: ' Accepted — congratulations!',
       declined: '❌ Declined — this offer was not accepted',
     };
     return (

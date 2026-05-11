@@ -35,7 +35,7 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
   }, [onSearch]);
 
   const handleVoiceError = useCallback((message: string) => {
-    toast({ title: '🎙️ Voice Search', description: message, variant: 'destructive' });
+    toast({ title: '️ Voice Search', description: message, variant: 'destructive' });
   }, [toast]);
 
   const { isListening, isTranscribing, startListening, stopListening, isSupported } = useVoiceSearch(handleVoiceResult, handleVoiceError);
@@ -212,7 +212,7 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
             className="mt-2 flex justify-center"
           >
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-medium">
-              🌐 Searching in English
+               Searching in English
             </span>
           </motion.div>
         )}

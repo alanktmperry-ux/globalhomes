@@ -38,7 +38,7 @@ class AppErrorBoundary extends Component<Props, State> {
       return (
         <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background px-6 text-center">
           <div className="rounded-2xl border border-border bg-card p-10 shadow-lg max-w-md w-full">
-            <div className="mb-4 text-5xl">⚠️</div>
+            <div className="mb-4 text-5xl"></div>
             <h1 className="text-2xl font-bold text-foreground mb-2">Something went wrong</h1>
             <p className="text-muted-foreground mb-6">
               An unexpected error occurred. You can try reloading the page or returning to the home screen.

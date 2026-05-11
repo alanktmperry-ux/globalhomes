@@ -3,8 +3,8 @@ import { SuburbStatsGrid } from './SuburbStatsGrid';
 import type { SuburbMarketStats, PropertyType } from '../types';
 
 const TYPES: { value: PropertyType; label: string }[] = [
-  { value: 'house', label: '🏡 Houses' },
-  { value: 'unit', label: '🏢 Units' },
+  { value: 'house', label: ' Houses' },
+  { value: 'unit', label: ' Units' },
   { value: 'townhouse', label: '🏘 Townhouses' },
 ];
 

@@ -8,20 +8,20 @@ import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 const buyerChips = [
   { icon: '🔮', titleKey: 'auth.landing.buyer.postHalo.title', descKey: 'auth.landing.buyer.postHalo.desc', top: true },
   { icon: '🎤', titleKey: 'auth.landing.buyer.voiceSearch.title', descKey: 'auth.landing.buyer.voiceSearch.desc', top: true },
-  { icon: '🌐', titleKey: 'auth.landing.buyer.translations.title', descKey: 'auth.landing.buyer.translations.desc', top: false },
+  { icon: '', titleKey: 'auth.landing.buyer.translations.title', descKey: 'auth.landing.buyer.translations.desc', top: false },
   { icon: '💱', titleKey: 'auth.landing.buyer.currency.title', descKey: 'auth.landing.buyer.currency.desc', top: false },
-  { icon: '🛡️', titleKey: 'auth.landing.buyer.bond.title', descKey: 'auth.landing.buyer.bond.desc', top: false },
+  { icon: '', titleKey: 'auth.landing.buyer.bond.title', descKey: 'auth.landing.buyer.bond.desc', top: false },
   { icon: '🏦', titleKey: 'auth.landing.buyer.brokers.title', descKey: 'auth.landing.buyer.brokers.desc', top: false },
 ] as const;
 
 const agentChips = [
   { icon: '🔮', titleKey: 'auth.landing.agent.haloBoard.title', descKey: 'auth.landing.agent.haloBoard.desc', top: true },
-  { icon: '🤖', titleKey: 'auth.landing.agent.aiConcierge.title', descKey: 'auth.landing.agent.aiConcierge.desc', top: true },
-  { icon: '🌐', titleKey: 'auth.landing.agent.translation.title', descKey: 'auth.landing.agent.translation.desc', top: false },
+  { icon: '', titleKey: 'auth.landing.agent.aiConcierge.title', descKey: 'auth.landing.agent.aiConcierge.desc', top: true },
+  { icon: '', titleKey: 'auth.landing.agent.translation.title', descKey: 'auth.landing.agent.translation.desc', top: false },
   { icon: '🤫', titleKey: 'auth.landing.agent.pocket.title', descKey: 'auth.landing.agent.pocket.desc', top: false },
   { icon: '🎤', titleKey: 'auth.landing.agent.voiceLeads.title', descKey: 'auth.landing.agent.voiceLeads.desc', top: false },
-  { icon: '⚡', titleKey: 'auth.landing.agent.exclusive.title', descKey: 'auth.landing.agent.exclusive.desc', top: false },
-  { icon: '📊', titleKey: 'auth.landing.agent.crm.title', descKey: 'auth.landing.agent.crm.desc', top: false },
+  { icon: '', titleKey: 'auth.landing.agent.exclusive.title', descKey: 'auth.landing.agent.exclusive.desc', top: false },
+  { icon: '', titleKey: 'auth.landing.agent.crm.title', descKey: 'auth.landing.agent.crm.desc', top: false },
   { icon: '🏦', titleKey: 'auth.landing.agent.trust.title', descKey: 'auth.landing.agent.trust.desc', top: false },
 ] as const;
 

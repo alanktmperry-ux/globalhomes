@@ -180,9 +180,9 @@ function LeadMetadataPanel({
           >
             <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="hot">🔥 Hot</SelectItem>
+              <SelectItem value="hot"> Hot</SelectItem>
               <SelectItem value="warm">🌡️ Warm</SelectItem>
-              <SelectItem value="cold">❄️ Cold</SelectItem>
+              <SelectItem value="cold"> Cold</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -281,7 +281,7 @@ const LeadContactForm = ({
       }
 
       toast({
-        title: context === 'lead' ? '✅ Lead created' : '✅ Contact saved',
+        title: context === 'lead' ? ' Lead created' : ' Contact saved',
         description: useExistingContactId
           ? 'Linked to existing contact.'
           : `${contactPayload.first_name ?? ''} ${contactPayload.last_name ?? ''}`.trim(),

@@ -2,15 +2,17 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import DashboardHeader from '@/features/agents/components/dashboard/DashboardHeader';
 import SmokeAlarmPanel from './SmokeAlarmPanel';
 import { format, parseISO, differenceInDays } from 'date-fns';
-import { Loader2, ShieldAlert, Flame } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import {
+  APlusPageHeader, APlusStatCard, APlusTable, APlusTHead, APlusTh, APlusTBody, APlusTr, APlusTd,
+  APlusBadge, APlusDueSoonBanner, type APlusBadgeTone,
+} from '@/components/ui/data-table-aplus';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface PropertyRow {
   id: string;

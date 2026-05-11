@@ -485,7 +485,7 @@ function BuyerServices() {
       <SmallServiceCard
         icon={Scale}
         title={t('seeker.buyerServices.conveyancer.title')}
-        body={t('seeker.buyerServices.conveyancer.body')}
+        body={t('seeker.buyerServices.conveyancer.body', { price: formatCurrency(990, language) })}
         onClick={() => navigate('/conveyancing')}
       />
     </section>

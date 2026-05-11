@@ -8,7 +8,7 @@ import {
 } from '@/lib/stampDuty';
 import { calculateFirbCosts, FOREIGN_SURCHARGE_RATES } from '@/lib/firb';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
-import { useTranslation } from '@/shared/lib/i18n';
+import { useTranslation, formatCurrency } from '@/shared/lib/i18n';
 
 interface Props {
   propertyPrice: number | null;
@@ -18,14 +18,11 @@ interface Props {
 
 const STATES: AustralianState[] = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT'];
 
-function formatAUD(n: number): string {
-  return 'A$' + Math.round(n).toLocaleString('en-AU');
-}
-
 export function FIRBCalculator({ propertyPrice, propertyAddress, propertyState }: Props) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { t: tp } = useTranslation();
   const { formatPrice, currency } = useCurrency();
+  const formatAUD = (n: number) => formatCurrency(Math.round(n), language);
   const [enabled, setEnabled] = useState(false);
   const [state, setState] = useState<AustralianState>(() => {
     if (propertyState) return propertyState;

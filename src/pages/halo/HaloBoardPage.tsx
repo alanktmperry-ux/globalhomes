@@ -271,13 +271,13 @@ export default function HaloBoardPage() {
                     : 'bg-amber-600 hover:bg-amber-700 text-white'
                 }
               >
-                Buy Credits →
+                {t('halo.board.lowCredit.buy')}
               </Button>
               {!persistentBanner && (
                 <button
                   type="button"
                   onClick={() => setBannerDismissed(true)}
-                  aria-label="Dismiss banner"
+                  aria-label={t('halo.board.lowCredit.dismiss')}
                   className="text-current opacity-60 hover:opacity-100"
                 >
                   <X size={16} />

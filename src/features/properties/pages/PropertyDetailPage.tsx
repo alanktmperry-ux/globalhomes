@@ -658,7 +658,7 @@ export default function PropertyDetailPage() {
                     <span className="text-lg text-muted-foreground font-medium">{tp('property.perWeek')}</span>
                   </div>
                   {currency.code !== 'AUD' && (
-                    <p className="text-sm text-muted-foreground mt-0.5">{tp('property.weeklyRentAud', { amount: weeklyRent.toLocaleString() })}</p>
+                    <p className="text-sm text-muted-foreground mt-0.5">{tp('property.weeklyRentAud', { amount: formatNumber(weeklyRent, language) })}</p>
                   )}
                 </>
               ) : (

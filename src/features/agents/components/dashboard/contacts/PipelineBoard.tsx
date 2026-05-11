@@ -138,9 +138,9 @@ const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect, addA
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Rankings</SelectItem>
-            <SelectItem value="hot">🔥 Hot</SelectItem>
+            <SelectItem value="hot"> Hot</SelectItem>
             <SelectItem value="warm">🌡 Warm</SelectItem>
-            <SelectItem value="cold">❄️ Cold</SelectItem>
+            <SelectItem value="cold"> Cold</SelectItem>
           </SelectContent>
         </Select>
 
@@ -206,13 +206,13 @@ const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect, addA
                         {RANKING_ICON[c.ranking]}
                       </div>
                       {c.suburb && (
-                        <p className="text-[10px] text-muted-foreground">📍 {c.suburb}{c.state ? `, ${c.state}` : ''}</p>
+                        <p className="text-[10px] text-muted-foreground"> {c.suburb}{c.state ? `, ${c.state}` : ''}</p>
                       )}
                       {pipelineType === 'buyer' && c.budget_max && (
-                        <p className="text-[10px] text-primary font-semibold mt-0.5">💰 up to {AUD.format(c.budget_max)}</p>
+                        <p className="text-[10px] text-primary font-semibold mt-0.5"> up to {AUD.format(c.budget_max)}</p>
                       )}
                       {pipelineType === 'seller' && c.estimated_value && (
-                        <p className="text-[10px] text-primary font-semibold mt-0.5">💰 {AUD.format(c.estimated_value)}</p>
+                        <p className="text-[10px] text-primary font-semibold mt-0.5"> {AUD.format(c.estimated_value)}</p>
                       )}
                       {c.tags?.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-1.5">

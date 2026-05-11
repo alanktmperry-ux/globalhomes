@@ -194,7 +194,7 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
             </div>
             {contact.suburb && (
               <p className="text-xs text-muted-foreground">
-                📍 {[contact.suburb, contact.state, contact.postcode].filter(Boolean).join(', ')}
+                 {[contact.suburb, contact.state, contact.postcode].filter(Boolean).join(', ')}
               </p>
             )}
           </section>
@@ -205,12 +205,12 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
               <h4 className="text-xs font-semibold text-muted-foreground uppercase">Buyer Preferences</h4>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 {(contact.budget_min != null || contact.budget_max != null) && (
-                  <p>💰 {contact.budget_min != null ? AUD.format(contact.budget_min) : '—'} — {contact.budget_max != null ? AUD.format(contact.budget_max) : '—'}</p>
+                  <p> {contact.budget_min != null ? AUD.format(contact.budget_min) : '—'} — {contact.budget_max != null ? AUD.format(contact.budget_max) : '—'}</p>
                 )}
                 {contact.preferred_beds && <p>🛏️ {contact.preferred_beds}+ beds</p>}
                 {contact.preferred_baths && <p>🚿 {contact.preferred_baths}+ baths</p>}
                 {contact.preferred_suburbs?.length > 0 && (
-                  <p className="col-span-2">📍 {contact.preferred_suburbs.join(', ')}</p>
+                  <p className="col-span-2"> {contact.preferred_suburbs.join(', ')}</p>
                 )}
               </div>
             </section>
@@ -219,7 +219,7 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
           {(contact.contact_type === 'seller' || contact.contact_type === 'both') && contact.property_address && (
             <section className="space-y-2 border-t border-border pt-4">
               <h4 className="text-xs font-semibold text-muted-foreground uppercase">Seller Property</h4>
-              <p className="text-sm">🏠 {contact.property_address}</p>
+              <p className="text-sm"> {contact.property_address}</p>
               {contact.estimated_value && <p className="text-sm font-bold text-primary">{AUD.format(contact.estimated_value)}</p>}
             </section>
           )}
@@ -240,17 +240,17 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
               <Select value={newActivityType} onValueChange={setNewActivityType}>
                 <SelectTrigger className="h-8 w-28 text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="call">📞 Call</SelectItem>
+                  <SelectItem value="call"> Call</SelectItem>
                   <SelectItem
                     value="email"
                     disabled={!contact.email}
                     title={!contact.email ? 'Add an email address to send emails' : undefined}
                   >📧 Email</SelectItem>
-                  <SelectItem value="sms">💬 SMS</SelectItem>
-                  <SelectItem value="inspection">🏠 Inspection</SelectItem>
-                  <SelectItem value="meeting">📅 Meeting</SelectItem>
-                  <SelectItem value="note">📝 Note</SelectItem>
-                  <SelectItem value="follow_up">📞 Follow-up</SelectItem>
+                  <SelectItem value="sms"> SMS</SelectItem>
+                  <SelectItem value="inspection"> Inspection</SelectItem>
+                  <SelectItem value="meeting"> Meeting</SelectItem>
+                  <SelectItem value="note"> Note</SelectItem>
+                  <SelectItem value="follow_up"> Follow-up</SelectItem>
                 </SelectContent>
               </Select>
               <Input

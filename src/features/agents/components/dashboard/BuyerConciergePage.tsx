@@ -409,7 +409,7 @@ const BuyerConciergePage = () => {
                           {buyerName(m)}
                           {m.profile?.language_preference && m.profile.language_preference !== 'en' && (
                             <span className="ml-1.5 text-base leading-none" title={m.profile.language_preference}>
-                              {LANG_FLAGS[m.profile.language_preference] ?? '🌐'}
+                              {LANG_FLAGS[m.profile.language_preference] ?? ''}
                             </span>
                           )}
                           <span className="text-muted-foreground font-normal"> — {buyerSuburb(m)}</span>
@@ -480,7 +480,7 @@ const BuyerConciergePage = () => {
                                 {buyerName(m)}
                                 {m.profile?.language_preference && m.profile.language_preference !== 'en' && (
                                   <span className="ml-1.5 text-base leading-none" title={m.profile.language_preference}>
-                                    {LANG_FLAGS[m.profile.language_preference] ?? '🌐'}
+                                    {LANG_FLAGS[m.profile.language_preference] ?? ''}
                                   </span>
                                 )}
                               </p>
@@ -546,7 +546,7 @@ const BuyerConciergePage = () => {
                             {buyerName(m)}
                             {m.profile?.language_preference && m.profile.language_preference !== 'en' && (
                               <span className="ml-1.5 text-base leading-none" title={m.profile.language_preference}>
-                                {LANG_FLAGS[m.profile.language_preference] ?? '🌐'}
+                                {LANG_FLAGS[m.profile.language_preference] ?? ''}
                               </span>
                             )}
                           </p>

@@ -69,7 +69,7 @@ const StepPreview = ({ draft, onPublish, publishing, isEdit }: Props) => {
                 ? 'bg-primary text-primary-foreground'
                 : 'bg-success text-success-foreground'
             }`}>
-              {draft.visibility === 'whisper' ? '🤫 Whisper' : draft.visibility === 'coming-soon' ? '🔜 Coming Soon' : '🟢 Live'}
+              {draft.visibility === 'whisper' ? '🤫 Whisper' : draft.visibility === 'coming-soon' ? '🔜 Coming Soon' : ' Live'}
             </span>
           </div>
           <div className="absolute bottom-3 left-3">

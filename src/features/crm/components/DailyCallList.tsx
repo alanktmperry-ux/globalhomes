@@ -68,7 +68,7 @@ export function DailyCallList({ onSelectLead }: Props) {
                 </p>
                 {hasOverdue && overdueTask && (
                   <p className="text-[11px] text-destructive truncate">
-                    ⚠️ {overdueTask.title}
+                     {overdueTask.title}
                   </p>
                 )}
                 {!hasOverdue && (

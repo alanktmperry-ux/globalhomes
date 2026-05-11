@@ -698,7 +698,7 @@ const RentRollPage = () => {
       <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
         <AlertTriangle size={14} className="text-amber-600 shrink-0 mt-0.5" />
         <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
-          📋 Tenancy records are retained for 7 years in compliance with Australian tenancy law. Records cannot be deleted during this period.
+           Tenancy records are retained for 7 years in compliance with Australian tenancy law. Records cannot be deleted during this period.
         </p>
       </div>
 
@@ -818,7 +818,7 @@ const RentRollPage = () => {
                             {activeTab === 'all'
                               ? 'No active tenancies yet. Click "+ Add Tenancy" to get started.'
                               : activeTab === 'arrears'
-                                ? 'No tenancies in arrears. 🎉'
+                                ? 'No tenancies in arrears. '
                                 : activeTab === 'expiring'
                                   ? 'No leases expiring in the next 90 days.'
                                   : activeTab === 'inspections'
@@ -1125,7 +1125,7 @@ const RentRollPage = () => {
                   )}
                   {bondExceedsFourWeeks && (
                     <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                      ⚠️ Bond exceeds 4 weeks rent (${fourWeeksAmount}). Confirm this is correct.
+                       Bond exceeds 4 weeks rent (${fourWeeksAmount}). Confirm this is correct.
                     </p>
                   )}
                 </div>
@@ -1427,7 +1427,7 @@ const RentRollPage = () => {
                 </p>
               ) : (
                 <p className="text-xs text-amber-600 dark:text-amber-400">
-                  ⚠️ No tenant email on record — inspections will be saved but no email notice will be sent.
+                   No tenant email on record — inspections will be saved but no email notice will be sent.
                 </p>
               )}
 

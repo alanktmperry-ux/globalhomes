@@ -718,7 +718,7 @@ const TenancyDetailPage = () => {
                   {(!tenancy.bond_lodgement_number || tenancy.bond_lodgement_number.trim() === '' || /^\d{1,4}$/.test(tenancy.bond_lodgement_number.trim())) && tenancy.bond_amount > 0 && (
                     <div className="col-span-full">
                       <div className="flex items-start gap-2 rounded-lg border border-yellow-300 bg-yellow-50 dark:border-yellow-600 dark:bg-yellow-950/30 px-3 py-2">
-                        <span className="text-sm mt-0.5">⚠️</span>
+                        <span className="text-sm mt-0.5"></span>
                         <p className="text-xs text-yellow-800 dark:text-yellow-300">
                           Bond lodgement reference missing — must be lodged with <strong>{tenancy.bond_authority || 'the relevant bond authority'}</strong> within 10 business days of receipt.
                         </p>
@@ -777,7 +777,7 @@ const TenancyDetailPage = () => {
               if (hasExit) return null;
               return (
                 <div className="mt-4 flex items-start gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                  <span className="text-amber-600 mt-0.5">⚠️</span>
+                  <span className="text-amber-600 mt-0.5"></span>
                   <div className="flex-1 flex flex-wrap items-center justify-between gap-2">
                     <p className="text-xs text-amber-800">
                       Lease ends {format(parseISO(tenancy.lease_end), 'dd MMM yyyy')} — exit condition report not yet scheduled.

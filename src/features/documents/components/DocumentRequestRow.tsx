@@ -33,7 +33,7 @@ export function DocumentRequestRow({ request, onUpload, onCancel, isRequester }:
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-2 p-3 border-l-4 border-amber-400 bg-card rounded-lg">
       <div className="flex items-start gap-2.5 flex-1 min-w-0">
-        <span className="text-lg shrink-0">{cat?.icon ?? '📄'}</span>
+        <span className="text-lg shrink-0">{cat?.icon ?? ''}</span>
         <div className="min-w-0 flex-1">
           <span className="font-medium text-sm">
             {request.custom_label || cat?.label || 'Document'}

@@ -70,7 +70,7 @@ const CommissionCalculator = () => {
 
   const handleSave = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
-    toast.success('💾 Scenario saved — Your commission scenario has been saved');
+    toast.success(' Scenario saved — Your commission scenario has been saved');
   };
 
   const formatAusDate = (d: Date) => format(d, 'dd/MM/yyyy');

@@ -17,7 +17,7 @@ const fields = [
 ];
 
 function getTip(pct: number) {
-  if (pct >= 100) return '✅ Listing complete — ready to publish';
+  if (pct >= 100) return ' Listing complete — ready to publish';
   if (pct >= 75) return 'Almost there — add your contact details to go live';
   if (pct >= 50) return 'Add a Chinese or Vietnamese translation to reach 3× more buyers — worth 25%';
   return 'Add photos and a description to get more views';

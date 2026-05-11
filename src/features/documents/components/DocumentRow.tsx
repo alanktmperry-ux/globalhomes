@@ -54,7 +54,7 @@ export function DocumentRow({ doc, canDelete, canChangeAccess, onDownload, onDel
     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-3 border-b border-border last:border-0 hover:bg-accent/30 transition-colors">
       {/* File info */}
       <div className="flex items-start gap-2.5 flex-1 min-w-0">
-        <span className="text-lg shrink-0">{cat?.icon ?? '📎'}</span>
+        <span className="text-lg shrink-0">{cat?.icon ?? ''}</span>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-medium text-sm truncate">{doc.label || doc.file_name}</span>
@@ -104,10 +104,10 @@ export function DocumentRow({ doc, canDelete, canChangeAccess, onDownload, onDel
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="public">🌐 Public</SelectItem>
-              <SelectItem value="registered_buyers">👤 Buyers</SelectItem>
-              <SelectItem value="agent_only">🔒 Agent Only</SelectItem>
-              <SelectItem value="parties_only">🤝 Parties</SelectItem>
+              <SelectItem value="public"> Public</SelectItem>
+              <SelectItem value="registered_buyers"> Buyers</SelectItem>
+              <SelectItem value="agent_only"> Agent Only</SelectItem>
+              <SelectItem value="parties_only"> Parties</SelectItem>
             </SelectContent>
           </Select>
         )}

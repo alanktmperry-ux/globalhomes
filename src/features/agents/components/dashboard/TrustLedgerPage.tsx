@@ -866,7 +866,7 @@ const TrustLedgerPage = () => {
             <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 p-3 text-xs text-amber-800 dark:text-amber-300 flex gap-2">
               <AlertTriangle size={14} className="shrink-0 mt-0.5" />
               <p>
-                ⚠️ Journal adjustments are permanent and form part of your statutory audit trail.
+                 Journal adjustments are permanent and form part of your statutory audit trail.
                 The original entry and this correction will both be visible to your auditor.
                 Only use this for genuine accounting corrections — not to hide or alter transactions.
               </p>

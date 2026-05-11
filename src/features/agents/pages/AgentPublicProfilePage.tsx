@@ -341,7 +341,7 @@ function AgentPublicProfilePageInner() {
                   <span key={s} className="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium border border-primary/20">{s}</span>
                 ))}
                 {agent.handlesTrustAccounting && (
-                  <span className="px-3 py-1.5 rounded-full bg-green-500/10 text-green-600 text-sm font-medium">🛡️ Trust Compliant</span>
+                  <span className="px-3 py-1.5 rounded-full bg-green-500/10 text-green-600 text-sm font-medium"> Trust Compliant</span>
                 )}
                 {agent.specialization && (
                   <span className="px-3 py-1.5 rounded-full bg-secondary text-sm text-secondary-foreground flex items-center gap-1"><Award size={14} /> {agent.specialization}</span>

@@ -13,10 +13,10 @@ interface Props {
 }
 
 const REVIEW_TYPES: { value: ReviewType; label: string; icon: string }[] = [
-  { value: 'buyer', label: 'Buyer', icon: '🏠' },
-  { value: 'vendor', label: 'Vendor', icon: '💰' },
-  { value: 'tenant', label: 'Tenant', icon: '🔑' },
-  { value: 'landlord', label: 'Landlord', icon: '🏢' },
+  { value: 'buyer', label: 'Buyer', icon: '' },
+  { value: 'vendor', label: 'Vendor', icon: '' },
+  { value: 'tenant', label: 'Tenant', icon: '' },
+  { value: 'landlord', label: 'Landlord', icon: '' },
 ];
 
 export function WriteReviewModal({ agentId, agentName, open, onClose }: Props) {

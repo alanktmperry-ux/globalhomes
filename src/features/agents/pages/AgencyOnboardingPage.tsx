@@ -457,12 +457,12 @@ export default function AgencyOnboardingPage() {
 </div>
 
 <div class="legislation-box">
-  📋 <strong>Governing legislation for ${safeState || 'your state'}:</strong> ${legislation}
+   <strong>Governing legislation for ${safeState || 'your state'}:</strong> ${legislation}
   &nbsp;|&nbsp; Annual audit due: <strong>${auditDue}</strong>
 </div>
 
 <div class="aml-box">
-  ⚠️ <strong>AML/CTF Notice:</strong> From 1 July 2026, real estate agents must comply with AUSTRAC Anti-Money Laundering and Counter-Terrorism Financing requirements. Ensure your agency is enrolled with AUSTRAC before that date.
+   <strong>AML/CTF Notice:</strong> From 1 July 2026, real estate agents must comply with AUSTRAC Anti-Money Laundering and Counter-Terrorism Financing requirements. Ensure your agency is enrolled with AUSTRAC before that date.
 </div>
 
 <!-- SECTION 1: THREE-WAY RECONCILIATION -->

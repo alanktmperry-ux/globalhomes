@@ -238,7 +238,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
           agent_id: agent.id,
           event_key: 'listing_approved',
           type: 'boost_requested',
-          title: `⚡ ${tierData.label} boost requested`,
+          title: ` ${tierData.label} boost requested`,
           message:
             `${listing.address} — pending`
             + ` activation. You'll get another`

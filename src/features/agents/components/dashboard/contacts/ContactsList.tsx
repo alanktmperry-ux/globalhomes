@@ -40,10 +40,10 @@ const RANKING_CONFIG: Record<string, { icon: React.ReactNode; color: string; lab
 };
 
 const TYPE_LABELS: Record<string, string> = {
-  buyer: '🏠 Buyer',
-  seller: '💰 Seller',
-  landlord: '🏢 Landlord',
-  tenant: '🔑 Tenant',
+  buyer: ' Buyer',
+  seller: ' Seller',
+  landlord: ' Landlord',
+  tenant: ' Tenant',
   both: '↔️ Both',
 };
 

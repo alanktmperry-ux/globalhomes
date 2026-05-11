@@ -25,9 +25,9 @@ export function calcIntentScore(lead: LeadScoreInput): number {
 export type IntentTier = 'hot' | 'warm' | 'cold';
 
 export function getIntentTier(score: number): { tier: IntentTier; label: string; className: string } {
-  if (score >= 80) return { tier: 'hot', label: '🔥 Hot', className: 'bg-destructive/15 text-destructive' };
-  if (score >= 50) return { tier: 'warm', label: '⚡ Warm', className: 'bg-amber-500/15 text-amber-600 dark:text-amber-400' };
-  return { tier: 'cold', label: '❄️ Cold', className: 'bg-blue-500/15 text-blue-600 dark:text-blue-400' };
+  if (score >= 80) return { tier: 'hot', label: ' Hot', className: 'bg-destructive/15 text-destructive' };
+  if (score >= 50) return { tier: 'warm', label: ' Warm', className: 'bg-amber-500/15 text-amber-600 dark:text-amber-400' };
+  return { tier: 'cold', label: ' Cold', className: 'bg-blue-500/15 text-blue-600 dark:text-blue-400' };
 }
 
 export const INTENT_TOOLTIP = 'Intent score based on enquiry recency, message quality, and contact completeness.';

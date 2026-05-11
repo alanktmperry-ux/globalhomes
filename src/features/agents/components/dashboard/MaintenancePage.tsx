@@ -232,7 +232,7 @@ export default function MaintenancePage() {
                                   onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/rent-roll?property=${j.property_id}`); }}
                                   className="text-primary hover:underline font-medium"
                                 >
-                                  📍 {j.property_address || 'View property'}
+                                   {j.property_address || 'View property'}
                                 </button>
                               )}
                               {j.tenant_name && (

@@ -118,7 +118,7 @@ export default function TodayPrioritiesPanel() {
           ) : items.length === 0 ? (
             <div className="px-5 py-8 text-center">
               <PartyPopper size={28} className="mx-auto text-primary mb-2" />
-              <p className="text-sm font-medium">You're all caught up 🎉</p>
+              <p className="text-sm font-medium">You're all caught up </p>
               <p className="text-xs text-muted-foreground mt-1">No urgent actions right now. Good work.</p>
             </div>
           ) : (

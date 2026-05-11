@@ -35,7 +35,7 @@ const OfferOutcomeTracker = ({ offerId, cardId, userId, onOutcome }: Props) => {
   return (
     <div className="flex gap-1 mt-2" onClick={e => e.stopPropagation()}>
       {[
-        { key: 'accepted' as const, label: '✅', title: 'Accepted' },
+        { key: 'accepted' as const, label: '', title: 'Accepted' },
         { key: 'rejected' as const, label: '❌', title: 'Rejected' },
         { key: 'countered' as const, label: '🔄', title: 'Countered' },
       ].map(o => (

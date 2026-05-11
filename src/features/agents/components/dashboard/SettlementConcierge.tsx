@@ -155,13 +155,13 @@ const SettlementConcierge = () => {
   };
 
   const handleCongrats = (s: Settlement) => {
-    toast.success(`🎉 Email sent — Congratulations email sent to ${s.buyerName}`);
+    toast.success(` Email sent — Congratulations email sent to ${s.buyerName}`);
   };
 
   const handleReviewRequest = (s: Settlement) => {
     const msg = `Hi ${s.buyerName}, it was a pleasure helping you settle on ${s.address}. If you'd be happy to leave a review, here's the link: ${window.location.origin}/agent/me`;
     navigator.clipboard.writeText(msg);
-    toast.success('📋 Copied — Review request copied to clipboard');
+    toast.success(' Copied — Review request copied to clipboard');
   };
 
   const { canAccessSettlementConcierge, loading: subLoading } = useSubscription();

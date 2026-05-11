@@ -33,7 +33,7 @@ export default function VerifyReviewPage() {
         {status === 'success' && (
           <>
             <CheckCircle size={48} className="mx-auto text-green-500" />
-            <h1 className="text-xl font-bold text-foreground">Review Verified! ✅</h1>
+            <h1 className="text-xl font-bold text-foreground">Review Verified! </h1>
             <p className="text-muted-foreground">Your review has been published.</p>
             <Link to="/" className="inline-block px-6 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-medium">
               Back to ListHQ

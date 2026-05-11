@@ -55,7 +55,7 @@ export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceF
           return {
             date: e.created_at,
             price: Number(price),
-            label: d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: '2-digit' }),
+            label: formatDate(d, language, { day: 'numeric', month: 'short', year: '2-digit' }),
           };
         });
 

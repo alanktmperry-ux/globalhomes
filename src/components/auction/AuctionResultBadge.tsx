@@ -36,6 +36,7 @@ const RESULT_CONFIG = {
 };
 
 export function AuctionResultBadge({ propertyId, agentId }: Props) {
+  const { language } = useTranslation();
   const result = useAuctionResult(propertyId);
   if (!result) return null;
 

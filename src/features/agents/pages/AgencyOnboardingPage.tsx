@@ -1479,7 +1479,7 @@ export default function AgencyOnboardingPage() {
                     onClick={handleSkipTrustAccount}
                     disabled={loading}
                   >
-                    Skip for now — I'll add this later
+                    {t('agentOnboarding.nav.skipTrust')}
                   </Button>
                 )}
               </div>

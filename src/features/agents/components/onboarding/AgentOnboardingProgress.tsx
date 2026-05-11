@@ -135,21 +135,29 @@ export function AgentOnboardingProgress() {
   const pct = Math.round((completedCount / steps.length) * 100);
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
+    <div
+      className="rounded-[16px] p-6 mb-8 space-y-4"
+      style={{
+        background: 'rgba(255,255,255,0.07)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255,255,255,0.15)',
+      }}
+    >
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-foreground">Getting started</h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <h3 className="text-base font-medium text-white">Getting started</h3>
+          <p className="text-sm font-light mt-0.5" style={{ color: 'rgba(255,255,255,0.55)' }}>
             {completedCount} of {steps.length} steps complete
           </p>
         </div>
-        <span className="text-sm font-semibold text-primary">{pct}%</span>
+        <span className="text-sm font-medium text-white">{pct}%</span>
       </div>
 
-      <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+      <div className="h-1.5 w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.15)' }}>
         <div
-          className="h-full bg-primary transition-all duration-500"
-          style={{ width: `${pct}%` }}
+          className="h-full transition-all duration-500"
+          style={{ width: `${pct}%`, background: '#FFFFFF' }}
         />
       </div>
 
@@ -159,26 +167,27 @@ export function AgentOnboardingProgress() {
             <Link
               to={step.href}
               className={cn(
-                'flex items-start gap-3 p-3 rounded-xl border border-border hover:bg-accent/40 transition-colors',
-                step.done && 'opacity-60',
+                'flex items-start gap-3 p-3 rounded-[10px] transition-colors hover:bg-white/5',
+                step.done && 'opacity-70',
               )}
             >
               {step.done ? (
-                <CheckCircle2 size={18} className="text-emerald-500 mt-0.5 shrink-0" />
+                <CheckCircle2 size={18} className="mt-0.5 shrink-0" style={{ color: '#34D399' }} />
               ) : (
-                <Circle size={18} className="text-muted-foreground mt-0.5 shrink-0" />
+                <span
+                  className="h-[18px] w-[18px] rounded-full shrink-0 mt-0.5"
+                  style={{ border: '1px solid rgba(255,255,255,0.30)' }}
+                />
               )}
               <div className="min-w-0 flex-1">
                 <p
-                  className={cn(
-                    'text-sm font-medium text-foreground',
-                    step.done && 'line-through',
-                  )}
+                  className={cn('text-sm font-light text-white', step.done && 'line-through')}
+                  style={step.done ? { color: 'rgba(255,255,255,0.55)' } : undefined}
                 >
                   {step.label}
                 </p>
                 {!step.done && (
-                  <p className="text-xs text-muted-foreground mt-0.5">{step.description}</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.55)' }}>{step.description}</p>
                 )}
               </div>
             </Link>

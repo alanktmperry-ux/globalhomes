@@ -476,28 +476,30 @@ const DashboardOverview = () => {
       {showWelcome && onboardingAgent?.name && (
         <WelcomeModal agentName={onboardingAgent.name} onClose={dismissWelcome} />
       )}
-      <DashboardHeader
-        title="Dashboard"
-       subtitle={`Welcome back, ${(() => {
-          const first = onboardingAgent?.name?.trim().split(/\s+/)[0];
-          if (!first) return 'Agent';
-          return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
-        })()}`}
-      />
-
-      <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
-        {agentId && (
-          <div className="flex justify-end">
+      <div className="p-4 sm:p-6 md:px-10 md:pt-8 space-y-6 max-w-7xl">
+        <div className="flex items-start justify-between gap-4 mb-2">
+          <div>
+            <h1 className="text-2xl tracking-tight font-normal text-white mb-1">Market Intelligence</h1>
+            <p className="text-sm font-light mb-2" style={{ color: 'rgba(255,255,255,0.55)' }}>
+              {`Welcome back, ${(() => {
+                const first = onboardingAgent?.name?.trim().split(/\s+/)[0];
+                if (!first) return 'Agent';
+                return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
+              })()}`}
+            </p>
+          </div>
+          {agentId && (
             <Link
               to={`/agents/${agentId}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-muted-foreground hover:text-primary underline"
+              style={{ color: 'rgba(255,255,255,0.70)' }}
+              className="text-sm hover:text-white transition-colors shrink-0 mt-1"
             >
               Your public profile →
             </Link>
-          </div>
-        )}
+          )}
+        </div>
         <div className="flex justify-end">
           <CustomiseToolbar
             editMode={editMode}
@@ -528,25 +530,37 @@ const DashboardOverview = () => {
             return null;
           }
           return (
-            <Card className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-primary/3 to-transparent border-primary/20">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-bold">Getting Started</CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
+            <div
+              className="rounded-[16px] p-6 mb-8 relative"
+              style={{
+                background: 'rgba(255,255,255,0.07)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,255,255,0.15)',
+              }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-medium text-white">Getting Started</h3>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-light whitespace-nowrap" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                    {completed} of 5 steps complete
+                  </span>
+                  <button
                     onClick={dismissOnboarding}
+                    className="text-white/60 hover:text-white transition-colors"
+                    aria-label="Dismiss"
                   >
                     <X size={16} />
-                  </Button>
+                  </button>
                 </div>
-                <div className="flex items-center gap-3 mt-1">
-                  <Progress value={(completed / 5) * 100} className="h-2 flex-1" />
-                  <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">{completed} of 5 steps complete</span>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0 space-y-1">
+              </div>
+              <div className="h-1.5 w-full rounded-full overflow-hidden mb-4" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                <div
+                  className="h-full transition-all duration-500"
+                  style={{ width: `${(completed / 5) * 100}%`, background: '#FFFFFF' }}
+                />
+              </div>
+              <div className="space-y-1">
                 {steps.map((step, i) => (
                   <button
                     key={i}
@@ -556,21 +570,27 @@ const DashboardOverview = () => {
                       }
                       if (step.link) navigate(step.link);
                     }}
-                    className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-primary/5 group text-left cursor-pointer"
+                    className="w-full flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-white/5 group text-left cursor-pointer"
                   >
                     {step.done ? (
-                      <div className="h-5 w-5 rounded-full bg-primary flex items-center justify-center shrink-0">
-                        <Check size={12} className="text-primary-foreground" />
-                      </div>
+                      <Check size={18} className="shrink-0" style={{ color: '#34D399' }} />
                     ) : (
-                      <Circle size={20} className="text-muted-foreground/40 shrink-0" />
+                      <span
+                        className="h-[18px] w-[18px] rounded-full shrink-0"
+                        style={{ border: '1px solid rgba(255,255,255,0.30)' }}
+                      />
                     )}
-                    <span className={step.done ? 'line-through text-muted-foreground' : 'text-foreground font-medium'}>{step.label}</span>
-                    <ChevronRight size={14} className="ml-auto text-muted-foreground/40 group-hover:text-primary transition-colors" />
+                    <span
+                      className={`text-sm font-light ${step.done ? 'line-through' : ''} text-white`}
+                      style={step.done ? { color: 'rgba(255,255,255,0.55)' } : undefined}
+                    >
+                      {step.label}
+                    </span>
+                    <ChevronRight size={14} className="ml-auto text-white/40 group-hover:text-white transition-colors" />
                   </button>
                 ))}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           );
         })()}
 

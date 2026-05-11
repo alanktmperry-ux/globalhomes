@@ -641,17 +641,6 @@ const AgentDashboardSidebar = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {!collapsed && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => navigate('/')}
-              className="gap-1.5 text-xs"
-            >
-              <Search size={14} />
-              Market
-            </Button>
-          )}
         </div>
 
         {/* Top-level sections — each is clickable and expands to show sub-items */}

@@ -1,119 +1,127 @@
 // Static seed data for the homepage "Featured in [Location]" grid.
-// This file is the contract for the backend table that ships in a later phase:
-//   public.featured_listings — sponsored by agents via Halo Boost billing (Stripe).
-// When the backend lands, swap this static array for a Supabase query of the
-// same shape. Do not change the shape without updating the consumer component.
+// Backend contract (later phase): public.featured_listings keyed by region,
+// sponsored by agents via Halo Boost billing (Stripe). When the table lands,
+// swap the static map for a Supabase query of the same shape.
 
 export interface FeaturedListing {
   id: string;
-  title: string;
+  imageUrl: string;
   suburb: string;
   state: string;
+  address: string;
   price: string;
   beds: number;
   baths: number;
   cars: number;
-  propertyType: string;
-  image: string;          // gradient or remote URL — null-safe in component
-  gradient: string;       // fallback when image missing
+  buyerLanguages: string[]; // flag emojis
   agentName: string;
-  agentLanguages: string[]; // e.g. ["EN", "中文"]
-  boosted: true;          // always true for this surface
-  href: string;           // route to listing
+  agentInitials: string;
+  agency: string;
+  region: string; // used for matching to user location
 }
 
-const GRADS = [
-  "linear-gradient(135deg, #2563EB 0%, #1d4ed8 55%, #0a0f1e 100%)",
-  "linear-gradient(135deg, #3b82f6 0%, #1e40af 60%, #0a0f1e 100%)",
-  "linear-gradient(135deg, #60a5fa 0%, #2563EB 55%, #1e3a8a 100%)",
-  "linear-gradient(135deg, #1e3a8a 0%, #2563EB 50%, #60a5fa 100%)",
-  "linear-gradient(135deg, #4F88FF 0%, #2563EB 60%, #1e3a8a 100%)",
-  "linear-gradient(135deg, #93C5FD 0%, #4F88FF 55%, #2563EB 100%)",
-];
+export const FEATURED_LISTINGS_BY_REGION: Record<string, FeaturedListing[]> = {
+  "Melbourne East": [
+    {
+      id: "L001",
+      imageUrl: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&q=85&w=900",
+      suburb: "Doncaster",
+      state: "VIC",
+      address: "14 Manningham Rd",
+      price: "$1,480,000",
+      beds: 4, baths: 2, cars: 2,
+      buyerLanguages: ["🇨🇳", "🇻🇳", "🇰🇷"],
+      agentName: "Sarah Chen",
+      agentInitials: "SC",
+      agency: "Buxton",
+      region: "Melbourne East",
+    },
+    {
+      id: "L002",
+      imageUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=85&w=900",
+      suburb: "Doncaster East",
+      state: "VIC",
+      address: "22 Tunstall Square",
+      price: "$1,895,000",
+      beds: 5, baths: 3, cars: 2,
+      buyerLanguages: ["🇨🇳", "🇮🇳"],
+      agentName: "David Marinakis",
+      agentInitials: "DM",
+      agency: "Marshall White",
+      region: "Melbourne East",
+    },
+    {
+      id: "L003",
+      imageUrl: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=85&w=900",
+      suburb: "Templestowe",
+      state: "VIC",
+      address: "8 Foote Street",
+      price: "$2,250,000",
+      beds: 4, baths: 3, cars: 2,
+      buyerLanguages: ["🇨🇳", "🇰🇷"],
+      agentName: "Jellis Nguyen",
+      agentInitials: "JN",
+      agency: "Jellis Craig",
+      region: "Melbourne East",
+    },
+    {
+      id: "L004",
+      imageUrl: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=85&w=900",
+      suburb: "Bulleen",
+      state: "VIC",
+      address: "31 Templestowe Rd",
+      price: "$1,295,000",
+      beds: 3, baths: 2, cars: 2,
+      buyerLanguages: ["🇮🇹", "🇬🇷"],
+      agentName: "Marco Rossi",
+      agentInitials: "MR",
+      agency: "Fletchers",
+      region: "Melbourne East",
+    },
+    {
+      id: "L005",
+      imageUrl: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&q=85&w=900",
+      suburb: "Box Hill",
+      state: "VIC",
+      address: "52 Whitehorse Rd",
+      price: "$1,675,000",
+      beds: 4, baths: 3, cars: 2,
+      buyerLanguages: ["🇨🇳", "🇰🇷", "🇻🇳"],
+      agentName: "Wei Lin",
+      agentInitials: "WL",
+      agency: "Ray White",
+      region: "Melbourne East",
+    },
+    {
+      id: "L006",
+      imageUrl: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=85&w=900",
+      suburb: "Balwyn North",
+      state: "VIC",
+      address: "5 Belmore Rd",
+      price: "$3,250,000",
+      beds: 5, baths: 4, cars: 3,
+      buyerLanguages: ["🇨🇳", "🇮🇳"],
+      agentName: "Priya Joshi",
+      agentInitials: "PJ",
+      agency: "Kay & Burton",
+      region: "Melbourne East",
+    },
+  ],
+};
 
-export const FEATURED_LISTINGS: FeaturedListing[] = [
-  {
-    id: "feat-1",
-    title: "Spacious family home, walk to top schools",
-    suburb: "Box Hill",
-    state: "VIC",
-    price: "$1,250,000",
-    beds: 4, baths: 2, cars: 2,
-    propertyType: "House",
-    image: "", gradient: GRADS[0],
-    agentName: "Mei Chen",
-    agentLanguages: ["EN", "中文"],
-    boosted: true,
-    href: "/buy",
-  },
-  {
-    id: "feat-2",
-    title: "Modern apartment with city views",
-    suburb: "Doncaster",
-    state: "VIC",
-    price: "$685,000",
-    beds: 2, baths: 2, cars: 1,
-    propertyType: "Apartment",
-    image: "", gradient: GRADS[1],
-    agentName: "David Nguyen",
-    agentLanguages: ["EN", "Tiếng Việt"],
-    boosted: true,
-    href: "/buy",
-  },
-  {
-    id: "feat-3",
-    title: "Renovated heritage near cafes",
-    suburb: "Glen Waverley",
-    state: "VIC",
-    price: "$1,480,000",
-    beds: 4, baths: 3, cars: 2,
-    propertyType: "House",
-    image: "", gradient: GRADS[2],
-    agentName: "Priya Sharma",
-    agentLanguages: ["EN", "हिंदी"],
-    boosted: true,
-    href: "/buy",
-  },
-  {
-    id: "feat-4",
-    title: "Brand-new townhouse, 5 min to station",
-    suburb: "Templestowe",
-    state: "VIC",
-    price: "$925,000",
-    beds: 3, baths: 2, cars: 2,
-    propertyType: "Townhouse",
-    image: "", gradient: GRADS[3],
-    agentName: "Wei Lin",
-    agentLanguages: ["EN", "中文"],
-    boosted: true,
-    href: "/buy",
-  },
-  {
-    id: "feat-5",
-    title: "Quiet cul-de-sac, big backyard",
-    suburb: "Balwyn",
-    state: "VIC",
-    price: "$2,150,000",
-    beds: 5, baths: 3, cars: 2,
-    propertyType: "House",
-    image: "", gradient: GRADS[4],
-    agentName: "Sofia Romano",
-    agentLanguages: ["EN", "Italiano"],
-    boosted: true,
-    href: "/buy",
-  },
-  {
-    id: "feat-6",
-    title: "Luxury penthouse with skyline views",
-    suburb: "Southbank",
-    state: "VIC",
-    price: "$3,250,000",
-    beds: 3, baths: 3, cars: 2,
-    propertyType: "Penthouse",
-    image: "", gradient: GRADS[5],
-    agentName: "Marco Tan",
-    agentLanguages: ["EN", "中文", "Bahasa"],
-    boosted: true,
-    href: "/buy",
-  },
-];
+// Suburb → region map for geo matching.
+export const SUBURB_TO_REGION: Record<string, string> = {
+  "Doncaster": "Melbourne East",
+  "Doncaster East": "Melbourne East",
+  "Templestowe": "Melbourne East",
+  "Bulleen": "Melbourne East",
+  "Box Hill": "Melbourne East",
+  "Balwyn": "Melbourne East",
+  "Balwyn North": "Melbourne East",
+  "Camberwell": "Melbourne East",
+};
+
+export function resolveFeaturedListings(suburb: string): FeaturedListing[] {
+  const region = SUBURB_TO_REGION[suburb] || "Melbourne East";
+  return FEATURED_LISTINGS_BY_REGION[region] || FEATURED_LISTINGS_BY_REGION["Melbourne East"];
+}

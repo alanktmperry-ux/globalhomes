@@ -112,7 +112,7 @@ export function HaloStep2({ data, update }: Props) {
             <Input
               id="budget_min"
               inputMode="numeric"
-              className="pl-7"
+              className="ps-7"
               value={formatAUD(data.budget_min)}
               onChange={(e) => update({ budget_min: parseAUD(e.target.value) })}
               placeholder={t('halo.wizard.step2.budget.minPlaceholder')}
@@ -128,7 +128,7 @@ export function HaloStep2({ data, update }: Props) {
             <Input
               id="budget_max"
               inputMode="numeric"
-              className="pl-7"
+              className="ps-7"
               value={formatAUD(data.budget_max)}
               onChange={(e) => update({ budget_max: parseAUD(e.target.value) ?? 0 })}
               placeholder={t('halo.wizard.step2.budget.maxPlaceholder')}

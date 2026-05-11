@@ -110,7 +110,7 @@ export function SiteFooter() {
                     try { localStorage.removeItem('listhq-cookie-consent'); } catch { /* ignore */ }
                     window.location.reload();
                   }}
-                  className="text-[13px] transition-colors text-left"
+                  className="text-[13px] transition-colors text-start"
                   style={{ color: 'rgba(255,255,255,0.6)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
                   onMouseEnter={e => ((e.target as HTMLElement).style.color = '#fff')}
                   onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.6)')}

@@ -797,7 +797,7 @@ export default function AgencyOnboardingPage() {
     <div className="mt-6 border-t border-border pt-4">
       <button
         onClick={() => setGuideOpen(o => !o)}
-        className="flex items-center justify-between w-full text-left group"
+        className="flex items-center justify-between w-full text-start group"
       >
         <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
           <BookOpen size={13} className="text-primary" />
@@ -846,7 +846,7 @@ export default function AgencyOnboardingPage() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   autoFocus
-                  className="pr-10"
+                  className="pe-10"
                 />
                 <button type="button" onClick={() => setShowPw(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1}>
                   {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -872,7 +872,7 @@ export default function AgencyOnboardingPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   onFocus={(e) => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-                  className="pr-10"
+                  className="pe-10"
                 />
                 <button type="button" onClick={() => setShowConfirmPw(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1}>
                   {showConfirmPw ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -888,7 +888,7 @@ export default function AgencyOnboardingPage() {
             disabled={!allPwReqsMet || !confirmPassword || newPassword !== confirmPassword || passwordLoading}
             onClick={handleSetPassword}
           >
-            {passwordLoading && <Loader2 size={14} className="mr-1 animate-spin" />}
+            {passwordLoading && <Loader2 size={14} className="me-1 animate-spin" />}
             {t('agentOnboarding.password.cta')}
           </Button>
         </div>
@@ -964,7 +964,7 @@ export default function AgencyOnboardingPage() {
             {/* Country selector — first */}
             <div>
               <Label className="text-xs font-semibold text-foreground">
-                {t('agentOnboarding.agency.country')} <span className="text-destructive ml-0.5">{'*'}</span>
+                {t('agentOnboarding.agency.country')} <span className="text-destructive ms-0.5">{'*'}</span>
               </Label>
               <Select value={country} onValueChange={setCountry}>
                 <SelectTrigger className="mt-1.5">
@@ -983,7 +983,7 @@ export default function AgencyOnboardingPage() {
               {/* Agency name */}
               <div className="sm:col-span-2">
                 <Label className="text-xs font-semibold text-foreground">
-                  {t('agentOnboarding.agency.name')} <span className="text-destructive ml-0.5">{'*'}</span>
+                  {t('agentOnboarding.agency.name')} <span className="text-destructive ms-0.5">{'*'}</span>
                 </Label>
                 <Input value={agencyName} onChange={e => setAgencyName(e.target.value)} placeholder="e.g. Smith Property Group" className="mt-1.5" />
                 {agencyName && (
@@ -994,7 +994,7 @@ export default function AgencyOnboardingPage() {
               {/* Principal name */}
               <div className="sm:col-span-2">
                 <Label className="text-xs font-semibold text-foreground">
-                  {t('agentOnboarding.agency.principal')} <span className="text-destructive ml-0.5">{'*'}</span>
+                  {t('agentOnboarding.agency.principal')} <span className="text-destructive ms-0.5">{'*'}</span>
                 </Label>
                 <Input value={principalName} onChange={e => setPrincipalName(e.target.value)} placeholder="e.g. Sarah Mitchell" className="mt-1.5" />
                 {principalName && (
@@ -1005,7 +1005,7 @@ export default function AgencyOnboardingPage() {
               {/* Business registration — label adapts by country */}
               <div>
                 <Label className="text-xs font-semibold text-foreground">
-                  {isAustralia ? 'ABN' : t('agentOnboarding.agency.businessRegOther')} <span className="text-destructive ml-0.5">{'*'}</span>
+                  {isAustralia ? 'ABN' : t('agentOnboarding.agency.businessRegOther')} <span className="text-destructive ms-0.5">{'*'}</span>
                 </Label>
                 {isAustralia ? (
                   <>
@@ -1046,7 +1046,7 @@ export default function AgencyOnboardingPage() {
               {/* Licence number */}
               <div>
                 <Label className="text-xs font-semibold text-foreground">
-                  {isAustralia ? t('agentOnboarding.agency.licence') : t('agentOnboarding.agency.licenceOther')} <span className="text-destructive ml-0.5">{'*'}</span>
+                  {isAustralia ? t('agentOnboarding.agency.licence') : t('agentOnboarding.agency.licenceOther')} <span className="text-destructive ms-0.5">{'*'}</span>
                 </Label>
                 <Input value={licenceNumber} onChange={e => setLicenceNumber(e.target.value)} placeholder="e.g. 074356" className="mt-1.5" />
               </div>
@@ -1055,7 +1055,7 @@ export default function AgencyOnboardingPage() {
               {isAustralia && (
                 <div>
                   <Label className="text-xs font-semibold text-foreground">
-                    {t('agentOnboarding.agency.state')} <span className="text-destructive ml-0.5">{'*'}</span>
+                    {t('agentOnboarding.agency.state')} <span className="text-destructive ms-0.5">{'*'}</span>
                   </Label>
                   <Select value={operatingState} onValueChange={setOperatingState}>
                     <SelectTrigger className="mt-1.5"><SelectValue placeholder={t('agentOnboarding.agency.statePlaceholder')} /></SelectTrigger>
@@ -1069,7 +1069,7 @@ export default function AgencyOnboardingPage() {
               {/* Agency phone */}
               <div>
                 <Label className="text-xs font-semibold text-foreground">
-                  {t('agentOnboarding.agency.phone')} <span className="text-destructive ml-0.5">{'*'}</span>
+                  {t('agentOnboarding.agency.phone')} <span className="text-destructive ms-0.5">{'*'}</span>
                 </Label>
                 <Input value={agencyPhone} onChange={e => setAgencyPhone(e.target.value)} placeholder={isAustralia ? '(03) 9123 4567' : 'Office phone number'} className="mt-1.5" />
               </div>
@@ -1077,7 +1077,7 @@ export default function AgencyOnboardingPage() {
               {/* Agency street address */}
               <div className="sm:col-span-2">
                 <Label className="text-xs font-semibold text-foreground">
-                  {t('agentOnboarding.agency.address')} <span className="text-destructive ml-0.5">{'*'}</span>
+                  {t('agentOnboarding.agency.address')} <span className="text-destructive ms-0.5">{'*'}</span>
                 </Label>
                 <AddressAutocomplete
                   value={agencyAddress}
@@ -1094,7 +1094,7 @@ export default function AgencyOnboardingPage() {
               {/* Agency email */}
               <div className="sm:col-span-2">
                 <Label className="text-xs font-semibold text-foreground">
-                  {t('agentOnboarding.agency.email')} <span className="text-destructive ml-0.5">{'*'}</span>
+                  {t('agentOnboarding.agency.email')} <span className="text-destructive ms-0.5">{'*'}</span>
                 </Label>
                 <Input value={agencyEmail} onChange={e => setAgencyEmail(e.target.value)} placeholder="office@smithproperty.com.au" className="mt-1.5" />
               </div>
@@ -1187,7 +1187,7 @@ export default function AgencyOnboardingPage() {
               <h2 className="text-2xl font-bold">{t('agentOnboarding.ready.heading')}</h2>
               <p className="text-muted-foreground mt-1">{t('agentOnboarding.ready.sub')}</p>
             </div>
-            <ul className="text-left space-y-3 w-full">
+            <ul className="text-start space-y-3 w-full">
               <li className="flex items-start gap-3"><PlusCircle className="mt-0.5 shrink-0 text-primary" size={18} /><span>{t('agentOnboarding.ready.next1')}</span></li>
               <li className="flex items-start gap-3"><Globe className="mt-0.5 shrink-0 text-primary" size={18} /><span>{t('agentOnboarding.ready.next2')}</span></li>
               <li className="flex items-start gap-3"><Users className="mt-0.5 shrink-0 text-primary" size={18} /><span>{t('agentOnboarding.ready.next3')}</span></li>
@@ -1264,7 +1264,7 @@ export default function AgencyOnboardingPage() {
                 navigate('/dashboard');
               }}
             >
-              {t('agentOnboarding.import.continueCta')} <ArrowRight size={14} className="ml-1" />
+              {t('agentOnboarding.import.continueCta')} <ArrowRight size={14} className="ms-1" />
             </Button>
             <GuideCard
               title="You're all set — what's next"
@@ -1292,7 +1292,7 @@ export default function AgencyOnboardingPage() {
           <div className="space-y-3">
             <button
               onClick={() => setShowRentRollWizard(true)}
-              className="w-full text-left rounded-lg border-2 border-primary bg-primary/5 p-4 hover:bg-primary/10 transition-colors"
+              className="w-full text-start rounded-lg border-2 border-primary bg-primary/5 p-4 hover:bg-primary/10 transition-colors"
             >
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-sm font-bold">{t('agentOnboarding.import.fullTitle')}</span>
@@ -1302,7 +1302,7 @@ export default function AgencyOnboardingPage() {
             </button>
             <button
               onClick={() => setShowWizard(true)}
-              className="w-full text-left rounded-lg border p-4 hover:border-primary/50 transition-colors"
+              className="w-full text-start rounded-lg border p-4 hover:border-primary/50 transition-colors"
             >
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-sm font-bold">{t('agentOnboarding.import.ledgerTitle')}</span>
@@ -1463,14 +1463,14 @@ export default function AgencyOnboardingPage() {
           <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-1 pb-2 shrink-0">
             {showBackButton ? (
               <Button variant="ghost" size="sm" onClick={() => setStep(s => s - 1)} disabled={loading} className="w-full sm:w-auto">
-                <ArrowLeft size={14} className="mr-1" /> {t('agentOnboarding.nav.back')}
+                <ArrowLeft size={14} className="me-1" /> {t('agentOnboarding.nav.back')}
               </Button>
             ) : <div />}
             {showNextButton && (
               <div className="flex flex-col w-full sm:w-auto gap-1">
                 <Button type="button" size="sm" disabled={!canNext() || loading} onClick={handleNext} className="w-full sm:w-auto">
-                  {loading && <Loader2 size={14} className="mr-1 animate-spin" />}
-                  {t('agentOnboarding.nav.next')} <ArrowRight size={14} className="ml-1" />
+                  {loading && <Loader2 size={14} className="me-1 animate-spin" />}
+                  {t('agentOnboarding.nav.next')} <ArrowRight size={14} className="ms-1" />
                 </Button>
                 {step === 2 && (
                   <Button

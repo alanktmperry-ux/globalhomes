@@ -903,7 +903,7 @@ export default function PropertyDetailPage() {
                         <button
                           key={`${slot.date}-${slot.start}`}
                           onClick={() => setInspectionBookingOpen(true)}
-                          className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-secondary hover:border-primary/40 text-left transition-all group"
+                          className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-secondary hover:border-primary/40 text-start transition-all group"
                         >
                           <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                             <Calendar size={16} className="text-primary group-hover:text-primary-foreground" />

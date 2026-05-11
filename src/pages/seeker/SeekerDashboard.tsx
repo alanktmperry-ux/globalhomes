@@ -496,7 +496,7 @@ function SmallServiceCard({ icon: Icon, title, body, onClick }: { icon: any; tit
   return (
     <button
       onClick={onClick}
-      className="w-full text-left bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 hover:border-[#2563EB] hover:shadow-md transition-all flex items-start gap-3"
+      className="w-full text-start bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 hover:border-[#2563EB] hover:shadow-md transition-all flex items-start gap-3"
     >
       <div className="w-9 h-9 rounded-lg bg-[#DBEAFE] text-[#2563EB] flex items-center justify-center shrink-0">
         <Icon size={18} />
@@ -593,7 +593,7 @@ function MatchedListings({ matches }: { matches: any[] }) {
       <h2 className="font-semibold text-sm text-foreground">
         {t('seeker.matches.title')}
         {matches.length > 0 && (
-          <span className="ml-2 text-xs font-normal text-muted-foreground">{t('seeker.matches.found', { count: matches.length })}</span>
+          <span className="ms-2 text-xs font-normal text-muted-foreground">{t('seeker.matches.found', { count: matches.length })}</span>
         )}
       </h2>
       {matches.length === 0 ? (
@@ -620,7 +620,7 @@ function MatchedListings({ matches }: { matches: any[] }) {
                     {specs}
                   </p>
                 </div>
-                <div className="shrink-0 text-right">
+                <div className="shrink-0 text-end">
                   <p className="text-sm font-semibold text-foreground">{price}</p>
                   {match.match_score != null && (
                     <p className="text-xs text-primary font-medium">{t('seeker.matches.score', { score: match.match_score })}</p>

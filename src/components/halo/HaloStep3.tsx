@@ -49,7 +49,7 @@ export function HaloStep3({ data, update }: Props) {
           placeholder={t('halo.wizard.step3.description.placeholder')}
           rows={4}
         />
-        <p className="text-xs text-muted-foreground mt-1 text-right">
+        <p className="text-xs text-muted-foreground mt-1 text-end">
           {t('halo.wizard.step3.description.counter', { count: desc.length })}
         </p>
       </div>
@@ -89,7 +89,7 @@ export function HaloStep3({ data, update }: Props) {
           placeholder={t('halo.wizard.step3.dealBreakers.placeholder')}
           maxLength={200}
         />
-        <p className="text-xs text-muted-foreground mt-1 text-right">
+        <p className="text-xs text-muted-foreground mt-1 text-end">
           {t('halo.wizard.step3.dealBreakers.counter', { count: dealBreakers.length })}
         </p>
       </div>

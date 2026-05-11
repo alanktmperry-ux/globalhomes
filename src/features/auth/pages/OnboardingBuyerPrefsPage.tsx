@@ -165,8 +165,8 @@ export default function OnboardingBuyerPrefsPage() {
                   value={budget}
                   onChange={(e) => setBudget(e.target.value.replace(/[^\d]/g, ''))}
                   placeholder={seekingType === 'buy' ? t('onboarding.buyerPrefs.buyPlaceholder') : t('onboarding.buyerPrefs.rentPlaceholder')}
-                  className={`w-full h-11 pl-7 ${
-                    seekingType === 'rent' ? 'pr-20' : 'pr-3'
+                  className={`w-full h-11 ps-7 ${
+                    seekingType === 'rent' ? 'pe-20' : 'pe-3'
                   } rounded-xl border border-stone-200 bg-white text-[14px] text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500`}
                 />
                 {seekingType === 'rent' && (

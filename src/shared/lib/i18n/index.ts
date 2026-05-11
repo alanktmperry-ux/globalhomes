@@ -3,6 +3,13 @@
  */
 export { useTranslation } from './useTranslation';
 export {
+  formatDate,
+  formatRelativeTime,
+  formatNumber,
+  formatCurrency,
+  toIntlLocale,
+} from './formatters';
+export {
   SUPPORTED_LANGUAGES,
   DEFAULT_LANGUAGE,
   LANGUAGE_STORAGE_KEY,

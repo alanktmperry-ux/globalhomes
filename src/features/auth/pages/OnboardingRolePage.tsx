@@ -122,7 +122,7 @@ const OnboardingRolePage = () => {
                 key={value}
                 type="button"
                 onClick={() => setSelected(value)}
-                className={`relative group text-left bg-white rounded-3xl border-2 p-7 transition-all hover:shadow-lg hover:-translate-y-0.5 ${
+                className={`relative group text-start bg-white rounded-3xl border-2 p-7 transition-all hover:shadow-lg hover:-translate-y-0.5 ${
                   isSelected
                     ? 'border-blue-600 shadow-md'
                     : 'border-stone-200 hover:border-stone-300'

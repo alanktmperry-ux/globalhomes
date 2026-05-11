@@ -291,7 +291,7 @@ export default function HaloBoardPage() {
               <TabsTrigger value="pocket">
                 {t('halo.board.tabs.pocket')}
                 {pocketMatchIds.size > 0 && (
-                  <span className="ml-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] text-[10px] rounded-full bg-amber-500 text-white px-1">
+                  <span className="ms-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] text-[10px] rounded-full bg-amber-500 text-white px-1">
                     {pocketMatchIds.size}
                   </span>
                 )}

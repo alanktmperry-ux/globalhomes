@@ -161,7 +161,7 @@ const AgentLandingPage = () => {
               </p>
               {themKeys.map((k) => (
                 <div key={k} className="flex items-start gap-3 mb-4 text-sm leading-snug" style={{ color: '#64748b' }}>
-                  <span className="shrink-0 mt-0.5">✗</span>
+                  <span className="shrink-0 mt-0.5">{'✗'}</span>
                   {t(k)}
                 </div>
               ))}

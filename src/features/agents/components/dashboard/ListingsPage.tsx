@@ -506,6 +506,9 @@ const ListingsPage = () => {
   const [statusOverrides, setStatusOverrides] = useState<Record<string, string>>({});
   const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
   const [stats, setStats] = useState<ListingStatsMaps>({ views: {}, enquiries: {}, matches: {} });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'price_high' | 'price_low'>('newest');
+  const [gridView, setGridView] = useState<'grid' | 'list'>('grid');
 
   useEffect(() => {
     if (!agent?.id) return;

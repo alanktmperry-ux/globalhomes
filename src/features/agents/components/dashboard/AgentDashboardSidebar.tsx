@@ -538,23 +538,22 @@ const AgentDashboardSidebar = () => {
           <div className="flex flex-col gap-3">
             {/* ListHQ brand wordmark — anchors brand inside the dashboard */}
             <div className="flex flex-col gap-1">
-              <div className="flex items-center">
+              <Link
+                to="/"
+                className="group relative flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                aria-label="Go to homepage"
+              >
                 <div
                   className="flex items-center justify-center rounded-[8px] font-bold text-[11px]"
                   style={{ background: '#FFFFFF', color: '#2563EB', width: '28px', height: '28px' }}
                 >
                   LHQ
                 </div>
-                <span className="text-white text-lg font-semibold tracking-tight ml-2">ListHQ</span>
-              </div>
-              <a
-                href="/"
-                className="flex items-center gap-1.5 text-xs font-light hover:text-white transition-colors mt-2"
-                style={{ color: 'rgba(255,255,255,0.55)' }}
-              >
-                <ArrowLeft size={12} strokeWidth={1.5} />
-                Back to homepage
-              </a>
+                <span className="text-white text-lg font-semibold tracking-tight">ListHQ</span>
+                <span className="absolute left-full ml-2 px-2 py-1 bg-[#0a0f1e] text-white text-xs rounded-[6px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  Go to homepage
+                </span>
+              </Link>
             </div>
             <div className="flex items-center gap-2.5">
              {agentLogo ? (

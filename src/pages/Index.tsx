@@ -11,6 +11,8 @@ import FeaturedListings from '@/features/marketing/FeaturedListings';
 import ReplaceFiveTools from '@/features/marketing/ReplaceFiveTools';
 import VoiceListingShowcase from '@/features/marketing/VoiceListingShowcase';
 import HaloBoardPreview from '@/features/marketing/HaloBoardPreview';
+import PricingSectionNew from '@/features/marketing/PricingSection';
+import FinalCTA from '@/features/marketing/FinalCTA';
 
 // ============================================================
 // Wave 17 V8 — Buyer-first multilingual homepage

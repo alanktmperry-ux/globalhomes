@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
+import { toIntlLocale } from '@/shared/lib/i18n/formatters';
 
 export type CurrencyCode = 'AUD' | 'USD' | 'EUR' | 'GBP' | 'JPY' | 'SGD' | 'HKD' | 'CNY' | 'AED' | 'MYR' | 'NZD' | 'CAD' | 'INR';
 export type ListingMode = 'sale' | 'rent';

@@ -1438,6 +1438,15 @@ export default function PropertyDetailPage() {
             />
           </div>
         </div>
+
+        {/* Similar properties */}
+        {property.suburb && (
+          <SimilarPropertiesSection
+            suburb={property.suburb}
+            state={property.state}
+            excludeId={property.id}
+          />
+        )}
       </main>
 
       {/* Mobile sticky CTA */}

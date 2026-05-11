@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
-import { Mic, Search, Play, X } from 'lucide-react';
+import { Mic, Search, Play, X, ArrowRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
+import LiveActivityTicker from '@/components/LiveActivityTicker';
+import HomeCountUp from '@/components/HomeCountUp';
 
 // ============================================================
 // Wave 17 V8 — Buyer-first multilingual homepage

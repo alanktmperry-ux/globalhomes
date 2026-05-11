@@ -1,284 +1,291 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Target, Bot, Globe, EyeOff, Mic, Zap, BarChart2, Landmark, Check } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { SEO } from '@/shared/components/SEO';
 import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
+import HomeCountUp from '@/components/HomeCountUp';
+import PricingSection from '@/features/marketing/PricingSection';
+import FinalCTA from '@/features/marketing/FinalCTA';
 
-const AgentLandingPage = () => {
-  const [showModal, setShowModal] = useState(false);
+const GRAD = 'linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%)';
+
+// iconify-icon is a globally loaded web component
+const Icon = ({ icon, size = 20, color }: { icon: string; size?: number; color?: string }) => (
+  // @ts-expect-error — iconify-icon is a web component
+  <iconify-icon icon={icon} style={{ fontSize: `${size}px`, color, display: 'inline-flex', lineHeight: 1 }} />
+);
+
+const CYCLING_LINES = [
+  'who move fast.',
+  'who think ahead.',
+  'who serve every buyer.',
+  'who close more deals.',
+  'who speak every language.',
+];
+
+const FEATURES: Array<{ icon: string; titleKey: string; bodyKey: string; badge: 'unique' | 'automated' }> = [
+  { icon: 'solar:streets-linear',         titleKey: 'agentLanding.feature1Title', bodyKey: 'agentLanding.feature1Body', badge: 'unique' },
+  { icon: 'solar:magic-stick-3-linear',   titleKey: 'agentLanding.feature2Title', bodyKey: 'agentLanding.feature2Body', badge: 'automated' },
+  { icon: 'solar:earth-linear',           titleKey: 'agentLanding.feature3Title', bodyKey: 'agentLanding.feature3Body', badge: 'unique' },
+  { icon: 'solar:lock-keyhole-linear',    titleKey: 'agentLanding.feature4Title', bodyKey: 'agentLanding.feature4Body', badge: 'unique' },
+  { icon: 'solar:microphone-3-linear',    titleKey: 'agentLanding.feature5Title', bodyKey: 'agentLanding.feature5Body', badge: 'unique' },
+  { icon: 'solar:clock-circle-linear',    titleKey: 'agentLanding.feature6Title', bodyKey: 'agentLanding.feature6Body', badge: 'unique' },
+  { icon: 'solar:chart-square-linear',    titleKey: 'agentLanding.feature7Title', bodyKey: 'agentLanding.feature7Body', badge: 'automated' },
+  { icon: 'solar:wallet-2-linear',        titleKey: 'agentLanding.feature8Title', bodyKey: 'agentLanding.feature8Body', badge: 'automated' },
+];
+
+const CON_KEYS = ['agentLanding.con1','agentLanding.con2','agentLanding.con3','agentLanding.con4','agentLanding.con5','agentLanding.con6','agentLanding.con7'];
+const PRO_KEYS = ['agentLanding.pro1','agentLanding.pro2','agentLanding.pro3','agentLanding.pro4','agentLanding.pro5','agentLanding.pro6','agentLanding.pro7'];
+
+const gradientText: React.CSSProperties = {
+  background: GRAD,
+  WebkitBackgroundClip: 'text',
+  backgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  color: 'transparent',
+};
+
+export default function AgentLandingPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [showModal, setShowModal] = useState(false);
+  const [lineIdx, setLineIdx] = useState(0);
 
-  const features: Array<{ num: string; Icon: React.ComponentType<any>; tagKey: string | null; titleKey: string; bodyKey: string; highlight: boolean }> = [
-    { num: '01', Icon: Target,    tagKey: 'agentLanding.badgeUnique',    titleKey: 'agentLanding.feature1Title', bodyKey: 'agentLanding.feature1Body', highlight: true },
-    { num: '02', Icon: Bot,       tagKey: 'agentLanding.badgeAutomated', titleKey: 'agentLanding.feature2Title', bodyKey: 'agentLanding.feature2Body', highlight: true },
-    { num: '03', Icon: Globe,     tagKey: null, titleKey: 'agentLanding.feature3Title', bodyKey: 'agentLanding.feature3Body', highlight: false },
-    { num: '04', Icon: EyeOff,    tagKey: null, titleKey: 'agentLanding.feature4Title', bodyKey: 'agentLanding.feature4Body', highlight: false },
-    { num: '05', Icon: Mic,       tagKey: null, titleKey: 'agentLanding.feature5Title', bodyKey: 'agentLanding.feature5Body', highlight: false },
-    { num: '06', Icon: Zap,       tagKey: null, titleKey: 'agentLanding.feature6Title', bodyKey: 'agentLanding.feature6Body', highlight: false },
-    { num: '07', Icon: BarChart2, tagKey: null, titleKey: 'agentLanding.feature7Title', bodyKey: 'agentLanding.feature7Body', highlight: false },
-    { num: '08', Icon: Landmark,  tagKey: null, titleKey: 'agentLanding.feature8Title', bodyKey: 'agentLanding.feature8Body', highlight: false },
-  ];
-
-  const themKeys = ['agentLanding.con1','agentLanding.con2','agentLanding.con3','agentLanding.con4','agentLanding.con5','agentLanding.con6','agentLanding.con7'];
-  const usKeys = ['agentLanding.pro1','agentLanding.pro2','agentLanding.pro3','agentLanding.pro4','agentLanding.pro5','agentLanding.pro6','agentLanding.pro7'];
-  const pricingKeys = ['agentLanding.tableRow1','agentLanding.tableRow2','agentLanding.tableRow3','agentLanding.tableRow4','agentLanding.tableRow5','agentLanding.tableRow6'];
+  useEffect(() => {
+    const id = setInterval(() => setLineIdx((i) => (i + 1) % CYCLING_LINES.length), 5000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
-    <div className="min-h-screen overflow-x-hidden" style={{ background: '#0f172a', color: 'white' }}>
+    <div className="min-h-screen bg-white text-black overflow-x-hidden">
       <SEO
         title="Real Estate Agent Software Australia | ListHQ"
         description="Halo Board, AI buyer matching, 20-language translation, trust accounting, and CRM — built for Australian agents."
         path="/for-agents"
       />
 
-      {/* ── HERO ── */}
-      <section
-        className="relative min-h-screen flex items-center px-6 md:px-16 py-24 overflow-hidden"
-        style={{ background: '#0f172a' }}
-      >
-
-        <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
-            style={{ background: 'rgba(59,91,219,0.2)', border: '1px solid rgba(59,91,219,0.4)', color: '#93c5fd', letterSpacing: '1.2px' }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-            {t('agentLanding.eyebrow')}
+      {/* ─── HERO ─── */}
+      <section className="pt-[120px] md:pt-[140px] pb-20 px-6 md:px-8 bg-white">
+        <div className="max-w-[1280px] mx-auto text-center">
+          <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-[#EFF6FF] border border-[#2563EB]/20 rounded-full text-[11px] font-bold tracking-[0.06em] uppercase text-[#1E40AF]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] animate-pulse" />
+            BUILT FOR AGENTS
           </div>
 
-          <h1 className="text-5xl md:text-[62px] font-black leading-[1.04] tracking-tight mb-6 text-white">
-            {t('agentLanding.headline')}<br />
-            <span style={{ color: '#60a5fa' }}>{t('agentLanding.headlineSub')}</span>
+          <h1 className="text-[clamp(48px,9vw,140px)] font-extrabold leading-[0.92] tracking-[-0.05em] text-black max-w-[1100px] mx-auto mt-6">
+            Built for agents
+            <br />
+            <span className="relative inline-block">
+              {CYCLING_LINES.map((line, i) => (
+                <span
+                  key={line}
+                  style={{
+                    ...gradientText,
+                    position: i === 0 ? 'relative' : 'absolute',
+                    inset: i === 0 ? undefined : 0,
+                    opacity: i === lineIdx ? 1 : 0,
+                    filter: i === lineIdx ? 'blur(0)' : 'blur(10px)',
+                    transition: 'opacity 700ms ease, filter 700ms ease',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {line}
+                </span>
+              ))}
+            </span>
           </h1>
 
-          <p className="text-lg md:text-xl mb-10 leading-relaxed max-w-lg" style={{ color: '#94a3b8' }}>
-            {t('agentLanding.body')}
+          <p className="text-[17px] md:text-[19px] leading-[1.55] text-[#4a4a4a] max-w-[620px] mx-auto mt-8 font-normal">
+            The tools no other portal offers. Twenty-language translation, AI buyer matching, full trust accounting, and the Halo reverse marketplace — all in one subscription.
           </p>
 
-          <div className="flex flex-wrap gap-3 mb-10">
-            {[
-              { n: '1.2M+', l: t('agentLanding.stat1Label') },
-              { n: '20', l: t('agentLanding.stat2Label') },
-              { n: '3 mo.', l: t('agentLanding.stat3Label') },
-            ].map((s) => (
-              <div key={s.n} className="text-center px-5 py-4 rounded-2xl min-w-[110px]"
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
-                <div className="text-2xl font-black mb-1" style={{ color: '#60a5fa' }}>{s.n}</div>
-                <div className="text-xs leading-tight whitespace-pre-line" style={{ color: '#64748b' }}>{s.l}</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                onClick={() => setShowModal(true)}
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-white font-bold text-base transition-all hover:scale-[1.02]"
-                style={{ background: '#3b5bdb', boxShadow: '0 0 40px rgba(59,91,219,0.4)' }}
-              >
-                {t('agentLanding.ctaPrimary')}
-              </button>
-              <button
-                onClick={() => navigate('/agents/login')}
-                className="inline-flex items-center gap-2 px-7 py-4 rounded-full text-base font-semibold transition-colors"
-                style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.18)', color: '#cbd5e1' }}
-              >
-                {t('agentLanding.ctaLogin')}
-              </button>
-            </div>
-            <p className="text-xs" style={{ color: '#475569' }}>
+          <div className="flex flex-col items-center gap-5 mt-10">
+            <button
+              type="button"
+              onClick={() => setShowModal(true)}
+              className="px-8 md:px-9 py-4 bg-black text-white border-[1.5px] border-black rounded-full text-[15px] font-bold inline-flex items-center gap-2.5 hover:bg-white hover:text-black transition-all"
+            >
+              Start free trial — 60 days free
+              <ArrowRight size={18} strokeWidth={2.2} />
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/agents/login')}
+              className="text-[13px] font-bold text-[#4a4a4a] hover:text-[#2563EB] transition-colors inline-flex items-center gap-1.5"
+            >
+              <Icon icon="solar:lock-keyhole-linear" size={14} />
+              {t('agentLanding.ctaLogin') || 'Sign in to your account'}
+            </button>
+            <p className="text-[12px] text-[#9CA3AF] mt-2">
               {t('agentLanding.disclaimer')}
             </p>
           </div>
         </div>
       </section>
 
-      {/* ── FEATURES ── */}
-      <section className="py-20 px-6 md:px-16" style={{ background: '#f8faff' }}>
-        <div className="max-w-5xl mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#3b5bdb', letterSpacing: '1.5px' }}>
-            {t('agentLanding.featuresEyebrow')}
-          </p>
-          <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-4" style={{ color: '#0f172a', lineHeight: 1.1 }}>
-            {t('agentLanding.featuresHeadline')}<br />{t('agentLanding.featuresHeadline2')}
+      {/* ─── TRUST STATS ─── */}
+      <section className="border-y border-[#E5E5E5] py-16 px-6 md:px-8 bg-white">
+        <div className="max-w-[1200px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          {[
+            { target: 50000, suffix: '+', label: 'Australian buyers reached' },
+            { target: 20, suffix: '', label: 'Languages, auto-translated' },
+            { target: 7, suffix: 'M+', label: 'International buyers in network' },
+            { target: 60, suffix: 'd', label: 'Free, then locked pricing' },
+          ].map((s) => (
+            <div key={s.label}>
+              <div
+                className="text-[clamp(40px,6vw,72px)] font-extrabold tracking-[-0.04em] leading-none tabular-nums"
+                style={gradientText}
+              >
+                <HomeCountUp target={s.target} suffix={s.suffix} duration={1600} />
+              </div>
+              <div className="text-[12px] md:text-[13px] text-[#6a6a6a] mt-3 font-medium">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── FEATURES ─── */}
+      <section className="py-[100px] md:py-[140px] px-6 md:px-8 max-w-[1280px] mx-auto">
+        <div className="text-center max-w-[720px] mx-auto">
+          <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-[#EFF6FF] border border-[#2563EB]/20 rounded-full text-[11px] font-bold tracking-[0.06em] uppercase text-[#1E40AF]">
+            {t('agentLanding.featuresEyebrow') || 'ONE PLATFORM'}
+          </div>
+          <h2 className="text-[clamp(40px,6vw,96px)] font-extrabold leading-[0.95] tracking-[-0.04em] text-black mt-5">
+            {t('agentLanding.featuresHeadline')}
+            <br />
+            <span style={gradientText}>{t('agentLanding.featuresHeadline2')}</span>
           </h2>
-          <p className="text-base mb-14 max-w-xl leading-relaxed" style={{ color: '#64748b' }}>
+          <p className="text-[16px] md:text-[18px] text-[#4a4a4a] mt-5 leading-[1.55]">
             {t('agentLanding.featuresSub')}
           </p>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {features.map((f) => (
-              <div
-                key={f.num}
-                className="relative rounded-[22px] p-8"
-                style={f.highlight
-                  ? { background: 'linear-gradient(135deg, #eff6ff, #f8faff)', border: '1px solid #bfdbfe' }
-                  : { background: 'white', border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-16 md:mt-20">
+          {FEATURES.map((f) => (
+            <div
+              key={f.titleKey}
+              className="relative bg-white border-2 border-[#E5E5E5] rounded-3xl p-7 cursor-default transition-all duration-300 hover:-translate-y-1 hover:border-[#2563EB] hover:shadow-[0_20px_50px_rgba(37,99,235,0.10)]"
+            >
+              <span
+                className={
+                  f.badge === 'unique'
+                    ? 'absolute top-5 right-5 px-2 py-1 rounded-full text-[9px] font-bold tracking-[0.10em] uppercase bg-[#EFF6FF] text-[#1E40AF]'
+                    : 'absolute top-5 right-5 px-2 py-1 rounded-full text-[9px] font-bold tracking-[0.10em] uppercase bg-[#ECFDF5] text-[#065F46]'
                 }
               >
-                <span className="absolute top-5 right-6 text-xs font-black tracking-wider"
-                  style={{ color: f.highlight ? '#93c5fd' : '#cbd5e1' }}>
-                  {f.num}
-                </span>
-                {f.tagKey && (
-                  <span className="inline-flex items-center mb-3 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider"
-                    style={{ background: '#eff6ff', border: '1px solid #bfdbfe', color: '#1e40af', letterSpacing: '0.5px' }}>
-                    {t(f.tagKey)}
-                  </span>
-                )}
-                <span className="block mb-4" style={{ color: f.highlight ? '#3b5bdb' : '#0f172a' }}><f.Icon size={28} /></span>
-                <h3 className="text-base font-black mb-2" style={{ color: f.highlight ? '#1e3a8a' : '#0f172a', fontSize: '17px' }}>
-                  {t(f.titleKey)}
-                </h3>
-                <p className="text-sm leading-relaxed" style={{ color: f.highlight ? '#475569' : '#64748b', lineHeight: '1.65' }}>
-                  {t(f.bodyKey)}
-                </p>
+                {f.badge === 'unique' ? t('agentLanding.badgeUnique') || 'Unique' : t('agentLanding.badgeAutomated') || 'Automated'}
+              </span>
+              <div className="w-12 h-12 rounded-2xl bg-[#EFF6FF] flex items-center justify-center text-[#2563EB] mb-5">
+                <Icon icon={f.icon} size={24} />
               </div>
-            ))}
-          </div>
+              <h3 className="text-[18px] font-extrabold text-black tracking-[-0.02em] leading-tight">
+                {t(f.titleKey)}
+              </h3>
+              <p className="text-[14px] font-normal text-[#4a4a4a] mt-2 leading-[1.55]">
+                {t(f.bodyKey)}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* ── COMPARISON ── */}
-      <section className="py-20 px-6 md:px-16" style={{ background: '#0f172a' }}>
-        <div className="max-w-4xl mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#60a5fa', letterSpacing: '1.5px' }}>
-            {t('agentLanding.compareEyebrow')}
-          </p>
-          <h2 className="text-3xl font-black tracking-tight mb-4 text-white leading-tight">
-            {t('agentLanding.compareHeadline')}<br />
-            {t('agentLanding.compareHeadline2')}
-          </h2>
-          <p className="text-sm mb-12 max-w-lg leading-relaxed" style={{ color: '#64748b' }}>
-            {t('agentLanding.compareBody')}
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="rounded-[18px] p-7"
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <p className="text-xs font-bold uppercase tracking-wider mb-5" style={{ color: '#475569', letterSpacing: '1px' }}>
-                {t('agentLanding.compareCol1')}
-              </p>
-              {themKeys.map((k) => (
-                <div key={k} className="flex items-start gap-3 mb-4 text-sm leading-snug" style={{ color: '#64748b' }}>
-                  <span className="shrink-0 mt-0.5">{'✗'}</span>
-                  {t(k)}
-                </div>
-              ))}
+      {/* ─── COMPARISON ─── */}
+      <section className="bg-[#F9FAFB] py-[100px] md:py-[140px] px-6 md:px-8 border-y border-[#E5E5E5]">
+        <div className="max-w-[1280px] mx-auto">
+          <div className="text-center max-w-[720px] mx-auto">
+            <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-[#EFF6FF] border border-[#2563EB]/20 rounded-full text-[11px] font-bold tracking-[0.06em] uppercase text-[#1E40AF]">
+              {t('agentLanding.compareEyebrow') || 'The full picture'}
             </div>
-            <div className="rounded-[18px] p-7"
-              style={{ background: 'rgba(59,91,219,0.15)', border: '1px solid rgba(59,91,219,0.3)' }}>
-              <p className="text-xs font-bold uppercase tracking-wider mb-5" style={{ color: '#93c5fd', letterSpacing: '1px' }}>
-                ListHQ
-              </p>
-              {usKeys.map((k) => (
-                <div key={k} className="flex items-start gap-3 mb-4 text-sm leading-snug" style={{ color: '#e2e8f0' }}>
-                  <Check size={16} className="shrink-0 mt-0.5 text-blue-300" strokeWidth={2.5} />
-                  {t(k)}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── PRICING ── */}
-      <section className="py-20 px-6" style={{ background: '#f8faff' }}>
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-10">
-            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#2563EB', letterSpacing: '1.5px' }}>
-              {t('agentLanding.pricing2.eyebrow')}
-            </p>
-            <h2 className="font-black tracking-tight" style={{ color: '#0a0f1e', fontSize: '38px', letterSpacing: '-1.5px' }}>
-              {t('agentLanding.pricing2.heading')}
+            <h2 className="text-[clamp(40px,6vw,96px)] font-extrabold leading-[0.95] tracking-[-0.04em] text-black mt-5">
+              {t('agentLanding.compareHeadline')}
+              <br />
+              <span style={gradientText}>{t('agentLanding.compareHeadline2')}</span>
             </h2>
-            <p className="mt-3 text-sm" style={{ color: '#6B7280' }}>
-              {t('agentLanding.pricing2.includes')}
+            <p className="text-[16px] md:text-[18px] text-[#4a4a4a] mt-5 leading-[1.55]">
+              {t('agentLanding.compareBody')}
             </p>
           </div>
 
-          {/* Value prop callout */}
-          <div className="mx-auto mb-10" style={{ maxWidth: 760, background: '#EFF6FF', border: '1px solid #DBEAFE', borderRadius: 16, padding: '20px 24px' }}>
-            <div className="font-extrabold mb-1.5" style={{ color: '#0a0f1e', fontSize: 15 }}>
-              {t('agentLanding.pricing2.callout.heading')}
-            </div>
-            <p className="text-sm" style={{ color: '#374151', lineHeight: 1.55 }}>
-              {t('agentLanding.pricing2.callout.body')}
-            </p>
-          </div>
-
-          <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-            {[
-              { name: t('agentLanding.pricing2.solo.name'), price: '$299/mo', desc: t('agentLanding.pricing2.solo.desc'),
-                feats: [t('agentLanding.pricing2.solo.feat1'),t('agentLanding.pricing2.solo.feat2'),t('agentLanding.pricing2.solo.feat3'),t('agentLanding.pricing2.solo.feat4'),t('agentLanding.pricing2.solo.feat5'),t('agentLanding.pricing2.solo.feat6'),t('agentLanding.pricing2.solo.feat7')],
-                cta: t('agentLanding.pricing2.solo.cta'), sub: t('agentLanding.pricing2.solo.sub'),
-                action: () => setShowModal(true), filled: true, popular: false },
-              { name: t('agentLanding.pricing2.agency.name'), price: '$599/mo', desc: t('agentLanding.pricing2.agency.desc'),
-                feats: [t('agentLanding.pricing2.agency.feat1'),t('agentLanding.pricing2.agency.feat2'),t('agentLanding.pricing2.agency.feat3'),t('agentLanding.pricing2.agency.feat4'),t('agentLanding.pricing2.agency.feat5'),t('agentLanding.pricing2.agency.feat6'),t('agentLanding.pricing2.agency.feat7'),t('agentLanding.pricing2.agency.feat8')],
-                cta: t('agentLanding.pricing2.agency.cta'), sub: t('agentLanding.pricing2.agency.sub'),
-                action: () => navigate('/contact'), filled: true, popular: true },
-              { name: t('agentLanding.pricing2.agencyPro.name'), price: '$1,199/mo', desc: t('agentLanding.pricing2.agencyPro.desc'),
-                feats: [t('agentLanding.pricing2.agencyPro.feat1'),t('agentLanding.pricing2.agencyPro.feat2'),t('agentLanding.pricing2.agencyPro.feat3'),t('agentLanding.pricing2.agencyPro.feat4'),t('agentLanding.pricing2.agencyPro.feat5'),t('agentLanding.pricing2.agencyPro.feat6'),t('agentLanding.pricing2.agencyPro.feat7')],
-                cta: t('agentLanding.pricing2.agencyPro.cta'), sub: t('agentLanding.pricing2.agencyPro.sub'),
-                action: () => navigate('/contact'), filled: false, popular: false },
-            ].map((p) => (
-              <div key={p.name} style={{
-                background: p.popular ? '#F8FBFF' : '#fff',
-                border: `${p.popular ? 2 : 1.5}px solid ${p.popular ? '#2563EB' : '#E5E7EB'}`,
-                borderRadius: 20, padding: '32px 28px', position: 'relative',
-                boxShadow: p.popular ? '0 8px 28px rgba(37,99,235,.12)' : 'none',
-              }}>
-                {p.popular && (
-                  <div style={{ position: 'absolute', top: -12, right: 20, background: '#2563EB', color: '#fff', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', padding: '5px 12px', borderRadius: 100 }}>
-                    {t('agentLanding.pricing2.mostPopular')}
-                  </div>
-                )}
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 12 }}>{p.name}</div>
-                <div style={{ fontSize: 36, fontWeight: 800, color: '#0a0f1e', letterSpacing: '-1px', marginBottom: 4 }}>{p.price}</div>
-                <div className="text-xs text-muted-foreground" style={{ marginBottom: 8 }}>{t('agentLanding.pricing2.foundingMember')}</div>
-                <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px', lineHeight: 1.5 }}>{p.desc}</p>
-                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 22px' }}>
-                  {p.feats.map((f) => (
-                    <li key={f} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 13.5, color: '#374151', padding: '6px 0' }}>
-                      <Check size={16} style={{ color: '#2563EB', flexShrink: 0 }} strokeWidth={2.5} />{f}
-                    </li>
-                  ))}
-                </ul>
-                <button onClick={p.action} style={{
-                  width: '100%', padding: '12px 18px', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                  background: p.filled ? '#2563EB' : 'transparent',
-                  color: p.filled ? '#fff' : '#2563EB',
-                  border: p.filled ? 'none' : '1.5px solid #2563EB',
-                }}>{p.cta}</button>
-                <p style={{ fontSize: 11.5, color: '#6B7280', margin: '10px 0 0', lineHeight: 1.45, textAlign: 'center' }}>{p.sub}</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-16 md:mt-20">
+            {/* LEFT — Other portals */}
+            <div className="bg-white border border-[#E5E5E5] rounded-3xl p-8">
+              <div className="flex items-center gap-3 mb-6 pb-5 border-b border-[#E5E5E5]">
+                <Icon icon="solar:close-circle-linear" size={24} color="#6a6a6a" />
+                <div className="text-[16px] font-bold text-[#0a0f1e]">REA / Domain / PropertyMe</div>
               </div>
-            ))}
+              {CON_KEYS.map((k) => (
+                <div
+                  key={k}
+                  className="flex items-start gap-3 py-3 border-b border-[#F3F4F6] last:border-0 text-[14px] text-[#6a6a6a]"
+                >
+                  <span className="mt-0.5 flex-shrink-0">
+                    <Icon icon="solar:close-circle-linear" size={16} color="#F87171" />
+                  </span>
+                  <span>{t(k)}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* RIGHT — ListHQ */}
+            <div className="relative bg-white border-2 border-[#2563EB] rounded-3xl p-8 shadow-[0_20px_50px_rgba(37,99,235,0.10)]">
+              <span
+                className="absolute -top-3 right-6 px-3 py-1 rounded-full text-white text-[10px] font-bold tracking-[0.10em] uppercase"
+                style={{ background: GRAD }}
+              >
+                Most chosen
+              </span>
+              <div className="flex items-center gap-3 mb-6 pb-5 border-b border-[#E5E5E5]">
+                <Icon icon="solar:check-circle-linear" size={24} color="#2563EB" />
+                <div className="text-[16px] font-bold text-[#0a0f1e]">ListHQ</div>
+              </div>
+              {PRO_KEYS.map((k) => (
+                <div
+                  key={k}
+                  className="flex items-start gap-3 py-3 border-b border-[#F3F4F6] last:border-0 text-[14px] text-[#0a0f1e] font-medium"
+                >
+                  <span className="mt-0.5 flex-shrink-0">
+                    <Icon icon="solar:check-circle-bold" size={16} color="#2563EB" />
+                  </span>
+                  <span>{t(k)}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-        <style>{`@media (max-width:880px){section .grid{grid-template-columns:1fr !important;max-width:420px;margin:0 auto}}`}</style>
       </section>
 
-      {/* ── LOGIN ── */}
-      <section className="py-10 px-6 text-center" style={{ background: 'white', borderTop: '1px solid #e2e8f0' }}>
-        <p className="text-sm mb-4" style={{ color: '#64748b' }}>{t('agentLanding.pricingLogin')}</p>
-        <button
-          onClick={() => navigate('/agents/login')}
-          className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold transition-colors hover:bg-slate-50"
-          style={{ background: 'white', border: '1.5px solid #e2e8f0', color: '#334155' }}
-        >
-          {t('agentLanding.pricingLoginCta')}
-        </button>
-        <p className="mt-4 text-xs" style={{ color: '#94a3b8' }}>
-          {t('agentLanding.partnerLabel')}{' '}
-          <button onClick={() => navigate('/partner/login')} className="font-semibold" style={{ color: '#3b5bdb', background: 'none', border: 'none', cursor: 'pointer' }}>
-            {t('agentLanding.partnerCta')}
+      {/* ─── FOUNDING CALLOUT ─── */}
+      <section className="bg-white px-6 md:px-8 pt-[100px] md:pt-[140px]">
+        <div className="bg-[#EFF6FF] border border-[#2563EB]/15 rounded-3xl p-8 md:p-10 max-w-[900px] mx-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-[0.10em] uppercase text-white" style={{ background: GRAD }}>
+            FOUNDING 100 OFFER
+          </div>
+          <h3 className="text-[clamp(28px,4vw,42px)] font-extrabold leading-[1.05] tracking-[-0.03em] text-black mt-4">
+            Lock in 30% lower pricing for 12 months.
+          </h3>
+          <p className="text-[15px] md:text-[16px] text-[#4a4a4a] mt-3 leading-[1.55] max-w-[640px]">
+            First 100 paying agents get founding rates. Once they're gone, public pricing applies.
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowModal(true)}
+            className="mt-6 inline-flex items-center gap-2 px-7 py-3.5 bg-black text-white rounded-full text-[14px] font-bold hover:-translate-y-0.5 transition-all"
+          >
+            Reserve your founding spot
+            <ArrowRight size={16} strokeWidth={2.2} />
           </button>
-        </p>
+        </div>
       </section>
+
+      {/* ─── PRICING (reused from homepage) ─── */}
+      <PricingSection />
+
+      {/* ─── FINAL CTA (reused from homepage) ─── */}
+      <FinalCTA />
 
       <AgentRegistrationModal open={showModal} onOpenChange={setShowModal} />
     </div>
   );
-};
-
-export default AgentLandingPage;
+}

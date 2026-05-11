@@ -863,12 +863,12 @@ export default function AgencyOnboardingPage() {
               </ul>
             </div>
             <div className="scroll-mt-4">
-              <Label htmlFor="confirm-password" className="text-xs font-semibold">Confirm password</Label>
+              <Label htmlFor="confirm-password" className="text-xs font-semibold">{t('agentOnboarding.password.confirmLabel')}</Label>
               <div className="relative">
                 <Input
                   id="confirm-password"
                   type={showConfirmPw ? 'text' : 'password'}
-                  placeholder="Re-enter your password"
+                  placeholder={t('agentOnboarding.password.confirmPlaceholder')}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   onFocus={(e) => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' })}

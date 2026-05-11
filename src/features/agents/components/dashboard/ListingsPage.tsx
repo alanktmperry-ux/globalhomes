@@ -811,40 +811,52 @@ const ListingsPage = () => {
             <ListingsSkeleton />
           ) : filtered.length === 0 ? (
             lifecycleTab === 'archived' ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
-                <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center">
-                  <CheckCircle2 size={28} className="text-muted-foreground" />
-                </div>
-                <h3 className="font-semibold text-foreground">No archived listings</h3>
-                <p className="text-sm text-muted-foreground max-w-xs">
+              <div
+                className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-[12px]"
+                style={{ border: '1px solid #E5E7EB' }}
+              >
+                <CheckCircle2 size={64} style={{ color: '#E5E7EB' }} />
+                <h3 className="text-xl font-bold text-[#0a0f1e] mt-6 mb-2">No archived listings</h3>
+                <p className="text-sm font-light text-[#6B7280] max-w-md">
                   Listings marked as Sold or Leased will appear here.
                 </p>
               </div>
             ) : withStatus.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                  <Home size={28} className="text-primary" />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="font-semibold text-foreground">No listings yet</h3>
-                  <p className="text-sm text-muted-foreground max-w-xs">
-                    Add your first property and generate multilingual translations in under 60 seconds.
-                  </p>
-                </div>
-                <Button onClick={() => navigate('/dashboard/listings/new')}>
-                  Add your first listing →
-                </Button>
+              <div
+                className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-[12px]"
+                style={{ border: '1px solid #E5E7EB' }}
+              >
+                <Building size={64} style={{ color: '#E5E7EB' }} />
+                <h3 className="text-xl font-bold text-[#0a0f1e] mt-6 mb-2">Your portfolio is empty</h3>
+                <p className="text-sm font-light text-[#6B7280] mb-8 max-w-md">
+                  Add your first property to start building your portfolio. ListHQ will translate it into 6 languages automatically.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => navigate('/pocket-listing')}
+                  className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold rounded-[10px] px-6 py-3 text-sm flex items-center gap-2 transition-all"
+                >
+                  <Plus size={16} /> Add to Portfolio
+                </button>
               </div>
             ) : (
-              <div className="text-center py-16 text-muted-foreground">
-                <div className="mb-3">
-                  {listingMode === 'rent' ? <Building size={32} className="mx-auto opacity-40" /> : <Home size={32} className="mx-auto opacity-40" />}
-                </div>
-                <p className="text-sm font-medium">No {listingMode === 'rent' ? 'rental' : 'sale'} listings{activeStatusTab !== 'all' ? ` with status "${activeStatusTab}"` : ''}</p>
-                <p className="text-xs mt-1">Create a new listing to get started.</p>
-                <Button size="sm" className="mt-4 gap-1.5 text-xs" onClick={() => navigate('/pocket-listing')}>
-                  <Plus size={14} /> New {listingMode === 'rent' ? 'Rental' : 'Sale'} Listing
-                </Button>
+              <div
+                className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-[12px]"
+                style={{ border: '1px solid #E5E7EB' }}
+              >
+                <Search size={64} style={{ color: '#E5E7EB' }} />
+                <h3 className="text-xl font-bold text-[#0a0f1e] mt-6 mb-2">No listings match</h3>
+                <p className="text-sm font-light text-[#6B7280] mb-6 max-w-md">
+                  Try adjusting your filters or search.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => { setSaleStatusTab('all'); setRentStatusTab('all'); }}
+                  className="px-4 py-2 rounded-[10px] text-sm font-medium text-[#374151] bg-white hover:bg-[#F9FAFB] transition-all"
+                  style={{ border: '1px solid #E5E7EB' }}
+                >
+                  Clear filters
+                </button>
               </div>
             )
           ) : (

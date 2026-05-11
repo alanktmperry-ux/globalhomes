@@ -65,7 +65,7 @@ export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceF
           points.unshift({
             date: listedDate,
             price: Number(firstMeta.old_price),
-            label: new Date(listedDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: '2-digit' }),
+            label: formatDate(listedDate, language, { day: 'numeric', month: 'short', year: '2-digit' }),
           });
         }
 

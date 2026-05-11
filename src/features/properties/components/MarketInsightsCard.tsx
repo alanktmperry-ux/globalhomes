@@ -152,7 +152,7 @@ export function MarketInsightsCard({ property }: MarketInsightsCardProps) {
             historyRows
               .filter(r => r.median_rent_weekly != null)
               .map(r => ({
-                month: new Date(r.month).toLocaleDateString('en-AU', { month: 'short' }),
+                month: formatDate(new Date(r.month), language, { month: 'short' }),
                 rent: r.median_rent_weekly!,
               }))
           );

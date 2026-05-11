@@ -233,7 +233,7 @@ function SearchesTab({ userId }: { userId?: string }) {
         title="Sign in to view saved searches"
         description="Save searches to get alerts when new properties match"
         actionLabel="Sign in"
-        onAction={() => navigate('/auth')}
+        onAction={() => navigate('/login')}
       />
     );
   }
@@ -338,7 +338,7 @@ function ApplicationsTab({ userId }: { userId?: string }) {
         title="Sign in to view applications"
         description="Track your rental applications in one place"
         actionLabel="Sign in"
-        onAction={() => navigate('/auth')}
+        onAction={() => navigate('/login')}
       />
     );
   }

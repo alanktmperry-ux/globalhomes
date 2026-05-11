@@ -129,7 +129,7 @@ export function SiteHeader() {
         <div className="flex items-center" style={{ gap: 18 }}>
           <LanguageSwitcher />
           <Link
-            to="/auth"
+            to="/login"
             className="text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors"
           >
             Sign in
@@ -278,7 +278,7 @@ export function SiteHeader() {
             </div>
           ) : (
             <button
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate('/login')}
               className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
               aria-label="Sign in"
               title="Sign in"
@@ -408,7 +408,7 @@ export function SiteHeader() {
                   </button>
                 ) : (
                   <>
-                    <button onClick={() => navTo('/auth')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                    <button onClick={() => navTo('/login')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                       <LogIn size={16} />
                       {t('common.signin')}
                     </button>

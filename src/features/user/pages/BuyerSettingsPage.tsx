@@ -207,7 +207,7 @@ const BuyerSettingsPage = () => {
   }
 
   if (!user) {
-    navigate('/auth');
+    navigate('/login');
     return null;
   }
 

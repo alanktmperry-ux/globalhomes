@@ -1,41 +1,68 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Globe, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useTranslation, type Language } from '@/shared/lib/i18n';
-import {
-  SUPPORTED_LANGUAGES,
-  LANGUAGE_STORAGE_KEY,
-  LEGACY_CODE_MAP,
-  FROM_LEGACY_CODE_MAP,
-  type SupportedLanguageCode,
-} from '@/shared/lib/i18n/config';
+import { LANGUAGE_STORAGE_KEY } from '@/shared/lib/i18n/config';
 import { supabase } from '@/integrations/supabase/client';
 
-// Locales with complete translation files. Others render as "Coming soon".
-const AVAILABLE_LOCALES: ReadonlySet<SupportedLanguageCode> = new Set<SupportedLanguageCode>([
-  'en', 'zh-CN', 'zh-TW', 'vi', 'ko', 'ar', 'hi', 'bn', 'pa', 'ta',
-  'id', 'ms', 'th', 'fil', 'it', 'es', 'fr', 'pt', 'ru',
-]);
+// Full display list — 21 languages, ordered. `legacy` is the value written to the
+// existing I18nProvider; `available` toggles "Soon" when no translation file exists.
+type DisplayLang = {
+  code: string;        // canonical code used for storage
+  legacy: Language;    // value the legacy I18nProvider understands
+  short: string;       // 2-3 char chip label shown on the trigger
+  flag: string;
+  name: string;
+  available: boolean;
+};
 
-const INTERACTED_KEY = 'gh-lang-switcher-interacted';
+const DISPLAY_LANGUAGES: DisplayLang[] = [
+  { code: 'en',    legacy: 'en',    short: 'EN', flag: '🇦🇺', name: 'English',          available: true },
+  { code: 'zh-CN', legacy: 'zh',    short: '简', flag: '🇨🇳', name: '简体中文 · Mandarin',  available: true },
+  { code: 'yue',   legacy: 'zh-TW', short: '粤', flag: '🇭🇰', name: '粵語 · Cantonese',     available: true },
+  { code: 'zh-TW', legacy: 'zh-TW', short: '繁', flag: '🇹🇼', name: '繁體中文',             available: true },
+  { code: 'vi',    legacy: 'vi',    short: 'VI', flag: '🇻🇳', name: 'Tiếng Việt',          available: true },
+  { code: 'ko',    legacy: 'ko',    short: 'KO', flag: '🇰🇷', name: '한국어',                available: true },
+  { code: 'ar',    legacy: 'ar',    short: 'AR', flag: '🇸🇦', name: 'العربية',             available: true },
+  { code: 'hi',    legacy: 'hi',    short: 'HI', flag: '🇮🇳', name: 'हिन्दी',               available: true },
+  { code: 'pa',    legacy: 'pa',    short: 'PA', flag: '🇮🇳', name: 'ਪੰਜਾਬੀ',                available: true },
+  { code: 'bn',    legacy: 'bn',    short: 'BN', flag: '🇧🇩', name: 'বাংলা',                available: true },
+  { code: 'ta',    legacy: 'ta',    short: 'TA', flag: '🇮🇳', name: 'தமிழ்',                available: true },
+  { code: 'th',    legacy: 'th',    short: 'TH', flag: '🇹🇭', name: 'ภาษาไทย',             available: true },
+  { code: 'fil',   legacy: 'fil',   short: 'FIL', flag: '🇵🇭', name: 'Filipino',          available: true },
+  { code: 'id',    legacy: 'id',    short: 'ID', flag: '🇮🇩', name: 'Bahasa Indonesia',   available: true },
+  { code: 'ms',    legacy: 'ms',    short: 'MS', flag: '🇲🇾', name: 'Bahasa Melayu',      available: true },
+  { code: 'it',    legacy: 'it',    short: 'IT', flag: '🇮🇹', name: 'Italiano',           available: true },
+  { code: 'el',    legacy: 'en',    short: 'EL', flag: '🇬🇷', name: 'Ελληνικά · Greek',   available: false },
+  { code: 'es',    legacy: 'es',    short: 'ES', flag: '🇪🇸', name: 'Español',            available: true },
+  { code: 'pt',    legacy: 'pt',    short: 'PT', flag: '🇵🇹', name: 'Português',          available: true },
+  { code: 'fr',    legacy: 'fr',    short: 'FR', flag: '🇫🇷', name: 'Français',           available: true },
+  { code: 'ru',    legacy: 'ru',    short: 'RU', flag: '🇷🇺', name: 'Русский',            available: true },
+];
+
+const MANUAL_SET_KEY = 'listhq_language_manually_set';
 
 export function LanguageSwitcher() {
   const { language, setLanguage } = useTranslation();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [hasInteracted, setHasInteracted] = useState(() => {
-    try { return localStorage.getItem(INTERACTED_KEY) === '1'; } catch { return true; }
-  });
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
+
+  // Resolve which DisplayLang is active. Prefer the canonical key in localStorage
+  // (so 'yue' and 'zh-TW' can be distinguished even though both map to legacy 'zh-TW').
+  const storedCanonical = (() => {
+    try { return localStorage.getItem(LANGUAGE_STORAGE_KEY); } catch { return null; }
+  })();
+  const active =
+    DISPLAY_LANGUAGES.find(l => l.code === storedCanonical) ??
+    DISPLAY_LANGUAGES.find(l => l.legacy === language) ??
+    DISPLAY_LANGUAGES[0];
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('listhq_language') || localStorage.getItem('i18n-language') || sessionStorage.getItem('i18n-language');
-      document.documentElement.dir = stored === 'ar' ? 'rtl' : 'ltr';
-    } catch { /* non-fatal */ }
-  }, []);
+    try { document.documentElement.dir = active.code === 'ar' ? 'rtl' : 'ltr'; } catch { /* */ }
+  }, [active.code]);
 
   useEffect(() => {
     if (!open) return;
@@ -43,19 +70,11 @@ export function LanguageSwitcher() {
       if (
         containerRef.current && !containerRef.current.contains(e.target as Node) &&
         dropdownRef.current && !dropdownRef.current.contains(e.target as Node)
-      ) {
-        setOpen(false);
-      }
+      ) setOpen(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
-
-  const markInteracted = () => {
-    if (hasInteracted) return;
-    setHasInteracted(true);
-    try { localStorage.setItem(INTERACTED_KEY, '1'); } catch { /* non-fatal */ }
-  };
 
   const handleToggle = () => {
     if (!open) {
@@ -67,29 +86,47 @@ export function LanguageSwitcher() {
         });
       }
     }
-    markInteracted();
-    setOpen(!open);
+    setOpen(o => !o);
   };
 
-  const activeName = SUPPORTED_LANGUAGES.find(l => l.code === (FROM_LEGACY_CODE_MAP[language] ?? 'en'))?.name ?? 'English';
+  const selectLang = async (item: DisplayLang) => {
+    if (!item.available) return;
+    setLanguage(item.legacy);
+    try {
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, item.code);
+      sessionStorage.setItem(LANGUAGE_STORAGE_KEY, item.code);
+      localStorage.setItem('i18n-language', item.legacy);
+      sessionStorage.setItem('i18n-language', item.legacy);
+      localStorage.removeItem('gh-lang');
+      localStorage.setItem('listhq_lang_user_set', '1');
+      localStorage.setItem(MANUAL_SET_KEY, item.code === 'en' ? 'false' : 'true');
+    } catch { /* non-fatal */ }
+    setOpen(false);
+    document.documentElement.dir = item.code === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = item.code;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('profiles').update({ language_preference: item.code }).eq('id', user.id);
+      }
+    } catch (err) {
+      if (import.meta.env.DEV) console.warn('[LanguageSwitcher] persist failed', err);
+    }
+  };
 
   return (
     <div ref={containerRef}>
       <button
         ref={buttonRef}
         onClick={handleToggle}
-        className="relative flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 px-2 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
-        aria-label={`Change language (current: ${activeName})`}
+        className="inline-flex items-center gap-1.5 h-9 px-3 rounded-full border border-[#E5E5E5] bg-white text-[13px] font-semibold text-[#1a1a1a] hover:border-[#2563EB] hover:text-[#2563EB] transition-colors"
+        aria-label={`Change language (current: ${active.name})`}
+        aria-haspopup="listbox"
+        aria-expanded={open}
       >
-        <Globe size={16} />
-        <span className="hidden sm:inline">{activeName}</span>
-        <ChevronDown size={14} />
-        {!hasInteracted && (
-          <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5" aria-hidden="true">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75" />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-blue-500" />
-          </span>
-        )}
+        <span className="text-[14px] leading-none">{active.flag}</span>
+        <span className="tracking-wide">{active.short}</span>
+        <ChevronDown size={14} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && createPortal(
@@ -97,68 +134,41 @@ export function LanguageSwitcher() {
           ref={dropdownRef}
           data-settings-portal-ignore
           style={{ position: 'fixed', top: dropdownPos.top, right: dropdownPos.right }}
-          className="z-[9999] min-w-[220px] bg-white border border-slate-200 rounded-xl shadow-lg p-2"
+          className="z-[9999] min-w-[260px] bg-white border border-[#E5E5E5] rounded-2xl shadow-[0_12px_32px_rgba(15,23,42,0.12)] p-2"
+          role="listbox"
         >
-          <div className="flex flex-col gap-0.5 max-h-80 overflow-y-auto scrollbar-thin">
-            {SUPPORTED_LANGUAGES.map(({ code, name }) => {
-              const activeCanonical = FROM_LEGACY_CODE_MAP[language] ?? 'en';
-              const isActive = code === activeCanonical;
-              const isAvailable = AVAILABLE_LOCALES.has(code);
+          <div className="flex flex-col gap-0.5 max-h-[60vh] overflow-y-auto">
+            {DISPLAY_LANGUAGES.map((item) => {
+              const isActive = item.code === active.code;
               return (
                 <button
-                  key={code}
-                  disabled={!isAvailable}
-                  onClick={async () => {
-                    if (!isAvailable) return;
-                    const legacy = (LEGACY_CODE_MAP[code] ?? 'en') as Language;
-                    setLanguage(legacy);
-                    try {
-                      localStorage.setItem(LANGUAGE_STORAGE_KEY, code);
-                      sessionStorage.setItem(LANGUAGE_STORAGE_KEY, code);
-                      // Also write to the legacy key so I18nProvider reads it on next session startup
-                      localStorage.setItem('i18n-language', LEGACY_CODE_MAP[code] ?? 'en');
-                      sessionStorage.setItem('i18n-language', LEGACY_CODE_MAP[code] ?? 'en');
-                      localStorage.removeItem('gh-lang');
-                      // Mark explicit user choice so PropertyCard/PropertyDetailPage
-                      // auto-overrides stop fighting this selection.
-                      localStorage.setItem('listhq_lang_user_set', '1');
-                    } catch { /* storage unavailable — non-fatal */ }
-                    setOpen(false);
-                    document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
-                    // Phase 2: persist for authenticated users so it follows them across devices
-                    try {
-                      const { data: { user } } = await supabase.auth.getUser();
-                      if (user) {
-                        await supabase
-                          .from('profiles')
-                          .update({ language_preference: code })
-                          .eq('id', user.id);
-                      }
-                    } catch (err) {
-                      // Non-fatal — localStorage still has the choice
-                      if (import.meta.env.DEV) console.warn('[LanguageSwitcher] persist failed', err);
-                    }
-                  }}
-                  className={`text-sm px-3 py-2 rounded-lg text-left transition-colors flex items-center justify-between ${
-                    !isAvailable
-                      ? 'text-slate-400 cursor-not-allowed'
+                  key={item.code}
+                  disabled={!item.available}
+                  onClick={() => selectLang(item)}
+                  role="option"
+                  aria-selected={isActive}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-[13px] transition-colors ${
+                    !item.available
+                      ? 'text-[#9CA3AF] cursor-not-allowed'
                       : isActive
-                        ? 'bg-slate-100 font-medium text-slate-900 cursor-pointer'
-                        : 'text-slate-700 hover:bg-slate-100 cursor-pointer'
+                        ? 'bg-[#EFF6FF] text-[#1d4ed8] font-semibold cursor-pointer'
+                        : 'text-[#1a1a1a] hover:bg-[#F9FAFB] cursor-pointer'
                   }`}
                 >
-                  <span>{name}</span>
-                  {!isAvailable && (
-                    <span className="text-[10px] uppercase tracking-wide text-slate-400 ml-2">
-                      Soon
-                    </span>
+                  <span className="text-[18px] leading-none w-6 text-center">{item.flag}</span>
+                  <span className="flex-1">{item.name}</span>
+                  {!item.available && (
+                    <span className="text-[10px] uppercase tracking-wide text-[#9CA3AF]">Soon</span>
+                  )}
+                  {isActive && item.available && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" aria-hidden />
                   )}
                 </button>
               );
             })}
           </div>
         </div>,
-        document.body
+        document.body,
       )}
     </div>
   );

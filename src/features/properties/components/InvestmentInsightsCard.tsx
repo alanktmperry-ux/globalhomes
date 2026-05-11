@@ -25,6 +25,7 @@ interface Props {
 }
 
 export function InvestmentInsightsCard({ property, compact }: Props) {
+  const { language } = useTranslation();
   const { grade } = calcGrade(property);
   const hasAnyData = property.rentalYieldPct || property.strPermitted !== null || property.yearBuilt || property.councilRatesAnnual || property.strataFeesQuarterly;
 

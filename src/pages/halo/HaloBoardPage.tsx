@@ -225,9 +225,9 @@ export default function HaloBoardPage() {
     <div className="max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold">Halo Board</h1>
+          <h1 className="text-2xl font-bold">{t('halo.board.title')}</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Browse active seeker Halos. Spend 1 credit to unlock contact details.
+            {t('halo.board.subtitle')}
           </p>
         </div>
         <AgentCreditBadge />

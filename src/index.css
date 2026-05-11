@@ -232,9 +232,7 @@ body {
    on top of the blue gradient. Scoped to [data-aplus-shell].
    ============================================================ */
 [data-aplus-shell] [data-sidebar="sidebar"] {
-  background: rgba(255, 255, 255, 0.03) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: linear-gradient(180deg, #2563EB 0%, #1E40AF 100%) !important;
   border-right: 1px solid rgba(255, 255, 255, 0.10);
   color: #ffffff;
 }

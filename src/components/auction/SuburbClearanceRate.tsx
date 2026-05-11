@@ -1,5 +1,6 @@
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { useSuburbAuctionStats } from '@/hooks/useSuburbAuctionStats';
+import { useTranslation, formatDate } from '@/shared/lib/i18n';
 
 interface Props {
   suburb: string;

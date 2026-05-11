@@ -2,29 +2,27 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface GeoLocation {
-  suburb: string;
+  city: string;
   state: string;
-  region: string;
-  display: string; // region label, e.g. "Melbourne East"
+  country: string;
+  display: string; // "City, STATE"
+  loading: boolean;
 }
 
 const DEFAULT_LOCATION: GeoLocation = {
-  suburb: "Doncaster",
+  city: "Melbourne",
   state: "VIC",
-  region: "Melbourne East",
-  display: "Melbourne East",
+  country: "AU",
+  display: "Melbourne, VIC",
+  loading: true,
 };
 
-const CACHE_KEY = "gh-geo-v1";
-const CACHE_TTL_MS = 1000 * 60 * 60 * 6; // 6 hours
+const CACHE_KEY = "gh-geo-v2";
+const CACHE_TTL_MS = 1000 * 60 * 30; // 30 minutes
 
 /**
- * Resolve the visitor's region for the homepage Featured section.
- * 1. Reads cached geo from localStorage (6 hr TTL).
- * 2. Falls back to `window.__GEO__` (set by an edge proxy if present).
- * 3. Calls the `geo-locate` edge function, which reads Cloudflare/Vercel
- *    headers server-side and matches against `suburb_region_map`.
- * 4. Always returns a sane default so the UI never appears blank.
+ * Resolves visitor city/state via the `get-geo` edge function.
+ * Caches result in localStorage for 30 minutes.
  */
 export function useGeoLocation(): GeoLocation {
   const [location, setLocation] = useState<GeoLocation>(() => {
@@ -33,8 +31,8 @@ export function useGeoLocation(): GeoLocation {
       const raw = window.localStorage.getItem(CACHE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as { at: number; data: GeoLocation };
-        if (Date.now() - parsed.at < CACHE_TTL_MS && parsed.data?.region) {
-          return parsed.data;
+        if (Date.now() - parsed.at < CACHE_TTL_MS && parsed.data?.city) {
+          return { ...parsed.data, loading: false };
         }
       }
     } catch {
@@ -45,31 +43,21 @@ export function useGeoLocation(): GeoLocation {
 
   useEffect(() => {
     let cancelled = false;
-
-    // Sync read: window.__GEO__ may be injected by the edge proxy
-    if (typeof window !== "undefined") {
-      const injected = (window as any).__GEO__;
-      if (injected && injected.region) {
-        setLocation({
-          suburb: injected.suburb || injected.city || DEFAULT_LOCATION.suburb,
-          state: injected.state || injected.region_code || DEFAULT_LOCATION.state,
-          region: injected.region,
-          display: injected.region,
-        });
-      }
-    }
-
     (async () => {
       try {
-        const { data, error } = await supabase.functions.invoke("geo-locate", {
+        const { data, error } = await supabase.functions.invoke("get-geo", {
           method: "GET",
         });
-        if (cancelled || error || !data?.region) return;
+        if (cancelled || error || !data?.city) {
+          if (!cancelled) setLocation((l) => ({ ...l, loading: false }));
+          return;
+        }
         const next: GeoLocation = {
-          suburb: data.suburb || DEFAULT_LOCATION.suburb,
-          state: data.state || DEFAULT_LOCATION.state,
-          region: data.region,
-          display: data.region,
+          city: data.city,
+          state: data.region || data.state || "",
+          country: data.country || "AU",
+          display: data.display || `${data.city}, ${data.region || ""}`.trim(),
+          loading: false,
         };
         setLocation(next);
         try {
@@ -81,10 +69,9 @@ export function useGeoLocation(): GeoLocation {
           /* ignore */
         }
       } catch {
-        /* keep default */
+        if (!cancelled) setLocation((l) => ({ ...l, loading: false }));
       }
     })();
-
     return () => {
       cancelled = true;
     };

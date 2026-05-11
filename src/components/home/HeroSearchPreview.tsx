@@ -2,11 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mic, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useVoiceSearch } from '@/shared/hooks/useVoiceSearch' assert {};
-
-// Note: useVoiceSearch lives at src/features/search/hooks/useVoiceSearch
-// but is re-exported in src/hooks/useVoiceSearch.ts. We use the re-export.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 type Seq = {
   flag: string; code: string; line: string; ph: string;

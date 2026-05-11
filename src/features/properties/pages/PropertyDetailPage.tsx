@@ -701,6 +701,7 @@ export default function PropertyDetailPage() {
                 </Link>
               )}
               <div className="mt-4 bg-[#EFF6FF] border border-[#2563EB]/15 rounded-2xl p-4 flex items-center gap-3 flex-wrap">
+                {/* @ts-expect-error — iconify-icon is a web component */}
                 <iconify-icon icon="solar:earth-linear" style={{ fontSize: '20px', color: '#2563EB', display: 'inline-flex', lineHeight: 1 }} />
                 <span className="text-[13px] font-semibold text-[#1E40AF]">
                   {tp('property.translatedIn') || 'Currently showing in your language'}

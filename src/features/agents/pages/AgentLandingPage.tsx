@@ -5,7 +5,7 @@ import { SEO } from '@/shared/components/SEO';
 import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import HomeCountUp from '@/components/HomeCountUp';
-import PricingSection from '@/features/marketing/PricingSection';
+// PricingSection moved to dedicated /for-agents/pricing route
 import FinalCTA from '@/features/marketing/FinalCTA';
 
 const GRAD = 'linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%)';

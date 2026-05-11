@@ -160,7 +160,7 @@ export default function NotificationPreferencesSettings() {
   };
 
   if (loading) {
-    return <div className="bg-card border border-border rounded-xl p-5 flex items-center justify-center">
+    return <div className="bg-white rounded-[12px] p-6 flex items-center justify-center" style={{ border: '1px solid #E5E7EB' }}>
       <Loader2 className="h-4 w-4 animate-spin" />
     </div>;
   }
@@ -168,8 +168,8 @@ export default function NotificationPreferencesSettings() {
   const muteActive = settings?.mute_until && new Date(settings.mute_until) > new Date();
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5 space-y-5">
-      <h3 className="font-display text-sm font-bold flex items-center gap-1.5">
+    <div className="bg-white rounded-[12px] p-6 space-y-5" style={{ border: '1px solid #E5E7EB' }}>
+      <h3 className="text-base font-bold text-[#0a0f1e] flex items-center gap-2">
         <Bell size={14} /> Notifications
       </h3>
 

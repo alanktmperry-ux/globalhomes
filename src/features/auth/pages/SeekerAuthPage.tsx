@@ -431,7 +431,7 @@ const SeekerAuthPage = () => {
                       disabled={loading || !email.trim() || !password || !dataLocationConsent || !policyConsent}
                       className={btnPrimary}
                     >
-                      {loading ? 'Creating account…' : 'Create account'}
+                      {loading ? t('auth.createAccountBtnLoading') : t('auth.createAccountBtn2')}
                     </button>
                   </form>
                   <button

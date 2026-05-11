@@ -42,7 +42,7 @@ export default function FindAgentPage() {
   const { results, total, loading } = useAgentSearch(filters, page);
 
   const onSearch = () => {
-    setFilters((f) => ({ ...f, query }));
+    setFilters((f) => ({ ...f, suburb: query || undefined }));
     setPage(0);
   };
 
@@ -50,9 +50,6 @@ export default function FindAgentPage() {
     setActiveLangs((prev) => {
       const next = new Set(prev);
       if (next.has(k)) next.delete(k); else next.add(k);
-      const arr = Array.from(next);
-      setFilters((f) => ({ ...f, languages: arr.length ? arr : undefined }));
-      setPage(0);
       return next;
     });
   };

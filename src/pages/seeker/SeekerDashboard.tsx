@@ -545,12 +545,17 @@ function HaloSummaryCard({ intent }: { intent: any | null }) {
   const { t } = useTranslation();
   if (!intent) {
     return (
-      <div className="rounded-xl border border-border bg-card p-5 space-y-3 mb-4">
-        <h2 className="font-semibold text-sm text-foreground">{t('seeker.summary.title')}</h2>
-        <p className="text-sm text-muted-foreground">{t('seeker.summary.empty')}</p>
-        <Button asChild size="sm">
-          <Link to="/halo/new">{t('seeker.summary.cta')}</Link>
-        </Button>
+      <div className="bg-white border border-[#E5E5E5] rounded-3xl p-7 flex items-center justify-between gap-6 flex-wrap hover:border-[#2563EB]/40 transition-colors">
+        <div className="min-w-0">
+          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#6a6a6a]">{t('seeker.summary.title')}</p>
+          <h2 className="text-[20px] font-bold text-[#0a0f1e] mt-1.5">{t('seeker.summary.empty')}</h2>
+        </div>
+        <Link
+          to="/halo/new"
+          className="bg-black text-white rounded-full px-6 py-3 font-bold text-[13px] hover:bg-white hover:text-black border border-black transition-all inline-flex items-center gap-2"
+        >
+          <Plus size={14} /> {t('seeker.summary.cta')}
+        </Link>
       </div>
     );
   }
@@ -566,25 +571,38 @@ function HaloSummaryCard({ intent }: { intent: any | null }) {
         ? t('seeker.summary.price.from', { min: minP })
         : null;
 
-  const Chip = ({ children }: { children: React.ReactNode }) => (
-    <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-foreground">
-      {children}
-    </span>
-  );
-
   return (
-    <div className="rounded-xl border border-border bg-card p-5 space-y-3 mb-4">
-      <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-sm text-foreground">{t('seeker.summary.title')}</h2>
-        <Link to="/halo/new" className="text-xs text-primary hover:underline">{t('seeker.summary.edit')}</Link>
+    <div className="bg-white border border-[#E5E5E5] rounded-3xl p-7 flex items-center justify-between gap-6 flex-wrap hover:border-[#2563EB]/40 transition-colors">
+      <div className="min-w-0 flex-1">
+        <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#6a6a6a]">{t('seeker.summary.title')}</p>
+        <h2 className="text-[20px] font-bold text-[#0a0f1e] mt-1.5">
+          {suburbs.length > 0 ? suburbs.join(', ') : t('seeker.haloCard.suburb.anywhere')}
+        </h2>
+        <div className="flex flex-wrap items-center gap-2 mt-3">
+          <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#EFF6FF] text-[#1E40AF]">
+            {t('seeker.summary.chip.buy')}
+          </span>
+          {types.map((ty) => (
+            <span key={ty} className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F3F4F6] text-[#374151]">
+              {ty}
+            </span>
+          ))}
+          {priceLabel && (
+            <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F3F4F6] text-[#374151]">{priceLabel}</span>
+          )}
+          {intent.bedrooms != null && (
+            <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F3F4F6] text-[#374151]">
+              {t('seeker.summary.chip.beds', { count: intent.bedrooms })}
+            </span>
+          )}
+        </div>
       </div>
-      <div className="flex flex-wrap gap-2">
-        <Chip>{t('seeker.summary.chip.buy')}</Chip>
-        {suburbs.length > 0 && <Chip>{suburbs.join(', ')}</Chip>}
-        {priceLabel && <Chip>{priceLabel}</Chip>}
-        {intent.bedrooms != null && <Chip>{t('seeker.summary.chip.beds', { count: intent.bedrooms })}</Chip>}
-        {types.map((t2) => <Chip key={t2}>{t2}</Chip>)}
-      </div>
+      <Link
+        to="/halo/new"
+        className="text-[13px] font-bold text-[#2563EB] hover:underline inline-flex items-center gap-1.5"
+      >
+        <Pencil size={14} /> {t('seeker.summary.edit')}
+      </Link>
     </div>
   );
 }
@@ -592,47 +610,47 @@ function HaloSummaryCard({ intent }: { intent: any | null }) {
 function MatchedListings({ matches }: { matches: any[] }) {
   const { t } = useTranslation();
   return (
-    <div className="space-y-3 mb-4">
-      <h2 className="font-semibold text-sm text-foreground">
-        {t('seeker.matches.title')}
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-[18px] font-bold text-[#0a0f1e]">{t('seeker.matches.title')}</h2>
         {matches.length > 0 && (
-          <span className="ms-2 text-xs font-normal text-muted-foreground">{t('seeker.matches.found', { count: matches.length })}</span>
+          <span className="text-[12px] font-semibold text-[#6a6a6a]">
+            {t('seeker.matches.found', { count: matches.length })}
+          </span>
         )}
-      </h2>
+      </div>
       {matches.length === 0 ? (
-        <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-sm text-muted-foreground">
-            {t('seeker.matches.empty')}
-          </p>
+        <div className="bg-white border border-[#E5E5E5] rounded-2xl p-8 text-center">
+          <div className="w-10 h-10 rounded-xl bg-[#F3F4F6] text-[#9CA3AF] flex items-center justify-center mx-auto">
+            <Search size={20} strokeWidth={1.5} />
+          </div>
+          <h3 className="text-[16px] font-bold text-[#0a0f1e] mt-4">{t('seeker.matches.empty')}</h3>
         </div>
       ) : (
-        matches.map((match) => {
-          const p = match.properties;
-          const price = p.price_formatted ?? (p.price ? `$${Number(p.price).toLocaleString('en-AU')}` : '—');
-          const specs = `${p.suburb}${p.beds != null ? t('seeker.matches.specs.bed', { count: p.beds }) : ''}${p.baths != null ? t('seeker.matches.specs.bath', { count: p.baths }) : ''}`;
-          return (
-            <Link
-              key={match.id}
-              to={`/properties/${p.id}`}
-              className="block rounded-xl border border-border bg-card p-4 hover:bg-accent transition-colors space-y-1"
-            >
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="font-medium text-sm text-foreground line-clamp-1">{p.address}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {specs}
-                  </p>
-                </div>
-                <div className="shrink-0 text-end">
-                  <p className="text-sm font-semibold text-foreground">{price}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          {matches.map((match) => {
+            const p = match.properties;
+            const price = p.price_formatted ?? (p.price ? `$${Number(p.price).toLocaleString('en-AU')}` : '—');
+            return (
+              <Link
+                key={match.id}
+                to={`/properties/${p.id}`}
+                className="block bg-white rounded-2xl border border-[#E5E5E5] p-5 hover:border-[#2563EB] transition-colors"
+              >
+                <p className="font-bold text-[15px] text-[#0a0f1e] line-clamp-1">{p.address}</p>
+                <p className="text-[12px] text-[#6a6a6a] mt-1">{p.suburb}</p>
+                <div className="flex items-center justify-between mt-3">
+                  <p className="text-[16px] font-extrabold text-black tabular-nums">{price}</p>
                   {match.match_score != null && (
-                    <p className="text-xs text-primary font-medium">{t('seeker.matches.score', { score: match.match_score })}</p>
+                    <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#EFF6FF] text-[#2563EB]">
+                      {t('seeker.matches.score', { score: match.match_score })}
+                    </span>
                   )}
                 </div>
-              </div>
-            </Link>
-          );
-        })
+              </Link>
+            );
+          })}
+        </div>
       )}
     </div>
   );

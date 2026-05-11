@@ -50,6 +50,7 @@ const DATE_AU = new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'long'
 export default function AgencyOnboardingPage() {
   const navigate = useNavigate();
   const { user, refreshRoles } = useAuth();
+  const { t } = useTranslation();
 
   const [step, setStep] = useState(0);
   const [path, setPath] = useState<OnboardingPath | null>(null);

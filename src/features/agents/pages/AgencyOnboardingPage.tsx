@@ -1425,10 +1425,10 @@ export default function AgencyOnboardingPage() {
         <div className="space-y-2">
           <div>
             <h1 className="text-lg font-bold text-foreground">
-              Agency Setup
+              {t('agentOnboarding.nav.heading')}
             </h1>
             <p className="text-xs text-muted-foreground">
-              {showPasswordStep ? 'Secure your account' : `Step ${step + 1} of ${totalSteps}`}
+              {showPasswordStep ? t('agentOnboarding.nav.securing') : t('agentOnboarding.nav.stepXofY', { current: step + 1, total: totalSteps })}
             </p>
           </div>
           <Progress value={progressPct} className="h-1.5" />

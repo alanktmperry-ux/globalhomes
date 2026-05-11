@@ -1252,10 +1252,9 @@ export default function AgencyOnboardingPage() {
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
                 <CheckCircle2 size={32} className="text-primary" />
               </div>
-              <h3 className="text-base font-bold">Your trust account is ready</h3>
+              <h3 className="text-base font-bold">{t('agentOnboarding.import.fresh.heading')}</h3>
               <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                Your trust account has been created with a $0.00 opening balance.
-                You can start recording trust transactions immediately.
+                {t('agentOnboarding.import.fresh.body')}
               </p>
             </div>
             <Button
@@ -1265,7 +1264,7 @@ export default function AgencyOnboardingPage() {
                 navigate('/dashboard');
               }}
             >
-              Continue to Dashboard <ArrowRight size={14} className="ml-1" />
+              {t('agentOnboarding.import.continueCta')} <ArrowRight size={14} className="ml-1" />
             </Button>
             <GuideCard
               title="You're all set — what's next"

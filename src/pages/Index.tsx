@@ -1542,6 +1542,7 @@ function SliverBar() {
 
 function StickyAcquisitionBar() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [show, setShow] = useState(false);
   useEffect(() => {
     const onScroll = () => setShow(window.scrollY > 300);

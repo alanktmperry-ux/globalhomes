@@ -60,12 +60,12 @@ const STATE_NOTICE: Record<string, { title: string; days: number }> = {
   NT: { title: 'Notice to Remedy Breach — Residential Tenancies Act 1999 (NT)', days: 14 },
 };
 
-const STATUS_META: Record<ArrearsStatus, { label: string; className: string }> = {
-  none: { label: 'No action', className: 'bg-muted text-muted-foreground' },
-  notice_sent: { label: 'Notice sent', className: 'bg-amber-500/15 text-amber-700 border-amber-500/30' },
-  responded: { label: 'Responded', className: 'bg-blue-500/15 text-blue-700 border-blue-500/30' },
-  escalated: { label: 'Escalated', className: 'bg-red-500/15 text-red-700 border-red-500/30' },
-  resolved: { label: 'Resolved', className: 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30' },
+const STATUS_META: Record<ArrearsStatus, { label: string; tone: APlusBadgeTone }> = {
+  none:         { label: 'No action',   tone: 'grey' },
+  notice_sent:  { label: 'Notice sent', tone: 'amber' },
+  responded:    { label: 'Responded',   tone: 'blue' },
+  escalated:    { label: 'Escalated',   tone: 'red' },
+  resolved:     { label: 'Resolved',    tone: 'green' },
 };
 
 const fmtMoney = (n: number) => `$${Math.round(n).toLocaleString()}`;

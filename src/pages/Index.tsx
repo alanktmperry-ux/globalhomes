@@ -841,6 +841,9 @@ const Index = () => {
         {/* ═══ Featured in [Location] — boosted listings (static seed) ═══ */}
         <FeaturedListings />
 
+        {/* ═══ Replace five tools with one — Bose-signature visual ═══ */}
+        <ReplaceFiveTools />
+
         {/* ═══ SECTION 4b — Featured Listings ═══ */}
         <section style={{ background: '#fff', padding: '72px 24px' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>

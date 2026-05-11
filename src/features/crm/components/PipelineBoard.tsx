@@ -13,7 +13,7 @@ const STAGES: { value: LeadStage; label: string; color: string }[] = [
   { value: 'new', label: '🆕 New', color: 'border-t-muted-foreground' },
   { value: 'contacted', label: '📞 Contacted', color: 'border-t-blue-400' },
   { value: 'qualified', label: '✅ Qualified', color: 'border-t-indigo-500' },
-  { value: 'offer_stage', label: '📋 Offer Stage', color: 'border-t-amber-400' },
+  { value: 'offer_stage', label: 'Offer Stage', color: 'border-t-amber-400' },
   { value: 'under_contract', label: '🔏 Under Contract', color: 'border-t-purple-500' },
   { value: 'settled', label: '🎉 Settled', color: 'border-t-green-500' },
 ];

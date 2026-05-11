@@ -503,6 +503,8 @@ const Index = () => {
         .mic-spin { width:18px; height:18px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation: spin .8s linear infinite; }
         @keyframes errFade { from { opacity:0; transform:translateY(-4px) } to { opacity:1; transform:translateY(0) } }
         .voice-err { animation: errFade .25s ease-out; }
+        .hero-pill:focus-within { border-color: #2563EB !important; box-shadow: 0 8px 32px rgba(37,99,235,0.20), 0 0 0 4px rgba(37,99,235,0.08) !important; }
+        .hero-pill input::placeholder { color: #6a6a6a; }
         .hero-headline { font-size: clamp(48px, 7vw, 110px); font-weight: 800; letter-spacing: -0.05em; line-height: 1.05; color: #000; margin-bottom: 0; max-width: 1100px; }
         .hero-headline .line1 { display: block; line-height: 1.05; color: #000; }
         .hero-headline .line2 { display: block; margin-top: 0.18em; padding-bottom: 0.08em; font-weight: 800; font-style: normal; line-height: 1.05; min-height: 1.2em; font-size: 1em; background: linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }

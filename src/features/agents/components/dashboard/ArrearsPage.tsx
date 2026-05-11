@@ -1,14 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { AlertTriangle, FileText, ExternalLink, Copy } from 'lucide-react';
-import DashboardHeader from './DashboardHeader';
-import { Card } from '@/components/ui/card';
+import { FileText, ExternalLink, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
+  APlusPageHeader, APlusStatCard, APlusTable, APlusTHead, APlusTh, APlusTBody, APlusTr, APlusTd,
+  APlusBadge, APlusArrearsBanner, type APlusBadgeTone,
+} from '@/components/ui/data-table-aplus';
+import { EmptyState } from '@/components/ui/empty-state';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
@@ -61,12 +60,12 @@ const STATE_NOTICE: Record<string, { title: string; days: number }> = {
   NT: { title: 'Notice to Remedy Breach — Residential Tenancies Act 1999 (NT)', days: 14 },
 };
 
-const STATUS_META: Record<ArrearsStatus, { label: string; className: string }> = {
-  none: { label: 'No action', className: 'bg-muted text-muted-foreground' },
-  notice_sent: { label: 'Notice sent', className: 'bg-amber-500/15 text-amber-700 border-amber-500/30' },
-  responded: { label: 'Responded', className: 'bg-blue-500/15 text-blue-700 border-blue-500/30' },
-  escalated: { label: 'Escalated', className: 'bg-red-500/15 text-red-700 border-red-500/30' },
-  resolved: { label: 'Resolved', className: 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30' },
+const STATUS_META: Record<ArrearsStatus, { label: string; tone: APlusBadgeTone }> = {
+  none:         { label: 'No action',   tone: 'grey' },
+  notice_sent:  { label: 'Notice sent', tone: 'amber' },
+  responded:    { label: 'Responded',   tone: 'blue' },
+  escalated:    { label: 'Escalated',   tone: 'red' },
+  resolved:     { label: 'Resolved',    tone: 'green' },
 };
 
 const fmtMoney = (n: number) => `$${Math.round(n).toLocaleString()}`;
@@ -255,116 +254,111 @@ ${agencyName || ''}`.trim();
     : null;
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      <DashboardHeader title="Arrears" subtitle="Tenants with outstanding rent" />
+    <div className="p-4 md:p-6">
+      <APlusPageHeader title="Arrears" subtitle="Tenants with outstanding rent" />
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <Card className="p-4">
-          <div className="text-xs text-muted-foreground">Total in Arrears</div>
-          <div className="text-2xl font-bold mt-1">{summary.count}</div>
-        </Card>
-        <Card className="p-4">
-          <div className="text-xs text-muted-foreground">Total Amount Owing</div>
-          <div className="text-2xl font-bold mt-1">{fmtMoney(summary.totalOwing)}</div>
-        </Card>
-        <Card className="p-4 border-red-200">
-          <div className="text-xs text-muted-foreground flex items-center gap-1">
-            <AlertTriangle size={12} className="text-red-600" /> Critical (14+ days)
-          </div>
-          <div className="text-2xl font-bold mt-1 text-red-700">{summary.critical}</div>
-        </Card>
+      {summary.count > 0 && (
+        <APlusArrearsBanner
+          title={`${summary.count} tenant${summary.count === 1 ? '' : 's'} in arrears — ${fmtMoney(summary.totalOwing)} outstanding`}
+          body={summary.critical > 0
+            ? `${summary.critical} critical (14+ days). Review and issue breach notices below.`
+            : 'Issue breach notices below if remediation is overdue.'}
+        />
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+        <APlusStatCard label="Total in Arrears" value={summary.count} />
+        <APlusStatCard label="Total Amount Owing" value={fmtMoney(summary.totalOwing)} />
+        <APlusStatCard
+          label="Critical (14+ days)"
+          value={summary.critical}
+          urgent={summary.critical > 0}
+          icon="solar:danger-triangle-linear"
+        />
       </div>
 
-      <Card className="overflow-hidden">
-        {loading ? (
-          <div className="p-10 text-center text-sm text-muted-foreground">Loading arrears…</div>
-        ) : items.length === 0 ? (
-          <div className="p-10 text-center text-sm text-muted-foreground">
-             No tenants currently in arrears.
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Tenant</TableHead>
-                  <TableHead>Property</TableHead>
-                  <TableHead>Days Overdue</TableHead>
-                  <TableHead>Est. Amount Owing</TableHead>
-                  <TableHead>Last Notice</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {items.map(row => {
-                  const status = (row.arrears_action_status || 'none') as ArrearsStatus;
-                  const meta = STATUS_META[status] || STATUS_META.none;
-                  const propLine = [row.properties?.address, row.properties?.suburb].filter(Boolean).join(', ');
-                  return (
-                    <TableRow key={row.id}>
-                      <TableCell>
-                        <div className="font-medium">{row.tenant_name || '—'}</div>
-                        {row.tenant_email && (
-                          <div className="text-xs text-muted-foreground">{row.tenant_email}</div>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-sm">{propLine || '—'}</TableCell>
-                      <TableCell className={daysCellClass(row.daysOverdue)}>
-                        {daysPrefix(row.daysOverdue)}{row.daysOverdue}d
-                      </TableCell>
-                      <TableCell className="font-medium">{fmtMoney(row.amountOwing)}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {row.last_arrears_notice_date
-                          ? new Date(row.last_arrears_notice_date).toLocaleDateString('en-AU')
-                          : '—'}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className={meta.className}>{meta.label}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => openBreachNotice(row)}
-                            className="gap-1"
-                          >
-                            <FileText size={14} /> Breach Notice
-                          </Button>
-                          <Select
-                            value={status}
-                            onValueChange={(v) => updateStatus(row.id, v as ArrearsStatus)}
-                          >
-                            <SelectTrigger className="h-8 w-[140px] text-xs">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none">No action</SelectItem>
-                              <SelectItem value="notice_sent">Notice sent</SelectItem>
-                              <SelectItem value="responded">Responded</SelectItem>
-                              <SelectItem value="escalated">Escalated</SelectItem>
-                              <SelectItem value="resolved">Resolved</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => navigate(`/dashboard/tenancies/${row.id}`)}
-                            className="gap-1"
-                          >
-                            <ExternalLink size={14} /> View
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-      </Card>
+      {loading ? (
+        <div
+          className="bg-white rounded-[12px] p-10 text-center text-sm text-[#6B7280]"
+          style={{ border: '1px solid #E5E7EB' }}
+        >
+          Loading arrears…
+        </div>
+      ) : items.length === 0 ? (
+        <div className="bg-white rounded-[12px] p-10" style={{ border: '1px solid #E5E7EB' }}>
+          <EmptyState
+            icon="solar:shield-check-linear"
+            title="No tenants currently in arrears"
+            body="When a tenant falls behind on rent, they will appear here with the days overdue and recommended action."
+            variant="compact"
+          />
+        </div>
+      ) : (
+        <APlusTable>
+          <APlusTHead>
+            <APlusTh>Tenant</APlusTh>
+            <APlusTh>Property</APlusTh>
+            <APlusTh align="right">Days Overdue</APlusTh>
+            <APlusTh align="right">Est. Amount Owing</APlusTh>
+            <APlusTh>Last Notice</APlusTh>
+            <APlusTh>Status</APlusTh>
+            <APlusTh align="right">Actions</APlusTh>
+          </APlusTHead>
+          <APlusTBody>
+            {items.map(row => {
+              const status = (row.arrears_action_status || 'none') as ArrearsStatus;
+              const meta = STATUS_META[status] || STATUS_META.none;
+              const propLine = [row.properties?.address, row.properties?.suburb].filter(Boolean).join(', ');
+              const daysColor = row.daysOverdue >= 14 ? 'text-[#991B1B]' : row.daysOverdue >= 7 ? 'text-[#C2410C]' : 'text-[#92400E]';
+              return (
+                <APlusTr key={row.id}>
+                  <APlusTd>
+                    <div className="font-semibold text-[#0a0f1e]">{row.tenant_name || '—'}</div>
+                    {row.tenant_email && <div className="text-xs text-[#6B7280] mt-0.5">{row.tenant_email}</div>}
+                  </APlusTd>
+                  <APlusTd>{propLine || '—'}</APlusTd>
+                  <APlusTd align="right">
+                    <span className={`tabular-nums font-bold ${daysColor}`}>{row.daysOverdue}d</span>
+                  </APlusTd>
+                  <APlusTd align="right">
+                    <span className="tabular-nums font-semibold text-[#991B1B]">{fmtMoney(row.amountOwing)}</span>
+                  </APlusTd>
+                  <APlusTd>
+                    <span className="text-xs text-[#6B7280] tabular-nums whitespace-nowrap">
+                      {row.last_arrears_notice_date
+                        ? new Date(row.last_arrears_notice_date).toLocaleDateString('en-AU')
+                        : '—'}
+                    </span>
+                  </APlusTd>
+                  <APlusTd>
+                    <APlusBadge tone={meta.tone} label={meta.label} />
+                  </APlusTd>
+                  <APlusTd align="right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button size="sm" variant="outline" onClick={() => openBreachNotice(row)} className="gap-1 h-8">
+                        <FileText size={14} /> Breach Notice
+                      </Button>
+                      <Select value={status} onValueChange={(v) => updateStatus(row.id, v as ArrearsStatus)}>
+                        <SelectTrigger className="h-8 w-[140px] text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">No action</SelectItem>
+                          <SelectItem value="notice_sent">Notice sent</SelectItem>
+                          <SelectItem value="responded">Responded</SelectItem>
+                          <SelectItem value="escalated">Escalated</SelectItem>
+                          <SelectItem value="resolved">Resolved</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button size="sm" variant="ghost" onClick={() => navigate(`/dashboard/tenancies/${row.id}`)} className="gap-1 h-8">
+                        <ExternalLink size={14} /> View
+                      </Button>
+                    </div>
+                  </APlusTd>
+                </APlusTr>
+              );
+            })}
+          </APlusTBody>
+        </APlusTable>
+      )}
 
       <Dialog open={!!noticeFor} onOpenChange={(open) => !open && setNoticeFor(null)}>
         <DialogContent className="max-w-2xl">

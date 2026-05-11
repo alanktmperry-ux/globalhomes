@@ -846,6 +846,12 @@ const Index = () => {
         {/* ═══ Replace five tools with one — Bose-signature visual ═══ */}
         <ReplaceFiveTools />
 
+        {/* ═══ Voice Listing showcase — blue gradient stage ═══ */}
+        <VoiceListingShowcase />
+
+        {/* ═══ Halo Board preview — reverse marketplace ═══ */}
+        <HaloBoardPreview />
+
         {/* ═══ SECTION 4b — Featured Listings ═══ */}
         <section style={{ background: '#fff', padding: '72px 24px' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>

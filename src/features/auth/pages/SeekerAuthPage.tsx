@@ -73,7 +73,7 @@ const SeekerAuthPage = () => {
     e.preventDefault();
     setError(null);
     if (!email.trim() || !password) {
-      setError('Please enter your email and password.');
+      setError(t('auth.error.emailPasswordRequired'));
       return;
     }
     setLoading(true);
@@ -83,13 +83,13 @@ const SeekerAuthPage = () => {
         password,
       });
       if (signErr) {
-        setError('Invalid email or password.');
+        setError(t('auth.error.invalidCredentials'));
         return;
       }
-      toast.success('Welcome back!');
+      toast.success(t('auth.toast.welcomeBack'));
       await routeAfterSignIn();
     } catch (err) {
-      setError(getErrorMessage(err) || 'Could not sign in. Please try again.');
+      setError(getErrorMessage(err) || t('auth.error.signInFailed'));
     } finally {
       setLoading(false);
     }
@@ -98,13 +98,13 @@ const SeekerAuthPage = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!email.trim()) { setError('Email is required.'); return; }
-    if (password.length < 10) { setError('Password must be at least 10 characters.'); return; }
-    if (!dataLocationConsent) { setError('Please acknowledge where your data is stored to continue.'); return; }
-    if (!policyConsent) { setError('Please agree to the Privacy Policy and Terms of Service to continue.'); return; }
+    if (!email.trim()) { setError(t('auth.error.emailRequired')); return; }
+    if (password.length < 10) { setError(t('auth.error.passwordTooShort')); return; }
+    if (!dataLocationConsent) { setError(t('auth.error.consentDataLocation')); return; }
+    if (!policyConsent) { setError(t('auth.error.consentPolicy')); return; }
     const cleanEmail = email.trim().toLowerCase();
     if (isDisposableEmail(cleanEmail)) {
-      setError('Disposable or temporary email addresses are not accepted. Please use a real email.');
+      setError(t('auth.error.disposableEmail'));
       return;
     }
     if (!captchaToken) {
@@ -119,11 +119,11 @@ const SeekerAuthPage = () => {
       });
       if (gateErr || !gate?.ok) {
         const messages: Record<string, string> = {
-          invalid_captcha: 'Captcha verification failed. Please refresh and try again.',
-          disposable_email: 'Disposable or temporary email addresses are not accepted. Please use a real email.',
-          breached_password: 'This password appears in known data breaches. For security, please choose a different one.',
+          invalid_captcha: t('auth.error.invalidCaptcha'),
+          disposable_email: t('auth.error.disposableEmail'),
+          breached_password: t('auth.error.breachedPassword'),
         };
-        setError(messages[gate?.reason] || 'Signup failed. Please try again or contact support.');
+        setError(messages[gate?.reason] || t('auth.error.signupFailed'));
         setCaptchaToken(null);
         captchaRef.current?.resetCaptcha();
         return;
@@ -141,7 +141,7 @@ const SeekerAuthPage = () => {
       setPendingOtpEmail(cleanEmail);
       setOtpStep(true);
     } catch (err) {
-      setError(getErrorMessage(err) || 'Could not send confirmation email. Please try again.');
+      setError(getErrorMessage(err) || t('auth.error.confirmEmailFailed'));
     } finally {
       setLoading(false);
       setCaptchaToken(null);
@@ -159,7 +159,7 @@ const SeekerAuthPage = () => {
       redirect_uri: window.location.origin + '/auth/callback',
     });
     if (oErr) {
-      toast.error('Something went wrong. Please try again.');
+      toast.error(t('auth.error.oauthGeneric'));
     }
   };
 
@@ -170,7 +170,7 @@ const SeekerAuthPage = () => {
       redirect_uri: window.location.origin + '/auth/callback',
     });
     if (oErr) {
-      toast.error('Something went wrong. Please try again.');
+      toast.error(t('auth.error.oauthGeneric'));
     }
     setPendingOAuthProvider(null);
   };
@@ -190,20 +190,19 @@ const SeekerAuthPage = () => {
             onClick={() => setOtpStep(false)}
             className="flex items-center gap-1.5 text-[13px] text-stone-500 hover:text-stone-800 mb-8 transition-colors"
           >
-            <ArrowLeft size={14} /> Back
+            <ArrowLeft size={14} /> {t('auth.back')}
           </button>
           <div className="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center mb-6">
             <Mail size={26} className="text-blue-600" />
           </div>
           <h1 className="text-[28px] font-semibold tracking-[-0.5px] text-stone-900 leading-tight">
-            Check your email
+            {t('auth.checkEmail.heading')}
           </h1>
           <p className="text-[15px] text-stone-600 mt-3 leading-relaxed">
-            We sent a confirmation link to{' '}
-            <span className="text-stone-900 font-medium">{pendingOtpEmail}</span>. Click the link in the email to activate your account.
+            {t('auth.checkEmail.body', { email: pendingOtpEmail })}
           </p>
           <p className="text-[13px] text-stone-400 mt-4">
-            Can't find it? Check your spam folder.
+            {t('auth.checkEmail.spamHint')}
           </p>
           <div>
             <ResendConfirmationButton email={pendingOtpEmail} />
@@ -212,7 +211,7 @@ const SeekerAuthPage = () => {
             to="/login"
             className="mt-8 inline-flex items-center gap-1.5 text-[14px] text-blue-600 hover:text-blue-700 font-medium"
           >
-            <ArrowLeft size={14} /> Back to login
+            <ArrowLeft size={14} /> {t('auth.backToLogin')}
           </Link>
         </div>
       </div>
@@ -241,7 +240,7 @@ const SeekerAuthPage = () => {
             <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
               <span className="text-white text-[11px] font-bold">L</span>
             </div>
-            <span className="text-[15px] font-semibold text-stone-900 tracking-[-0.3px]">ListHQ</span>
+            <span className="text-[15px] font-semibold text-stone-900 tracking-[-0.3px]">{'ListHQ'}</span>
           </Link>
         </div>
 
@@ -322,7 +321,7 @@ const SeekerAuthPage = () => {
 
                   <div className="flex items-center gap-3 my-7">
                     <div className="flex-1 h-px bg-stone-100" />
-                    <span className="text-[11px] text-stone-300 tracking-[0.08em] uppercase">or</span>
+                    <span className="text-[11px] text-stone-300 tracking-[0.08em] uppercase">{t('auth.or')}</span>
                     <div className="flex-1 h-px bg-stone-100" />
                   </div>
 
@@ -380,7 +379,7 @@ const SeekerAuthPage = () => {
                         minLength={10}
                         value={password}
                         onChange={(e) => { setPassword(e.target.value); setError(null); }}
-                        placeholder="At least 10 characters"
+                        placeholder={t('auth.passwordMinPlaceholder')}
                         className={input}
                         autoComplete="new-password"
                       />
@@ -394,8 +393,8 @@ const SeekerAuthPage = () => {
                         className="mt-0.5 h-4 w-4 rounded border-stone-300 text-primary focus:ring-primary cursor-pointer shrink-0"
                       />
                       <span className="text-[12px] text-stone-500 leading-relaxed">
-                        I understand that my data is processed and stored by Supabase (AWS ap-southeast-2, Sydney) in accordance with the ListHQ{' '}
-                        <a href="/privacy" className="underline underline-offset-2 hover:text-stone-700">Privacy Policy</a>.
+                        {t('auth.consent.dataLocation')}{' '}
+                        <a href="/privacy" className="underline underline-offset-2 hover:text-stone-700">{t('auth.privacyLink')}</a>.
                       </span>
                     </label>
 
@@ -407,10 +406,10 @@ const SeekerAuthPage = () => {
                         className="mt-0.5 h-4 w-4 rounded border-stone-300 text-primary focus:ring-primary cursor-pointer shrink-0"
                       />
                       <span className="text-[12px] text-stone-500 leading-relaxed">
-                        I agree to the{' '}
-                        <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-stone-700">Privacy Policy</a>
-                        {' '}and{' '}
-                        <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-stone-700">Terms of Service</a>.
+                        {t('auth.consent.agreement')}{' '}
+                        <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-stone-700">{t('auth.privacyLink')}</a>
+                        {' '}{t('auth.and')}{' '}
+                        <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-stone-700">{t('auth.termsLink')}</a>.
                       </span>
                     </label>
 
@@ -432,7 +431,7 @@ const SeekerAuthPage = () => {
                       disabled={loading || !email.trim() || !password || !dataLocationConsent || !policyConsent}
                       className={btnPrimary}
                     >
-                      {loading ? 'Creating account…' : 'Create account'}
+                      {loading ? t('auth.createAccountBtnLoading') : t('auth.createAccountBtn2')}
                     </button>
                   </form>
                   <button
@@ -475,25 +474,25 @@ const SeekerAuthPage = () => {
       {showOAuthConsentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6">
-            <h3 className="text-base font-semibold text-stone-900 mb-2">Before you continue</h3>
+            <h3 className="text-base font-semibold text-stone-900 mb-2">{t('auth.oauthModal.title')}</h3>
             <p className="text-sm text-stone-600 mb-4 leading-relaxed">
-              By signing up with Google or Apple you agree to our{' '}
-              <a href="/privacy" className="text-blue-600 underline">Privacy Policy</a> and{' '}
-              <a href="/terms" className="text-blue-600 underline">Terms of Service</a>.
-              Your data is stored securely in Australia (AWS Sydney region).
+              {t('auth.oauthModal.body')}{' '}
+              <a href="/privacy" className="text-blue-600 underline">{t('auth.privacyLink')}</a> {t('auth.and')}{' '}
+              <a href="/terms" className="text-blue-600 underline">{t('auth.termsLink')}</a>.
+              {' '}{t('auth.oauthModal.bodyStorage')}
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => { setShowOAuthConsentModal(false); setPendingOAuthProvider(null); }}
                 className="flex-1 h-11 rounded-xl border border-stone-200 text-stone-600 text-sm font-medium hover:bg-stone-50 transition-colors"
               >
-                Cancel
+                {t('auth.oauthModal.cancel')}
               </button>
               <button
                 onClick={confirmOAuthConsent}
                 className="flex-1 h-11 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
               >
-                I agree — Continue
+                {t('auth.oauthModal.confirm')}
               </button>
             </div>
           </div>

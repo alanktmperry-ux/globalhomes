@@ -5,10 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -17,17 +19,14 @@ const ForgotPasswordPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Bug Fix 1: All password reset emails must link back to /login.
-      // SeekerAuthPage detects the recovery hash and forwards to /reset-password
-      // so the user lands on the new-password form with the recovery session intact.
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/login`,
       });
       if (error) throw error;
       setSent(true);
-      toast({ title: 'Check your email', description: 'We sent a password reset link.' });
+      toast({ title: t('auth.forgotPassword.toast.sentTitle'), description: t('auth.forgotPassword.toast.sentBody') });
     } catch (err: unknown) {
-      toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
+      toast({ title: t('auth.forgotPassword.toast.errorTitle'), description: getErrorMessage(err), variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -42,23 +41,23 @@ const ForgotPasswordPage = () => {
       </header>
       <main className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full px-6 py-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="font-display text-2xl font-bold text-foreground mb-1">Reset password</h1>
+          <h1 className="font-display text-2xl font-bold text-foreground mb-1">{t('auth.forgotPassword.heading')}</h1>
           <p className="text-sm text-muted-foreground mb-6">
-            {sent ? 'Check your inbox for a reset link.' : "Enter your email and we'll send a reset link."}
+            {sent ? t('auth.forgotPassword.subSent') : t('auth.forgotPassword.subInitial')}
           </p>
           {!sent && (
             <form onSubmit={handleSubmit} className="space-y-3">
               <div className="relative">
                 <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <input
-                  type="email" placeholder="Email address" required value={email}
+                  type="email" placeholder={t('auth.forgotPassword.placeholder')} required value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 rounded-xl bg-secondary text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
               <button type="submit" disabled={loading}
                 className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm disabled:opacity-50">
-                {loading ? 'Sending...' : 'Send Reset Link'}
+                {loading ? t('auth.forgotPassword.submitting') : t('auth.forgotPassword.submit')}
               </button>
             </form>
           )}

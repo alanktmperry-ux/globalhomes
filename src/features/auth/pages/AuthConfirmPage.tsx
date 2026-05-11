@@ -3,9 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { capture, identify } from '@/shared/lib/posthog';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 const AuthConfirmPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
   const [message, setMessage] = useState('');
 
@@ -77,7 +79,7 @@ const AuthConfirmPage = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setStatus('success');
-        setMessage('Email confirmed! Setting up your account...');
+        setMessage(t('auth.confirm.body.success'));
         setTimeout(() => routeUser(session.user.id), 1200);
         return;
       }
@@ -86,7 +88,7 @@ const AuthConfirmPage = () => {
           subscription?.unsubscribe();
           if (timeout) clearTimeout(timeout);
           setStatus('success');
-          setMessage('Email confirmed! Setting up your account...');
+          setMessage(t('auth.confirm.body.success'));
           setTimeout(() => routeUser(newSession.user.id), 1200);
         }
       });
@@ -94,7 +96,7 @@ const AuthConfirmPage = () => {
       timeout = setTimeout(() => {
         subscription?.unsubscribe();
         setStatus('error');
-        setMessage('Confirmation link has expired or already been used. Please sign up again.');
+        setMessage(t('auth.confirm.body.expired'));
       }, 8000);
     };
 
@@ -103,7 +105,7 @@ const AuthConfirmPage = () => {
       if (timeout) clearTimeout(timeout);
       subscription?.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, t]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -127,12 +129,12 @@ const AuthConfirmPage = () => {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-foreground mb-2">
-            {status === 'verifying' && 'Confirming your email…'}
-            {status === 'success' && 'Email confirmed!'}
-            {status === 'error' && 'Confirmation failed'}
+            {status === 'verifying' && t('auth.confirm.title.verifying')}
+            {status === 'success' && t('auth.confirm.title.success')}
+            {status === 'error' && t('auth.confirm.title.error')}
           </h1>
           <p className="text-muted-foreground text-sm">
-            {status === 'verifying' && 'Please wait a moment.'}
+            {status === 'verifying' && t('auth.confirm.body.verifying')}
             {message}
           </p>
         </div>
@@ -141,7 +143,7 @@ const AuthConfirmPage = () => {
             to="/login"
             className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
           >
-            Back to sign in
+            {t('auth.confirm.backToSignIn')}
           </Link>
         )}
       </div>

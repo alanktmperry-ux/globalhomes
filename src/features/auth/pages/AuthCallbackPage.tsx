@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 const AuthCallbackPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const handle = async () => {
@@ -24,7 +26,7 @@ const AuthCallbackPage = () => {
         });
         setTimeout(() => {
           subscription.unsubscribe();
-          toast.error('Sign-in is taking too long. Please try again.');
+          toast.error(t('auth.callback.oauthTimeout'));
           navigate('/auth?error=oauth_failed', { replace: true });
         }, 8000);
         return;
@@ -71,7 +73,7 @@ const AuthCallbackPage = () => {
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="text-center space-y-4">
         <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-        <p className="text-sm text-muted-foreground">Signing you in…</p>
+        <p className="text-sm text-muted-foreground">{t('auth.callback.signingIn')}</p>
       </div>
     </div>
   );

@@ -1284,9 +1284,9 @@ export default function AgencyOnboardingPage() {
         <div className="space-y-5">
           <div className="text-center space-y-1 mb-4">
             <Upload size={32} className="mx-auto text-primary" />
-            <h3 className="text-base font-bold">Import from your old system</h3>
+            <h3 className="text-base font-bold">{t('agentOnboarding.import.heading')}</h3>
             <p className="text-xs text-muted-foreground">
-              Choose how much you want to migrate
+              {t('agentOnboarding.import.sub')}
             </p>
           </div>
           <div className="space-y-3">
@@ -1295,25 +1295,25 @@ export default function AgencyOnboardingPage() {
               className="w-full text-left rounded-lg border-2 border-primary bg-primary/5 p-4 hover:bg-primary/10 transition-colors"
             >
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-sm font-bold">Full Rent Roll Migration</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary text-primary-foreground font-semibold">RECOMMENDED</span>
+                <span className="text-sm font-bold">{t('agentOnboarding.import.fullTitle')}</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary text-primary-foreground font-semibold">{t('agentOnboarding.import.recommended')}</span>
               </div>
-              <p className="text-xs text-muted-foreground">Properties, tenancies, owners, tenants, bonds, fees and trust balances — everything in one go.</p>
+              <p className="text-xs text-muted-foreground">{t('agentOnboarding.import.fullBody')}</p>
             </button>
             <button
               onClick={() => setShowWizard(true)}
               className="w-full text-left rounded-lg border p-4 hover:border-primary/50 transition-colors"
             >
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-sm font-bold">Trust Ledger Only</span>
+                <span className="text-sm font-bold">{t('agentOnboarding.import.ledgerTitle')}</span>
               </div>
-              <p className="text-xs text-muted-foreground">Just the opening trust balance and transaction ledger — for if you'll add properties manually later.</p>
+              <p className="text-xs text-muted-foreground">{t('agentOnboarding.import.ledgerBody')}</p>
             </button>
           </div>
           <Separator />
           <div className="text-center space-y-2">
             <p className="text-xs text-muted-foreground">
-              Not ready to import yet? You can skip this for now and import your opening balance later from Trust Dashboard → Import Existing Account.
+              {t('agentOnboarding.import.skipNote')}
             </p>
             <Button
               variant="ghost"
@@ -1324,7 +1324,7 @@ export default function AgencyOnboardingPage() {
                 navigate('/dashboard');
               }}
             >
-              Skip for now
+              {t('agentOnboarding.import.skip')}
             </Button>
           </div>
           <GuideCard

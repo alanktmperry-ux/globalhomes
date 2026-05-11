@@ -1097,9 +1097,9 @@ export default function PropertyDetailPage() {
               <div className="p-4 rounded-2xl bg-card border border-border">
                 <p className="text-sm font-medium text-foreground">{tp('property.priceGuide')}</p>
                 <p className="text-xl font-bold text-foreground mt-1">
-                  {(property as any).price_guide_low && `$${Number((property as any).price_guide_low).toLocaleString()}`}
+                  {(property as any).price_guide_low && formatCurrency(Number((property as any).price_guide_low), language)}
                   {(property as any).price_guide_low && (property as any).price_guide_high && (property as any).price_guide_low !== (property as any).price_guide_high
-                    ? ` – $${Number((property as any).price_guide_high).toLocaleString()}` : ''}
+                    ? ` – ${formatCurrency(Number((property as any).price_guide_high), language)}` : ''}
                 </p>
                 <PriceGuideHistory propertyId={property.id} currentLow={(property as any).price_guide_low} currentHigh={(property as any).price_guide_high} />
               </div>

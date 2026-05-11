@@ -107,21 +107,34 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     return Math.round(audPrice * currency.rate);
   }, [currency]);
 
+  const { language } = useTranslation();
+
   const formatPrice = useCallback((audPrice: number, listingType?: string) => {
     const isRental = listingType === 'rent' || listingType === 'rental' || (!listingType && audPrice < 50000);
     const converted = convertPrice(audPrice);
-    const suffix = isRental ? '/wk' : '';
-    if (currency.code === 'JPY') {
-      return `¥${converted.toLocaleString()}${suffix}`;
+    const intlLocale = toIntlLocale(language);
+    if (isRental) {
+      const formatted = new Intl.NumberFormat(intlLocale, {
+        style: 'currency',
+        currency: currency.code,
+        maximumFractionDigits: 0,
+      }).format(converted);
+      return `${formatted}/wk`;
     }
-    if (!isRental && converted >= 1_000_000) {
-      return `${currency.symbol}${(converted / 1_000_000).toFixed(1)}M`;
+    if (converted >= 1000) {
+      return new Intl.NumberFormat(intlLocale, {
+        style: 'currency',
+        currency: currency.code,
+        notation: 'compact',
+        maximumFractionDigits: 1,
+      }).format(converted);
     }
-    if (!isRental && converted >= 1_000) {
-      return `${currency.symbol}${(converted / 1_000).toFixed(0)}k`;
-    }
-    return `${currency.symbol}${converted.toLocaleString()}${suffix}`;
-  }, [convertPrice, currency]);
+    return new Intl.NumberFormat(intlLocale, {
+      style: 'currency',
+      currency: currency.code,
+      maximumFractionDigits: 0,
+    }).format(converted);
+  }, [convertPrice, currency, language]);
 
   return (
     <CurrencyContext.Provider value={{ currency, setCurrencyCode, convertPrice, formatPrice, listingMode, setListingMode, isLiveRates }}>

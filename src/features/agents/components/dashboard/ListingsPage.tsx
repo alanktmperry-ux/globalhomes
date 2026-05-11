@@ -729,20 +729,7 @@ const ListingsPage = () => {
   return (
     <>
       <div>
-        <DashboardHeader
-          title="Listings"
-          actions={
-            <div className="flex items-center gap-2">
-              {viewToggle}
-              <Button size="sm" variant="outline" onClick={() => navigate('/')} className="gap-1.5 text-xs">
-                <Globe size={14} /> Browse Market
-              </Button>
-              <Button size="sm" onClick={() => navigate('/pocket-listing')} className="gap-1.5 text-xs">
-                <Plus size={14} /> New Listing
-              </Button>
-            </div>
-          }
-        />
+        {portfolioHeader}
 
         <div className="p-4 sm:p-6 max-w-5xl">
           {isMockData && (

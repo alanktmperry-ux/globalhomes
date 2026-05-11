@@ -252,7 +252,7 @@ export default function HeroSearchPreview() {
         </div>
 
         {/* ── RIGHT ─────────────────────────── */}
-        <div className="hsp-right" style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+        <div className="hsp-right relative flex justify-center">
           <div
             style={{
               position: 'relative',
@@ -364,8 +364,7 @@ export default function HeroSearchPreview() {
           border-color: #2563EB !important;
           box-shadow: 0 0 0 4px rgba(37,99,235,0.15), 0 8px 24px rgba(37,99,235,0.12);
         }
-        @media (max-width: 980px) {
-          .hsp-grid { grid-template-columns: 1fr !important; gap: 48px !important; }
+        @media (max-width: 1023px) {
           .hsp-enq { display: none !important; }
         }
       `}</style>

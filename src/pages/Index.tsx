@@ -538,7 +538,7 @@ const Index = () => {
         </a>
         {/* ═══ Agent sliver bar (rotating) ═══ */}
         <SliverBar />
-        <StickyAcquisitionBar />
+        
 
 
         {/* ═══ SECTION 2 — Hero (HeroSearchPreview) ═══ */}
@@ -563,7 +563,7 @@ const Index = () => {
           <div className="trust-strip" style={{ maxWidth:1280, margin:'0 auto' }}>
             {[
               { type:'count' as const, target: 50000, format: (v:number)=>v.toLocaleString(), label:'ACTIVE LISTINGS' },
-              { type:'count' as const, target: 20,    format: (v:number)=>v.toString(),       label:'LANGUAGES, AUTO' },
+              { type:'static' as const, text:'Any language',                                  label:'AUTO-TRANSLATED' },
               { type:'count' as const, target: 7,     format: (v:number)=>`${v}M+`,           label:'MULTILINGUAL BUYERS' },
               { type:'static' as const, text:'Free',                                          label:'COST FOR BUYERS' },
             ].map((s, i) => (
@@ -572,7 +572,7 @@ const Index = () => {
                   target={s.type === 'count' ? s.target : 0}
                   format={s.type === 'count' ? s.format : undefined}
                   staticText={s.type === 'static' ? s.text : undefined}
-                  className="text-[clamp(48px,6vw,88px)] font-extrabold leading-[0.95] tracking-[-0.05em] tabular-nums"
+                  className={`${s.label === 'AUTO-TRANSLATED' ? 'text-[clamp(36px,5vw,64px)]' : 'text-[clamp(48px,6vw,88px)]'} font-extrabold leading-[0.95] tracking-[-0.05em] tabular-nums`}
                   style={{
                     background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)',
                     WebkitBackgroundClip: 'text',
@@ -1404,44 +1404,6 @@ function SliverBar() {
           {t('home.sliver.cta')}
         </a>
       </div>
-    </div>
-  );
-}
-
-function StickyAcquisitionBar() {
-  const navigate = useNavigate();
-  const { t } = useTranslation();
-  const [show, setShow] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setShow(window.scrollY > 300);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-  return (
-    <div
-      className="sticky-acq-bar"
-      style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 40,
-        background: 'rgba(255,255,255,0.96)', backdropFilter: 'blur(10px)',
-        borderBottom: '1px solid #E5E7EB',
-        padding: '10px 24px',
-        transform: show ? 'translateY(0)' : 'translateY(-100%)',
-        transition: 'transform .25s ease',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        gap: 16,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div style={{ width: 28, height: 28, borderRadius: 8, background: '#2563EB', color: '#fff', fontSize: 13, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>L</div>
-        <span style={{ fontSize: 15, fontWeight: 700, color: '#0a0f1e' }}>ListHQ</span>
-      </div>
-      <button
-        onClick={() => navigate('/agents/login')}
-        style={{ background: '#2563EB', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
-      >
-        {t('home.stickyBar.freeTrialCta')}
-      </button>
-      <style>{`@media (max-width: 768px) { .sticky-acq-bar { display: none !important; } }`}</style>
     </div>
   );
 }

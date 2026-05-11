@@ -573,7 +573,7 @@ export default function PropertyDetailPage() {
   const ctaLabel = isRental ? 'Enquire / Apply' : tp('property.contactAgent');
 
   return (
-    <div className="bg-background overflow-y-auto overflow-x-hidden">
+    <div className="bg-white text-black overflow-y-auto overflow-x-hidden">
       <PropertySEOHead property={{
         ...property,
         images: property.images,
@@ -591,17 +591,18 @@ export default function PropertyDetailPage() {
         address: property.address,
         id: property.id,
       }} agent={property.agent} />
-      {/* Back button */}
-      <div className="max-w-6xl mx-auto w-full px-4 pt-4">
+      {/* Back link */}
+      <div className="max-w-[1280px] mx-auto w-full px-6 md:px-8 pt-24">
         <button
           onClick={() => navigate(-1)}
-          className="w-10 h-10 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors mb-4"
+          className="text-[13px] font-semibold text-[#4a4a4a] hover:text-[#2563EB] inline-flex items-center gap-1.5 transition-colors"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={14} strokeWidth={2.2} />
+          Back to results
         </button>
       </div>
 
-      <main className="max-w-6xl mx-auto w-full px-4 pb-24 md:pb-12">
+      <main className="max-w-[1280px] mx-auto w-full px-6 md:px-8 pt-6 pb-24 md:pb-16">
         {/* Hero image gallery */}
         {images.length > 0 ? (
           <ListingImageGallery

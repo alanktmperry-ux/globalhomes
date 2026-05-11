@@ -1005,7 +1005,7 @@ export default function AgencyOnboardingPage() {
               {/* Business registration — label adapts by country */}
               <div>
                 <Label className="text-xs font-semibold text-foreground">
-                  {isAustralia ? 'ABN' : 'Business Reg. No.'} <span className="text-destructive ml-0.5">*</span>
+                  {isAustralia ? 'ABN' : t('agentOnboarding.agency.businessRegOther')} <span className="text-destructive ml-0.5">{'*'}</span>
                 </Label>
                 {isAustralia ? (
                   <>

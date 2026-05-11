@@ -34,7 +34,7 @@ interface BoostedListing {
   boost_ends_at: string | null;
 }
 
-const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
+
 
 const formatAUDate = (d: Date) =>
   d.toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });

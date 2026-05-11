@@ -27,10 +27,10 @@ interface PropertyRow {
   } | null;
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  compliant: 'bg-emerald-500/15 text-emerald-700',
-  non_compliant: 'bg-red-500/15 text-red-700',
-  requires_attention: 'bg-amber-500/15 text-amber-700',
+const STATUS_TONE: Record<string, APlusBadgeTone> = {
+  compliant: 'green',
+  non_compliant: 'red',
+  requires_attention: 'amber',
 };
 const STATUS_LABEL: Record<string, string> = {
   compliant: 'Compliant',

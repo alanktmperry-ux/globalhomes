@@ -889,7 +889,7 @@ export default function AgencyOnboardingPage() {
             onClick={handleSetPassword}
           >
             {passwordLoading && <Loader2 size={14} className="mr-1 animate-spin" />}
-            Set password & continue
+            {t('agentOnboarding.password.cta')}
           </Button>
         </div>
       );

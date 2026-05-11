@@ -1456,6 +1456,14 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(SESSION_LANGUAGE_KEY, language);
       localStorage.setItem('listhq_language', language);
     } catch { /* non-fatal */ }
+    // Sync <html dir> and <html lang> with active language for RTL + a11y/SEO.
+    if (typeof document !== 'undefined') {
+      const RTL_LANGS = new Set(['ar', 'he', 'fa', 'ur']);
+      document.documentElement.dir = RTL_LANGS.has(language) ? 'rtl' : 'ltr';
+      // Map internal codes to BCP 47 for the lang attribute.
+      const bcp47: Record<string, string> = { zh: 'zh-CN', en: 'en-AU' };
+      document.documentElement.lang = bcp47[language] ?? language;
+    }
   }, [language]);
 
   const t = (key: string) => translations[language]?.[key] || translations.en[key] || key;

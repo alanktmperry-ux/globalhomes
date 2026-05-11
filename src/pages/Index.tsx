@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import LiveActivityTicker from '@/components/LiveActivityTicker';
 import HomeCountUp from '@/components/HomeCountUp';
+import FeaturedListings from '@/features/marketing/FeaturedListings';
 
 // ============================================================
 // Wave 17 V8 — Buyer-first multilingual homepage
@@ -814,6 +815,8 @@ const Index = () => {
           `}</style>
         </div>
 
+        {/* ═══ Featured in [Location] — boosted listings (static seed) ═══ */}
+        <FeaturedListings />
 
         {/* ═══ SECTION 4b — Featured Listings ═══ */}
         <section style={{ background: '#fff', padding: '72px 24px' }}>

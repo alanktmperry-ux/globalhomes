@@ -80,10 +80,10 @@ export default function AgencyOnboardingPage() {
 
   // Password requirements
   const pwReqs = [
-    { label: 'At least 8 characters', met: newPassword.length >= 8 },
-    { label: 'At least one uppercase letter (A–Z)', met: /[A-Z]/.test(newPassword) },
-    { label: 'At least one number (0–9)', met: /[0-9]/.test(newPassword) },
-    { label: 'At least one special character (!@#$%^&*)', met: /[!@#$%^&*]/.test(newPassword) },
+    { label: t('agentOnboarding.password.rule.length'), met: newPassword.length >= 8 },
+    { label: t('agentOnboarding.password.rule.uppercase'), met: /[A-Z]/.test(newPassword) },
+    { label: t('agentOnboarding.password.rule.number'), met: /[0-9]/.test(newPassword) },
+    { label: t('agentOnboarding.password.rule.special'), met: /[!@#$%^&*]/.test(newPassword) },
   ];
   const allPwReqsMet = pwReqs.every(r => r.met);
 

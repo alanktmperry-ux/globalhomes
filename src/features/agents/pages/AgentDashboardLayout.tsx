@@ -87,12 +87,7 @@ const AgentDashboardLayout = () => {
     setTrustPending(!!agent?.trust_setup_pending);
   }, [agent?.trust_setup_pending]);
 
-
-  if (mfaChecked && mfaRequired) {
-    return <MFAChallenge />;
-  }
-
-  // Breadcrumbs: derive from path segments after /dashboard
+  // Breadcrumbs: derive from path segments
   const breadcrumbs = useMemo(() => {
     const segments = location.pathname.split('/').filter(Boolean);
     return segments.map((seg, i) => ({
@@ -102,6 +97,10 @@ const AgentDashboardLayout = () => {
       href: '/' + segments.slice(0, i + 1).join('/'),
     }));
   }, [location.pathname]);
+
+  if (mfaChecked && mfaRequired) {
+    return <MFAChallenge />;
+  }
 
   const agentInitials = (agent?.name || user?.email || 'A')
     .split(/\s+/)

@@ -130,8 +130,10 @@ export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceF
             No price history available yet.
           </p>
           <p className="text-sm text-muted-foreground mt-1">
-            Listed at <span className="font-semibold text-foreground">{priceFormatted || formatPrice(currentPrice)}</span> on{' '}
-            <span className="font-semibold text-foreground">{listedStr}</span>
+            {t('priceHistory.listedAtOn', {
+              price: priceFormatted || formatPrice(currentPrice),
+              date: listedStr,
+            })}
           </p>
         </div>
       </div>

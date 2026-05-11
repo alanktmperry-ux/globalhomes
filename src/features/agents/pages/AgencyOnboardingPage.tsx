@@ -903,8 +903,8 @@ export default function AgencyOnboardingPage() {
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
               <Building2 size={28} className="text-primary" />
             </div>
-            <h2 className="text-xl font-bold">Welcome — let's get your agency set up</h2>
-            <p className="text-sm text-muted-foreground">Choose how you'd like to get started</p>
+            <h2 className="text-xl font-bold">{t('agentOnboarding.welcome.heading')}</h2>
+            <p className="text-sm text-muted-foreground">{t('agentOnboarding.welcome.sub')}</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <Card

@@ -476,28 +476,30 @@ const DashboardOverview = () => {
       {showWelcome && onboardingAgent?.name && (
         <WelcomeModal agentName={onboardingAgent.name} onClose={dismissWelcome} />
       )}
-      <DashboardHeader
-        title="Dashboard"
-       subtitle={`Welcome back, ${(() => {
-          const first = onboardingAgent?.name?.trim().split(/\s+/)[0];
-          if (!first) return 'Agent';
-          return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
-        })()}`}
-      />
-
-      <div className="p-4 sm:p-6 space-y-6 max-w-7xl">
-        {agentId && (
-          <div className="flex justify-end">
+      <div className="p-4 sm:p-6 md:px-10 md:pt-8 space-y-6 max-w-7xl">
+        <div className="flex items-start justify-between gap-4 mb-2">
+          <div>
+            <h1 className="text-2xl tracking-tight font-normal text-white mb-1">Market Intelligence</h1>
+            <p className="text-sm font-light mb-2" style={{ color: 'rgba(255,255,255,0.55)' }}>
+              {`Welcome back, ${(() => {
+                const first = onboardingAgent?.name?.trim().split(/\s+/)[0];
+                if (!first) return 'Agent';
+                return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
+              })()}`}
+            </p>
+          </div>
+          {agentId && (
             <Link
               to={`/agents/${agentId}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-muted-foreground hover:text-primary underline"
+              style={{ color: 'rgba(255,255,255,0.70)' }}
+              className="text-sm hover:text-white transition-colors shrink-0 mt-1"
             >
               Your public profile →
             </Link>
-          </div>
-        )}
+          )}
+        </div>
         <div className="flex justify-end">
           <CustomiseToolbar
             editMode={editMode}

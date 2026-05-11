@@ -147,8 +147,12 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
               contactName={`${lead.first_name} ${lead.last_name ?? ''}`.trim()}
               contactEmail={lead.email ?? null}
             />
-            <button onClick={onClose} className="text-muted-foreground hover:text-foreground p-1">
-              <X size={18} />
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              className="w-9 h-9 rounded-full bg-[#F9FAFB] hover:bg-[#0a0f1e] text-[#374151] hover:text-white flex items-center justify-center transition-all"
+            >
+              <X size={16} />
             </button>
           </div>
         </div>

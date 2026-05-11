@@ -72,74 +72,69 @@ export function ListingImageGallery({ images, address, overlay }: Props) {
     );
   }
 
+  const totalCount = safeImages.length;
+  const sideImages = safeImages.slice(1, 5);
+
   return (
     <>
-      {/* Hero image */}
-      <div
-        className="group relative rounded-2xl overflow-hidden aspect-[16/9] md:aspect-[2.4/1] cursor-pointer bg-muted"
-        onClick={() => openLightbox(activeIndex)}
-      >
-        <img
-          src={safeImages[activeIndex]}
-          alt={`${address} — photo ${activeIndex + 1}`}
-          className="w-full h-full object-cover"
-        />
+      {/* 5-image grid hero */}
+      <div className="relative grid grid-cols-1 md:grid-cols-4 grid-rows-1 md:grid-rows-2 gap-2 h-[420px] md:h-[520px] rounded-3xl overflow-hidden">
+        {/* Main image */}
+        <button
+          type="button"
+          onClick={() => openLightbox(0)}
+          className="relative col-span-1 md:col-span-2 row-span-1 md:row-span-2 w-full h-full overflow-hidden group/hero"
+        >
+          <img
+            src={safeImages[0]}
+            alt={`${address} — photo 1`}
+            className="w-full h-full object-cover cursor-pointer group-hover/hero:opacity-95 transition-opacity"
+          />
+        </button>
 
-        {safeImages.length > 1 && (
-          <>
-            <button
-              type="button"
-              aria-label="Previous photo"
-              onClick={(e) => {
-                e.stopPropagation();
-                setActiveIndex((i) => (i - 1 + safeImages.length) % safeImages.length);
-              }}
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors opacity-0 group-hover:opacity-100"
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <button
-              type="button"
-              aria-label="Next photo"
-              onClick={(e) => {
-                e.stopPropagation();
-                setActiveIndex((i) => (i + 1) % safeImages.length);
-              }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors opacity-0 group-hover:opacity-100"
-            >
-              <ChevronRight size={18} />
-            </button>
+        {/* Side images (desktop only) */}
+        {sideImages.map((img, i) => (
+          <button
+            key={i + 1}
+            type="button"
+            onClick={() => openLightbox(i + 1)}
+            className="hidden md:block col-span-1 row-span-1 w-full h-full overflow-hidden"
+          >
+            <img
+              src={img}
+              alt={`${address} — photo ${i + 2}`}
+              className="w-full h-full object-cover cursor-pointer hover:opacity-95 transition-opacity"
+              loading="lazy"
+            />
+          </button>
+        ))}
 
-            <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-black/60 text-white text-xs font-medium">
-              {activeIndex + 1} / {safeImages.length}
-            </div>
-            <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full bg-black/60 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-              View all photos
-            </div>
-          </>
+        {/* Mobile "+N more" pill */}
+        {totalCount > 1 && (
+          <button
+            type="button"
+            onClick={() => openLightbox(0)}
+            className="md:hidden absolute bottom-5 right-5 px-3.5 py-2 rounded-full bg-black/70 backdrop-blur text-white text-[12px] font-bold"
+          >
+            +{totalCount - 1} more
+          </button>
+        )}
+
+        {/* Desktop "View all photos" button */}
+        {totalCount > 1 && (
+          <button
+            type="button"
+            onClick={() => openLightbox(0)}
+            className="hidden md:inline-flex absolute bottom-5 right-5 bg-white text-[#0a0f1e] px-4 py-2.5 rounded-full text-[13px] font-bold shadow-md items-center gap-2 hover:scale-[1.02] transition-transform"
+          >
+            {/* @ts-expect-error iconify-icon is a web component */}
+            <iconify-icon icon="solar:gallery-linear" style={{ fontSize: '16px' }} />
+            View all {totalCount} photos
+          </button>
         )}
 
         {overlay}
       </div>
-
-      {/* Thumbnail strip */}
-      {safeImages.length > 1 && (
-        <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
-          {safeImages.map((img, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setActiveIndex(i)}
-              className={cn(
-                'shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors',
-                activeIndex === i ? 'border-primary' : 'border-transparent hover:border-border',
-              )}
-            >
-              <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
-            </button>
-          ))}
-        </div>
-      )}
 
       {/* Lightbox */}
       {lightboxOpen && (

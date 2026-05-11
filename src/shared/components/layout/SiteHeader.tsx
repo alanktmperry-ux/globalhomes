@@ -238,6 +238,15 @@ export function SiteHeader() {
 
         {/* ─── Mobile hamburger (visible below md) ─── */}
         <div className="flex md:hidden items-center gap-1 shrink-0">
+          {user && (
+            <button
+              onClick={() => navigate(isAdmin ? '/admin' : isAgentLike ? '/dashboard' : '/seeker/dashboard')}
+              className="w-9 h-9 rounded-full bg-[#2563EB] flex items-center justify-center text-white"
+              aria-label="Dashboard"
+            >
+              <LayoutDashboard size={16} />
+            </button>
+          )}
           {user && isAgent && <NotificationBell />}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>

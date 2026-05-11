@@ -119,7 +119,8 @@ export function LanguageSwitcher() {
       <button
         ref={buttonRef}
         onClick={handleToggle}
-        className="inline-flex items-center gap-1.5 h-9 px-3 rounded-full border border-[#E5E5E5] bg-white text-[13px] font-semibold text-[#1a1a1a] hover:border-[#2563EB] hover:text-[#2563EB] transition-colors"
+        className="inline-flex items-center gap-1.5 rounded-full border border-[#E5E7EB] bg-[#F9FAFB] text-[13px] font-semibold text-[#374151] hover:border-[rgba(37,99,235,0.3)] hover:bg-[#EFF6FF] hover:text-[#1E40AF] transition-colors"
+        style={{ padding: '7px 13px' }}
         aria-label={`Change language (current: ${active.name})`}
         aria-haspopup="listbox"
         aria-expanded={open}

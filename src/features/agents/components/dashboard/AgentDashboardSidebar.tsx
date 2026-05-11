@@ -38,7 +38,7 @@ interface NavSection {
 // Six top-level sections. Each top-level item is clickable AND expands to show its sub-items.
 const NAV_SECTIONS: NavSection[] = [
   {
-    title: 'Dashboard',
+    title: 'Intelligence',
     url: '/dashboard',
     icon: LayoutDashboard,
   },
@@ -53,14 +53,14 @@ const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
-    title: 'Listings',
+    title: 'Portfolio',
     url: '',
     icon: Briefcase,
     children: [
       { title: 'All Listings', url: '/dashboard/listings', icon: Briefcase },
       { title: 'Inbox', url: '/dashboard/inbox', icon: Mail, badgeKey: 'inbox', alertWhenBadge: true },
       { title: 'Contacts', url: '/dashboard/contacts', icon: Contact },
-      { title: 'Leads', url: '/dashboard/crm', icon: Flame },
+      { title: 'Buyer Pipeline', url: '/dashboard/crm', icon: Flame },
       { title: 'Voice Leads', url: '/dashboard/leads', icon: Mic, badgeKey: 'leads' },
       { title: 'Open Homes', url: '/dashboard/open-homes', icon: CalendarDays },
       { title: 'Settlement', url: '/dashboard/settlements', icon: PartyPopper },

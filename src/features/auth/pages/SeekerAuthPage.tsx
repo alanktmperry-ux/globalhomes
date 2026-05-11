@@ -98,13 +98,13 @@ const SeekerAuthPage = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!email.trim()) { setError('Email is required.'); return; }
-    if (password.length < 10) { setError('Password must be at least 10 characters.'); return; }
-    if (!dataLocationConsent) { setError('Please acknowledge where your data is stored to continue.'); return; }
-    if (!policyConsent) { setError('Please agree to the Privacy Policy and Terms of Service to continue.'); return; }
+    if (!email.trim()) { setError(t('auth.error.emailRequired')); return; }
+    if (password.length < 10) { setError(t('auth.error.passwordTooShort')); return; }
+    if (!dataLocationConsent) { setError(t('auth.error.consentDataLocation')); return; }
+    if (!policyConsent) { setError(t('auth.error.consentPolicy')); return; }
     const cleanEmail = email.trim().toLowerCase();
     if (isDisposableEmail(cleanEmail)) {
-      setError('Disposable or temporary email addresses are not accepted. Please use a real email.');
+      setError(t('auth.error.disposableEmail'));
       return;
     }
     if (!captchaToken) {
@@ -119,11 +119,11 @@ const SeekerAuthPage = () => {
       });
       if (gateErr || !gate?.ok) {
         const messages: Record<string, string> = {
-          invalid_captcha: 'Captcha verification failed. Please refresh and try again.',
-          disposable_email: 'Disposable or temporary email addresses are not accepted. Please use a real email.',
-          breached_password: 'This password appears in known data breaches. For security, please choose a different one.',
+          invalid_captcha: t('auth.error.invalidCaptcha'),
+          disposable_email: t('auth.error.disposableEmail'),
+          breached_password: t('auth.error.breachedPassword'),
         };
-        setError(messages[gate?.reason] || 'Signup failed. Please try again or contact support.');
+        setError(messages[gate?.reason] || t('auth.error.signupFailed'));
         setCaptchaToken(null);
         captchaRef.current?.resetCaptcha();
         return;
@@ -141,7 +141,7 @@ const SeekerAuthPage = () => {
       setPendingOtpEmail(cleanEmail);
       setOtpStep(true);
     } catch (err) {
-      setError(getErrorMessage(err) || 'Could not send confirmation email. Please try again.');
+      setError(getErrorMessage(err) || t('auth.error.confirmEmailFailed'));
     } finally {
       setLoading(false);
       setCaptchaToken(null);

@@ -209,7 +209,7 @@ export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceF
                 width={50}
               />
               <Tooltip
-                formatter={(value: number) => [formatPrice(value), 'Suburb Median']}
+                formatter={(value: number) => [formatPrice(value), t('priceHistory.tooltip.suburbMedian')]}
                 labelFormatter={(label: string) => label}
                 contentStyle={{ borderRadius: '0.75rem', border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}
               />

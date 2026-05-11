@@ -21,11 +21,13 @@ import {
 } from '@/components/halo/HaloBoardFilters';
 import type { Halo } from '@/types/halo';
 import { usePageTitle } from '@/lib/usePageTitle';
+import { useTranslation } from '@/shared/lib/i18n';
 
 type BoardTab = 'all' | 'pocket';
 
 export default function HaloBoardPage() {
-  usePageTitle('Buyer Matches');
+  const { t } = useTranslation();
+  usePageTitle(t('halo.board.pageTitle'));
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -168,7 +170,7 @@ export default function HaloBoardPage() {
         .eq('user_id', user.id)
         .maybeSingle();
       if (!agent) {
-        toast.error('Agent record not found.');
+        toast.error(t('halo.board.toast.agentNotFound'));
         setTarget(null);
         return;
       }
@@ -179,7 +181,7 @@ export default function HaloBoardPage() {
         p_halo_id: target.id,
       });
       if (rpcErr) {
-        toast.error('Insufficient credits or already unlocked.');
+        toast.error(t('halo.board.toast.insufficient'));
         setTarget(null);
         return;
       }
@@ -209,11 +211,11 @@ export default function HaloBoardPage() {
       setTarget(null);
       queryClient.invalidateQueries({ queryKey: ['halo-credits-balance', user.id] });
       setUnlockedIds((prev) => new Set(prev).add(id));
-      toast.success('Halo unlocked. Contact details are now visible.');
+      toast.success(t('halo.board.toast.unlocked'));
       navigate(`/dashboard/halo-board/${id}`);
     } catch (e) {
       console.error('[HaloBoard] unlock error', e);
-      toast.error('Something went wrong. Your credit has not been spent. Please try again.');
+      toast.error(t('halo.board.toast.error'));
     } finally {
       setBusy(false);
     }
@@ -223,9 +225,9 @@ export default function HaloBoardPage() {
     <div className="max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold">Halo Board</h1>
+          <h1 className="text-2xl font-bold">{t('halo.board.title')}</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Browse active seeker Halos. Spend 1 credit to unlock contact details.
+            {t('halo.board.subtitle')}
           </p>
         </div>
         <AgentCreditBadge />
@@ -233,7 +235,7 @@ export default function HaloBoardPage() {
 
       {error ? (
         <Alert variant="destructive">
-          <AlertDescription>Unable to load Halo Board. Please refresh.</AlertDescription>
+          <AlertDescription>{t('halo.board.error')}</AlertDescription>
         </Alert>
       ) : loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -254,10 +256,10 @@ export default function HaloBoardPage() {
               <AlertTriangle size={18} className="shrink-0 mt-0.5" />
               <div className="flex-1 text-sm">
                 <p className="font-medium">
-                  You have {balance} credit{balance === 1 ? '' : 's'} left.
+                  {t(balance === 1 ? 'halo.board.lowCredit.one' : 'halo.board.lowCredit.other', { count: balance })}
                 </p>
                 <p className="text-xs opacity-90">
-                  Top up to keep responding to seekers.
+                  {t('halo.board.lowCredit.topUp')}
                 </p>
               </div>
               <Button
@@ -269,13 +271,13 @@ export default function HaloBoardPage() {
                     : 'bg-amber-600 hover:bg-amber-700 text-white'
                 }
               >
-                Buy Credits →
+                {t('halo.board.lowCredit.buy')}
               </Button>
               {!persistentBanner && (
                 <button
                   type="button"
                   onClick={() => setBannerDismissed(true)}
-                  aria-label="Dismiss banner"
+                  aria-label={t('halo.board.lowCredit.dismiss')}
                   className="text-current opacity-60 hover:opacity-100"
                 >
                   <X size={16} />
@@ -285,9 +287,9 @@ export default function HaloBoardPage() {
           )}
           <Tabs value={tab} onValueChange={(v) => setTab(v as BoardTab)} className="mb-4">
             <TabsList>
-              <TabsTrigger value="all">All Halos</TabsTrigger>
+              <TabsTrigger value="all">{t('halo.board.tabs.all')}</TabsTrigger>
               <TabsTrigger value="pocket">
-                Private Matches
+                {t('halo.board.tabs.pocket')}
                 {pocketMatchIds.size > 0 && (
                   <span className="ml-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] text-[10px] rounded-full bg-amber-500 text-white px-1">
                     {pocketMatchIds.size}
@@ -304,20 +306,20 @@ export default function HaloBoardPage() {
                   <Sparkles size={28} className="text-primary" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="font-semibold text-foreground">No buyer matches yet</h3>
+                  <h3 className="font-semibold text-foreground">{t('halo.board.empty.title')}</h3>
                   <p className="text-sm text-muted-foreground max-w-xs">
-                    Once you publish a listing, ListHQ automatically matches it to buyers with a matching Halo. They'll appear here.
+                    {t('halo.board.empty.body')}
                   </p>
                 </div>
                 <Button onClick={() => navigate('/dashboard/listings/new')}>
-                  Publish a listing to start matching →
+                  {t('halo.board.empty.cta')}
                 </Button>
               </div>
             ) : (
               <p className="text-center text-muted-foreground py-12">
                 {tab === 'pocket'
-                  ? 'No Halos match any of your pocket listings yet.'
-                  : 'No active Halos match your filters.'}
+                  ? t('halo.board.empty.filtered.pocket')
+                  : t('halo.board.empty.filtered.all')}
               </p>
             )
           ) : (

@@ -13,6 +13,7 @@ import VoiceListingShowcase from '@/features/marketing/VoiceListingShowcase';
 import HaloBoardPreview from '@/features/marketing/HaloBoardPreview';
 import PricingSectionNew from '@/features/marketing/PricingSection';
 import FinalCTA from '@/features/marketing/FinalCTA';
+import HeroSearchPreview from '@/components/home/HeroSearchPreview';
 
 // ============================================================
 // Wave 17 V8 — Buyer-first multilingual homepage

@@ -5,6 +5,7 @@ import { Loader2, Coins } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import CreditPackageCard from '@/components/halo/CreditPackageCard';
+import { useTranslation } from '@/shared/lib/i18n';
 
 interface CreditPackage {
   id: string;
@@ -16,6 +17,7 @@ interface CreditPackage {
 }
 
 export default function BuyCreditsPage() {
+  const { t } = useTranslation();
   const [params] = useSearchParams();
   const success = params.get('success') === 'true';
   const cancelled = params.get('cancelled') === 'true';
@@ -33,13 +35,13 @@ export default function BuyCreditsPage() {
         .order('credits', { ascending: true });
       if (error) {
         console.error('[BuyCredits]', error);
-        toast.error('Failed to load credit packages.');
+        toast.error(t('halo.credits.loadError'));
       } else {
         setPackages((data ?? []) as unknown as CreditPackage[]);
       }
       setLoading(false);
     })();
-  }, []);
+  }, [t]);
 
   const handleBuy = async (pkg: CreditPackage) => {
     setBuyingId(pkg.id);
@@ -55,9 +57,9 @@ export default function BuyCreditsPage() {
       console.error('[BuyCredits] checkout failed', e);
       const msg = String(e?.message ?? e);
       if (msg.includes('not configured')) {
-        toast.error('Stripe is not configured yet. Please try again soon.');
+        toast.error(t('halo.credits.stripeNotConfigured'));
       } else {
-        toast.error('Could not start checkout. Please try again.');
+        toast.error(t('halo.credits.checkoutError'));
       }
       setBuyingId(null);
     }
@@ -67,24 +69,24 @@ export default function BuyCreditsPage() {
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Coins size={22} /> Buy Halo credits
+          <Coins size={22} /> {t('halo.credits.title')}
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Each credit lets you unlock one seeker's contact details on the Halo Board.
+          {t('halo.credits.subtitle')}
         </p>
       </div>
 
       {success && (
         <Alert className="border-green-500 bg-green-50">
           <AlertDescription className="text-green-800">
-            Payment successful. Your credits have been added to your account.
+            {t('halo.credits.success')}
           </AlertDescription>
         </Alert>
       )}
       {cancelled && (
         <Alert className="border-amber-500 bg-amber-50">
           <AlertDescription className="text-amber-800">
-            Payment cancelled. No charge was made.
+            {t('halo.credits.cancelled')}
           </AlertDescription>
         </Alert>
       )}

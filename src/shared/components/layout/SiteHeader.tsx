@@ -163,11 +163,11 @@ export function SiteHeader() {
             </button>
           )}
 
-          {/* Dashboard quick-access button — logged-in users only */}
-          {user && (
+          {/* Dashboard quick-access button — agents/admins only */}
+          {user && isAgentLike && (
             <button
-              onClick={() => navigate(isAdmin ? '/admin' : isAgentLike ? '/dashboard' : '/seeker/dashboard')}
-              className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold rounded-[10px] px-4 py-2 text-sm flex items-center gap-2 transition-all"
+              onClick={() => navigate(isAdmin ? '/admin' : '/dashboard')}
+              className="bg-white border border-[#E5E7EB] text-[#2563EB] hover:bg-[#EFF6FF] hover:border-[#2563EB] font-semibold rounded-[10px] px-4 py-2 text-sm flex items-center gap-2 transition-all"
             >
               <LayoutDashboard size={16} />
               Dashboard
@@ -238,10 +238,10 @@ export function SiteHeader() {
 
         {/* ─── Mobile hamburger (visible below md) ─── */}
         <div className="flex md:hidden items-center gap-1 shrink-0">
-          {user && (
+          {user && isAgentLike && (
             <button
-              onClick={() => navigate(isAdmin ? '/admin' : isAgentLike ? '/dashboard' : '/seeker/dashboard')}
-              className="w-9 h-9 rounded-full bg-[#2563EB] flex items-center justify-center text-white"
+              onClick={() => navigate(isAdmin ? '/admin' : '/dashboard')}
+              className="w-9 h-9 rounded-full bg-white border border-[#E5E7EB] text-[#2563EB] hover:bg-[#EFF6FF] flex items-center justify-center"
               aria-label="Dashboard"
             >
               <LayoutDashboard size={16} />

@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import LiveActivityTicker from '@/components/LiveActivityTicker';
 import HomeCountUp from '@/components/HomeCountUp';
+import FeaturedListings from '@/features/marketing/FeaturedListings';
 
 // ============================================================
 // Wave 17 V8 — Buyer-first multilingual homepage

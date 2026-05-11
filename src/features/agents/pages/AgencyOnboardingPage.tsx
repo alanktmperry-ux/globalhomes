@@ -1210,24 +1210,24 @@ export default function AgencyOnboardingPage() {
         <div className="space-y-5">
           <div className="text-center space-y-1 mb-4">
             <Calendar size={32} className="mx-auto text-primary" />
-            <h3 className="text-base font-bold">When are you switching to ListHQ?</h3>
-            <p className="text-xs text-muted-foreground">All transactions from this date will be recorded in ListHQ</p>
+            <h3 className="text-base font-bold">{t('agentOnboarding.cutover.heading')}</h3>
+            <p className="text-xs text-muted-foreground">{t('agentOnboarding.cutover.sub')}</p>
           </div>
           <div>
-            <Label className="text-xs font-medium">Cut-over date *</Label>
+            <Label className="text-xs font-medium">{t('agentOnboarding.cutover.label')}</Label>
             <Input type="date" value={cutoverDate} onChange={e => setCutoverDate(e.target.value)} className="mt-1.5" />
           </div>
           <div className="bg-muted/50 border border-border rounded-lg p-4 space-y-2">
-            <p className="text-xs font-medium text-foreground">Before proceeding, your trust account must be reconciled to this date in your current system. You will need:</p>
+            <p className="text-xs font-medium text-foreground">{t('agentOnboarding.cutover.needs')}</p>
             <ul className="text-xs text-muted-foreground space-y-1.5 list-disc list-inside">
-              <li>Trust Trial Balance as at cut-over date</li>
-              <li>Client Ledger Summary (from Reports in your current system)</li>
-              <li>Last bank statement showing the closing balance</li>
-              <li>Active matters list (clients with funds in trust)</li>
+              <li>{t('agentOnboarding.cutover.need1')}</li>
+              <li>{t('agentOnboarding.cutover.need2')}</li>
+              <li>{t('agentOnboarding.cutover.need3')}</li>
+              <li>{t('agentOnboarding.cutover.need4')}</li>
             </ul>
           </div>
           <Button variant="outline" size="sm" onClick={generateImportChecklist} className="w-full gap-2">
-            <Download size={14} /> Download import checklist
+            <Download size={14} /> {t('agentOnboarding.cutover.downloadChecklist')}
           </Button>
           <GuideCard
             title="Choosing your cut-over date"

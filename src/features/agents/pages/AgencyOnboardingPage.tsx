@@ -1046,7 +1046,7 @@ export default function AgencyOnboardingPage() {
               {/* Licence number */}
               <div>
                 <Label className="text-xs font-semibold text-foreground">
-                  {isAustralia ? 'Real Estate Licence No.' : 'Licence / Registration No.'} <span className="text-destructive ml-0.5">*</span>
+                  {isAustralia ? t('agentOnboarding.agency.licence') : t('agentOnboarding.agency.licenceOther')} <span className="text-destructive ml-0.5">{'*'}</span>
                 </Label>
                 <Input value={licenceNumber} onChange={e => setLicenceNumber(e.target.value)} placeholder="e.g. 074356" className="mt-1.5" />
               </div>

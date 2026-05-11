@@ -8,6 +8,7 @@ import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import LiveActivityTicker from '@/components/LiveActivityTicker';
 import HomeCountUp from '@/components/HomeCountUp';
 import FeaturedListings from '@/features/marketing/FeaturedListings';
+import ReplaceFiveTools from '@/features/marketing/ReplaceFiveTools';
 
 // ============================================================
 // Wave 17 V8 — Buyer-first multilingual homepage

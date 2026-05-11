@@ -357,16 +357,21 @@ const ProfilePage = () => {
   ];
 
   return (
-    <div>
-      <DashboardHeader title="Agent Profile" subtitle="Manage your professional profile and credentials" />
+    <div className="p-4 sm:p-6 max-w-4xl">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-[#0a0f1e] tracking-tight">Agent Profile</h1>
+        <p className="text-sm font-light text-[#6B7280] mt-1">Manage your professional profile and credentials</p>
+      </div>
 
-      <div className="p-4 sm:p-6 max-w-4xl">
-        <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="bg-secondary">
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="credentials">Credentials</TabsTrigger>
-            <TabsTrigger value="verification">Verification</TabsTrigger>
-          </TabsList>
+      <Tabs defaultValue="profile" className="space-y-6">
+        <TabsList
+          className="bg-white gap-1 p-1 rounded-[10px] h-auto"
+          style={{ border: '1px solid #E5E7EB' }}
+        >
+          <TabsTrigger value="profile" className="text-sm px-4 py-2 rounded-[8px] data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium">Profile</TabsTrigger>
+          <TabsTrigger value="credentials" className="text-sm px-4 py-2 rounded-[8px] data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium">Credentials</TabsTrigger>
+          <TabsTrigger value="verification" className="text-sm px-4 py-2 rounded-[8px] data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium">Verification</TabsTrigger>
+        </TabsList>
 
           {/* ===== PROFILE TAB ===== */}
           <TabsContent value="profile" className="space-y-6">

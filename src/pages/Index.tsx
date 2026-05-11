@@ -572,7 +572,7 @@ const Index = () => {
                   target={s.type === 'count' ? s.target : 0}
                   format={s.type === 'count' ? s.format : undefined}
                   staticText={s.type === 'static' ? s.text : undefined}
-                  className={`${s.label === 'AUTO-TRANSLATED' ? 'text-[clamp(24px,3vw,44px)]' : 'text-[clamp(48px,6vw,88px)]'} font-extrabold tracking-[-0.05em] tabular-nums`}
+                  className={`${s.label === 'AUTO-TRANSLATED' ? '' : 'text-[clamp(48px,6vw,88px)]'} font-extrabold tabular-nums`}
                   style={{
                     background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)',
                     WebkitBackgroundClip: 'text',
@@ -582,6 +582,8 @@ const Index = () => {
                     display: 'inline-block',
                     whiteSpace: 'nowrap',
                     lineHeight: 1,
+                    letterSpacing: '-0.02em',
+                    ...(s.label === 'AUTO-TRANSLATED' ? { fontSize: 'clamp(20px, 2.4vw, 36px)' } : { letterSpacing: '-0.05em' }),
                   }}
                 />
                 <div className="text-[13px] font-bold tracking-wider uppercase mt-3.5" style={{ color:'#4a4a4a' }}>{s.label}</div>

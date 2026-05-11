@@ -426,6 +426,8 @@ Deno.serve(async (req) => {
         properties: properties ?? [],
         intent,
         total: properties?.length ?? 0,
+        detectedLang,
+        translatedQuery,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

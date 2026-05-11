@@ -116,11 +116,12 @@ export default function TodayPrioritiesPanel() {
               <Loader2 size={14} className="animate-spin" /> Loading priorities…
             </div>
           ) : items.length === 0 ? (
-            <div className="px-5 py-8 text-center">
-              <PartyPopper size={28} className="mx-auto text-primary mb-2" />
-              <p className="text-sm font-medium">You're all caught up </p>
-              <p className="text-xs text-muted-foreground mt-1">No urgent actions right now. Good work.</p>
-            </div>
+            <EmptyState
+              variant="compact"
+              icon="solar:bell-linear"
+              title="You're all caught up"
+              body="We'll let you know when something needs your attention."
+            />
           ) : (
             <ul className="divide-y divide-border">
               {items.map(item => (

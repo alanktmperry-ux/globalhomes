@@ -136,7 +136,7 @@ export function SiteHeader() {
           </Link>
           <Link
             to="/for-agents"
-            className="hidden md:inline text-[13px] font-medium text-[#6a6a6a] hover:text-[#0a0f1e] transition-colors"
+            className="hidden md:inline text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors"
           >
             List with us →
           </Link>

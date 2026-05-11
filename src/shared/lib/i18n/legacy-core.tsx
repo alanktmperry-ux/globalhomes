@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { toast } from 'sonner';
 
-export type Language = 'en' | 'zh' | 'zh-TW' | 'ko' | 'ms' | 'es' | 'ar' | 'hi' | 'fr' | 'pt' | 'bn' | 'ru' | 'ja' | 'de' | 'id' | 'nl' | 'pl' | 'vi' | 'th' | 'tr' | 'sv' | 'da' | 'no' | 'fil' | 'it' | 'pa' | 'ta';
+export type Language = 'en' | 'zh' | 'zh-TW' | 'ko' | 'ms' | 'es' | 'ar' | 'hi' | 'fr' | 'pt' | 'bn' | 'ru' | 'ja' | 'de' | 'id' | 'nl' | 'pl' | 'vi' | 'th' | 'tr' | 'sv' | 'da' | 'no' | 'fil' | 'it' | 'pa' | 'ta' | 'ne';
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
@@ -1346,6 +1346,7 @@ export const languageNames: Record<Language, string> = {
   bn: 'বাংলা',
   pa: 'ਪੰਜਾਬੀ',
   ta: 'தமிழ்',
+  ne: 'नेपाली',
 };
 
 interface I18nContextType {
@@ -1366,7 +1367,7 @@ const BROWSER_LANG_MAP: Record<string, Language> = {
   'ar': 'ar', 'pt': 'pt', 'it': 'it', 'id': 'id', 'nl': 'nl', 'pl': 'pl',
   'vi': 'vi', 'ko': 'ko', 'hi': 'hi', 'th': 'th', 'tr': 'tr', 'sv': 'sv',
   'da': 'da', 'no': 'no', 'nb': 'no', 'nn': 'no',
-  'ms': 'ms', 'bn': 'bn', 'pa': 'pa', 'ta': 'ta',
+  'ms': 'ms', 'bn': 'bn', 'pa': 'pa', 'ta': 'ta', 'ne': 'ne',
   // Filipino / Tagalog
   'fil': 'fil', 'tl': 'fil',
 };
@@ -1397,6 +1398,7 @@ const languageUpdatedMessages: Record<Language, string> = {
   tr: 'Dil güncellendi', sv: 'Språk uppdaterat', da: 'Sprog opdateret',
   no: 'Språk oppdatert', fil: 'Na-update ang wika', bn: 'ভাষা আপডেট হয়েছে',
   pa: 'ਭਾਸ਼ਾ ਅੱਪਡੇਟ ਹੋਈ', ta: 'மொழி புதுப்பிக்கப்பட்டது',
+  ne: 'भाषा अद्यावधिक गरियो',
 };
 
 // Canonical (config) language codes that need mapping to legacy codes.

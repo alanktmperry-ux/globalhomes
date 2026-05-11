@@ -144,61 +144,98 @@ export default function BillingPage() {
     setSearchParams(searchParams, { replace: true });
   }
 
-  return (
-    <div>
-      <DashboardHeader title="Billing & Plans" subtitle="Choose the plan that fits your business." />
+  const currentPlanMeta = currentFrontendPlan ? PLANS.find(p => p.id === currentFrontendPlan) : null;
+  const currentPlanLabel = currentFrontendPlan
+    ? `${currentPlanMeta?.name ?? currentFrontendPlan} Plan`.toUpperCase()
+    : 'FREE TRIAL';
+  const currentPlanPrice = currentPlanMeta ? `$${currentPlanMeta.founding}` : '$0';
 
-      <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
+  return (
+    <div className="p-4 sm:p-6 max-w-6xl mx-auto">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-[#0a0f1e] tracking-tight">Billing &amp; Plans</h1>
+        <p className="text-sm font-light text-[#6B7280] mt-1">Choose the plan that fits your business.</p>
+      </div>
+
+      <div className="space-y-6">
         {showSuccess && (
-          <div className="rounded-xl border border-success/30 bg-success/10 p-4 flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center shrink-0">
-              <CheckCircle2 size={18} className="text-success" />
+          <div
+            className="rounded-[12px] p-4 flex items-start gap-3 bg-[#ECFDF5]"
+            style={{ border: '1px solid rgba(52,211,153,0.30)' }}
+          >
+            <div className="w-8 h-8 rounded-full bg-[#34D399]/20 flex items-center justify-center shrink-0">
+              <CheckCircle2 size={18} className="text-[#065F46]" />
             </div>
             <div className="flex-1">
-              <p className="font-semibold text-foreground">Subscription activated</p>
-              <p className="text-sm text-muted-foreground">Welcome to ListHQ. Your account is now fully active.</p>
+              <p className="text-sm font-bold text-[#065F46]">Subscription activated</p>
+              <p className="text-xs text-[#065F46]/80 mt-0.5">Welcome to ListHQ. Your account is now fully active.</p>
             </div>
-            <button onClick={dismissBanner} className="text-muted-foreground hover:text-foreground" aria-label="Dismiss">
+            <button onClick={dismissBanner} className="text-[#6B7280] hover:text-[#0a0f1e]" aria-label="Dismiss">
               <X size={16} />
             </button>
           </div>
         )}
         {showCancelled && (
-          <div className="rounded-xl border border-border bg-muted/40 p-4 flex items-start gap-3">
-            <p className="text-sm text-foreground flex-1">Checkout cancelled. Your account is unchanged.</p>
-            <button onClick={dismissBanner} className="text-muted-foreground hover:text-foreground" aria-label="Dismiss">
+          <div
+            className="rounded-[12px] p-4 flex items-start gap-3 bg-[#F9FAFB]"
+            style={{ border: '1px solid #E5E7EB' }}
+          >
+            <p className="text-sm text-[#374151] flex-1">Checkout cancelled. Your account is unchanged.</p>
+            <button onClick={dismissBanner} className="text-[#6B7280] hover:text-[#0a0f1e]" aria-label="Dismiss">
               <X size={16} />
             </button>
           </div>
         )}
 
-        {/* Current plan summary */}
-        <div className="rounded-xl border border-border bg-card p-5 flex items-start justify-between gap-4 flex-wrap">
-          <div>
-            <p className="text-sm text-muted-foreground">Current plan</p>
-            <p className="text-lg font-semibold text-foreground capitalize">
-              {currentFrontendPlan ?? 'Free Trial'}
-            </p>
+        {/* Current plan card — dark with blue glow */}
+        <div className="bg-[#0a0f1e] rounded-[12px] p-6 text-white relative overflow-hidden">
+          <div
+            className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-30 pointer-events-none"
+            style={{ background: '#2563EB' }}
+          />
+          <div className="relative z-10">
+            <span
+              className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase mb-4"
+              style={{ background: 'rgba(37,99,235,0.30)', color: '#93C5FD', letterSpacing: '0.10em' }}
+            >
+              {currentPlanLabel}
+            </span>
+            <div className="text-2xl font-bold mb-1 capitalize">{currentPlanMeta?.name ?? 'Free Trial'}</div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-bold tabular-nums">{currentPlanPrice}</span>
+              {currentPlanMeta && <span className="text-sm font-light text-white/60">/ month</span>}
+            </div>
             {trialEndDate && (
-              <TrialCountdown trialEndsAt={trialEndDate} className="mt-1" />
+              <div className="mt-3">
+                <TrialCountdown trialEndsAt={trialEndDate} className="" />
+              </div>
+            )}
+            {isSubscribed && (
+              <button
+                onClick={openPortal}
+                disabled={portalLoading}
+                className="bg-white text-[#0a0f1e] hover:bg-white/95 font-semibold rounded-[10px] px-4 py-2 text-sm mt-5 inline-flex items-center gap-2 transition-all disabled:opacity-60"
+              >
+                {portalLoading
+                  ? <Loader2 size={14} className="animate-spin" />
+                  : <ExternalLink size={14} />}
+                Manage subscription
+              </button>
             )}
           </div>
-          {isSubscribed && (
-            <Button variant="outline" size="sm" onClick={openPortal} disabled={portalLoading}>
-              {portalLoading ? <Loader2 size={14} className="animate-spin mr-2" /> : <ExternalLink size={14} className="mr-2" />}
-              Manage subscription
-            </Button>
-          )}
         </div>
 
         {/* Founding member banner */}
-        <div className="rounded-xl border border-primary/30 bg-primary/5 p-5 flex items-start gap-4">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <Sparkles size={20} className="text-primary" />
+        <div
+          className="bg-[#EFF6FF] rounded-[12px] p-5 flex items-start gap-4"
+          style={{ border: '1px solid #DBEAFE' }}
+        >
+          <div className="w-10 h-10 rounded-[10px] bg-white flex items-center justify-center shrink-0">
+            <Sparkles size={20} className="text-[#2563EB]" />
           </div>
           <div>
-            <h2 className="font-semibold text-foreground">Founding Member Pricing</h2>
-            <p className="text-sm text-muted-foreground">
+            <h2 className="text-sm font-bold text-[#1E40AF]">Founding Member Pricing</h2>
+            <p className="text-xs text-[#1E40AF]/80 mt-1 font-light">
               Lock in discounted rates permanently — available to the first 50 agents only.
             </p>
           </div>
@@ -212,58 +249,68 @@ export default function BillingPage() {
             return (
               <div
                 key={plan.id}
-                className={cn(
-                  'rounded-xl border bg-card p-5 flex flex-col',
-                  isCurrent ? 'border-primary ring-2 ring-primary/40' : 'border-border'
-                )}
+                className="bg-white rounded-[12px] p-6 flex flex-col"
+                style={{
+                  border: isCurrent ? '2px solid #2563EB' : '1px solid #E5E7EB',
+                  boxShadow: isCurrent ? '0 0 0 4px rgba(37,99,235,0.10)' : undefined,
+                }}
               >
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold text-base text-foreground">{plan.name}</h3>
+                  <h3 className="text-base font-bold text-[#0a0f1e]">{plan.name}</h3>
                   {plan.popular && !isCurrent && (
-                    <Badge className="bg-primary text-primary-foreground hover:bg-primary">
+                    <span
+                      className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase"
+                      style={{ background: '#EFF6FF', color: '#1E40AF', letterSpacing: '0.08em' }}
+                    >
                       Most popular
-                    </Badge>
+                    </span>
                   )}
                   {isCurrent && (
-                    <Badge variant="outline" className="border-primary text-primary">
-                      Current plan
-                    </Badge>
+                    <span
+                      className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase"
+                      style={{ background: '#ECFDF5', color: '#065F46', letterSpacing: '0.08em' }}
+                    >
+                      Current
+                    </span>
                   )}
                 </div>
 
                 <div className="mb-1">
-                  <span className="text-3xl font-bold text-foreground">${plan.founding}</span>
-                  <span className="text-sm text-muted-foreground">/month</span>
+                  <span className="text-3xl font-bold text-[#0a0f1e] tabular-nums">${plan.founding}</span>
+                  <span className="text-sm text-[#6B7280]">/month</span>
                 </div>
-                <p className="text-xs text-muted-foreground line-through mb-4">
+                <p className="text-xs text-[#9CA3AF] line-through mb-4 tabular-nums">
                   ${plan.full}/mo full price
                 </p>
 
                 <ul className="space-y-2 mb-5 flex-1">
                   {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm text-foreground">
-                      <Check size={14} className="text-primary mt-0.5 shrink-0" />
+                    <li key={f} className="flex items-start gap-2 text-sm text-[#374151]">
+                      <Check size={14} className="text-[#2563EB] mt-0.5 shrink-0" />
                       <span>{f}</span>
                     </li>
                   ))}
                 </ul>
 
                 {isCurrent ? (
-                  <Button variant="outline" disabled className="w-full">
+                  <button
+                    disabled
+                    className="w-full rounded-[10px] px-4 py-2.5 text-sm font-semibold bg-[#F3F4F6] text-[#9CA3AF]"
+                  >
                     Current plan
-                  </Button>
+                  </button>
                 ) : (
-                  <Button
-                    className="w-full"
+                  <button
                     onClick={() => subscribe(plan)}
                     disabled={isLoading || loadingPlan !== null}
+                    className="w-full rounded-[10px] px-4 py-2.5 text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
                   >
                     {isLoading ? (
-                      <><Loader2 size={14} className="animate-spin mr-2" /> Redirecting…</>
+                      <><Loader2 size={14} className="animate-spin" /> Redirecting…</>
                     ) : (
                       <>Subscribe now →</>
                     )}
-                  </Button>
+                  </button>
                 )}
               </div>
             );
@@ -271,16 +318,16 @@ export default function BillingPage() {
         </div>
 
         {/* FAQ row */}
-        <div className="rounded-xl border border-border bg-card p-5 space-y-2">
-          <h3 className="font-semibold text-sm text-foreground">Questions about pricing?</h3>
-          <p className="text-sm text-muted-foreground">
+        <div className="bg-white rounded-[12px] p-6" style={{ border: '1px solid #E5E7EB' }}>
+          <h3 className="text-base font-bold text-[#0a0f1e] mb-2">Questions about pricing?</h3>
+          <p className="text-sm text-[#374151]">
             Email{' '}
-            <a href={`mailto:${SUPPORT_EMAIL}`} className="text-primary hover:underline">
+            <a href={`mailto:${SUPPORT_EMAIL}`} className="text-[#2563EB] hover:text-[#1D4ED8] font-semibold">
               {SUPPORT_EMAIL}
             </a>{' '}
             or call during business hours.
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-[#6B7280] mt-2 font-light">
             Founding member pricing is locked for life — it never increases as long as your subscription stays active.
           </p>
         </div>

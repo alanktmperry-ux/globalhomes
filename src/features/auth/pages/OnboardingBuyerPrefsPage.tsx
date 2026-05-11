@@ -72,7 +72,7 @@ export default function OnboardingBuyerPrefsPage() {
       navigate(qs ? `/?${qs}` : '/', { replace: true });
       sendWelcomeEmail();
     } catch (err) {
-      toast.error("Couldn't save your preferences", { description: getErrorMessage(err) });
+      toast.error(t('onboarding.buyerPrefs.savingErrorTitle'), { description: getErrorMessage(err) });
       setSaving(false);
     }
   };

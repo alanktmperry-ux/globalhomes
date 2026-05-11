@@ -573,7 +573,7 @@ export default function PropertyDetailPage() {
   const ctaLabel = isRental ? 'Enquire / Apply' : tp('property.contactAgent');
 
   return (
-    <div className="bg-background overflow-y-auto overflow-x-hidden">
+    <div className="bg-white text-black overflow-y-auto overflow-x-hidden">
       <PropertySEOHead property={{
         ...property,
         images: property.images,
@@ -591,17 +591,18 @@ export default function PropertyDetailPage() {
         address: property.address,
         id: property.id,
       }} agent={property.agent} />
-      {/* Back button */}
-      <div className="max-w-6xl mx-auto w-full px-4 pt-4">
+      {/* Back link */}
+      <div className="max-w-[1280px] mx-auto w-full px-6 md:px-8 pt-24">
         <button
           onClick={() => navigate(-1)}
-          className="w-10 h-10 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors mb-4"
+          className="text-[13px] font-semibold text-[#4a4a4a] hover:text-[#2563EB] inline-flex items-center gap-1.5 transition-colors"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={14} strokeWidth={2.2} />
+          Back to results
         </button>
       </div>
 
-      <main className="max-w-6xl mx-auto w-full px-4 pb-24 md:pb-12">
+      <main className="max-w-[1280px] mx-auto w-full px-6 md:px-8 pt-6 pb-24 md:pb-16">
         {/* Hero image gallery */}
         {images.length > 0 ? (
           <ListingImageGallery
@@ -699,11 +700,23 @@ export default function PropertyDetailPage() {
                   {tp('property.viewSuburbArrow', { suburb: property.suburb })}
                 </Link>
               )}
-              <ListingLanguageSwitcher
-                translations={(property as any).translations}
-                currentLang={language === 'zh' ? 'zh-CN' : language}
-                onChange={(code) => setLanguage((code === 'zh-CN' ? 'zh' : code) as any)}
-              />
+              <div className="mt-4 bg-[#EFF6FF] border border-[#2563EB]/15 rounded-2xl p-4 flex items-center gap-3 flex-wrap">
+                {/* @ts-expect-error — iconify-icon is a web component */}
+                <iconify-icon icon="solar:earth-linear" style={{ fontSize: '20px', color: '#2563EB', display: 'inline-flex', lineHeight: 1 }} />
+                <span className="text-[13px] font-semibold text-[#1E40AF]">
+                  {tp('property.translatedIn') || 'Currently showing in your language'}
+                </span>
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.10em] bg-white text-[#2563EB] border border-[#2563EB]/20">
+                  AI TRANSLATED
+                </span>
+                <div className="ml-auto">
+                  <ListingLanguageSwitcher
+                    translations={(property as any).translations}
+                    currentLang={language === 'zh' ? 'zh-CN' : language}
+                    onChange={(code) => setLanguage((code === 'zh-CN' ? 'zh' : code) as any)}
+                  />
+                </div>
+              </div>
               {socialProof && (
                 <div className="flex flex-wrap items-center gap-3 mt-3 py-2.5 px-4 bg-primary/5 rounded-xl border border-primary/10 text-xs text-muted-foreground">
                   {socialProof.suburbSearchers > 0 && (
@@ -1187,31 +1200,31 @@ export default function PropertyDetailPage() {
             {/* Investment Insights (hide for rentals) */}
             {!isRental && <InvestmentInsightsCard property={property} />}
 
-            <div className="rounded-2xl overflow-hidden sticky top-4" style={{ background: '#020817' }}>
+            <div className="rounded-2xl overflow-hidden sticky top-24 bg-white border border-[#E5E5E5] shadow-sm">
               {/* Agent info */}
               <Link to={property.agent.id ? `/agent/${property.agent.id}` : '#'} className="flex items-center gap-3.5 p-5 pb-4 group/agent">
                 <div className="relative shrink-0">
-                  <Avatar className="w-14 h-14 rounded-[14px] border-2 transition-transform group-hover/agent:scale-105" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
+                  <Avatar className="w-14 h-14 rounded-[14px] border border-[#E5E5E5] transition-transform group-hover/agent:scale-105">
                     <AvatarImage src={property.agent.avatarUrl} alt={property.agent.name} className="object-cover" />
-                    <AvatarFallback className="text-base font-bold rounded-[14px]" style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)', color: '#fff' }}>
+                    <AvatarFallback className="text-base font-bold rounded-[14px] text-white" style={{ background: 'linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%)' }}>
                       {property.agent.name.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-white text-[15px] leading-tight group-hover/agent:text-blue-400 transition-colors">{property.agent.name}</p>
-                  <p className="text-[12px] mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>{property.agent.agency}</p>
+                  <p className="font-bold text-[#0a0f1e] text-[15px] leading-tight group-hover/agent:text-[#2563EB] transition-colors">{property.agent.name}</p>
+                  <p className="text-[12px] mt-0.5 text-[#6a6a6a]">{property.agent.agency}</p>
                   {property.agent.isSubscribed && (
-                    <p className="text-[11px] font-semibold text-emerald-400 mt-1.5 flex items-center gap-1">
+                    <p className="text-[11px] font-semibold text-emerald-600 mt-1.5 flex items-center gap-1">
                       <BadgeCheck size={12} /> {t('agent.subscribed')}
                     </p>
                   )}
                   {property.agent.rating ? (
                     <div className="flex items-center gap-1 mt-1">
                       <Star size={12} className="fill-yellow-400 text-yellow-400" />
-                      <span className="text-[12px] font-medium text-white">{property.agent.rating.toFixed(1)}</span>
+                      <span className="text-[12px] font-medium text-[#0a0f1e]">{property.agent.rating.toFixed(1)}</span>
                       {property.agent.reviewCount ? (
-                        <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{tp('property.agent.reviewCount', { count: property.agent.reviewCount })}</span>
+                        <span className="text-[11px] text-[#9CA3AF]">{tp('property.agent.reviewCount', { count: property.agent.reviewCount })}</span>
                       ) : null}
                     </div>
                   ) : null}
@@ -1223,23 +1236,22 @@ export default function PropertyDetailPage() {
                 {property.agent.phone ? (
                   <a
                     href={`tel:${property.agent.phone}`}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold text-white transition-colors"
-                    style={{ border: '1.5px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)' }}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold text-[#0a0f1e] border border-[#E5E5E5] bg-white hover:border-[#2563EB] hover:text-[#2563EB] transition-all"
                   >
                     <Phone size={13} strokeWidth={2} /> {tp('property.call')}
                   </a>
                 ) : (
                   <button
                     onClick={handleCtaClick}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold text-white transition-colors"
-                    style={{ border: '1.5px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)' }}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold text-[#0a0f1e] border border-[#E5E5E5] bg-white hover:border-[#2563EB] hover:text-[#2563EB] transition-all"
                   >
                     <Phone size={13} strokeWidth={2} /> {tp('property.call')}
                   </button>
                 )}
                 <button
                   onClick={handleCtaClick}
-                  className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                  className="flex-1 py-2.5 rounded-xl text-[13px] font-bold text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(37,99,235,0.35)]"
+                  style={{ background: 'linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%)' }}
                 >
                   {ctaLabel}
                 </button>
@@ -1249,8 +1261,7 @@ export default function PropertyDetailPage() {
                 <div className="px-5 pb-5 -mt-2">
                   <button
                     onClick={() => setRentalApplicationOpen(true)}
-                    className="w-full py-2.5 rounded-xl text-[13px] font-semibold transition-colors"
-                    style={{ border: '1.5px solid rgba(255,255,255,0.12)', color: '#fff', background: 'transparent' }}
+                    className="w-full py-2.5 rounded-xl text-[13px] font-semibold border border-[#0a0f1e] text-[#0a0f1e] bg-white hover:bg-[#0a0f1e] hover:text-white transition-all"
                   >
                     {tp('property.applyNow')}
                   </button>

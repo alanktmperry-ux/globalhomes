@@ -344,9 +344,16 @@ function HaloCard({ halo }: { halo: HaloRow }) {
         <h3 className="font-semibold text-[#1E293B] text-base sm:text-lg leading-snug">
           {title}
         </h3>
-        <Badge className={isBuy ? 'bg-[#DBEAFE] text-[#1D4ED8] hover:bg-[#DBEAFE]' : 'bg-[#D1FAE5] text-[#059669] hover:bg-[#D1FAE5]'}>
+        <span
+          className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold uppercase"
+          style={{
+            letterSpacing: '0.06em',
+            background: isBuy ? '#EFF6FF' : '#ECFDF5',
+            color: isBuy ? '#1E40AF' : '#065F46',
+          }}
+        >
           {isBuy ? t('seeker.haloCard.badge.buy') : t('seeker.haloCard.badge.rent')}
-        </Badge>
+        </span>
       </div>
 
       <p className="text-sm text-[#64748B] mb-3">

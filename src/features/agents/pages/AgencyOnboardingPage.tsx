@@ -1069,7 +1069,7 @@ export default function AgencyOnboardingPage() {
               {/* Agency phone */}
               <div>
                 <Label className="text-xs font-semibold text-foreground">
-                  Agency Phone <span className="text-destructive ml-0.5">*</span>
+                  {t('agentOnboarding.agency.phone')} <span className="text-destructive ml-0.5">{'*'}</span>
                 </Label>
                 <Input value={agencyPhone} onChange={e => setAgencyPhone(e.target.value)} placeholder={isAustralia ? '(03) 9123 4567' : 'Office phone number'} className="mt-1.5" />
               </div>

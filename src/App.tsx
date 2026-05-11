@@ -272,6 +272,16 @@ function PropertyRedirect() {
   return <Navigate to={`/properties/${id}`} replace />;
 }
 
+/** Role-select page is retired. Route /signup (and the old /auth role-select)
+ *  to the buyer or agent signup form based on ?role=agent. */
+function SignupRedirect() {
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  const role = params.get('role');
+  const target = role === 'agent' ? '/agents/login?mode=signup' : '/login?mode=signup';
+  return <Navigate to={target} replace />;
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

@@ -298,7 +298,7 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
       <MortgageBrokerCard
         propertyId={listing.id}
         propertyAddress={listing.address ?? listing.suburb ?? undefined}
-        propertyPrice={listing.price ? `$${Number(listing.price).toLocaleString()}` : undefined}
+        propertyPrice={listing.price ? formatCurrency(Number(listing.price), i18nLang) : undefined}
       />
       {culturalHighlights.length > 0 && (
         <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-900/20">

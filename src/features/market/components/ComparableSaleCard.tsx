@@ -1,6 +1,6 @@
 import { Bed, Bath, Car, Ruler, CheckCircle } from 'lucide-react';
 import type { ComparableSaleRecord } from '@/types/market';
-import { useTranslation, formatCurrency, formatDate as fmtDate, formatNumber } from '@/shared/lib/i18n';
+import { useTranslation, formatCurrency, formatDate as fmtDate } from '@/shared/lib/i18n';
 
 const methodLabel: Record<string, { label: string; className: string }> = {
   auction: { label: 'Auction', className: 'bg-orange-100 text-orange-700' },

@@ -144,7 +144,7 @@ export function InspectionBookingModal({ property, inspectionTimes, open, onClos
                   ) : (
                     upcomingSlots.map((slot, i) => {
                       const dateObj = new Date(slot.date);
-                      const dayStr = dateObj.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+                      const dayStr = formatDate(dateObj, language, { weekday: 'short', day: 'numeric', month: 'short' });
                       const isSelected = selectedSlot === i;
                       return (
                         <button

@@ -927,10 +927,10 @@ export default function AgencyOnboardingPage() {
               <CardContent className="p-6 space-y-3">
                 <div className="flex items-center justify-between">
                   <Upload size={24} className="text-primary" />
-                  <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[10px]">Allow 15–20 mins</Badge>
+                  <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[10px]">{t('agentOnboarding.welcome.migration.badge')}</Badge>
                 </div>
-                <h3 className="font-bold">Migrating from another system</h3>
-                <p className="text-xs text-muted-foreground">Moving from PropertyMe, Console Cloud, Reapit, or TrustSoft. Import your opening balances and ledger.</p>
+                <h3 className="font-bold">{t('agentOnboarding.welcome.migration.title')}</h3>
+                <p className="text-xs text-muted-foreground">{t('agentOnboarding.welcome.migration.body')}</p>
               </CardContent>
             </Card>
           </div>

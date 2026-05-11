@@ -1004,7 +1004,7 @@ function AgentBand() {
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:16, marginTop:24 }}>
             {[
               { v: buyers, l: t('home.agentBand.roiLabel1') },
-              { v: '20', l: t('home.agentBand.roiLabel2') },
+              { v: 'Any', l: t('home.agentBand.roiLabel2') },
               { v: roi, l: t('home.agentBand.roiLabel3') },
             ].map((s) => (
               <div key={s.l} style={{ background:'rgba(255,255,255,.04)', border:'1px solid rgba(255,255,255,.08)', borderRadius:14, padding:20, textAlign:'center' }}>

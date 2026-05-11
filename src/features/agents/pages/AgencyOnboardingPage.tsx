@@ -1184,14 +1184,14 @@ export default function AgencyOnboardingPage() {
               <CheckCircle2 className="w-8 h-8 text-green-600" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold">You're all set!</h2>
-              <p className="text-muted-foreground mt-1">Your agency is set up. Here's what to do next.</p>
+              <h2 className="text-2xl font-bold">{t('agentOnboarding.ready.heading')}</h2>
+              <p className="text-muted-foreground mt-1">{t('agentOnboarding.ready.sub')}</p>
             </div>
             <ul className="text-left space-y-3 w-full">
-              <li className="flex items-start gap-3"><PlusCircle className="mt-0.5 shrink-0 text-primary" size={18} /><span>Create your first listing — go to <strong>Dashboard → New Listing</strong></span></li>
-              <li className="flex items-start gap-3"><Globe className="mt-0.5 shrink-0 text-primary" size={18} /><span>Enable multilingual translation — publish any listing and translations generate automatically</span></li>
-              <li className="flex items-start gap-3"><Users className="mt-0.5 shrink-0 text-primary" size={18} /><span>Invite your team — go to <strong>Dashboard → Team</strong></span></li>
-              <li className="flex items-start gap-3"><HelpCircle className="mt-0.5 shrink-0 text-primary" size={18} /><span>Get help anytime — go to <strong>Dashboard → Help</strong></span></li>
+              <li className="flex items-start gap-3"><PlusCircle className="mt-0.5 shrink-0 text-primary" size={18} /><span>{t('agentOnboarding.ready.next1')}</span></li>
+              <li className="flex items-start gap-3"><Globe className="mt-0.5 shrink-0 text-primary" size={18} /><span>{t('agentOnboarding.ready.next2')}</span></li>
+              <li className="flex items-start gap-3"><Users className="mt-0.5 shrink-0 text-primary" size={18} /><span>{t('agentOnboarding.ready.next3')}</span></li>
+              <li className="flex items-start gap-3"><HelpCircle className="mt-0.5 shrink-0 text-primary" size={18} /><span>{t('agentOnboarding.ready.next4')}</span></li>
             </ul>
             <Button
               className="w-full py-5 text-base font-bold"
@@ -1200,7 +1200,7 @@ export default function AgencyOnboardingPage() {
                 navigate('/dashboard');
               }}
             >
-              Go to Dashboard →
+              {t('agentOnboarding.ready.cta')}
             </Button>
           </div>
         );

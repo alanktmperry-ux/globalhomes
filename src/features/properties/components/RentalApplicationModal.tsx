@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
+import { useTranslation, formatCurrency } from '@/shared/lib/i18n';
 
 /* ── Validation schemas per step ── */
 const step1Schema = z.object({

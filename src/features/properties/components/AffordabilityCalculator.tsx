@@ -20,6 +20,7 @@ function calcWeeklyMortgage(principal: number, annualRate: number, years: number
 }
 
 export function AffordabilityCalculator({ property }: AffordabilityCalculatorProps) {
+  const { language } = useTranslation();
   const isRental = property.listingType === 'rent' || property.listingType === 'rental' || property.price < 50000;
   const weeklyRent = property.rentalWeekly || property.price;
 

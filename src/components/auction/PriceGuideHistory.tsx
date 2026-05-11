@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, TrendingUp, TrendingDown } from 'lucide-react';
 import { usePriceGuideHistory } from '@/hooks/usePriceGuideHistory';
+import { useTranslation, formatCurrency, formatDate } from '@/shared/lib/i18n';
 
 interface Props {
   propertyId: string;
@@ -8,22 +9,15 @@ interface Props {
   currentHigh: number | null;
 }
 
-function formatPrice(n: number | null) {
-  if (!n) return '—';
-  return '$' + n.toLocaleString('en-AU');
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('en-AU', {
-    day: 'numeric', month: 'short', year: 'numeric',
-  });
-}
-
 export function PriceGuideHistory({ propertyId }: Props) {
+  const { language } = useTranslation();
   const [open, setOpen] = useState(false);
   const { history, loading } = usePriceGuideHistory(propertyId);
 
   if (loading || history.length === 0) return null;
+
+  const fmtPrice = (n: number | null) => (n == null ? '—' : formatCurrency(n, language));
+  const fmtDate = (iso: string) => formatDate(iso, language, { day: 'numeric', month: 'short', year: 'numeric' });
 
   return (
     <div className="mt-2">

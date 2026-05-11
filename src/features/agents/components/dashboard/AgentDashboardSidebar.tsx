@@ -549,7 +549,7 @@ const AgentDashboardSidebar = () => {
                 className="flex items-center gap-1.5 text-xs font-light hover:text-white transition-colors mt-2"
                 style={{ color: 'rgba(255,255,255,0.55)' }}
               >
-                <iconify-icon icon="solar:arrow-left-linear" style={{ fontSize: '12px' }}></iconify-icon>
+                <ArrowLeft size={12} strokeWidth={1.5} />
                 Back to homepage
               </a>
             </div>

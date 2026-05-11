@@ -464,7 +464,7 @@ function RenterServices() {
 
 function BuyerServices() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   return (
     <section className="mt-8">
       <h2 className="text-lg font-semibold text-[#1E293B] mb-4">{t('seeker.buyerServices.title')}</h2>

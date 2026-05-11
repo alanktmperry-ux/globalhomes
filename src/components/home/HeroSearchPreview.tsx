@@ -131,7 +131,6 @@ export default function HeroSearchPreview() {
           <h1
             style={{
               fontFamily: '"Plus Jakarta Sans", Inter, system-ui, sans-serif',
-              fontWeight: 200,
               fontSize: 'clamp(56px, 7vw, 108px)',
               letterSpacing: '-0.045em',
               lineHeight: 0.98,
@@ -139,7 +138,7 @@ export default function HeroSearchPreview() {
               color: '#0a0f1e',
             }}
           >
-            <span style={{ display: 'block' }}>
+            <span style={{ display: 'block', fontWeight: 800 }}>
               Find your home<span style={{ color: '#2563EB' }}>.</span>
             </span>
             <span
@@ -150,6 +149,7 @@ export default function HeroSearchPreview() {
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openLangDropdown(); }}
               style={{
                 display: 'block',
+                fontWeight: 600,
                 fontStyle: 'italic',
                 cursor: 'pointer',
                 background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)',

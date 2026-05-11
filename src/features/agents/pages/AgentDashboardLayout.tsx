@@ -108,7 +108,7 @@ const AgentDashboardLayout = () => {
           <div className="w-px h-full" style={{ background: 'rgba(255,255,255,0.05)' }} />
         </div>
         <AgentDashboardSidebar />
-        <main id="main-content" className="relative z-10 flex-1 flex flex-col min-w-0 overflow-y-auto pb-[env(safe-area-inset-bottom)] bg-transparent">
+        <main id="main-content" className="relative z-10 flex-1 flex flex-col min-w-0 overflow-y-auto pb-[env(safe-area-inset-bottom)]" style={{ background: '#F9FAFB' }}>
           <PaymentStatusBanner onVisibleChange={setPaymentBannerVisible} />
           {!paymentBannerVisible && trustPending && (
             <div className="bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-sm px-4 py-3 flex items-center justify-between">

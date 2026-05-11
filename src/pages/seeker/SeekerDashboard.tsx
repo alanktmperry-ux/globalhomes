@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Sparkles, Loader2, Home as HomeIcon, Key, PiggyBank, Wallet, Shield, Zap, Scale } from 'lucide-react';
+import { Loader2, Home as HomeIcon, Key, PiggyBank, Wallet, Shield, Zap, Scale, Pencil, Plus, Search, MapPin, Inbox } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';

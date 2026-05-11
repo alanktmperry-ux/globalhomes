@@ -401,6 +401,7 @@ export const en = {
   'auth.otherPortals': 'Other portals:',
   'auth.agentPortal': 'Agent Portal',
   'auth.trustPartner': 'Trust Accounting Partner',
+  'auth.or': 'or',
 
   'rent.pageTitle': 'Properties for Rent',
   'rent.searching': 'Searching…',

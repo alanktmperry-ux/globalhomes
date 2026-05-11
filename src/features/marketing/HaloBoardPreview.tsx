@@ -123,21 +123,35 @@ const GRAD = "linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)";
  * Three buyer brief cards demonstrating the reverse marketplace.
  */
 export default function HaloBoardPreview() {
-  const [briefs, setBriefs] = useState<Brief[]>(FALLBACK_BRIEFS);
+  const [briefs, setBriefs] = useState<BriefWithMeta[]>(FALLBACK_BRIEFS);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const { data, error } = await supabase
         .from("halos")
-        .select("id, intent, property_types, bedrooms_min, bedrooms_max, suburbs, budget_min, budget_max, preferred_language, created_at")
+        .select("id, intent, property_types, bedrooms_min, bedrooms_max, suburbs, budget_min, budget_max, preferred_language, created_at, seeker_id")
         .eq("status", "active")
         .order("created_at", { ascending: false })
         .limit(3);
-      if (cancelled) return;
-      if (!error && data && data.length > 0) {
-        setBriefs(data.map(mapRow));
+      if (cancelled || error || !data || data.length === 0) return;
+
+      const seekerIds = Array.from(new Set(data.map((d) => d.seeker_id).filter(Boolean))) as string[];
+      const nameMap: Record<string, string> = {};
+      if (seekerIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, display_name, full_name")
+          .in("id", seekerIds);
+        (profiles ?? []).forEach((p: any) => {
+          nameMap[p.id] = p.display_name || p.full_name || "";
+        });
       }
+      if (cancelled) return;
+
+      const real: BriefWithMeta[] = data.map((row) => mapRow(row, nameMap[row.seeker_id as string]));
+      const filled: BriefWithMeta[] = [...real, ...FALLBACK_BRIEFS.slice(real.length, 3)];
+      setBriefs(filled);
     })();
     return () => {
       cancelled = true;

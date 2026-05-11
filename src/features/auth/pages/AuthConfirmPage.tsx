@@ -129,12 +129,12 @@ const AuthConfirmPage = () => {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-foreground mb-2">
-            {status === 'verifying' && 'Confirming your email…'}
-            {status === 'success' && 'Email confirmed!'}
-            {status === 'error' && 'Confirmation failed'}
+            {status === 'verifying' && t('auth.confirm.title.verifying')}
+            {status === 'success' && t('auth.confirm.title.success')}
+            {status === 'error' && t('auth.confirm.title.error')}
           </h1>
           <p className="text-muted-foreground text-sm">
-            {status === 'verifying' && 'Please wait a moment.'}
+            {status === 'verifying' && t('auth.confirm.body.verifying')}
             {message}
           </p>
         </div>
@@ -143,7 +143,7 @@ const AuthConfirmPage = () => {
             to="/login"
             className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
           >
-            Back to sign in
+            {t('auth.confirm.backToSignIn')}
           </Link>
         )}
       </div>

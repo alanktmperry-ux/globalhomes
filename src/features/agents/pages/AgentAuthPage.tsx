@@ -1,18 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
-import { motion } from 'framer-motion';
-import { Building2, Zap, ListChecks, FileText, ShieldCheck, Landmark } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
-import { capture, identify } from '@/shared/lib/posthog';
-import { Mail, ArrowLeft } from 'lucide-react';
+import { Mail, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import ResendConfirmationButton from '@/features/auth/components/ResendConfirmationButton';
-import agentAuthHero from '@/assets/agent-auth-hero.jpg';
 import { usePageTitle } from '@/lib/usePageTitle';
 import { isDisposableEmail } from '@/shared/lib/disposableEmails';
+import {
+  AuthShell,
+  authStyles as s,
+  AuthError,
+  AuthDivider,
+  AuthSpinner,
+} from '@/features/auth/components/AuthShell';
 
 type Step = 'email' | 'password' | 'register' | 'otp';
 
@@ -21,12 +24,12 @@ const AgentAuthPage = () => {
   const navigate = useNavigate();
   const { user, isAgent, isAdmin, loading: authLoading } = useAuth();
 
-  // ── All useState hooks together ──
   const [pendingRedirect, setPendingRedirect] = useState<'dashboard' | null>(null);
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [regEmail, setRegEmail] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [emailSubmitting, setEmailSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
@@ -35,16 +38,13 @@ const AgentAuthPage = () => {
   const [dataLocationConsent, setDataLocationConsent] = useState(false);
   const [policyConsent, setPolicyConsent] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
-  const [emailTouched, setEmailTouched] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [showOAuthConsentModal, setShowOAuthConsentModal] = useState(false);
   const [pendingOAuthProvider, setPendingOAuthProvider] = useState<'google' | 'apple' | null>(null);
 
-  // ── All useRef hooks ──
   const captchaRef = useRef<HCaptcha>(null);
-
   const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
 
-  // ── useEffect hooks ──
   useEffect(() => {
     if (pendingRedirect === 'dashboard' && user && (isAgent || isAdmin) && !authLoading) {
       setPendingRedirect(null);
@@ -62,17 +62,16 @@ const AgentAuthPage = () => {
       }, 8000);
       return () => clearTimeout(timeout);
     }
-  }, [pendingRedirect, user, authLoading, isAgent, isAdmin, toast]);
+  }, [pendingRedirect, user, authLoading, isAgent, isAdmin]);
 
-  // Auto-submit sign-in after captcha verification
   useEffect(() => {
     if (pendingSignIn && captchaToken && step === 'password') {
       setPendingSignIn(false);
       handleSignIn({ preventDefault: () => {} } as React.FormEvent);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingSignIn, captchaToken]);
 
-  // Auto-submit signup after captcha verification
   useEffect(() => {
     if (pendingSignup && captchaToken && step === 'register') {
       setPendingSignup(false);
@@ -81,14 +80,12 @@ const AgentAuthPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingSignup, captchaToken]);
 
-  // Redirect already-authenticated agents straight to the dashboard
   useEffect(() => {
     if (!authLoading && user && (isAgent || isAdmin) && !pendingRedirect) {
       navigate('/dashboard', { replace: true });
     }
   }, [authLoading, user, isAgent, isAdmin, navigate, pendingRedirect]);
 
-  // ── Handlers ──
   const handleEmailContinue = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
@@ -108,14 +105,14 @@ const AgentAuthPage = () => {
       setCaptchaToken(null);
       captchaRef.current?.resetCaptcha();
       if (error) {
-        toast.error("If an account exists with this email, you'll receive a login link.");
+        setFormError("If an account exists with this email, you'll receive a login link.");
         setLoading(false);
         return;
       }
       toast('Welcome back!');
       setPendingRedirect('dashboard');
     } catch {
-      toast.error("If an account exists with this email, you'll receive a login link.");
+      setFormError("If an account exists with this email, you'll receive a login link.");
       setLoading(false);
     }
   };
@@ -123,29 +120,14 @@ const AgentAuthPage = () => {
   const handleEmailSubmit = async () => {
     const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const trimmed = regEmail.trim();
-    if (!trimmed) {
-      setEmailError('Email address is required');
-      return;
-    }
-    if (!emailRe.test(trimmed)) {
-      setEmailError('Enter a valid email (e.g. name@agency.com.au)');
-      return;
-    }
-    if (password.length < 10) {
-      toast.error('Password must be at least 10 characters.');
-      return;
-    }
-    if (!dataLocationConsent) {
-      toast.error('Please acknowledge where your data is stored to continue.');
-      return;
-    }
-    if (!policyConsent) {
-      toast.error('Please agree to the Privacy Policy and Terms of Service to continue.');
-      return;
-    }
+    if (!trimmed) { setEmailError('Email address is required'); return; }
+    if (!emailRe.test(trimmed)) { setEmailError('Enter a valid email (e.g. name@agency.com.au)'); return; }
+    if (password.length < 10) { setFormError('Password must be at least 10 characters.'); return; }
+    if (!dataLocationConsent) { setFormError('Please acknowledge where your data is stored to continue.'); return; }
+    if (!policyConsent) { setFormError('Please agree to the Privacy Policy and Terms of Service to continue.'); return; }
     const cleaned = trimmed.toLowerCase();
     if (isDisposableEmail(cleaned)) {
-      toast.error('Disposable or temporary email addresses are not accepted. Please use a real email.');
+      setFormError('Disposable or temporary email addresses are not accepted. Please use a real email.');
       return;
     }
     if (!captchaToken) {
@@ -154,6 +136,7 @@ const AgentAuthPage = () => {
       return;
     }
     setEmailSubmitting(true);
+    setFormError(null);
     try {
       const { data: gate, error: gateErr } = await supabase.functions.invoke('before-signup', {
         body: { email: cleaned, password, role: 'agent', hcaptchaToken: captchaToken },
@@ -164,7 +147,7 @@ const AgentAuthPage = () => {
           disposable_email: 'Disposable or temporary email addresses are not accepted. Please use a real email.',
           breached_password: 'This password appears in known data breaches. For security, please choose a different one.',
         };
-        toast.error(messages[gate?.reason] || 'Signup failed. Please try again or contact support.');
+        setFormError(messages[gate?.reason] || 'Signup failed. Please try again or contact support.');
         setCaptchaToken(null);
         captchaRef.current?.resetCaptcha();
         setEmailSubmitting(false);
@@ -182,10 +165,10 @@ const AgentAuthPage = () => {
       if (signUpErr) throw signUpErr;
       sessionStorage.setItem('listhq_pending_email', cleaned);
       setRegEmail(cleaned);
-      toast.success("We've sent a confirmation link to your email. Click it to activate your account.");
+      toast.success("We've sent a confirmation link to your email.");
       setStep('otp');
     } catch (err) {
-      toast.error(getErrorMessage(err) || 'Failed to send confirmation email. Please try again.');
+      setFormError(getErrorMessage(err) || 'Failed to send confirmation email. Please try again.');
     } finally {
       setEmailSubmitting(false);
       setCaptchaToken(null);
@@ -217,307 +200,242 @@ const AgentAuthPage = () => {
     setPendingOAuthProvider(null);
   };
 
-  const goBack = () => {
-    setCaptchaToken(null);
-    captchaRef.current?.resetCaptcha();
-    if (step === 'password') { setStep('email'); setPassword(''); }
-    else if (step === 'otp') { setStep('register'); }
-    else if (step === 'register') { setStep('email'); setRegEmail(''); }
-    else navigate('/for-agents');
-  };
-
-  const inputClass = "w-full px-4 py-3.5 rounded-[14px] border border-stone-200 bg-stone-50 text-stone-900 text-sm placeholder:text-stone-300 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:bg-white transition-all";
-
-  const AGENT_PILLS = ['Pocket listings', 'Pre-market period', 'AI buyer matching', 'Pipeline kanban', 'Rent roll', 'Trust accounting', '20 languages'];
-
+  /* ── OTP step ── */
   if (step === 'otp') {
     return (
-      <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-[420px] bg-white rounded-3xl border border-stone-200 shadow-sm p-8 sm:p-10">
-          <button
-            type="button"
-            onClick={() => setStep('register')}
-            className="flex items-center gap-1.5 text-[13px] text-stone-500 hover:text-stone-800 mb-8 transition-colors"
+      <AuthShell
+        heading="Check your email"
+        subheading={<>We sent a confirmation link to <span className="text-white font-medium">{regEmail}</span>. Click the link to activate your account.</>}
+      >
+        <div className="flex justify-center mb-4">
+          <div
+            className="w-14 h-14 rounded-full flex items-center justify-center"
+            style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.20)' }}
           >
-            <ArrowLeft size={14} /> Back
-          </button>
-          <div className="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center mb-6">
-            <Mail size={26} className="text-blue-600" />
+            <Mail size={24} className="text-white" />
           </div>
-          <h1 className="text-[28px] font-semibold tracking-[-0.5px] text-stone-900 leading-tight">
-            Check your email
-          </h1>
-          <p className="text-[15px] text-stone-600 mt-3 leading-relaxed">
-            We sent a confirmation link to{' '}
-            <span className="text-stone-900 font-medium">{regEmail}</span>. Click the link in the email to activate your account.
-          </p>
-          <p className="text-[13px] text-stone-400 mt-4">
-            Can't find it? Check your spam folder.
-          </p>
-          <div>
-            <ResendConfirmationButton email={regEmail} />
-          </div>
-          <Link
-            to="/agents/login"
-            className="mt-8 inline-flex items-center gap-1.5 text-[14px] text-blue-600 hover:text-blue-700 font-medium"
-          >
-            <ArrowLeft size={14} /> Back to login
-          </Link>
         </div>
-      </div>
+        <p className="text-sm text-center mb-5" style={{ color: 'rgba(255,255,255,0.65)' }}>
+          Can't find it? Check your spam folder.
+        </p>
+        <ResendConfirmationButton email={regEmail} />
+        <button
+          type="button"
+          onClick={() => setStep('register')}
+          className="mt-6 w-full text-sm font-light flex items-center justify-center gap-2 hover:text-white transition-colors"
+          style={{ color: 'rgba(255,255,255,0.65)' }}
+        >
+          <ArrowLeft size={14} /> Back
+        </button>
+      </AuthShell>
     );
   }
 
+  const heading =
+    step === 'register' ? 'Join ListHQ'
+      : step === 'password' ? 'Welcome back'
+        : 'Welcome back';
+
+  const sub =
+    step === 'register' ? 'Start your free 60-day trial. No contracts, cancel anytime.'
+      : step === 'password' ? email
+        : 'Sign in to manage your portfolio';
+
   return (
-    <div className="min-h-screen flex bg-white">
+    <AuthShell heading={heading} subheading={sub}>
+      {formError && <AuthError>{formError}</AuthError>}
 
-      {/* ── LEFT: Full-bleed hero image ── */}
-      <div className="hidden lg:block lg:w-[48%] shrink-0 relative">
-        <img
-          src={agentAuthHero}
-          alt="ListHQ agent portal"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      </div>
+      {/* ── Step: Email ── */}
+      {step === 'email' && (
+        <>
+          <form onSubmit={handleEmailContinue}>
+            <div className={s.field}>
+              <label className={s.label} style={s.labelStyle}>Email Address</label>
+              <input
+                type="email"
+                required
+                autoFocus
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={s.input}
+                style={s.inputStyle}
+                autoComplete="email"
+              />
+            </div>
+            <button type="submit" className={s.primaryBtn}>Continue</button>
+          </form>
 
-      {/* ── RIGHT: White form panel ── */}
-      <div className="flex-1 bg-white flex flex-col min-h-screen">
-        <div className="flex-1 flex flex-col justify-center px-10 lg:px-20 py-12 overflow-y-auto max-w-lg mx-auto w-full">
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+          <AuthDivider />
 
-          {/* Form badge */}
+          <button type="button" onClick={() => handleOAuth('google')} className={s.oauthBtn} style={s.oauthStyle}>
+            <svg width="18" height="18" viewBox="0 0 24 24" className="shrink-0"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Continue with Google
+          </button>
 
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-stone-200 bg-stone-50 mb-5">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
-            <span className="text-[10px] font-medium tracking-widest uppercase text-stone-400">
-              {step === 'register' ? 'Agent registration' : 'Agent sign in'}
+          <p className={s.footer} style={s.footerStyle}>
+            New to ListHQ?
+            <button type="button" onClick={() => setStep('register')} className={`${s.link} ml-1`}>
+              Start your free 60-day trial
+            </button>
+          </p>
+        </>
+      )}
+
+      {/* ── Step: Password ── */}
+      {step === 'password' && (
+        <>
+          <form onSubmit={handleSignIn}>
+            <div className={s.field}>
+              <div className="flex items-center justify-between mb-2">
+                <label className={s.label} style={{ ...s.labelStyle, marginBottom: 0 }}>Password</label>
+                <Link to="/forgot-password" className="text-sm font-medium hover:text-white" style={s.mutedLinkStyle}>
+                  Forgot password?
+                </Link>
+              </div>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  autoFocus
+                  minLength={8}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={s.input}
+                  style={s.inputStyle}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/55 hover:text-white"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+            <HCaptcha sitekey={hcaptchaSiteKey} size="invisible" ref={captchaRef} onVerify={setCaptchaToken} />
+            <button type="submit" disabled={loading} className={s.primaryBtn}>
+              {loading ? <><AuthSpinner /> Signing in…</> : 'Sign in'}
+            </button>
+          </form>
+          <button
+            type="button"
+            onClick={() => { setStep('email'); setPassword(''); setFormError(null); }}
+            className="mt-4 w-full text-sm font-light flex items-center justify-center gap-2 hover:text-white"
+            style={{ color: 'rgba(255,255,255,0.65)' }}
+          >
+            <ArrowLeft size={14} /> Use a different email
+          </button>
+        </>
+      )}
+
+      {/* ── Step: Register ── */}
+      {step === 'register' && (
+        <>
+          <div
+            className="mb-5 p-3 rounded-[10px] flex items-start gap-2"
+            style={{ background: 'rgba(52,211,153,0.15)', border: '1px solid rgba(52,211,153,0.30)' }}
+          >
+            <span className="text-sm" style={{ color: '#A7F3D0' }}>
+              Free for 60 days — no credit card required. Cancel anytime.
             </span>
           </div>
-
-          <h1 className="text-[38px] font-light text-stone-900 leading-[1.08] mb-8" style={{ letterSpacing: '-1.5px' }}>
-            {(step === 'email' || step === 'password') && <>Welcome<br /><strong className="font-semibold">back.</strong></>}
-            {step === 'register' && <>Join<br /><strong className="font-semibold">ListHQ.</strong></>}
-          </h1>
-
-          <p className="text-sm text-stone-400 mb-6 -mt-4">
-            {step === 'email' && 'Access your dashboard, listings, and leads.'}
-            {step === 'password' && email}
-            {step === 'register' && 'Start your free 60-day trial. No contracts, cancel anytime.'}
-          </p>
-
-
-          {/* ── Step: Email (sign in) ── */}
-          {step === 'email' && (
-            <>
-              <form onSubmit={handleEmailContinue} className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">
-                    Email Address<span className="text-destructive">*</span>
-                  </label>
-                  <input type="email" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
-                </div>
-                <button type="submit" className="w-full py-3.5 rounded-full bg-primary hover:opacity-90 text-primary-foreground font-semibold text-sm transition-opacity">
-                  Continue
+          <form onSubmit={(e) => { e.preventDefault(); handleEmailSubmit(); }}>
+            <div className={s.field}>
+              <label className={s.label} style={s.labelStyle}>Your email address</label>
+              <input
+                type="email"
+                autoFocus
+                value={regEmail}
+                onChange={(e) => { setRegEmail(e.target.value); if (emailError) setEmailError(null); }}
+                placeholder="jane@agency.com.au"
+                className={s.input}
+                style={s.inputStyle}
+                aria-invalid={!!emailError}
+              />
+              {emailError && (
+                <p className="text-xs mt-1.5" style={{ color: '#FCA5A5' }}>{emailError}</p>
+              )}
+            </div>
+            <div className={s.field}>
+              <label className={s.label} style={s.labelStyle}>Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  minLength={10}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="At least 10 characters"
+                  className={s.input}
+                  style={s.inputStyle}
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/55 hover:text-white"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
-              </form>
-
-              <p className="text-sm text-muted-foreground mt-4">
-                New to ListHQ?{' '}
-                <button type="button" onClick={() => setStep('register')} className="text-primary font-semibold underline underline-offset-2">
-                  Start your free 60-day trial
-                </button>
-              </p>
-
-              <div className="flex items-center gap-4 my-6">
-                <div className="flex-1 h-px bg-border" />
-                <span className="text-xs font-medium text-muted-foreground uppercase">Or</span>
-                <div className="flex-1 h-px bg-border" />
               </div>
+            </div>
 
-              <button type="button" onClick={() => handleOAuth('google')} className="w-full flex items-center gap-3 py-3.5 px-5 rounded-full border border-border bg-background text-foreground text-sm font-medium hover:bg-accent transition-colors">
-                <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                Continue with Google
-              </button>
-
-              <p className="text-xs text-muted-foreground mt-3 text-center leading-relaxed">
-                By continuing you agree to our{' '}
-                <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Terms of Service</a>
+            <label className="flex items-start gap-2.5 mb-3 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={dataLocationConsent}
+                onChange={(e) => setDataLocationConsent(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded shrink-0 cursor-pointer accent-white"
+              />
+              <span className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.70)' }}>
+                I understand that my data is stored on secure servers compliant with the Australian Privacy Act 1988.
+              </span>
+            </label>
+            <label className="flex items-start gap-2.5 mb-5 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={policyConsent}
+                onChange={(e) => setPolicyConsent(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded shrink-0 cursor-pointer accent-white"
+              />
+              <span className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.70)' }}>
+                I agree to the{' '}
+                <Link to="/privacy" target="_blank" rel="noopener noreferrer" className="text-white underline underline-offset-2">Privacy Policy</Link>
                 {' '}and{' '}
-                <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Privacy Policy</a>.
-              </p>
-            </>
-          )}
+                <Link to="/terms" target="_blank" rel="noopener noreferrer" className="text-white underline underline-offset-2">Terms of Service</Link>.
+              </span>
+            </label>
 
-          {/* ── Step: Password (sign in) ── */}
-          {step === 'password' && (
-            <>
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Password</label>
-                  <input type="password" required autoFocus minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
-                </div>
-                <div className="text-right">
-                  <Link to="/forgot-password" className="text-xs text-primary font-medium underline underline-offset-2">Forgot password?</Link>
-                </div>
-                <HCaptcha
-                  sitekey={hcaptchaSiteKey}
-                  size="invisible"
-                  ref={captchaRef}
-                  onVerify={setCaptchaToken}
-                />
-                <button type="submit" disabled={loading} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
-                  {loading ? 'Signing in…' : 'Sign In'}
-                </button>
-              </form>
-              <button type="button" onClick={goBack} className="text-sm text-muted-foreground mt-4 hover:text-foreground underline underline-offset-2">
-                ← Use a different email
-              </button>
-            </>
-          )}
+            <HCaptcha sitekey={hcaptchaSiteKey} size="invisible" ref={captchaRef} onVerify={setCaptchaToken} />
 
-          {/* ── Step: Register (email-first verification) ── */}
-          {step === 'register' && (
-            <>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 mb-5">
-                <Zap size={13} className="text-emerald-600 shrink-0" />
-                <p className="text-xs font-medium text-emerald-700">Free for 60 days — no credit card required. Cancel anytime.</p>
-              </div>
+            <button
+              type="submit"
+              disabled={emailSubmitting || !(dataLocationConsent && policyConsent)}
+              className={s.primaryBtn}
+            >
+              {emailSubmitting
+                ? <><AuthSpinner /> Sending confirmation…</>
+                : 'Continue — confirm my email'}
+            </button>
+          </form>
 
-              <form onSubmit={(e) => { e.preventDefault(); handleEmailSubmit(); }} className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">
-                    Your email address<span className="text-destructive">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    autoFocus
-                    value={regEmail}
-                    onChange={(e) => {
-                      setRegEmail(e.target.value);
-                      if (emailError) setEmailError(null);
-                    }}
-                    onBlur={() => {
-                      setEmailTouched(true);
-                      const v = regEmail.trim();
-                      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                      if (!v) setEmailError('Email address is required');
-                      else if (!re.test(v)) setEmailError('Enter a valid email (e.g. name@agency.com.au)');
-                      else setEmailError(null);
-                    }}
-                    placeholder="jane@agency.com.au"
-                    className={`${inputClass} ${emailError ? 'border-red-500 focus:border-red-500 focus:ring-red-100' : ''}`}
-                    aria-invalid={!!emailError}
-                  />
-                  {emailError ? (
-                    <p className="text-red-500 text-sm mt-1">{emailError}</p>
-                  ) : (
-                    <p className="text-xs text-muted-foreground mt-1.5">
-                      We'll send a confirmation link to this address before you continue.
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">
-                    Password<span className="text-destructive">*</span>
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    minLength={10}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="At least 10 characters"
-                    autoComplete="new-password"
-                    className={inputClass}
-                  />
-                </div>
-                <label className="flex items-start gap-2.5 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={dataLocationConsent}
-                    onChange={(e) => setDataLocationConsent(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-stone-300 text-primary focus:ring-primary cursor-pointer shrink-0"
-                  />
-                  <span className="text-xs text-muted-foreground leading-relaxed">
-                    I understand that my data is stored on secure servers compliant with the Australian Privacy Act 1988.
-                  </span>
-                </label>
-                <label className="flex items-start gap-2.5 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={policyConsent}
-                    onChange={(e) => setPolicyConsent(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-stone-300 text-primary focus:ring-primary cursor-pointer shrink-0"
-                  />
-                  <span className="text-xs text-muted-foreground leading-relaxed">
-                    I agree to the{' '}
-                    <Link to="/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Privacy Policy</Link>
-                    {' '}and{' '}
-                    <Link to="/terms" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Terms of Service</Link>.
-                  </span>
-                </label>
-
-                {/* Have these ready checklist — moved below email + consent */}
-                <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
-                  <div className="flex items-center gap-2 text-sm font-semibold text-stone-900 mb-3">
-                    <ListChecks size={16} className="text-primary" />
-                    Have these ready before you begin
-                  </div>
-                  <div className="space-y-2">
-                    {[
-                      { icon: <FileText size={14} />, text: 'ABN — 11-digit Australian Business Number' },
-                      { icon: <ShieldCheck size={14} />, text: 'Real estate licence number — from your state regulator, not your CPD number' },
-                      { icon: <Building2 size={14} />, text: 'Agency name — your trading name as registered' },
-                      { icon: <Landmark size={14} />, text: 'Trust account BSB & account number — only needed if migrating from another system' },
-                    ].map((item) => (
-                      <div key={item.text} className="flex items-start gap-2 text-xs text-stone-500">
-                        <span className="text-primary mt-0.5 shrink-0">{item.icon}</span>
-                        {item.text}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <HCaptcha
-                  sitekey={hcaptchaSiteKey}
-                  size="invisible"
-                  ref={captchaRef}
-                  onVerify={setCaptchaToken}
-                />
-
-                <button type="submit" disabled={emailSubmitting || !(dataLocationConsent && policyConsent)} className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-colors disabled:opacity-50">
-                  {emailSubmitting ? 'Sending confirmation...' : 'Continue — confirm my email'}
-                </button>
-              </form>
-
-              <p className="text-sm text-muted-foreground mt-4">
-                Already have an account?{' '}
-                <button type="button" onClick={() => { setStep('email'); setRegEmail(''); }} className="text-primary font-semibold underline underline-offset-2">
-                  Sign in here
-                </button>
-              </p>
-            </>
-          )}
-
-
-
-
-        </motion.div>
-        </div>
-
-        {/* Portal whisper footer */}
-        <div className="px-10 lg:px-20 py-5 border-t border-stone-100 shrink-0 max-w-lg mx-auto w-full">
-          <p className="text-[11px] text-stone-300">
-            Looking to search properties?{' '}
-            <Link to="/login" className="text-stone-400 hover:text-blue-600 transition-colors">Buyer sign in</Link>
-            <span className="mx-1.5 text-stone-200">·</span>
-            <Link to="/partner/login" className="text-stone-400 hover:text-blue-600 transition-colors">Trust Accounting Partner</Link>
+          <p className={s.footer} style={s.footerStyle}>
+            Already have an account?
+            <button
+              type="button"
+              onClick={() => { setStep('email'); setRegEmail(''); setFormError(null); }}
+              className={`${s.link} ml-1`}
+            >
+              Sign in
+            </button>
           </p>
-        </div>
-      </div>
+        </>
+      )}
 
       {showOAuthConsentModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6">
             <h3 className="text-base font-semibold text-stone-900 mb-2">Before you continue</h3>
             <p className="text-sm text-stone-600 mb-4 leading-relaxed">
@@ -529,13 +447,13 @@ const AgentAuthPage = () => {
             <div className="flex gap-3">
               <button
                 onClick={() => { setShowOAuthConsentModal(false); setPendingOAuthProvider(null); }}
-                className="flex-1 h-11 rounded-xl border border-stone-200 text-stone-600 text-sm font-medium hover:bg-stone-50 transition-colors"
+                className="flex-1 h-11 rounded-xl border border-stone-200 text-stone-600 text-sm font-medium hover:bg-stone-50"
               >
                 Discard
               </button>
               <button
                 onClick={confirmOAuthConsent}
-                className="flex-1 h-11 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
+                className="flex-1 h-11 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700"
               >
                 I agree — Continue as Agent
               </button>
@@ -543,7 +461,7 @@ const AgentAuthPage = () => {
           </div>
         </div>
       )}
-    </div>
+    </AuthShell>
   );
 };
 

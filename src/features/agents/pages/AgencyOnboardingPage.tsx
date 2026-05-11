@@ -957,8 +957,8 @@ export default function AgencyOnboardingPage() {
             <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
               <Building2 size={26} className="text-primary" />
             </div>
-            <h3 className="text-lg font-bold text-foreground">Agency & Licence Details</h3>
-            <p className="text-sm text-muted-foreground">Required for compliance and trust account setup</p>
+            <h3 className="text-lg font-bold text-foreground">{t('agentOnboarding.agency.heading')}</h3>
+            <p className="text-sm text-muted-foreground">{t('agentOnboarding.agency.sub')}</p>
           </div>
           <div className="space-y-4">
             {/* Country selector — first */}

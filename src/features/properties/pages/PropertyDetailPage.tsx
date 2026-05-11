@@ -1200,31 +1200,31 @@ export default function PropertyDetailPage() {
             {/* Investment Insights (hide for rentals) */}
             {!isRental && <InvestmentInsightsCard property={property} />}
 
-            <div className="rounded-2xl overflow-hidden sticky top-4" style={{ background: '#020817' }}>
+            <div className="rounded-2xl overflow-hidden sticky top-24 bg-white border border-[#E5E5E5] shadow-sm">
               {/* Agent info */}
               <Link to={property.agent.id ? `/agent/${property.agent.id}` : '#'} className="flex items-center gap-3.5 p-5 pb-4 group/agent">
                 <div className="relative shrink-0">
-                  <Avatar className="w-14 h-14 rounded-[14px] border-2 transition-transform group-hover/agent:scale-105" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
+                  <Avatar className="w-14 h-14 rounded-[14px] border border-[#E5E5E5] transition-transform group-hover/agent:scale-105">
                     <AvatarImage src={property.agent.avatarUrl} alt={property.agent.name} className="object-cover" />
-                    <AvatarFallback className="text-base font-bold rounded-[14px]" style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)', color: '#fff' }}>
+                    <AvatarFallback className="text-base font-bold rounded-[14px] text-white" style={{ background: 'linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%)' }}>
                       {property.agent.name.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-white text-[15px] leading-tight group-hover/agent:text-blue-400 transition-colors">{property.agent.name}</p>
-                  <p className="text-[12px] mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>{property.agent.agency}</p>
+                  <p className="font-bold text-[#0a0f1e] text-[15px] leading-tight group-hover/agent:text-[#2563EB] transition-colors">{property.agent.name}</p>
+                  <p className="text-[12px] mt-0.5 text-[#6a6a6a]">{property.agent.agency}</p>
                   {property.agent.isSubscribed && (
-                    <p className="text-[11px] font-semibold text-emerald-400 mt-1.5 flex items-center gap-1">
+                    <p className="text-[11px] font-semibold text-emerald-600 mt-1.5 flex items-center gap-1">
                       <BadgeCheck size={12} /> {t('agent.subscribed')}
                     </p>
                   )}
                   {property.agent.rating ? (
                     <div className="flex items-center gap-1 mt-1">
                       <Star size={12} className="fill-yellow-400 text-yellow-400" />
-                      <span className="text-[12px] font-medium text-white">{property.agent.rating.toFixed(1)}</span>
+                      <span className="text-[12px] font-medium text-[#0a0f1e]">{property.agent.rating.toFixed(1)}</span>
                       {property.agent.reviewCount ? (
-                        <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{tp('property.agent.reviewCount', { count: property.agent.reviewCount })}</span>
+                        <span className="text-[11px] text-[#9CA3AF]">{tp('property.agent.reviewCount', { count: property.agent.reviewCount })}</span>
                       ) : null}
                     </div>
                   ) : null}
@@ -1236,23 +1236,22 @@ export default function PropertyDetailPage() {
                 {property.agent.phone ? (
                   <a
                     href={`tel:${property.agent.phone}`}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold text-white transition-colors"
-                    style={{ border: '1.5px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)' }}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold text-[#0a0f1e] border border-[#E5E5E5] bg-white hover:border-[#2563EB] hover:text-[#2563EB] transition-all"
                   >
                     <Phone size={13} strokeWidth={2} /> {tp('property.call')}
                   </a>
                 ) : (
                   <button
                     onClick={handleCtaClick}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold text-white transition-colors"
-                    style={{ border: '1.5px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)' }}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[13px] font-semibold text-[#0a0f1e] border border-[#E5E5E5] bg-white hover:border-[#2563EB] hover:text-[#2563EB] transition-all"
                   >
                     <Phone size={13} strokeWidth={2} /> {tp('property.call')}
                   </button>
                 )}
                 <button
                   onClick={handleCtaClick}
-                  className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                  className="flex-1 py-2.5 rounded-xl text-[13px] font-bold text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(37,99,235,0.35)]"
+                  style={{ background: 'linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%)' }}
                 >
                   {ctaLabel}
                 </button>
@@ -1262,8 +1261,7 @@ export default function PropertyDetailPage() {
                 <div className="px-5 pb-5 -mt-2">
                   <button
                     onClick={() => setRentalApplicationOpen(true)}
-                    className="w-full py-2.5 rounded-xl text-[13px] font-semibold transition-colors"
-                    style={{ border: '1.5px solid rgba(255,255,255,0.12)', color: '#fff', background: 'transparent' }}
+                    className="w-full py-2.5 rounded-xl text-[13px] font-semibold border border-[#0a0f1e] text-[#0a0f1e] bg-white hover:bg-[#0a0f1e] hover:text-white transition-all"
                   >
                     {tp('property.applyNow')}
                   </button>

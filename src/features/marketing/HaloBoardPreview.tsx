@@ -70,18 +70,21 @@ function relativeTime(iso: string): string {
   return `Posted ${months} month${months === 1 ? "" : "s"} ago`;
 }
 
-function mapRow(row: {
-  id: string;
-  intent: string | null;
-  property_types: string[] | null;
-  bedrooms_min: number | null;
-  bedrooms_max: number | null;
-  suburbs: string[] | null;
-  budget_min: number | null;
-  budget_max: number | null;
-  preferred_language: string | null;
-  created_at: string;
-}): Brief {
+function mapRow(
+  row: {
+    id: string;
+    intent: string | null;
+    property_types: string[] | null;
+    bedrooms_min: number | null;
+    bedrooms_max: number | null;
+    suburbs: string[] | null;
+    budget_min: number | null;
+    budget_max: number | null;
+    preferred_language: string | null;
+    created_at: string;
+  },
+  seekerName?: string | null,
+): BriefWithMeta {
   const lang = LANG_MAP[row.preferred_language ?? "en"] ?? { flag: "🌐", name: row.preferred_language ?? "English" };
   const propType = (row.property_types?.[0] ?? "Property").replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
   const beds =
@@ -91,11 +94,18 @@ function mapRow(row: {
       ? `${row.bedrooms_min}+ bed`
       : null;
   const property = beds ? `${propType} · ${beds}` : propType;
-  const suburbs = (row.suburbs ?? []).slice(0, 2).join(", ") || "Any suburb";
+  const suburbsArr = row.suburbs ?? [];
+  const suburbs =
+    suburbsArr.length === 0
+      ? "Any suburb"
+      : suburbsArr.length <= 2
+      ? suburbsArr.join(", ")
+      : `${suburbsArr.slice(0, 2).join(", ")} and ${suburbsArr.length - 2} more`;
   const intent = row.intent ? row.intent.charAt(0).toUpperCase() + row.intent.slice(1) : "Buy";
+  const initial = seekerName && seekerName.trim() ? seekerName.trim().charAt(0).toUpperCase() : "?";
   return {
     id: row.id,
-    initial: "?",
+    initial,
     flag: lang.flag,
     language: lang.name,
     intent,

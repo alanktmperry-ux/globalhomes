@@ -278,129 +278,146 @@ interface ListingCardProps {
   stats: ListingStatsMaps;
 }
 
+// iconify-icon helper (script loaded in index.html)
+const Ico = ({ icon, size = 16, color, className }: { icon: string; size?: number; color?: string; className?: string }) => (
+  // @ts-expect-error — iconify-icon is a web component
+  <iconify-icon icon={icon} class={className} style={{ fontSize: `${size}px`, color, display: 'inline-flex', lineHeight: 1 }} />
+);
+
+const STATUS_OVERLAY: Record<string, { label: string; className: string }> = {
+  public: { label: 'For Sale', className: 'bg-[#0a0f1e]/85 backdrop-blur text-white' },
+  rent: { label: 'For Rent', className: 'bg-[#1E40AF]/85 backdrop-blur text-white' },
+  sold: { label: 'Sold', className: 'bg-[#34D399]/95 text-[#065F46]' },
+  leased: { label: 'Leased', className: 'bg-[#34D399]/95 text-[#065F46]' },
+  under_offer: { label: 'Under Offer', className: 'bg-[#FBBF24]/95 text-[#92400E]' },
+  pending: { label: 'Pending', className: 'bg-[#FBBF24]/95 text-[#92400E]' },
+  whisper: { label: 'Off-market', className: 'bg-white/95 text-[#0a0f1e] border border-[#E5E5E5]' },
+  draft: { label: 'Draft', className: 'bg-white/95 text-[#0a0f1e] border border-[#E5E5E5]' },
+  'coming-soon': { label: 'Coming Soon', className: 'bg-white/95 text-[#0a0f1e] border border-[#E5E5E5]' },
+};
+
 const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSendReport, navigate, isRental, onStatusChange, onDelete, stats }: ListingCardProps) => {
-  const s = STATUS_CONFIG[l._status] || STATUS_CONFIG.public;
-  const days = getListingDays(l);
-  const leads = getListingLeads(l);
-  const daysColor = days < 7 ? 'text-success' : days < 15 ? 'text-primary' : 'text-destructive';
+  const thumb = getListingThumb(l);
+  const enquiries = stats.enquiries[l.id] ?? l.contact_clicks ?? 0;
+  const views = stats.views[l.id] ?? l.views ?? 0;
+  const langCount = Array.isArray(l.images) ? 20 : 20; // listings auto-translate into 20 languages
+  const overlayKey = isRental && l._status === 'public' ? 'rent' : l._status;
+  const overlay = STATUS_OVERLAY[overlayKey] || STATUS_OVERLAY.public;
+  const isBoosted = (l as any).is_featured === true || (l as any).boost_ends_at;
 
   return (
     <div
-      className="bg-white rounded-[12px] flex flex-col sm:flex-row gap-4 p-4 mb-2 cursor-pointer hover:shadow-md transition-all"
-      style={{ border: '1px solid #E5E7EB' }}
+      className="group bg-white rounded-3xl border border-[#E5E5E5] overflow-hidden cursor-pointer transition-all hover:border-[#2563EB]/40 hover:shadow-[0_12px_32px_rgba(0,0,0,0.06)] hover:-translate-y-0.5"
+      onClick={() => onSelect(toProperty(l))}
     >
-      {(() => {
-        const thumb = getListingThumb(l);
-        return thumb ? (
-          <img
-            src={thumb}
-            alt=""
-            className="w-full sm:w-28 h-20 rounded-lg object-cover shrink-0 cursor-pointer transition-transform duration-200 hover:scale-105"
-            onClick={() => onSelect(toProperty(l))}
-          />
+      {/* Image area */}
+      <div className="aspect-[16/10] relative overflow-hidden bg-[#F3F4F6]">
+        {thumb ? (
+          <img src={thumb} alt={l.address} className="w-full h-full object-cover" loading="lazy" />
         ) : (
-          <div
-            className={`w-full sm:w-28 h-20 rounded-lg shrink-0 cursor-pointer ${LISTING_PLACEHOLDER_CLASS}`}
-            onClick={() => onSelect(toProperty(l))}
-          >
-            <ImageIcon size={20} />
+          <div className="w-full h-full flex items-center justify-center text-[#D1D5DB]">
+            <Ico icon="solar:buildings-linear" size={40} />
           </div>
-        );
-      })()}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1 flex-wrap">
-          {l._source === 'db' ? (
+        )}
+        {/* Status pill top-left */}
+        <span className={`absolute top-3 left-3 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] ${overlay.className}`}>
+          {overlay.label}
+        </span>
+        {/* Boost indicator top-right */}
+        {isBoosted && (
+          <div
+            className="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center text-white shadow-[0_4px_12px_rgba(37,99,235,0.4)]"
+            style={{ background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)' }}
+            title="Boosted listing"
+          >
+            <Ico icon="solar:bolt-bold" size={16} color="#fff" />
+          </div>
+        )}
+        {/* Language pill bottom-left */}
+        <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 bg-white/95 backdrop-blur rounded-full px-2.5 py-1 text-[11px] font-bold text-[#0a0f1e]">
+          <Ico icon="solar:earth-bold" size={12} color="#2563EB" />
+          {langCount} languages
+        </span>
+      </div>
+
+      {/* Body */}
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="text-[16px] font-bold text-[#0a0f1e] leading-tight truncate flex-1">{l.address}</h3>
+          <div onClick={(e) => e.stopPropagation()} className="shrink-0 -mt-1 -mr-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" variant="ghost" className="h-8 w-8 p-0 rounded-full hover:bg-[#F3F4F6]" aria-label="More actions">
+                  <MoreHorizontal size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                {l._source === 'db' && (
+                  <DropdownMenuItem onClick={() => navigate(`/dashboard/listings/${l.id}/edit`)} className="gap-2 text-xs cursor-pointer">
+                    <Pencil size={14} /> Edit listing
+                  </DropdownMenuItem>
+                )}
+                {l._source === 'db' && l._status === 'public' && (
+                  <DropdownMenuItem onClick={() => window.open(`/property/${l.id}`, '_blank')} className="gap-2 text-xs cursor-pointer">
+                    <ExternalLink size={14} /> View public page
+                  </DropdownMenuItem>
+                )}
+                {l._source === 'db' && (
+                  <DropdownMenuItem onClick={() => navigate(`/dashboard/listings/${l.id}`)} className="gap-2 text-xs cursor-pointer">
+                    <Eye size={14} /> Manage
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={() => onSendReport(l)} className="gap-2 text-xs cursor-pointer">
+                  <FileBarChart2 size={14} /> Send vendor report
+                </DropdownMenuItem>
+                {l._status === 'pending' && (
+                  <DropdownMenuItem onClick={() => onPublish(l)} disabled={actionLoading === l.id} className="gap-2 text-xs cursor-pointer">
+                    <Zap size={14} /> Publish listing
+                  </DropdownMenuItem>
+                )}
+                {l._status !== 'sold' && l._status !== 'leased' && (
+                  <DropdownMenuItem onClick={() => onMarkSold(l)} disabled={actionLoading === l.id} className="gap-2 text-xs cursor-pointer">
+                    <CheckCircle2 size={14} /> Mark {isRental ? 'leased' : 'sold'}
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+        <p className="text-[12px] text-[#6a6a6a] font-medium mt-1 truncate">{l.suburb}{l.state ? `, ${l.state}` : ''}</p>
+        <p className="text-[22px] font-extrabold text-[#0a0f1e] tabular-nums mt-3">{l.price_formatted}</p>
+
+        {/* Meta row */}
+        <div className="flex items-center gap-4 mt-3 text-[12px] text-[#6a6a6a] font-medium">
+          <span className="inline-flex items-center gap-1"><Ico icon="solar:bed-linear" size={14} />{l.beds ?? 0}</span>
+          <span className="inline-flex items-center gap-1"><Ico icon="solar:bath-linear" size={14} />{l.baths ?? 0}</span>
+          <span className="inline-flex items-center gap-1"><Ico icon="solar:car-linear" size={14} />{l.parking ?? 0}</span>
+          <span className="inline-flex items-center gap-1 ml-auto"><Ico icon="solar:eye-linear" size={14} />{views}</span>
+        </div>
+
+        {/* Inline status menu (preserves existing status-change + delete mutation) */}
+        {l._source === 'db' && (
+          <div className="mt-4" onClick={(e) => e.stopPropagation()}>
             <StatusMenu
               listing={{ id: l.id, status: l._status, listing_type: l.listing_type }}
               onStatusChange={onStatusChange}
               onDelete={onDelete}
             />
-          ) : (
-            <Badge className={`${s.color} text-[10px] gap-0.5 border-0`}>{s.icon} {s.label}</Badge>
-          )}
-          {isRental && <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">Rental</Badge>}
-          <span className={`text-xs font-bold ${daysColor}`}>{days}d</span>
-        </div>
-        <h3 className="font-display text-sm font-bold truncate">{l.title}</h3>
-        <p className="text-xs text-muted-foreground truncate">{l.address}</p>
-        <p className="text-sm font-display font-bold text-primary mt-1">{l.price_formatted}</p>
-        <ListingStats listingId={l.id} stats={stats} />
-      </div>
-      <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1 shrink-0">
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/performance?listing=${l.id}`); }}
-          className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-border bg-background hover:bg-accent hover:border-primary/40 cursor-pointer transition"
-          aria-label="View performance"
-          title="View performance"
-        >
-          {l.views === 0 && leads === 0 ? (
-            <span className="text-xs text-muted-foreground">—</span>
-          ) : (
-            <>
-              <span className="text-xs font-semibold text-foreground flex items-center gap-1">
-                <Eye size={10} /> {l.views} views
-              </span>
-              <span className="text-xs text-muted-foreground">·</span>
-              <span className="text-xs font-semibold text-primary flex items-center gap-1">
-                <Sparkles size={10} /> {leads} {leads === 1 ? 'enquiry' : 'enquiries'}
-              </span>
-            </>
-          )}
-        </button>
-        <div className="flex gap-1 mt-1">
-          {l._source === 'db' && (
-            <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" onClick={() => navigate(`/dashboard/listings/${l.id}`)}>
-              <Eye size={10} /> Manage
-            </Button>
-          )}
-          {l._source === 'db' && l._status === 'public' && (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="text-[10px] h-6 px-2 gap-0.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open(`/property/${l.id}`, '_blank');
-              }}
-              title="View buyer-facing listing in a new tab"
-            >
-              <ExternalLink size={10} /> View live
-            </Button>
-          )}
-          <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5" disabled={actionLoading === l.id} onClick={() => {
-            if (l._source === 'db') navigate(`/dashboard/listings/${l.id}/edit`);
-          }}>
-            <Pencil size={10} /> Edit
-          </Button>
-          {l._status === 'pending' && (
-            <Button size="sm" className="text-[10px] h-6 px-2.5 gap-0.5 bg-green-600 hover:bg-green-700 text-white" disabled={actionLoading === l.id} onClick={() => onPublish(l)}>
-              {actionLoading === l.id ? <Loader2 size={10} className="animate-spin" /> : <Zap size={10} />} Publish Listing
-            </Button>
-          )}
-          {l._source === 'db' && l._status === 'public' && (
-            <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 gap-0.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50" onClick={() => navigate(`/dashboard/listings/${l.id}?tab=marketing`)}>
-              <Zap size={10} /> Featured
-            </Button>
-          )}
-          {l._status !== 'sold' && (
-            <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2 text-success" disabled={actionLoading === l.id} onClick={() => onMarkSold(l)}>
-              {actionLoading === l.id ? <Loader2 size={10} className="animate-spin" /> : null} Mark Sold
-            </Button>
-          )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="sm" variant="ghost" className="h-6 w-6 p-0" aria-label="More actions">
-                <MoreHorizontal size={14} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuItem onClick={() => onSendReport(l)} className="gap-2 text-xs cursor-pointer">
-                <FileBarChart2 size={14} className="text-primary" />
-                Send vendor report 
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          </div>
+        )}
+
+        {/* Bottom action row */}
+        <div className="mt-4 pt-4 border-t border-[#F3F4F6] flex items-center justify-between gap-2">
+          <span className="text-[11px] text-[#6a6a6a]">
+            {enquiries} {enquiries === 1 ? 'enquiry' : 'enquiries'} · {views} {views === 1 ? 'view' : 'views'}
+          </span>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/listings/${l.id}?tab=marketing`); }}
+            className="text-[13px] font-bold text-[#2563EB] hover:underline"
+          >
+            Boost →
+          </button>
         </div>
       </div>
     </div>

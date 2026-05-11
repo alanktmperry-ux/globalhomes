@@ -211,11 +211,11 @@ export default function HaloBoardPage() {
       setTarget(null);
       queryClient.invalidateQueries({ queryKey: ['halo-credits-balance', user.id] });
       setUnlockedIds((prev) => new Set(prev).add(id));
-      toast.success('Halo unlocked. Contact details are now visible.');
+      toast.success(t('halo.board.toast.unlocked'));
       navigate(`/dashboard/halo-board/${id}`);
     } catch (e) {
       console.error('[HaloBoard] unlock error', e);
-      toast.error('Something went wrong. Your credit has not been spent. Please try again.');
+      toast.error(t('halo.board.toast.error'));
     } finally {
       setBusy(false);
     }

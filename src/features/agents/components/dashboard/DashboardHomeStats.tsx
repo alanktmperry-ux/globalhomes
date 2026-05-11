@@ -135,16 +135,11 @@ export default function DashboardHomeStats({ agentId }: Props) {
           Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="rounded-[16px] p-6 min-h-[130px] space-y-3"
-              style={{
-                background: 'rgba(255,255,255,0.07)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255,255,255,0.15)',
-              }}
+              className="bg-white rounded-[12px] p-6 min-h-[130px] space-y-3"
+              style={{ border: '1px solid #E5E7EB' }}
             >
-              <SkeletonBar className="h-2 w-20 bg-white/15" />
-              <SkeletonBar className="h-10 w-16 bg-white/15" />
+              <SkeletonBar className="h-2 w-20" />
+              <SkeletonBar className="h-10 w-16" />
             </div>
           ))
         ) : (

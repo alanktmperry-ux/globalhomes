@@ -706,8 +706,6 @@ const ListingsPage = () => {
     </div>
   );
 
-  const portfolioHeader = (
-    <div className="flex items-start justify-between gap-4 flex-wrap p-4 sm:p-6 pb-0 max-w-5xl">
   const totalCount = listings.filter((l) => !deletedIds.has(l.id)).length;
 
   const SORT_LABELS: Record<typeof sortBy, string> = {

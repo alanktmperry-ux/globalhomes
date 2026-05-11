@@ -30,6 +30,8 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'fr',    name: 'Français' },
   { code: 'pt',    name: 'Português' },
   { code: 'ru',    name: 'Русский' },
+  { code: 'ne',    name: 'नेपाली' },
+  { code: 'pl',    name: 'Polski' },
 ] as const;
 
 export type SupportedLanguageCode = typeof SUPPORTED_LANGUAGES[number]['code'];
@@ -62,6 +64,8 @@ export const LEGACY_CODE_MAP: Record<SupportedLanguageCode, string> = {
   'fr':    'fr',
   'pt':    'pt',
   'ru':    'ru',
+  'ne':    'ne' as any,
+  'pl':    'pl',
 };
 
 export const FROM_LEGACY_CODE_MAP: Record<string, SupportedLanguageCode> = {

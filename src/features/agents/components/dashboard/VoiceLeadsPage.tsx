@@ -183,13 +183,12 @@ const VoiceLeadsPage = () => {
         <div className={`${selectedId ? 'hidden lg:block lg:w-[380px]' : 'flex-1'} border-r border-border`}>
           <div className="p-4 space-y-2">
             {leads.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <Mic size={32} className="text-muted-foreground/30 mb-3" />
-                <p className="text-sm font-medium text-muted-foreground">No voice leads yet</p>
-                <p className="text-xs text-muted-foreground/70 mt-1 max-w-[240px]">
-                  When buyers use voice search on your listings, their inquiries will appear here with AI-scored urgency.
-                </p>
-              </div>
+              <EmptyState
+                variant="compact"
+                icon="solar:microphone-linear"
+                title="No voice enquiries yet"
+                body="Buyers who search by voice in any language land here automatically."
+              />
             )}
             {leads.map((lead) => {
               const u = URGENCY_CONFIG[lead.urgency];

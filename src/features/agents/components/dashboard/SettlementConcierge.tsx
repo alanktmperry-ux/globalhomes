@@ -215,12 +215,13 @@ const SettlementConcierge = () => {
       {/* Upcoming Settlements */}
       <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Upcoming Settlements</h2>
       {upcoming.length === 0 ? (
-        <Card className="mb-8">
-          <CardContent className="py-12 text-center text-muted-foreground">
-            <p className="text-sm">No upcoming settlements</p>
-            <p className="text-xs mt-1">Move a deal to &quot;Under Offer&quot; in your Pipeline to see it here.</p>
-          </CardContent>
-        </Card>
+        <div className="mb-8">
+          <EmptyState
+            icon="solar:calendar-mark-linear"
+            title="No upcoming settlements"
+            body="Settlements scheduled in the next 90 days will appear here."
+          />
+        </div>
       ) : (
         <div className="space-y-3 mb-8">
           {upcoming.map(s => {

@@ -1086,7 +1086,7 @@ export const ar: Partial<Record<TranslationKey, string>> = {
   'seeker.buyerServices.preapproval.copy': 'اعرف ميزانيتك الحقيقية. سنوصلك بوسيط قروض عقارية متعدد اللغات - الإنجليزية والصينية والفيتنامية متاحة.',
   'seeker.buyerServices.preapproval.cta': 'ابحث عن وسيط → مجاناً وبدون أي التزامات',
   'seeker.buyerServices.conveyancer.title': 'هل تحتاج إلى محامٍ مختص بنقل الملكية؟',
-  'seeker.buyerServices.conveyancer.body': 'تسوية برسوم ثابتة تبدأ من 990 دولارًا. خدمة متعددة اللغات متوفرة في ولايات نيو ساوث ويلز وفيكتوريا وكوينزلاند.',
+  'seeker.buyerServices.conveyancer.body': 'تسوية برسوم ثابتة ابتداءً من {price}. خدمات متعددة اللغات متاحة في نيو ساوث ويلز وفيكتوريا وكوينزلاند.',
   'seeker.planningToBuy.title': 'هل تخطط لشراء منزل في يوم من الأيام؟ ابدأ الآن.',
   'seeker.planningToBuy.copy': 'تحدث إلى وسيط عقاري متعدد اللغات - سيخبرك بالضبط بالمبلغ المطلوب كدفعة أولى ومتى ستكون جاهزاً. بدون أي التزام أو تكلفة.',
   'seeker.planningToBuy.findMandarin': '🏦 ابحث عن وسيط يتحدث اللغة الصينية (الماندرين)',

@@ -173,7 +173,7 @@ export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceF
                 width={55}
               />
               <Tooltip
-                formatter={(value: number) => [formatPrice(value), 'Price']}
+                formatter={(value: number) => [formatPrice(value), t('priceHistory.tooltip.price')]}
                 labelFormatter={(label: string) => label}
                 contentStyle={{ borderRadius: '0.75rem', border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}
               />

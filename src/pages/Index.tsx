@@ -561,8 +561,8 @@ const Index = () => {
                 className="hero-headline opacity-0 animate-fade-up"
                 style={{ margin: '0 0 12px', animationDelay: '0.25s' }}
               >
-                <span className="line1">Find your home.</span>
-                <span className={`line2 ${blur ? 'blur-out' : 'blur-in'}`}>{seq.line2}</span>
+                <span className="line1">{language === 'en' ? 'Find your home.' : t('hero.headline.line1')}</span>
+                <span className={`line2 ${blur ? 'blur-out' : 'blur-in'}`}>{language === 'en' ? seq.line2 : t('hero.headline.line2')}</span>
               </h1>
 
               <p

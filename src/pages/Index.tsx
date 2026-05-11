@@ -9,6 +9,8 @@ import LiveActivityTicker from '@/components/LiveActivityTicker';
 import HomeCountUp from '@/components/HomeCountUp';
 import FeaturedListings from '@/features/marketing/FeaturedListings';
 import ReplaceFiveTools from '@/features/marketing/ReplaceFiveTools';
+import VoiceListingShowcase from '@/features/marketing/VoiceListingShowcase';
+import HaloBoardPreview from '@/features/marketing/HaloBoardPreview';
 
 // ============================================================
 // Wave 17 V8 — Buyer-first multilingual homepage
@@ -843,6 +845,12 @@ const Index = () => {
 
         {/* ═══ Replace five tools with one — Bose-signature visual ═══ */}
         <ReplaceFiveTools />
+
+        {/* ═══ Voice Listing showcase — blue gradient stage ═══ */}
+        <VoiceListingShowcase />
+
+        {/* ═══ Halo Board preview — reverse marketplace ═══ */}
+        <HaloBoardPreview />
 
         {/* ═══ SECTION 4b — Featured Listings ═══ */}
         <section style={{ background: '#fff', padding: '72px 24px' }}>

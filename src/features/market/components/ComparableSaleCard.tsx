@@ -41,11 +41,11 @@ export function ComparableSaleCard({ sale, compact }: Props) {
         </div>
 
         <div className="text-right shrink-0 space-y-1">
-          <p className="text-base font-bold text-foreground">{formatAUD(sale.sold_price)}</p>
+          <p className="text-base font-bold text-foreground">{formatCurrency(sale.sold_price, language)}</p>
           {sale.price_per_sqm != null && (
-            <p className="text-[11px] text-primary font-medium">${Math.round(sale.price_per_sqm).toLocaleString()}/m²</p>
+            <p className="text-[11px] text-primary font-medium">{formatCurrency(Math.round(sale.price_per_sqm), language)}/m²</p>
           )}
-          <p className="text-[11px] text-muted-foreground">{formatDate(sale.sold_date)}</p>
+          <p className="text-[11px] text-muted-foreground">{fmtDate(sale.sold_date, language, { month: 'short', year: 'numeric' })}</p>
           {sale.days_on_market != null && !compact && (
             <p className="text-[11px] text-muted-foreground">{sale.days_on_market} DOM</p>
           )}

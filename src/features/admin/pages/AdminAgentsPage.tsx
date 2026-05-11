@@ -1,8 +1,14 @@
+import { EmptyState } from '@/components/ui/empty-state';
+
 export default function AdminAgentsPage() {
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       <h1 className="text-2xl font-bold text-foreground">Agents</h1>
-      <p className="text-sm text-muted-foreground">Coming soon — agent lifecycle, users, and roles management will live here.</p>
+      <EmptyState
+        icon="solar:users-group-rounded-linear"
+        title="Agent management is in progress"
+        body="Agent lifecycle, users, and roles will live here. We'll notify you when it's ready."
+      />
     </div>
   );
 }

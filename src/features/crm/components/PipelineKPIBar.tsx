@@ -1,98 +1,77 @@
 import { useCRMLeads } from '../hooks/useCRMLeads';
-import { useCommunicationStats } from '../hooks/useCommunicationStats';
-import { useAgentId } from '../hooks/useAgentId';
-import { Phone, MessageSquare } from 'lucide-react';
-import { URGENCY_CONFIG, URGENCY_TIERS, type UrgencyTier } from '../lib/urgency';
+import { URGENCY_TIERS, type UrgencyTier } from '../lib/urgency';
 
 interface Props {
-  /** Called when an urgency tile is clicked (switches to filtered list view). */
+  /** Called when a heat tile is clicked (switches to filtered list view). */
   onUrgencyClick?: (tier: UrgencyTier) => void;
 }
 
+const Ico = ({ icon, size = 18, color }: { icon: string; size?: number; color?: string }) => (
+  // @ts-expect-error iconify-icon is a web component
+  <iconify-icon icon={icon} style={{ fontSize: `${size}px`, color, display: 'inline-flex', lineHeight: 1 }} />
+);
+
+const TILE_CONFIG: Record<UrgencyTier, {
+  label: string;
+  icon: string;
+  iconColor: string;
+  labelColor: string;
+  sub: string;
+}> = {
+  hot:  { label: 'HOT',  icon: 'solar:flame-bold',                iconColor: '#DC2626', labelColor: '#DC2626', sub: 'ready to act' },
+  warm: { label: 'WARM', icon: 'solar:fire-minimalistic-bold',    iconColor: '#F59E0B', labelColor: '#D97706', sub: 'warming up' },
+  cool: { label: 'COOL', icon: 'solar:snowflake-linear',          iconColor: '#0EA5E9', labelColor: '#0EA5E9', sub: 'in early discovery' },
+  cold: { label: 'COLD', icon: 'solar:snowflake-linear',          iconColor: '#6B7280', labelColor: '#374151', sub: 'gone quiet' },
+};
+
 export function PipelineKPIBar({ onUrgencyClick }: Props) {
   const { leads, loading } = useCRMLeads({ stage: 'all' });
-  const agentId = useAgentId();
-  const { totals: commTotals } = useCommunicationStats({ range: 'month', agentId: agentId ?? undefined });
 
-  if (loading) return <div className="h-20 bg-muted/30 rounded-xl animate-pulse" />;
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[0,1,2,3].map(i => (
+          <div key={i} className="h-[124px] bg-white border border-[#E5E5E5] rounded-3xl animate-pulse" />
+        ))}
+      </div>
+    );
+  }
 
   const active = leads.filter(l => !['settled', 'lost'].includes(l.stage));
-  const totalValue = active.reduce((sum, l) => sum + (l.budget_max ?? 0), 0);
-  const settled30d = leads.filter(l =>
-    l.stage === 'settled' &&
-    (Date.now() - new Date(l.updated_at).getTime()) < 30 * 86400000
-  ).length;
-
   const counts: Record<UrgencyTier, number> = { hot: 0, warm: 0, cool: 0, cold: 0 };
   for (const l of active) counts[(l as any).urgency as UrgencyTier]++;
 
   return (
-    <div className="space-y-3">
-      {/* Top row: pipeline meta */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <Tile label="Active Leads" value={active.length} sub="in pipeline" />
-        <Tile label="Pipeline Value" value={`$${(totalValue / 1_000_000).toFixed(1)}m`} sub="combined budget" />
-        <Tile label="Settled (30d)" value={settled30d} sub="this month" valueClass="text-primary" />
-        <Tile
-          label="Calls (30d)"
-          value={commTotals.calls}
-          sub={commTotals.calls > 0 ? `${Math.round((commTotals.answered / commTotals.calls) * 100)}% answered` : 'none logged'}
-          icon={<Phone size={13} className="text-primary" />}
-        />
-        <Tile
-          label="SMS (30d)"
-          value={commTotals.sms}
-          sub="messages sent"
-          icon={<MessageSquare size={13} className="text-cyan-500" />}
-          valueClass="text-cyan-600 dark:text-cyan-400"
-        />
-      </div>
-
-      {/* Urgency row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {URGENCY_TIERS.map(tier => {
-          const cfg = URGENCY_CONFIG[tier];
-          const count = counts[tier];
-          const interactive = !!onUrgencyClick && count > 0;
-          return (
-            <button
-              key={tier}
-              type="button"
-              disabled={!interactive}
-              onClick={() => onUrgencyClick?.(tier)}
-              className={`bg-white rounded-[12px] p-5 text-left transition ${
-                interactive ? 'hover:shadow-md hover:-translate-y-0.5 cursor-pointer' : 'cursor-default'
-              }`}
-              style={{ border: '1px solid #E5E7EB' }}
-            >
-              <div className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${cfg.dot}`} />
-                <p
-                  className="text-xs font-semibold uppercase text-[#6B7280]"
-                  style={{ letterSpacing: '0.08em' }}
-                >
-                  {cfg.label}
-                </p>
-              </div>
-              <p className="text-4xl font-extralight text-[#0a0f1e] tabular-nums mt-2">{count}</p>
-              <p className="text-xs text-[#9CA3AF] mt-1">{cfg.sub}</p>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function Tile({ label, value, sub, valueClass = 'text-foreground', icon }: {
-  label: string; value: string | number; sub: string; valueClass?: string; icon?: React.ReactNode;
-}) {
-  return (
-    <div className="bg-card border border-border rounded-xl p-4 text-center">
-      {icon && <div className="flex justify-center mb-1">{icon}</div>}
-      <p className={`text-2xl font-bold ${valueClass}`}>{value}</p>
-      <p className="text-xs font-medium text-foreground">{label}</p>
-      <p className="text-[10px] text-muted-foreground">{sub}</p>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {URGENCY_TIERS.map(tier => {
+        const cfg = TILE_CONFIG[tier];
+        const count = counts[tier];
+        const interactive = !!onUrgencyClick;
+        return (
+          <button
+            key={tier}
+            type="button"
+            disabled={!interactive}
+            onClick={() => onUrgencyClick?.(tier)}
+            className={
+              'bg-white rounded-3xl border border-[#E5E5E5] p-5 text-left transition-all ' +
+              (interactive ? 'hover:border-[#2563EB]/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.04)] cursor-pointer' : 'cursor-default')
+            }
+          >
+            <div className="flex items-center gap-2">
+              <Ico icon={cfg.icon} size={18} color={cfg.iconColor} />
+              <span
+                className="text-[11px] uppercase font-bold"
+                style={{ letterSpacing: '0.12em', color: cfg.labelColor }}
+              >
+                {cfg.label}
+              </span>
+            </div>
+            <p className="text-[36px] font-extrabold text-[#0a0f1e] tabular-nums leading-none mt-3">{count}</p>
+            <p className="text-[12px] text-[#6a6a6a] mt-1">{cfg.sub}</p>
+          </button>
+        );
+      })}
     </div>
   );
 }

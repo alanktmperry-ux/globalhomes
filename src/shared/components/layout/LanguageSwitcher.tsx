@@ -5,7 +5,7 @@ import { useTranslation, type Language } from '@/shared/lib/i18n';
 import { LANGUAGE_STORAGE_KEY } from '@/shared/lib/i18n/config';
 import { supabase } from '@/integrations/supabase/client';
 
-// Full display list — 21 languages, ordered. `legacy` is the value written to the
+// Full display list — 22 languages, ordered. `legacy` is the value written to the
 // existing I18nProvider; `available` toggles "Soon" when no translation file exists.
 type DisplayLang = {
   code: string;        // canonical code used for storage
@@ -33,7 +33,6 @@ const DISPLAY_LANGUAGES: DisplayLang[] = [
   { code: 'id',    legacy: 'id',    short: 'ID', flag: '🇮🇩', name: 'Bahasa Indonesia',   available: true },
   { code: 'ms',    legacy: 'ms',    short: 'MS', flag: '🇲🇾', name: 'Bahasa Melayu',      available: true },
   { code: 'it',    legacy: 'it',    short: 'IT', flag: '🇮🇹', name: 'Italiano',           available: true },
-  { code: 'el',    legacy: 'en',    short: 'EL', flag: '🇬🇷', name: 'Ελληνικά · Greek',   available: false },
   { code: 'es',    legacy: 'es',    short: 'ES', flag: '🇪🇸', name: 'Español',            available: true },
   { code: 'pt',    legacy: 'pt',    short: 'PT', flag: '🇵🇹', name: 'Português',          available: true },
   { code: 'fr',    legacy: 'fr',    short: 'FR', flag: '🇫🇷', name: 'Français',           available: true },

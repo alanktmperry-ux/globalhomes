@@ -26,7 +26,8 @@ import { useTranslation } from '@/shared/lib/i18n';
 type BoardTab = 'all' | 'pocket';
 
 export default function HaloBoardPage() {
-  usePageTitle('Buyer Matches');
+  const { t } = useTranslation();
+  usePageTitle(t('halo.board.pageTitle'));
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();

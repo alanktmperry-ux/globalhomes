@@ -170,7 +170,7 @@ export default function HaloBoardPage() {
         .eq('user_id', user.id)
         .maybeSingle();
       if (!agent) {
-        toast.error('Agent record not found.');
+        toast.error(t('halo.board.toast.agentNotFound'));
         setTarget(null);
         return;
       }

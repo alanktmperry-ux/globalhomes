@@ -823,8 +823,7 @@ const Index = () => {
 
         <FAQSection />
 
-        {/* ═══ SECTION 9 — Pricing (Bose × Blue) ═══ */}
-        <PricingSectionNew />
+        {/* Agent pricing moved to /for-agents/pricing */}
 
         {/* ═══ Final CTA — dark ink with blue glow ═══ */}
         <FinalCTA />

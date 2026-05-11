@@ -938,7 +938,7 @@ export default function PropertyDetailPage() {
                   <Calendar size={16} className="text-muted-foreground shrink-0" />
                   <div>
                     <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.facts.listed')}</p>
-                    <p className="text-sm font-semibold text-foreground">{new Date(property.listedDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                    <p className="text-sm font-semibold text-foreground">{formatDate(property.listedDate, language, { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                   </div>
                 </div>
               )}

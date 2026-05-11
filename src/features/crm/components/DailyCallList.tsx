@@ -34,19 +34,19 @@ export function DailyCallList({ onSelectLead }: Props) {
   }, [leads, overdueLeadIds]);
 
   if (callList.length === 0) return (
-    <div className="bg-card border border-border rounded-xl p-5">
-      <h3 className="text-sm font-bold text-foreground mb-2">📋 Today's Call List</h3>
-      <p className="text-xs text-muted-foreground text-center py-4">
+    <div className="bg-white rounded-[12px] p-5" style={{ border: '1px solid #E5E7EB' }}>
+      <h3 className="text-sm font-bold text-[#0a0f1e] mb-2">Today's Call List</h3>
+      <p className="text-xs text-[#6B7280] text-center py-4">
         All caught up — no urgent leads to contact.
       </p>
     </div>
   );
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5 space-y-3">
+    <div className="bg-white rounded-[12px] p-5 space-y-3" style={{ border: '1px solid #E5E7EB' }}>
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold text-foreground">📋 Today's Call List</h3>
-        <span className="text-xs bg-destructive/10 text-destructive font-medium px-2 py-0.5 rounded-full">
+        <h3 className="text-sm font-bold text-[#0a0f1e]">Today's Call List</h3>
+        <span className="text-xs bg-[#FEF2F2] text-[#991B1B] font-medium px-2 py-0.5 rounded-full">
           {callList.length} to contact
         </span>
       </div>

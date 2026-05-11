@@ -1166,8 +1166,8 @@ export const en = {
   // Seeker dashboard (Phase 1B-1)
   // ──────────────────────────────────────────────────────────────────
   'seeker.dashboard.title': 'My Halos · ListHQ',
-  'seeker.dashboard.welcome.firstTime': 'Welcome, {name} 👋',
-  'seeker.dashboard.welcome.returning': 'Welcome back, {name} 👋',
+  'seeker.dashboard.welcome.firstTime': 'Welcome, {name}',
+  'seeker.dashboard.welcome.returning': 'Welcome back, {name}',
   'seeker.dashboard.subtitle': "Here's everything happening with your property search.",
   'seeker.dashboard.langBanner.title': 'Listings shown in your language',
   'seeker.dashboard.langBanner.copy': 'Property details are automatically displayed in your preferred language when available.',

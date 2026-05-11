@@ -442,7 +442,7 @@ const StatusTabs = ({
     { key: 'sold', label: 'Sold' },
   ];
   return (
-    <div className="flex items-center gap-2 mb-6 flex-wrap">
+    <div className="flex items-center gap-2 flex-wrap">
       {items.map((t) => {
         const active = activeTab === t.key;
         const count = t.key !== 'all' ? counts[t.key] : undefined;
@@ -453,13 +453,12 @@ const StatusTabs = ({
             onClick={() => setActiveTab(t.key)}
             className={
               active
-                ? 'px-4 py-2 rounded-full text-sm font-semibold bg-[#2563EB] text-white transition-all'
-                : 'px-4 py-2 rounded-full text-sm font-medium text-[#374151] hover:bg-[#E5E7EB] transition-all'
+                ? 'px-4 py-2 rounded-full text-[13px] font-semibold bg-[#0a0f1e] text-white transition-all'
+                : 'px-4 py-2 rounded-full text-[13px] font-semibold bg-[#F9FAFB] text-[#6a6a6a] hover:bg-[#EFF6FF] hover:text-[#1E40AF] transition-all'
             }
-            style={active ? undefined : { background: '#F3F4F6' }}
           >
             {t.label}
-            {count ? <span className="ml-1.5 opacity-70">· {count}</span> : null}
+            {count ? <span className={active ? 'ml-1.5 opacity-70 font-normal' : 'ml-1.5 text-[#9CA3AF] font-normal'}>· {count}</span> : null}
           </button>
         );
       })}

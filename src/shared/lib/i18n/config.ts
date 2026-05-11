@@ -88,4 +88,6 @@ export const FROM_LEGACY_CODE_MAP: Record<string, SupportedLanguageCode> = {
   'fr':    'fr',
   'pt':    'pt',
   'ru':    'ru',
+  'ne':    'ne' as SupportedLanguageCode,
+  'pl':    'pl' as SupportedLanguageCode,
 };

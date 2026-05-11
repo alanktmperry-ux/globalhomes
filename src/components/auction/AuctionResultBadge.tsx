@@ -64,7 +64,7 @@ export function AuctionResultBadge({ propertyId, agentId }: Props) {
 
             {result.auction_date && (
               <p className="text-sm opacity-70">
-                {new Date(result.auction_date).toLocaleDateString('en-AU', {
+                {formatDate(result.auction_date, language, {
                   weekday: 'short', day: 'numeric', month: 'long', year: 'numeric',
                 })}
               </p>

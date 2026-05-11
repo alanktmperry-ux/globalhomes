@@ -77,8 +77,9 @@ const AgentPortalPage = () => {
       // Get or create agent record
       let { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (!agent) {
-        const { data: newAgent, error } = await supabase.from('agents').insert({ user_id: user.id, name: user.email || 'Agent', email: user.email }).select('id').single();
+        const { data: newAgent, error } = await supabase.from('agents').insert({ user_id: user.id, name: user.email || 'Agent', email: user.email }).select('id').maybeSingle();
         if (error) throw error;
+        if (!newAgent) throw new Error('Could not create agent profile. Please try again.');
         agent = newAgent;
       }
 

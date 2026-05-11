@@ -26,8 +26,9 @@ const recentDate = (daysAgo: number) => {
 const v = () => Math.floor(Math.random() * 321) + 80;
 
 export async function seedProperties() {
-  const { data: agent, error: agentErr } = await supabase.from('agents').select('id').limit(1).single();
-  if (agentErr || !agent) throw new Error('No agent found — create an agent first.');
+  const { data: agent, error: agentErr } = await supabase.from('agents').select('id').limit(1).maybeSingle();
+  if (agentErr) throw agentErr;
+  if (!agent) throw new Error('No agent found — create an agent first.');
   const aid = agent.id;
 
   const props = [

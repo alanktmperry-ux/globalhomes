@@ -57,9 +57,9 @@ export function PreAuctionOfferForm({ propertyId, auctionId }: Props) {
 
   if (submitted) {
     return (
-      <div className="rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 p-5">
-        <p className="font-semibold text-emerald-700 dark:text-emerald-400">Offer submitted</p>
-        <p className="text-sm text-emerald-600 dark:text-emerald-500 mt-1">
+      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+        <p className="font-semibold text-emerald-700">Offer submitted</p>
+        <p className="text-sm text-emerald-600 mt-1">
           Your pre-auction offer of ${amountNum.toLocaleString('en-AU')} has been sent to the agent. They'll review it and respond within 48 hours.
         </p>
       </div>
@@ -75,9 +75,9 @@ export function PreAuctionOfferForm({ propertyId, auctionId }: Props) {
 
       {expanded && (
         <div className="px-5 pb-5 space-y-3">
-          <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 flex items-start gap-2">
-            <AlertTriangle size={14} className="text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-            <p className="text-xs text-amber-700 dark:text-amber-400">
+          <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-2">
+            <AlertTriangle size={14} className="text-amber-600 mt-0.5 shrink-0" />
+            <p className="text-xs text-amber-700">
               Vendors are not obligated to accept pre-auction offers. Cooling-off does NOT apply to properties purchased at or prior to auction.
             </p>
           </div>

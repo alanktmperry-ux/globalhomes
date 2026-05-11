@@ -41,8 +41,8 @@ export default function VendorReportPage() {
         .then(() => {});
 
       const [{ data: prop }, { data: ag }, perfResult, benchResult] = await Promise.all([
-        supabase.from('properties').select('id, title, address, suburb, state, price, price_formatted, beds, baths, parking, sqm, property_type, image_url, images, description, listing_type, listed_date, views, contact_clicks, is_active').eq('id', propertyId).single(),
-        supabase.from('agents').select('name, avatar_url, phone, email').eq('id', agentId).single(),
+        supabase.from('properties').select('id, title, address, suburb, state, price, price_formatted, beds, baths, parking, sqm, property_type, image_url, images, description, listing_type, listed_date, views, contact_clicks, is_active').eq('id', propertyId).maybeSingle(),
+        supabase.from('agents').select('name, avatar_url, phone, email').eq('id', agentId).maybeSingle(),
         supabase.rpc('get_property_performance', { p_property_id: propertyId, p_days: 30 }),
         supabase.rpc('get_suburb_benchmarks', { p_property_id: propertyId }),
       ]);

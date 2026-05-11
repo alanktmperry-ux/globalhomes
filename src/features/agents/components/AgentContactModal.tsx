@@ -313,7 +313,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
           .from('agents')
           .select('user_id')
           .eq('id', agent.id)
-          .single();
+          .maybeSingle();
 
         if (agentRow?.user_id) {
           const p1 = user.id < agentRow.user_id ? user.id : agentRow.user_id;

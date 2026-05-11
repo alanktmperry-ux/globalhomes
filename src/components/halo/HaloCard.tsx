@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Pause, Play, Trash2, Pencil, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +14,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { toast } from 'sonner';
 import HaloQualityBadge from '@/components/halo/HaloQualityBadge';
 import HaloFulfilmentDialog from '@/components/halo/HaloFulfilmentDialog';
 import type { Halo, HaloStatus } from '@/types/halo';
@@ -114,25 +114,19 @@ export function HaloCard({ halo, onStatusChange, onFulfil }: Props) {
             {lowScore && (halo.status === 'active' || halo.status === 'paused') && (
               <p className="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-2 py-1.5">
                 Tip: Add more detail to attract more agents.{' '}
-                <button
-                  type="button"
-                  onClick={() => toast('Edit coming soon')}
-                  className="underline font-medium"
-                >
+                <Link to="/halo/edit" className="underline font-medium">
                   Edit Halo
-                </button>
+                </Link>
               </p>
             )}
           </div>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => toast('Edit coming soon')}
-          >
-            <Pencil size={14} /> Edit
+          <Button size="sm" variant="outline" asChild>
+            <Link to="/halo/edit">
+              <Pencil size={14} /> Edit
+            </Link>
           </Button>
           {halo.status === 'active' || halo.status === 'paused' ? (
             <Button size="sm" variant="outline" onClick={handleToggle} disabled={busy}>

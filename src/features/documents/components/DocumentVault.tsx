@@ -108,7 +108,7 @@ export function DocumentVault({ propertyId, viewerRole, canUpload }: Props) {
       {/* Pending requests */}
       {pendingRequests.length > 0 && (
         <div className="space-y-2">
-          <h4 className="text-xs font-semibold text-amber-700 dark:text-amber-400">
+          <h4 className="text-xs font-semibold text-amber-700">
              Documents Requested ({pendingRequests.length})
           </h4>
           {pendingRequests.map(req => (

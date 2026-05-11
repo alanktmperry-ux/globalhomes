@@ -140,10 +140,10 @@ export function investmentScore(inputs: InvestmentScoreInputs): number {
 }
 
 export function scoreLabel(score: number): { label: string; color: string } {
-  if (score >= 75) return { label: 'Strong investment', color: 'text-green-700 bg-green-100 dark:text-green-400 dark:bg-green-900/30' };
-  if (score >= 55) return { label: 'Good investment', color: 'text-blue-700 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30' };
-  if (score >= 35) return { label: 'Average', color: 'text-amber-700 bg-amber-100 dark:text-amber-400 dark:bg-amber-900/30' };
-  return { label: 'Weak investment', color: 'text-red-700 bg-red-100 dark:text-red-400 dark:bg-red-900/30' };
+  if (score >= 75) return { label: 'Strong investment', color: 'text-green-700 bg-green-100' };
+  if (score >= 55) return { label: 'Good investment', color: 'text-blue-700 bg-blue-100' };
+  if (score >= 35) return { label: 'Average', color: 'text-amber-700 bg-amber-100' };
+  return { label: 'Weak investment', color: 'text-red-700 bg-red-100' };
 }
 
 export const DEFAULT_INVESTOR_ASSUMPTIONS = {

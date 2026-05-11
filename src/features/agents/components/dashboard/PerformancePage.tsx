@@ -129,8 +129,8 @@ function TeamPerformanceView() {
               <tr key={a.id} className="border-b border-border/50 hover:bg-muted/30">
                 <td className="py-3 px-4 font-medium">{a.name}</td>
                 <td className="py-3 px-4 text-center">{enquiryCounts[a.id] || 0}</td>
-                <td className="py-3 px-4 text-center text-muted-foreground">Coming soon</td>
-                <td className="py-3 px-4 text-center text-muted-foreground">Coming soon</td>
+                <td className="py-3 px-4 text-center text-muted-foreground/60">—</td>
+                <td className="py-3 px-4 text-center text-muted-foreground/60">—</td>
               </tr>
             ))}
           </tbody>

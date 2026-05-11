@@ -109,7 +109,7 @@ export function DocumentUploadModal({ propertyId, open, onClose, onUpload, prese
                 dragOver
                   ? 'border-primary bg-primary/5 scale-[1.01]'
                   : file
-                  ? 'border-emerald-400 bg-emerald-50/50 dark:bg-emerald-900/10'
+                  ? 'border-emerald-400 bg-emerald-50/50'
                   : 'border-border hover:border-primary/50 hover:bg-accent/30'
               }`}
               onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}

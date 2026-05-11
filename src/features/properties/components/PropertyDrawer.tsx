@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Phone, MessageCircle, Mail, Shield, ShieldCheck } from 'lucide-react';
 import { Property } from '@/shared/lib/types';
-import { useTranslation } from '@/shared/lib/i18n';
+import { useTranslation, formatDate, formatNumber } from '@/shared/lib/i18n';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { AgentContactModal } from '@/features/agents/components/AgentContactModal';
 import { ShareSheet } from '@/shared/components/ShareSheet';
@@ -66,7 +66,7 @@ interface PropertyDrawerProps {
 }
 
 export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searchContext }: PropertyDrawerProps) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { title: translatedTitle, description: translatedDescription, isTranslating: descTranslating, isTranslated: descIsTranslated } = useListingTranslation(property);
   const { formatPrice, currency } = useCurrency();
   const [contactOpen, setContactOpen] = useState(false);
@@ -337,13 +337,13 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
                   {property.listedDate && (
                     <div className="p-3 rounded-xl bg-secondary">
                       <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Listed</p>
-                      <p className="text-sm font-semibold text-foreground mt-0.5">{new Date(property.listedDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                      <p className="text-sm font-semibold text-foreground mt-0.5">{formatDate(property.listedDate, language, { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                     </div>
                   )}
                   {property.views > 0 && (
                     <div className="p-3 rounded-xl bg-secondary">
                       <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Views</p>
-                      <p className="text-sm font-semibold text-foreground mt-0.5">{property.views.toLocaleString()}</p>
+                      <p className="text-sm font-semibold text-foreground mt-0.5">{formatNumber(property.views, language)}</p>
                     </div>
                   )}
                 </div>

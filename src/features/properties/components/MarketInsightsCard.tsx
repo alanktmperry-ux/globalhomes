@@ -5,6 +5,7 @@ import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation, formatDate } from '@/shared/lib/i18n';
 
 interface RentalStats {
   medianRentWeekly: number | null;
@@ -29,6 +30,7 @@ interface MarketInsightsCardProps {
 
 export function MarketInsightsCard({ property }: MarketInsightsCardProps) {
   const { formatPrice } = useCurrency();
+  const { language } = useTranslation();
   const [rentalStats, setRentalStats] = useState<RentalStats | null>(null);
   const [snapshot, setSnapshot] = useState<SuburbSnapshot | null>(null);
   const [history, setHistory] = useState<PricePoint[]>([]);
@@ -150,7 +152,7 @@ export function MarketInsightsCard({ property }: MarketInsightsCardProps) {
             historyRows
               .filter(r => r.median_rent_weekly != null)
               .map(r => ({
-                month: new Date(r.month).toLocaleDateString('en-AU', { month: 'short' }),
+                month: formatDate(new Date(r.month), language, { month: 'short' }),
                 rent: r.median_rent_weekly!,
               }))
           );

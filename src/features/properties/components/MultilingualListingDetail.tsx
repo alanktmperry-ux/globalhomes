@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp, AlertTriangle, Sparkles, Globe } from 'lucide-r
 import { supabase } from '@/integrations/supabase/client';
 import { MortgageBrokerCard } from './MortgageBrokerCard';
 import { capture } from '@/shared/lib/posthog';
-import { useTranslation, type Language } from '@/shared/lib/i18n';
+import { useTranslation, type Language, formatCurrency } from '@/shared/lib/i18n';
 
 type LanguageKey = 'en' | 'zh_simplified' | 'zh_traditional' | 'vi' | 'ko' | 'ar' | 'ja' | 'hi' | 'bn' | 'tl' | 'id';
 
@@ -298,7 +298,7 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
       <MortgageBrokerCard
         propertyId={listing.id}
         propertyAddress={listing.address ?? listing.suburb ?? undefined}
-        propertyPrice={listing.price ? `$${Number(listing.price).toLocaleString()}` : undefined}
+        propertyPrice={listing.price ? formatCurrency(Number(listing.price), i18nLang) : undefined}
       />
       {culturalHighlights.length > 0 && (
         <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-900/20">

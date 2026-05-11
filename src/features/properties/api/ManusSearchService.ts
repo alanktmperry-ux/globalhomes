@@ -197,7 +197,7 @@ class ManusSearchService {
         state: p.state || '',
         country: p.country || 'Australia',
         price: typeof p.price === 'number' ? p.price : parseInt(String(p.price).replace(/[^0-9]/g, '')) || 0,
-        priceFormatted: p.priceFormatted || p.price_formatted || `$${(p.price || 0).toLocaleString()}`,
+        priceFormatted: p.priceFormatted || p.price_formatted || new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 }).format(p.price || 0),
         beds: p.beds || p.bedrooms || 0,
         baths: p.baths || p.bathrooms || 0,
         parking: p.parking || p.garage || 0,

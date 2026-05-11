@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianG
 import { TrendingUp, BarChart3 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
+import { useTranslation, formatDate } from '@/shared/lib/i18n';
 
 interface PriceHistoryChartProps {
   propertyId: string;
@@ -28,6 +29,7 @@ interface SuburbPoint {
 
 export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceFormatted, suburb, state, propertyType }: PriceHistoryChartProps) {
   const { formatPrice } = useCurrency();
+  const { language } = useTranslation();
   const [data, setData] = useState<PricePoint[]>([]);
   const [suburbData, setSuburbData] = useState<SuburbPoint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +55,7 @@ export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceF
           return {
             date: e.created_at,
             price: Number(price),
-            label: d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: '2-digit' }),
+            label: formatDate(d, language, { day: 'numeric', month: 'short', year: '2-digit' }),
           };
         });
 
@@ -63,7 +65,7 @@ export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceF
           points.unshift({
             date: listedDate,
             price: Number(firstMeta.old_price),
-            label: new Date(listedDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: '2-digit' }),
+            label: formatDate(listedDate, language, { day: 'numeric', month: 'short', year: '2-digit' }),
           });
         }
 
@@ -91,7 +93,7 @@ export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceF
             return {
               month: r.month,
               medianPrice: Number(r.median_sale_price),
-              label: d.toLocaleDateString('en-AU', { month: 'short', year: '2-digit' }),
+              label: formatDate(d, language, { month: 'short', year: '2-digit' }),
             };
           }));
         }
@@ -103,7 +105,7 @@ export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceF
   }, [propertyId, currentPrice, listedDate, suburb, state, propertyType]);
 
   const listedStr = listedDate
-    ? new Date(listedDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
+    ? formatDate(listedDate, language, { day: 'numeric', month: 'short', year: 'numeric' })
     : 'listing date';
 
   if (loading) {

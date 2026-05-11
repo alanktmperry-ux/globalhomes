@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, TrendingUp, TrendingDown } from 'lucide-react';
 import { usePriceGuideHistory } from '@/hooks/usePriceGuideHistory';
+import { useTranslation, formatCurrency, formatDate } from '@/shared/lib/i18n';
 
 interface Props {
   propertyId: string;
@@ -8,22 +9,15 @@ interface Props {
   currentHigh: number | null;
 }
 
-function formatPrice(n: number | null) {
-  if (!n) return '—';
-  return '$' + n.toLocaleString('en-AU');
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('en-AU', {
-    day: 'numeric', month: 'short', year: 'numeric',
-  });
-}
-
 export function PriceGuideHistory({ propertyId }: Props) {
+  const { language } = useTranslation();
   const [open, setOpen] = useState(false);
   const { history, loading } = usePriceGuideHistory(propertyId);
 
   if (loading || history.length === 0) return null;
+
+  const fmtPrice = (n: number | null) => (n == null ? '—' : formatCurrency(n, language));
+  const fmtDate = (iso: string) => formatDate(iso, language, { day: 'numeric', month: 'short', year: 'numeric' });
 
   return (
     <div className="mt-2">
@@ -54,22 +48,22 @@ export function PriceGuideHistory({ propertyId }: Props) {
                 <div className="pb-2">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold text-foreground">
-                      {formatPrice(entry.price_low)}
+                      {fmtPrice(entry.price_low)}
                       {entry.price_low && entry.price_high && entry.price_low !== entry.price_high
-                        ? ` – ${formatPrice(entry.price_high)}` : ''}
+                        ? ` – ${fmtPrice(entry.price_high)}` : ''}
                     </span>
                     {isUp && (
                       <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5">
-                        <TrendingUp size={12} /> +${Math.abs(moved!).toLocaleString('en-AU')}
+                        <TrendingUp size={12} /> +{formatCurrency(Math.abs(moved!), language)}
                       </span>
                     )}
                     {isDown && (
                       <span className="text-xs text-destructive flex items-center gap-0.5">
-                        <TrendingDown size={12} /> –${Math.abs(moved!).toLocaleString('en-AU')}
+                        <TrendingDown size={12} /> –{formatCurrency(Math.abs(moved!), language)}
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">{formatDate(entry.changed_at)}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{fmtDate(entry.changed_at)}</p>
                   {entry.note && <p className="text-xs text-muted-foreground italic mt-0.5">{entry.note}</p>}
                 </div>
               </div>

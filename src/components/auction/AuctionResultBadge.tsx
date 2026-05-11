@@ -1,6 +1,7 @@
 import { Trophy, Gavel, XCircle, ArrowRight } from 'lucide-react';
 import { useAuctionResult } from '@/hooks/useAuctionResult';
 import { Link } from 'react-router-dom';
+import { useTranslation, formatCurrency, formatDate } from '@/shared/lib/i18n';
 
 interface Props {
   propertyId: string;
@@ -35,6 +36,7 @@ const RESULT_CONFIG = {
 };
 
 export function AuctionResultBadge({ propertyId, agentId }: Props) {
+  const { language } = useTranslation();
   const result = useAuctionResult(propertyId);
   if (!result) return null;
 
@@ -50,7 +52,7 @@ export function AuctionResultBadge({ propertyId, agentId }: Props) {
 
             {result.sold_price && (
               <p className="text-2xl font-bold">
-                ${result.sold_price.toLocaleString('en-AU')}
+                {formatCurrency(result.sold_price, language)}
               </p>
             )}
 
@@ -62,7 +64,7 @@ export function AuctionResultBadge({ propertyId, agentId }: Props) {
 
             {result.auction_date && (
               <p className="text-sm opacity-70">
-                {new Date(result.auction_date).toLocaleDateString('en-AU', {
+                {formatDate(result.auction_date, language, {
                   weekday: 'short', day: 'numeric', month: 'long', year: 'numeric',
                 })}
               </p>

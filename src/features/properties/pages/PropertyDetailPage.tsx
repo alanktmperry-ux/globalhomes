@@ -11,7 +11,7 @@ import { OpenHomesCard } from '@/features/properties/components/OpenHomesCard';
 import { ListingChatWidget } from '@/features/properties/components/ListingChatWidget';
 import { Button } from '@/components/ui/button';
 import { Property } from '@/shared/lib/types';
-import { useTranslation } from '@/shared/lib/i18n';
+import { useTranslation, formatCurrency, formatDate, formatNumber } from '@/shared/lib/i18n';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { AgentContactModal } from '@/features/agents/components/AgentContactModal';
 import { InvestmentInsightsCard } from '@/features/properties/components/InvestmentInsightsCard';
@@ -658,7 +658,7 @@ export default function PropertyDetailPage() {
                     <span className="text-lg text-muted-foreground font-medium">{tp('property.perWeek')}</span>
                   </div>
                   {currency.code !== 'AUD' && (
-                    <p className="text-sm text-muted-foreground mt-0.5">{tp('property.weeklyRentAud', { amount: weeklyRent.toLocaleString() })}</p>
+                    <p className="text-sm text-muted-foreground mt-0.5">{tp('property.weeklyRentAud', { amount: formatNumber(weeklyRent, language) })}</p>
                   )}
                 </>
               ) : (
@@ -898,7 +898,7 @@ export default function PropertyDetailPage() {
                 return (
                   <div className="space-y-2">
                     {upcoming.map((slot, i) => {
-                      const dayStr = new Date(slot.date).toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+                      const dayStr = formatDate(slot.date, language, { weekday: 'short', day: 'numeric', month: 'short' });
                       return (
                         <button
                           key={`${slot.date}-${slot.start}`}
@@ -938,7 +938,7 @@ export default function PropertyDetailPage() {
                   <Calendar size={16} className="text-muted-foreground shrink-0" />
                   <div>
                     <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.facts.listed')}</p>
-                    <p className="text-sm font-semibold text-foreground">{new Date(property.listedDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                    <p className="text-sm font-semibold text-foreground">{formatDate(property.listedDate, language, { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                   </div>
                 </div>
               )}
@@ -947,7 +947,7 @@ export default function PropertyDetailPage() {
                   <Eye size={16} className="text-muted-foreground shrink-0" />
                   <div>
                     <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.facts.views')}</p>
-                    <p className="text-sm font-semibold text-foreground">{property.views.toLocaleString()}</p>
+                    <p className="text-sm font-semibold text-foreground">{formatNumber(property.views, language)}</p>
                   </div>
                 </div>
               )}
@@ -1097,9 +1097,9 @@ export default function PropertyDetailPage() {
               <div className="p-4 rounded-2xl bg-card border border-border">
                 <p className="text-sm font-medium text-foreground">{tp('property.priceGuide')}</p>
                 <p className="text-xl font-bold text-foreground mt-1">
-                  {(property as any).price_guide_low && `$${Number((property as any).price_guide_low).toLocaleString()}`}
+                  {(property as any).price_guide_low && formatCurrency(Number((property as any).price_guide_low), language)}
                   {(property as any).price_guide_low && (property as any).price_guide_high && (property as any).price_guide_low !== (property as any).price_guide_high
-                    ? ` – $${Number((property as any).price_guide_high).toLocaleString()}` : ''}
+                    ? ` – ${formatCurrency(Number((property as any).price_guide_high), language)}` : ''}
                 </p>
                 <PriceGuideHistory propertyId={property.id} currentLow={(property as any).price_guide_low} currentHigh={(property as any).price_guide_high} />
               </div>

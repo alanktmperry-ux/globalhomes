@@ -14,7 +14,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { supabase } from '@/integrations/supabase/client';
-import { useTranslation } from '@/shared/lib/i18n/useTranslation';
+import { useTranslation, formatCurrency } from '@/shared/lib/i18n';
 
 interface Props {
   propertyPrice: number | null;
@@ -23,10 +23,6 @@ interface Props {
 }
 
 const STATES: AustralianState[] = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT'];
-
-function formatDollars(n: number): string {
-  return '$' + Math.round(n).toLocaleString('en-AU');
-}
 
 function getFIRBFee(price: number): number {
   if (price < 75000) return 4200;
@@ -42,7 +38,8 @@ const FOREIGN_SURCHARGE: Record<AustralianState, number> = {
 };
 
 export function StampDutyCalculator({ propertyPrice, propertyAddress, propertyState }: Props) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const formatDollars = (n: number) => formatCurrency(Math.round(n), language);
   const [price, setPrice] = useState(propertyPrice ? String(propertyPrice) : '');
   const [state, setState] = useState<AustralianState>(() => {
     if (propertyState) return propertyState;

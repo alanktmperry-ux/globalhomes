@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { AddressAutocomplete } from '@/components/ui/AddressAutocomplete';
+import { useTranslation, formatCurrency } from '@/shared/lib/i18n';
 
 /* ── Validation schemas per step ── */
 const step1Schema = z.object({
@@ -57,6 +58,7 @@ interface Props {
 }
 
 export function RentalApplicationModal({ property, open, onClose }: Props) {
+  const { language } = useTranslation();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -427,7 +429,7 @@ export function RentalApplicationModal({ property, open, onClose }: Props) {
                             <span>Name:</span><span className="text-foreground font-medium">{form.fullName}</span>
                             <span>Email:</span><span className="text-foreground font-medium">{form.email}</span>
                             <span>Employment:</span><span className="text-foreground font-medium">{form.employmentStatus || '—'}</span>
-                            <span>Income:</span><span className="text-foreground font-medium">{form.annualIncome ? `$${Number(form.annualIncome).toLocaleString()}` : '—'}</span>
+                            <span>Income:</span><span className="text-foreground font-medium">{form.annualIncome ? formatCurrency(Number(form.annualIncome), language) : '—'}</span>
                             <span>ID uploaded:</span><span className="text-foreground font-medium">{form.identityFile ? 'Yes' : 'No'}</span>
                           </div>
                         </div>

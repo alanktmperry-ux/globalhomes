@@ -1,11 +1,6 @@
 import { Bed, Bath, Car, Ruler, CheckCircle } from 'lucide-react';
 import type { ComparableSaleRecord } from '@/types/market';
-
-const formatAUD = (n: number) =>
-  new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 }).format(n);
-
-const formatDate = (d: string) =>
-  new Date(d).toLocaleDateString('en-AU', { month: 'short', year: 'numeric' });
+import { useTranslation, formatCurrency, formatDate as fmtDate } from '@/shared/lib/i18n';
 
 const methodLabel: Record<string, { label: string; className: string }> = {
   auction: { label: 'Auction', className: 'bg-orange-100 text-orange-700' },
@@ -20,6 +15,7 @@ interface Props {
 }
 
 export function ComparableSaleCard({ sale, compact }: Props) {
+  const { language } = useTranslation();
   const method = methodLabel[sale.sale_method] ?? methodLabel.private_treaty;
 
   return (
@@ -45,11 +41,11 @@ export function ComparableSaleCard({ sale, compact }: Props) {
         </div>
 
         <div className="text-right shrink-0 space-y-1">
-          <p className="text-base font-bold text-foreground">{formatAUD(sale.sold_price)}</p>
+          <p className="text-base font-bold text-foreground">{formatCurrency(sale.sold_price, language)}</p>
           {sale.price_per_sqm != null && (
-            <p className="text-[11px] text-primary font-medium">${Math.round(sale.price_per_sqm).toLocaleString()}/m²</p>
+            <p className="text-[11px] text-primary font-medium">{formatCurrency(Math.round(sale.price_per_sqm), language)}/m²</p>
           )}
-          <p className="text-[11px] text-muted-foreground">{formatDate(sale.sold_date)}</p>
+          <p className="text-[11px] text-muted-foreground">{fmtDate(sale.sold_date, language, { month: 'short', year: 'numeric' })}</p>
           {sale.days_on_market != null && !compact && (
             <p className="text-[11px] text-muted-foreground">{sale.days_on_market} DOM</p>
           )}

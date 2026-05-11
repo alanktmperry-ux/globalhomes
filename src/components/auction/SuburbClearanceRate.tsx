@@ -1,5 +1,6 @@
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { useSuburbAuctionStats } from '@/hooks/useSuburbAuctionStats';
+import { useTranslation, formatDate } from '@/shared/lib/i18n';
 
 interface Props {
   suburb: string;
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export function SuburbClearanceRate({ suburb, state }: Props) {
+  const { language } = useTranslation();
   const { stats, loading } = useSuburbAuctionStats(suburb, state);
 
   if (loading) return <div className="h-16 rounded-xl bg-muted animate-pulse" />;
@@ -22,8 +24,7 @@ export function SuburbClearanceRate({ suburb, state }: Props) {
     ? 'text-destructive bg-destructive/10 border-destructive/20'
     : 'text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800';
 
-  const periodDate = new Date(stats.period_end);
-  const periodLabel = periodDate.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
+  const periodLabel = formatDate(stats.period_end, language, { day: 'numeric', month: 'short' });
 
   return (
     <div className={`flex items-start gap-3 p-4 rounded-xl border ${colorClass}`}>

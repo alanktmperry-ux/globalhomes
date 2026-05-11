@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { Calendar, Clock, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation, formatDate } from '@/shared/lib/i18n';
 
 const bookingSchema = z.object({
   name: z.string().trim().min(1, 'Name is required').max(100),
@@ -22,6 +23,7 @@ interface InspectionBookingProps {
 }
 
 export function InspectionBookingModal({ property, inspectionTimes, open, onClose }: InspectionBookingProps) {
+  const { language } = useTranslation();
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -54,7 +56,7 @@ export function InspectionBookingModal({ property, inspectionTimes, open, onClos
 
     setSubmitting(true);
     const slot = upcomingSlots[selectedSlot];
-    const slotStr = `${new Date(slot.date).toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' })} ${slot.start}–${slot.end}`;
+    const slotStr = `${formatDate(slot.date, language, { weekday: 'short', day: 'numeric', month: 'short' })} ${slot.start}–${slot.end}`;
 
     try {
       // Create lead with inspection type
@@ -142,7 +144,7 @@ export function InspectionBookingModal({ property, inspectionTimes, open, onClos
                   ) : (
                     upcomingSlots.map((slot, i) => {
                       const dateObj = new Date(slot.date);
-                      const dayStr = dateObj.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+                      const dayStr = formatDate(dateObj, language, { weekday: 'short', day: 'numeric', month: 'short' });
                       const isSelected = selectedSlot === i;
                       return (
                         <button

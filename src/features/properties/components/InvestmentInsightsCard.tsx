@@ -1,5 +1,6 @@
 import { TrendingUp, Home, Globe, CalendarDays, Receipt, Building2 } from 'lucide-react';
 import { Property } from '@/shared/lib/types';
+import { useTranslation, formatCurrency } from '@/shared/lib/i18n';
 
 function calcGrade(p: Property): { grade: 'A' | 'B' | 'C'; score: number } {
   let score = 0;
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export function InvestmentInsightsCard({ property, compact }: Props) {
+  const { language } = useTranslation();
   const { grade } = calcGrade(property);
   const hasAnyData = property.rentalYieldPct || property.strPermitted !== null || property.yearBuilt || property.councilRatesAnnual || property.strataFeesQuarterly;
 
@@ -57,13 +59,13 @@ export function InvestmentInsightsCard({ property, compact }: Props) {
     property.councilRatesAnnual != null && {
       icon: Receipt,
       label: 'Council Rates',
-      value: `$${property.councilRatesAnnual.toLocaleString()}/yr`,
+      value: `${formatCurrency(property.councilRatesAnnual, language)}/yr`,
       highlight: false,
     },
     property.strataFeesQuarterly != null && {
       icon: Building2,
       label: 'Strata Fees',
-      value: `$${property.strataFeesQuarterly.toLocaleString()}/qtr`,
+      value: `${formatCurrency(property.strataFeesQuarterly, language)}/qtr`,
       highlight: false,
     },
   ].filter(Boolean) as { icon: any; label: string; value: string; highlight: boolean }[];

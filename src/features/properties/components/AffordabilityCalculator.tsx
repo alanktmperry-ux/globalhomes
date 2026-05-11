@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Calculator, DollarSign, TrendingDown } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { Property } from '@/shared/lib/types';
+import { useTranslation, formatCurrency } from '@/shared/lib/i18n';
 
 interface AffordabilityCalculatorProps {
   property: Property;
@@ -19,6 +20,7 @@ function calcWeeklyMortgage(principal: number, annualRate: number, years: number
 }
 
 export function AffordabilityCalculator({ property }: AffordabilityCalculatorProps) {
+  const { language } = useTranslation();
   const isRental = property.listingType === 'rent' || property.listingType === 'rental' || property.price < 50000;
   const weeklyRent = property.rentalWeekly || property.price;
 
@@ -45,7 +47,7 @@ export function AffordabilityCalculator({ property }: AffordabilityCalculatorPro
     return { requiredWeeklyGross, requiredAnnualGross, bondEstimate };
   }, [weeklyRent]);
 
-  const fmt = (n: number) => `$${Math.round(n).toLocaleString()}`;
+  const fmt = (n: number) => formatCurrency(Math.round(n), language);
 
   if (isRental) {
     return (

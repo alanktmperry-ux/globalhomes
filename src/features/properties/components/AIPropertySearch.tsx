@@ -89,9 +89,17 @@ export function AIPropertySearch({ onRefineWithFilters, listingType = 'sale' }: 
         }
       }
 
+      const userLocale = (user as any)?.user_metadata?.locale
+        || (typeof localStorage !== 'undefined' ? localStorage.getItem('gh-lang') || localStorage.getItem('listhq.locale') : null)
+        || (typeof navigator !== 'undefined' ? navigator.language?.split('-')[0] : null)
+        || language
+        || 'en';
+
       const { data, error } = await supabase.functions.invoke('ai-property-search', {
         body: {
+          rawQuery: q,
           query: searchQuery,
+          userLocale,
           session_id: getSessionId(),
           buyer_id: user?.id ?? undefined,
           listing_type: listingType === 'rent' ? 'rent' : undefined,

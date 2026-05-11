@@ -357,22 +357,27 @@ const ProfilePage = () => {
   ];
 
   return (
-    <div>
-      <DashboardHeader title="Agent Profile" subtitle="Manage your professional profile and credentials" />
+    <div className="p-4 sm:p-6 max-w-4xl">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-[#0a0f1e] tracking-tight">Agent Profile</h1>
+        <p className="text-sm font-light text-[#6B7280] mt-1">Manage your professional profile and credentials</p>
+      </div>
 
-      <div className="p-4 sm:p-6 max-w-4xl">
-        <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="bg-secondary">
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="credentials">Credentials</TabsTrigger>
-            <TabsTrigger value="verification">Verification</TabsTrigger>
-          </TabsList>
+      <Tabs defaultValue="profile" className="space-y-6">
+        <TabsList
+          className="bg-white gap-1 p-1 rounded-[10px] h-auto"
+          style={{ border: '1px solid #E5E7EB' }}
+        >
+          <TabsTrigger value="profile" className="text-sm px-4 py-2 rounded-[8px] data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium">Profile</TabsTrigger>
+          <TabsTrigger value="credentials" className="text-sm px-4 py-2 rounded-[8px] data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium">Credentials</TabsTrigger>
+          <TabsTrigger value="verification" className="text-sm px-4 py-2 rounded-[8px] data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium">Verification</TabsTrigger>
+        </TabsList>
 
           {/* ===== PROFILE TAB ===== */}
           <TabsContent value="profile" className="space-y-6">
             {/* Avatar + Basic */}
-            <div className="bg-card border border-border rounded-xl p-5 space-y-5">
-              <h3 className="font-display text-sm font-bold flex items-center gap-1.5">
+            <div className="bg-white rounded-[12px] p-6 space-y-5" style={{ border: '1px solid #E5E7EB' }}>
+              <h3 className="text-base font-bold text-[#0a0f1e] flex items-center gap-2">
                 <User size={14} /> Personal Information
               </h3>
               <div className="flex items-center gap-5">
@@ -435,8 +440,8 @@ const ProfilePage = () => {
             </div>
 
             {/* Agency Info */}
-            <div className="bg-card border border-border rounded-xl p-5 space-y-4">
-              <h3 className="font-display text-sm font-bold flex items-center gap-1.5">
+            <div className="bg-white rounded-[12px] p-6 space-y-4" style={{ border: '1px solid #E5E7EB' }}>
+              <h3 className="text-base font-bold text-[#0a0f1e] flex items-center gap-2">
                 <Building2 size={14} /> Agency Information
               </h3>
 
@@ -590,8 +595,8 @@ const ProfilePage = () => {
             </div>
 
             {/* Languages */}
-            <div className="bg-card border border-border rounded-xl p-5 space-y-4">
-              <h3 className="font-display text-sm font-bold flex items-center gap-1.5">
+            <div className="bg-white rounded-[12px] p-6 space-y-4" style={{ border: '1px solid #E5E7EB' }}>
+              <h3 className="text-base font-bold text-[#0a0f1e] flex items-center gap-2">
                 <Languages size={14} /> Languages Spoken
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -610,8 +615,8 @@ const ProfilePage = () => {
             </div>
 
             {/* Service Areas */}
-            <div className="bg-card border border-border rounded-xl p-5 space-y-4">
-              <h3 className="font-display text-sm font-bold flex items-center gap-1.5">
+            <div className="bg-white rounded-[12px] p-6 space-y-4" style={{ border: '1px solid #E5E7EB' }}>
+              <h3 className="text-base font-bold text-[#0a0f1e] flex items-center gap-2">
                 <MapPin size={14} /> Service Areas
               </h3>
               <p className="text-xs text-muted-foreground">Search or click on the map to add your service areas.</p>
@@ -623,8 +628,8 @@ const ProfilePage = () => {
             </div>
 
             {/* Social Links */}
-            <div className="bg-card border border-border rounded-xl p-5 space-y-4">
-              <h3 className="font-display text-sm font-bold flex items-center gap-1.5">
+            <div className="bg-white rounded-[12px] p-6 space-y-4" style={{ border: '1px solid #E5E7EB' }}>
+              <h3 className="text-base font-bold text-[#0a0f1e] flex items-center gap-2">
                 <Globe size={14} /> Social Media
               </h3>
               <div className="grid sm:grid-cols-2 gap-4">
@@ -648,8 +653,8 @@ const ProfilePage = () => {
             </div>
 
             {/* Support PIN */}
-            <div className="bg-card border border-border rounded-xl p-5 space-y-3">
-              <h3 className="font-display text-sm font-bold flex items-center gap-1.5">
+            <div className="bg-white rounded-[12px] p-6 space-y-3" style={{ border: '1px solid #E5E7EB' }}>
+              <h3 className="text-base font-bold text-[#0a0f1e] flex items-center gap-2">
                 <Shield size={14} /> Support PIN
               </h3>
               <p className="text-xs text-muted-foreground">
@@ -687,8 +692,8 @@ const ProfilePage = () => {
 
           {/* ===== CREDENTIALS TAB ===== */}
           <TabsContent value="credentials" className="space-y-6">
-            <div className="bg-card border border-border rounded-xl p-5 space-y-4">
-              <h3 className="font-display text-sm font-bold flex items-center gap-1.5">
+            <div className="bg-white rounded-[12px] p-6 space-y-4" style={{ border: '1px solid #E5E7EB' }}>
+              <h3 className="text-base font-bold text-[#0a0f1e] flex items-center gap-2">
                 <FileText size={14} /> Upload Document
               </h3>
               <div className="flex flex-col sm:flex-row gap-3">
@@ -710,8 +715,8 @@ const ProfilePage = () => {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-xl p-5 space-y-3">
-              <h3 className="font-display text-sm font-bold flex items-center gap-1.5">
+            <div className="bg-white rounded-[12px] p-6 space-y-3" style={{ border: '1px solid #E5E7EB' }}>
+              <h3 className="text-base font-bold text-[#0a0f1e] flex items-center gap-2">
                 <Award size={14} /> Uploaded Documents
               </h3>
               {credentials.length === 0 ? (
@@ -746,8 +751,8 @@ const ProfilePage = () => {
 
           {/* ===== VERIFICATION TAB ===== */}
           <TabsContent value="verification" className="space-y-6">
-            <div className="bg-card border border-border rounded-xl p-5 space-y-4">
-              <h3 className="font-display text-sm font-bold flex items-center gap-1.5">
+            <div className="bg-white rounded-[12px] p-6 space-y-4" style={{ border: '1px solid #E5E7EB' }}>
+              <h3 className="text-base font-bold text-[#0a0f1e] flex items-center gap-2">
                 <Shield size={14} /> Verification Status
               </h3>
               <div className="space-y-3">
@@ -776,8 +781,8 @@ const ProfilePage = () => {
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-xl p-5 space-y-3">
-              <h3 className="font-display text-sm font-bold">How to get verified</h3>
+            <div className="bg-white rounded-[12px] p-6 space-y-3" style={{ border: '1px solid #E5E7EB' }}>
+              <h3 className="text-base font-bold text-[#0a0f1e]">How to get verified</h3>
               <div className="space-y-2 text-sm text-muted-foreground">
                 <p>1. <strong className="text-foreground">Email</strong> — Verify your email address during sign-up</p>
                 <p>2. <strong className="text-foreground">Phone</strong> — Add and verify your phone number</p>
@@ -787,7 +792,6 @@ const ProfilePage = () => {
             </div>
           </TabsContent>
         </Tabs>
-      </div>
     </div>
   );
 };

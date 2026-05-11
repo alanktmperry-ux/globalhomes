@@ -6,56 +6,65 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/shared/hooks/use-toast';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
-const AGENT_PILLS = ['Pocket listings', 'Pre-market period', 'AI buyer matching', 'Pipeline kanban', 'Rent roll', 'Trust accounting', '20 languages'];
+const AGENT_PILL_KEYS = [
+  'auth.resetPassword.agentPills.pocket',
+  'auth.resetPassword.agentPills.preMarket',
+  'auth.resetPassword.agentPills.aiMatching',
+  'auth.resetPassword.agentPills.kanban',
+  'auth.resetPassword.agentPills.rentRoll',
+  'auth.resetPassword.agentPills.trust',
+  'auth.resetPassword.agentPills.languages',
+] as const;
 
-const BrandPanel = () => (
-  <div className="hidden lg:flex lg:w-[48%] shrink-0 flex-col justify-between p-11 relative overflow-hidden">
-    <div className="absolute -top-28 -right-16 w-[380px] h-[380px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%)' }} />
-    <div className="absolute -bottom-16 -left-12 w-[280px] h-[280px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(37,99,235,0.10) 0%, transparent 70%)' }} />
-    <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(37,99,235,0.6), rgba(99,179,237,0.4), transparent)' }} />
+const BrandPanel = () => {
+  const { t } = useTranslation();
+  const stats = [
+    { val: t('auth.resetPassword.stat.free'), lbl: t('auth.resetPassword.stat.freeLabel') },
+    { val: t('auth.resetPassword.stat.live'), lbl: t('auth.resetPassword.stat.liveLabel') },
+    { val: t('auth.resetPassword.stat.ai'), lbl: t('auth.resetPassword.stat.aiLabel') },
+  ];
+  return (
+    <div className="hidden lg:flex lg:w-[48%] shrink-0 flex-col justify-between p-11 relative overflow-hidden">
+      <div className="absolute -top-28 -right-16 w-[380px] h-[380px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%)' }} />
+      <div className="absolute -bottom-16 -left-12 w-[280px] h-[280px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(37,99,235,0.10) 0%, transparent 70%)' }} />
+      <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(37,99,235,0.6), rgba(99,179,237,0.4), transparent)' }} />
 
-    <div className="relative z-10 flex items-center gap-2.5">
-      <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-[11px] font-bold text-white">L</div>
-      <span className="text-[15px] font-semibold text-white tracking-tight">ListHQ</span>
+      <div className="relative z-10 flex items-center gap-2.5">
+        <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-[11px] font-bold text-white">{'L'}</div>
+        <span className="text-[15px] font-semibold text-white tracking-tight">{'ListHQ'}</span>
+      </div>
+
+      <div className="relative z-10">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border mb-7" style={{ borderColor: 'rgba(37,99,235,0.3)', background: 'rgba(37,99,235,0.08)' }}>
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+          <span className="text-[11px] font-medium tracking-widest uppercase text-blue-400">{t('auth.landing.agentEyebrow')}</span>
+        </div>
+
+        <h2 className="text-[42px] font-light text-white leading-[1.05] tracking-tight mb-9" style={{ letterSpacing: '-1.5px' }}>
+          {t('auth.resetPassword.brandTitle1')}<br />{t('auth.resetPassword.brandTitle2')} <span className="font-semibold text-blue-400">{t('auth.resetPassword.brandTitleEm')}</span>
+        </h2>
+
+        <div className="flex flex-wrap gap-2 mb-10">
+          {AGENT_PILL_KEYS.map(k => (
+            <span key={k} className="px-3.5 py-1.5 rounded-full text-xs text-white/60" style={{ border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)' }}>
+              {t(k)}
+            </span>
+          ))}
+        </div>
+
+        <div className="flex gap-8 pt-7" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          {stats.map(s => (
+            <div key={s.lbl}>
+              <div className="text-xl font-semibold text-white tracking-tight leading-none">{s.val}</div>
+              <div className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{s.lbl}</div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
-
-    <div className="relative z-10">
-      <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border mb-7" style={{ borderColor: 'rgba(37,99,235,0.3)', background: 'rgba(37,99,235,0.08)' }}>
-        <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-        <span className="text-[11px] font-medium tracking-widest uppercase text-blue-400">Agent Portal</span>
-      </div>
-
-      <h2 className="text-[42px] font-light text-white leading-[1.05] tracking-tight mb-9" style={{ letterSpacing: '-1.5px' }}>
-        Built for agents<br />who move <span className="font-semibold text-blue-400">fast.</span>
-      </h2>
-
-      <div className="flex flex-wrap gap-2 mb-10">
-        {AGENT_PILLS.map(p => (
-          <span key={p} className="px-3.5 py-1.5 rounded-full text-xs text-white/60" style={{ border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)' }}>
-            {p}
-          </span>
-        ))}
-      </div>
-
-      <div className="flex gap-8 pt-7" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        {[{ val: 'Free', lbl: 'First listing' }, { val: 'Live', lbl: 'Lead alerts' }, { val: 'AI', lbl: 'Buyer matching' }].map(s => (
-          <div key={s.lbl}>
-            <div className="text-xl font-semibold text-white tracking-tight leading-none">{s.val}</div>
-            <div className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{s.lbl}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-);
-
-const getStrength = (pw: string): { score: 0 | 1 | 2 | 3; label: string } => {
-  if (pw.length < 8) return { score: 1, label: 'Weak' };
-  const hasLetters = /[a-zA-Z]/.test(pw);
-  const hasNumbers = /\d/.test(pw);
-  if (hasLetters && hasNumbers) return { score: 3, label: 'Strong' };
-  return { score: 2, label: 'Fair' };
+  );
 };
 
 const inputClass = "w-full pl-10 pr-11 py-3.5 rounded-[14px] border border-stone-200 bg-stone-50 text-stone-900 text-sm placeholder:text-stone-300 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:bg-white transition-all";
@@ -64,6 +73,7 @@ const ResetPasswordPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { refreshRoles } = useAuth();
+  const { t } = useTranslation();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -72,6 +82,14 @@ const ResetPasswordPage = () => {
   const [ready, setReady] = useState(false);
   const [expired, setExpired] = useState(false);
   const readyRef = useRef(false);
+
+  const getStrength = (pw: string): { score: 0 | 1 | 2 | 3; label: string } => {
+    if (pw.length < 8) return { score: 1, label: t('auth.resetPassword.strength.weak') };
+    const hasLetters = /[a-zA-Z]/.test(pw);
+    const hasNumbers = /\d/.test(pw);
+    if (hasLetters && hasNumbers) return { score: 3, label: t('auth.resetPassword.strength.strong') };
+    return { score: 2, label: t('auth.resetPassword.strength.fair') };
+  };
 
   const markReady = () => {
     readyRef.current = true;
@@ -124,7 +142,7 @@ const ResetPasswordPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!passwordsMatch) {
-      toast({ title: 'Passwords do not match', description: 'Please make sure both passwords are identical.', variant: 'destructive' });
+      toast({ title: t('auth.resetPassword.toast.mismatchTitle'), description: t('auth.resetPassword.toast.mismatchBody'), variant: 'destructive' });
       return;
     }
     setLoading(true);
@@ -132,33 +150,26 @@ const ResetPasswordPage = () => {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
 
-      // After updateUser succeeds during PASSWORD_RECOVERY, the session is already active.
-      // Verify we have a session, then route based on whether the user is an agent.
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session) {
-        // No session somehow — fall back to standard login
-        toast({ title: 'Password updated', description: 'Please sign in with your new password.' });
+        toast({ title: t('auth.resetPassword.toast.updatedTitle'), description: t('auth.resetPassword.toast.signInAgain') });
         navigate('/login');
         return;
       }
 
-      // Bug Fix 1: Refresh roles in AuthProvider BEFORE navigating to /dashboard.
-      // Without this, ProtectedRoute may see isAgent=false and bounce the user
-      // back to /login — the "kicked out" symptom.
       await refreshRoles();
 
-      // Check whether this user is an agent → dashboard, otherwise home
       const { data: agentRow } = await supabase
         .from('agents')
         .select('id')
         .eq('user_id', session.user.id)
         .maybeSingle();
 
-      toast({ title: 'Password updated', description: 'You are now signed in.' });
+      toast({ title: t('auth.resetPassword.toast.updatedTitle'), description: t('auth.resetPassword.toast.signedIn') });
       navigate(agentRow ? '/dashboard' : '/', { replace: true });
     } catch (err: unknown) {
-      toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
+      toast({ title: t('auth.resetPassword.toast.errorTitle'), description: getErrorMessage(err), variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -175,16 +186,16 @@ const ResetPasswordPage = () => {
                 <AlertTriangle size={22} className="text-destructive" />
               </div>
               <h1 className="text-[32px] font-light text-stone-900 leading-[1.1] mb-3" style={{ letterSpacing: '-1px' }}>
-                Reset link <strong className="font-semibold">expired.</strong>
+                {t('auth.resetPassword.expired.heading1')} <strong className="font-semibold">{t('auth.resetPassword.expired.heading2')}</strong>
               </h1>
               <p className="text-sm text-stone-500 mb-7 leading-relaxed">
-                This password reset link has expired or was already used. Some email clients pre-scan links which can invalidate them.
+                {t('auth.resetPassword.expired.body')}
               </p>
               <button
                 onClick={() => navigate('/forgot-password')}
                 className="w-full py-3.5 rounded-full bg-primary hover:opacity-90 text-primary-foreground font-semibold text-sm transition-opacity"
               >
-                Request a new reset link
+                {t('auth.resetPassword.expired.cta')}
               </button>
             </motion.div>
           </div>
@@ -198,7 +209,7 @@ const ResetPasswordPage = () => {
       <div className="min-h-screen flex" style={{ background: '#020817' }}>
         <BrandPanel />
         <div className="flex-1 bg-white flex items-center justify-center min-h-screen">
-          <p className="text-stone-400 text-sm">Verifying reset link…</p>
+          <p className="text-stone-400 text-sm">{t('auth.resetPassword.verifying')}</p>
         </div>
       </div>
     );
@@ -220,22 +231,22 @@ const ResetPasswordPage = () => {
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-stone-200 bg-stone-50 mb-5">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
-              <span className="text-[10px] font-medium tracking-widest uppercase text-stone-400">Reset password</span>
+              <span className="text-[10px] font-medium tracking-widest uppercase text-stone-400">{t('auth.resetPassword.eyebrow')}</span>
             </div>
 
             <h1 className="text-[38px] font-light text-stone-900 leading-[1.08] mb-3" style={{ letterSpacing: '-1.5px' }}>
-              Set a new<br /><strong className="font-semibold">password.</strong>
+              {t('auth.resetPassword.heading1')}<br /><strong className="font-semibold">{t('auth.resetPassword.heading2')}</strong>
             </h1>
-            <p className="text-sm text-stone-400 mb-8">Choose something strong — you'll use this to sign in next time.</p>
+            <p className="text-sm text-stone-400 mb-8">{t('auth.resetPassword.sub')}</p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">New password</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">{t('auth.resetPassword.newPasswordLabel')}</label>
                 <div className="relative">
                   <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter new password"
+                    placeholder={t('auth.resetPassword.newPasswordPlaceholder')}
                     required
                     minLength={8}
                     value={password}
@@ -252,7 +263,6 @@ const ResetPasswordPage = () => {
                   </button>
                 </div>
 
-                {/* Strength indicator */}
                 <div className="mt-2.5 flex items-center gap-2">
                   <div className="flex gap-1 flex-1">
                     {[1, 2, 3].map(i => (
@@ -265,16 +275,16 @@ const ResetPasswordPage = () => {
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-stone-400 mt-1.5">Minimum 8 characters</p>
+                <p className="text-xs text-stone-400 mt-1.5">{t('auth.resetPassword.minChars')}</p>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Confirm new password</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">{t('auth.resetPassword.confirmLabel')}</label>
                 <div className="relative">
                   <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
                   <input
                     type={showConfirm ? 'text' : 'password'}
-                    placeholder="Re-enter new password"
+                    placeholder={t('auth.resetPassword.confirmPlaceholder')}
                     required
                     minLength={8}
                     value={confirmPassword}
@@ -291,7 +301,7 @@ const ResetPasswordPage = () => {
                   </button>
                 </div>
                 {showMismatch && (
-                  <p className="text-xs text-destructive mt-1.5">Passwords don't match</p>
+                  <p className="text-xs text-destructive mt-1.5">{t('auth.resetPassword.mismatch')}</p>
                 )}
               </div>
 
@@ -300,7 +310,7 @@ const ResetPasswordPage = () => {
                 disabled={loading || !password || !confirmPassword || !passwordsMatch}
                 className="w-full py-3.5 rounded-full bg-primary hover:opacity-90 text-primary-foreground font-semibold text-sm transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Updating…' : 'Update password'}
+                {loading ? t('auth.resetPassword.updating') : t('auth.resetPassword.submit')}
               </button>
             </form>
           </motion.div>

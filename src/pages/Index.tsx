@@ -8,6 +8,7 @@ import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import LiveActivityTicker from '@/components/LiveActivityTicker';
 import HomeCountUp from '@/components/HomeCountUp';
 import FeaturedListings from '@/features/marketing/FeaturedListings';
+import ReplaceFiveTools from '@/features/marketing/ReplaceFiveTools';
 
 // ============================================================
 // Wave 17 V8 — Buyer-first multilingual homepage
@@ -839,6 +840,9 @@ const Index = () => {
 
         {/* ═══ Featured in [Location] — boosted listings (static seed) ═══ */}
         <FeaturedListings />
+
+        {/* ═══ Replace five tools with one — Bose-signature visual ═══ */}
+        <ReplaceFiveTools />
 
         {/* ═══ SECTION 4b — Featured Listings ═══ */}
         <section style={{ background: '#fff', padding: '72px 24px' }}>

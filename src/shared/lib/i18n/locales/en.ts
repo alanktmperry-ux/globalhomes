@@ -500,7 +500,7 @@ export const en = {
   'home.agentBand.watchDemo': 'Watch 90-sec demo',
   'home.agentBand.roiHeading': 'If you have {n} active listings on ListHQ…',
   'home.agentBand.roiLabel1': 'multilingual buyers reached / month',
-  'home.agentBand.roiLabel2': 'languages auto-translated, zero work',
+  'home.agentBand.roiLabel2': 'language auto-translated, zero work',
   'home.agentBand.roiLabel3': 'avg. return on $299/mo subscription',
   'home.agentBand.demoTitle': 'See your listing translated — live',
   'home.agentBand.demoSub': 'Type any property description and watch it appear in 5 languages instantly.',

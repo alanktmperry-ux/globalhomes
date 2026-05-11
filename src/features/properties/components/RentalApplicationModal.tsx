@@ -429,7 +429,7 @@ export function RentalApplicationModal({ property, open, onClose }: Props) {
                             <span>Name:</span><span className="text-foreground font-medium">{form.fullName}</span>
                             <span>Email:</span><span className="text-foreground font-medium">{form.email}</span>
                             <span>Employment:</span><span className="text-foreground font-medium">{form.employmentStatus || '—'}</span>
-                            <span>Income:</span><span className="text-foreground font-medium">{form.annualIncome ? `$${Number(form.annualIncome).toLocaleString()}` : '—'}</span>
+                            <span>Income:</span><span className="text-foreground font-medium">{form.annualIncome ? formatCurrency(Number(form.annualIncome), language) : '—'}</span>
                             <span>ID uploaded:</span><span className="text-foreground font-medium">{form.identityFile ? 'Yes' : 'No'}</span>
                           </div>
                         </div>

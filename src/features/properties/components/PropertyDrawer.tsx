@@ -337,13 +337,13 @@ export function PropertyDrawer({ property, onClose, isSaved, onToggleSave, searc
                   {property.listedDate && (
                     <div className="p-3 rounded-xl bg-secondary">
                       <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Listed</p>
-                      <p className="text-sm font-semibold text-foreground mt-0.5">{new Date(property.listedDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                      <p className="text-sm font-semibold text-foreground mt-0.5">{formatDate(property.listedDate, language, { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                     </div>
                   )}
                   {property.views > 0 && (
                     <div className="p-3 rounded-xl bg-secondary">
                       <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Views</p>
-                      <p className="text-sm font-semibold text-foreground mt-0.5">{property.views.toLocaleString()}</p>
+                      <p className="text-sm font-semibold text-foreground mt-0.5">{formatNumber(property.views, language)}</p>
                     </div>
                   )}
                 </div>

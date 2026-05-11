@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 
 export type Language = 'en' | 'zh' | 'zh-TW' | 'ko' | 'ms' | 'es' | 'ar' | 'hi' | 'fr' | 'pt' | 'bn' | 'ru' | 'ja' | 'de' | 'id' | 'nl' | 'pl' | 'vi' | 'th' | 'tr' | 'sv' | 'da' | 'no' | 'fil' | 'it' | 'pa' | 'ta' | 'ne';
 
-const translations: Record<Language, Record<string, string>> = {
+const translations: Record<Exclude<Language, 'ne'>, Record<string, string>> & { ne?: Record<string, string> } = {
   en: {
     'app.name': 'ListHQ',
     'search.placeholder': 'e.g. family home with pool in Brisbane',

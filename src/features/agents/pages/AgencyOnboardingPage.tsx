@@ -964,7 +964,7 @@ export default function AgencyOnboardingPage() {
             {/* Country selector — first */}
             <div>
               <Label className="text-xs font-semibold text-foreground">
-                Country <span className="text-destructive ml-0.5">*</span>
+                {t('agentOnboarding.agency.country')} <span className="text-destructive ml-0.5">{'*'}</span>
               </Label>
               <Select value={country} onValueChange={setCountry}>
                 <SelectTrigger className="mt-1.5">

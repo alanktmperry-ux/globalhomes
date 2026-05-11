@@ -10,11 +10,13 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import type { Halo } from '@/types/halo';
 import { TIMEFRAME_LABELS, FINANCE_LABELS } from '@/types/halo';
+import { useTranslation } from '@/shared/lib/i18n';
 
 const fmt = (n: number | null | undefined) =>
   n == null ? '—' : n.toLocaleString('en-AU');
 
 export default function HaloDetailPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -29,7 +31,6 @@ export default function HaloDetailPage() {
     (async () => {
       setLoading(true);
       try {
-        // Verify unlock locally first
         const { data: resp } = await supabase
           .from('halo_responses')
           .select('id')
@@ -48,7 +49,7 @@ export default function HaloDetailPage() {
 
         if (!active) return;
         if (haloRes.error || !haloRes.data) {
-          setError('Halo not found.');
+          setError(t('halo.detail.notFound'));
           return;
         }
         setHalo(haloRes.data as Halo);
@@ -60,7 +61,7 @@ export default function HaloDetailPage() {
         }
       } catch (e) {
         console.error('[HaloDetail] load error', e);
-        if (active) setError('Unable to load Halo details.');
+        if (active) setError(t('halo.detail.loadError'));
       } finally {
         if (active) setLoading(false);
       }
@@ -68,7 +69,7 @@ export default function HaloDetailPage() {
     return () => {
       active = false;
     };
-  }, [id, user, navigate]);
+  }, [id, user, navigate, t]);
 
   if (loading) {
     return (
@@ -82,25 +83,48 @@ export default function HaloDetailPage() {
     return (
       <div className="max-w-3xl mx-auto">
         <Button variant="ghost" onClick={() => navigate('/dashboard/halo-board')} className="mb-4">
-          <ArrowLeft size={16} /> Back
+          <ArrowLeft size={16} /> {t('halo.detail.back')}
         </Button>
         <Alert variant="destructive">
-          <AlertDescription>{error ?? 'Halo not found.'}</AlertDescription>
+          <AlertDescription>{error ?? t('halo.detail.notFound')}</AlertDescription>
         </Alert>
       </div>
     );
   }
 
-  const intentLabel = halo.intent === 'buy' ? 'Buy' : 'Rent';
+  const intentLabel = halo.intent === 'buy' ? t('halo.detail.intent.buy') : t('halo.detail.intent.rent');
   const intentClass =
     halo.intent === 'buy'
       ? 'bg-blue-100 text-blue-800 hover:bg-blue-100'
       : 'bg-purple-100 text-purple-800 hover:bg-purple-100';
 
+  const budgetValue = (() => {
+    const hasMin = halo.budget_min != null && halo.budget_min > 0;
+    const hasMax = halo.budget_max != null && halo.budget_max > 0;
+    if (hasMin && hasMax) return t('halo.detail.budget.range', { min: fmt(halo.budget_min), max: fmt(halo.budget_max) });
+    if (hasMax) return t('halo.detail.budget.upTo', { max: fmt(halo.budget_max) });
+    if (hasMin) return t('halo.detail.budget.from', { min: fmt(halo.budget_min) });
+    return t('halo.detail.budget.any');
+  })();
+
+  const bedroomsValue = (() => {
+    const min = halo.bedrooms_min;
+    const max = halo.bedrooms_max;
+    if (!min && !max) return t('halo.detail.any');
+    if (min && max) {
+      if (min === max) {
+        return t(min === 1 ? 'halo.detail.bedrooms.exact.one' : 'halo.detail.bedrooms.exact.other', { count: min });
+      }
+      return t('halo.detail.bedrooms.range', { min, max });
+    }
+    if (max) return t('halo.detail.bedrooms.upTo', { max });
+    return t('halo.detail.bedrooms.min', { min: min ?? 0 });
+  })();
+
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <Button variant="ghost" onClick={() => navigate('/dashboard/halo-board')}>
-        <ArrowLeft size={16} /> Back to Halo Board
+        <ArrowLeft size={16} /> {t('halo.detail.backToBoard')}
       </Button>
 
       <div className="flex flex-wrap items-center gap-2">
@@ -116,11 +140,11 @@ export default function HaloDetailPage() {
 
       <Card>
         <CardContent className="p-6 space-y-4">
-          <h2 className="text-lg font-semibold">Seeker contact</h2>
+          <h2 className="text-lg font-semibold">{t('halo.detail.seekerContact')}</h2>
           {seekerEmail ? (
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">
-                Contact this seeker directly via email
+                {t('halo.detail.contactBlurb')}
               </p>
               <a
                 href={`mailto:${seekerEmail}`}
@@ -131,12 +155,12 @@ export default function HaloDetailPage() {
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">
-              Unable to retrieve contact details.{' '}
+              {t('halo.detail.contactUnavailable')}{' '}
               <button
                 className="text-blue-600 underline"
-                onClick={() => toast('Contact ListHQ support if this persists.')}
+                onClick={() => toast(t('halo.detail.supportToast'))}
               >
-                Get help
+                {t('halo.detail.getHelp')}
               </button>
             </p>
           )}
@@ -145,46 +169,26 @@ export default function HaloDetailPage() {
 
       <Card>
         <CardContent className="p-6 space-y-4">
-          <h2 className="text-lg font-semibold">What they're looking for</h2>
-          <Field label="Property types" value={halo.property_types.join(', ') || '—'} />
-          <Field label="Suburbs" value={halo.suburbs.join(', ') || '—'} />
+          <h2 className="text-lg font-semibold">{t('halo.detail.lookingFor')}</h2>
+          <Field label={t('halo.detail.field.propertyTypes')} value={halo.property_types.join(', ') || '—'} />
+          <Field label={t('halo.detail.field.suburbs')} value={halo.suburbs.join(', ') || '—'} />
           <Field
-            label="Suburb flexibility"
-            value={halo.suburb_flexibility ? 'Open to similar suburbs' : 'These suburbs only'}
+            label={t('halo.detail.field.suburbFlexibility')}
+            value={halo.suburb_flexibility ? t('halo.detail.suburbFlex.open') : t('halo.detail.suburbFlex.strict')}
           />
-          <Field
-            label="Budget"
-            value={(() => {
-              const hasMin = halo.budget_min != null && halo.budget_min > 0;
-              const hasMax = halo.budget_max != null && halo.budget_max > 0;
-              if (hasMin && hasMax) return `AUD $${fmt(halo.budget_min)} – $${fmt(halo.budget_max)}`;
-              if (hasMax) return `AUD Up to $${fmt(halo.budget_max)}`;
-              if (hasMin) return `AUD From $${fmt(halo.budget_min)}`;
-              return 'Any budget';
-            })()}
-          />
-          <Field
-            label="Bedrooms"
-            value={(() => {
-              const min = halo.bedrooms_min;
-              const max = halo.bedrooms_max;
-              if (!min && !max) return 'Any';
-              if (min && max) return min === max ? `${min} bedrooms` : `${min} to ${max}`;
-              if (max) return `Up to ${max}`;
-              return `${min}+`;
-            })()}
-          />
-          <Field label="Bathrooms (min)" value={halo.bathrooms_min ?? 'Any'} />
-          <Field label="Car spaces (min)" value={halo.car_spaces_min ?? 'Any'} />
-          <Field label="Timeframe" value={TIMEFRAME_LABELS[halo.timeframe]} />
-          <Field label="Finance status" value={FINANCE_LABELS[halo.finance_status]} />
+          <Field label={t('halo.detail.field.budget')} value={budgetValue} />
+          <Field label={t('halo.detail.field.bedrooms')} value={bedroomsValue} />
+          <Field label={t('halo.detail.field.bathrooms')} value={halo.bathrooms_min ?? t('halo.detail.any')} />
+          <Field label={t('halo.detail.field.carSpaces')} value={halo.car_spaces_min ?? t('halo.detail.any')} />
+          <Field label={t('halo.detail.field.timeframe')} value={TIMEFRAME_LABELS[halo.timeframe]} />
+          <Field label={t('halo.detail.field.finance')} value={FINANCE_LABELS[halo.finance_status]} />
         </CardContent>
       </Card>
 
       {halo.must_haves.length > 0 && (
         <Card>
           <CardContent className="p-6 space-y-3">
-            <h2 className="text-lg font-semibold">Must-haves</h2>
+            <h2 className="text-lg font-semibold">{t('halo.detail.mustHaves')}</h2>
             <div className="flex flex-wrap gap-2">
               {halo.must_haves.map((m) => (
                 <Badge key={m} variant="secondary">
@@ -199,7 +203,7 @@ export default function HaloDetailPage() {
       {halo.deal_breakers && (
         <Card>
           <CardContent className="p-6 space-y-2">
-            <h2 className="text-lg font-semibold">Deal breakers</h2>
+            <h2 className="text-lg font-semibold">{t('halo.detail.dealBreakers')}</h2>
             <p className="text-sm whitespace-pre-wrap">{halo.deal_breakers}</p>
           </CardContent>
         </Card>
@@ -208,7 +212,7 @@ export default function HaloDetailPage() {
       {halo.description && (
         <Card>
           <CardContent className="p-6 space-y-2">
-            <h2 className="text-lg font-semibold">Description</h2>
+            <h2 className="text-lg font-semibold">{t('halo.detail.description')}</h2>
             <p className="text-sm whitespace-pre-wrap">{halo.description}</p>
           </CardContent>
         </Card>

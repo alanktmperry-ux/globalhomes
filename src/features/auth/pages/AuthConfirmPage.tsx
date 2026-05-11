@@ -105,7 +105,7 @@ const AuthConfirmPage = () => {
       if (timeout) clearTimeout(timeout);
       subscription?.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, t]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Sparkles, ChevronDown, ChevronUp, X, Flame, Snowflake, Clock, Mail, CalendarClock, Loader2, PartyPopper, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useTodayPriorities, type PriorityItem, type PrioritySourceKey } from '@/features/agents/hooks/useTodayPriorities';
 import TemplatePicker, { type TemplatePickerContact, type TemplatePickerProperty } from '@/features/messaging/components/TemplatePicker';

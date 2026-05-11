@@ -91,6 +91,46 @@ export function SiteHeader() {
     navigate('/');
   };
 
+  // Public (signed-out) header — Bose × Blue simplified design.
+  // Authenticated users (seekers / agents / admins) keep the full role-aware header below.
+  if (!user && !loading) {
+    return (
+      <header className="sticky top-0 z-50 h-16 px-4 md:px-8 bg-white/95 backdrop-blur-md border-b border-[#E5E5E5] flex items-center">
+        <Link
+          to="/"
+          className="text-xl font-extrabold uppercase tracking-[0.06em] cursor-pointer hover:opacity-80 transition-opacity"
+          style={{
+            background: 'linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%)',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            color: 'transparent',
+          }}
+          aria-label="ListHQ home"
+        >
+          ListHQ
+        </Link>
+        <div className="ml-auto flex items-center gap-3 md:gap-6">
+          <div className="hidden sm:block">
+            <LanguageSwitcher />
+          </div>
+          <Link
+            to="/auth"
+            className="text-[13px] font-semibold text-[#1a1a1a] hover:text-[#2563EB] transition-colors hidden sm:inline"
+          >
+            Sign in
+          </Link>
+          <button
+            onClick={() => navigate('/auth?mode=signup')}
+            className="px-[22px] py-[10px] bg-[#1a1a1a] text-white text-[13px] font-semibold rounded-full hover:bg-white hover:text-[#1a1a1a] border border-[#1a1a1a] transition-all"
+          >
+            Get started
+          </button>
+        </div>
+      </header>
+    );
+  }
+
   return (
     <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-border/50">
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-3">

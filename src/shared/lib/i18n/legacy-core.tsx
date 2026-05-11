@@ -1428,7 +1428,7 @@ function readStoredLanguage(): Language | null {
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(() => readStoredLanguage() ?? 'en');
+  const [language, setLanguageState] = useState<Language>(() => readStoredLanguage() ?? detectBrowserLanguage());
 
   // Wrap setLanguage to show toast only on active user language changes
   const setLanguage = useCallback((newLang: Language) => {

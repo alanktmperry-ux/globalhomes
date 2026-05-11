@@ -3,9 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { capture, identify } from '@/shared/lib/posthog';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 const AuthConfirmPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
   const [message, setMessage] = useState('');
 

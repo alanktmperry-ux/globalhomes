@@ -1071,10 +1071,11 @@ const Index = () => {
 
         <FAQSection />
 
-        {/* ═══ SECTION 9 — Pricing ═══ */}
-        <PricingSection navigate={navigate} T={T} />
+        {/* ═══ SECTION 9 — Pricing (Bose × Blue) ═══ */}
+        <PricingSectionNew />
 
-        <ClosingCTA navigate={navigate} T={T} />
+        {/* ═══ Final CTA — dark ink with blue glow ═══ */}
+        <FinalCTA />
 
         {/* ═══ Search modal ═══ */}
         {modalOpen && (

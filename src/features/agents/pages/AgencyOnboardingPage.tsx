@@ -1408,8 +1408,8 @@ export default function AgencyOnboardingPage() {
   const showNextButton = !showPasswordStep && (step < 3 || (path === 'migration' && step === 3));
 
   const stepLabels = path === 'migration'
-    ? ['Welcome', 'Agency', 'Trust Account', 'Cut-over', 'Import', 'Complete']
-    : ['Welcome', 'Agency', 'Trust Account', 'Ready'];
+    ? [t('agentOnboarding.nav.label.welcome'), t('agentOnboarding.nav.label.agency'), t('agentOnboarding.nav.label.trust'), t('agentOnboarding.nav.label.cutover'), t('agentOnboarding.nav.label.import'), t('agentOnboarding.nav.label.complete')]
+    : [t('agentOnboarding.nav.label.welcome'), t('agentOnboarding.nav.label.agency'), t('agentOnboarding.nav.label.trust'), t('agentOnboarding.nav.label.ready')];
 
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden">

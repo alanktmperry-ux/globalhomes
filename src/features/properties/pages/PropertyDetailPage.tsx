@@ -790,7 +790,8 @@ export default function PropertyDetailPage() {
             {/* School zone feature row */}
             {property.schoolZoneTop && (
               <div className="flex items-center gap-3 border border-slate-200 rounded-2xl px-4 py-3 bg-white">
-                <span className="text-xl leading-none" aria-hidden>{'🏫'}</span>
+                {/* @ts-expect-error iconify-icon is a web component */}
+                <iconify-icon icon="solar:square-academic-cap-linear" style={{ fontSize: '20px', color: '#2563EB' }} aria-hidden="true" />
                 <div className="flex-1 min-w-0">
                   <p className="text-[11px] uppercase tracking-wide text-slate-400 font-medium">{tp('property.schoolZone.label')}</p>
                   <p className="text-sm font-semibold text-slate-900 truncate">

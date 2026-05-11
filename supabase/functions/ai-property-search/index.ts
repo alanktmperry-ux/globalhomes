@@ -198,7 +198,7 @@ Deno.serve(async (req) => {
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: query },
+          { role: "user", content: translatedQuery },
         ],
         tools: [intentTool],
         tool_choice: { type: "function", function: { name: "extract_intent" } },

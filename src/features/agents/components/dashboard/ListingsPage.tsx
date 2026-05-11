@@ -411,34 +411,40 @@ const StatusTabs = ({
   activeTab: string;
   setActiveTab: (v: string) => void;
   counts: Record<string, number>;
-}) => (
-  <Tabs value={activeTab} onValueChange={setActiveTab}>
-    <TabsList className="bg-secondary mb-4 flex-wrap h-auto gap-1 p-1">
-      <TooltipProvider delayDuration={300}>
-        {[
-          { key: 'all', label: 'All', tip: 'View all listings' },
-          { key: 'pending', label: 'Pending', tip: 'Awaiting publish' },
-          { key: 'whisper', label: 'Whisper', tip: 'Private — only visible to you and your network' },
-          { key: 'coming-soon', label: 'Coming Soon', tip: 'Teaser — not yet searchable' },
-          { key: 'public', label: 'Public', tip: 'Live — visible in search results' },
-          { key: 'sold', label: 'Sold', tip: 'Archived' },
-        ].map((t) => (
-          <Tooltip key={t.key}>
-            <TooltipTrigger asChild>
-              <TabsTrigger value={t.key} className="text-xs gap-1">
-                {t.label}
-                {t.key !== 'all' && counts[t.key] && (
-                  <Badge variant="secondary" className="text-[9px] px-1 h-4 ml-0.5">{counts[t.key]}</Badge>
-                )}
-              </TabsTrigger>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="text-xs max-w-[200px]">{t.tip}</TooltipContent>
-          </Tooltip>
-        ))}
-      </TooltipProvider>
-    </TabsList>
-  </Tabs>
-);
+}) => {
+  const items = [
+    { key: 'all', label: 'All' },
+    { key: 'pending', label: 'Pending' },
+    { key: 'whisper', label: 'Whisper' },
+    { key: 'coming-soon', label: 'Coming Soon' },
+    { key: 'public', label: 'Public' },
+    { key: 'sold', label: 'Sold' },
+  ];
+  return (
+    <div className="flex items-center gap-2 mb-6 flex-wrap">
+      {items.map((t) => {
+        const active = activeTab === t.key;
+        const count = t.key !== 'all' ? counts[t.key] : undefined;
+        return (
+          <button
+            key={t.key}
+            type="button"
+            onClick={() => setActiveTab(t.key)}
+            className={
+              active
+                ? 'px-4 py-2 rounded-full text-sm font-semibold bg-[#2563EB] text-white transition-all'
+                : 'px-4 py-2 rounded-full text-sm font-medium text-[#374151] hover:bg-[#E5E7EB] transition-all'
+            }
+            style={active ? undefined : { background: '#F3F4F6' }}
+          >
+            {t.label}
+            {count ? <span className="ml-1.5 opacity-70">· {count}</span> : null}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 const ARCHIVED_STATUSES = new Set(['sold', 'leased']);
 

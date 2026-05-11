@@ -1522,3 +1522,88 @@ export default function PropertyDetailPage() {
     </div>
   );
 }
+
+function SimilarPropertiesSection({ suburb, state, excludeId }: { suburb: string; state: string | null; excludeId: string }) {
+  const [items, setItems] = useState<any[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('properties')
+        .select('id, address, suburb, price, beds, baths, parking, property_type, images, image_url, translations')
+        .eq('suburb', suburb)
+        .in('status', ['public', 'active', 'published', 'under_offer'])
+        .neq('id', excludeId)
+        .limit(6);
+      if (!cancelled) setItems((data as any) ?? []);
+    })();
+    return () => { cancelled = true; };
+  }, [suburb, excludeId]);
+
+  if (items.length === 0) return null;
+
+  const slug = state ? `${state.toLowerCase()}/${suburb.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}` : '';
+
+  return (
+    <section className="mt-[100px] pt-[60px] border-t border-[#E5E5E5]">
+      <div className="flex items-end justify-between mb-8 flex-wrap gap-4">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#2563EB]">MORE TO SEE</p>
+          <h2 className="text-[clamp(28px,4vw,44px)] font-extrabold tracking-[-0.03em] text-black leading-none mt-2">
+            More in {suburb}
+          </h2>
+        </div>
+        {slug && (
+          <Link
+            to={`/buy/${slug}`}
+            className="text-[13px] font-bold text-[#2563EB] hover:underline inline-flex items-center gap-1.5"
+          >
+            See all {suburb} listings
+            {/* @ts-expect-error iconify-icon web component */}
+            <iconify-icon icon="solar:arrow-right-linear" style={{ fontSize: '14px' }} />
+          </Link>
+        )}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {items.map((p) => {
+          const img = p.images?.[0] || p.image_url;
+          const hasTranslations = p.translations && typeof p.translations === 'object' && Object.keys(p.translations).length > 0;
+          return (
+            <Link
+              key={p.id}
+              to={`/properties/${p.id}`}
+              className="group block bg-white rounded-2xl border border-[#E5E5E5] overflow-hidden hover:border-[#2563EB] hover:shadow-[0_8px_28px_-12px_rgba(37,99,235,0.25)] transition-all"
+            >
+              <div className="aspect-[16/10] bg-[#F3F4F6] overflow-hidden relative">
+                {hasTranslations && (
+                  <span className="absolute top-3 right-3 z-10 px-2.5 py-1 rounded-full text-[10px] font-bold bg-white/95 text-[#0a0f1e] backdrop-blur">
+                    20 languages
+                  </span>
+                )}
+                {img && (
+                  <img
+                    src={img}
+                    alt={p.address || 'Property'}
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
+                  />
+                )}
+              </div>
+              <div className="p-5">
+                <p className="text-[11px] font-bold uppercase tracking-[0.10em] text-[#6a6a6a]">{p.suburb}</p>
+                <p className="font-bold text-[#0a0f1e] text-[15px] mt-1 line-clamp-1">{p.address || ''}</p>
+                <p className="text-[20px] font-extrabold text-black tabular-nums mt-2">
+                  {p.price ? `$${Number(p.price).toLocaleString('en-AU')}` : 'POA'}
+                </p>
+                <p className="text-[12px] text-[#6a6a6a] mt-1.5">
+                  {p.beds ?? 0} bed · {p.baths ?? 0} bath{p.parking ? ` · ${p.parking} car` : ''}
+                  {p.property_type ? ` · ${p.property_type}` : ''}
+                </p>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
+}

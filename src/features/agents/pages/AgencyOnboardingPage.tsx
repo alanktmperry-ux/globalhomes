@@ -1055,10 +1055,10 @@ export default function AgencyOnboardingPage() {
               {isAustralia && (
                 <div>
                   <Label className="text-xs font-semibold text-foreground">
-                    State of Operation <span className="text-destructive ml-0.5">*</span>
+                    {t('agentOnboarding.agency.state')} <span className="text-destructive ml-0.5">{'*'}</span>
                   </Label>
                   <Select value={operatingState} onValueChange={setOperatingState}>
-                    <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select state" /></SelectTrigger>
+                    <SelectTrigger className="mt-1.5"><SelectValue placeholder={t('agentOnboarding.agency.statePlaceholder')} /></SelectTrigger>
                     <SelectContent>
                       {STATES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                     </SelectContent>

@@ -1356,27 +1356,31 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
+// Maps lowercased BCP-47 tags (full or base) to our internal Language codes.
 const BROWSER_LANG_MAP: Record<string, Language> = {
-  'zh': 'zh',
-  'zh-cn': 'zh',
-  'zh-hans': 'zh',
-  'zh-sg': 'zh',
-  'zh-tw': 'zh-TW',
-  'zh-hk': 'zh-TW',
-  'zh-hant': 'zh-TW',
-  'vi': 'vi',
-  'vi-vn': 'vi',
-  'pa': 'pa',
-  'pa-in': 'pa',
-  'ta': 'ta',
-  'ta-in': 'ta',
+  // Chinese variants
+  'zh': 'zh', 'zh-cn': 'zh', 'zh-hans': 'zh', 'zh-sg': 'zh', 'zh-my': 'zh',
+  'zh-tw': 'zh-TW', 'zh-hk': 'zh-TW', 'zh-mo': 'zh-TW', 'zh-hant': 'zh-TW',
+  // Single-base languages we support
+  'en': 'en', 'es': 'es', 'fr': 'fr', 'de': 'de', 'ru': 'ru', 'ja': 'ja',
+  'ar': 'ar', 'pt': 'pt', 'it': 'it', 'id': 'id', 'nl': 'nl', 'pl': 'pl',
+  'vi': 'vi', 'ko': 'ko', 'hi': 'hi', 'th': 'th', 'tr': 'tr', 'sv': 'sv',
+  'da': 'da', 'no': 'no', 'nb': 'no', 'nn': 'no',
+  'ms': 'ms', 'bn': 'bn', 'pa': 'pa', 'ta': 'ta',
+  // Filipino / Tagalog
+  'fil': 'fil', 'tl': 'fil',
 };
 
 function detectBrowserLanguage(): Language {
-  const browserLang = (navigator.languages?.[0] || navigator.language || 'en').toLowerCase();
-  if (BROWSER_LANG_MAP[browserLang]) return BROWSER_LANG_MAP[browserLang];
-  const short = browserLang.slice(0, 2);
-  if (BROWSER_LANG_MAP[short]) return BROWSER_LANG_MAP[short];
+  if (typeof navigator === 'undefined') return 'en';
+  const candidates = navigator.languages?.length ? navigator.languages : [navigator.language || 'en'];
+  for (const raw of candidates) {
+    if (!raw) continue;
+    const lower = raw.toLowerCase();
+    if (BROWSER_LANG_MAP[lower]) return BROWSER_LANG_MAP[lower];
+    const base = lower.split('-')[0];
+    if (BROWSER_LANG_MAP[base]) return BROWSER_LANG_MAP[base];
+  }
   return 'en';
 }
 
@@ -1428,7 +1432,7 @@ function readStoredLanguage(): Language | null {
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(() => readStoredLanguage() ?? 'en');
+  const [language, setLanguageState] = useState<Language>(() => readStoredLanguage() ?? detectBrowserLanguage());
 
   // Wrap setLanguage to show toast only on active user language changes
   const setLanguage = useCallback((newLang: Language) => {

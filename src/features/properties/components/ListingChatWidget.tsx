@@ -4,14 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { useTranslation } from '@/shared/lib/i18n';
 
 interface Msg {
   role: 'user' | 'assistant';
   content: string;
 }
 
-const OPENING_MESSAGE =
-  'Hi! Ask me anything about this property — I can reply in your language. 你好！Xin chào！';
 const MAX_USER_MESSAGES = 20;
 
 interface ListingChatWidgetProps {
@@ -20,8 +19,10 @@ interface ListingChatWidgetProps {
 }
 
 export function ListingChatWidget({ listingId, onContactAgent }: ListingChatWidgetProps) {
+  const { t } = useTranslation();
+  const greeting = t('chatWidget.greeting');
   const [messages, setMessages] = useState<Msg[]>([
-    { role: 'assistant', content: OPENING_MESSAGE },
+    { role: 'assistant', content: greeting },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -52,7 +53,7 @@ export function ListingChatWidget({ listingId, onContactAgent }: ListingChatWidg
     try {
       // Strip the opening assistant greeting before sending — it's UI-only
       const toSend = next.filter(
-        (m, i) => !(i === 0 && m.role === 'assistant' && m.content === OPENING_MESSAGE)
+        (m, i) => !(i === 0 && m.role === 'assistant' && m.content === greeting)
       );
 
       const { data, error: fnErr } = await supabase.functions.invoke('listing-chat', {
@@ -80,15 +81,15 @@ export function ListingChatWidget({ listingId, onContactAgent }: ListingChatWidg
   return (
     <section
       className="rounded-2xl border border-border bg-card shadow-card overflow-hidden"
-      aria-label="Ask about this property"
+      aria-label={t('chatWidget.heading')}
     >
       <header className="px-4 sm:px-5 py-3 border-b border-border bg-secondary/40">
         <h2 className="font-display text-base sm:text-lg font-semibold text-foreground flex items-center gap-2">
           <Globe size={18} className="text-primary" aria-hidden="true" />
-          Ask about this property
+          {t('chatWidget.heading')}
         </h2>
         <p className="text-xs text-muted-foreground mt-0.5">
-          Ask in any language — English, 中文, Tiếng Việt, हिन्दी and more
+          {t('chatWidget.subheading')}
         </p>
       </header>
 
@@ -117,7 +118,7 @@ export function ListingChatWidget({ listingId, onContactAgent }: ListingChatWidg
           <div className="flex justify-start">
             <div className="bg-secondary text-muted-foreground rounded-2xl rounded-bl-sm px-3.5 py-2.5 text-sm flex items-center gap-2">
               <Loader2 size={14} className="animate-spin" />
-              Thinking…
+              {t('chatWidget.thinking')}
             </div>
           </div>
         )}
@@ -132,11 +133,11 @@ export function ListingChatWidget({ listingId, onContactAgent }: ListingChatWidg
         {limitReached ? (
           <div className="text-center space-y-2">
             <p className="text-sm text-muted-foreground">
-              To continue, please contact the agent directly.
+              {t('chatWidget.limitReached')}
             </p>
             {onContactAgent && (
               <Button size="sm" onClick={onContactAgent}>
-                Contact agent
+                {t('chatWidget.contactAgent')}
               </Button>
             )}
           </div>
@@ -145,24 +146,24 @@ export function ListingChatWidget({ listingId, onContactAgent }: ListingChatWidg
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Type your question in any language…"
+              placeholder={t('chatWidget.placeholder')}
               disabled={loading}
               maxLength={1000}
-              aria-label="Your question"
+              aria-label={t('chatWidget.inputLabel')}
               className="flex-1"
             />
             <Button
               type="submit"
               size="icon"
               disabled={loading || !input.trim()}
-              aria-label="Send message"
+              aria-label={t('chatWidget.send')}
             >
               {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
             </Button>
           </form>
         )}
         <p className="text-[10px] text-muted-foreground mt-2 text-center">
-          Answers are AI-generated from the listing data. Always confirm details with the agent.
+          {t('chatWidget.disclaimer')}
         </p>
       </div>
     </section>

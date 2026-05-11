@@ -29,7 +29,7 @@ interface SuburbPoint {
 
 export function PriceHistoryChart({ propertyId, currentPrice, listedDate, priceFormatted, suburb, state, propertyType }: PriceHistoryChartProps) {
   const { formatPrice } = useCurrency();
-  const { language } = useTranslation();
+  const { language, t } = useTranslation();
   const [data, setData] = useState<PricePoint[]>([]);
   const [suburbData, setSuburbData] = useState<SuburbPoint[]>([]);
   const [loading, setLoading] = useState(true);

@@ -1094,7 +1094,7 @@ export default function AgencyOnboardingPage() {
               {/* Agency email */}
               <div className="sm:col-span-2">
                 <Label className="text-xs font-semibold text-foreground">
-                  Agency Email <span className="text-destructive ml-0.5">*</span>
+                  {t('agentOnboarding.agency.email')} <span className="text-destructive ml-0.5">{'*'}</span>
                 </Label>
                 <Input value={agencyEmail} onChange={e => setAgencyEmail(e.target.value)} placeholder="office@smithproperty.com.au" className="mt-1.5" />
               </div>

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Sparkles, Loader2, Home as HomeIcon, Key, PiggyBank, Wallet, Shield, Zap, Scale } from 'lucide-react';
+import { Loader2, Home as HomeIcon, Key, PiggyBank, Wallet, Shield, Zap, Scale, Pencil, Plus, Search, MapPin, Inbox } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -147,71 +147,61 @@ export default function SeekerDashboard() {
     filter === 'rent' ? 'seeker.dashboard.filter.noMatch.rent' :
     'seeker.dashboard.filter.noMatch.all';
 
+  const [tab, setTab] = useState<'halos' | 'inbox'>('halos');
+
   return (
-    <div className="min-h-screen bg-[#F0F4F8]">
+    <div className="min-h-screen bg-[#F9FAFB]">
       <Helmet><title>{t('seeker.dashboard.title')}</title></Helmet>
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
-        {/* Greeting */}
-        <header className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#1E293B]">
-            {isNewUser
-              ? t('seeker.dashboard.welcome.firstTime', { name: displayName })
-              : t('seeker.dashboard.welcome.returning', { name: displayName })}
-          </h1>
-          <p className="text-[#64748B] mt-1 text-sm sm:text-base">{t('seeker.dashboard.subtitle')}</p>
-        </header>
 
-        {halos === null ? (
-          <div className="bg-white rounded-xl border border-[#E2E8F0] p-12 flex justify-center">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      {/* Greeting */}
+      <div className="max-w-[1280px] mx-auto pt-[120px] pb-12 px-6 sm:px-8">
+        <h1 className="text-[clamp(36px,5vw,64px)] font-extrabold tracking-[-0.04em] text-black leading-[1.05]">
+          {t(isNewUser ? 'seeker.dashboard.welcome.firstTime' : 'seeker.dashboard.welcome.returning', { name: displayName })}.
+        </h1>
+        <p className="text-[17px] text-[#4a4a4a] mt-3 font-normal">{t('seeker.dashboard.subtitle')}</p>
+      </div>
+
+      {halos === null ? (
+        <div className="max-w-[1280px] mx-auto px-6 sm:px-8">
+          <div className="bg-white rounded-2xl border border-[#E5E5E5] p-12 flex justify-center">
+            <Loader2 className="h-6 w-6 animate-spin text-[#6a6a6a]" />
           </div>
-        ) : (
-          <>
-            {/* Language preference banner */}
-            {profile?.language_preference && profile.language_preference !== 'en' && (
-              <div className="mb-6 rounded-xl bg-primary/5 border border-primary/20 p-4 flex items-center gap-3">
-                <span className="text-lg" aria-hidden>{''}</span>
-                <div>
-                  <p className="text-sm font-medium text-foreground">{t('seeker.dashboard.langBanner.title')}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {t('seeker.dashboard.langBanner.copy')}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Halo summary card */}
+        </div>
+      ) : (
+        <>
+          {/* Your Halo card */}
+          <div className="max-w-[1280px] mx-auto px-6 sm:px-8 mt-2">
             <HaloSummaryCard intent={buyerIntent} />
+          </div>
 
-            {/* Matched listings */}
+          {/* Matched listings */}
+          <div className="max-w-[1280px] mx-auto px-6 sm:px-8 mt-6">
             <MatchedListings matches={matches} />
+          </div>
 
-            {/* Stats */}
-            <section className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 mt-8">
-              <StatTile label={t('seeker.dashboard.stats.activeHalos')} value={String(stats.active)} />
-              <StatTile label={t('seeker.dashboard.stats.unreadResponses')} value={String(stats.unread)} highlight={stats.unread > 0} />
-              <StatTile label={t('seeker.dashboard.stats.languages')} value={stats.languages} small />
-            </section>
+          {/* Stats */}
+          <section className="max-w-[1280px] mx-auto px-6 sm:px-8 mt-10 grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <StatTile label={t('seeker.dashboard.stats.activeHalos')} value={String(stats.active)} />
+            <StatTile label={t('seeker.dashboard.stats.unreadResponses')} value={String(stats.unread)} highlight={stats.unread > 0} />
+            <StatTile label={t('seeker.dashboard.stats.languages')} value={stats.languages} small />
+          </section>
 
-            {/* Expiry banner */}
-            {expiringSoon && (() => {
-              const dayCount = Math.max(0, daysBetween(new Date(expiringSoon.expires_at), new Date()));
-              const daysLabel = t(
-                dayCount === 1 ? 'seeker.dashboard.expiry.days.singular' : 'seeker.dashboard.expiry.days.plural',
-                { count: dayCount },
-              );
-              const intentLabel = t(
-                expiringSoon.intent === 'buy' ? 'seeker.dashboard.expiry.intent.buy' : 'seeker.dashboard.expiry.intent.rent',
-              );
-              const suburbLabel = expiringSoon.suburbs?.[0] ?? t('seeker.haloCard.suburb.anywhere');
-              return (
-                <div className="mb-6 rounded-xl border border-[#FCD34D] bg-[#FEF3C7] p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+          {/* Expiry banner */}
+          {expiringSoon && (() => {
+            const dayCount = Math.max(0, daysBetween(new Date(expiringSoon.expires_at), new Date()));
+            const daysLabel = t(
+              dayCount === 1 ? 'seeker.dashboard.expiry.days.singular' : 'seeker.dashboard.expiry.days.plural',
+              { count: dayCount },
+            );
+            const intentLabel = t(
+              expiringSoon.intent === 'buy' ? 'seeker.dashboard.expiry.intent.buy' : 'seeker.dashboard.expiry.intent.rent',
+            );
+            const suburbLabel = expiringSoon.suburbs?.[0] ?? t('seeker.haloCard.suburb.anywhere');
+            return (
+              <div className="max-w-[1280px] mx-auto px-6 sm:px-8 mt-6">
+                <div className="rounded-2xl border border-[#FCD34D] bg-[#FEF3C7] p-5 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
                   <p className="text-sm text-[#92400E]">
-                    {t('seeker.dashboard.expiry.body', {
-                      suburb: suburbLabel,
-                      intent: intentLabel,
-                      days: daysLabel,
-                    })}
+                    {t('seeker.dashboard.expiry.body', { suburb: suburbLabel, intent: intentLabel, days: daysLabel })}
                   </p>
                   <Button
                     size="sm"
@@ -221,17 +211,30 @@ export default function SeekerDashboard() {
                     {t('seeker.dashboard.expiry.cta')}
                   </Button>
                 </div>
-              );
-            })()}
+              </div>
+            );
+          })()}
 
-            {/* Tabs */}
-            <div className="flex items-center gap-2 mb-4 border-b border-[#E2E8F0]">
-              <button className="px-4 py-2.5 text-sm font-semibold text-[#1A2E4A] border-b-2 border-[#1A2E4A] -mb-px">
+          {/* Tabs */}
+          <div className="max-w-[1280px] mx-auto px-6 sm:px-8 mt-10">
+            <div className="flex items-center gap-1 bg-white rounded-2xl p-1 w-fit border border-[#E5E5E5]">
+              <button
+                onClick={() => setTab('halos')}
+                className={`px-5 py-2.5 rounded-xl text-[13px] transition-colors ${
+                  tab === 'halos'
+                    ? 'bg-[#EFF6FF] text-[#2563EB] font-bold'
+                    : 'text-[#6a6a6a] hover:text-[#374151] font-semibold'
+                }`}
+              >
                 {t('seeker.dashboard.tabs.myHalos')}
               </button>
               <button
-                onClick={() => navigate('/seeker/inbox')}
-                className="px-4 py-2.5 text-sm font-medium text-[#64748B] hover:text-[#1E293B] transition-colors flex items-center gap-2"
+                onClick={() => { setTab('inbox'); navigate('/seeker/inbox'); }}
+                className={`px-5 py-2.5 rounded-xl text-[13px] inline-flex items-center gap-2 transition-colors ${
+                  tab === 'inbox'
+                    ? 'bg-[#EFF6FF] text-[#2563EB] font-bold'
+                    : 'text-[#6a6a6a] hover:text-[#374151] font-semibold'
+                }`}
               >
                 {t('seeker.dashboard.tabs.inbox')}
                 {unreadTotal > 0 && (
@@ -241,62 +244,64 @@ export default function SeekerDashboard() {
                 )}
               </button>
             </div>
+          </div>
 
-            {/* Filter pills */}
-            {(halos.length > 0) && (
-              <div className="flex flex-wrap gap-2 mb-4">
-                {(['all', 'buy', 'rent'] as const).map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => setFilter(f)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors min-h-[36px] ${
-                      filter === f
-                        ? 'bg-[#1A2E4A] text-white'
-                        : 'bg-white text-[#64748B] border border-[#E2E8F0] hover:bg-[#F8FAFC]'
-                    }`}
-                  >
-                    {f === 'all'
-                      ? t('seeker.dashboard.filter.all')
-                      : f === 'buy'
-                        ? t('seeker.dashboard.filter.buying')
-                        : t('seeker.dashboard.filter.renting')}
-                  </button>
-                ))}
-              </div>
-            )}
+          {/* Filter pills */}
+          {halos.length > 0 && (
+            <div className="max-w-[1280px] mx-auto px-6 sm:px-8 mt-5 flex flex-wrap gap-2">
+              {(['all', 'buy', 'rent'] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={`px-4 py-2 rounded-full text-[13px] font-semibold transition-all ${
+                    filter === f
+                      ? 'bg-[#0a0f1e] text-white border border-[#0a0f1e]'
+                      : 'bg-white text-[#374151] border border-[#E5E5E5] hover:border-[#2563EB] hover:text-[#2563EB]'
+                  }`}
+                >
+                  {f === 'all'
+                    ? t('seeker.dashboard.filter.all')
+                    : f === 'buy'
+                      ? t('seeker.dashboard.filter.buying')
+                      : t('seeker.dashboard.filter.renting')}
+                </button>
+              ))}
+            </div>
+          )}
 
-            {/* Halo cards */}
+          {/* Halo cards or empty */}
+          <div className="max-w-[1280px] mx-auto px-6 sm:px-8 mt-6">
             {halos.length === 0 ? (
               <EmptyState onCreate={() => navigate('/halo/new')} />
             ) : filtered.length === 0 ? (
-              <div className="bg-white rounded-xl border border-[#E2E8F0] p-8 text-center text-sm text-[#64748B]">
+              <div className="bg-white rounded-2xl border border-[#E5E5E5] p-8 text-center text-sm text-[#6a6a6a]">
                 {t(noMatchKey)}
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                 {filtered.map((h) => <HaloCard key={h.id} halo={h} />)}
               </div>
             )}
+          </div>
 
-            {/* Property journey */}
+          {/* Property journey & services */}
+          <div className="max-w-[1280px] mx-auto px-6 sm:px-8 pb-16">
             <PropertyJourney hasRent={hasRent} hasBuy={hasBuy} />
-
-            {/* Services */}
             {hasRent && <RenterServices />}
             {hasBuy && <BuyerServices />}
             {hasRent && <PlanningToBuy />}
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
 function StatTile({ label, value, highlight, small }: { label: string; value: string; highlight?: boolean; small?: boolean }) {
   return (
-    <div className="bg-white rounded-xl border border-[#E2E8F0] p-4 sm:p-5 shadow-sm">
-      <p className="text-xs uppercase tracking-wider font-semibold text-[#64748B] mb-1">{label}</p>
-      <p className={`font-bold text-[#1E293B] ${small ? 'text-base' : 'text-2xl sm:text-3xl'} ${highlight ? 'text-[#2563EB]' : ''}`}>
+    <div className="bg-white rounded-2xl border border-[#E5E5E5] p-6">
+      <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#6a6a6a]">{label}</p>
+      <p className={`${small ? 'text-[22px]' : 'text-[48px]'} font-extrabold tabular-nums mt-3 leading-none ${highlight ? 'text-[#2563EB]' : 'text-black'}`}>
         {value}
       </p>
     </div>
@@ -311,10 +316,6 @@ function HaloCard({ halo }: { halo: HaloRow }) {
   const propType = halo.property_types?.[0] ?? t('seeker.haloCard.type.default');
   const beds = halo.bedrooms_min ?? halo.bedrooms_max;
   const isBuy = halo.intent === 'buy';
-  const score = halo.quality_score ?? 0;
-  const scoreColour = score >= 75 ? 'bg-[#D1FAE5] text-[#059669]' : score >= 50 ? 'bg-[#DBEAFE] text-[#2563EB]' : 'bg-[#F1F5F9] text-[#64748B]';
-  const scoreLabelKey = score >= 75 ? 'seeker.haloCard.score.strong' : score >= 50 ? 'seeker.haloCard.score.good' : 'seeker.haloCard.score.fair';
-  const statusColour = halo.status === 'active' ? 'bg-[#D1FAE5] text-[#059669]' : halo.status === 'fulfilled' ? 'bg-[#DBEAFE] text-[#2563EB]' : 'bg-[#F1F5F9] text-[#64748B]';
   const ageDays = daysBetween(new Date(), new Date(halo.created_at));
 
   const title = beds
@@ -329,25 +330,16 @@ function HaloCard({ halo }: { halo: HaloRow }) {
     ? t('seeker.haloCard.posted.today')
     : t(ageDays === 1 ? 'seeker.haloCard.posted.daysAgo.singular' : 'seeker.haloCard.posted.daysAgo.plural', { count: ageDays });
 
-  const responsesLabel = halo.response_count > 0
-    ? t(halo.response_count === 1 ? 'seeker.haloCard.responses.count.singular' : 'seeker.haloCard.responses.count.plural', { count: halo.response_count })
-    : t('seeker.haloCard.responses.none');
-
   const safeDays = Math.max(0, days);
   const daysLeftLabel = t(safeDays === 1 ? 'seeker.haloCard.daysLeft.singular' : 'seeker.haloCard.daysLeft.plural', { count: safeDays });
 
-  const statusKey = `seeker.haloCard.status.${halo.status}`;
-
   return (
-    <article className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-4 sm:p-5">
-      <div className="flex items-start justify-between gap-3 mb-2">
-        <h3 className="font-semibold text-[#1E293B] text-base sm:text-lg leading-snug">
-          {title}
-        </h3>
+    <article className="bg-white rounded-2xl border border-[#E5E5E5] p-6 hover:border-[#2563EB]/40 transition-colors flex flex-col gap-4">
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="font-bold text-[#0a0f1e] text-[16px] leading-snug">{title}</h3>
         <span
-          className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold uppercase"
+          className="inline-flex items-center px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider"
           style={{
-            letterSpacing: '0.06em',
             background: isBuy ? '#EFF6FF' : '#ECFDF5',
             color: isBuy ? '#1E40AF' : '#065F46',
           }}
@@ -356,43 +348,42 @@ function HaloCard({ halo }: { halo: HaloRow }) {
         </span>
       </div>
 
-      <p className="text-sm text-[#64748B] mb-3">
-        {budgetLabel}{postedLabel}
-      </p>
+      <p className="text-[13px] text-[#6a6a6a]">{budgetLabel}{postedLabel}</p>
 
-      <div className="flex flex-wrap gap-2 mb-4">
-        <Badge variant="secondary" className={statusColour + ' hover:' + statusColour}>
-          {t(statusKey)}
-        </Badge>
-        {halo.quality_score != null && (
-          <Badge variant="secondary" className={scoreColour + ' hover:' + scoreColour}>
-            {t('seeker.haloCard.score', { score: halo.quality_score, label: t(scoreLabelKey) })}
-          </Badge>
-        )}
-        <Badge variant="secondary" className={halo.response_count > 0 ? 'bg-[#DBEAFE] text-[#1D4ED8] hover:bg-[#DBEAFE]' : 'bg-[#F1F5F9] text-[#64748B] hover:bg-[#F1F5F9]'}>
-          {responsesLabel}
-        </Badge>
-        <Badge variant="secondary" className={days < 7 ? 'bg-[#FEE2E2] text-[#DC2626] hover:bg-[#FEE2E2]' : 'bg-[#F1F5F9] text-[#64748B] hover:bg-[#F1F5F9]'}>
+      <div className="flex flex-wrap gap-2">
+        <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#F3F4F6] text-[#374151]">
+          {halo.response_count > 0
+            ? t(halo.response_count === 1 ? 'seeker.haloCard.responses.count.singular' : 'seeker.haloCard.responses.count.plural', { count: halo.response_count })
+            : t('seeker.haloCard.responses.none')}
+        </span>
+        <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold ${days < 7 ? 'bg-[#FEE2E2] text-[#DC2626]' : 'bg-[#F3F4F6] text-[#374151]'}`}>
           {daysLeftLabel}
-        </Badge>
+        </span>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-2">
+      <div className="flex flex-wrap gap-2 mt-auto">
         {halo.response_count > 0 ? (
           <>
-            <Button onClick={() => navigate('/seeker/inbox')} className="bg-[#2563EB] hover:bg-[#1D4ED8]">{t('seeker.haloCard.cta.viewResponses')}</Button>
-            <Button variant="ghost" onClick={() => navigate(`/halo/new?edit=${halo.id}`)}>{t('seeker.haloCard.cta.edit')}</Button>
+            <button
+              onClick={() => navigate('/seeker/inbox')}
+              className="bg-[#0a0f1e] text-white rounded-full px-5 py-2.5 text-[13px] font-bold hover:bg-[#1a1f2e] transition-colors"
+            >
+              {t('seeker.haloCard.cta.viewResponses')}
+            </button>
+            <button
+              onClick={() => navigate(`/halo/new?edit=${halo.id}`)}
+              className="text-[#2563EB] hover:underline inline-flex items-center gap-1.5 text-[13px] font-bold px-2"
+            >
+              <Pencil size={13} /> {t('seeker.haloCard.cta.edit')}
+            </button>
           </>
         ) : (
-          <>
-            <Button variant="ghost" onClick={() => navigate(`/halo/new?edit=${halo.id}`)}>{t('seeker.haloCard.cta.edit')}</Button>
-            <Button
-              className="bg-[#1E3A5F] hover:bg-[#1A2E4A] text-white"
-              onClick={() => toast.info(t('seeker.haloCard.toast.boost'))}
-            >
-              {t('seeker.haloCard.cta.boost')}
-            </Button>
-          </>
+          <button
+            onClick={() => navigate(`/halo/new?edit=${halo.id}`)}
+            className="text-[#2563EB] hover:underline inline-flex items-center gap-1.5 text-[13px] font-bold"
+          >
+            <Pencil size={13} /> {t('seeker.haloCard.cta.edit')}
+          </button>
         )}
       </div>
     </article>
@@ -402,15 +393,20 @@ function HaloCard({ halo }: { halo: HaloRow }) {
 function EmptyState({ onCreate }: { onCreate: () => void }) {
   const { t } = useTranslation();
   return (
-    <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-8 sm:p-12 text-center">
-      <div className="text-5xl mb-4" aria-hidden>{''}</div>
-      <h2 className="text-xl font-bold text-[#1E293B] mb-2">{t('seeker.empty.title')}</h2>
-      <p className="text-[#64748B] max-w-md mx-auto mb-6 text-sm sm:text-base">
+    <div className="bg-white border border-[#E5E5E5] rounded-3xl p-16 text-center">
+      <div className="w-14 h-14 rounded-2xl bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center mx-auto">
+        <MapPin size={28} strokeWidth={1.5} />
+      </div>
+      <h2 className="text-[24px] font-bold text-[#0a0f1e] mt-6">{t('seeker.empty.title')}</h2>
+      <p className="text-[15px] text-[#6a6a6a] mt-3 max-w-[420px] mx-auto leading-[1.55]">
         {t('seeker.empty.copy')}
       </p>
-      <Button onClick={onCreate} className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white">
-        {t('seeker.empty.cta')}
-      </Button>
+      <button
+        onClick={onCreate}
+        className="mt-7 bg-black text-white border border-black rounded-full px-7 py-3.5 font-bold text-[14px] hover:bg-white hover:text-black transition-all inline-flex items-center gap-2.5"
+      >
+        <Plus size={16} /> {t('seeker.empty.cta')}
+      </button>
     </div>
   );
 }
@@ -549,12 +545,17 @@ function HaloSummaryCard({ intent }: { intent: any | null }) {
   const { t } = useTranslation();
   if (!intent) {
     return (
-      <div className="rounded-xl border border-border bg-card p-5 space-y-3 mb-4">
-        <h2 className="font-semibold text-sm text-foreground">{t('seeker.summary.title')}</h2>
-        <p className="text-sm text-muted-foreground">{t('seeker.summary.empty')}</p>
-        <Button asChild size="sm">
-          <Link to="/halo/new">{t('seeker.summary.cta')}</Link>
-        </Button>
+      <div className="bg-white border border-[#E5E5E5] rounded-3xl p-7 flex items-center justify-between gap-6 flex-wrap hover:border-[#2563EB]/40 transition-colors">
+        <div className="min-w-0">
+          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#6a6a6a]">{t('seeker.summary.title')}</p>
+          <h2 className="text-[20px] font-bold text-[#0a0f1e] mt-1.5">{t('seeker.summary.empty')}</h2>
+        </div>
+        <Link
+          to="/halo/new"
+          className="bg-black text-white rounded-full px-6 py-3 font-bold text-[13px] hover:bg-white hover:text-black border border-black transition-all inline-flex items-center gap-2"
+        >
+          <Plus size={14} /> {t('seeker.summary.cta')}
+        </Link>
       </div>
     );
   }
@@ -570,25 +571,38 @@ function HaloSummaryCard({ intent }: { intent: any | null }) {
         ? t('seeker.summary.price.from', { min: minP })
         : null;
 
-  const Chip = ({ children }: { children: React.ReactNode }) => (
-    <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-foreground">
-      {children}
-    </span>
-  );
-
   return (
-    <div className="rounded-xl border border-border bg-card p-5 space-y-3 mb-4">
-      <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-sm text-foreground">{t('seeker.summary.title')}</h2>
-        <Link to="/halo/new" className="text-xs text-primary hover:underline">{t('seeker.summary.edit')}</Link>
+    <div className="bg-white border border-[#E5E5E5] rounded-3xl p-7 flex items-center justify-between gap-6 flex-wrap hover:border-[#2563EB]/40 transition-colors">
+      <div className="min-w-0 flex-1">
+        <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#6a6a6a]">{t('seeker.summary.title')}</p>
+        <h2 className="text-[20px] font-bold text-[#0a0f1e] mt-1.5">
+          {suburbs.length > 0 ? suburbs.join(', ') : t('seeker.haloCard.suburb.anywhere')}
+        </h2>
+        <div className="flex flex-wrap items-center gap-2 mt-3">
+          <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#EFF6FF] text-[#1E40AF]">
+            {t('seeker.summary.chip.buy')}
+          </span>
+          {types.map((ty) => (
+            <span key={ty} className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F3F4F6] text-[#374151]">
+              {ty}
+            </span>
+          ))}
+          {priceLabel && (
+            <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F3F4F6] text-[#374151]">{priceLabel}</span>
+          )}
+          {intent.bedrooms != null && (
+            <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F3F4F6] text-[#374151]">
+              {t('seeker.summary.chip.beds', { count: intent.bedrooms })}
+            </span>
+          )}
+        </div>
       </div>
-      <div className="flex flex-wrap gap-2">
-        <Chip>{t('seeker.summary.chip.buy')}</Chip>
-        {suburbs.length > 0 && <Chip>{suburbs.join(', ')}</Chip>}
-        {priceLabel && <Chip>{priceLabel}</Chip>}
-        {intent.bedrooms != null && <Chip>{t('seeker.summary.chip.beds', { count: intent.bedrooms })}</Chip>}
-        {types.map((t2) => <Chip key={t2}>{t2}</Chip>)}
-      </div>
+      <Link
+        to="/halo/new"
+        className="text-[13px] font-bold text-[#2563EB] hover:underline inline-flex items-center gap-1.5"
+      >
+        <Pencil size={14} /> {t('seeker.summary.edit')}
+      </Link>
     </div>
   );
 }
@@ -596,47 +610,47 @@ function HaloSummaryCard({ intent }: { intent: any | null }) {
 function MatchedListings({ matches }: { matches: any[] }) {
   const { t } = useTranslation();
   return (
-    <div className="space-y-3 mb-4">
-      <h2 className="font-semibold text-sm text-foreground">
-        {t('seeker.matches.title')}
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-[18px] font-bold text-[#0a0f1e]">{t('seeker.matches.title')}</h2>
         {matches.length > 0 && (
-          <span className="ms-2 text-xs font-normal text-muted-foreground">{t('seeker.matches.found', { count: matches.length })}</span>
+          <span className="text-[12px] font-semibold text-[#6a6a6a]">
+            {t('seeker.matches.found', { count: matches.length })}
+          </span>
         )}
-      </h2>
+      </div>
       {matches.length === 0 ? (
-        <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-sm text-muted-foreground">
-            {t('seeker.matches.empty')}
-          </p>
+        <div className="bg-white border border-[#E5E5E5] rounded-2xl p-8 text-center">
+          <div className="w-10 h-10 rounded-xl bg-[#F3F4F6] text-[#9CA3AF] flex items-center justify-center mx-auto">
+            <Search size={20} strokeWidth={1.5} />
+          </div>
+          <h3 className="text-[16px] font-bold text-[#0a0f1e] mt-4">{t('seeker.matches.empty')}</h3>
         </div>
       ) : (
-        matches.map((match) => {
-          const p = match.properties;
-          const price = p.price_formatted ?? (p.price ? `$${Number(p.price).toLocaleString('en-AU')}` : '—');
-          const specs = `${p.suburb}${p.beds != null ? t('seeker.matches.specs.bed', { count: p.beds }) : ''}${p.baths != null ? t('seeker.matches.specs.bath', { count: p.baths }) : ''}`;
-          return (
-            <Link
-              key={match.id}
-              to={`/properties/${p.id}`}
-              className="block rounded-xl border border-border bg-card p-4 hover:bg-accent transition-colors space-y-1"
-            >
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="font-medium text-sm text-foreground line-clamp-1">{p.address}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {specs}
-                  </p>
-                </div>
-                <div className="shrink-0 text-end">
-                  <p className="text-sm font-semibold text-foreground">{price}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          {matches.map((match) => {
+            const p = match.properties;
+            const price = p.price_formatted ?? (p.price ? `$${Number(p.price).toLocaleString('en-AU')}` : '—');
+            return (
+              <Link
+                key={match.id}
+                to={`/properties/${p.id}`}
+                className="block bg-white rounded-2xl border border-[#E5E5E5] p-5 hover:border-[#2563EB] transition-colors"
+              >
+                <p className="font-bold text-[15px] text-[#0a0f1e] line-clamp-1">{p.address}</p>
+                <p className="text-[12px] text-[#6a6a6a] mt-1">{p.suburb}</p>
+                <div className="flex items-center justify-between mt-3">
+                  <p className="text-[16px] font-extrabold text-black tabular-nums">{price}</p>
                   {match.match_score != null && (
-                    <p className="text-xs text-primary font-medium">{t('seeker.matches.score', { score: match.match_score })}</p>
+                    <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#EFF6FF] text-[#2563EB]">
+                      {t('seeker.matches.score', { score: match.match_score })}
+                    </span>
                   )}
                 </div>
-              </div>
-            </Link>
-          );
-        })
+              </Link>
+            );
+          })}
+        </div>
       )}
     </div>
   );

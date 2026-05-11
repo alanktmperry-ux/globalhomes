@@ -129,7 +129,7 @@ export function SiteHeader() {
         <div className="flex items-center" style={{ gap: 18 }}>
           <LanguageSwitcher />
           <Link
-            to="/auth"
+            to="/login"
             className="text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors"
           >
             Sign in

@@ -95,12 +95,27 @@ export function SiteHeader() {
   // Authenticated users (seekers / agents / admins) keep the full role-aware header below.
   if (!user && !loading) {
     return (
-      <header className="sticky top-0 z-50 h-16 px-4 md:px-8 bg-white/95 backdrop-blur-md border-b border-[#E5E5E5] flex items-center">
+      <header
+        className="fixed top-0 left-0 right-0 z-10 flex items-center justify-between"
+        style={{
+          height: 72,
+          padding: '0 24px',
+          background: 'rgba(255,255,255,0.85)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(229,231,235,0.6)',
+        }}
+      >
+        {/* Logo */}
         <Link
           to="/"
-          className="text-xl font-extrabold uppercase tracking-[0.06em] cursor-pointer hover:opacity-80 transition-opacity"
+          className="cursor-pointer hover:opacity-80 transition-opacity"
           style={{
-            background: 'linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%)',
+            fontSize: 22,
+            fontWeight: 800,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)',
             WebkitBackgroundClip: 'text',
             backgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
@@ -110,22 +125,22 @@ export function SiteHeader() {
         >
           ListHQ
         </Link>
-        <div className="ml-auto flex items-center gap-3 md:gap-6">
-          <div className="hidden sm:block">
-            <LanguageSwitcher />
-          </div>
+
+        {/* Right cluster */}
+        <div className="flex items-center" style={{ gap: 18 }}>
+          <LanguageSwitcher />
           <Link
             to="/auth"
-            className="text-[13px] font-semibold text-[#1a1a1a] hover:text-[#2563EB] transition-colors hidden sm:inline"
+            className="text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors"
           >
             Sign in
           </Link>
-          <button
-            onClick={() => navigate('/auth?mode=signup')}
-            className="px-[22px] py-[10px] bg-[#1a1a1a] text-white text-[13px] font-semibold rounded-full hover:bg-white hover:text-[#1a1a1a] border border-[#1a1a1a] transition-all"
+          <Link
+            to="/for-agents"
+            className="hidden md:inline text-[13px] font-medium text-[#6a6a6a] hover:text-[#0a0f1e] transition-colors"
           >
-            Get started
-          </button>
+            List with us →
+          </Link>
         </div>
       </header>
     );

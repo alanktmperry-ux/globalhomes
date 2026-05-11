@@ -287,9 +287,9 @@ export default function HaloBoardPage() {
           )}
           <Tabs value={tab} onValueChange={(v) => setTab(v as BoardTab)} className="mb-4">
             <TabsList>
-              <TabsTrigger value="all">All Halos</TabsTrigger>
+              <TabsTrigger value="all">{t('halo.board.tabs.all')}</TabsTrigger>
               <TabsTrigger value="pocket">
-                Private Matches
+                {t('halo.board.tabs.pocket')}
                 {pocketMatchIds.size > 0 && (
                   <span className="ml-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] text-[10px] rounded-full bg-amber-500 text-white px-1">
                     {pocketMatchIds.size}

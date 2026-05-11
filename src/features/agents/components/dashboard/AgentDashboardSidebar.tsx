@@ -111,6 +111,7 @@ const NAV_SECTIONS: NavSection[] = [
     url: '',
     icon: LineChart,
     children: [
+      { title: 'Market Tools', url: '/dashboard/market-tools', icon: LineChart },
       { title: 'AI Concierge', url: '/dashboard/concierge', icon: Sparkles, badgeKey: 'buyerMatches', alertWhenBadge: true },
       { title: 'Lead Marketplace', url: '/dashboard/lead-marketplace', icon: ShoppingBag },
       { title: 'Pre-Market', url: '/dashboard/pre-market', icon: Target },

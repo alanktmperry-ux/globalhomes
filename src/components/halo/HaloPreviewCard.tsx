@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, Languages, Star, Mail, Loader2, BedDouble } from 'lucide-react';
+import { CheckCircle2, Languages, Star, Mail, Loader2, BedDouble, LockKeyhole } from 'lucide-react';
 import HaloQualityBadge from '@/components/halo/HaloQualityBadge';
 import { supabase } from '@/integrations/supabase/client';
 import type { Halo } from '@/types/halo';

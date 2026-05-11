@@ -14,7 +14,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { supabase } from '@/integrations/supabase/client';
-import { useTranslation } from '@/shared/lib/i18n/useTranslation';
+import { useTranslation, formatCurrency } from '@/shared/lib/i18n';
 
 interface Props {
   propertyPrice: number | null;
@@ -23,10 +23,6 @@ interface Props {
 }
 
 const STATES: AustralianState[] = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT'];
-
-function formatDollars(n: number): string {
-  return '$' + Math.round(n).toLocaleString('en-AU');
-}
 
 function getFIRBFee(price: number): number {
   if (price < 75000) return 4200;

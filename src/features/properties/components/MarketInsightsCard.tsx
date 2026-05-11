@@ -5,6 +5,7 @@ import { Property } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation, formatDate } from '@/shared/lib/i18n';
 
 interface RentalStats {
   medianRentWeekly: number | null;

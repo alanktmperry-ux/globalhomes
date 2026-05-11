@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
-import { Mic, Search, Play, X } from 'lucide-react';
+import { Mic, Search, Play, X, ArrowRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
+import LiveActivityTicker from '@/components/LiveActivityTicker';
+import HomeCountUp from '@/components/HomeCountUp';
 
 // ============================================================
 // Wave 17 V8 — Buyer-first multilingual homepage
@@ -500,9 +502,9 @@ const Index = () => {
         .mic-spin { width:18px; height:18px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation: spin .8s linear infinite; }
         @keyframes errFade { from { opacity:0; transform:translateY(-4px) } to { opacity:1; transform:translateY(0) } }
         .voice-err { animation: errFade .25s ease-out; }
-        .hero-headline { font-size: clamp(44px, 5vw, 76px); font-weight: 800; letter-spacing: -2px; line-height: 1.05; color: #0a0f1e; margin-bottom: 0; }
-        .hero-headline .line1 { display: block; line-height: 1.1; }
-        .hero-headline .line2 { display: block; color: #2563EB; font-style: italic; font-weight: 700; line-height: 1.15; margin-top: 6px; min-height: 1.2em; font-size: clamp(28px, 3.5vw, 58px); }
+        .hero-headline { font-size: clamp(48px, 7vw, 110px); font-weight: 800; letter-spacing: -0.05em; line-height: 1.05; color: #000; margin-bottom: 0; max-width: 1100px; }
+        .hero-headline .line1 { display: block; line-height: 1.05; color: #000; }
+        .hero-headline .line2 { display: block; margin-top: 0.18em; padding-bottom: 0.08em; font-weight: 800; font-style: normal; line-height: 1.05; min-height: 1.2em; font-size: 1em; background: linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
         .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
         @media (prefers-reduced-motion: reduce) {
           .marquee-track { animation: none; }
@@ -535,17 +537,77 @@ const Index = () => {
           <div style={{ maxWidth: 1240, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 460px', gap:48, alignItems:'center' }} className="hero-grid">
             {/* Left */}
             <div>
-              <div style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'6px 12px', borderRadius:100, background:T.blueL, border:`1px solid ${T.blueMid}`, color:T.blue, fontSize:11, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:24, maxWidth:'100%', whiteSpace:'normal', textAlign:'left', lineHeight:1.3 }} className="hero-eyebrow">
-                <span className="pulseDot" style={{ width:6, height:6, borderRadius:'50%', background:T.blue, flexShrink:0 }} />
-                <span>{t('hero.eyebrow')}</span>
+              <div
+                className="opacity-0 animate-fade-up"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  marginBottom: 32, animationDelay: '0.1s',
+                  fontSize: 12, fontWeight: 600, letterSpacing: '0.16em',
+                  textTransform: 'uppercase', color: '#6a6a6a',
+                }}
+              >
+                <span>Australia's multilingual property platform</span>
               </div>
 
-              <h1 className="hero-headline" style={{ margin:'0 0 12px' }}>
-                <span className="line1">{seq.line1}</span>
-                <span className={`line2 ${blur ? 'blur-out' : 'blur-in'}`} style={{ fontFamily: "'DM Serif Display', serif" }}>{seq.line2}</span>
+              <h1
+                className="hero-headline opacity-0 animate-fade-up"
+                style={{ margin: '0 0 12px', animationDelay: '0.25s' }}
+              >
+                <span className="line1">Find your home.</span>
+                <span className={`line2 ${blur ? 'blur-out' : 'blur-in'}`}>{seq.line2}</span>
               </h1>
 
-              <div className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:14, fontWeight:500, color:T.mid, marginBottom:16, display:'flex', alignItems:'center', gap:6 }}>
+              <p
+                className="opacity-0 animate-fade-up"
+                style={{
+                  fontSize: 19, lineHeight: 1.55, color: '#4a4a4a',
+                  maxWidth: 620, marginTop: 32, marginBottom: 0,
+                  animationDelay: '0.4s',
+                }}
+              >
+                Twenty languages. Seven million multicultural Australians. The only property platform that speaks every buyer's language.
+              </p>
+
+              <div
+                className="opacity-0 animate-fade-up"
+                style={{
+                  display: 'flex', gap: 14, marginTop: 40, marginBottom: 12,
+                  flexWrap: 'wrap', animationDelay: '0.55s',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    const el = document.getElementById('heroSearch');
+                    if (el) { (el as HTMLInputElement).focus(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+                  }}
+                  style={{
+                    background: '#000', color: '#fff', border: '1px solid #000',
+                    borderRadius: 9999, padding: '16px 32px', fontSize: 14, fontWeight: 600,
+                    display: 'inline-flex', alignItems: 'center', gap: 10, cursor: 'pointer',
+                    transition: 'all .15s ease',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#000'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = '#000'; e.currentTarget.style.color = '#fff'; }}
+                >
+                  Start searching <ArrowRight size={16} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/agents/landing')}
+                  style={{
+                    background: '#fff', color: '#000', border: '1px solid #000',
+                    borderRadius: 9999, padding: '16px 32px', fontSize: 14, fontWeight: 600,
+                    cursor: 'pointer', transition: 'all .15s ease',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = '#000'; e.currentTarget.style.color = '#fff'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#000'; }}
+                >
+                  For agents
+                </button>
+              </div>
+
+              <div className={blur ? 'blur-out' : 'blur-in'} style={{ fontSize:14, fontWeight:500, color:T.mid, marginTop:24, marginBottom:16, display:'flex', alignItems:'center', gap:6 }}>
                 <span style={{ fontSize:20, lineHeight:1 }}>{seq.flag}</span> {seq.sub} · {t('home.hero.langSwitch')}
               </div>
 
@@ -702,6 +764,9 @@ const Index = () => {
           `}</style>
         </section>
 
+        {/* ═══ Live Activity Ticker ═══ */}
+        <LiveActivityTicker />
+
         {/* ═══ SECTION 3 — Language Marquee ═══ */}
         <div style={{ background:T.ink, padding:'14px 0', overflow:'hidden' }}>
           <div className="marquee-track" style={{ display:'flex', whiteSpace:'nowrap', width:'max-content' }}>
@@ -713,30 +778,42 @@ const Index = () => {
           </div>
         </div>
 
-        {/* ═══ SECTION 4 — Trust Strip ═══ */}
-        <div style={{ background:T.off, borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}`, padding:'20px 16px' }}>
-          <div className="trust-strip" style={{ maxWidth:1200, margin:'0 auto' }}>
+        {/* ═══ SECTION 4 — Trust Strip (count-up) ═══ */}
+        <div style={{ background:'#fff', borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}`, padding:'72px 24px' }}>
+          <div className="trust-strip" style={{ maxWidth:1280, margin:'0 auto' }}>
             {[
-              { n: propertyCount && propertyCount > 0 ? `${propertyCount.toLocaleString()}+` : '—', l: t('home.trust.listings') },
-              { n:'20', l: t('home.trust.languages') },
-              { n:'Free', l: t('home.trust.free') },
-            ].map((s) => (
-              <div key={s.l} className="trust-cell" style={{ textAlign:'center', padding:'8px 16px' }}>
-                <div style={{ fontSize:22, fontWeight:800, color:T.ink, lineHeight:1 }}>{s.n}</div>
-                <div style={{ fontSize:13, fontWeight:600, color:T.mid, marginTop:4 }}>{s.l}</div>
+              { type:'count' as const, target: 50000, format: (v:number)=>v.toLocaleString(), label:'ACTIVE LISTINGS' },
+              { type:'count' as const, target: 20,    format: (v:number)=>v.toString(),       label:'LANGUAGES, AUTO' },
+              { type:'count' as const, target: 7,     format: (v:number)=>`${v}M+`,           label:'MULTILINGUAL BUYERS' },
+              { type:'static' as const, text:'Free',                                          label:'COST FOR BUYERS' },
+            ].map((s, i) => (
+              <div key={i} className="trust-cell" style={{ textAlign:'center', padding:'12px 16px' }}>
+                <HomeCountUp
+                  target={s.type === 'count' ? s.target : 0}
+                  format={s.type === 'count' ? s.format : undefined}
+                  staticText={s.type === 'static' ? s.text : undefined}
+                  className="text-[clamp(48px,6vw,88px)] font-extrabold leading-[0.95] tracking-[-0.05em] tabular-nums"
+                  style={{
+                    background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)',
+                    WebkitBackgroundClip: 'text',
+                    backgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    color: 'transparent',
+                    display: 'inline-block',
+                  }}
+                />
+                <div className="text-[13px] font-bold tracking-wider uppercase mt-3.5" style={{ color:'#4a4a4a' }}>{s.label}</div>
               </div>
             ))}
           </div>
           <style>{`
-            .trust-strip { display:grid; grid-template-columns: repeat(3, 1fr); align-items:center; }
-            .trust-cell + .trust-cell { border-left:1px solid ${T.border}; }
-            @media (max-width: 640px) {
-              .trust-strip { grid-template-columns: repeat(2, 1fr); row-gap: 16px; }
-              .trust-cell + .trust-cell { border-left: none; }
-              .trust-cell:nth-child(even) { border-left: 1px solid ${T.border}; }
+            .trust-strip { display:grid; grid-template-columns: repeat(4, 1fr); align-items:end; gap: 24px; }
+            @media (max-width: 768px) {
+              .trust-strip { grid-template-columns: repeat(2, 1fr); row-gap: 32px; }
             }
           `}</style>
         </div>
+
 
         {/* ═══ SECTION 4b — Featured Listings ═══ */}
         <section style={{ background: '#fff', padding: '72px 24px' }}>

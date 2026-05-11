@@ -126,6 +126,33 @@ body {
   }
 }
 
+/* Homepage Bose × Blue animations */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fade-up 1.2s ease forwards; }
+
+@keyframes ping-soft {
+  0%   { transform: scale(1);   opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+.animate-ping-soft { animation: ping-soft 2s ease-in-out infinite; }
+
+@keyframes hero-lang-cycle {
+  0%, 100% { filter: blur(10px); opacity: 0; }
+  10%, 90% { filter: blur(0);    opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-ping-soft {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 /* Google Places autocomplete dropdown */
 .pac-container {
   z-index: 9999 !important;

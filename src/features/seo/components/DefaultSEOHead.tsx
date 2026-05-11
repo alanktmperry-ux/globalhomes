@@ -24,7 +24,7 @@ export function DefaultSEOHead() {
         "name": "ListHQ",
         "url": "https://listhq.com.au",
         "logo": "https://listhq.com.au/og-image.png",
-        "description": "Australia's AI-powered property platform. Search, buy, rent and manage property across Australia in 20 languages.",
+        "description": "Australia's AI-powered property platform. Search, buy, rent and manage property across Australia in any language.",
         "contactPoint": {
           "@type": "ContactPoint",
           "contactType": "customer support",

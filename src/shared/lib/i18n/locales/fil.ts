@@ -689,7 +689,7 @@ export const fil: Partial<Record<TranslationKey, string>> = {
   'agentLanding.eyebrow': 'Para sa mga ahente',
   'agentLanding.headline': 'Hanapin ang iyong susunod na mamimili',
   'agentLanding.headlineSub': 'bago sila makahanap ng listahan.',
-  'agentLanding.body': 'Ang ListHQ ay isang kumpletong plataporma ng negosyo na ginawa para sa mga ahente ng Australia — Halo Board, AI buyer matching, 20-language auto-translation, trust accounting, at isang CRM na tumatakbo nang kusa. Lahat ng kailangan mo. Isang subscription lang.',
+  'agentLanding.body': 'Ang ListHQ ay isang kumpletong plataporma ng negosyo na ginawa para sa mga ahente ng Australia — Halo Board, AI buyer matching, multilingual auto-translation, trust accounting, at isang CRM na tumatakbo nang kusa. Lahat ng kailangan mo. Isang subscription lang.',
   'agentLanding.stat1Label': 'Mga mamimiling maraming wika\nwalang ibang portal ang nakakarating',
   'agentLanding.stat2Label': 'Mga wika, bawat listahan ay awtomatikong isinasalin',
   'agentLanding.stat3Label': 'Libreng pagsubok, walang credit card',

@@ -154,7 +154,7 @@ export default function HeroSearchPreview() {
             fontSize: 17, lineHeight: 1.55, color: '#6a6a6a',
             maxWidth: 520,
           }}>
-            The only property search in Australia that speaks 24 languages.
+            The only property search in Australia that speaks every language your buyer does.
           </p>
 
           {/* Search bar */}
@@ -286,7 +286,7 @@ export default function HeroSearchPreview() {
                 fontSize: 11, fontWeight: 700,
                 display: 'inline-flex', alignItems: 'center', gap: 6,
               }}>
-                <span aria-hidden>🌐</span> 24 languages · auto-translated
+                <span aria-hidden>🌐</span> any language · auto-translated
               </div>
 
               {/* Bottom overlay */}

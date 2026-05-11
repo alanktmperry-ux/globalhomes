@@ -1,12 +1,12 @@
 # ListHQ
 
-> Australia's only property platform with listings translated into 24 languages — built for agents, buyers, property managers, and investors.
+> Australia's only property platform with listings translated into any language — built for agents, buyers, property managers, and investors.
 
-ListHQ is a two-sided multilingual property marketplace built for the Australian market. It combines traditional property search with enterprise-grade property management, trust accounting compliant with the Agents Financial Administration Act 2014 (AFA 2014), and AI tools including voice search, multilingual AI listing generation (24 languages), seller likelihood scoring, buyer concierge matching (Halo reverse marketplace), and AI-generated offer letters.
+ListHQ is a two-sided multilingual property marketplace built for the Australian market. It combines traditional property search with enterprise-grade property management, trust accounting compliant with the Agents Financial Administration Act 2014 (AFA 2014), and AI tools including voice search, multilingual AI listing generation (any language), seller likelihood scoring, buyer concierge matching (Halo reverse marketplace), and AI-generated offer letters.
 
 ## For Agents
 
-- List properties (sale and rental) with AI-generated descriptions translated into 24 languages including Mandarin, Vietnamese, Korean, Arabic, Hindi
+- List properties (sale and rental) with AI-generated descriptions translated into any language including Mandarin, Vietnamese, Korean, Arabic, Hindi
 
 - Access seller likelihood scores to identify motivated vendors in any suburb
 

@@ -67,7 +67,7 @@ export function SiteFooter() {
               ListHQ
             </Link>
             <p className="text-[13px] text-white/55 max-w-[280px] leading-[1.55] mt-4">
-              Australia's multilingual property platform. Listings in 20 languages. AI
+              Australia's multilingual property platform. Listings in any language. AI
               translation. Built for the way Australia actually looks.
             </p>
             <div className="flex gap-2 mt-5">

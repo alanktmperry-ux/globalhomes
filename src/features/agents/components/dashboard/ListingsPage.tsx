@@ -300,7 +300,7 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
   const thumb = getListingThumb(l);
   const enquiries = stats.enquiries[l.id] ?? l.contact_clicks ?? 0;
   const views = stats.views[l.id] ?? l.views ?? 0;
-  const langCount = Array.isArray(l.images) ? 20 : 20; // listings auto-translate into 20 languages
+  const langCount = Array.isArray(l.images) ? 20 : 20; // listings auto-translate into any language
   const overlayKey = isRental && l._status === 'public' ? 'rent' : l._status;
   const overlay = STATUS_OVERLAY[overlayKey] || STATUS_OVERLAY.public;
   const isBoosted = (l as any).is_featured === true || (l as any).boost_ends_at;
@@ -920,7 +920,7 @@ const ListingsPage = () => {
               <div className="flex justify-center"><Ico icon="solar:buildings-linear" size={56} color="#E5E7EB" /></div>
               <h2 className="text-[22px] font-bold text-[#0a0f1e] mt-6">You haven't listed any properties yet</h2>
               <p className="text-[14px] text-[#6a6a6a] max-w-[420px] mx-auto leading-[1.55] mt-3">
-                Add your first listing in 90 seconds. It auto-translates into 20 languages the moment it's live.
+                Add your first listing in 90 seconds. It auto-translates into any language the moment it's live.
               </p>
               <button
                 type="button"

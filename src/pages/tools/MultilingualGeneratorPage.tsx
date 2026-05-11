@@ -93,7 +93,7 @@ export default function MultilingualGeneratorPage() {
           <h1 className="text-[clamp(48px,7vw,100px)] font-extrabold leading-[0.95] tracking-[-0.05em] text-black mt-6">
             Translate any listing into
             <br />
-            <span className="bg-gradient-to-r from-[#2563EB] to-[#60A5FA] bg-clip-text text-transparent">six languages.</span>
+            <span className="bg-gradient-to-r from-[#2563EB] to-[#60A5FA] bg-clip-text text-transparent">every language.</span>
           </h1>
           <p className="text-[18px] text-[#4a4a4a] mt-6 max-w-[640px] mx-auto leading-[1.55]">
             Paste your listing description. AI rewrites it in Mandarin, Vietnamese, Korean, Arabic, Hindi, and Cantonese — with Australian real-estate context. Free. No sign-up.
@@ -244,7 +244,7 @@ export default function MultilingualGeneratorPage() {
             <span className="bg-gradient-to-r from-[#93C5FD] to-[#60A5FA] bg-clip-text text-transparent">in twenty languages.</span>
           </h2>
           <p className="text-[18px] text-white/65 mt-6 max-w-[600px] mx-auto leading-[1.55]">
-            ListHQ translates your listings into 20 languages the moment you publish — Mandarin, Vietnamese, Arabic, Hindi, and 16 more. With Australian real-estate terminology built in.
+            ListHQ translates your listings into any language the moment you publish — Mandarin, Vietnamese, Arabic, Hindi, and 16 more. With Australian real-estate terminology built in.
           </p>
           <div className="flex gap-3 justify-center mt-10 flex-wrap">
             <a

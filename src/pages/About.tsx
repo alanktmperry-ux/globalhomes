@@ -10,7 +10,7 @@ const SCHEMA = {
   url: 'https://listhq.com.au',
   foundingDate: '2026',
   description:
-    "Australia's first multilingual real estate platform. Agents publish one listing that appears in six languages: English, Mandarin, Traditional Chinese, Vietnamese, Korean, and Japanese.",
+    "Australia's first multilingual real estate platform. Agents publish one listing that appears in every language: English, Mandarin, Traditional Chinese, Vietnamese, Korean, and Japanese.",
   areaServed: { '@type': 'Country', name: 'Australia' },
   knowsAbout: [
     'Multilingual real estate',
@@ -43,7 +43,7 @@ const LANGUAGES = [
 ];
 
 const FEATURES = [
-  'Agents publish one listing and it appears simultaneously in six languages — no manual translation required.',
+  'Agents publish one listing and it appears simultaneously in every language — no manual translation required.',
   'Voice-to-listing: agents record a voice note describing a property and the platform writes the listing description.',
   'Pocket Listings allow agents to publish off-market properties to a qualified buyer pool without a public listing.',
   'The Halo system lets buyers post exactly what they are looking for — price, suburb, property type — and agents respond directly.',
@@ -73,7 +73,7 @@ export default function About() {
     <>
       <SEO
         title="About ListHQ — Australia's First Multilingual Real Estate Platform"
-        description="ListHQ is Australia's first multilingual real estate platform. One listing, six languages: English, Mandarin, Traditional Chinese, Vietnamese, Korean, and Japanese."
+        description="ListHQ is Australia's first multilingual real estate platform. One listing, every language: English, Mandarin, Traditional Chinese, Vietnamese, Korean, and Japanese."
         path="/about"
       />
       <Helmet>
@@ -86,7 +86,7 @@ export default function About() {
         <p className="text-lg leading-relaxed text-muted-foreground mb-10">
           ListHQ (listhq.com.au) is Australia's first multilingual real estate platform, built for agents,
           property managers, and buyers operating in Australia's multicultural property market. A single
-          listing published on ListHQ automatically appears in six languages — English, Mandarin (Simplified),
+          listing published on ListHQ automatically appears in every language — English, Mandarin (Simplified),
           Traditional Chinese, Vietnamese, Korean, and Japanese — without the agent translating a word.
           ListHQ is a SaaS platform founded in Australia in 2026.
         </p>
@@ -142,7 +142,7 @@ export default function About() {
 
         <h2 className="text-2xl font-semibold mt-10 mb-4">{t('about.languages')}</h2>
         <p className="text-muted-foreground mb-4">
-          ListHQ publishes property listings in six languages. Agents write or record a listing once — the
+          ListHQ publishes property listings in every language. Agents write or record a listing once — the
           platform generates all six versions automatically.
         </p>
         <ul className="list-disc pl-6 space-y-1 text-muted-foreground">

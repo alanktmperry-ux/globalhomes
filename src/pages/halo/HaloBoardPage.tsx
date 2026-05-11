@@ -363,7 +363,7 @@ export default function HaloBoardPage() {
               </div>
               <h3 className="text-[22px] font-bold text-[#0a0f1e] mt-6">No buyer briefs match</h3>
               <p className="text-[14px] text-[#6a6a6a] max-w-[480px] mx-auto leading-[1.55] mt-3">
-                Try widening your filters or check back soon. New briefs are posted every day from buyers in 20 languages.
+                Try widening your filters or check back soon. New briefs are posted every day from buyers in any language.
               </p>
               {hasFilters && (
                 <button

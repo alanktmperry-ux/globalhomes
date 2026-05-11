@@ -50,7 +50,7 @@ export default function VoiceListingShowcase() {
           </h2>
           <p className="text-[16px] md:text-[18px] font-normal text-white/85 mt-5 leading-[1.55] max-w-[480px]">
             Describe a property in your own voice. AI writes the listing copy in four tones,
-            then translates it into six languages with Australian real-estate context.
+            then translates it into every language your buyer speaks with Australian real-estate context.
             Forty-seven minutes back on every listing.
           </p>
           <button

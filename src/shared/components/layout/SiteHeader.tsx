@@ -238,10 +238,10 @@ export function SiteHeader() {
 
         {/* ─── Mobile hamburger (visible below md) ─── */}
         <div className="flex md:hidden items-center gap-1 shrink-0">
-          {user && (
+          {user && isAgentLike && (
             <button
-              onClick={() => navigate(isAdmin ? '/admin' : isAgentLike ? '/dashboard' : '/seeker/dashboard')}
-              className="w-9 h-9 rounded-full bg-[#2563EB] flex items-center justify-center text-white"
+              onClick={() => navigate(isAdmin ? '/admin' : '/dashboard')}
+              className="w-9 h-9 rounded-full bg-white border border-[#E5E7EB] text-[#2563EB] hover:bg-[#EFF6FF] flex items-center justify-center"
               aria-label="Dashboard"
             >
               <LayoutDashboard size={16} />

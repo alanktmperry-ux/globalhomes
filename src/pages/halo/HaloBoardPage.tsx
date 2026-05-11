@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { Loader2, AlertTriangle, X, Sparkles, Plus, Lightbulb } from 'lucide-react';
-import { EmptyState } from '@/components/ui/empty-state';
+import { Loader2, AlertTriangle, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -10,10 +9,8 @@ import { useHaloCreditsBalance } from '@/features/halo/hooks/useHaloCreditsBalan
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HaloPreviewCard } from '@/components/halo/HaloPreviewCard';
 import { HaloUnlockDialog } from '@/components/halo/HaloUnlockDialog';
-import { AgentCreditBadge } from '@/components/halo/AgentCreditBadge';
 import {
   HaloBoardFilters,
   applyFilters,

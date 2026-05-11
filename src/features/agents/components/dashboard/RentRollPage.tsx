@@ -683,121 +683,194 @@ const RentRollPage = () => {
     { label: 'Monthly Mgmt Fees', value: `$${monthlyMgmtFees.toFixed(0)}`, icon: Clock },
   ];
 
-  return (
-    <div className="space-y-6">
-      <DashboardHeader
-        title="Rent Roll"
-        subtitle="Manage tenancies and rental income"
-        actions={
-          <Button size="sm" onClick={() => setShowAddModal(true)}>
-            <Plus size={14} className="mr-1" /> Add Tenancy
-          </Button>
-        }
-      />
+  const Ico = ({ icon, size = 16, color }: { icon: string; size?: number; color?: string }) =>
+    // @ts-expect-error iconify web component
+    <iconify-icon icon={icon} width={size} height={size} style={{ color, display: 'inline-block' }} />;
 
-      <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
-        <AlertTriangle size={14} className="text-amber-600 shrink-0 mt-0.5" />
-        <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
-           Tenancy records are retained for 7 years in compliance with Australian tenancy law. Records cannot be deleted during this period.
+  // KPI card colour map per metric tone
+  const kpiCards = [
+    { key: 'managed', label: 'TOTAL MANAGED', value: String(activeTenancies.length), sub: `${properties.length} rental ${properties.length === 1 ? 'property' : 'properties'}`, icon: 'solar:home-2-bold', iconColor: '#065F46', iconBg: '#ECFDF5' },
+    { key: 'rent', label: 'WEEKLY RENT', value: `$${totalWeeklyRent.toLocaleString('en-AU', { maximumFractionDigits: 0 })}`, sub: 'across active tenancies', icon: 'solar:wallet-2-bold', iconColor: '#2563EB', iconBg: '#EFF6FF' },
+    { key: 'arrears', label: 'IN ARREARS', value: String(overdueCount), sub: arrearsSummary.totalOwed > 0 ? `$${arrearsSummary.totalOwed.toLocaleString('en-AU', { maximumFractionDigits: 0 })} outstanding` : 'no overdue tenants', icon: 'solar:danger-triangle-bold', iconColor: '#DC2626', iconBg: '#FEF2F2', emphasise: overdueCount > 0 },
+    { key: 'mgmt', label: 'MONTHLY MGMT FEES', value: `$${monthlyMgmtFees.toLocaleString('en-AU', { maximumFractionDigits: 0 })}`, sub: 'this month', icon: 'solar:clock-circle-bold', iconColor: '#D97706', iconBg: '#FFFBEB' },
+  ];
+
+  return (
+    <div className="max-w-[1480px] mx-auto px-6 md:px-10 py-10">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-6 flex-wrap mb-8">
+        <div>
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1
+              className="font-extrabold tracking-[-0.04em] text-[#0a0f1e]"
+              style={{ fontSize: 'clamp(32px,4vw,48px)', lineHeight: 1.05 }}
+            >
+              Tenancies
+            </h1>
+            {!loading && !noAgent && (
+              <span className="bg-[#EFF6FF] border border-[#2563EB]/15 text-[#1E40AF] rounded-full px-3 py-1 text-[12px] font-bold">
+                {activeTenancies.length} active lease{activeTenancies.length === 1 ? '' : 's'}
+              </span>
+            )}
+          </div>
+          <p className="text-[14px] text-[#6a6a6a] font-medium mt-2">
+            Your rent roll, arrears, inspections, and maintenance — one place.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => navigate('/dashboard/pm-inspections')}
+            className="bg-white border border-[#E5E5E5] text-[#0a0f1e] rounded-full px-4 py-2.5 text-[13px] font-semibold inline-flex items-center gap-2 hover:bg-[#F9FAFB] transition"
+          >
+            <Ico icon="solar:calendar-add-linear" size={16} color="#0a0f1e" />
+            <span className="hidden sm:inline">Add inspection</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowAddModal(true)}
+            className="text-white rounded-full px-5 py-2.5 text-[13px] font-extrabold inline-flex items-center gap-2 transition hover:opacity-95"
+            style={{ background: 'linear-gradient(135deg,#2563EB,#1D4ED8)' }}
+          >
+            <Ico icon="solar:home-add-bold" size={16} color="#fff" />
+            Add tenancy
+          </button>
+        </div>
+      </div>
+
+      {/* Arrears warning banner */}
+      {!loading && !noAgent && arrearsSummary.count > 0 && (
+        <div className="bg-[#FEF2F2] border border-[#DC2626]/20 rounded-3xl p-5 mb-8 flex items-center gap-5 flex-wrap">
+          <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shrink-0">
+            <Ico icon="solar:danger-triangle-bold" size={24} color="#DC2626" />
+          </div>
+          <div className="flex-1 min-w-[200px]">
+            <div className="text-[15px] font-extrabold text-[#991B1B]">
+              {arrearsSummary.count} tenant{arrearsSummary.count === 1 ? '' : 's'} in arrears
+            </div>
+            <div className="text-[13px] text-[#991B1B]/85 mt-0.5">
+              ${arrearsSummary.totalOwed.toLocaleString('en-AU', { maximumFractionDigits: 0 })} total outstanding
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setActiveTab('arrears')}
+            className="bg-[#DC2626] text-white rounded-full px-5 py-2.5 text-[13px] font-bold hover:bg-[#991B1B] transition"
+          >
+            Review arrears
+          </button>
+        </div>
+      )}
+
+      {/* Retention notice */}
+      <div className="flex items-start gap-2 px-4 py-3 rounded-2xl bg-[#FFFBEB] border border-[#F59E0B]/20 mb-6">
+        <AlertTriangle size={14} className="text-[#D97706] shrink-0 mt-0.5" />
+        <p className="text-xs text-[#92400E] leading-relaxed">
+          Tenancy records are retained for 7 years in compliance with Australian tenancy law. Records cannot be deleted during this period.
         </p>
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" size={28} /></div>
+        <div className="flex justify-center py-20"><Loader2 className="animate-spin text-[#2563EB]" size={28} /></div>
       ) : noAgent ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <Home size={40} className="text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-1">Agent profile required</h3>
-            <p className="text-sm text-muted-foreground max-w-md">Set up your agent profile to manage tenancies and rental income.</p>
-            <Button className="mt-4" onClick={() => navigate('/onboarding')}>Set Up Profile</Button>
-          </CardContent>
-        </Card>
+        <div className="bg-white rounded-3xl border border-[#E5E5E5] py-20 px-8 text-center">
+          <div className="flex justify-center">
+            <Ico icon="solar:home-bold" size={48} color="#E5E7EB" />
+          </div>
+          <h3 className="text-[20px] font-bold text-[#0a0f1e] mt-6">Agent profile required</h3>
+          <p className="text-[14px] text-[#6a6a6a] max-w-[480px] mx-auto mt-3">Set up your agent profile to manage tenancies and rental income.</p>
+          <button
+            type="button"
+            onClick={() => navigate('/onboarding')}
+            className="mt-6 text-white rounded-full px-5 py-2.5 text-[13px] font-extrabold inline-flex items-center gap-2"
+            style={{ background: 'linear-gradient(135deg,#2563EB,#1D4ED8)' }}
+          >
+            Set up profile
+          </button>
+        </div>
       ) : (
         <>
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-4"
-          >
-            {stats.map((s, i) => (
-              <motion.div
-                key={s.label}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-              >
-                <Card>
-                  <CardContent className="p-4 flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-primary/10">
-                      <s.icon size={18} className="text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">{s.label}</p>
-                      <p className="text-lg font-semibold text-foreground">{s.value}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+          {/* KPI cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {kpiCards.map((c) => (
+              <div key={c.key} className="bg-white rounded-3xl border border-[#E5E5E5] p-5">
+                <div className="flex items-start justify-between">
+                  <div
+                    className="w-10 h-10 rounded-2xl flex items-center justify-center"
+                    style={{ background: c.iconBg }}
+                  >
+                    <Ico icon={c.icon} size={20} color={c.iconColor} />
+                  </div>
+                </div>
+                <div className="text-[11px] uppercase tracking-[0.12em] text-[#6a6a6a] font-bold mt-4">
+                  {c.label}
+                </div>
+                <div
+                  className="font-extrabold tabular-nums mt-2"
+                  style={{
+                    fontSize: '36px',
+                    lineHeight: 1.05,
+                    color: c.emphasise ? '#DC2626' : '#0a0f1e',
+                  }}
+                >
+                  {c.value}
+                </div>
+                <div className="text-[12px] text-[#6a6a6a] mt-1">{c.sub}</div>
+              </div>
             ))}
-          </motion.div>
+          </div>
 
-          {/* Filter tabs */}
-          <div className="flex flex-wrap items-center gap-2 border-b border-border">
+          {/* Sub-tabs pill bar */}
+          <div className="flex items-center gap-1 bg-[#F9FAFB] rounded-full p-1 w-fit mb-6 overflow-x-auto max-w-full">
             {([
-              { key: 'all' as const, label: 'All Tenancies', count: activeTenancies.length },
+              { key: 'all' as const, label: 'All', count: activeTenancies.length, alert: false },
               { key: 'arrears' as const, label: 'Arrears', count: arrearsSummary.count, alert: arrearsSummary.count > 0 },
-              { key: 'expiring' as const, label: 'Expiring Soon', count: expiringCount },
-              { key: 'renewals' as const, label: 'Renewals Due', count: renewalsCount, alert: renewalsCount > 0 },
-              { key: 'inspections' as const, label: 'Inspections Due', count: inspectionsDueCount },
+              { key: 'expiring' as const, label: 'Expiring', count: expiringCount, alert: false },
+              { key: 'renewals' as const, label: 'Renewals', count: renewalsCount, alert: renewalsCount > 0 },
+              { key: 'inspections' as const, label: 'Inspections', count: inspectionsDueCount, alert: false },
             ]).map(tab => {
               const isActive = activeTab === tab.key;
               return (
                 <button
                   key={tab.key}
+                  type="button"
                   onClick={() => setActiveTab(tab.key)}
                   className={cn(
-                    'px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors flex items-center gap-2',
+                    'px-5 py-2.5 rounded-full text-[13px] font-bold transition inline-flex items-center gap-2 whitespace-nowrap',
                     isActive
-                      ? 'border-primary text-primary'
-                      : 'border-transparent text-muted-foreground hover:text-foreground',
+                      ? 'bg-white text-[#0a0f1e] shadow-[0_2px_8px_rgba(0,0,0,0.04)]'
+                      : 'text-[#6a6a6a] hover:text-[#0a0f1e]',
                   )}
                 >
                   {tab.label}
                   {tab.count > 0 && (
-                    <Badge
-                      variant={tab.alert ? 'destructive' : 'secondary'}
-                      className="text-[10px] px-1.5 py-0 h-5"
+                    <span
+                      className={cn(
+                        'rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums',
+                        tab.alert
+                          ? 'bg-[#FEF2F2] text-[#DC2626]'
+                          : isActive
+                            ? 'bg-[#EFF6FF] text-[#1E40AF]'
+                            : 'bg-white text-[#6a6a6a]',
+                      )}
                     >
                       {tab.count}
-                    </Badge>
+                    </span>
                   )}
                 </button>
               );
             })}
           </div>
 
-          {/* Arrears summary bar */}
-          {activeTab === 'arrears' && arrearsSummary.count > 0 && (
-            <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/20">
-              <AlertTriangle size={18} className="text-red-600 shrink-0" />
-              <p className="text-sm text-red-700 dark:text-red-400 font-medium">
-                {arrearsSummary.count} {arrearsSummary.count === 1 ? 'tenancy' : 'tenancies'} overdue — total AUD ${arrearsSummary.totalOwed.toLocaleString('en-AU', { maximumFractionDigits: 0 })} outstanding
-              </p>
-            </div>
-          )}
-
           {/* Table */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
           >
-            <Card>
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
+            <div className="bg-white rounded-3xl border border-[#E5E5E5] overflow-hidden">
+              <div className="overflow-x-auto">
+
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -1033,9 +1106,9 @@ const RentRollPage = () => {
                     </TableBody>
                   </Table>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
           </motion.div>
+
         </>
       )}
 

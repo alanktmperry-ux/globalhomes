@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import type { Halo } from '@/types/halo';
 import { usePageTitle } from '@/lib/usePageTitle';
-import { useTranslation } from '@/shared/lib/i18n';
+import { useTranslation, formatCurrency } from '@/shared/lib/i18n';
 
 type HaloRow = Halo & { response_count: number; unread_count: number };
 

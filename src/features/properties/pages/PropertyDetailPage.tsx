@@ -947,7 +947,7 @@ export default function PropertyDetailPage() {
                   <Eye size={16} className="text-muted-foreground shrink-0" />
                   <div>
                     <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{tp('property.facts.views')}</p>
-                    <p className="text-sm font-semibold text-foreground">{property.views.toLocaleString()}</p>
+                    <p className="text-sm font-semibold text-foreground">{formatNumber(property.views, language)}</p>
                   </div>
                 </div>
               )}

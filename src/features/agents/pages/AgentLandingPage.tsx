@@ -111,7 +111,7 @@ export default function AgentLandingPage() {
             </button>
             <button
               type="button"
-              onClick={() => navigate('/agents/login')}
+              onClick={() => navigate('/signup?role=agent')}
               className="text-[13px] font-bold text-[#4a4a4a] hover:text-[#2563EB] transition-colors inline-flex items-center gap-1.5"
             >
               <Icon icon="solar:lock-keyhole-linear" size={14} />

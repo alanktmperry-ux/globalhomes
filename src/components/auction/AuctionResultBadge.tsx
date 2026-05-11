@@ -52,7 +52,7 @@ export function AuctionResultBadge({ propertyId, agentId }: Props) {
 
             {result.sold_price && (
               <p className="text-2xl font-bold">
-                ${result.sold_price.toLocaleString('en-AU')}
+                {formatCurrency(result.sold_price, language)}
               </p>
             )}
 

@@ -32,7 +32,7 @@ export default defineConfig(({ mode }) => {
   build: {
     target: 'es2020',
     sourcemap: false,
-    chunkSizeWarningLimit: 1500,
+    chunkSizeWarningLimit: 600,
     // Only preload entry chunks, not the transitive closure of every dynamic import.
     // Without this, Vite emits 60+ <link rel="modulepreload"> tags on the homepage
     // because every React.lazy() route gets its dep graph preloaded eagerly.
@@ -45,31 +45,44 @@ export default defineConfig(({ mode }) => {
       output: {
         chunkFileNames: "assets/[name]-[hash].js",
         entryFileNames: "assets/[name]-[hash].js",
+        assetFileNames: "assets/[name]-[hash].[ext]",
         banner: mode === 'production'
           ? '/*! ListHQ — Proprietary code © ' + new Date().getFullYear() + ' ListHQ Pty Ltd. All rights reserved. Reproduction or reverse-engineering prohibited under Australian copyright and trade secret law. */'
           : undefined,
         manualChunks(id) {
-          if (!id.includes("node_modules")) return;
-
-          // Heavy libs that should stay split off the critical path
-          if (id.includes("@supabase")) return "supabase";
-          if (id.includes("recharts") || id.includes("d3-")) return "charts";
-          if (id.includes("react-day-picker") || id.includes("date-fns")) return "datepicker";
-          if (id.includes("jspdf") || id.includes("html2canvas") || id.includes("pdfjs")) return "pdf";
-          if (id.includes("@sentry")) return "sentry";
-          if (id.includes("mapbox-gl") || id.includes("@googlemaps")) return "maps";
-          if (id.includes("framer-motion")) return "motion";
-          // NOTE: Do NOT split @radix-ui into its own chunk. Radix modules call
-          // React.forwardRef at module-evaluation time, so they must live in the
-          // same chunk as React (vendor). A separate "radix" chunk loads before
-          // "vendor" in production and crashes Safari with a white screen:
-          // "Cannot read properties of undefined (reading 'forwardRef')".
-
-          return "vendor";
+          if (id.includes("node_modules")) {
+            // Lazy / page-specific heavies first
+            if (id.includes("@supabase/realtime-js")) return "supabase-realtime";
+            if (id.includes("@supabase")) return "vendor-supabase";
+            if (id.includes("recharts") || id.includes("victory") || /[\\/]d3-/.test(id)) return "charts";
+            if (id.includes("@stripe")) return "stripe";
+            if (id.includes("jspdf") || id.includes("pdf-lib") || id.includes("html2canvas") || id.includes("pdfjs")) return "pdf";
+            if (id.includes("@tiptap") || id.includes("prosemirror") || /[\\/]slate[\\/]/.test(id)) return "rich-text";
+            if (id.includes("mapbox-gl") || id.includes("@googlemaps") || id.includes("@react-google-maps")) return "maps";
+            if (id.includes("react-day-picker") || id.includes("date-fns")) return "datepicker";
+            if (id.includes("@sentry")) return "sentry";
+            if (id.includes("@iconify")) return "icons";
+            if (id.includes("framer-motion")) return "motion";
+            if (id.includes("i18next") || id.includes("react-i18next")) return "vendor-i18n";
+            // NOTE: Do NOT split @radix-ui into its own chunk. Radix modules call
+            // React.forwardRef at module-evaluation time, so they must live in the
+            // same chunk as React (vendor). A separate "radix" chunk loads before
+            // "vendor" in production and crashes Safari with a white screen:
+            // "Cannot read properties of undefined (reading 'forwardRef')".
+            return "vendor";
+          }
+          // App code: group by feature area so lazy routes share chunks.
+          if (id.includes("/features/admin/")) return "feature-admin";
+          if (id.includes("/features/agents/")) return "feature-agents";
+          if (id.includes("/features/marketing/")) return "feature-marketing";
+          if (id.includes("/features/halo/")) return "feature-halo";
+          if (id.includes("/features/auctions/")) return "feature-auctions";
+          if (id.includes("/features/rentals/")) return "feature-rentals";
+          if (id.includes("/features/messaging/")) return "feature-messaging";
+          if (id.includes("/features/trust/") || id.includes("/features/bank-recon/") || id.includes("/features/bond")) return "feature-trust";
         },
       },
     },
-  },
   optimizeDeps: {
     force: true,
     include: [

@@ -2944,4 +2944,5 @@ export const pl: Partial<Record<TranslationKey, string>> = {
   'mortgage.referral.validation.nameRequired': "Imię i nazwisko jest wymagane",
   'mortgage.referral.validation.invalidEmail': "Nieprawidłowy adres e-mail",
   'mortgage.referral.validation.phoneRequired': "Numer telefonu jest wymagany",
+  'seeker.currencyToggle.hkd': "Dolar hongkoński (HKD)",
 };

@@ -2944,4 +2944,5 @@ export const ja: Partial<Record<TranslationKey, string>> = {
   'mortgage.referral.validation.nameRequired': "氏名は必須です",
   'mortgage.referral.validation.invalidEmail': "無効なEメールアドレスです",
   'mortgage.referral.validation.phoneRequired': "電話番号は必須です",
+  'marketing.finalCta.line2': "ここで終わりです。",
 };

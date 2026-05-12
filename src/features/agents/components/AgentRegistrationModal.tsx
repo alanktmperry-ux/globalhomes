@@ -37,6 +37,7 @@ const PASSWORD_REQUIREMENTS = [
 ];
 
 const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
+  const { t } = useTranslation();
   const [step, setStep] = useState<'email' | 'check-email' | 'set-password' | 'prepare' | 'trust-info' | 'cutover' | 'import-wizard' | 'form' | 'success'>('email');
   const [emailInput, setEmailInput] = useState('');
   const [emailSubmitting, setEmailSubmitting] = useState(false);

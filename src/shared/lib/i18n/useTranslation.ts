@@ -60,6 +60,11 @@ const LOCALES: Partial<Record<SupportedLanguageCode, Record<string, string>>> = 
   'ru': ru,
   'ne': ne as any,
   'pl': pl as any,
+  'zh': zh as any,
+  'ja': ja as any,
+  'tr': tr as any,
+  'de': de as any,
+  'el': el as any,
 };
 
 type AnyKey = TranslationKey | (string & {});

@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { Suspense, lazy, useState } from 'react';
 import { Search, Heart, MessageCircle, User, LogIn, Building2, Globe, Users, ShieldCheck } from 'lucide-react';
 import { useTranslation, languageNames, type Language } from '@/shared/lib/i18n';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { useConversations } from '@/features/messaging/hooks/useConversations';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+
+// useConversations lives in feature-messaging — only relevant when signed in.
+// Wrapping it in a lazy child component keeps the messaging chunk out of the
+// public/cold-paint entry bundle.
+const MessagesTab = lazy(() => import('./BottomNavMessagesTab'));
 
 export function BottomNav() {
   const { t, language, setLanguage } = useTranslation();
@@ -13,7 +17,6 @@ export function BottomNav() {
   const navigate = useNavigate();
   const { user, isAdmin, isAgent, loading } = useAuth();
   const [showLangPicker, setShowLangPicker] = useState(false);
-  const { totalUnread } = useConversations(user?.id);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();

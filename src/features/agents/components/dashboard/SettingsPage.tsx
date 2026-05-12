@@ -313,10 +313,10 @@ const SettingsPage = () => {
           {/* Territory */}
           <div className="bg-white rounded-[12px] p-6" style={{ border: '1px solid #E5E7EB' }}>
             <h3 className="text-base font-bold text-[#0a0f1e] flex items-center gap-2 mb-1">
-              <Globe size={16} /> Territory
+              <Globe size={16} /> {t('agent.settings.profile.territory')}
             </h3>
             <p className="text-xs text-[#6B7280] mb-4 font-light">
-              Your primary suburbs for voice lead matching.
+              {t('agent.settings.profile.territoryHint')}
             </p>
             <div className="flex flex-wrap gap-1.5 mb-4">
               {['Berwick', 'Narre Warren', 'Officer', 'Clyde North', 'Pakenham'].map((s) => (
@@ -331,7 +331,7 @@ const SettingsPage = () => {
             <button
               className="bg-white border border-[#E5E7EB] text-[#374151] hover:bg-[#F9FAFB] font-semibold rounded-[10px] px-4 py-2 text-sm transition-all"
             >
-              Edit Suburbs
+              {t('agent.settings.profile.editSuburbs')}
             </button>
           </div>
 
@@ -340,7 +340,7 @@ const SettingsPage = () => {
             disabled={saving}
             className="w-full rounded-[10px] px-4 py-3 text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
           >
-            {saving ? <><Loader2 size={16} className="animate-spin" /> Saving…</> : 'Save Changes'}
+            {saving ? <><Loader2 size={16} className="animate-spin" /> {t('agent.settings.profile.saving')}</> : t('agent.settings.account.saveChanges')}
           </button>
         </TabsContent>
 

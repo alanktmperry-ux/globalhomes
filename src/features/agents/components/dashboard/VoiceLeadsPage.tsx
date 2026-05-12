@@ -69,6 +69,7 @@ const URGENCY_CONFIG = {
 /* ── Component ───────────────────────────────────────────────── */
 
 const VoiceLeadsPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { saveContact, isSaved, isSaving } = useSaveContact();

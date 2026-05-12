@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useSaveContact } from '@/features/agents/hooks/useSaveContact';
 import { formatDistanceToNow } from 'date-fns';
+import { useTranslation } from '@/shared/lib/i18n';
 
 /* ── Types ───────────────────────────────────────────────────── */
 

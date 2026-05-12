@@ -14,6 +14,7 @@ import HaloBoardPreview from '@/features/marketing/HaloBoardPreview';
 // PricingSection removed from homepage; lives on /for-agents/pricing
 import FinalCTA from '@/features/marketing/FinalCTA';
 import HeroSearchPreview from '@/components/home/HeroSearchPreview';
+import { cardImageProps } from '@/shared/lib/optimizeImageUrl';
 
 // ============================================================
 // Wave 17 V8 — Buyer-first multilingual homepage
@@ -699,7 +700,7 @@ const Index = () => {
                       >
                         <div style={{ height: 180, background: FALLBACK_GRADIENTS[0], position: 'relative', overflow: 'hidden' }}>
                           {img ? (
-                            <img src={img} alt={p.title || p.address} loading="lazy" decoding="async" width={640} height={480} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <img {...cardImageProps(img, p.title || p.address)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                           ) : (
                             <img src={HOUSE_PLACEHOLDER_SVG} alt="" aria-hidden="true" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'contain', opacity: 0.85 }} />
                           )}

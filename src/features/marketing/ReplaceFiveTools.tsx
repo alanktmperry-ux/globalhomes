@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Layers } from "lucide-react";
 import { useTranslation } from "@/shared/lib/i18n";
+import { cardImageProps } from "@/shared/lib/optimizeImageUrl";
 
 /**
  * "Replace five tools with one." — Bose-signature visual moment.
@@ -63,9 +64,11 @@ export default function ReplaceFiveTools() {
         {/* Image stage with callouts */}
         <div ref={stageRef} className="relative max-w-[1200px] mx-auto">
           <img
-            src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=85&w=1800"
-            alt="Modern Australian home"
-            loading="lazy"
+            {...cardImageProps(
+              "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=85&w=1800",
+              "Modern Australian home"
+            )}
+            sizes="(max-width: 1200px) 100vw, 1200px"
             className="w-full aspect-[16/9] object-cover rounded-3xl bg-[#FAFAFA]"
           />
 

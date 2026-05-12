@@ -1,8 +1,19 @@
 # Edge Cache Purge
 
-The Cloudflare Worker for listhq.com.au serves the SPA HTML shell from
-Cloudflare's edge cache with a 60s `max-age` + 600s `stale-while-revalidate`
-window. Hashed `/assets/*` files are cached for 1 year (`immutable`).
+> **STATUS — 2026-05-12:** PERF-P2 (edge cache + brotli + SWR) is **code
+> complete, deployment parked.** `listhq.com.au` is currently served
+> directly by Lovable hosting; the Cloudflare Worker in
+> `cloudflare-worker.js` is not on the request path. `X-Cache-Status`
+> headers will not appear in production until activation — see
+> [`docs/CLOUDFLARE-WORKER-ACTIVATION.md`](docs/CLOUDFLARE-WORKER-ACTIVATION.md).
+>
+> The rest of this document describes the cache behaviour and purge flow
+> that becomes available **after** activation.
+
+Once activated, the Cloudflare Worker for listhq.com.au serves the SPA HTML
+shell from Cloudflare's edge cache with a 60s `max-age` + 600s
+`stale-while-revalidate` window. Hashed `/assets/*` files are cached for 1
+year (`immutable`).
 
 In practice this means after Publish → Update:
 

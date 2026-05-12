@@ -1,7 +1,14 @@
-// Cloudflare Worker: listhq-seo-proxy
-// Deploy manually to Cloudflare Workers — not used by Lovable build.
-// Intercepts bot requests and injects property/agent meta tags into HTML.
-// Humans receive the unmodified SPA.
+// Cloudflare Worker: listhq-edge
+// STATUS: Code complete, not yet deployed. Activation requires:
+//   1. Set CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID in GitHub repo secrets
+//   2. Flip listhq.com.au DNS from grey-cloud to orange-cloud (proxied) on Cloudflare
+//   3. Add worker route: listhq.com.au/* → listhq-edge in Cloudflare dashboard
+//   4. Push to main — GHA workflow auto-deploys
+//
+// Runbook: docs/CLOUDFLARE-WORKER-ACTIVATION.md
+// Bumping WORKER_VERSION is the easiest way to confirm a fresh deploy is live.
+
+const WORKER_VERSION = '2026-05-12-edge-cache-v2';
 
 const BOT_PATTERNS = [
   'facebookexternalhit', 'facebot', 'twitterbot', 'linkedinbot',

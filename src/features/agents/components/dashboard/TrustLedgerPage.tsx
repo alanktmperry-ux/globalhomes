@@ -820,7 +820,7 @@ const TrustLedgerPage = () => {
                                       <Download size={12} />
                                     </Button>
                                   </TooltipTrigger>
-                                  <TooltipContent><p className="text-xs">Download Receipt PDF</p></TooltipContent>
+                                  <TooltipContent><p className="text-xs">{t('agent.trust.ledger.downloadReceiptPdf')}</p></TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
                             )}
@@ -837,11 +837,11 @@ const TrustLedgerPage = () => {
             {entriesWithBalance.length > 0 && (
               <div className="flex items-center justify-between mt-3 px-2">
                 <span className="text-xs text-muted-foreground">
-                  {entriesWithBalance.length} entr{entriesWithBalance.length === 1 ? 'y' : 'ies'}
+                  {t(entriesWithBalance.length === 1 ? 'agent.trust.ledger.entries.one' : 'agent.trust.ledger.entries.other', { count: entriesWithBalance.length })}
                 </span>
                 <div className="flex items-center gap-2">
                   <Button size="sm" variant="outline" className="h-7 text-[10px] gap-1" onClick={() => setShowStatement(true)}>
-                    <FileDown size={11} /> Monthly Statement
+                    <FileDown size={11} /> {t('agent.trust.ledger.monthlyStatement')}
                   </Button>
                 </div>
               </div>

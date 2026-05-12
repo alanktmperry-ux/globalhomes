@@ -1,19 +1,22 @@
 import { Clock, Award, Star, MessageSquare } from 'lucide-react';
 import { usePublicAgentPerformance } from '@/features/agents/hooks/usePublicAgentPerformance';
+import { useTranslation } from '@/shared/lib/i18n';
 
 interface Props {
   agentId: string;
 }
 
-function formatTime(hours: number | null) {
-  if (!hours) return null;
-  if (hours < 1) return `${Math.round(hours * 60)} min`;
-  if (hours < 24) return `${hours.toFixed(0)}h`;
-  return `${(hours / 24).toFixed(0)} day${hours >= 48 ? 's' : ''}`;
-}
-
 export function AgentPublicPerformanceCard({ agentId }: Props) {
   const perf = usePublicAgentPerformance(agentId);
+  const { t } = useTranslation();
+
+  function formatTime(hours: number | null) {
+    if (!hours) return null;
+    if (hours < 1) return t('agent.performance.card.minutes', { count: Math.round(hours * 60) });
+    if (hours < 24) return t('agent.performance.card.hours', { count: Math.round(hours) });
+    const days = Math.round(hours / 24);
+    return t(days === 1 ? 'agent.performance.card.days_one' : 'agent.performance.card.days_other', { count: days });
+  }
 
   if (!perf) return null;
   const hasData = perf.sold_listings > 0 || perf.review_count > 0 || perf.avg_response_hours != null;
@@ -23,15 +26,15 @@ export function AgentPublicPerformanceCard({ agentId }: Props) {
 
   return (
     <div className="rounded-2xl border border-border bg-card p-5 mb-8">
-      <h3 className="text-sm font-bold text-foreground mb-4">Performance</h3>
+      <h3 className="text-sm font-bold text-foreground mb-4">{t('agent.performance.card.title')}</h3>
       <div className="grid grid-cols-2 gap-4">
         {timeLabel && (
           <div className="flex items-start gap-2.5">
             <Clock size={16} className="text-primary mt-0.5 shrink-0" />
             <div>
-              <p className="text-xs text-muted-foreground">Response time</p>
+              <p className="text-xs text-muted-foreground">{t('agent.performance.card.responseTime')}</p>
               <p className="text-sm font-semibold text-foreground">
-                Typically replies in {timeLabel}
+                {t('agent.performance.card.repliesIn', { time: timeLabel })}
               </p>
             </div>
           </div>
@@ -40,7 +43,7 @@ export function AgentPublicPerformanceCard({ agentId }: Props) {
           <div className="flex items-start gap-2.5">
             <Award size={16} className="text-primary mt-0.5 shrink-0" />
             <div>
-              <p className="text-xs text-muted-foreground">Properties sold</p>
+              <p className="text-xs text-muted-foreground">{t('agent.performance.card.propertiesSold')}</p>
               <p className="text-sm font-semibold text-foreground">{perf.sold_listings}</p>
             </div>
           </div>
@@ -49,7 +52,7 @@ export function AgentPublicPerformanceCard({ agentId }: Props) {
           <div className="flex items-start gap-2.5">
             <Star size={16} className="text-primary mt-0.5 shrink-0" />
             <div>
-              <p className="text-xs text-muted-foreground">Rating</p>
+              <p className="text-xs text-muted-foreground">{t('agent.performance.card.rating')}</p>
               <div className="flex items-center gap-1">
                 <div className="flex gap-0.5">
                   {[1, 2, 3, 4, 5].map(i => (
@@ -69,7 +72,7 @@ export function AgentPublicPerformanceCard({ agentId }: Props) {
           <div className="flex items-start gap-2.5">
             <MessageSquare size={16} className="text-primary mt-0.5 shrink-0" />
             <div>
-              <p className="text-xs text-muted-foreground">Response rate</p>
+              <p className="text-xs text-muted-foreground">{t('agent.performance.card.responseRate')}</p>
               <p className="text-sm font-semibold text-foreground">
                 {Math.round(perf.response_rate)}%
               </p>
@@ -79,7 +82,7 @@ export function AgentPublicPerformanceCard({ agentId }: Props) {
       </div>
       {perf.active_listings > 0 && (
         <p className="text-xs text-muted-foreground mt-4 pt-3 border-t border-border">
-          {perf.active_listings} active listing{perf.active_listings !== 1 ? 's' : ''}
+          {t(perf.active_listings === 1 ? 'agent.performance.card.activeListings_one' : 'agent.performance.card.activeListings_other', { count: perf.active_listings })}
         </p>
       )}
     </div>

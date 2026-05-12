@@ -1,7 +1,14 @@
-// Cloudflare Worker: listhq-seo-proxy
-// Deploy manually to Cloudflare Workers — not used by Lovable build.
-// Intercepts bot requests and injects property/agent meta tags into HTML.
-// Humans receive the unmodified SPA.
+// Cloudflare Worker: listhq-edge
+// STATUS: Code complete, not yet deployed. Activation requires:
+//   1. Set CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID in GitHub repo secrets
+//   2. Flip listhq.com.au DNS from grey-cloud to orange-cloud (proxied) on Cloudflare
+//   3. Add worker route: listhq.com.au/* → listhq-edge in Cloudflare dashboard
+//   4. Push to main — GHA workflow auto-deploys
+//
+// Runbook: docs/CLOUDFLARE-WORKER-ACTIVATION.md
+// Bumping WORKER_VERSION is the easiest way to confirm a fresh deploy is live.
+
+const WORKER_VERSION = '2026-05-12-edge-cache-v2';
 
 const BOT_PATTERNS = [
   'facebookexternalhit', 'facebot', 'twitterbot', 'linkedinbot',
@@ -275,7 +282,7 @@ async function refreshCacheInBackground(originRequest, cacheKey, cache, env) {
   }
 }
 
-export default {
+const handler = {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const userAgent = request.headers.get('User-Agent') ?? '';
@@ -399,5 +406,16 @@ export default {
       },
     });
     return withSecurityHeaders(botRes, env);
+  },
+};
+
+// Wrapper: stamp X-Worker-Version on every response so a curl -I against
+// listhq.com.au can confirm a fresh worker deploy is actually live.
+export default {
+  async fetch(request, env, ctx) {
+    const res = await handler.fetch(request, env, ctx);
+    const headers = new Headers(res.headers);
+    headers.set('X-Worker-Version', WORKER_VERSION);
+    return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
   },
 };

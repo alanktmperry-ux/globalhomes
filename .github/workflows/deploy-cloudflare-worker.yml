@@ -1,0 +1,58 @@
+name: Deploy Cloudflare Worker
+
+# Sits dormant until CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID are added
+# to repo secrets. See docs/CLOUDFLARE-WORKER-ACTIVATION.md.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudflare-worker.js'
+      - 'wrangler.toml'
+      - '.github/workflows/deploy-cloudflare-worker.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for Cloudflare credentials
+        id: check
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "skipped — secrets not set (CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID missing)"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Node
+        if: steps.check.outputs.skip == 'false'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Deploy to Cloudflare Workers
+        if: steps.check.outputs.skip == 'false'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+
+      - name: Smoke test deploy
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          set -e
+          echo "Confirming X-Worker-Version is live..."
+          for i in 1 2 3 4 5; do
+            VER=$(curl -sI https://listhq.com.au/ | grep -i '^x-worker-version:' || true)
+            if [ -n "$VER" ]; then echo "OK: $VER"; exit 0; fi
+            sleep 5
+          done
+          echo "WARNING: X-Worker-Version not observed yet — DNS route may not be wired."

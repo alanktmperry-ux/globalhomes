@@ -1,0 +1,42 @@
+# Cloudflare Worker config for listhq.com.au edge layer.
+#
+# STATUS: dormant. This file is checked in so activation is one CF dashboard
+# change + two GitHub secrets away — see docs/CLOUDFLARE-WORKER-ACTIVATION.md.
+#
+# Deploy locally:   wrangler deploy
+# Deploy from CI:   .github/workflows/deploy-cloudflare-worker.yml
+
+# Worker script name as it will appear in the Cloudflare dashboard.
+name = "listhq-edge"
+
+# Entry file — single-file worker, no bundler step required.
+main = "cloudflare-worker.js"
+
+# Pin the Workers runtime ABI. Update when you intentionally adopt new APIs.
+compatibility_date = "2026-05-12"
+
+# Enables Node-compat-style globals (URL, TextEncoder, etc. already exist; this
+# is here so future additions like `node:buffer` Just Work without churn).
+compatibility_flags = ["nodejs_compat"]
+
+# Route binding lives in the Cloudflare dashboard (Workers → listhq-edge →
+# Triggers → Routes) rather than here, so DNS activation and code deploy can
+# move independently. When ready, add:
+#   listhq.com.au/*       → listhq-edge
+#   www.listhq.com.au/*   → listhq-edge
+
+# ---------------------------------------------------------------------------
+# Runtime bindings — set the actual values via:
+#   wrangler secret put SUPABASE_URL
+#   wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+#   wrangler secret put APP_ORIGIN
+# Do NOT inline secrets here.
+# ---------------------------------------------------------------------------
+[vars]
+# Non-secret defaults. APP_ORIGIN is the Lovable-hosted origin the worker
+# proxies to once DNS is orange-clouded.
+APP_ORIGIN = "https://listhq.lovable.app"
+
+# Observability: ship console.log output to the CF dashboard's tail UI.
+[observability]
+enabled = true

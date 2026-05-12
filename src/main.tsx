@@ -38,7 +38,7 @@ type IdleWindow = Window & {
 const w = window as IdleWindow;
 const warm = () => {
   import('@/pages/SeekerAuthPage').catch(() => {});
-  import('@/features/properties/pages/PropertiesPage').catch(() => {});
+  import('@/pages/properties/PropertySearchPage').catch(() => {});
   import('@/features/marketing/FeaturedListings').catch(() => {});
 };
 if (typeof w.requestIdleCallback === 'function') {

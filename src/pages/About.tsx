@@ -52,7 +52,7 @@ export default function About() {
     { term: 'Website', def: 'listhq.com.au' },
     { term: t('about.factType'), def: 'SaaS / marketplace' },
     { term: t('about.factMarket'), def: 'Australian residential and commercial real estate' },
-    { term: t('about.factLanguages'), def: '6 (English, Mandarin Simplified, Traditional Chinese, Vietnamese, Korean, Japanese)' },
+    { term: t('about.factLanguages'), def: '30+ buyer languages supported across listings and search' },
     { term: 'Key compliance', def: 'Agents Financial Administration Act 2014 (AFA 2014) trust accounting' },
     { term: 'Core differentiator', def: "Australia's first multilingual real estate platform" },
     { term: 'AI capabilities', def: 'Multilingual listing generation, voice-to-listing transcription' },
@@ -64,7 +64,7 @@ export default function About() {
     <>
       <SEO
         title="About ListHQ — Australia's First Multilingual Real Estate Platform"
-        description="ListHQ is Australia's first multilingual real estate platform. One listing, every language: English, Mandarin, Traditional Chinese, Vietnamese, Korean, and Japanese."
+        description="ListHQ is Australia's multilingual real estate platform — one listing published in every buyer language, built for the 30% of Australians born overseas."
         path="/about"
       />
       <Helmet>
@@ -75,11 +75,7 @@ export default function About() {
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">{t('about.title')}</h1>
 
         <p className="text-lg leading-relaxed text-muted-foreground mb-10">
-          ListHQ (listhq.com.au) is Australia's first multilingual real estate platform, built for agents,
-          property managers, and buyers operating in Australia's multicultural property market. A single
-          listing published on ListHQ automatically appears in every language — English, Mandarin (Simplified),
-          Traditional Chinese, Vietnamese, Korean, and Japanese — without the agent translating a word.
-          ListHQ is a SaaS platform founded in Australia in 2026.
+          ListHQ (listhq.com.au) is Australia's multilingual real estate platform, built for agents, property managers, and buyers operating in Australia's multicultural property market. A single listing published on ListHQ automatically appears in every language — without the agent translating a word. ListHQ is a SaaS platform founded in Australia in 2026.
         </p>
 
         <h2 className="text-2xl font-semibold mt-10 mb-4">{t('about.problem')}</h2>

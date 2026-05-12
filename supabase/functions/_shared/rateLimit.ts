@@ -194,3 +194,24 @@ export async function getUserIdFromRequest(req: Request): Promise<string | null>
     return null;
   }
 }
+
+/**
+ * One-call rate-limit guard. Returns a 429 Response if the caller is over
+ * the limit, otherwise null. Fails open (returns null) on any internal error
+ * so a DB hiccup never takes down an endpoint.
+ */
+export async function enforceRateLimit(
+  req: Request,
+  config: RateLimitConfig,
+  corsHeaders: Record<string, string>,
+): Promise<Response | null> {
+  try {
+    const userId = await getUserIdFromRequest(req);
+    const result = await checkRateLimit(req, config, userId);
+    if (!result.allowed) return rateLimitResponse(result, corsHeaders);
+    return null;
+  } catch (e) {
+    console.error("[rateLimit] check failed, failing open:", e);
+    return null;
+  }
+}

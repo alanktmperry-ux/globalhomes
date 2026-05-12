@@ -6,6 +6,7 @@ import { loadGoogleMapsScript } from '@/shared/lib/googleMapsService';
 import { Loader2, Locate, Search, X, HelpCircle, MapPin } from 'lucide-react';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { useTranslation } from '@/shared/lib/i18n';
 
 
 const TYPE_COLORS: Record<string, string> = {
@@ -59,6 +60,7 @@ export function PropertyMap({
   properties, onPropertySelect, selectedPropertyId, onAreaSearch, centerOn, onMapMoved, onScrollToProperty, formatPrice, onGeolocate,
   hideDrawingTools, hideSearchArea, hideGeolocation, initialZoom, height, schoolMarkers,
 }: PropertyMapProps) {
+  const { t } = useTranslation();
 
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
@@ -177,7 +179,7 @@ export function PropertyMap({
 
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to load map');
+          setError(err instanceof Error ? err.message : t('property.map.loadError'));
           setIsLoading(false);
         }
       }
@@ -524,7 +526,7 @@ export function PropertyMap({
       {isLoading && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background gap-2">
           <Loader2 className="animate-spin text-primary" size={24} />
-          <span className="text-xs text-muted-foreground">Mapping properties…</span>
+          <span className="text-xs text-muted-foreground">{t('property.map.loading')}</span>
         </div>
       )}
       <div ref={mapRef} className="w-full" style={{ height: height ?? '100%' }} />
@@ -538,10 +540,10 @@ export function PropertyMap({
               className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-4 py-2 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated text-sm font-medium text-foreground hover:bg-card transition-colors"
             >
               <Search size={14} className="text-primary" />
-              Search this area
+              {t('property.map.searchThisArea')}
             </button>
           </TooltipTrigger>
-          <TooltipContent>Search for properties visible in this map area</TooltipContent>
+          <TooltipContent>{t('property.map.searchThisAreaTooltip')}</TooltipContent>
         </Tooltip>
       )}
 
@@ -554,10 +556,10 @@ export function PropertyMap({
               className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated text-xs font-medium text-foreground hover:bg-card transition-colors"
             >
               <X size={12} />
-              Clear area
+              {t('property.map.clearArea')}
             </button>
           </TooltipTrigger>
-          <TooltipContent>Remove the drawn area filter and show all properties</TooltipContent>
+          <TooltipContent>{t('property.map.clearAreaTooltip')}</TooltipContent>
         </Tooltip>
       )}
 
@@ -572,8 +574,8 @@ export function PropertyMap({
             </button>
           </TooltipTrigger>
           <TooltipContent side="right" className="max-w-[220px]">
-            <p className="font-medium mb-1">Map drawing tools</p>
-            <p className="text-xs">Use the icons above to draw a <strong>circle</strong> or <strong>polygon</strong> on the map to filter properties within that area. Click and drag to draw.</p>
+            <p className="font-medium mb-1">{t('property.map.drawingToolsTitle')}</p>
+            <p className="text-xs">{t('property.map.drawingToolsBody')}</p>
           </TooltipContent>
         </Tooltip>
       )}
@@ -585,7 +587,7 @@ export function PropertyMap({
             <button
               onClick={handleGeolocate}
               className="absolute bottom-4 left-4 z-20 w-10 h-10 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated flex items-center justify-center hover:bg-card transition-colors"
-              aria-label="Find properties near me"
+              aria-label={t('property.map.geolocateAria')}
             >
               {locating ? (
                 <Loader2 size={16} className="animate-spin text-primary" />
@@ -594,7 +596,7 @@ export function PropertyMap({
               )}
             </button>
           </TooltipTrigger>
-          <TooltipContent>Use your current location to find nearby properties</TooltipContent>
+          <TooltipContent>{t('property.map.geolocateTooltip')}</TooltipContent>
         </Tooltip>
       )}
     </div>

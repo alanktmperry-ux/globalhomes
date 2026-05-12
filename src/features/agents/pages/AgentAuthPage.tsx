@@ -315,6 +315,8 @@ const AgentAuthPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className={s.input}
                   style={s.inputStyle}
+                  name="password"
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"

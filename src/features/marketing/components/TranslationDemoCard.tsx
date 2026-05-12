@@ -45,6 +45,7 @@ const CONTENT: Record<
 };
 
 export function TranslationDemoCard() {
+  const { t } = useTranslation();
   const [active, setActive] = useState<LangKey>('zh');
   const [visible, setVisible] = useState(false);
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -89,7 +90,7 @@ export function TranslationDemoCard() {
               3 bed House · South Melbourne VIC · $1.85M
             </span>
             <span className="shrink-0 inline-flex items-center px-2.5 py-1 rounded-full bg-blue-500 text-white text-[11px] font-semibold">
-              AI Translated
+              {t("marketing.translationDemo.tag")}
             </span>
           </div>
 
@@ -145,7 +146,7 @@ export function TranslationDemoCard() {
         </div>
 
         <p className="text-center text-xs text-slate-500 mt-4">
-          Every listing automatically translated by AI. No agent effort required.
+          {t("marketing.translationDemo.footer")}
         </p>
       </div>
     </section>

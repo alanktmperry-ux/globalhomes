@@ -699,9 +699,9 @@ const Index = () => {
                       >
                         <div style={{ height: 180, background: FALLBACK_GRADIENTS[0], position: 'relative', overflow: 'hidden' }}>
                           {img ? (
-                            <img src={img} alt={p.title || p.address} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <img src={img} alt={p.title || p.address} loading="lazy" decoding="async" width={640} height={480} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                           ) : (
-                            <img src={HOUSE_PLACEHOLDER_SVG} alt="" aria-hidden="true" style={{ width: '100%', height: '100%', objectFit: 'contain', opacity: 0.85 }} />
+                            <img src={HOUSE_PLACEHOLDER_SVG} alt="" aria-hidden="true" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'contain', opacity: 0.85 }} />
                           )}
                           {(p.boost_tier || p.is_featured) && (
                             <span style={{ position: 'absolute', top: 10, left: 10, background: p.boost_tier ? '#f59e0b' : T.blue, color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 100, textTransform: 'uppercase', letterSpacing: '.06em' }}>

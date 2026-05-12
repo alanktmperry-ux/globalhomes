@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Bell, X, Check, CheckCheck, MessageSquare, MousePointerClick, Mic, Zap } from 'lucide-react';
+import { Bell, X, CheckCheck, MessageSquare, MousePointerClick, Mic, Zap } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useViewerLocale } from '@/features/auth/hooks/useViewerLocale';
 import { formatDistanceToNow } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +17,15 @@ interface Notification {
   created_at: string;
   property_id: string | null;
   lead_id: string | null;
+  original_title?: string | null;
+  original_body?: string | null;
+  original_lang?: string | null;
+  translated_titles?: Record<string, string> | null;
+  translated_bodies?: Record<string, string> | null;
+  translation_status?: string | null;
 }
+
+const RTL_LANGS = ['ar', 'fa', 'ur', 'he'];
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
   lead: <MessageSquare size={14} className="text-primary" />,

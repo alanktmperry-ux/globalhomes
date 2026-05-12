@@ -16,7 +16,7 @@ let corsHeaders: Record<string, string> = getCorsHeaders(null);
 type GlossarySupportedLanguage =
   | 'zh_simplified' | 'zh_traditional' | 'vi' | 'ko' | 'ar' | 'hi' | 'bn'
   | 'pa' | 'ta' | 'ja' | 'id' | 'ms' | 'th' | 'tl' | 'it' | 'es' | 'fr'
-  | 'pt' | 'ru' | 'el';
+  | 'pt' | 'ru' | 'el' | 'ne' | 'si' | 'fa' | 'de' | 'tr' | 'ur' | 'mr' | 'te';
 
 type GlossaryEntry = {
   source: string;

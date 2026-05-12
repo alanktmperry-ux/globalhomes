@@ -386,6 +386,7 @@ const AgentAuthPage = () => {
                   placeholder="At least 10 characters"
                   className={s.input}
                   style={s.inputStyle}
+                  name="new-password"
                   autoComplete="new-password"
                 />
                 <button

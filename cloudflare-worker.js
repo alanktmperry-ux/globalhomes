@@ -185,8 +185,95 @@ function withSecurityHeaders(response, env) {
   });
 }
 
+// =============================================================================
+// Edge cache helpers (Cache API + stale-while-revalidate + brotli)
+// =============================================================================
+
+const STRIP_QUERY_PARAMS = [
+  'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content',
+  'fbclid', 'gclid', 'msclkid', '_ga', '_gl', 'mc_cid', 'mc_eid',
+];
+
+const UNCACHEABLE_PREFIXES = ['/api/', '/functions/', '/auth/', '/dashboard', '/admin'];
+
+function isCacheableRequest(request, url) {
+  if (request.method !== 'GET') return false;
+  if (request.headers.get('Authorization')) return false;
+  if (request.headers.get('Cookie')?.includes('sb-')) return false;
+  for (const p of UNCACHEABLE_PREFIXES) if (url.pathname.startsWith(p)) return false;
+  return true;
+}
+
+function buildCacheKey(request) {
+  const cleanUrl = new URL(request.url);
+  for (const p of STRIP_QUERY_PARAMS) cleanUrl.searchParams.delete(p);
+  cleanUrl.searchParams.sort();
+  // Vary by Accept-Encoding so brotli/gzip/identity have separate entries
+  const ae = request.headers.get('Accept-Encoding') || '';
+  const encTag = ae.includes('br') ? 'br' : ae.includes('gzip') ? 'gz' : 'id';
+  cleanUrl.searchParams.set('__enc', encTag);
+  return new Request(cleanUrl.toString(), { method: 'GET', headers: { 'Accept-Encoding': ae } });
+}
+
+function cacheControlFor(url, contentType) {
+  if (contentType.includes('text/html')) {
+    return 'public, max-age=60, s-maxage=60, stale-while-revalidate=600';
+  }
+  if (/\/assets\/[^/]+-[a-zA-Z0-9_-]{6,}\.(js|css|woff2?|ttf|otf)$/.test(url.pathname)) {
+    return 'public, max-age=31536000, immutable';
+  }
+  if (/\.(jpg|jpeg|png|webp|avif|svg|gif|ico)$/.test(url.pathname)) {
+    return 'public, max-age=604800';
+  }
+  return 'public, max-age=300';
+}
+
+async function compressIfHtml(request, response) {
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('text/html') || !response.body) return response;
+  if (response.headers.get('content-encoding')) return response; // already encoded
+  const ae = request.headers.get('Accept-Encoding') || '';
+  let encoding = null;
+  if (ae.includes('br')) encoding = 'br';
+  else if (ae.includes('gzip')) encoding = 'gzip';
+  if (!encoding) return response;
+  let stream;
+  try {
+    stream = response.body.pipeThrough(new CompressionStream(encoding));
+  } catch {
+    return response;
+  }
+  const headers = new Headers(response.headers);
+  headers.set('Content-Encoding', encoding);
+  headers.delete('Content-Length');
+  const prevVary = headers.get('Vary');
+  headers.set('Vary', prevVary && !/accept-encoding/i.test(prevVary) ? `${prevVary}, Accept-Encoding` : 'Accept-Encoding');
+  return new Response(stream, { status: response.status, statusText: response.statusText, headers });
+}
+
+function annotateCache(response, status, age) {
+  const headers = new Headers(response.headers);
+  headers.set('X-Cache-Status', status);
+  if (age != null) headers.set('X-Cache-Age', String(age));
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
+async function refreshCacheInBackground(originRequest, cacheKey, cache, env) {
+  try {
+    const fresh = await fetch(originRequest);
+    if (fresh.status !== 200) return;
+    const ct = fresh.headers.get('content-type') || '';
+    const stored = new Response(fresh.clone().body, fresh);
+    stored.headers.set('Cache-Control', cacheControlFor(new URL(originRequest.url), ct));
+    stored.headers.set('X-Cache-Stored-At', new Date().toUTCString());
+    await cache.put(cacheKey, withSecurityHeaders(stored, env));
+  } catch (err) {
+    console.warn('refreshCache failed', err && err.message);
+  }
+}
+
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const userAgent = request.headers.get('User-Agent') ?? '';
     const SUPABASE_URL = env.SUPABASE_URL;
@@ -213,15 +300,74 @@ export default {
     }
 
     const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
-    if (isBot(userAgent) && checkRateLimit(ip)) {
+    const bot = isBot(userAgent);
+    if (bot && checkRateLimit(ip)) {
       return new Response('Too Many Requests', { status: 429 });
     }
 
-    if (!isBot(userAgent)) {
-      const humanRes = await fetch(request);
-      return withSecurityHeaders(humanRes, env);
+    // -----------------------------------------------------------------------
+    // Human path with edge cache + SWR + brotli
+    // -----------------------------------------------------------------------
+    if (!bot) {
+      const cacheable = isCacheableRequest(request, url);
+      const cache = caches.default;
+
+      if (cacheable) {
+        const cacheKey = buildCacheKey(request);
+        const cached = await cache.match(cacheKey);
+        if (cached) {
+          const storedAt = Date.parse(cached.headers.get('X-Cache-Stored-At') || '') || 0;
+          const ageSec = storedAt ? Math.floor((Date.now() - storedAt) / 1000) : 0;
+          const cc = cached.headers.get('Cache-Control') || '';
+          const maxAge = parseInt(cc.match(/max-age=(\d+)/)?.[1] || '60', 10);
+          const isStale = ageSec > maxAge;
+          if (isStale) {
+            const originRequest = new Request(request.url, { method: 'GET', headers: request.headers });
+            ctx.waitUntil(refreshCacheInBackground(originRequest, cacheKey, cache, env));
+          }
+          console.log(JSON.stringify({ type: 'cache', status: isStale ? 'STALE' : 'HIT', path: url.pathname, age: ageSec }));
+          return annotateCache(cached, isStale ? 'STALE' : 'HIT', ageSec);
+        }
+
+        // MISS — fetch origin, store, compress, return
+        const originRes = await fetch(request);
+        const ct = originRes.headers.get('content-type') || '';
+        const isHtml = ct.includes('text/html');
+
+        if (originRes.status === 200) {
+          // Build the cached copy (uncompressed) with stamped Cache-Control + Stored-At.
+          const cacheCopy = new Response(originRes.clone().body, originRes);
+          cacheCopy.headers.set('Cache-Control', cacheControlFor(url, ct));
+          cacheCopy.headers.set('X-Cache-Stored-At', new Date().toUTCString());
+          const cacheWithSec = withSecurityHeaders(cacheCopy, env);
+          ctx.waitUntil(cache.put(cacheKey, cacheWithSec.clone()));
+
+          // Serve a parallel response (compress HTML before sending to client).
+          let response = new Response(originRes.body, originRes);
+          response.headers.set('Cache-Control', cacheControlFor(url, ct));
+          response = withSecurityHeaders(response, env);
+          response = annotateCache(response, 'MISS', 0);
+          if (isHtml) response = await compressIfHtml(request, response);
+          console.log(JSON.stringify({ type: 'cache', status: 'MISS', path: url.pathname }));
+          return response;
+        }
+
+        // Non-200 — pass through with security headers, no caching
+        return withSecurityHeaders(originRes, env);
+      }
+
+      // Bypass path (auth/dashboard/admin/api) — pass through, never cache
+      const passRes = await fetch(request);
+      const secured = withSecurityHeaders(passRes, env);
+      const headers = new Headers(secured.headers);
+      headers.set('X-Cache-Status', 'BYPASS');
+      headers.set('Cache-Control', 'no-store');
+      return new Response(secured.body, { status: secured.status, statusText: secured.statusText, headers });
     }
 
+    // -----------------------------------------------------------------------
+    // Bot path (SEO meta injection) — unchanged logic, still gets sec headers
+    // -----------------------------------------------------------------------
     const originRes = await fetch(new Request(APP_ORIGIN + url.pathname + url.search, request));
     let html = await originRes.text();
     let injected = '';

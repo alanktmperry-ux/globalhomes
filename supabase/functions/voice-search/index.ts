@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { enforceRateLimit } from "../_shared/rateLimit.ts";
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get("Origin"));
@@ -7,6 +8,15 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const rlBlocked = await enforceRateLimit(req, {
+    endpoint: "voice-search",
+    userMaxPerWindow: 30,
+    ipMaxPerWindow: 10,
+    windowSeconds: 60,
+    punishScrapers: true,
+  }, corsHeaders);
+  if (rlBlocked) return rlBlocked;
 
   try {
     const body = await req.json();

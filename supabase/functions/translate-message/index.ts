@@ -101,6 +101,16 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const { enforceRateLimit } = await import("../_shared/rateLimit.ts");
+  const rlBlocked = await enforceRateLimit(req, {
+    endpoint: "translate-message",
+    userMaxPerWindow: 100,
+    ipMaxPerWindow: 0,
+    windowSeconds: 60,
+    punishScrapers: true,
+  }, corsHeaders);
+  if (rlBlocked) return rlBlocked;
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "method_not_allowed" }), {
       status: 405,

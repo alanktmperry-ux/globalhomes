@@ -12,6 +12,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { translateEmailPayload } from "../_shared/translateEmailPayload.ts";
+import { enforceRateLimit } from "../_shared/rateLimit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -72,6 +73,15 @@ async function waitFor<T>(
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const rlBlocked = await enforceRateLimit(req, {
+    endpoint: "verify-cross-lingual",
+    userMaxPerWindow: 5,
+    ipMaxPerWindow: 0,
+    windowSeconds: 60,
+    punishScrapers: true,
+  }, corsHeaders);
+  if (rlBlocked) return rlBlocked;
 
   const overallStart = Date.now();
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;

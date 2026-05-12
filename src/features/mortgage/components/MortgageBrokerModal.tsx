@@ -101,7 +101,7 @@ export function MortgageBrokerModal({
     });
 
     setSubmitting(false);
-    toast.success('A broker will contact you within 2 hours.');
+    toast.success(t('mortgage.referral.successToast'));
     onOpenChange(false);
   };
 
@@ -109,51 +109,51 @@ export function MortgageBrokerModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Connect with a mortgage broker</DialogTitle>
+          <DialogTitle>{t('mortgage.referral.title')}</DialogTitle>
           <DialogDescription>
-            A licensed broker will help you understand your borrowing power and pre-approval options.
+            {t('mortgage.referral.description')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <Label htmlFor="mb-name">Full name</Label>
+            <Label htmlFor="mb-name">{t('mortgage.referral.fullName')}</Label>
             <Input id="mb-name" value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
           <div>
-            <Label htmlFor="mb-email">Email</Label>
+            <Label htmlFor="mb-email">{t('mortgage.referral.email')}</Label>
             <Input id="mb-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <div>
-            <Label htmlFor="mb-phone">Phone</Label>
+            <Label htmlFor="mb-phone">{t('mortgage.referral.phone')}</Label>
             <Input id="mb-phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required />
           </div>
           <div>
-            <Label htmlFor="mb-price">Purchase price (AUD)</Label>
+            <Label htmlFor="mb-price">{t('mortgage.referral.purchasePrice')}</Label>
             <Input
               id="mb-price"
               type="number"
               inputMode="numeric"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              placeholder="e.g. 850000"
+              placeholder={t('mortgage.referral.purchasePricePlaceholder')}
             />
           </div>
           <div>
-            <Label htmlFor="mb-timeframe">Timeframe</Label>
+            <Label htmlFor="mb-timeframe">{t('mortgage.referral.timeframe')}</Label>
             <Select value={timeframe} onValueChange={(v) => setTimeframe(v as any)}>
               <SelectTrigger id="mb-timeframe"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="buying_now">Buying now</SelectItem>
-                <SelectItem value="within_3_months">Within 3 months</SelectItem>
-                <SelectItem value="just_researching">Just researching</SelectItem>
+                <SelectItem value="buying_now">{t('mortgage.referral.timeframe.buyingNow')}</SelectItem>
+                <SelectItem value="within_3_months">{t('mortgage.referral.timeframe.within3Months')}</SelectItem>
+                <SelectItem value="just_researching">{t('mortgage.referral.timeframe.justResearching')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <p className="text-[11px] text-muted-foreground leading-relaxed">
-            By submitting, you agree to be contacted by a licensed mortgage broker. ListHQ may receive a referral fee.
+            {t('mortgage.referral.consent')}
           </p>
           <Button type="submit" disabled={submitting} className="w-full">
-            {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Submitting…</> : 'Connect me with a broker'}
+            {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('common.buttons.submitting')}</> : t('mortgage.referral.submit')}
           </Button>
         </form>
       </DialogContent>

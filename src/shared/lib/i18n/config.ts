@@ -38,6 +38,9 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'tr',    name: 'Türkçe' },
   { code: 'de',    name: 'Deutsch' },
   { code: 'el',    name: 'Ελληνικά' },
+  { code: 'ur',    name: 'اردو · Urdu' },
+  { code: 'mr',    name: 'मराठी · Marathi' },
+  { code: 'te',    name: 'తెలుగు · Telugu' },
 ] as const;
 
 export type SupportedLanguageCode = typeof SUPPORTED_LANGUAGES[number]['code'];
@@ -78,6 +81,9 @@ export const LEGACY_CODE_MAP: Record<SupportedLanguageCode, string> = {
   'tr':    'tr' as any,
   'de':    'de' as any,
   'el':    'el' as any,
+  'ur':    'ur' as any,
+  'mr':    'mr' as any,
+  'te':    'te' as any,
 };
 
 export const FROM_LEGACY_CODE_MAP: Record<string, SupportedLanguageCode> = {
@@ -108,4 +114,7 @@ export const FROM_LEGACY_CODE_MAP: Record<string, SupportedLanguageCode> = {
   'tr':    'tr' as SupportedLanguageCode,
   'de':    'de' as SupportedLanguageCode,
   'el':    'el' as SupportedLanguageCode,
+  'ur':    'ur' as SupportedLanguageCode,
+  'mr':    'mr' as SupportedLanguageCode,
+  'te':    'te' as SupportedLanguageCode,
 };

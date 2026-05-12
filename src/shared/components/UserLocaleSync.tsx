@@ -17,7 +17,7 @@ const LOCALE_TO_LANGUAGE: Record<string, Language> = {
  * a user who set Mandarin 6 months ago sees the platform in Mandarin on every
  * new device immediately after login.
  */
-export function UserLocaleSync() {
+export function UserLocaleSync(): null {
   const { user } = useAuth();
   const { setLanguage } = useI18n();
 

@@ -1483,9 +1483,9 @@ export const en = {
   // Phase 1B-3: Property Search page
   // ──────────────────────────────────────────────────────────────────
   'propertySearch.metaTitle': 'Browse properties | ListHQ',
-  'propertySearch.metaDesc': 'Browse properties listed by ListHQ agents — available in 10 languages.',
+  'propertySearch.metaDesc': 'Browse properties listed by ListHQ agents — available in 30+ languages.',
   'propertySearch.heading': 'Find your next home',
-  'propertySearch.subheading': 'Browse properties listed by ListHQ agents — available in 10 languages.',
+  'propertySearch.subheading': 'Browse properties listed by ListHQ agents — available in 30+ languages.',
   'propertySearch.createHaloCta': 'Create a Halo →',
   'propertySearch.filter.suburbPlaceholder': 'Suburb or address...',
   'propertySearch.filter.buyOrRent': 'Buy or rent',

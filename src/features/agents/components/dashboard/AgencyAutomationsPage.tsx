@@ -15,6 +15,7 @@ import { Plus, Trash2, Loader2, AlertTriangle, Play } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { logAction } from '@/shared/lib/auditLog';
+import { useTranslation } from '@/shared/lib/i18n';
 
 type TriggerType =
   | 'lead_going_cold'

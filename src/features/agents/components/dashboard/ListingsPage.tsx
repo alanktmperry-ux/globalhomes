@@ -22,6 +22,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { usePageTitle } from '@/lib/usePageTitle';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 function ListingsSkeleton() {
   return (

@@ -215,7 +215,7 @@ const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect, addA
                         <p className="text-[10px] text-muted-foreground"> {c.suburb}{c.state ? `, ${c.state}` : ''}</p>
                       )}
                       {pipelineType === 'buyer' && c.budget_max && (
-                        <p className="text-[10px] text-primary font-semibold mt-0.5"> up to {AUD.format(c.budget_max)}</p>
+                        <p className="text-[10px] text-primary font-semibold mt-0.5"> {t('agent.crm.budget.upTo', { amount: AUD.format(c.budget_max) })}</p>
                       )}
                       {pipelineType === 'seller' && c.estimated_value && (
                         <p className="text-[10px] text-primary font-semibold mt-0.5"> {AUD.format(c.estimated_value)}</p>
@@ -232,7 +232,7 @@ const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect, addA
                 })}
                 {stageContacts.length === 0 && (
                   <p className="text-[10px] text-muted-foreground text-center py-6">
-                    {hasActiveFilters ? 'No matches' : 'Drop contacts here'}
+                    {hasActiveFilters ? t('agent.crm.pipeline.noMatches') : t('agent.crm.pipeline.dropHere')}
                   </p>
                 )}
               </div>

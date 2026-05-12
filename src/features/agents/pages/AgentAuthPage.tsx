@@ -429,19 +429,20 @@ const AgentAuthPage = () => {
             >
               {emailSubmitting
                 ? <><AuthSpinner /> Sending confirmation…</>
-                : 'Continue — confirm my email'}
+                : 'Start free trial'}
             </button>
           </form>
 
           <p className={s.footer} style={s.footerStyle}>
             Already have an account?
-            <button
-              type="button"
-              onClick={() => { setStep('email'); setRegEmail(''); setFormError(null); }}
-              className={`${s.link} ml-1`}
-            >
-              Sign in
-            </button>
+            <Link to="/agents/login" className={`${s.link} ml-1`}>
+              Sign in →
+            </Link>
+          </p>
+          <p className="text-center text-sm font-light mt-2" style={s.footerStyle}>
+            <Link to="/signup" className={s.link}>
+              I'm a buyer, not an agent →
+            </Link>
           </p>
         </>
       )}

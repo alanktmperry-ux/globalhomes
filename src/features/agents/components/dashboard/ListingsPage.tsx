@@ -471,6 +471,7 @@ const StatusTabs = ({
 const ARCHIVED_STATUSES = new Set(['sold', 'leased']);
 
 const ListingsPage = () => {
+  const { t } = useTranslation();
   usePageTitle('My Listings');
   const navigate = useNavigate();
   const sub = useSubscription();

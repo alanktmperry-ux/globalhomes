@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import DashboardHeader from './DashboardHeader';
+import { useTranslation } from '@/shared/lib/i18n';
 import TrustReceiptModal from './TrustReceiptModal';
 import TrustStatementModal from './TrustStatementModal';
 import { supabase } from '@/integrations/supabase/client';
@@ -95,6 +96,7 @@ interface TrustEntry {
 }
 
 const TrustLedgerPage = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [receipts, setReceipts] = useState<TrustReceipt[]>([]);
   const [payments, setPayments] = useState<TrustPayment[]>([]);
@@ -633,7 +635,7 @@ const TrustLedgerPage = () => {
   if (loading) {
     return (
       <div>
-        <DashboardHeader title="Trust Ledger" subtitle="Receipts & payments register" />
+        <DashboardHeader title={t('agent.trust.ledger.title')} subtitle={t('agent.trust.ledger.subtitle')} />
         <div className="p-6 text-center text-muted-foreground">Loading…</div>
       </div>
     );

@@ -17,6 +17,7 @@ import { Wrench, Loader2, Copy, ChevronDown, ChevronUp, CheckCircle2 } from 'luc
 import { toast } from 'sonner';
 import { format, parseISO, differenceInDays } from 'date-fns';
 import DashboardHeader from './DashboardHeader';
+import { useTranslation } from '@/shared/lib/i18n';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 });
 
@@ -70,6 +71,7 @@ const priorityBadge = (p: string) => (
 );
 
 export default function MaintenancePage() {
+  const { t } = useTranslation();
   const agentId = useAgentId();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -176,7 +178,7 @@ export default function MaintenancePage() {
           </>
         )}
       </nav>
-      <DashboardHeader title="Maintenance" subtitle="All maintenance jobs across your managed properties." />
+      <DashboardHeader title={t('agent.pm.maintenance.title')} subtitle={t('agent.pm.maintenance.subtitle')} />
 
       <div className="flex items-center gap-2 flex-wrap">
         <Select value={statusFilter} onValueChange={setStatusFilter}>

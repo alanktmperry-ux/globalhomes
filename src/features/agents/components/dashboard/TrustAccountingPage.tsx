@@ -20,6 +20,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import DashboardHeader from './DashboardHeader';
+import { useTranslation } from '@/shared/lib/i18n';
 import TrustImportWizard from './TrustImportWizard';
 import RentRollMigrationWizard from './RentRollMigrationWizard';
 import TrustReceiptModal from './TrustReceiptModal';
@@ -52,6 +53,7 @@ const STATUS_MAP: Record<string, { variant: 'default' | 'secondary' | 'outline' 
 };
 
 const TrustAccountingPage = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { canAccessTrust, loading: subLoading } = useSubscription();
   const {
@@ -484,7 +486,7 @@ const TrustAccountingPage = () => {
   if (loading) {
     return (
       <div>
-        <DashboardHeader title="Trust Dashboard" subtitle="Australian trust account management" />
+        <DashboardHeader title={t('agent.trust.dashboardTitle')} subtitle={t('agent.trust.dashboardSubtitle')} />
         <div className="p-6 text-center text-muted-foreground">Loading…</div>
       </div>
     );
@@ -500,7 +502,7 @@ const TrustAccountingPage = () => {
   if (showImportWizard) {
     return (
       <div>
-        <DashboardHeader title="Trust Dashboard" subtitle="Import existing trust account" />
+        <DashboardHeader title={t('agent.trust.dashboardTitle')} subtitle={t('agent.trust.importSubtitle')} />
         <div className="p-4 sm:p-6">
           <TrustImportWizard
             onComplete={() => { setShowImportWizard(false); fetchAccounts(); fetchTransactions(); }}
@@ -514,7 +516,7 @@ const TrustAccountingPage = () => {
   if (showRentRollWizard) {
     return (
       <div>
-        <DashboardHeader title="Trust Dashboard" subtitle="Migrate full rent roll from another system" />
+        <DashboardHeader title={t('agent.trust.dashboardTitle')} subtitle={t('agent.trust.migrateSubtitle')} />
         <div className="p-4 sm:p-6">
           <RentRollMigrationWizard
             onComplete={() => { setShowRentRollWizard(false); fetchAccounts(); fetchTransactions(); }}

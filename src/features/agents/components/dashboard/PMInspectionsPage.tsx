@@ -39,6 +39,7 @@ import {
   isSameDay, isSameMonth,
 } from 'date-fns';
 import DashboardHeader from './DashboardHeader';
+import { useTranslation } from '@/shared/lib/i18n';
 import { cn } from '@/shared/lib/utils';
 
 type InspectionType = 'entry' | 'routine' | 'exit';
@@ -175,6 +176,7 @@ interface PlannedInspection {
 }
 
 export default function PMInspectionsPage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [agentId, setAgentId] = useState<string | null>(null);
@@ -695,8 +697,8 @@ ${agencyName || ''}`.trim();
   return (
     <div className="min-h-screen bg-background">
       <DashboardHeader
-        title="Routine Inspections"
-        subtitle="Schedule, track and record property inspections"
+        title={t('agent.pm.inspections.title')}
+        subtitle={t('agent.pm.inspections.subtitle')}
       />
 
       <div className="px-4 sm:px-6 py-6 max-w-7xl mx-auto space-y-6">

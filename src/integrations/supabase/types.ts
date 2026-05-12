@@ -9193,6 +9193,7 @@ export type Database = {
           full_name: string | null
           id: string
           language_preference: string | null
+          locale: string
           onboarded: boolean | null
           onboarding_steps_completed: Json | null
           pending_role_request: string | null
@@ -9225,6 +9226,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           language_preference?: string | null
+          locale?: string
           onboarded?: boolean | null
           onboarding_steps_completed?: Json | null
           pending_role_request?: string | null
@@ -9257,6 +9259,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           language_preference?: string | null
+          locale?: string
           onboarded?: boolean | null
           onboarding_steps_completed?: Json | null
           pending_role_request?: string | null

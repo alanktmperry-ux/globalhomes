@@ -261,10 +261,10 @@ const IdleTimeoutWatcher = (): null => {
   return null;
 };
 
-/** Redirects /search?q=foo to /?q=foo so shared/bookmarked search URLs don't 404 */
+/** Redirects /search?q=foo to /buy?q=foo so shared/bookmarked search URLs land on results */
 function SearchRedirect() {
   const { search } = useLocation();
-  return <Navigate to={`/${search}`} replace />;
+  return <Navigate to={`/buy${search}`} replace />;
 }
 
 /** Redirects /property/:id to /properties/:id so old bookmarks/shares don't 404 */

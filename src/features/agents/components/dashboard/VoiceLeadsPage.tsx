@@ -174,7 +174,7 @@ const VoiceLeadsPage = () => {
 
   return (
     <div>
-      <DashboardHeader title="Voice Leads" subtitle={`${leads.length} inquiries from voice searches`} />
+      <DashboardHeader title={t('agent.voiceListing.pageTitle')} subtitle={t('agent.voiceListing.pageSubtitle', { count: leads.length })} />
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
@@ -189,8 +189,8 @@ const VoiceLeadsPage = () => {
               <EmptyState
                 variant="compact"
                 icon="solar:microphone-linear"
-                title="No voice enquiries yet"
-                body="Buyers who search by voice in any language land here automatically."
+                title={t('agent.voiceListing.empty.title')}
+                body={t('agent.voiceListing.empty.body')}
               />
             )}
             {leads.map((lead) => {

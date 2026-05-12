@@ -50,7 +50,7 @@ const PrivacyPage = () => {
           <div className="prose prose-neutral max-w-none">
             <section id="introduction">
               <h2>1. Introduction</h2>
-              <p>ListHQ Pty Ltd is committed to protecting your privacy in accordance with the Australian <em>Privacy Act 1988</em> (Cth) and the Australian Privacy Principles (APPs). This policy also addresses obligations under the GDPR for users in the European Union and equivalent international privacy laws.</p>
+              <p>Square Development Pty Ltd (trading as ListHQ) is committed to protecting your privacy in accordance with the Australian <em>Privacy Act 1988</em> (Cth) and the Australian Privacy Principles (APPs). This policy also addresses obligations under the GDPR for users in the European Union and equivalent international privacy laws.</p>
             </section>
 
             <section id="collect">

@@ -106,6 +106,15 @@ function i18nLangToListingLang(lang: Language | string): LanguageKey {
     case 'fil':
     case 'tl':    return 'tl';
     case 'id':    return 'id';
+    case 'pa':    return 'pa';
+    case 'ta':    return 'ta';
+    case 'ms':    return 'ms';
+    case 'th':    return 'th';
+    case 'ne':    return 'ne';
+    case 'el':    return 'el';
+    case 'it':    return 'it';
+    case 'es':    return 'es';
+    case 'fa':    return 'fa';
     default:      return 'en';
   }
 }

@@ -28,6 +28,11 @@ import { fil } from './locales/fil';
 import { ru } from './locales/ru';
 import { ne } from './locales/ne';
 import { pl } from './locales/pl';
+import { zh } from './locales/zh';
+import { ja } from './locales/ja';
+import { tr } from './locales/tr';
+import { de } from './locales/de';
+import { el } from './locales/el';
 import {
   FROM_LEGACY_CODE_MAP,
   type SupportedLanguageCode,

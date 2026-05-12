@@ -1,71 +1,88 @@
 /**
  * useTranslation — canonical i18n hook.
  *
- * Returns the same surface as the legacy useI18n() ({ language, setLanguage, t })
- * so it's a drop-in replacement, but resolves translations via the new
- * per-locale dictionaries first, falling back to en.ts and then the legacy
- * translation table.
+ * Returns { language, setLanguage, t, canonical } as before, but locale
+ * dictionaries (other than English, which is the always-loaded fallback)
+ * are loaded on demand via dynamic import() so they ship as their own
+ * code-split chunks instead of bloating the initial bundle.
  */
+import { useEffect, useState } from 'react';
 import { useI18n } from './legacy-core';
 import { en, type TranslationKey } from './locales/en';
-import { zhCN } from './locales/zh-CN';
-import { zhTW } from './locales/zh-TW';
-import { hi } from './locales/hi';
-import { bn } from './locales/bn';
-import { vi } from './locales/vi';
-import { ko } from './locales/ko';
-import { ar } from './locales/ar';
-import { pa } from './locales/pa';
-import { ta } from './locales/ta';
-import { es } from './locales/es';
-import { fr } from './locales/fr';
-import { pt } from './locales/pt';
-import { it } from './locales/it';
-import { id } from './locales/id';
-import { ms } from './locales/ms';
-import { th } from './locales/th';
-import { fil } from './locales/fil';
-import { ru } from './locales/ru';
-import { ne } from './locales/ne';
-import { pl } from './locales/pl';
-import { zh } from './locales/zh';
-import { ja } from './locales/ja';
-import { tr } from './locales/tr';
-import { de } from './locales/de';
-import { el } from './locales/el';
 import {
   FROM_LEGACY_CODE_MAP,
   type SupportedLanguageCode,
 } from './config';
 
-const LOCALES: Partial<Record<SupportedLanguageCode, Record<string, string>>> = {
-  'en': en,
-  'zh-CN': zhCN,
-  'zh-TW': zhTW,
-  'hi': hi,
-  'bn': bn,
-  'vi': vi,
-  'ko': ko,
-  'ar': ar,
-  'pa': pa,
-  'ta': ta,
-  'es': es,
-  'fr': fr,
-  'pt': pt,
-  'it': it,
-  'id': id,
-  'ms': ms,
-  'th': th,
-  'fil': fil,
-  'ru': ru,
-  'ne': ne as any,
-  'pl': pl as any,
-  'zh': zh as any,
-  'ja': ja as any,
-  'tr': tr as any,
-  'de': de as any,
-  'el': el as any,
+type LocaleDict = Record<string, string>;
+
+const loaders: Partial<Record<SupportedLanguageCode, () => Promise<unknown>>> = {
+  'zh-CN': () => import('./locales/zh-CN'),
+  'zh-TW': () => import('./locales/zh-TW'),
+  'hi':    () => import('./locales/hi'),
+  'bn':    () => import('./locales/bn'),
+  'vi':    () => import('./locales/vi'),
+  'ko':    () => import('./locales/ko'),
+  'ar':    () => import('./locales/ar'),
+  'pa':    () => import('./locales/pa'),
+  'ta':    () => import('./locales/ta'),
+  'es':    () => import('./locales/es'),
+  'fr':    () => import('./locales/fr'),
+  'pt':    () => import('./locales/pt'),
+  'it':    () => import('./locales/it'),
+  'id':    () => import('./locales/id'),
+  'ms':    () => import('./locales/ms'),
+  'th':    () => import('./locales/th'),
+  'fil':   () => import('./locales/fil'),
+  'ru':    () => import('./locales/ru'),
+  'ne':    () => import('./locales/ne'),
+  'pl':    () => import('./locales/pl'),
+  'zh':    () => import('./locales/zh'),
+  'ja':    () => import('./locales/ja'),
+  'tr':    () => import('./locales/tr'),
+  'de':    () => import('./locales/de'),
+  'el':    () => import('./locales/el'),
 };
+
+const cache: Partial<Record<SupportedLanguageCode, LocaleDict>> = { en: en as LocaleDict };
+const pending = new Map<SupportedLanguageCode, Promise<void>>();
+const subscribers = new Set<() => void>();
+
+function notify() {
+  for (const s of subscribers) s();
+}
+
+function pickDict(mod: unknown): LocaleDict | undefined {
+  if (!mod || typeof mod !== 'object') return undefined;
+  const m = mod as Record<string, unknown>;
+  if (m.default && typeof m.default === 'object') return m.default as LocaleDict;
+  for (const v of Object.values(m)) {
+    if (v && typeof v === 'object' && !Array.isArray(v)) return v as LocaleDict;
+  }
+  return undefined;
+}
+
+export function ensureLocaleLoaded(code: SupportedLanguageCode): Promise<void> {
+  if (cache[code]) return Promise.resolve();
+  const existing = pending.get(code);
+  if (existing) return existing;
+  const loader = loaders[code];
+  if (!loader) return Promise.resolve();
+  const p = loader()
+    .then((mod) => {
+      const dict = pickDict(mod);
+      if (dict) cache[code] = dict;
+      pending.delete(code);
+      notify();
+    })
+    .catch((err) => {
+      pending.delete(code);
+      // eslint-disable-next-line no-console
+      console.error('[i18n] Failed to load locale', code, err);
+    });
+  pending.set(code, p);
+  return p;
+}
 
 type AnyKey = TranslationKey | (string & {});
 
@@ -73,16 +90,32 @@ export function useTranslation() {
   const { language, setLanguage, t: legacyT } = useI18n();
   const canonical: SupportedLanguageCode = FROM_LEGACY_CODE_MAP[language] ?? 'en';
 
+  // Subscribe to locale-cache updates so this hook re-renders when the
+  // active locale finishes loading.
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const fn = () => setTick((x) => x + 1);
+    subscribers.add(fn);
+    return () => {
+      subscribers.delete(fn);
+    };
+  }, []);
+
+  // Kick off the dynamic import if we don't have the active locale yet.
+  if (canonical !== 'en' && !cache[canonical] && loaders[canonical]) {
+    void ensureLocaleLoaded(canonical);
+  }
+
   const t = (key: AnyKey, vars?: Record<string, string | number>): string => {
     let value: string | undefined;
 
-    // 1. New locale dictionary for active language
-    const dict = LOCALES[canonical];
+    // 1. Active language dictionary (if loaded)
+    const dict = cache[canonical];
     if (dict && typeof dict[key as string] === 'string') {
       value = dict[key as string];
     }
 
-    // 2. English base (en.ts)
+    // 2. English base (en.ts) — always available
     if (value === undefined && key in en) {
       value = (en as Record<string, string>)[key as string];
     }
@@ -100,7 +133,7 @@ export function useTranslation() {
 
     if (vars) {
       return value.replace(/\{(\w+)\}/g, (_, name) =>
-        name in vars ? String(vars[name]) : `{${name}}`
+        name in vars ? String(vars[name]) : `{${name}}`,
       );
     }
     return value;

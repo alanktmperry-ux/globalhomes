@@ -18,8 +18,7 @@ export {
   type SupportedLanguageCode,
 } from './config';
 export { en, type TranslationKey } from './locales/en';
-export { zhCN } from './locales/zh-CN';
-export { zhTW } from './locales/zh-TW';
+export { ensureLocaleLoaded } from './useTranslation';
 
 // Legacy-compat exports (provider, types). useI18n is internal; prefer
 // useTranslation() from this module.

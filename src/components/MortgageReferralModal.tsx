@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { z } from 'zod';
+import { useTranslation } from '@/shared/lib/i18n';
 
 const schema = z.object({
   name: z.string().trim().min(1, 'Name is required').max(100),
@@ -32,6 +33,7 @@ export function MortgageReferralModal({
   propertyId,
   purchasePrice,
 }: MortgageReferralModalProps) {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -79,7 +81,7 @@ export function MortgageReferralModal({
 
     if (error) {
       setSubmitting(false);
-      toast.error('Could not submit. Please try again.');
+      toast.error(t('common.errors.couldNotSubmit'));
       return;
     }
 
@@ -104,7 +106,7 @@ export function MortgageReferralModal({
     });
 
     setSubmitting(false);
-    toast.success('A broker will contact you within 2 hours');
+    toast.success(t('mortgage.referral.successToast'));
     onOpenChange(false);
   };
 
@@ -112,48 +114,48 @@ export function MortgageReferralModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Connect with a mortgage broker</DialogTitle>
+          <DialogTitle>{t('mortgage.referral.title')}</DialogTitle>
           <DialogDescription>
-            A licensed broker will help you understand your borrowing power and pre-approval options.
+            {t('mortgage.referral.description')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <Label htmlFor="mr-name">Full name</Label>
+            <Label htmlFor="mr-name">{t('mortgage.referral.fullName')}</Label>
             <Input id="mr-name" value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
           <div>
-            <Label htmlFor="mr-email">Email</Label>
+            <Label htmlFor="mr-email">{t('mortgage.referral.email')}</Label>
             <Input id="mr-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <div>
-            <Label htmlFor="mr-phone">Phone</Label>
+            <Label htmlFor="mr-phone">{t('mortgage.referral.phone')}</Label>
             <Input id="mr-phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required />
           </div>
           <div>
-            <Label htmlFor="mr-price">Purchase price (AUD)</Label>
+            <Label htmlFor="mr-price">{t('mortgage.referral.purchasePrice')}</Label>
             <Input
               id="mr-price"
               type="number"
               inputMode="numeric"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              placeholder="e.g. 850000"
+              placeholder={t('mortgage.referral.purchasePricePlaceholder')}
             />
           </div>
           <div>
-            <Label htmlFor="mr-timeframe">Timeframe</Label>
+            <Label htmlFor="mr-timeframe">{t('mortgage.referral.timeframe')}</Label>
             <Select value={timeframe} onValueChange={(v) => setTimeframe(v as typeof timeframe)}>
               <SelectTrigger id="mr-timeframe"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="buying_now">Buying now</SelectItem>
-                <SelectItem value="within_3_months">Within 3 months</SelectItem>
-                <SelectItem value="just_researching">Just researching</SelectItem>
+                <SelectItem value="buying_now">{t('mortgage.referral.timeframe.buyingNow')}</SelectItem>
+                <SelectItem value="within_3_months">{t('mortgage.referral.timeframe.within3Months')}</SelectItem>
+                <SelectItem value="just_researching">{t('mortgage.referral.timeframe.justResearching')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <p className="text-[11px] text-muted-foreground leading-relaxed">
-            By submitting, you agree to be contacted by a licensed mortgage broker. ListHQ may receive a referral fee.
+            {t('mortgage.referral.consent')}
           </p>
           <label className="flex items-start gap-2 text-xs text-foreground cursor-pointer">
             <input
@@ -163,14 +165,14 @@ export function MortgageReferralModal({
               className="mt-0.5 h-4 w-4 shrink-0 rounded border-input accent-primary"
             />
             <span className="leading-relaxed">
-              I understand that ListHQ may receive a referral fee from a broker or lender if I proceed with a loan. ListHQ is not a licensed credit adviser and is not providing financial or credit advice.
+              {t('mortgage.referral.acknowledgement')}
             </span>
           </label>
           <Button type="submit" disabled={submitting || !acknowledged} className="w-full">
             {submitting ? (
-              <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Submitting…</>
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('common.buttons.submitting')}</>
             ) : (
-              'Connect me with a broker'
+              t('mortgage.referral.submit')
             )}
           </Button>
         </form>

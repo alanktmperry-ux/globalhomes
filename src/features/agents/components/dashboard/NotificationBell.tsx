@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Bell, X, Check, CheckCheck, MessageSquare, MousePointerClick, Mic, Zap } from 'lucide-react';
+import { Bell, X, CheckCheck, MessageSquare, MousePointerClick, Mic, Zap } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useViewerLocale } from '@/features/auth/hooks/useViewerLocale';
 import { formatDistanceToNow } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +17,15 @@ interface Notification {
   created_at: string;
   property_id: string | null;
   lead_id: string | null;
+  original_title?: string | null;
+  original_body?: string | null;
+  original_lang?: string | null;
+  translated_titles?: Record<string, string> | null;
+  translated_bodies?: Record<string, string> | null;
+  translation_status?: string | null;
 }
+
+const RTL_LANGS = ['ar', 'fa', 'ur', 'he'];
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
   lead: <MessageSquare size={14} className="text-primary" />,
@@ -31,6 +40,7 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
 export function NotificationBell() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const viewerLocale = useViewerLocale();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [agentId, setAgentId] = useState<string | null>(null);
@@ -74,6 +84,15 @@ export function NotificationBell() {
         { event: 'INSERT', schema: 'public', table: 'notifications', filter: `agent_id=eq.${agentId}` },
         (payload) => {
           setNotifications((prev) => [payload.new as Notification, ...prev].slice(0, 20));
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'notifications', filter: `agent_id=eq.${agentId}` },
+        (payload) => {
+          setNotifications((prev) => prev.map((n) =>
+            n.id === (payload.new as Notification).id ? { ...n, ...(payload.new as Notification) } : n
+          ));
         }
       )
       .on(
@@ -175,36 +194,50 @@ export function NotificationBell() {
                     body="We'll let you know when something needs your attention."
                   />
                 ) : (
-                  notifications.map((n) => (
-                    <button
-                      key={n.id}
-                      type="button"
-                      className={`w-full text-left px-4 py-3 border-b border-border/50 last:border-0 cursor-pointer hover:bg-secondary/50 transition-colors ${
-                        !n.is_read ? 'bg-primary/5' : ''
-                      }`}
-                      onClick={() => handleNotificationClick(n)}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0 mt-0.5">
-                          {TYPE_ICON[n.type] || <Bell size={14} />}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className={`text-xs font-medium truncate ${!n.is_read ? 'text-foreground' : 'text-muted-foreground'}`}>
-                              {n.title}
-                            </p>
-                            {!n.is_read && <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />}
+                  notifications.map((n) => {
+                    const tTitle = n.translated_titles?.[viewerLocale];
+                    const tBody = n.translated_bodies?.[viewerLocale];
+                    const displayTitle = tTitle || n.original_title || n.title;
+                    const displayBody = tBody || n.original_body || n.message;
+                    const isTranslated = !!(n.original_lang && n.original_lang !== viewerLocale && (tTitle || tBody));
+                    const isTranslating = n.translation_status === 'pending' || n.translation_status === 'translating';
+                    const dir = RTL_LANGS.includes(viewerLocale) ? 'rtl' : 'ltr';
+                    return (
+                      <button
+                        key={n.id}
+                        type="button"
+                        dir={dir}
+                        className={`w-full text-left px-4 py-3 border-b border-border/50 last:border-0 cursor-pointer hover:bg-secondary/50 transition-colors ${
+                          !n.is_read ? 'bg-primary/5' : ''
+                        }`}
+                        onClick={() => handleNotificationClick(n)}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0 mt-0.5">
+                            {TYPE_ICON[n.type] || <Bell size={14} />}
                           </div>
-                          {n.message && (
-                            <p className="text-[11px] text-muted-foreground truncate mt-0.5">{n.message}</p>
-                          )}
-                          <p className="text-[10px] text-muted-foreground/60 mt-1">
-                            {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
-                          </p>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className={`text-xs font-medium truncate ${!n.is_read ? 'text-foreground' : 'text-muted-foreground'}`}>
+                                {displayTitle}
+                              </p>
+                              {isTranslated && (
+                                <span className="text-[10px] opacity-60 shrink-0" title={`Translated from ${n.original_lang}`}>🌐</span>
+                              )}
+                              {!n.is_read && <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />}
+                            </div>
+                            {displayBody && (
+                              <p className="text-[11px] text-muted-foreground truncate mt-0.5">{displayBody}</p>
+                            )}
+                            <p className="text-[10px] text-muted-foreground/60 mt-1">
+                              {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
+                              {isTranslating && <span className="ml-1 animate-pulse">· translating…</span>}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </button>
-                  ))
+                      </button>
+                    );
+                  })
                 )}
               </div>
 

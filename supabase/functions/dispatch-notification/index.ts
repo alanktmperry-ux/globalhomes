@@ -117,6 +117,11 @@ Deno.serve(async (req) => {
           message: input.message ?? null,
           property_id: input.property_id ?? null,
           lead_id: input.lead_id ?? null,
+          // Cross-lingual translation fields — translate-notification trigger fires on insert
+          original_title: input.title,
+          original_body: input.message ?? "",
+          original_lang: "en",
+          translation_status: "pending",
         }).select("id").maybeSingle();
         if (error) { results.in_app = `error:${error.message}`; }
         else {

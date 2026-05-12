@@ -59,6 +59,10 @@ Deno.serve(async (req) => {
               type: `digest_${frequency}`,
               title: summaryTitle,
               message: summaryBody,
+              original_title: summaryTitle,
+              original_body: summaryBody,
+              original_lang: "en",
+              translation_status: "pending",
             });
           }
         } else if (channel === "email") {

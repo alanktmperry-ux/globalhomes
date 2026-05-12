@@ -271,6 +271,7 @@ const AgentAuthPage = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 className={s.input}
                 style={s.inputStyle}
+                name="email"
                 autoComplete="email"
               />
             </div>

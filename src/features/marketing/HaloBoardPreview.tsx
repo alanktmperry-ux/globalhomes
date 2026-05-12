@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Network, Unlock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "@/shared/lib/i18n";
 
 type Brief = {
   id?: string;
@@ -123,6 +124,7 @@ const GRAD = "linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)";
  * Three buyer brief cards demonstrating the reverse marketplace.
  */
 export default function HaloBoardPreview() {
+  const { t } = useTranslation();
   const [briefs, setBriefs] = useState<BriefWithMeta[]>(FALLBACK_BRIEFS);
 
   useEffect(() => {
@@ -164,10 +166,10 @@ export default function HaloBoardPreview() {
         <div className="max-w-[760px] mx-auto mb-[60px] text-center">
           <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-[#EFF6FF] border border-[#2563EB]/20 rounded-full text-[11px] font-bold tracking-[0.06em] uppercase text-[#1E40AF]">
             <Network size={13} strokeWidth={1.6} />
-            REVERSE MARKETPLACE
+            {t("marketing.halo.eyebrow")}
           </div>
           <h2 className="text-[clamp(40px,6vw,96px)] font-extrabold leading-[0.95] tracking-[-0.04em] text-black mt-5">
-            Buyers tell you
+            {t("marketing.halo.headlineLine1")}
             <br />
             <span
               style={{
@@ -178,12 +180,11 @@ export default function HaloBoardPreview() {
                 color: "transparent",
               }}
             >
-              what they want.
+              {t("marketing.halo.headlineLine2")}
             </span>
           </h2>
           <p className="text-[16px] md:text-[18px] font-normal text-[#4a4a4a] mt-5 leading-[1.55]">
-            Halo briefs let active buyers post their criteria in their own language. You
-            unlock the ones that match your listings. No cold calling. Just intent.
+            {t("marketing.halo.sub")}
           </p>
         </div>
 
@@ -214,10 +215,10 @@ export default function HaloBoardPreview() {
 
               <div className="flex flex-col gap-3">
                 {[
-                  ["Intent", b.intent],
-                  ["Property", b.property],
-                  ["Budget", b.budget],
-                  ["Suburbs", b.suburbs],
+                  [t("marketing.halo.label.intent"), b.intent],
+                  [t("marketing.halo.label.property"), b.property],
+                  [t("marketing.halo.label.budget"), b.budget],
+                  [t("marketing.halo.label.suburbs"), b.suburbs],
                 ].map(([label, value]) => (
                   <div key={label} className="flex justify-between items-center gap-3">
                     <span className="text-[10px] font-bold tracking-[0.12em] uppercase text-[#6a6a6a]">
@@ -238,7 +239,7 @@ export default function HaloBoardPreview() {
                   style={{ background: GRAD }}
                 >
                   <Unlock size={12} strokeWidth={1.8} />
-                  Unlock
+                  {t("marketing.halo.unlock")}
                 </Link>
               </div>
             </div>

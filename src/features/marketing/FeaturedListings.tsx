@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Bed, Bath, Car, Sparkles, ArrowRight, MapPin } from "lucide-react";
 import { useGeoLocation } from "./useGeoLocation";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "@/shared/lib/i18n";
 
 interface FeaturedRow {
   id: string;
@@ -59,6 +60,7 @@ const mapRow = (r: FeaturedRow): DisplayListing => ({
 });
 
 export default function FeaturedListings() {
+  const { t } = useTranslation();
   const geo = useGeoLocation();
   const [listings, setListings] = useState<DisplayListing[]>([]);
   const [loading, setLoading] = useState(true);
@@ -145,10 +147,10 @@ export default function FeaturedListings() {
               <span className="w-2 h-2 rounded-full bg-[#2563EB] relative inline-block">
                 <span className="absolute inset-0 rounded-full bg-[#2563EB] animate-ping" />
               </span>
-              BOOSTED LISTINGS · NEAR YOU
+              {t("marketing.featured.eyebrow")}
             </div>
             <h2 className="text-[clamp(28px,4vw,44px)] font-extrabold tracking-[-0.03em] leading-[1.1] text-black">
-              Featured in{" "}
+              {t("marketing.featured.headlinePrefix")}{" "}
               <span
                 style={{
                   background: "linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%)",
@@ -162,7 +164,7 @@ export default function FeaturedListings() {
               </span>
             </h2>
             <p className="text-[15px] text-[#6a6a6a] mt-2 max-w-[600px]">
-              Hand-picked homes near you, presented by multilingual agents.
+              {t("marketing.featured.sub")}
             </p>
           </div>
           <button
@@ -170,7 +172,7 @@ export default function FeaturedListings() {
             className="text-[13px] font-semibold text-[#4a4a4a] inline-flex items-center gap-1.5 border border-[#E5E5E5] px-4 py-2.5 rounded-full bg-white hover:border-[#2563EB] hover:text-[#2563EB] transition-all cursor-pointer"
           >
             <MapPin size={14} />
-            Change location
+            {t("marketing.shared.changeLocation")}
           </button>
         </div>
 
@@ -217,7 +219,7 @@ export default function FeaturedListings() {
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
                     />
                     <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur text-[10px] font-bold uppercase tracking-wider text-[#2563EB]">
-                      <Sparkles size={10} /> Boosted
+                      <Sparkles size={10} /> {t("marketing.featured.boosted")}
                     </span>
                     {l.buyerLanguages.length > 0 && (
                       <span className="absolute top-3 right-3 inline-flex items-center gap-0.5 px-2 py-1 rounded-full bg-black/55 backdrop-blur text-white text-[12px]">
@@ -260,16 +262,16 @@ export default function FeaturedListings() {
 
         <div className="mt-8 pt-6 border-t border-[#E5E5E5] flex justify-between items-center flex-wrap gap-4">
           <p className="text-xs text-[#6a6a6a] font-medium max-w-[540px] leading-relaxed">
-            <strong>Boosted listings</strong> are paid placements by agents in your area, ranked by recency and relevance. Want your listing here?{" "}
+            {t("marketing.featured.footerNote")}{" "}
             <Link to="/dashboard/listings" className="text-[#2563EB] font-bold hover:underline">
-              Boost a listing →
+              {t("marketing.shared.boostListing")}
             </Link>
           </p>
           <Link
             to="/buy"
             className="text-[13px] font-bold text-[#2563EB] inline-flex items-center gap-1.5 hover:gap-2.5 transition-all"
           >
-            See all {geo.display} listings <ArrowRight size={14} />
+            {t("marketing.shared.seeAllListings", { city: geo.display })} <ArrowRight size={14} />
           </Link>
         </div>
       </div>

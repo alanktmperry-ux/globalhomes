@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useTranslation } from '@/shared/lib/i18n';
 
 export default function WaitlistPage() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [agency, setAgency] = useState('');
@@ -43,17 +45,17 @@ export default function WaitlistPage() {
             setPosition((existing as any).position);
             setSubmitted(true);
           }
-          toast.info("You're already on the waitlist!");
+          toast.info(t('marketing.waitlist.toast.alreadyOn'));
         } else {
-          toast.error('Something went wrong. Please try again.');
+          toast.error(t('marketing.waitlist.toast.generic'));
         }
       } else {
         setPosition((data as any)?.position ?? null);
         setSubmitted(true);
-        toast.success("You're on the list!");
+        toast.success(t('marketing.waitlist.toast.onList'));
       }
     } catch {
-      toast.error('Something went wrong.');
+      toast.error(t('marketing.waitlist.toast.generic'));
     } finally {
       setLoading(false);
     }
@@ -63,7 +65,7 @@ export default function WaitlistPage() {
 
   const copyShareLink = () => {
     navigator.clipboard.writeText(shareUrl);
-    toast.success('Share link copied!');
+    toast.success(t('marketing.waitlist.toast.copied'));
   };
 
   return (
@@ -83,9 +85,9 @@ export default function WaitlistPage() {
           <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
             <Sparkles size={28} className="text-primary" />
           </div>
-          <h1 className="font-display text-3xl font-extrabold mb-2">Join the Waitlist</h1>
+          <h1 className="font-display text-3xl font-extrabold mb-2">{t('marketing.waitlist.title')}</h1>
           <p className="text-muted-foreground">
-            Be among the first 100 founding agents to access ListHQ's AI tools.
+            {t('marketing.waitlist.subtitle')}
           </p>
         </div>
 
@@ -93,14 +95,14 @@ export default function WaitlistPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               type="text"
-              placeholder="Your name"
+              placeholder={t('marketing.waitlist.fields.name')}
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="rounded-xl h-12"
             />
             <Input
               type="email"
-              placeholder="Email address *"
+              placeholder={t('marketing.waitlist.fields.email')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -108,42 +110,42 @@ export default function WaitlistPage() {
             />
             <Input
               type="text"
-              placeholder="Agency name (optional)"
+              placeholder={t('marketing.waitlist.fields.agency')}
               value={agency}
               onChange={(e) => setAgency(e.target.value)}
               className="rounded-xl h-12"
             />
             {referredBy && (
               <p className="text-xs text-primary flex items-center gap-1">
-                <CheckCircle2 size={14} /> Referred — you'll jump 5 spots!
+                <CheckCircle2 size={14} /> {t('marketing.waitlist.referred')}
               </p>
             )}
             <Button type="submit" className="w-full h-12 rounded-xl font-bold text-base" disabled={loading}>
-              {loading ? 'Joining...' : 'Join the Waitlist'}
+              {loading ? t('marketing.waitlist.joining') : t('marketing.waitlist.submit')}
             </Button>
           </form>
         ) : (
           <div className="text-center space-y-6">
             <div className="bg-primary/5 border border-primary/20 rounded-2xl p-8">
               <CheckCircle2 size={40} className="text-primary mx-auto mb-3" />
-              <p className="font-display text-lg font-bold mb-1">You're on the list!</p>
+              <p className="font-display text-lg font-bold mb-1">{t('marketing.waitlist.success.title')}</p>
               {position && (
                 <p className="text-4xl font-display font-extrabold text-primary my-3">
                   #{position}
                 </p>
               )}
               <p className="text-sm text-muted-foreground">
-                We'll email you when it's your turn.
+                {t('marketing.waitlist.success.note')}
               </p>
             </div>
 
             <div className="bg-card border border-border rounded-2xl p-6">
               <div className="flex items-center gap-2 mb-3">
                 <Share2 size={16} className="text-primary" />
-                <p className="font-display text-sm font-bold">Share to jump 5 spots</p>
+                <p className="font-display text-sm font-bold">{t('marketing.waitlist.share.title')}</p>
               </div>
               <p className="text-xs text-muted-foreground mb-3">
-                Each colleague who joins through your link moves you up.
+                {t('marketing.waitlist.share.body')}
               </p>
               <div className="flex gap-2">
                 <Input value={shareUrl} readOnly className="text-xs rounded-xl h-10" />

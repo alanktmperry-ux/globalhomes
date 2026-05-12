@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Layers } from "lucide-react";
+import { useTranslation } from "@/shared/lib/i18n";
 
 /**
  * "Replace five tools with one." — Bose-signature visual moment.
  * Large property hero with three thin-line callouts. Pure presentation.
  */
 export default function ReplaceFiveTools() {
+  const { t } = useTranslation();
   const stageRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -36,10 +38,10 @@ export default function ReplaceFiveTools() {
         <div className="max-w-[760px] mx-auto mb-16 md:mb-20 text-center">
           <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-[#EFF6FF] border border-[#2563EB]/20 rounded-full text-[11px] font-bold tracking-[0.06em] uppercase text-[#1E40AF]">
             <Layers size={13} strokeWidth={1.6} />
-            ONE PLATFORM
+            {t('marketing.replaceTools.eyebrow')}
           </div>
           <h2 className="text-[clamp(40px,6vw,96px)] font-extrabold leading-[0.95] tracking-[-0.04em] text-black mt-5">
-            Replace five tools
+            {t('marketing.replaceTools.headlineLine1')}
             <br />
             <span
               style={{
@@ -50,12 +52,11 @@ export default function ReplaceFiveTools() {
                 color: "transparent",
               }}
             >
-              with one.
+              {t('marketing.replaceTools.headlineLine2')}
             </span>
           </h2>
           <p className="text-[16px] md:text-[18px] font-normal text-[#4a4a4a] mt-5 leading-[1.55]">
-            Listings, multilingual translation, Halo, CRM, trust accounting, property
-            management. One subscription. One login. One source of truth.
+            {t('marketing.replaceTools.sub')}
           </p>
         </div>
 
@@ -79,7 +80,7 @@ export default function ReplaceFiveTools() {
               animationDelay: "0ms",
             }}
           >
-            <CalloutCard number="Any" label="Language, auto-translated" />
+            <CalloutCard number="Any" label={t("marketing.replaceTools.callout.anyLanguage")} />
             <CalloutLine direction="horizontal" dotSide="right" />
           </div>
 
@@ -94,7 +95,7 @@ export default function ReplaceFiveTools() {
               animationDelay: "300ms",
             }}
           >
-            <CalloutCard number="AI" label="Voice listing creation" />
+            <CalloutCard number="AI" label={t("marketing.replaceTools.callout.voice")} />
             <CalloutLine direction="horizontal" dotSide="left" />
           </div>
 
@@ -110,15 +111,15 @@ export default function ReplaceFiveTools() {
             }}
           >
             <CalloutLine direction="vertical" dotSide="top" />
-            <CalloutCard number="7" suffix="M+" label="Multilingual buyers reached" />
+            <CalloutCard number="7" suffix="M+" label={t("marketing.replaceTools.callout.buyers")} />
           </div>
         </div>
 
         {/* Mobile simplified stat row (visible <1024px) */}
         <div className="replace-mobile-stats hidden grid-cols-3 gap-3 max-w-[640px] mx-auto mt-8">
-          <MobileStat number="Any" label="Language" />
-          <MobileStat number="AI" label="Voice listing" />
-          <MobileStat number="7M+" label="Buyers reached" />
+          <MobileStat number="Any" label={t("marketing.replaceTools.mobile.language")} />
+          <MobileStat number="AI" label={t("marketing.replaceTools.mobile.voice")} />
+          <MobileStat number="7M+" label={t("marketing.replaceTools.mobile.buyers")} />
         </div>
 
         {/* The 5 tools being replaced */}

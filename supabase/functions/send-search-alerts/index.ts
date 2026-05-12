@@ -108,7 +108,18 @@ async function handleNewListing(propertyId: string) {
           </div>
         `;
 
-    const translated = await translateEmail({ subject, bodyHtml, targetLanguage: recipientLanguage });
+    const recipientLocale = recipientLanguage;
+    let translated;
+    try {
+      translated = await translateEmailPayload(
+        { subject, body: bodyHtml, isHtml: true, sourceLang: 'en' },
+        recipientLocale,
+      );
+    } catch (err) {
+      console.error('[send-search-alerts] translation failed (new match), sending original', err, { email: match.buyer_email, recipientLocale });
+      translated = { subject, body: bodyHtml, wasTranslated: false, sourceLang: 'en', targetLang: recipientLocale, cached: false };
+    }
+    console.log('[send-search-alerts] new_match sending', { email: match.buyer_email, recipientLocale, wasTranslated: translated.wasTranslated });
 
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -120,7 +131,11 @@ async function handleNewListing(propertyId: string) {
         from: EMAIL_FROM,
         to: [match.buyer_email],
         subject: translated.subject,
-        html: translated.bodyHtml,
+        html: translated.body,
+        headers: {
+          'X-ListHQ-Locale': translated.targetLang,
+          'X-ListHQ-Translated': translated.wasTranslated ? 'true' : 'false',
+        },
       }),
     });
 

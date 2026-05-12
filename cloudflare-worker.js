@@ -282,7 +282,7 @@ async function refreshCacheInBackground(originRequest, cacheKey, cache, env) {
   }
 }
 
-export default {
+const handler = {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const userAgent = request.headers.get('User-Agent') ?? '';

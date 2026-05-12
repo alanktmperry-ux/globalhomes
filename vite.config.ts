@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
   const SUPABASE_PUBLISHABLE_KEY = env.VITE_SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_ANON_KEY;
   const SUPABASE_PROJECT_ID = env.VITE_SUPABASE_PROJECT_ID;
 
-  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  if (mode === "production" && (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY)) {
     throw new Error(
       "Missing Supabase env vars. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in Lovable project settings before building."
     );

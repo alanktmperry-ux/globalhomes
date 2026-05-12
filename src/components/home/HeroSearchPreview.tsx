@@ -2,43 +2,90 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mic, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
+import { useViewerLocale } from '@/features/auth/hooks/useViewerLocale';
 
 type Seq = {
   flag: string; code: string; line: string; ph: string;
   title: string; price: string;
 };
 
+// 14-language cycling demo (Phase 4 expansion)
 const SEQ: Seq[] = [
-  { flag:'🇦🇺', code:'EN', line:'In any language.',        ph:'Suburb, postcode, or address', title:'Renovated North-Facing<br>Family Home', price:'$1,850,000' },
-  { flag:'🇨🇳', code:'ZH', line:'任何语言。',                ph:'区, 邮编, 或地址',               title:'翻新北向<br>家庭住宅',                 price:'$1,850,000 AUD' },
-  { flag:'🇻🇳', code:'VI', line:'Bằng bất kỳ ngôn ngữ.',   ph:'Vùng ngoại ô, mã bưu điện',    title:'Nhà gia đình<br>hướng bắc',            price:'$1,850,000 AUD' },
-  { flag:'🇰🇷', code:'KO', line:'어떤 언어로든.',            ph:'교외, 우편번호, 또는 주소',     title:'북향 가족주택<br>리노베이션',           price:'$1,850,000 AUD' },
-  { flag:'🇸🇦', code:'AR', line:'بأي لغة.',                ph:'الضاحية أو الرمز البريدي',     title:'منزل عائلي<br>مُجدد',                  price:'$1,850,000 AUD' },
-  { flag:'🇮🇳', code:'HI', line:'किसी भी भाषा में।',        ph:'उपनगर, पिनकोड या पता',         title:'उत्तर-मुखी<br>पारिवारिक घर',           price:'$1,850,000 AUD' },
-  { flag:'🇯🇵', code:'JA', line:'どんな言語でも。',          ph:'地区、郵便番号、住所',           title:'北向きの<br>ファミリーホーム',          price:'$1,850,000 AUD' },
-  { flag:'🇮🇹', code:'IT', line:'In qualsiasi lingua.',    ph:'Sobborgo, CAP, o indirizzo',   title:'Casa familiare<br>esposta a nord',    price:'$1,850,000 AUD' },
+  { flag:'🇦🇺', code:'EN', line:'In any language.',        ph:'Suburb, postcode, or address',     title:'Renovated North-Facing<br>Family Home',     price:'$1,850,000' },
+  { flag:'🇨🇳', code:'ZH', line:'任何语言。',                ph:'区, 邮编, 或地址',                  title:'翻新北向<br>家庭住宅',                       price:'$1,850,000 AUD' },
+  { flag:'🇻🇳', code:'VI', line:'Bằng bất kỳ ngôn ngữ.',   ph:'Vùng ngoại ô, mã bưu điện',        title:'Nhà gia đình<br>hướng bắc',                  price:'$1,850,000 AUD' },
+  { flag:'🇰🇷', code:'KO', line:'어떤 언어로든.',            ph:'교외, 우편번호, 또는 주소',         title:'북향 가족주택<br>리노베이션',                 price:'$1,850,000 AUD' },
+  { flag:'🇸🇦', code:'AR', line:'بأي لغة.',                ph:'الضاحية أو الرمز البريدي',         title:'منزل عائلي<br>مُجدد',                        price:'$1,850,000 AUD' },
+  { flag:'🇮🇳', code:'HI', line:'किसी भी भाषा में।',        ph:'उपनगर, पिनकोड या पता',             title:'उत्तर-मुखी<br>पारिवारिक घर',                 price:'$1,850,000 AUD' },
+  { flag:'🇯🇵', code:'JA', line:'どんな言語でも。',          ph:'地区、郵便番号、住所',              title:'北向きの<br>ファミリーホーム',                price:'$1,850,000 AUD' },
+  { flag:'🇮🇹', code:'IT', line:'In qualsiasi lingua.',    ph:'Sobborgo, CAP, o indirizzo',       title:'Casa familiare<br>esposta a nord',          price:'$1,850,000 AUD' },
+  { flag:'🇩🇪', code:'DE', line:'In jeder Sprache.',       ph:'Vorort, PLZ oder Adresse',         title:'Renoviertes nordausgerichtetes<br>Familienhaus', price:'$1,850,000 AUD' },
+  { flag:'🇹🇷', code:'TR', line:'Herhangi bir dilde.',     ph:'Mahalle, posta kodu veya adres',   title:'Yenilenmiş kuzeye bakan<br>aile evi',        price:'$1,850,000 AUD' },
+  { flag:'🇬🇷', code:'EL', line:'Σε οποιαδήποτε γλώσσα.',  ph:'Προάστιο, ταχ. κώδικας ή διεύθυνση', title:'Ανακαινισμένο σπίτι<br>με βορινό προσανατολισμό', price:'$1,850,000 AUD' },
+  { flag:'🇵🇱', code:'PL', line:'W dowolnym języku.',      ph:'Dzielnica, kod pocztowy lub adres', title:'Wyremontowany dom<br>rodzinny od północy',   price:'$1,850,000 AUD' },
+  { flag:'🇳🇵', code:'NE', line:'कुनै पनि भाषामा।',         ph:'उपनगर, पिनकोड वा ठेगाना',          title:'नवीकृत उत्तर-मुखी<br>पारिवारिक घर',          price:'$1,850,000 AUD' },
+  { flag:'🇪🇸', code:'ES', line:'En cualquier idioma.',    ph:'Barrio, código postal o dirección', title:'Casa familiar renovada<br>orientada al norte', price:'$1,850,000 AUD' },
 ];
 
-const CHIPS = ['Melbourne', 'Sydney', 'Under $1M', '3+ bed', 'House'];
+const RTL_LANGS = ['ar', 'fa', 'ur', 'he'];
 
 export default function HeroSearchPreview() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const viewerLocale = useViewerLocale();
   const [idx, setIdx] = useState(0);
   const [q, setQ] = useState('');
   const [heroImg, setHeroImg] = useState<string | null>(null);
+  const [hasExplicitLocale, setHasExplicitLocale] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem('listhq.locale') !== null || localStorage.getItem('gh-lang') !== null;
+  });
   const inputRef = useRef<HTMLInputElement>(null);
   const paused = useRef(false);
+  const intervalRef = useRef<number | null>(null);
+
+  // Auto-cycling runs only when viewer is on English AND has no explicit saved locale.
+  const shouldAutoCycle = viewerLocale === 'en' && !hasExplicitLocale;
+  const isRTL = RTL_LANGS.includes(viewerLocale);
 
   const cur = SEQ[idx];
 
-  // Cycle every 3500ms (pause on user typing)
+  const CHIPS: Array<{ key: string; label: string }> = [
+    { key: 'Melbourne', label: t('hero.chips.melbourne') },
+    { key: 'Sydney', label: t('hero.chips.sydney') },
+    { key: 'Under $1M', label: t('hero.chips.under1m') },
+    { key: '3+ bed', label: t('hero.chips.threeBed') },
+    { key: 'House', label: t('hero.chips.house') },
+  ];
+
+  // Watch localStorage for explicit-locale changes (LanguageSwitcher writes here)
   useEffect(() => {
+    const sync = () => {
+      const explicit = localStorage.getItem('listhq.locale') !== null || localStorage.getItem('gh-lang') !== null;
+      setHasExplicitLocale(explicit);
+    };
+    sync();
+    window.addEventListener('storage', sync);
+    return () => window.removeEventListener('storage', sync);
+  }, [viewerLocale]);
+
+  // Cycle every 3500ms — only when shouldAutoCycle is true
+  useEffect(() => {
+    if (!shouldAutoCycle) {
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      return;
+    }
     const id = window.setInterval(() => {
       if (paused.current) return;
       setIdx(i => (i + 1) % SEQ.length);
     }, 3500);
+    intervalRef.current = id;
     return () => window.clearInterval(id);
-  }, []);
+  }, [shouldAutoCycle]);
 
   useEffect(() => { paused.current = q.length > 0; }, [q]);
 
@@ -77,21 +124,29 @@ export default function HeroSearchPreview() {
   }
 
   function startVoice() {
-    // Trigger header's voice button if present; otherwise focus input.
     const el = document.querySelector<HTMLElement>('[data-voice-search-trigger]');
     if (el) { el.click(); return; }
     inputRef.current?.focus();
   }
 
+  // Computed display values for static-mode (non-cycling) hero
+  const cyclingLine = shouldAutoCycle ? cur.line : t('hero.cyclingLine');
+  const searchPlaceholder = shouldAutoCycle ? cur.ph : t('hero.searchPlaceholder');
+  const cardBadge = shouldAutoCycle ? 'any language · auto-translated' : t('hero.card.badge');
+  const cardSuburb = t('hero.card.suburb');
+  const cardTitleHtml = shouldAutoCycle ? cur.title : t('hero.card.title');
+  const cardPrice = shouldAutoCycle ? cur.price : `$1,850,000 ${t('hero.card.priceSuffix')}`;
+
   return (
     <section
       id="main-content"
+      dir={isRTL ? 'rtl' : 'ltr'}
       className="bg-white min-h-screen pt-32 pb-20"
       style={{ overflowX: 'hidden' }}
     >
-      <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 max-w-[1400px] mx-auto px-8 lg:px-12 items-center">
+      <div className={`grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 max-w-[1400px] mx-auto px-8 lg:px-12 items-center ${isRTL ? 'lg:[direction:rtl]' : ''}`}>
         {/* ── LEFT ─────────────────────────── */}
-        <div className="flex flex-col">
+        <div className="flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
           {/* Eyebrow pill */}
           <div
             style={{
@@ -100,6 +155,7 @@ export default function HeroSearchPreview() {
               padding: '7px 14px',
               fontSize: 11, fontWeight: 700, letterSpacing: '0.10em',
               textTransform: 'uppercase', color: '#1E40AF',
+              alignSelf: 'flex-start',
             }}
           >
             <span
@@ -108,7 +164,7 @@ export default function HeroSearchPreview() {
                 animation: 'hspPulse 2s ease-in-out infinite',
               }}
             />
-            Australia's multilingual property platform
+            {t('hero.eyebrow')}
           </div>
 
           {/* H1 */}
@@ -123,7 +179,7 @@ export default function HeroSearchPreview() {
             }}
           >
             <span style={{ display: 'block', fontWeight: 800 }}>
-              Find your home<span style={{ color: '#2563EB' }}>.</span>
+              {t('hero.h1').replace(/[.。।]$/, '')}<span style={{ color: '#2563EB' }}>{t('hero.h1').slice(-1)}</span>
             </span>
             <span
               id="h2Cycle"
@@ -144,7 +200,7 @@ export default function HeroSearchPreview() {
               }}
               aria-label="Change language"
             >
-              {cur.line}
+              {cyclingLine}
             </span>
           </h1>
 
@@ -154,7 +210,7 @@ export default function HeroSearchPreview() {
             fontSize: 17, lineHeight: 1.55, color: '#6a6a6a',
             maxWidth: 520,
           }}>
-            The only property search in Australia that speaks every language your buyer does.
+            {t('hero.sub')}
           </p>
 
           {/* Search bar */}
@@ -188,12 +244,14 @@ export default function HeroSearchPreview() {
               type="text"
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder={cur.ph}
+              placeholder={searchPlaceholder}
               aria-label="Search properties"
+              dir={isRTL ? 'rtl' : 'ltr'}
               style={{
                 flex: 1, background: 'transparent', border: 0, outline: 0,
                 padding: '14px 0', fontSize: 15, color: '#0a0f1e', fontWeight: 500,
                 fontFamily: 'inherit', minWidth: 0,
+                textAlign: isRTL ? 'right' : 'left',
               }}
             />
 
@@ -208,7 +266,7 @@ export default function HeroSearchPreview() {
                 flexShrink: 0, whiteSpace: 'nowrap',
               }}
             >
-              Search <ArrowRight size={14} />
+              {t('hero.searchButton')} <ArrowRight size={14} />
             </button>
           </form>
 
@@ -219,9 +277,9 @@ export default function HeroSearchPreview() {
           }}>
             {CHIPS.map((c) => (
               <button
-                key={c}
+                key={c.key}
                 type="button"
-                onClick={() => navigate(`/search?q=${encodeURIComponent(c)}`)}
+                onClick={() => navigate(`/search?q=${encodeURIComponent(c.key)}`)}
                 style={{
                   background: '#F9FAFB', border: '1px solid #E5E7EB',
                   borderRadius: 100, padding: '7px 14px',
@@ -231,7 +289,7 @@ export default function HeroSearchPreview() {
                 onMouseEnter={(e) => { e.currentTarget.style.background = '#EFF6FF'; e.currentTarget.style.borderColor = 'rgba(37,99,235,.30)'; e.currentTarget.style.color = '#1E40AF'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = '#F9FAFB'; e.currentTarget.style.borderColor = '#E5E7EB'; e.currentTarget.style.color = '#374151'; }}
               >
-                {c}
+                {c.label}
               </button>
             ))}
           </div>
@@ -247,12 +305,12 @@ export default function HeroSearchPreview() {
                 animation: 'hspPulse 2s ease-in-out infinite',
               }}
             />
-            Free for buyers · No account needed
+            {t('hero.freeForBuyers')}
           </div>
         </div>
 
         {/* ── RIGHT ─────────────────────────── */}
-        <div className="hsp-right relative flex justify-center">
+        <div className="hsp-right relative flex justify-center" dir="ltr">
           <div
             style={{
               position: 'relative',
@@ -265,7 +323,7 @@ export default function HeroSearchPreview() {
           >
             <div style={{ position: 'relative', aspectRatio: '4 / 5', width: '100%' }}>
               <img
-                src="/hero-fallback-auburn.jpg"
+                src={heroImg ?? '/hero-fallback-auburn.jpg'}
                 alt="Renovated north-facing family home in Auburn, NSW"
                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                 loading="eager"
@@ -286,7 +344,7 @@ export default function HeroSearchPreview() {
                 fontSize: 11, fontWeight: 700,
                 display: 'inline-flex', alignItems: 'center', gap: 6,
               }}>
-                <span aria-hidden>🌐</span> any language · auto-translated
+                <span aria-hidden>🌐</span> {cardBadge}
               </div>
 
               {/* Bottom overlay */}
@@ -299,15 +357,15 @@ export default function HeroSearchPreview() {
                   color: 'rgba(255,255,255,0.78)', textTransform: 'uppercase',
                   marginBottom: 8,
                 }}>
-                  Auburn · NSW
+                  {cardSuburb}
                 </div>
                 <div
                   id="propTitle"
                   style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.15, marginBottom: 10 }}
-                  dangerouslySetInnerHTML={{ __html: cur.title }}
+                  dangerouslySetInnerHTML={{ __html: cardTitleHtml }}
                 />
                 <div id="propPrice" style={{ fontSize: 24, fontWeight: 800, marginBottom: 10 }}>
-                  {cur.price}
+                  {cardPrice}
                 </div>
                 <div style={{ fontSize: 13, fontWeight: 600, opacity: 0.9 }}>
                   🛏 4 · 🛁 3 · 🚗 2
@@ -336,10 +394,10 @@ export default function HeroSearchPreview() {
               }}>🇨🇳</span>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <span style={{ fontSize: 12, fontWeight: 700, color: '#0a0f1e' }}>
-                  New enquiry in Mandarin
+                  {t('hero.card.liveEnquiryTitle')}
                 </span>
                 <span style={{ fontSize: 11, color: '#6B7280' }}>
-                  14 Bellevue Rd · 2 min ago
+                  {t('hero.card.liveEnquiryMeta')}
                 </span>
               </div>
             </div>

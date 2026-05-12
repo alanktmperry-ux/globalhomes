@@ -398,6 +398,22 @@ const AgentAuthPage = () => {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+              {password.length > 0 && (() => {
+                const score = password.length >= 12 && /[A-Z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password) ? 3
+                  : password.length >= 10 && (/[A-Z]/.test(password) || /[0-9]/.test(password)) ? 2
+                  : 1;
+                const labels = ['', 'Weak', 'Good', 'Strong'];
+                const colors = ['', '#ef4444', '#f59e0b', '#22c55e'];
+                const widths = ['', '33%', '66%', '100%'];
+                return (
+                  <div className="mt-2">
+                    <div className="h-1 rounded-full bg-white/15 overflow-hidden">
+                      <div style={{ width: widths[score], background: colors[score], height: '100%', borderRadius: 9999, transition: 'width 0.2s ease' }} />
+                    </div>
+                    <p className="text-[11px] mt-1" style={{ color: colors[score] }}>{labels[score]}</p>
+                  </div>
+                );
+              })()}
             </div>
 
             <label className="flex items-start gap-2.5 mb-3 cursor-pointer select-none">

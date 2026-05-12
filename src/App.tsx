@@ -10,6 +10,7 @@ import { I18nProvider } from "@/shared/lib/i18n";
 
 import { CurrencyProvider } from "@/shared/lib/CurrencyContext";
 import { AuthProvider, useAuth } from "@/features/auth/AuthProvider";
+import { UserLocaleSync } from "@/shared/components/UserLocaleSync";
 import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
 import AppErrorBoundary from "@/components/AppErrorBoundary";
 import { BetaGate } from "@/features/beta-gate/BetaGate";

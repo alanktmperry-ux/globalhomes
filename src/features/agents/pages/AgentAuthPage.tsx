@@ -367,6 +367,8 @@ const AgentAuthPage = () => {
                 className={s.input}
                 style={s.inputStyle}
                 aria-invalid={!!emailError}
+                name="email"
+                autoComplete="email"
               />
               {emailError && (
                 <p className="text-xs mt-1.5" style={{ color: '#FCA5A5' }}>{emailError}</p>

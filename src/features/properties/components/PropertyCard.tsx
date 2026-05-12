@@ -110,7 +110,7 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
           <img
             {...cardImageProps(property.imageUrl, property.title)}
             loading={priority ? 'eager' : 'lazy'}
-            fetchpriority={priority ? 'high' : 'low'}
+            fetchPriority={priority ? 'high' : 'low'}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           {badge && (

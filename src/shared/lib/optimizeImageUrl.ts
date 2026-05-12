@@ -61,7 +61,7 @@ export function cardImageProps(url: string, alt: string) {
     width: 640,
     height: 480,
     loading: 'lazy' as const,
-    fetchpriority: 'low' as const,
+    fetchPriority: 'low' as const,
     decoding: 'async' as const,
   };
 }

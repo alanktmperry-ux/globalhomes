@@ -103,10 +103,13 @@ export function useMessages(conversationId: string | null) {
 
   const sendMessage = useCallback(async (content: string, senderId: string) => {
     if (!conversationId || !content.trim()) return;
+    const trimmed = content.trim();
     const { error } = await supabase.from('messages').insert({
       conversation_id: conversationId,
       sender_id: senderId,
-      content: content.trim(),
+      content: trimmed,
+      original_body: trimmed,
+      original_lang: 'en',
     });
 
     // Fire-and-forget: email the other participant

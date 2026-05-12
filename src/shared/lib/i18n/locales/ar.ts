@@ -1867,7 +1867,7 @@ export const ar: Partial<Record<TranslationKey, string>> = {
   'agent.crm.reassign.confirming': "Reassigning...",
   'agent.crm.toast.reassigned': "Contact reassigned",
   'agent.crm.toast.reassignFailed': "Failed to reassign contact",
-  'agent.crm.toast.deleteFailed': 'Failed to delete contact. Please try again.',
+  'agent.crm.toast.deleteFailed': "فشل حذف جهة الاتصال. يرجى المحاولة مرة أخرى.",
   // CRM contact detail drawer
   'agent.crm.detail.nextAction': 'الإجراء التالي',
   'agent.crm.detail.lastContacted': '· آخر اتصال {date}',

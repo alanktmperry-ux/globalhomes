@@ -1867,7 +1867,7 @@ export const vi: Partial<Record<TranslationKey, string>> = {
   'agent.crm.reassign.confirming': "Đang chuyển...",
   'agent.crm.toast.reassigned': "Đã phân lại liên hệ",
   'agent.crm.toast.reassignFailed': "Phân lại liên hệ thất bại",
-  'agent.crm.toast.deleteFailed': 'Failed to delete contact. Please try again.',
+  'agent.crm.toast.deleteFailed': "Không thể xóa liên hệ. Vui lòng thử lại.",
   // CRM contact detail drawer
   'agent.crm.detail.nextAction': 'Hành động tiếp theo',
   'agent.crm.detail.lastContacted': '· liên hệ lần cuối {date}',

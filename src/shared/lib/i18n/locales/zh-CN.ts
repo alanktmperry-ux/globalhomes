@@ -1881,7 +1881,7 @@ export const zhCN: Partial<Record<keyof typeof EnBase, string>> = {
   'agent.crm.reassign.confirming': "转移中...",
   'agent.crm.toast.reassigned': "联系人已重新分配",
   'agent.crm.toast.reassignFailed': "重新分配失败",
-  'agent.crm.toast.deleteFailed': 'Failed to delete contact. Please try again.',
+  'agent.crm.toast.deleteFailed': "删除联系人失败，请重试。",
   // CRM contact detail drawer
   'agent.crm.detail.nextAction': '下一步行动',
   'agent.crm.detail.lastContacted': '· 最后联系 {date}',

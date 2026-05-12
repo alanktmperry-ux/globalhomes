@@ -1867,7 +1867,7 @@ export const ko: Partial<Record<TranslationKey, string>> = {
   'agent.crm.reassign.confirming': "Reassigning...",
   'agent.crm.toast.reassigned': "Contact reassigned",
   'agent.crm.toast.reassignFailed': "Failed to reassign contact",
-  'agent.crm.toast.deleteFailed': 'Failed to delete contact. Please try again.',
+  'agent.crm.toast.deleteFailed': "연락처 삭제에 실패했습니다. 다시 시도해주세요.",
   // CRM contact detail drawer
   'agent.crm.detail.nextAction': '다음 작업',
   'agent.crm.detail.lastContacted': '· 마지막 연락 {date}',

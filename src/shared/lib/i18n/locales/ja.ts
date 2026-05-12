@@ -1871,7 +1871,7 @@ export const ja: Partial<Record<TranslationKey, string>> = {
   'agent.crm.reassign.confirming': "引き継ぎ中...",
   'agent.crm.toast.reassigned': "コンタクトを再割り当てしました",
   'agent.crm.toast.reassignFailed': "再割り当てに失敗しました",
-  'agent.crm.toast.deleteFailed': 'Failed to delete contact. Please try again.',
+  'agent.crm.toast.deleteFailed': "連絡先の削除に失敗しました。再度お試しください。",
   // CRM contact detail drawer
   'agent.crm.detail.nextAction': '次のアクション',
   'agent.crm.detail.lastContacted': '· 最終連絡 {date}',

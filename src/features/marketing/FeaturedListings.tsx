@@ -38,7 +38,21 @@ interface DisplayListing {
 }
 
 const PLACEHOLDER_IMG =
-  "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&q=85&w=900";
+  "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&q=70&w=640&fm=avif";
+
+function optimizeUnsplashUrl(url: string, width = 640): string {
+  if (!url || !url.includes("unsplash.com")) return url;
+  try {
+    const u = new URL(url);
+    u.searchParams.set("w", String(width));
+    u.searchParams.set("auto", "format,compress");
+    u.searchParams.set("q", "70");
+    u.searchParams.set("fm", "avif");
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
 
 const SELECT_COLS =
   "id, display_image_url, display_address, display_suburb, display_state, display_price, display_beds, display_baths, display_cars, display_languages, agent_name, agent_initials, agent_agency";
@@ -213,9 +227,15 @@ export default function FeaturedListings() {
                 >
                   <div className="relative h-[220px] w-full overflow-hidden bg-[#F3F4F6]">
                     <img
-                      src={l.imageUrl}
+                      src={optimizeUnsplashUrl(l.imageUrl, 640)}
+                      srcSet={`${optimizeUnsplashUrl(l.imageUrl, 320)} 320w, ${optimizeUnsplashUrl(l.imageUrl, 640)} 640w, ${optimizeUnsplashUrl(l.imageUrl, 1280)} 1280w`}
+                      sizes="(max-width: 768px) 100vw, 33vw"
                       alt={`${l.address}, ${l.suburb}`}
+                      width={640}
+                      height={480}
                       loading="lazy"
+                      fetchPriority="low"
+                      decoding="async"
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
                     />
                     <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur text-[10px] font-bold uppercase tracking-wider text-[#2563EB]">

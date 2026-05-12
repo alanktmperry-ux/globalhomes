@@ -709,7 +709,7 @@ const ListingsPage = () => {
     </div>
   );
 
-  const totalCount = listings.filter((l) => !deletedIds.has(l.id)).length;
+  const totalCount = activeWithStatus.length;
 
   const SORT_LABELS: Record<typeof sortBy, string> = {
     newest: t('agent.listings.sort.newest'),

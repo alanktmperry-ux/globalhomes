@@ -3,6 +3,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { HelpCircle, X, Search, ArrowRight } from 'lucide-react';
 import { FAQ_ITEMS } from '@/data/faq';
 import { HelpSearch } from './HelpSearch';
+import { useTranslation } from '@/shared/lib/i18n';
 
 function getContextLinks(pathname: string) {
   if (pathname.startsWith('/dashboard/listings')) {

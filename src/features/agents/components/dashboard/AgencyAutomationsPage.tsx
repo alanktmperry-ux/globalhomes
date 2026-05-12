@@ -183,8 +183,8 @@ export default function AgencyAutomationsPage() {
     setRunning(false);
     if (error) { toast.error(error.message); return; }
     const summary = (data as any)?.summary ?? {};
-    const totalFired = Object.values(summary).reduce((s: number, x: any) => s + (x?.fired ?? 0), 0);
-    toast.success(t(totalFired === 1 ? 'agent.automations.runComplete_one' : 'agent.automations.runComplete', { count: Number(totalFired) }));
+    const totalFired: number = Object.values(summary).reduce<number>((s, x: any) => s + (x?.fired ?? 0), 0);
+    toast.success(t(totalFired === 1 ? 'agent.automations.runComplete_one' : 'agent.automations.runComplete', { count: totalFired }));
     fetchAll();
   };
 

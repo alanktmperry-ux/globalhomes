@@ -41,7 +41,6 @@ interface DisplayListing {
 const PLACEHOLDER_IMG =
   "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&q=70&w=640&fm=avif";
 
-import { optimizeUnsplashUrl, unsplashSrcSet } from "@/shared/lib/optimizeImageUrl";
 
 const SELECT_COLS =
   "id, display_image_url, display_address, display_suburb, display_state, display_price, display_beds, display_baths, display_cars, display_languages, agent_name, agent_initials, agent_agency";

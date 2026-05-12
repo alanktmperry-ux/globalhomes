@@ -271,9 +271,7 @@ export default function NotificationPreferencesSettings() {
         </div>
       ))}
 
-      {!PUSH_AVAILABLE && (
-        <p className="text-xs text-muted-foreground">Push notifications are not yet available — coming soon.</p>
-      )}
+
     </div>
   );
 }

@@ -526,7 +526,7 @@ export function PropertyMap({
       {isLoading && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background gap-2">
           <Loader2 className="animate-spin text-primary" size={24} />
-          <span className="text-xs text-muted-foreground">Mapping properties…</span>
+          <span className="text-xs text-muted-foreground">{t('property.map.loading')}</span>
         </div>
       )}
       <div ref={mapRef} className="w-full" style={{ height: height ?? '100%' }} />

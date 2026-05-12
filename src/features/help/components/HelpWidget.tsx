@@ -19,6 +19,7 @@ function getContextLinks(pathname: string) {
 }
 
 export function HelpWidget() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
   const contextLinks = useMemo(() => getContextLinks(pathname), [pathname]);

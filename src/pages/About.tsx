@@ -5,25 +5,16 @@ import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 const SCHEMA = {
   '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'ListHQ',
-  url: 'https://listhq.com.au',
-  foundingDate: '2026',
+  '@type': 'AboutPage',
+  name: "About ListHQ — Australia's multilingual property platform",
+  url: 'https://listhq.com.au/about',
   description:
-    "Australia's first multilingual real estate platform. Agents publish one listing that appears in every language: English, Mandarin, Traditional Chinese, Vietnamese, Korean, and Japanese.",
-  areaServed: { '@type': 'Country', name: 'Australia' },
-  knowsAbout: [
-    'Multilingual real estate',
-    'Property listings',
-    'Real estate SaaS',
-    'Trust accounting',
-    'Australian property market',
-  ],
-  offers: [
-    { '@type': 'Offer', name: 'Solo', price: '299', priceCurrency: 'AUD', billingIncrement: 'month' },
-    { '@type': 'Offer', name: 'Agency', price: '899', priceCurrency: 'AUD', billingIncrement: 'month' },
-    { '@type': 'Offer', name: 'Agency Pro', price: '1999', priceCurrency: 'AUD', billingIncrement: 'month' },
-  ],
+    "Australia's multilingual property platform — one listing published in every language for agents serving multicultural Australia.",
+  publisher: {
+    '@type': 'Organization',
+    name: 'ListHQ',
+    url: 'https://listhq.com.au',
+  },
 };
 
 const PRICING: Array<[string, string, string]> = [

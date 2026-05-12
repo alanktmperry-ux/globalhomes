@@ -259,6 +259,11 @@ Deno.serve(async (req) => {
       }).select("id").single();
       if (mErr || !msg) throw new Error(`msg_insert_failed: ${mErr?.message}`);
       created.messageIds.push(msg.id);
+      fetch(`${SUPABASE_URL}/functions/v1/translate-message`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${SERVICE_ROLE}` },
+        body: JSON.stringify({ messageId: msg.id }),
+      }).catch(() => {});
 
       const final = await waitFor(
         async () => {

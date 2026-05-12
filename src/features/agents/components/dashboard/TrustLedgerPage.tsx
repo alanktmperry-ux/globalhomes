@@ -706,9 +706,9 @@ const TrustLedgerPage = () => {
             </Button>
           </div>
           <div className="flex items-center gap-4 text-xs">
-            <span>In: <strong className="text-green-600">{AUD.format(monthTotalIn)}</strong></span>
-            <span>Out: <strong className="text-destructive">{AUD.format(monthTotalOut)}</strong></span>
-            <span className="border-l border-border pl-4">Balance: <strong className="text-base">{AUD.format(closingBalance)}</strong></span>
+            <span>{t('agent.trust.ledger.summary.in')}: <strong className="text-green-600">{AUD.format(monthTotalIn)}</strong></span>
+            <span>{t('agent.trust.ledger.summary.out')}: <strong className="text-destructive">{AUD.format(monthTotalOut)}</strong></span>
+            <span className="border-l border-border ps-4">{t('agent.trust.ledger.summary.balance')}: <strong className="text-base">{AUD.format(closingBalance)}</strong></span>
           </div>
         </div>
 
@@ -717,13 +717,13 @@ const TrustLedgerPage = () => {
           <div className="flex flex-wrap items-center gap-3 mb-3">
             <TabsList>
               <TabsTrigger value="all" className="text-xs gap-1.5">
-                All <Badge variant="secondary" className="text-[9px] px-1 h-4 ml-1">{filtered.length}</Badge>
+                {t('agent.trust.ledger.tabs.all')} <Badge variant="secondary" className="text-[9px] px-1 h-4 ms-1">{filtered.length}</Badge>
               </TabsTrigger>
               <TabsTrigger value="receipts" className="text-xs gap-1.5">
-                <ArrowDownCircle size={12} /> Receipts
+                <ArrowDownCircle size={12} /> {t('agent.trust.ledger.tabs.receipts')}
               </TabsTrigger>
               <TabsTrigger value="payments" className="text-xs gap-1.5">
-                <ArrowUpCircle size={12} /> Payments
+                <ArrowUpCircle size={12} /> {t('agent.trust.ledger.tabs.payments')}
               </TabsTrigger>
             </TabsList>
             <div className="flex-1" />
@@ -731,19 +731,19 @@ const TrustLedgerPage = () => {
               <div className="relative">
                 <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="Search client, property, ref…" className="h-8 pl-8 w-[200px] text-xs" />
+                  placeholder={t('agent.trust.ledger.search.placeholder')} className="h-8 pl-8 w-[200px] text-xs" />
               </div>
               <Select value={filterStatus} onValueChange={setFilterStatus}>
                 <SelectTrigger className="w-[120px] h-8 text-xs">
-                  <Filter size={12} className="mr-1" /><SelectValue placeholder="Status" />
+                  <Filter size={12} className="me-1" /><SelectValue placeholder={t('agent.trust.ledger.status')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="received">Received</SelectItem>
-                  <SelectItem value="deposited">Deposited</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                  <SelectItem value="cleared">Cleared</SelectItem>
+                  <SelectItem value="all">{t('agent.trust.ledger.filter.allStatus')}</SelectItem>
+                  <SelectItem value="received">{t('agent.trust.ledger.statusReceived')}</SelectItem>
+                  <SelectItem value="deposited">{t('agent.trust.ledger.statusDeposited')}</SelectItem>
+                  <SelectItem value="pending">{t('agent.trust.ledger.statusPending')}</SelectItem>
+                  <SelectItem value="paid">{t('agent.trust.ledger.statusCleared')}</SelectItem>
+                  <SelectItem value="cleared">{t('agent.trust.ledger.statusCleared')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -755,14 +755,14 @@ const TrustLedgerPage = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-xs">Date</TableHead>
-                    <TableHead className="text-xs">Receipt #</TableHead>
-                    <TableHead className="text-xs">Payment #</TableHead>
-                    <TableHead className="text-xs">Client</TableHead>
-                    <TableHead className="text-xs">Property</TableHead>
-                    <TableHead className="text-xs text-right">In</TableHead>
-                    <TableHead className="text-xs text-right">Out</TableHead>
-                    <TableHead className="text-xs text-right">Balance</TableHead>
+                    <TableHead className="text-xs">{t('agent.trust.ledger.col.date')}</TableHead>
+                    <TableHead className="text-xs">{t('agent.trust.ledger.col.receiptNo')}</TableHead>
+                    <TableHead className="text-xs">{t('agent.trust.ledger.col.paymentNo')}</TableHead>
+                    <TableHead className="text-xs">{t('agent.trust.ledger.col.client')}</TableHead>
+                    <TableHead className="text-xs">{t('agent.trust.ledger.col.property')}</TableHead>
+                    <TableHead className="text-xs text-right">{t('agent.trust.ledger.col.in')}</TableHead>
+                    <TableHead className="text-xs text-right">{t('agent.trust.ledger.col.out')}</TableHead>
+                    <TableHead className="text-xs text-right">{t('agent.trust.ledger.col.balance')}</TableHead>
                     <TableHead className="text-xs w-[40px]"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -772,14 +772,14 @@ const TrustLedgerPage = () => {
                       <TableCell colSpan={9} className="py-14">
                         <div className="text-center space-y-2 max-w-xs mx-auto">
                           {searchQuery || filterStatus !== 'all' ? (
-                            <p className="text-sm text-muted-foreground">No entries match your filters.</p>
+                            <p className="text-sm text-muted-foreground">{t('agent.trust.ledger.empty.filtered')}</p>
                           ) : (
                             <>
                               <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mx-auto">
                                 <Landmark size={18} className="text-muted-foreground" />
                               </div>
-                              <p className="font-medium text-sm text-foreground">No trust entries for {monthNames[viewMonth]} {viewYear}</p>
-                              <p className="text-xs text-muted-foreground">Record a receipt or payment to start tracking your trust account for this period.</p>
+                              <p className="font-medium text-sm text-foreground">{t('agent.trust.ledger.empty.title', { month: monthNames[viewMonth], year: viewYear })}</p>
+                              <p className="text-xs text-muted-foreground">{t('agent.trust.ledger.empty.body')}</p>
                             </>
                           )}
                         </div>
@@ -820,7 +820,7 @@ const TrustLedgerPage = () => {
                                       <Download size={12} />
                                     </Button>
                                   </TooltipTrigger>
-                                  <TooltipContent><p className="text-xs">Download Receipt PDF</p></TooltipContent>
+                                  <TooltipContent><p className="text-xs">{t('agent.trust.ledger.downloadReceiptPdf')}</p></TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
                             )}
@@ -837,11 +837,11 @@ const TrustLedgerPage = () => {
             {entriesWithBalance.length > 0 && (
               <div className="flex items-center justify-between mt-3 px-2">
                 <span className="text-xs text-muted-foreground">
-                  {entriesWithBalance.length} entr{entriesWithBalance.length === 1 ? 'y' : 'ies'}
+                  {t(entriesWithBalance.length === 1 ? 'agent.trust.ledger.entries.one' : 'agent.trust.ledger.entries.other', { count: entriesWithBalance.length })}
                 </span>
                 <div className="flex items-center gap-2">
                   <Button size="sm" variant="outline" className="h-7 text-[10px] gap-1" onClick={() => setShowStatement(true)}>
-                    <FileDown size={11} /> Monthly Statement
+                    <FileDown size={11} /> {t('agent.trust.ledger.monthlyStatement')}
                   </Button>
                 </div>
               </div>

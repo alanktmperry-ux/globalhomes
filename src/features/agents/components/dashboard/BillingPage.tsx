@@ -32,7 +32,7 @@ const PLANS: Plan[] = [
     full: 499,
     features: [
       'Up to 20 listings',
-      'Multilingual listing generator (10 languages)',
+      'Multilingual listing generator (30+ languages)',
       'Halo buyer matching',
       'Basic CRM',
     ],

@@ -62,7 +62,7 @@ export default function MultilingualGenerator() {
           </div>
           <h1 className="text-4xl font-semibold text-foreground tracking-tight">Multilingual Listing Generator</h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Paste any property listing and instantly see it translated into 10 languages — reach Chinese, Vietnamese, Korean, Arabic, Japanese, Hindi, Bengali, Filipino, and Indonesian buyers.
+            Paste any property listing and instantly see it translated into 30+ languages — reach Chinese, Vietnamese, Korean, Arabic, Japanese, Hindi, Bengali, Filipino, Indonesian buyers and more.
           </p>
         </div>
 
@@ -91,7 +91,7 @@ export default function MultilingualGenerator() {
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button onClick={handleTranslate} disabled={loading} className="w-full gap-2">
-            {loading ? <><Loader2 size={14} className="animate-spin" /> Translating…</> : <><Sparkles size={14} /> Translate into 10 languages</>}
+            {loading ? <><Loader2 size={14} className="animate-spin" /> Translating…</> : <><Sparkles size={14} /> Translate into 30+ languages</>}
           </Button>
         </div>
 

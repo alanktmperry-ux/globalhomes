@@ -5,7 +5,7 @@ const MESSAGES: Array<{ name: string; rest: string }> = [
   { name: 'Wei',    rest: 'just unlocked a Halo in Auburn · 4 min ago' },
   { name: 'Tuan',   rest: 'matched with a 3-bed in Cabramatta · 6 min ago' },
   { name: 'Priya',  rest: 'viewed 12 listings in Parramatta · 8 min ago' },
-  { name: 'Marco',  rest: 'published a listing in 6 languages · 12 min ago' },
+  { name: 'Marco',  rest: 'published a listing in every buyer language · 12 min ago' },
   { name: 'Sofia',  rest: 'generated a CMA in 24 seconds · 15 min ago' },
 ];
 

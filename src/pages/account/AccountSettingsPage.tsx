@@ -229,6 +229,29 @@ export default function AccountSettingsPage() {
           </div>
         </section>
 
+        <hr className="border-slate-200 my-8" />
+
+        {/* Section 2b — Language preference */}
+        <section className="mb-10">
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">Language preference</h2>
+          <div className="bg-white border border-slate-200 rounded-xl p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <p className="text-sm font-medium text-slate-900">Preferred language</p>
+                <p className="mt-1 text-xs text-slate-600">
+                  Used for the site UI, emails, and notifications. Changes apply instantly.
+                </p>
+                {profile.locale && (
+                  <p className="mt-2 text-xs text-slate-500">
+                    Current: <span className="font-medium">{profile.locale}</span>
+                  </p>
+                )}
+              </div>
+              <LanguageSwitcher />
+            </div>
+          </div>
+        </section>
+
         {!isAgent && (
           <>
             <hr className="border-slate-200 my-8" />

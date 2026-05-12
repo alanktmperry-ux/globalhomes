@@ -73,7 +73,11 @@ export default function AgentLandingPage() {
             BUILT FOR AGENTS
           </div>
 
-          <h1 className="text-[clamp(48px,9vw,140px)] font-extrabold leading-[0.92] tracking-[-0.05em] text-black max-w-[1100px] mx-auto mt-6">
+          {/* Semantic H1 for screen readers and Google — hidden visually */}
+          <h1 className="sr-only">Built for agents who serve every buyer — real estate software for multilingual Australia</h1>
+
+          {/* Visual cycling headline — hidden from assistive tech */}
+          <div aria-hidden="true" className="text-[clamp(48px,9vw,140px)] font-extrabold leading-[0.92] tracking-[-0.05em] text-black max-w-[1100px] mx-auto mt-6">
             Built for agents
             <br />
             <span className="relative inline-block">
@@ -94,10 +98,10 @@ export default function AgentLandingPage() {
                 </span>
               ))}
             </span>
-          </h1>
+          </div>
 
           <p className="text-[17px] md:text-[19px] leading-[1.55] text-[#4a4a4a] max-w-[620px] mx-auto mt-8 font-normal">
-            The tools no other portal offers. Twenty-language translation, AI buyer matching, full trust accounting, and the Halo reverse marketplace — all in one subscription.
+            The tools no other portal offers. Any-language translation, AI buyer matching, full trust accounting, and the Halo reverse marketplace — all in one subscription.
           </p>
 
           <div className="flex flex-col items-center gap-5 mt-10">

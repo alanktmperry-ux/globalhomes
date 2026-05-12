@@ -1,19 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Flame, Thermometer, Snowflake, Phone, Mail, MessageSquare, Calendar, ClipboardList, StickyNote, PhoneCall, Send } from 'lucide-react';
+import { Flame, Thermometer, Snowflake, Phone, Mail, MessageSquare, Calendar, ClipboardList, StickyNote, PhoneCall, Send, Languages } from 'lucide-react';
 import type { Contact, ContactActivity } from '@/features/agents/hooks/useContacts';
 import TemplatePicker from '@/features/messaging/components/TemplatePicker';
-
-const RANKING_CONFIG: Record<string, { icon: React.ReactNode; color: string; label: string }> = {
-  hot: { icon: <Flame size={12} />, color: 'bg-destructive/15 text-destructive', label: 'Hot' },
-  warm: { icon: <Thermometer size={12} />, color: 'bg-primary/15 text-primary', label: 'Warm' },
-  cold: { icon: <Snowflake size={12} />, color: 'bg-muted text-muted-foreground', label: 'Cold' },
-};
+import { useTranslation } from '@/shared/lib/i18n';
+import { SUPPORTED_LANGUAGES } from '@/shared/lib/i18n/config';
 
 const ACTIVITY_ICONS: Record<string, React.ReactNode> = {
   call: <PhoneCall size={14} className="text-success" />,
@@ -33,6 +29,12 @@ const AU_DATE = (d: string) => {
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 
+const getLanguageName = (code: string | null | undefined): string | null => {
+  if (!code) return null;
+  const match = SUPPORTED_LANGUAGES.find(l => l.code === code || l.code.toLowerCase() === code.toLowerCase());
+  return match?.name ?? code;
+};
+
 interface Props {
   contact: Contact;
   onClose: () => void;
@@ -42,13 +44,19 @@ interface Props {
 }
 
 const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActivities }: Props) => {
+  const { t } = useTranslation();
   const [activities, setActivities] = useState<ContactActivity[]>([]);
   const [newActivityType, setNewActivityType] = useState('note');
   const [newActivityDesc, setNewActivityDesc] = useState('');
   const [loadingActivities, setLoadingActivities] = useState(true);
   const [pickerOpen, setPickerOpen] = useState(false);
 
-  // Next action editor state
+  const RANKING_CONFIG: Record<string, { icon: React.ReactNode; color: string; label: string }> = useMemo(() => ({
+    hot: { icon: <Flame size={12} />, color: 'bg-destructive/15 text-destructive', label: t('agent.crm.readiness.hot') },
+    warm: { icon: <Thermometer size={12} />, color: 'bg-primary/15 text-primary', label: t('agent.crm.readiness.warm') },
+    cold: { icon: <Snowflake size={12} />, color: 'bg-muted text-muted-foreground', label: t('agent.crm.readiness.cold') },
+  }), [t]);
+
   const toLocalInput = (iso: string | null) => {
     if (!iso) return '';
     const d = new Date(iso);
@@ -105,6 +113,7 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
 
   const r = RANKING_CONFIG[contact.ranking] || RANKING_CONFIG.cold;
   const initials = `${contact.first_name[0]}${(contact.last_name || '')[0] || ''}`.toUpperCase();
+  const preferredLangName = getLanguageName(contact.preferred_language ?? null);
 
   return (
     <Sheet open onOpenChange={onClose}>
@@ -139,15 +148,15 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
               <section className={`rounded-lg border p-3 space-y-2 ${banner}`}>
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-semibold uppercase">
-                    Next Action {contact.last_contacted_at && (
-                      <span className="ml-2 normal-case text-[10px] font-normal text-muted-foreground">
-                        · last contacted {new Date(contact.last_contacted_at).toLocaleDateString('en-AU')}
+                    {t('agent.crm.detail.nextAction')} {contact.last_contacted_at && (
+                      <span className="ms-2 normal-case text-[10px] font-normal text-muted-foreground">
+                        {t('agent.crm.detail.lastContacted', { date: new Date(contact.last_contacted_at).toLocaleDateString() })}
                       </span>
                     )}
                   </h4>
                   {(contact.next_action_due_at || contact.next_action_note) && (
                     <Button size="sm" variant="ghost" className="h-6 px-2 text-[10px]" onClick={handleClearNextAction} disabled={savingNext}>
-                      Clear
+                      {t('agent.crm.detail.clear')}
                     </Button>
                   )}
                 </div>
@@ -159,13 +168,13 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
                     className="h-8 text-xs w-auto"
                   />
                   <Input
-                    placeholder="What's due? (e.g. Follow up re: 12 Smith St)"
+                    placeholder={t('agent.crm.detail.nextDuePlaceholder')}
                     value={nextNote}
                     onChange={(e) => setNextNote(e.target.value)}
                     className="h-8 text-xs"
                   />
                   <Button size="sm" onClick={handleSaveNextAction} className="h-8 text-xs" disabled={savingNext}>
-                    Save
+                    {t('agent.crm.detail.save')}
                   </Button>
                 </div>
               </section>
@@ -175,9 +184,9 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
           {/* Contact Info */}
           <section className="space-y-2">
             <div className="flex items-center justify-between">
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase">Contact Details</h4>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase">{t('agent.crm.detail.contactDetails')}</h4>
               <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={() => setPickerOpen(true)}>
-                <Send size={12} /> Send template
+                <Send size={12} /> {t('agent.crm.detail.sendTemplate')}
               </Button>
             </div>
             <div className="grid grid-cols-2 gap-2 text-sm">
@@ -192,6 +201,13 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
                 </a>
               )}
             </div>
+            {preferredLangName && (
+              <p className="flex items-center gap-2 text-xs">
+                <Languages size={12} className="text-muted-foreground" />
+                <span className="text-muted-foreground">{t('agent.crm.detail.preferredLanguage')}:</span>
+                <span className="font-medium">{preferredLangName}</span>
+              </p>
+            )}
             {contact.suburb && (
               <p className="text-xs text-muted-foreground">
                  {[contact.suburb, contact.state, contact.postcode].filter(Boolean).join(', ')}
@@ -202,13 +218,13 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
           {/* Preferences */}
           {(contact.contact_type === 'buyer' || contact.contact_type === 'both') && (
             <section className="space-y-2 border-t border-border pt-4">
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase">Buyer Preferences</h4>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase">{t('agent.crm.detail.buyerPreferences')}</h4>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 {(contact.budget_min != null || contact.budget_max != null) && (
                   <p> {contact.budget_min != null ? AUD.format(contact.budget_min) : '—'} — {contact.budget_max != null ? AUD.format(contact.budget_max) : '—'}</p>
                 )}
-                {contact.preferred_beds && <p>🛏️ {contact.preferred_beds}+ beds</p>}
-                {contact.preferred_baths && <p>🚿 {contact.preferred_baths}+ baths</p>}
+                {contact.preferred_beds && <p>🛏️ {t('agent.crm.detail.beds', { count: contact.preferred_beds })}</p>}
+                {contact.preferred_baths && <p>🚿 {t('agent.crm.detail.baths', { count: contact.preferred_baths })}</p>}
                 {contact.preferred_suburbs?.length > 0 && (
                   <p className="col-span-2"> {contact.preferred_suburbs.join(', ')}</p>
                 )}
@@ -218,7 +234,7 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
 
           {(contact.contact_type === 'seller' || contact.contact_type === 'both') && contact.property_address && (
             <section className="space-y-2 border-t border-border pt-4">
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase">Seller Property</h4>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase">{t('agent.crm.detail.sellerProperty')}</h4>
               <p className="text-sm"> {contact.property_address}</p>
               {contact.estimated_value && <p className="text-sm font-bold text-primary">{AUD.format(contact.estimated_value)}</p>}
             </section>
@@ -226,50 +242,50 @@ const ContactDetailDrawer = ({ contact, onClose, onUpdate, addActivity, getActiv
 
           {contact.notes && (
             <section className="space-y-2 border-t border-border pt-4">
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase">Notes</h4>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase">{t('agent.crm.detail.notes')}</h4>
               <p className="text-sm whitespace-pre-wrap">{contact.notes}</p>
             </section>
           )}
 
           {/* Activity Timeline */}
           <section className="space-y-3 border-t border-border pt-4">
-            <h4 className="text-xs font-semibold text-muted-foreground uppercase">Activity Timeline</h4>
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase">{t('agent.crm.detail.activityTimeline')}</h4>
 
             {/* Add activity */}
             <div className="flex gap-2">
               <Select value={newActivityType} onValueChange={setNewActivityType}>
                 <SelectTrigger className="h-8 w-28 text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="call"> Call</SelectItem>
+                  <SelectItem value="call">{t('agent.crm.detail.type.call')}</SelectItem>
                   <SelectItem
                     value="email"
                     disabled={!contact.email}
-                    title={!contact.email ? 'Add an email address to send emails' : undefined}
-                  >📧 Email</SelectItem>
-                  <SelectItem value="sms"> SMS</SelectItem>
-                  <SelectItem value="inspection"> Inspection</SelectItem>
-                  <SelectItem value="meeting"> Meeting</SelectItem>
-                  <SelectItem value="note"> Note</SelectItem>
-                  <SelectItem value="follow_up"> Follow-up</SelectItem>
+                    title={!contact.email ? t('agent.crm.detail.emailDisabledTitle') : undefined}
+                  >{t('agent.crm.detail.type.email')}</SelectItem>
+                  <SelectItem value="sms">{t('agent.crm.detail.type.sms')}</SelectItem>
+                  <SelectItem value="inspection">{t('agent.crm.detail.type.inspection')}</SelectItem>
+                  <SelectItem value="meeting">{t('agent.crm.detail.type.meeting')}</SelectItem>
+                  <SelectItem value="note">{t('agent.crm.detail.type.note')}</SelectItem>
+                  <SelectItem value="follow_up">{t('agent.crm.detail.type.followUp')}</SelectItem>
                 </SelectContent>
               </Select>
               <Input
-                placeholder="Add note..."
+                placeholder={t('agent.crm.detail.addPlaceholder')}
                 value={newActivityDesc}
                 onChange={e => setNewActivityDesc(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleAddActivity()}
                 className="h-8 text-xs flex-1"
               />
               <Button size="sm" onClick={handleAddActivity} className="h-8 text-xs" disabled={!newActivityDesc.trim()}>
-                Add
+                {t('agent.crm.detail.add')}
               </Button>
             </div>
 
             {/* Timeline */}
             {loadingActivities ? (
-              <p className="text-xs text-muted-foreground">Loading...</p>
+              <p className="text-xs text-muted-foreground">{t('agent.crm.detail.loading')}</p>
             ) : activities.length === 0 ? (
-              <p className="text-xs text-muted-foreground">No activities yet</p>
+              <p className="text-xs text-muted-foreground">{t('agent.crm.detail.noActivities')}</p>
             ) : (
               <div className="space-y-3">
                 {activities.map((a) => (

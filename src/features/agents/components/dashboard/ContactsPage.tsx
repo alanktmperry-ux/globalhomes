@@ -27,11 +27,13 @@ import { logAction } from '@/shared/lib/auditLog';
 import { toast } from 'sonner';
 import type { Contact } from '@/features/agents/hooks/useContacts';
 import { usePageTitle } from '@/lib/usePageTitle';
+import { useTranslation } from '@/shared/lib/i18n';
 
 const LAST_VIEW_LS_KEY = 'gh-contacts-last-view';
 
 const ContactsPage = () => {
-  usePageTitle('Contacts');
+  const { t } = useTranslation();
+  usePageTitle(t('agent.crm.pageTitle'));
   const { contacts, loading, hasMore, loadMore, createContact, updateContact, deleteContact, addActivity, getActivities, fetchContacts } = useContacts();
   const { user, isPrincipal, isAdmin, agencyId } = useAuth();
   const { agents } = useTeamAgents();
@@ -118,12 +120,12 @@ const ContactsPage = () => {
         actionType: 'reassigned', entityType: 'contact', entityId: reassignContact.id,
         description: `Reassigned ${reassignContact.first_name} ${reassignContact.last_name || ''} to ${toAgent?.name || 'another agent'}`,
       });
-      toast.success('Contact reassigned');
+      toast.success(t('agent.crm.toast.reassigned'));
       setReassignContact(null);
       setReassignTo('');
       fetchContacts();
     } catch {
-      toast.error('Failed to reassign contact');
+      toast.error(t('agent.crm.toast.reassignFailed'));
     } finally {
       setReassigning(false);
     }
@@ -149,7 +151,7 @@ const ContactsPage = () => {
 
   return (
     <div>
-      <DashboardHeader title="Contacts" subtitle="Unified contact database" />
+      <DashboardHeader title={t('agent.crm.pageTitle')} subtitle={t('agent.crm.pageSubtitle')} />
       <div className="p-4 sm:p-6 max-w-7xl space-y-4">
         {/* Toolbar */}
         <div className="flex flex-wrap items-center gap-2">
@@ -163,23 +165,23 @@ const ContactsPage = () => {
             />
           )}
           <Button size="sm" onClick={() => setShowForm(true)} className="gap-1.5">
-            <Plus size={14} /> Add Contact
+            <Plus size={14} /> {t('agent.crm.actions.addContact')}
           </Button>
           <Button size="sm" variant="outline" onClick={() => setShowImport(true)} className="gap-1.5">
-            <Upload size={14} /> Import CSV
+            <Upload size={14} /> {t('agent.crm.actions.importCsv')}
           </Button>
           <Button size="sm" variant="outline" onClick={exportCsv} className="gap-1.5">
-            <Download size={14} /> Export CSV
+            <Download size={14} /> {t('agent.crm.actions.exportCsv')}
           </Button>
 
           {/* Principal: Agent filter */}
           {showPrincipalControls && (
             <Select value={agentFilter} onValueChange={setAgentFilter}>
               <SelectTrigger className="w-[180px] h-8 text-xs">
-                <SelectValue placeholder="All agents" />
+                <SelectValue placeholder={t('agent.crm.actions.allAgents')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All agents</SelectItem>
+                <SelectItem value="all">{t('agent.crm.actions.allAgents')}</SelectItem>
                 {agents.map(a => (
                   <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
                 ))}
@@ -189,10 +191,10 @@ const ContactsPage = () => {
 
           <div className="ml-auto flex items-center gap-1 bg-muted rounded-lg p-0.5">
             <Button size="sm" variant={view === 'list' ? 'secondary' : 'ghost'} onClick={() => setView('list')} className="h-7 px-2 gap-1 text-xs">
-              <LayoutList size={14} /> List
+              <LayoutList size={14} /> {t('agent.crm.view.list')}
             </Button>
             <Button size="sm" variant={view === 'pipeline' ? 'secondary' : 'ghost'} onClick={() => setView('pipeline')} className="h-7 px-2 gap-1 text-xs">
-              <Kanban size={14} /> Pipeline
+              <Kanban size={14} /> {t('agent.crm.view.pipeline')}
             </Button>
           </div>
         </div>
@@ -200,8 +202,8 @@ const ContactsPage = () => {
         {view === 'pipeline' && (
           <Tabs value={pipelineType} onValueChange={(v) => setPipelineType(v as 'buyer' | 'seller')}>
             <TabsList>
-              <TabsTrigger value="buyer">Buyer Pipeline</TabsTrigger>
-              <TabsTrigger value="seller">Seller Pipeline</TabsTrigger>
+              <TabsTrigger value="buyer">{t('agent.crm.pipeline.buyer')}</TabsTrigger>
+              <TabsTrigger value="seller">{t('agent.crm.pipeline.seller')}</TabsTrigger>
             </TabsList>
           </Tabs>
         )}
@@ -221,7 +223,7 @@ const ContactsPage = () => {
               try {
                 await deleteContact(id);
               } catch {
-                toast.error('Failed to delete contact. Please try again.');
+                toast.error(t('agent.crm.toast.deleteFailed'));
               }
             }}
             hasMore={hasMore}
@@ -275,16 +277,16 @@ const ContactsPage = () => {
         <Dialog open={!!reassignContact} onOpenChange={() => { setReassignContact(null); setReassignTo(''); }}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Reassign Contact</DialogTitle>
+              <DialogTitle>{t('agent.crm.reassign.title')}</DialogTitle>
               <DialogDescription>
-                Move {reassignContact?.first_name} {reassignContact?.last_name || ''} to another agent.
+                {t('agent.crm.reassign.description', { name: `${reassignContact?.first_name ?? ''} ${reassignContact?.last_name || ''}`.trim() })}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 mt-2">
               <div>
-                <Label className="text-sm font-medium mb-1.5 block">Transfer to</Label>
+                <Label className="text-sm font-medium mb-1.5 block">{t('agent.crm.reassign.transferTo')}</Label>
                 <Select value={reassignTo} onValueChange={setReassignTo}>
-                  <SelectTrigger><SelectValue placeholder="Select agent..." /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t('agent.crm.reassign.selectPlaceholder')} /></SelectTrigger>
                   <SelectContent>
                     {agents.filter(a => a.id !== reassignContact?.assigned_agent_id).map(a => (
                       <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
@@ -293,7 +295,7 @@ const ContactsPage = () => {
                 </Select>
               </div>
               <Button onClick={handleReassignContact} disabled={reassigning || !reassignTo} className="w-full">
-                {reassigning ? <><Loader2 size={14} className="animate-spin mr-2" /> Reassigning...</> : 'Confirm Reassignment'}
+                {reassigning ? <><Loader2 size={14} className="animate-spin mr-2" /> {t('agent.crm.reassign.confirming')}</> : t('agent.crm.reassign.confirm')}
               </Button>
             </div>
           </DialogContent>

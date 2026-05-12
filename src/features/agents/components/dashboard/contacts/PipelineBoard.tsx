@@ -6,28 +6,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Flame, Thermometer, Snowflake, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Contact } from '@/features/agents/hooks/useContacts';
-
-const BUYER_STAGES = [
-  { key: 'cold_lead', label: 'Cold Lead', color: 'bg-muted' },
-  { key: 'active_buyer', label: 'Active Buyer', color: 'bg-blue-500/10' },
-  { key: 'under_contract', label: 'Under Contract', color: 'bg-orange-500/10' },
-  { key: 'settled', label: 'Settled', color: 'bg-green-500/10' },
-];
-
-const SELLER_STAGES = [
-  { key: 'cold_lead', label: 'Cold Lead', color: 'bg-muted' },
-  { key: 'appraisal', label: 'Appraisal', color: 'bg-purple-500/10' },
-  { key: 'listing_authority', label: 'Listing Authority', color: 'bg-blue-500/10' },
-  { key: 'marketing', label: 'Marketing', color: 'bg-yellow-500/10' },
-  { key: 'under_contract', label: 'Under Contract', color: 'bg-orange-500/10' },
-  { key: 'settled', label: 'Settled', color: 'bg-green-500/10' },
-];
+import { useTranslation } from '@/shared/lib/i18n';
 
 const RANKING_ICON: Record<string, React.ReactNode> = {
   hot: <Flame size={10} className="text-destructive" />,
   warm: <Thermometer size={10} className="text-primary" />,
   cold: <Snowflake size={10} className="text-muted-foreground" />,
 };
+
+const RTL_LANGS = new Set(['ar', 'fa', 'ur', 'he']);
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 
@@ -39,8 +26,27 @@ interface Props {
   addActivity?: (contactId: string, type: string, description: string) => Promise<void>;
 }
 
+type Stage = { key: string; label: string; color: string };
+
 const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect, addActivity }: Props) => {
-  const stages = pipelineType === 'buyer' ? BUYER_STAGES : SELLER_STAGES;
+  const { t, language } = useTranslation();
+  const isRTL = RTL_LANGS.has(language);
+
+  const BUYER_STAGES: Stage[] = [
+    { key: 'cold_lead', label: t('agent.crm.pipeline.coldLead'), color: 'bg-muted' },
+    { key: 'active_buyer', label: t('agent.crm.pipeline.activeBuyer'), color: 'bg-blue-500/10' },
+    { key: 'under_contract', label: t('agent.crm.pipeline.underContract'), color: 'bg-orange-500/10' },
+    { key: 'settled', label: t('agent.crm.pipeline.settled'), color: 'bg-green-500/10' },
+  ];
+  const SELLER_STAGES: Stage[] = [
+    { key: 'cold_lead', label: t('agent.crm.pipeline.coldLead'), color: 'bg-muted' },
+    { key: 'appraisal', label: t('agent.crm.pipeline.appraisal'), color: 'bg-purple-500/10' },
+    { key: 'listing_authority', label: t('agent.crm.pipeline.listingAuthority'), color: 'bg-blue-500/10' },
+    { key: 'marketing', label: t('agent.crm.pipeline.marketing'), color: 'bg-yellow-500/10' },
+    { key: 'under_contract', label: t('agent.crm.pipeline.underContract'), color: 'bg-orange-500/10' },
+    { key: 'settled', label: t('agent.crm.pipeline.settled'), color: 'bg-green-500/10' },
+  ];
+  const stages: Stage[] = pipelineType === 'buyer' ? BUYER_STAGES : SELLER_STAGES;
   const stageField = pipelineType === 'buyer' ? 'buyer_pipeline_stage' : 'seller_pipeline_stage';
   const [draggedId, setDraggedId] = useState<string | null>(null);
 
@@ -113,8 +119,8 @@ const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect, addA
     await onUpdateContact(contactId, { [stageField]: stageKey } as any);
     const stage = stages.find(s => s.key === stageKey);
     if (stage && addActivity) {
-      const label = pipelineType === 'buyer' ? 'Buyer pipeline' : 'Seller pipeline';
-      await addActivity(contactId, 'status_change', `${label}: moved to ${stage.label}`);
+      const label = pipelineType === 'buyer' ? t('agent.crm.pipeline.buyerLabel') : t('agent.crm.pipeline.sellerLabel');
+      await addActivity(contactId, 'status_change', t('agent.crm.pipeline.movedTo', { label, stage: stage.label }));
     }
   };
 
@@ -125,7 +131,7 @@ const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect, addA
         <div className="relative flex-1 min-w-[180px]">
           <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search contacts…"
+            placeholder={t('agent.crm.search.placeholder')}
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="pl-8 h-8 text-xs"
@@ -134,25 +140,25 @@ const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect, addA
 
         <Select value={rankingFilter} onValueChange={setRankingFilter}>
           <SelectTrigger className="w-[120px] h-8 text-xs">
-            <SelectValue placeholder="Ranking" />
+            <SelectValue placeholder={t('agent.crm.filter.ranking')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Rankings</SelectItem>
-            <SelectItem value="hot"> Hot</SelectItem>
-            <SelectItem value="warm">🌡 Warm</SelectItem>
-            <SelectItem value="cold"> Cold</SelectItem>
+            <SelectItem value="all">{t('agent.crm.filter.allRankings')}</SelectItem>
+            <SelectItem value="hot">{t('agent.crm.readiness.hot')}</SelectItem>
+            <SelectItem value="warm">🌡 {t('agent.crm.readiness.warm')}</SelectItem>
+            <SelectItem value="cold">{t('agent.crm.readiness.cold')}</SelectItem>
           </SelectContent>
         </Select>
 
         {allTags.length > 0 && (
           <Select value={tagFilter} onValueChange={setTagFilter}>
             <SelectTrigger className="w-[130px] h-8 text-xs">
-              <SelectValue placeholder="Tag" />
+              <SelectValue placeholder={t('agent.crm.filter.tag')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Tags</SelectItem>
-              {allTags.map(t => (
-                <SelectItem key={t} value={t}>{t}</SelectItem>
+              <SelectItem value="all">{t('agent.crm.filter.allTags')}</SelectItem>
+              {allTags.map(tg => (
+                <SelectItem key={tg} value={tg}>{tg}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -160,17 +166,17 @@ const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect, addA
 
         {hasActiveFilters && (
           <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 px-2 text-xs gap-1 text-muted-foreground">
-            <X size={12} /> Clear
+            <X size={12} /> {t('agent.crm.actions.clear')}
           </Button>
         )}
 
-        <span className="text-[10px] text-muted-foreground ml-auto">
-          {filteredContacts.length} contact{filteredContacts.length !== 1 ? 's' : ''}
+        <span className="text-[10px] text-muted-foreground ms-auto">
+          {t(filteredContacts.length === 1 ? 'agent.crm.count.singular' : 'agent.crm.count.plural', { count: filteredContacts.length })}
         </span>
       </div>
 
       {/* Board */}
-      <div className="flex gap-3 overflow-x-auto pb-4 min-h-[400px]">
+      <div dir={isRTL ? 'rtl' : 'ltr'} className="flex gap-3 overflow-x-auto pb-4 min-h-[400px]">
         {stages.map((stage) => {
           const stageContacts = getContactsForStage(stage.key);
           return (
@@ -209,7 +215,7 @@ const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect, addA
                         <p className="text-[10px] text-muted-foreground"> {c.suburb}{c.state ? `, ${c.state}` : ''}</p>
                       )}
                       {pipelineType === 'buyer' && c.budget_max && (
-                        <p className="text-[10px] text-primary font-semibold mt-0.5"> up to {AUD.format(c.budget_max)}</p>
+                        <p className="text-[10px] text-primary font-semibold mt-0.5"> {t('agent.crm.budget.upTo', { amount: AUD.format(c.budget_max) })}</p>
                       )}
                       {pipelineType === 'seller' && c.estimated_value && (
                         <p className="text-[10px] text-primary font-semibold mt-0.5"> {AUD.format(c.estimated_value)}</p>
@@ -226,7 +232,7 @@ const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect, addA
                 })}
                 {stageContacts.length === 0 && (
                   <p className="text-[10px] text-muted-foreground text-center py-6">
-                    {hasActiveFilters ? 'No matches' : 'Drop contacts here'}
+                    {hasActiveFilters ? t('agent.crm.pipeline.noMatches') : t('agent.crm.pipeline.dropHere')}
                   </p>
                 )}
               </div>

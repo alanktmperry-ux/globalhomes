@@ -35,7 +35,7 @@ export default function ExclusiveLandingPage() {
   return (
     <>
       <Helmet>
-        <title>{t('exclusive.hero.eyebrow')} | ListHQ</title>
+        <title>{t('exclusive.hero.eyebrow')}</title>
         <meta name="description" content={t('exclusive.hero.subheadline')} />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",

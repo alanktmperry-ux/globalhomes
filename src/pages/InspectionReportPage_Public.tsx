@@ -226,7 +226,7 @@ export default function InspectionReportPublic() {
   if (notFound || !data) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background px-4">
-        <Helmet><title>Report Not Found | ListHQ</title></Helmet>
+        <Helmet><title>Report Not Found</title></Helmet>
         <div className="text-2xl font-bold text-foreground">ListHQ</div>
         <div className="text-center">
           <h1 className="text-xl font-semibold text-foreground mb-2">Report not found or link has expired</h1>
@@ -259,7 +259,7 @@ export default function InspectionReportPublic() {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Condition Report — {address} | ListHQ</title>
+        <title>Condition Report — {address}</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 

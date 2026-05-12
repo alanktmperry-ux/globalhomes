@@ -112,7 +112,7 @@ export default function ReferralLandingPage() {
     };
     return (
       <>
-        <Helmet><title>{t('referral.success.title')} | ListHQ</title></Helmet>
+        <Helmet><title>{t('referral.success.title')}</title></Helmet>
         <div className="min-h-screen bg-background flex items-center justify-center px-4 py-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -168,7 +168,7 @@ export default function ReferralLandingPage() {
   return (
     <>
       <Helmet>
-        <title>{t('referral.hero.eyebrow')} | ListHQ</title>
+        <title>{t('referral.hero.eyebrow')}</title>
         <meta name="description" content={t('referral.hero.subheadline')} />
       </Helmet>
       <div className="min-h-screen bg-background">

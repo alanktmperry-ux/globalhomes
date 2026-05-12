@@ -5,7 +5,7 @@ const APP_URL = 'https://listhq.com.au';
 export function AgentSEOHead({ agent, listingCount = 0 }: { agent: any; listingCount?: number }) {
   const name = agent.name || agent.full_name || 'Agent';
   const agency = agent.agency || agent.agency_name || '';
-  const title = `${name}${agency ? ' · ' + agency : ''} | Real Estate Agent${agent.suburb ? ' ' + agent.suburb : ''} | ListHQ`;
+  const title = `${name}${agency ? ' · ' + agency : ''} | Real Estate Agent${agent.suburb ? ' ' + agent.suburb : ''}`;
   const description = agent.bio?.slice(0, 160) ?? `${name} is a real estate agent${agent.suburb ? ' in ' + agent.suburb : ''}${agent.state ? ', ' + agent.state : ''}. View ${listingCount} active listing${listingCount !== 1 ? 's' : ''} on ListHQ.`;
   const url = `${APP_URL}/agent/${agent.slug ?? agent.id}`;
   const avatar = agent.avatar_url || agent.avatarUrl;

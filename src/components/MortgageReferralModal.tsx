@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { z } from 'zod';
+import { useTranslation } from '@/shared/lib/i18n';
 
 const schema = z.object({
   name: z.string().trim().min(1, 'Name is required').max(100),

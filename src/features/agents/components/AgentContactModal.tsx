@@ -331,10 +331,13 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
 
           if (convo) {
             // Send the enquiry message as the first message
+            const enquiryBody = formData.message || `Hi, I'm interested in ${property.title}`;
             await supabase.from('messages').insert({
               conversation_id: convo.id,
               sender_id: user.id,
-              content: formData.message || `Hi, I'm interested in ${property.title}`,
+              content: enquiryBody,
+              original_body: enquiryBody,
+              original_lang: 'en',
             });
           }
         }

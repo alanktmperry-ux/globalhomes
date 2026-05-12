@@ -7486,7 +7486,11 @@ export type Database = {
           edited_at: string | null
           id: string
           is_read: boolean
+          original_body: string
+          original_lang: string
           sender_id: string
+          translated_bodies: Json
+          translation_status: string
         }
         Insert: {
           content: string
@@ -7495,7 +7499,11 @@ export type Database = {
           edited_at?: string | null
           id?: string
           is_read?: boolean
+          original_body: string
+          original_lang: string
           sender_id: string
+          translated_bodies?: Json
+          translation_status?: string
         }
         Update: {
           content?: string
@@ -7504,7 +7512,11 @@ export type Database = {
           edited_at?: string | null
           id?: string
           is_read?: boolean
+          original_body?: string
+          original_lang?: string
           sender_id?: string
+          translated_bodies?: Json
+          translation_status?: string
         }
         Relationships: [
           {
@@ -14999,6 +15011,21 @@ export type Database = {
           preferred_type?: string | null
         }
         Relationships: []
+      }
+      conversation_participant_locales: {
+        Row: {
+          conversation_id: string | null
+          locales: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       listings_translation_summary: {
         Row: {

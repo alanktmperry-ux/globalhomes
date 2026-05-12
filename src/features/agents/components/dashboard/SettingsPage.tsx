@@ -17,6 +17,7 @@ import MessageTemplatesSettings from './MessageTemplatesSettings';
 import NotificationPreferencesSettings from './NotificationPreferencesSettings';
 import { MFAManager } from '@/features/auth/components/MFAManager';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { useTranslation } from '@/shared/lib/i18n';
 
 interface AgentProfile {
   id: string;

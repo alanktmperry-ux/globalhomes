@@ -45,6 +45,9 @@ export default defineConfig(({ mode }) => {
       output: {
         chunkFileNames: "assets/[name]-[hash].js",
         entryFileNames: "assets/[name]-[hash].js",
+        banner: mode === 'production'
+          ? '/*! ListHQ — Proprietary code © ' + new Date().getFullYear() + ' ListHQ Pty Ltd. All rights reserved. Reproduction or reverse-engineering prohibited under Australian copyright and trade secret law. */'
+          : undefined,
         manualChunks(id) {
           if (!id.includes("node_modules")) return;
 

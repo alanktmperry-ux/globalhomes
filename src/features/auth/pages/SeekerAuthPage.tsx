@@ -138,7 +138,17 @@ const SeekerAuthPage = () => {
         options: {
           emailRedirectTo: window.location.origin + '/auth/confirm',
           captchaToken,
-          data: { registered_as: 'seeker', display_name: displayName || undefined },
+          data: {
+            registered_as: 'seeker',
+            display_name: displayName || undefined,
+            locale: (() => {
+              try {
+                const stored = localStorage.getItem('listhq.locale');
+                if (stored) return stored;
+              } catch { /* */ }
+              return (navigator.language || 'en').split('-')[0].toLowerCase();
+            })(),
+          },
         },
       });
       if (signUpErr) throw signUpErr;

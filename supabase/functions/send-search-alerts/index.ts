@@ -313,19 +313,30 @@ async function handleDigest(mode: 'daily' | 'weekly') {
             </p>
           </div>
         `;
-    const translated = await translateEmail({ subject, bodyHtml, targetLanguage: recipientLanguage });
+    let translated;
+    try {
+      translated = await translateEmailPayload(
+        { subject, body: bodyHtml, isHtml: true, sourceLang: 'en' },
+        recipientLanguage,
+      );
+    } catch (err) {
+      console.error('[send-search-alerts] translation failed (digest), sending original', err, { email, recipientLocale: recipientLanguage });
+      translated = { subject, body: bodyHtml, wasTranslated: false, sourceLang: 'en', targetLang: recipientLanguage, cached: false };
+    }
+    console.log('[send-search-alerts] digest sending', { email, recipientLocale: recipientLanguage, wasTranslated: translated.wasTranslated });
 
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${RESEND_KEY}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Authorization': `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         from: EMAIL_FROM,
         to: [email],
         subject: translated.subject,
-        html: translated.bodyHtml,
+        html: translated.body,
+        headers: {
+          'X-ListHQ-Locale': translated.targetLang,
+          'X-ListHQ-Translated': translated.wasTranslated ? 'true' : 'false',
+        },
       }),
     });
 

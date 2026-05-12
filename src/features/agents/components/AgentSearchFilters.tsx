@@ -21,6 +21,7 @@ interface Props {
 }
 
 export function AgentSearchFilters({ filters, onChange, resultCount }: Props) {
+  const { t } = useTranslation();
   const [showMore, setShowMore] = useState(false);
   const [suburbInput, setSuburbInput] = useState(filters.suburb ?? '');
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -57,7 +58,7 @@ export function AgentSearchFilters({ filters, onChange, resultCount }: Props) {
             }}
             onBlur={() => { setTimeout(() => setShowSuggestions(false), 150); set('suburb', suburbInput); }}
             onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
-            placeholder="Search by suburb..."
+            placeholder={t('agent.search.searchSuburb')}
             className="w-full pl-9 border border-border rounded-xl px-3 py-2.5 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
           {showSuggestions && suggestions.length > 0 && (
@@ -86,7 +87,7 @@ export function AgentSearchFilters({ filters, onChange, resultCount }: Props) {
           onChange={e => set('state', e.target.value || undefined)}
           className="border border-border rounded-xl px-3 py-2.5 text-sm bg-background text-foreground focus:outline-none"
         >
-          <option value="">All states</option>
+          <option value="">{t('agent.search.allStates')}</option>
           {AU_STATES.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
 
@@ -96,8 +97,8 @@ export function AgentSearchFilters({ filters, onChange, resultCount }: Props) {
           onChange={e => set('specialty', e.target.value || undefined)}
           className="border border-border rounded-xl px-3 py-2.5 text-sm bg-background text-foreground focus:outline-none"
         >
-          <option value="">Any specialty</option>
-          {SPECIALTIES.map(s => <option key={s} value={s}>{s}</option>)}
+          <option value="">{t('agent.search.anySpecialty')}</option>
+          {SPECIALTIES.map(s => <option key={s.value} value={s.value}>{t(s.key)}</option>)}
         </select>
 
         {/* Min rating */}
@@ -106,9 +107,9 @@ export function AgentSearchFilters({ filters, onChange, resultCount }: Props) {
           onChange={e => set('minRating', e.target.value ? Number(e.target.value) : undefined)}
           className="border border-border rounded-xl px-3 py-2.5 text-sm bg-background text-foreground focus:outline-none"
         >
-          <option value="">Any rating</option>
-          <option value="4">4+ Stars</option>
-          <option value="4.5">4.5+ Stars</option>
+          <option value="">{t('agent.search.anyRating')}</option>
+          <option value="4">{t('agent.search.rating4Plus')}</option>
+          <option value="4.5">{t('agent.search.rating45Plus')}</option>
         </select>
 
         {hasFilters && (
@@ -116,14 +117,14 @@ export function AgentSearchFilters({ filters, onChange, resultCount }: Props) {
             onClick={() => { onChange({}); setSuburbInput(''); setSuggestions([]); }}
             className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors px-2"
           >
-            <X size={14} /> Clear
+            <X size={14} /> {t('agent.search.clear')}
           </button>
         )}
       </div>
 
       {resultCount !== undefined && (
         <p className="text-xs text-muted-foreground">
-          Showing {resultCount} agent{resultCount !== 1 ? 's' : ''}
+          {t(resultCount === 1 ? 'agent.search.showingAgents_one' : 'agent.search.showingAgents_other', { count: resultCount })}
         </p>
       )}
     </div>

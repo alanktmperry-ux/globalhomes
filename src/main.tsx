@@ -27,6 +27,17 @@ const rootEl = document.getElementById("root")!;
 // and re-render anyway — we strip the shell and use createRoot, which cleanly
 // replaces it on first commit. If a future build-time prerender produces a tree
 // that matches React, set `data-hydrate="1"` on #root to attach in place.
+// Capture any pre-mount interaction with the inert search input so we can
+// forward the user's focus + typed value into the live React input.
+const prerenderInput = rootEl.querySelector('[data-prerender-shell="1"] input');
+let preHadFocus = false;
+let preTypedValue = '';
+if (prerenderInput instanceof HTMLInputElement) {
+  preHadFocus = document.activeElement === prerenderInput;
+  preTypedValue = prerenderInput.value;
+  prerenderInput.removeAttribute('readonly');
+}
+
 const prerenderShell = rootEl.querySelector('[data-prerender-shell]');
 if (prerenderShell) prerenderShell.remove();
 

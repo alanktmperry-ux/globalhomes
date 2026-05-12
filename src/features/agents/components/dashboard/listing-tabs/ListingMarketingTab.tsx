@@ -1093,6 +1093,15 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               { lang: 'bn', flag: '🇧🇩', label: 'Bengali' },
               { lang: 'tl', flag: '🇵🇭', label: 'Filipino' },
               { lang: 'id', flag: '🇮🇩', label: 'Indonesian' },
+              { lang: 'pa', flag: '🇮🇳', label: 'Punjabi' },
+              { lang: 'ta', flag: '🇮🇳', label: 'Tamil' },
+              { lang: 'ms', flag: '🇲🇾', label: 'Malay' },
+              { lang: 'th', flag: '🇹🇭', label: 'Thai' },
+              { lang: 'ne', flag: '🇳🇵', label: 'Nepali' },
+              { lang: 'el', flag: '🇬🇷', label: 'Greek' },
+              { lang: 'it', flag: '🇮🇹', label: 'Italian' },
+              { lang: 'es', flag: '🇪🇸', label: 'Spanish' },
+              { lang: 'fa', flag: '🇮🇷', label: 'Persian' },
             ].map(({ lang, flag, label }) => (
               <button
                 key={lang}

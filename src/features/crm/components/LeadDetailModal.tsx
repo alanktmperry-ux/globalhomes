@@ -78,6 +78,34 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
   const [showSMSComposer, setShowSMSComposer] = useState(false);
   const [smsBody, setSmsBody] = useState('');
   const [smsSent, setSmsSent] = useState(false);
+  const [showOriginal, setShowOriginal] = useState(false);
+
+  const viewerLocale = useViewerLocale();
+  const vLoc = normalizeLocale(viewerLocale);
+  const origLang = normalizeLocale(lead.original_lang || lead.original_language || 'en');
+  const originalMessage =
+    lead.original_message || lead.message_original || lead.message || null;
+  const translatedMap = (lead.translated_messages as Record<string, string> | null | undefined) || null;
+  const cachedTranslation =
+    translatedMap?.[vLoc] || translatedMap?.[viewerLocale] || null;
+  // Fall back to legacy message_en when viewer is English
+  const legacyEn = vLoc === 'en' ? (lead.message_en || null) : null;
+  const translationStatus = lead.translation_status || null;
+
+  const hasTranslation = !!(cachedTranslation || legacyEn) && origLang !== vLoc;
+  const displayMessage = showOriginal
+    ? (originalMessage || lead.message || '')
+    : (cachedTranslation || legacyEn || originalMessage || lead.message || '');
+
+  const renderedLang = showOriginal ? origLang : (hasTranslation ? vLoc : origLang);
+  const isRTL = RTL_LANGS.includes(renderedLang);
+  const isTranslating =
+    !hasTranslation &&
+    (translationStatus === 'pending' || translationStatus === 'translating') &&
+    origLang !== vLoc &&
+    !!originalMessage;
+  const isFailed =
+    translationStatus === 'failed' && !hasTranslation && origLang !== vLoc;
 
   const handleAddActivity = async () => {
     if (!actBody.trim()) return;

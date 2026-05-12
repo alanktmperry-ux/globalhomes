@@ -179,7 +179,7 @@ export function PropertyMap({
 
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to load map');
+          setError(err instanceof Error ? err.message : t('property.map.loadError'));
           setIsLoading(false);
         }
       }

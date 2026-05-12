@@ -755,14 +755,14 @@ const TrustLedgerPage = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-xs">Date</TableHead>
-                    <TableHead className="text-xs">Receipt #</TableHead>
-                    <TableHead className="text-xs">Payment #</TableHead>
-                    <TableHead className="text-xs">Client</TableHead>
-                    <TableHead className="text-xs">Property</TableHead>
-                    <TableHead className="text-xs text-right">In</TableHead>
-                    <TableHead className="text-xs text-right">Out</TableHead>
-                    <TableHead className="text-xs text-right">Balance</TableHead>
+                    <TableHead className="text-xs">{t('agent.trust.ledger.col.date')}</TableHead>
+                    <TableHead className="text-xs">{t('agent.trust.ledger.col.receiptNo')}</TableHead>
+                    <TableHead className="text-xs">{t('agent.trust.ledger.col.paymentNo')}</TableHead>
+                    <TableHead className="text-xs">{t('agent.trust.ledger.col.client')}</TableHead>
+                    <TableHead className="text-xs">{t('agent.trust.ledger.col.property')}</TableHead>
+                    <TableHead className="text-xs text-right">{t('agent.trust.ledger.col.in')}</TableHead>
+                    <TableHead className="text-xs text-right">{t('agent.trust.ledger.col.out')}</TableHead>
+                    <TableHead className="text-xs text-right">{t('agent.trust.ledger.col.balance')}</TableHead>
                     <TableHead className="text-xs w-[40px]"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -772,14 +772,14 @@ const TrustLedgerPage = () => {
                       <TableCell colSpan={9} className="py-14">
                         <div className="text-center space-y-2 max-w-xs mx-auto">
                           {searchQuery || filterStatus !== 'all' ? (
-                            <p className="text-sm text-muted-foreground">No entries match your filters.</p>
+                            <p className="text-sm text-muted-foreground">{t('agent.trust.ledger.empty.filtered')}</p>
                           ) : (
                             <>
                               <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mx-auto">
                                 <Landmark size={18} className="text-muted-foreground" />
                               </div>
-                              <p className="font-medium text-sm text-foreground">No trust entries for {monthNames[viewMonth]} {viewYear}</p>
-                              <p className="text-xs text-muted-foreground">Record a receipt or payment to start tracking your trust account for this period.</p>
+                              <p className="font-medium text-sm text-foreground">{t('agent.trust.ledger.empty.title', { month: monthNames[viewMonth], year: viewYear })}</p>
+                              <p className="text-xs text-muted-foreground">{t('agent.trust.ledger.empty.body')}</p>
                             </>
                           )}
                         </div>

@@ -28,6 +28,11 @@ import { fil } from './locales/fil';
 import { ru } from './locales/ru';
 import { ne } from './locales/ne';
 import { pl } from './locales/pl';
+import { zh } from './locales/zh';
+import { ja } from './locales/ja';
+import { tr } from './locales/tr';
+import { de } from './locales/de';
+import { el } from './locales/el';
 import {
   FROM_LEGACY_CODE_MAP,
   type SupportedLanguageCode,
@@ -55,6 +60,11 @@ const LOCALES: Partial<Record<SupportedLanguageCode, Record<string, string>>> = 
   'ru': ru,
   'ne': ne as any,
   'pl': pl as any,
+  'zh': zh as any,
+  'ja': ja as any,
+  'tr': tr as any,
+  'de': de as any,
+  'el': el as any,
 };
 
 type AnyKey = TranslationKey | (string & {});

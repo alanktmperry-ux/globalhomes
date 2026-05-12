@@ -33,6 +33,11 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'ru',    name: 'Русский' },
   { code: 'ne',    name: 'नेपाली' },
   { code: 'pl',    name: 'Polski' },
+  { code: 'zh',    name: '中文' },
+  { code: 'ja',    name: '日本語' },
+  { code: 'tr',    name: 'Türkçe' },
+  { code: 'de',    name: 'Deutsch' },
+  { code: 'el',    name: 'Ελληνικά' },
 ] as const;
 
 export type SupportedLanguageCode = typeof SUPPORTED_LANGUAGES[number]['code'];
@@ -68,11 +73,16 @@ export const LEGACY_CODE_MAP: Record<SupportedLanguageCode, string> = {
   'ru':    'ru',
   'ne':    'ne' as any,
   'pl':    'pl',
+  'zh':    'zh' as any,
+  'ja':    'ja' as any,
+  'tr':    'tr' as any,
+  'de':    'de' as any,
+  'el':    'el' as any,
 };
 
 export const FROM_LEGACY_CODE_MAP: Record<string, SupportedLanguageCode> = {
   'en':    'en',
-  'zh':    'zh-CN',
+  // 'zh' → 'zh' (added below with new locales)
   'zh-TW': 'zh-TW',
   'yue':   'yue',
   'vi':    'vi',
@@ -93,4 +103,9 @@ export const FROM_LEGACY_CODE_MAP: Record<string, SupportedLanguageCode> = {
   'ru':    'ru',
   'ne':    'ne' as SupportedLanguageCode,
   'pl':    'pl' as SupportedLanguageCode,
+  'zh':    'zh' as SupportedLanguageCode,
+  'ja':    'ja' as SupportedLanguageCode,
+  'tr':    'tr' as SupportedLanguageCode,
+  'de':    'de' as SupportedLanguageCode,
+  'el':    'el' as SupportedLanguageCode,
 };

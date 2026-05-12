@@ -39,6 +39,11 @@ const DISPLAY_LANGUAGES: DisplayLang[] = [
   { code: 'ru',    legacy: 'ru',    short: 'RU', flag: '🇷🇺', name: 'Русский',            available: true },
   { code: 'ne',    legacy: 'ne' as Language, short: 'NE', flag: '🇳🇵', name: 'नेपाली · Nepali',  available: true },
   { code: 'pl',    legacy: 'pl',    short: 'PL', flag: '🇵🇱', name: 'Polski',              available: true },
+  { code: 'zh',    legacy: 'zh' as Language, short: 'ZH', flag: '🇨🇳', name: '中文 · Chinese',  available: true },
+  { code: 'ja',    legacy: 'ja' as Language, short: 'JA', flag: '🇯🇵', name: '日本語 · Japanese', available: true },
+  { code: 'tr',    legacy: 'tr' as Language, short: 'TR', flag: '🇹🇷', name: 'Türkçe',          available: true },
+  { code: 'de',    legacy: 'de' as Language, short: 'DE', flag: '🇩🇪', name: 'Deutsch',          available: true },
+  { code: 'el',    legacy: 'el' as Language, short: 'EL', flag: '🇬🇷', name: 'Ελληνικά',         available: true },
 ];
 
 const MANUAL_SET_KEY = 'listhq_language_manually_set';

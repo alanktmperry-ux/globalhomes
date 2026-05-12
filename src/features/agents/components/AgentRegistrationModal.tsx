@@ -781,18 +781,18 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                   <div>
                     <Label>I primarily sell:</Label>
                     <div className="flex flex-wrap gap-1.5 mt-1.5">
-                      {PROPERTY_TYPES.map((t) => (
+                      {PROPERTY_TYPES.map((pt) => (
                         <button
-                          key={t}
+                          key={pt.value}
                           type="button"
-                          onClick={() => update('propertyType', t)}
+                          onClick={() => update('propertyType', pt.value)}
                           className={`px-3 py-1 text-xs rounded-full border transition-colors font-medium ${
-                            form.propertyType === t
+                            form.propertyType === pt.value
                               ? 'bg-primary text-primary-foreground border-primary'
                               : 'bg-secondary text-foreground border-border hover:border-primary/50'
                           }`}
                         >
-                          {t}
+                          {t(pt.key)}
                         </button>
                       ))}
                     </div>

@@ -23,9 +23,11 @@ const AgentAuthPage = () => {
   usePageTitle('Log In');
   const navigate = useNavigate();
   const { user, isAgent, isAdmin, loading: authLoading } = useAuth();
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get('mode') ?? 'login';
 
   const [pendingRedirect, setPendingRedirect] = useState<'dashboard' | null>(null);
-  const [step, setStep] = useState<Step>('email');
+  const [step, setStep] = useState<Step>(mode === 'signup' ? 'register' : 'email');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [regEmail, setRegEmail] = useState('');

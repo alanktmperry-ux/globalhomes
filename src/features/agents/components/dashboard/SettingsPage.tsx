@@ -263,14 +263,14 @@ const SettingsPage = () => {
                 </button>
               </div>
               <div>
-                <p className="text-sm font-semibold text-[#0a0f1e]">Profile Photo</p>
-                <p className="text-xs text-[#6B7280] mt-0.5 font-light">PNG, JPG up to 5MB. Click photo to upload.</p>
+                <p className="text-sm font-semibold text-[#0a0f1e]">{t('agent.settings.profile.photo')}</p>
+                <p className="text-xs text-[#6B7280] mt-0.5 font-light">{t('agent.settings.profile.photoHint')}</p>
               </div>
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <Label className="text-xs font-semibold text-[#374151]">Full Name</Label>
+                <Label className="text-xs font-semibold text-[#374151]">{t('agent.settings.profile.fullName')}</Label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
@@ -278,7 +278,7 @@ const SettingsPage = () => {
                 />
               </div>
               <div>
-                <Label className="text-xs font-semibold text-[#374151]">Agency</Label>
+                <Label className="text-xs font-semibold text-[#374151]">{t('agent.settings.profile.agency')}</Label>
                 <Input
                   value={formData.agency}
                   onChange={(e) => setFormData(prev => ({ ...prev, agency: e.target.value }))}
@@ -286,7 +286,7 @@ const SettingsPage = () => {
                 />
               </div>
               <div>
-                <Label className="text-xs font-semibold text-[#374151]">Email</Label>
+                <Label className="text-xs font-semibold text-[#374151]">{t('agent.settings.account.email')}</Label>
                 <Input
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
@@ -294,7 +294,7 @@ const SettingsPage = () => {
                 />
               </div>
               <div>
-                <Label className="text-xs font-semibold text-[#374151]">Phone</Label>
+                <Label className="text-xs font-semibold text-[#374151]">{t('agent.settings.profile.phone')}</Label>
                 <Input
                   value={formData.phone}
                   onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}

@@ -138,22 +138,21 @@ Deno.serve(async (req: Request) => {
   });
 
   // ---- Auth ----
-  // The Postgres trigger calls us with the service-role key in the Authorization
-  // header. End users call us with their personal JWT. We require one of:
-  //   (a) Authorization === Bearer <SERVICE_ROLE>, or
-  //   (b) a JWT that resolves to a participant in the message's conversation.
+  // Two modes:
+  //   (a) System mode: caller has no JWT, or supplies the project anon/service-role
+  //       key in Authorization. Used by the AFTER INSERT trigger and server-side jobs.
+  //       Skips the participant ACL — data exposure is still gated by messages RLS
+  //       on the read side (translated_bodies is only readable by participants).
+  //   (b) User mode: caller supplies a user JWT. We resolve the user and require
+  //       them to be a participant in the message's conversation.
   const authHeader = req.headers.get("Authorization") || "";
   const bearer = authHeader.replace(/^Bearer\s+/i, "").trim();
-  const isServiceRoleCall = bearer && bearer === SERVICE_ROLE;
+  const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") || "";
+  const isSystemCall =
+    !bearer || bearer === SERVICE_ROLE || (ANON_KEY && bearer === ANON_KEY);
 
   let callerUserId: string | null = null;
-  if (!isServiceRoleCall) {
-    if (!bearer) {
-      return new Response(JSON.stringify({ error: "auth_required" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+  if (!isSystemCall) {
     const { data: userData, error: userErr } = await admin.auth.getUser(bearer);
     if (userErr || !userData?.user) {
       return new Response(JSON.stringify({ error: "invalid_token" }), {

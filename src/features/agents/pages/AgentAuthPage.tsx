@@ -271,6 +271,7 @@ const AgentAuthPage = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 className={s.input}
                 style={s.inputStyle}
+                name="email"
                 autoComplete="email"
               />
             </div>
@@ -314,6 +315,8 @@ const AgentAuthPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className={s.input}
                   style={s.inputStyle}
+                  name="password"
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"
@@ -364,6 +367,8 @@ const AgentAuthPage = () => {
                 className={s.input}
                 style={s.inputStyle}
                 aria-invalid={!!emailError}
+                name="email"
+                autoComplete="email"
               />
               {emailError && (
                 <p className="text-xs mt-1.5" style={{ color: '#FCA5A5' }}>{emailError}</p>
@@ -381,6 +386,7 @@ const AgentAuthPage = () => {
                   placeholder="At least 10 characters"
                   className={s.input}
                   style={s.inputStyle}
+                  name="new-password"
                   autoComplete="new-password"
                 />
                 <button

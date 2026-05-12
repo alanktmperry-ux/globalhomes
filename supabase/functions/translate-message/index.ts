@@ -179,7 +179,7 @@ Deno.serve(async (req: Request) => {
   }
 
   // ---- Participant ACL (skipped for service-role) ----
-  if (!isServiceRoleCall && callerUserId) {
+  if (!isSystemCall && callerUserId) {
     const { data: part } = await admin
       .from("conversation_participants")
       .select("user_id")

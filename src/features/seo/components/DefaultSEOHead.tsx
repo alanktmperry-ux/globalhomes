@@ -5,8 +5,8 @@ const OG_IMAGE = `${SITE_URL}/og-image.png`;
 
 export function DefaultSEOHead() {
   return (
-    <Helmet defaultTitle="ListHQ — Find Properties Across Australia" titleTemplate="%s | ListHQ">
-      <meta name="description" content="ListHQ is Australia's AI-powered property platform. Search houses, apartments and rentals with voice search. Get instant alerts for new listings." />
+    <Helmet defaultTitle="ListHQ — Australia's multilingual property platform" titleTemplate="%s | ListHQ">
+      <meta name="description" content="Australia's multilingual property platform. Search listings in any language. Free for buyers, 60-day free trial for agents." />
       <link rel="canonical" href={SITE_URL} />
       <meta property="og:site_name" content="ListHQ" />
       <meta property="og:type" content="website" />
@@ -24,7 +24,7 @@ export function DefaultSEOHead() {
         "name": "ListHQ",
         "url": "https://listhq.com.au",
         "logo": "https://listhq.com.au/og-image.png",
-        "description": "Australia's AI-powered property platform. Search, buy, rent and manage property across Australia in any language.",
+        "description": "Australia's multilingual property platform — listings auto-translated into 30+ languages. One platform for every buyer and every agent.",
         "contactPoint": {
           "@type": "ContactPoint",
           "contactType": "customer support",

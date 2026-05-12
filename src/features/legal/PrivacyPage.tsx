@@ -27,7 +27,7 @@ const PrivacyPage = () => {
   return (
     <>
       <SEO
-        title="Privacy Policy | ListHQ"
+        title="Privacy Policy"
         description="Privacy Policy for ListHQ — how we collect, use and protect your personal information under the Australian Privacy Act and GDPR."
         path="/privacy"
       />

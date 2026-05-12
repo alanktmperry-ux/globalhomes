@@ -254,7 +254,7 @@ LISTING DATA:
 - Features: ${listing.features ? JSON.stringify(listing.features) : "None listed"}
 - Year Built: ${listing.year_built || "N/A"}
 
-TRANSLATIONS — provide for each of these language keys: "zh_simplified" (Simplified Chinese), "zh_traditional" (Traditional Chinese), "vi" (Vietnamese), "ko" (Korean), "ar" (Arabic), "ja" (Japanese), "hi" (Hindi), "pa" (Punjabi - Gurmukhi script), "ta" (Tamil), "bn" (Bengali), "tl" (Tagalog/Filipino), "id" (Indonesian), "ms" (Malay), "th" (Thai), "ne" (Nepali - Devanagari script), "si" (Sinhala), "el" (Greek), "it" (Italian), "es" (Spanish - Australian/international context), "fa" (Farsi/Persian - right-to-left)
+TRANSLATIONS — provide for each of these language keys: "zh_simplified" (Simplified Chinese), "zh_traditional" (Traditional Chinese), "vi" (Vietnamese), "ko" (Korean), "ar" (Arabic), "ja" (Japanese), "hi" (Hindi), "pa" (Punjabi - Gurmukhi script), "ta" (Tamil), "bn" (Bengali), "tl" (Tagalog/Filipino), "id" (Indonesian), "ms" (Malay), "th" (Thai), "ne" (Nepali - Devanagari script), "si" (Sinhala), "el" (Greek), "it" (Italian), "es" (Spanish - Australian/international context), "fa" (Farsi/Persian - right-to-left), "fr" (French), "ru" (Russian), "pt" (Portuguese), "de" (German), "tr" (Turkish), "ur" (Urdu), "mr" (Marathi), "te" (Telugu)
 Each language must contain:
 - title: translated property title
 - description: full translated description (natural, not word-for-word)

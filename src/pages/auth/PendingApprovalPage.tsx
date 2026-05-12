@@ -58,8 +58,8 @@ export default function PendingApprovalPage() {
           </button>
           <p className="text-xs text-muted-foreground">
             Questions? Email{" "}
-            <a href="mailto:alan@squaredevelopment.com.au" className="underline">
-              alan@squaredevelopment.com.au
+            <a href="mailto:hello@listhq.com.au" className="underline">
+              hello@listhq.com.au
             </a>
           </p>
         </div>

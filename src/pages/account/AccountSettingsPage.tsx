@@ -11,12 +11,14 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/shared/hooks/use-toast";
 import { getErrorMessage } from "@/shared/lib/errorUtils";
 import { usePageTitle } from '@/lib/usePageTitle';
+import { LanguageSwitcher } from '@/shared/components/layout/LanguageSwitcher';
 
 type Profile = {
   id: string;
   full_name: string | null;
   phone: string | null;
   language_preference: string | null;
+  locale: string | null;
   email_unsubscribed: boolean | null;
   email_unsubscribed_at: string | null;
 };

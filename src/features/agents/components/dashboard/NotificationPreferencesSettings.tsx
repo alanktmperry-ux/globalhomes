@@ -223,7 +223,6 @@ export default function NotificationPreferencesSettings() {
                   <th className="text-left px-3 py-2 font-medium">Event</th>
                   <th className="px-2 py-2 font-medium w-16">In-app</th>
                   <th className="px-2 py-2 font-medium w-16">Email</th>
-                  <th className="px-2 py-2 font-medium w-16" title="Push notifications coming soon">Push</th>
                   <th className="px-2 py-2 font-medium w-32">Frequency</th>
                 </tr>
               </thead>
@@ -249,9 +248,6 @@ export default function NotificationPreferencesSettings() {
                           onCheckedChange={(v) => upsertPref(ev.key, { channels: { ...p.channels, email: v } })}
                         />
                       </td>
-                      <td className="px-2 py-2 text-center">
-                        <Switch checked={false} disabled />
-                      </td>
                       <td className="px-2 py-2">
                         <Select
                           value={p.frequency}
@@ -275,9 +271,7 @@ export default function NotificationPreferencesSettings() {
         </div>
       ))}
 
-      {!PUSH_AVAILABLE && (
-        <p className="text-xs text-muted-foreground">Push notifications are not yet available — coming soon.</p>
-      )}
+
     </div>
   );
 }

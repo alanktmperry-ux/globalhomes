@@ -10409,6 +10409,33 @@ export type Database = {
           },
         ]
       }
+      rate_limits: {
+        Row: {
+          blocked_until: string | null
+          bucket_key: string
+          id: string
+          last_request_at: string
+          request_count: number
+          window_start: string
+        }
+        Insert: {
+          blocked_until?: string | null
+          bucket_key: string
+          id?: string
+          last_request_at?: string
+          request_count?: number
+          window_start?: string
+        }
+        Update: {
+          blocked_until?: string | null
+          bucket_key?: string
+          id?: string
+          last_request_at?: string
+          request_count?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       referral_agents: {
         Row: {
           agency_name: string | null
@@ -15449,6 +15476,16 @@ export type Database = {
           },
         ]
       }
+      rate_limit_dashboard: {
+        Row: {
+          active_buckets: number | null
+          currently_blocked: number | null
+          endpoint: string | null
+          scope: string | null
+          total_requests_this_window: number | null
+        }
+        Relationships: []
+      }
       trust_account_balances_view: {
         Row: {
           agent_id: string | null
@@ -15472,6 +15509,7 @@ export type Database = {
         Returns: undefined
       }
       check_webhook_config: { Args: never; Returns: Json }
+      cleanup_old_rate_limits: { Args: never; Returns: undefined }
       close_trust_period:
         | {
             Args: {

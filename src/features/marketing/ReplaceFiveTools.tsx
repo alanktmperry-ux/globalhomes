@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Layers } from "lucide-react";
+import { useTranslation } from "@/shared/lib/i18n";
 
 /**
  * "Replace five tools with one." — Bose-signature visual moment.

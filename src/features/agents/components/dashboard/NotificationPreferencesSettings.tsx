@@ -248,9 +248,6 @@ export default function NotificationPreferencesSettings() {
                           onCheckedChange={(v) => upsertPref(ev.key, { channels: { ...p.channels, email: v } })}
                         />
                       </td>
-                      <td className="px-2 py-2 text-center">
-                        <Switch checked={false} disabled />
-                      </td>
                       <td className="px-2 py-2">
                         <Select
                           value={p.frequency}

@@ -8,7 +8,7 @@ interface Props {
 }
 
 const FEATURES = [
-  { icon: Globe, text: 'Translate any listing into 6 languages in 60 seconds' },
+  { icon: Globe, text: 'Publish any listing in every buyer language — automatically' },
   { icon: Users, text: 'Match buyers automatically with AI — no cold calls' },
   { icon: BarChart2, text: 'Trust accounting, PM, CRM and vendor reports in one place' },
 ];
@@ -37,7 +37,7 @@ export function WelcomeModal({ agentName, onClose }: Props) {
           Welcome to ListHQ, {firstName}!
         </h2>
         <p className="text-sm text-muted-foreground text-center mt-1.5">
-          You're on Australia's only multilingual property platform. Here's what you can do right now:
+          You're on Australia's multilingual property platform — every listing, every buyer language. Here's what you unlock today:
         </p>
 
         <ul className="space-y-2.5 mt-5">

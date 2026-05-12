@@ -80,7 +80,7 @@ export default function ReplaceFiveTools() {
               animationDelay: "0ms",
             }}
           >
-            <CalloutCard number="Any" label="Language, auto-translated" />
+            <CalloutCard number="Any" label={t("marketing.replaceTools.callout.anyLanguage")} />
             <CalloutLine direction="horizontal" dotSide="right" />
           </div>
 
@@ -95,7 +95,7 @@ export default function ReplaceFiveTools() {
               animationDelay: "300ms",
             }}
           >
-            <CalloutCard number="AI" label="Voice listing creation" />
+            <CalloutCard number="AI" label={t("marketing.replaceTools.callout.voice")} />
             <CalloutLine direction="horizontal" dotSide="left" />
           </div>
 
@@ -111,15 +111,15 @@ export default function ReplaceFiveTools() {
             }}
           >
             <CalloutLine direction="vertical" dotSide="top" />
-            <CalloutCard number="7" suffix="M+" label="Multilingual buyers reached" />
+            <CalloutCard number="7" suffix="M+" label={t("marketing.replaceTools.callout.buyers")} />
           </div>
         </div>
 
         {/* Mobile simplified stat row (visible <1024px) */}
         <div className="replace-mobile-stats hidden grid-cols-3 gap-3 max-w-[640px] mx-auto mt-8">
-          <MobileStat number="Any" label="Language" />
-          <MobileStat number="AI" label="Voice listing" />
-          <MobileStat number="7M+" label="Buyers reached" />
+          <MobileStat number="Any" label={t("marketing.replaceTools.mobile.language")} />
+          <MobileStat number="AI" label={t("marketing.replaceTools.mobile.voice")} />
+          <MobileStat number="7M+" label={t("marketing.replaceTools.mobile.buyers")} />
         </div>
 
         {/* The 5 tools being replaced */}

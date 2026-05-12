@@ -7,6 +7,30 @@ import type { CRMLead, ActivityType, LeadStage, LeadPriority } from '../types';
 import { HaloInviteButton } from '@/components/halo/HaloInviteButton';
 import { BuyerLanguageBadge } from '@/shared/components/BuyerLanguageBadge';
 import { ReplyTranslationPreview } from './ReplyTranslationPreview';
+import { useViewerLocale } from '@/features/auth/hooks/useViewerLocale';
+
+const RTL_LANGS = ['ar', 'fa', 'ur', 'he'];
+
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: 'English', zh: 'Chinese', 'zh-CN': 'Chinese', 'zh-TW': 'Traditional Chinese',
+  yue: 'Cantonese', vi: 'Vietnamese', ko: 'Korean', ja: 'Japanese',
+  ar: 'Arabic', hi: 'Hindi', pa: 'Punjabi', ta: 'Tamil', bn: 'Bengali',
+  it: 'Italian', es: 'Spanish', fr: 'French', pt: 'Portuguese',
+  ru: 'Russian', th: 'Thai', id: 'Indonesian', ms: 'Malay',
+  fil: 'Filipino', de: 'German', el: 'Greek', pl: 'Polish',
+  ne: 'Nepali', tr: 'Turkish', fa: 'Persian', ur: 'Urdu', he: 'Hebrew',
+};
+
+function getLanguageName(code: string | null | undefined): string {
+  if (!code) return 'unknown';
+  const norm = code.split('-')[0].split('_')[0];
+  return LANGUAGE_NAMES[code] || LANGUAGE_NAMES[norm] || code.toUpperCase();
+}
+
+function normalizeLocale(l: string): string {
+  if (!l) return 'en';
+  return l.startsWith('zh_') ? l : l.split(/[-_]/)[0].toLowerCase();
+}
 
 const ACTIVITY_TYPES: { value: ActivityType; label: string; icon: string }[] = [
   { value: 'note', label: 'Note', icon: '' },

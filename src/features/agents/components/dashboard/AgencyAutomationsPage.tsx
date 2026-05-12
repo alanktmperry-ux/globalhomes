@@ -75,6 +75,7 @@ const TRIGGER_ORDER: TriggerType[] = [
 ];
 
 export default function AgencyAutomationsPage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [agencyId, setAgencyId] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);

@@ -72,6 +72,7 @@ function triggerLabel(rule: Rule): string {
 }
 
 const AutomationSettingsPage = () => {
+  const { t } = useTranslation();
   const agentId = useAgentId();
   const [rules, setRules] = useState<Rule[]>([]);
   const [log, setLog] = useState<LogEntry[]>([]);

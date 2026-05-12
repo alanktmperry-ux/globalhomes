@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Mail, Play, Pencil, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { useTranslation } from '@/shared/lib/i18n';
 
 type Rule = {
   id: string;

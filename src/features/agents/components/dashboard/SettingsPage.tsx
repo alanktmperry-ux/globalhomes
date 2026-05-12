@@ -221,10 +221,10 @@ const SettingsPage = () => {
           <div className="bg-white rounded-[12px] p-6" style={{ border: '1px solid #E5E7EB' }}>
             <div className="mb-5">
               <h3 className="text-base font-bold text-[#0a0f1e] flex items-center gap-2">
-                <User size={16} /> Agent Profile
+                <User size={16} /> {t('agent.settings.profile.title')}
               </h3>
               <p className="text-xs text-[#6B7280] mt-1 font-light">
-                Your public-facing identity for buyers and across the platform.
+                {t('agent.settings.profile.subtitle')}
               </p>
             </div>
 

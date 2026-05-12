@@ -66,7 +66,6 @@ export async function checkRateLimit(
 
   const now = new Date();
   const windowMs = config.windowSeconds * 1000;
-  const windowFloor = new Date(now.getTime() - windowMs);
 
   // Hard zero — endpoint disallows this scope entirely
   if (maxRequests <= 0) {
@@ -79,80 +78,49 @@ export async function checkRateLimit(
     };
   }
 
-  const { data: existing } = await supabase
-    .from("rate_limits")
-    .select("request_count, window_start, blocked_until")
-    .eq("bucket_key", bucketKey)
-    .maybeSingle();
+  // Atomic increment via SQL function — avoids read-then-write race under concurrency.
+  const { data, error } = await supabase.rpc("bump_rate_limit", {
+    p_bucket_key: bucketKey,
+    p_window_seconds: config.windowSeconds,
+    p_max_requests: maxRequests,
+  });
 
-  if (existing?.blocked_until && new Date(existing.blocked_until) > now) {
+  if (error || !data || !Array.isArray(data) || data.length === 0) {
+    // Fail open
+    console.error("[rateLimit] bump_rate_limit failed:", error);
+    return {
+      allowed: true,
+      remaining: maxRequests,
+      limit: maxRequests,
+      resetAt: new Date(now.getTime() + windowMs),
+    };
+  }
+
+  const row = data[0] as {
+    request_count: number;
+    window_start: string;
+    blocked_until: string | null;
+    allowed: boolean;
+  };
+
+  const windowEnd = new Date(new Date(row.window_start).getTime() + windowMs);
+  const resetAt = row.blocked_until ? new Date(row.blocked_until) : windowEnd;
+
+  if (!row.allowed) {
     return {
       allowed: false,
       remaining: 0,
       limit: maxRequests,
-      resetAt: new Date(existing.blocked_until),
+      resetAt,
       blockedReason: "rate-limited",
     };
   }
 
-  if (existing && new Date(existing.window_start) > windowFloor) {
-    const newCount = existing.request_count + 1;
-    const windowEnd = new Date(new Date(existing.window_start).getTime() + windowMs);
-
-    if (newCount > maxRequests) {
-      await supabase
-        .from("rate_limits")
-        .update({
-          request_count: newCount,
-          last_request_at: now.toISOString(),
-          blocked_until: windowEnd.toISOString(),
-        })
-        .eq("bucket_key", bucketKey);
-
-      return {
-        allowed: false,
-        remaining: 0,
-        limit: maxRequests,
-        resetAt: windowEnd,
-        blockedReason: "rate-limited",
-      };
-    }
-
-    await supabase
-      .from("rate_limits")
-      .update({
-        request_count: newCount,
-        last_request_at: now.toISOString(),
-      })
-      .eq("bucket_key", bucketKey);
-
-    return {
-      allowed: true,
-      remaining: maxRequests - newCount,
-      limit: maxRequests,
-      resetAt: windowEnd,
-    };
-  }
-
-  // New window — upsert reset row
-  await supabase
-    .from("rate_limits")
-    .upsert(
-      {
-        bucket_key: bucketKey,
-        request_count: 1,
-        window_start: now.toISOString(),
-        last_request_at: now.toISOString(),
-        blocked_until: null,
-      },
-      { onConflict: "bucket_key" },
-    );
-
   return {
     allowed: true,
-    remaining: maxRequests - 1,
+    remaining: Math.max(0, maxRequests - row.request_count),
     limit: maxRequests,
-    resetAt: new Date(now.getTime() + windowMs),
+    resetAt: windowEnd,
   };
 }
 

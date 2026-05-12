@@ -574,8 +574,8 @@ export function PropertyMap({
             </button>
           </TooltipTrigger>
           <TooltipContent side="right" className="max-w-[220px]">
-            <p className="font-medium mb-1">Map drawing tools</p>
-            <p className="text-xs">Use the icons above to draw a <strong>circle</strong> or <strong>polygon</strong> on the map to filter properties within that area. Click and drag to draw.</p>
+            <p className="font-medium mb-1">{t('property.map.drawingToolsTitle')}</p>
+            <p className="text-xs">{t('property.map.drawingToolsBody')}</p>
           </TooltipContent>
         </Tooltip>
       )}

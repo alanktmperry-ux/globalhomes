@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from '@/shared/lib/i18n';
 
 type LangKey = 'zh' | 'vi' | 'ar' | 'en';
 

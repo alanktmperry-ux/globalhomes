@@ -220,8 +220,10 @@ const SeekerAuthPage = () => {
 
   return (
     <AuthShell
-      heading={isSignIn ? t('auth.welcomeBack') : t('auth.createAccount')}
-      subheading={isSignIn ? t('auth.emailPlaceholder') || '' : t('auth.createAccountSub')}
+      heading={isSignIn
+        ? `${t('auth.welcome')} ${t('auth.welcomeBack')}`
+        : `${t('auth.createAccount')} ${t('auth.createAccountSub')}`}
+      subheading=""
     >
       {error && <AuthError>{error}</AuthError>}
 

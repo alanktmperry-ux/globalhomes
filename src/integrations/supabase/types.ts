@@ -5307,6 +5307,48 @@ export type Database = {
         }
         Relationships: []
       }
+      email_translation_cache: {
+        Row: {
+          created_at: string
+          hit_count: number
+          id: string
+          last_used_at: string
+          original_body: string
+          original_subject: string
+          payload_hash: string
+          source_lang: string
+          target_lang: string
+          translated_body: string
+          translated_subject: string
+        }
+        Insert: {
+          created_at?: string
+          hit_count?: number
+          id?: string
+          last_used_at?: string
+          original_body: string
+          original_subject: string
+          payload_hash: string
+          source_lang?: string
+          target_lang: string
+          translated_body: string
+          translated_subject: string
+        }
+        Update: {
+          created_at?: string
+          hit_count?: number
+          id?: string
+          last_used_at?: string
+          original_body?: string
+          original_subject?: string
+          payload_hash?: string
+          source_lang?: string
+          target_lang?: string
+          translated_body?: string
+          translated_subject?: string
+        }
+        Relationships: []
+      }
       email_unsubscribe_tokens: {
         Row: {
           created_at: string

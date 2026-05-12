@@ -128,17 +128,17 @@ export default function AgentLandingPage() {
       <section className="border-y border-[#E5E5E5] py-16 px-6 md:px-8 bg-white">
         <div className="max-w-[1200px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
-            { target: 50000, suffix: '+', label: 'Australian buyers reached' },
-            { target: 20, suffix: '', label: 'Languages, auto-translated' },
-            { target: 7, suffix: 'M+', label: 'International buyers in network' },
-            { target: 60, suffix: 'd', label: 'Free, then locked pricing' },
+            { target: 0, staticText: 'Active', label: 'Verified buyer network' },
+            { target: 0, staticText: 'Any language', label: 'Auto-translated listings' },
+            { target: 24, suffix: '', label: 'Communities served' },
+            { target: 0, staticText: '60 days', label: 'Free trial, then price-locked for 12 months' },
           ].map((s) => (
             <div key={s.label}>
               <div
                 className="text-[clamp(40px,6vw,72px)] font-extrabold tracking-[-0.04em] leading-none tabular-nums"
                 style={gradientText}
               >
-                <HomeCountUp target={s.target} suffix={s.suffix} duration={1600} />
+                <HomeCountUp target={s.target} suffix={s.suffix} staticText={s.staticText} duration={1600} />
               </div>
               <div className="text-[12px] md:text-[13px] text-[#6a6a6a] mt-3 font-medium">{s.label}</div>
             </div>

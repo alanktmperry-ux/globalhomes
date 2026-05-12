@@ -125,7 +125,7 @@ export default function SuburbProfilePage() {
   return (
     <>
       <Helmet>
-        <title>{suburbName} Real Estate — Properties for Sale & Rent | ListHQ</title>
+        <title>{suburbName} Real Estate — Properties for Sale & Rent</title>
         <meta name="description" content={`Browse ${active.length || 'available'} properties in ${suburbName}, ${stateUpper}. Median price ${houseStats?.median_sale_price ? '$' + houseStats.median_sale_price.toLocaleString() : 'available on request'}. Search houses, apartments and rentals on ListHQ.`} />
         <meta property="og:title" content={`${suburbName} Real Estate | ListHQ`} />
         <meta property="og:description" content={`Properties for sale and rent in ${suburbName}, ${stateUpper}.`} />

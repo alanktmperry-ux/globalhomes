@@ -84,7 +84,7 @@ export default function HomeServicesPage() {
   return (
     <>
       <Helmet>
-        <title>{t('homeServices.pageTitle')} | ListHQ</title>
+        <title>{t('homeServices.pageTitle')}</title>
         <meta
           name="description"
           content={t('homeServices.pageSubtitle')}

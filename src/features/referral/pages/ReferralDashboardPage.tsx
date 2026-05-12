@@ -103,7 +103,7 @@ export default function ReferralDashboardPage() {
 
   return (
     <>
-      <Helmet><title>{t('referral.dashboard.title')} | ListHQ</title></Helmet>
+      <Helmet><title>{t('referral.dashboard.title')}</title></Helmet>
       <div className="min-h-screen bg-background">
         <div className="max-w-6xl mx-auto px-4 py-8 md:py-12 space-y-8">
           {/* Header */}

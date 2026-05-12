@@ -99,7 +99,7 @@ const MyApplicationsPage = () => {
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
       <Helmet>
-        <title>My Applications | ListHQ</title>
+        <title>My Applications</title>
       </Helmet>
 
       <div className="flex items-center gap-3 mb-6">

@@ -142,7 +142,7 @@ export default function InboxPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] bg-background">
-      <Helmet><title>Inbox | ListHQ</title></Helmet>
+      <Helmet><title>Inbox</title></Helmet>
 
       <div className="grid md:grid-cols-[360px_1fr] flex-1 min-h-0">
         {/* LEFT — list */}

@@ -147,7 +147,9 @@ Deno.serve(async (req) => {
       const userId = createUserData.user.id;
       created.authUserIds.push(userId);
 
-      const { data: prof, error: pErr } = await admin.from("profiles").insert({
+      // A handle_new_user trigger may have already created a profile row.
+      // Upsert by user_id so locale + display fields land regardless.
+      const { data: prof, error: pErr } = await admin.from("profiles").upsert({
         user_id: userId,
         display_name: `Verify ${key}`,
         full_name: `Verify ${key}`,
@@ -155,8 +157,8 @@ Deno.serve(async (req) => {
         language_preference: locale,
         preferred_language: locale,
         onboarded: true,
-      }).select("id").single();
-      if (pErr || !prof) throw new Error(`profile_insert_failed_${key}: ${pErr?.message}`);
+      }, { onConflict: "user_id" }).select("id").single();
+      if (pErr || !prof) throw new Error(`profile_upsert_failed_${key}: ${pErr?.message}`);
       created.profileIds.push(prof.id);
 
       accounts[key] = { userId, locale };

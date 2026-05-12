@@ -40,19 +40,7 @@ interface DisplayListing {
 const PLACEHOLDER_IMG =
   "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&q=70&w=640&fm=avif";
 
-function optimizeUnsplashUrl(url: string, width = 640): string {
-  if (!url || !url.includes("unsplash.com")) return url;
-  try {
-    const u = new URL(url);
-    u.searchParams.set("w", String(width));
-    u.searchParams.set("auto", "format,compress");
-    u.searchParams.set("q", "70");
-    u.searchParams.set("fm", "avif");
-    return u.toString();
-  } catch {
-    return url;
-  }
-}
+import { optimizeUnsplashUrl, unsplashSrcSet } from "@/shared/lib/optimizeImageUrl";
 
 const SELECT_COLS =
   "id, display_image_url, display_address, display_suburb, display_state, display_price, display_beds, display_baths, display_cars, display_languages, agent_name, agent_initials, agent_agency";

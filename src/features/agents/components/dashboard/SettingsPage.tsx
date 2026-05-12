@@ -175,8 +175,8 @@ const SettingsPage = () => {
   return (
     <div className="p-4 sm:p-6 max-w-3xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#0a0f1e] tracking-tight">Settings</h1>
-        <p className="text-sm font-light text-[#6B7280] mt-1">Manage your agent profile and preferences</p>
+        <h1 className="text-2xl font-bold text-[#0a0f1e] tracking-tight">{t('agent.settings.pageTitle')}</h1>
+        <p className="text-sm font-light text-[#6B7280] mt-1">{t('agent.settings.pageSubtitle')}</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
@@ -188,31 +188,31 @@ const SettingsPage = () => {
             value="profile"
             className="text-sm px-4 py-2 rounded-[8px] data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium"
           >
-            Profile
+            {t('agent.settings.nav.profile')}
           </TabsTrigger>
           <TabsTrigger
             value="pipeline"
             className="text-sm px-4 py-2 rounded-[8px] gap-1.5 data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium"
           >
-            <GitBranch size={14} /> Pipeline
+            <GitBranch size={14} /> {t('agent.settings.nav.pipeline')}
           </TabsTrigger>
           <TabsTrigger
             value="suppliers"
             className="text-sm px-4 py-2 rounded-[8px] gap-1.5 data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium"
           >
-            <Package size={14} /> Suppliers
+            <Package size={14} /> {t('agent.settings.nav.suppliers')}
           </TabsTrigger>
           <TabsTrigger
             value="templates"
             className="text-sm px-4 py-2 rounded-[8px] gap-1.5 data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium"
           >
-            <Languages size={14} /> Templates
+            <Languages size={14} /> {t('agent.settings.nav.templates')}
           </TabsTrigger>
           <TabsTrigger
             value="security"
             className="text-sm px-4 py-2 rounded-[8px] gap-1.5 data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium"
           >
-            <ShieldCheck size={14} /> Security
+            <ShieldCheck size={14} /> {t('agent.settings.nav.security')}
           </TabsTrigger>
         </TabsList>
 

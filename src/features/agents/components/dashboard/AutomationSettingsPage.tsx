@@ -154,9 +154,9 @@ const AutomationSettingsPage = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Automation</h1>
+        <h1 className="text-2xl font-bold">{t('agent.automations.pmTitle')}</h1>
         <p className="text-sm text-muted-foreground">
-          Multi-step communication sequences for property management. Toggle individual steps on or off, edit templates, or run a sequence now to test.
+          {t('agent.automations.pmSubtitle')}
         </p>
       </div>
 

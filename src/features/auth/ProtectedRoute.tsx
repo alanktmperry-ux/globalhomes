@@ -62,7 +62,7 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
     return <Navigate to="/check-email" replace />;
   }
 
-  if (requireAdmin && !isAdmin && !isSupport) return <Navigate to="/agents/login" replace />;
+  if (requireAdmin && !isAdmin && !isSupport) return <Navigate to="/login" replace />;
 
   // Agent guard: if no agents row exists, send to onboarding to create one.
   if (requireAgent && !isAdmin && approvalState === 'none') {

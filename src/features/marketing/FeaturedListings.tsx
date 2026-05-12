@@ -227,9 +227,15 @@ export default function FeaturedListings() {
                 >
                   <div className="relative h-[220px] w-full overflow-hidden bg-[#F3F4F6]">
                     <img
-                      src={l.imageUrl}
+                      src={optimizeUnsplashUrl(l.imageUrl, 640)}
+                      srcSet={`${optimizeUnsplashUrl(l.imageUrl, 320)} 320w, ${optimizeUnsplashUrl(l.imageUrl, 640)} 640w, ${optimizeUnsplashUrl(l.imageUrl, 1280)} 1280w`}
+                      sizes="(max-width: 768px) 100vw, 33vw"
                       alt={`${l.address}, ${l.suburb}`}
+                      width={640}
+                      height={480}
                       loading="lazy"
+                      fetchPriority="low"
+                      decoding="async"
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
                     />
                     <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur text-[10px] font-bold uppercase tracking-wider text-[#2563EB]">

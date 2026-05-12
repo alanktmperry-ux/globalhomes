@@ -73,6 +73,11 @@ export const LEGACY_CODE_MAP: Record<SupportedLanguageCode, string> = {
   'ru':    'ru',
   'ne':    'ne' as any,
   'pl':    'pl',
+  'zh':    'zh' as any,
+  'ja':    'ja' as any,
+  'tr':    'tr' as any,
+  'de':    'de' as any,
+  'el':    'el' as any,
 };
 
 export const FROM_LEGACY_CODE_MAP: Record<string, SupportedLanguageCode> = {

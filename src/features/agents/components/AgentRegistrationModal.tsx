@@ -81,7 +81,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
     e.preventDefault();
     const unmet = PASSWORD_REQUIREMENTS.filter((r) => !r.test(newPassword));
     if (unmet.length > 0) {
-      toast.error(`Password requirements not met: ${unmet.map((r) => r.label).join(', ')}`);
+      toast.error(`Password requirements not met: ${unmet.map((r) => t(r.labelKey)).join(', ')}`);
       return;
     }
     if (newPassword !== confirmPassword) {

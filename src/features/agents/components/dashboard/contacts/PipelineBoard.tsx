@@ -119,8 +119,8 @@ const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect, addA
     await onUpdateContact(contactId, { [stageField]: stageKey } as any);
     const stage = stages.find(s => s.key === stageKey);
     if (stage && addActivity) {
-      const label = pipelineType === 'buyer' ? 'Buyer pipeline' : 'Seller pipeline';
-      await addActivity(contactId, 'status_change', `${label}: moved to ${stage.label}`);
+      const label = pipelineType === 'buyer' ? t('agent.crm.pipeline.buyerLabel') : t('agent.crm.pipeline.sellerLabel');
+      await addActivity(contactId, 'status_change', t('agent.crm.pipeline.movedTo', { label, stage: stage.label }));
     }
   };
 
@@ -131,7 +131,7 @@ const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect, addA
         <div className="relative flex-1 min-w-[180px]">
           <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search contacts…"
+            placeholder={t('agent.crm.search.placeholder')}
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="pl-8 h-8 text-xs"
@@ -140,25 +140,25 @@ const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect, addA
 
         <Select value={rankingFilter} onValueChange={setRankingFilter}>
           <SelectTrigger className="w-[120px] h-8 text-xs">
-            <SelectValue placeholder="Ranking" />
+            <SelectValue placeholder={t('agent.crm.filter.ranking')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Rankings</SelectItem>
-            <SelectItem value="hot"> Hot</SelectItem>
-            <SelectItem value="warm">🌡 Warm</SelectItem>
-            <SelectItem value="cold"> Cold</SelectItem>
+            <SelectItem value="all">{t('agent.crm.filter.allRankings')}</SelectItem>
+            <SelectItem value="hot">{t('agent.crm.readiness.hot')}</SelectItem>
+            <SelectItem value="warm">🌡 {t('agent.crm.readiness.warm')}</SelectItem>
+            <SelectItem value="cold">{t('agent.crm.readiness.cold')}</SelectItem>
           </SelectContent>
         </Select>
 
         {allTags.length > 0 && (
           <Select value={tagFilter} onValueChange={setTagFilter}>
             <SelectTrigger className="w-[130px] h-8 text-xs">
-              <SelectValue placeholder="Tag" />
+              <SelectValue placeholder={t('agent.crm.filter.tag')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Tags</SelectItem>
-              {allTags.map(t => (
-                <SelectItem key={t} value={t}>{t}</SelectItem>
+              <SelectItem value="all">{t('agent.crm.filter.allTags')}</SelectItem>
+              {allTags.map(tg => (
+                <SelectItem key={tg} value={tg}>{tg}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -166,17 +166,17 @@ const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect, addA
 
         {hasActiveFilters && (
           <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 px-2 text-xs gap-1 text-muted-foreground">
-            <X size={12} /> Clear
+            <X size={12} /> {t('agent.crm.actions.clear')}
           </Button>
         )}
 
-        <span className="text-[10px] text-muted-foreground ml-auto">
-          {filteredContacts.length} contact{filteredContacts.length !== 1 ? 's' : ''}
+        <span className="text-[10px] text-muted-foreground ms-auto">
+          {t(filteredContacts.length === 1 ? 'agent.crm.count.singular' : 'agent.crm.count.plural', { count: filteredContacts.length })}
         </span>
       </div>
 
       {/* Board */}
-      <div className="flex gap-3 overflow-x-auto pb-4 min-h-[400px]">
+      <div dir={isRTL ? 'rtl' : 'ltr'} className="flex gap-3 overflow-x-auto pb-4 min-h-[400px]">
         {stages.map((stage) => {
           const stageContacts = getContactsForStage(stage.key);
           return (

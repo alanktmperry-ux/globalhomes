@@ -1,48 +1,50 @@
 import { Link } from 'react-router-dom';
 import { Instagram, Youtube, Linkedin } from 'lucide-react';
+import { useTranslation } from '@/shared/lib/i18n';
 
 const GRAD = 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)';
 
-const COLUMNS: { title: string; links: { label: string; to: string; external?: boolean }[] }[] = [
-  {
-    title: 'Platform',
-    links: [
-      { label: 'Search', to: '/' },
-      { label: 'Translate', to: '/tools/translate' },
-      { label: 'Find an Agent', to: '/agents' },
-      { label: 'Pricing', to: '/for-agents/pricing' },
-    ],
-  },
-  {
-    title: 'For Agents',
-    links: [
-      { label: 'Voice listing', to: '/voice' },
-      { label: 'Halo Board', to: '/halo' },
-      { label: 'Trust accounting', to: '/trust' },
-      { label: 'Migrate', to: '/migrate' },
-    ],
-  },
-  {
-    title: 'Company',
-    links: [
-      { label: 'About', to: '/about' },
-      { label: 'Careers', to: '/careers' },
-      { label: 'Press', to: '/press' },
-      { label: 'Contact', to: '/contact' },
-    ],
-  },
-  {
-    title: 'Legal',
-    links: [
-      { label: 'Privacy', to: '/privacy' },
-      { label: 'Terms', to: '/terms' },
-      { label: 'Trust compliance', to: '/compliance' },
-    ],
-  },
-];
-
 export function SiteFooter() {
+  const { t } = useTranslation();
   const year = new Date().getFullYear();
+
+  const COLUMNS: { titleKey: string; links: { labelKey: string; to: string; external?: boolean }[] }[] = [
+    {
+      titleKey: 'layout.footer.sections.platform',
+      links: [
+        { labelKey: 'layout.footer.links.search', to: '/' },
+        { labelKey: 'layout.footer.links.translate', to: '/tools/translate' },
+        { labelKey: 'layout.footer.links.findAgent', to: '/agents' },
+        { labelKey: 'layout.footer.links.pricing', to: '/for-agents/pricing' },
+      ],
+    },
+    {
+      titleKey: 'layout.footer.sections.forAgents',
+      links: [
+        { labelKey: 'layout.footer.links.voiceListing', to: '/voice' },
+        { labelKey: 'layout.footer.links.halo', to: '/halo' },
+        { labelKey: 'layout.footer.links.trustAccounting', to: '/trust' },
+        { labelKey: 'layout.footer.links.migrate', to: '/migrate' },
+      ],
+    },
+    {
+      titleKey: 'layout.footer.sections.company',
+      links: [
+        { labelKey: 'layout.footer.links.about', to: '/about' },
+        { labelKey: 'layout.footer.links.careers', to: '/careers' },
+        { labelKey: 'layout.footer.links.press', to: '/press' },
+        { labelKey: 'layout.footer.links.contact', to: '/contact' },
+      ],
+    },
+    {
+      titleKey: 'layout.footer.sections.legal',
+      links: [
+        { labelKey: 'layout.footer.links.privacy', to: '/privacy' },
+        { labelKey: 'layout.footer.links.terms', to: '/terms' },
+        { labelKey: 'layout.footer.links.compliance', to: '/compliance' },
+      ],
+    },
+  ];
 
   return (
     <footer className="bg-[#0a0f1e] text-white px-6 md:px-8 pt-[60px] pb-8 border-t border-white/10">
@@ -67,8 +69,7 @@ export function SiteFooter() {
               ListHQ
             </Link>
             <p className="text-[13px] text-white/55 max-w-[280px] leading-[1.55] mt-4">
-              Australia's multilingual property platform. Listings in any language. AI
-              translation. Built for the way Australia actually looks.
+              {t('layout.footer.tagline')}
             </p>
             <div className="flex gap-2 mt-5">
               {[
@@ -91,25 +92,19 @@ export function SiteFooter() {
           </div>
 
           {COLUMNS.map((col) => (
-            <div key={col.title}>
+            <div key={col.titleKey}>
               <h4 className="text-[11px] font-bold tracking-[0.12em] uppercase text-white/40 mb-4">
-                {col.title}
+                {t(col.titleKey)}
               </h4>
               <ul className="flex flex-col gap-2.5">
                 {col.links.map((l) => (
-                  <li key={l.label}>
-                    {l.external ? (
-                      <a href={l.to} className="block text-[14px] text-white/80 no-underline hover:text-white transition-colors">
-                        {l.label}
-                      </a>
-                    ) : (
-                      <Link to={l.to} className="block text-[14px] text-white/80 no-underline hover:text-white transition-colors">
-                        {l.label}
-                      </Link>
-                    )}
+                  <li key={l.labelKey}>
+                    <Link to={l.to} className="block text-[14px] text-white/80 no-underline hover:text-white transition-colors">
+                      {t(l.labelKey)}
+                    </Link>
                   </li>
                 ))}
-                {col.title === 'Legal' && (
+                {col.titleKey === 'layout.footer.sections.legal' && (
                   <li>
                     <button
                       type="button"
@@ -119,7 +114,7 @@ export function SiteFooter() {
                       }}
                       className="block text-[14px] text-white/80 hover:text-white transition-colors bg-transparent border-0 p-0 cursor-pointer text-left"
                     >
-                      Cookie preferences
+                      {t('layout.footer.links.cookiePreferences')}
                     </button>
                   </li>
                 )}
@@ -128,9 +123,14 @@ export function SiteFooter() {
           ))}
         </div>
 
-        <div className="pt-6 flex justify-between items-center text-[12px] text-white/40 flex-wrap gap-3">
-          <span>© {year} ListHQ · All rights reserved.</span>
-          <span>ABN 12 345 678 901</span>
+        <div className="pt-6 flex flex-col gap-3 text-[12px] text-white/40">
+          <p className="text-white/50 leading-relaxed max-w-3xl">
+            {t('layout.footer.legal.acknowledgement')}
+          </p>
+          <div className="flex justify-between items-center flex-wrap gap-3">
+            <span>{t('layout.footer.legal.copyright', { year })}</span>
+            <span>{t('layout.footer.legal.abn', { abn: '12 345 678 901' })}</span>
+          </div>
         </div>
       </div>
 

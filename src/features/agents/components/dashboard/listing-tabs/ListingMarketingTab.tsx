@@ -1150,6 +1150,19 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                       { key: 'ko', flag: '🇰🇷', label: '한국어' },
                       { key: 'ar', flag: '🇸🇦', label: 'العربية' },
                       { key: 'ja', flag: '🇯🇵', label: '日本語' },
+                      { key: 'hi', flag: '🇮🇳', label: 'हिन्दी' },
+                      { key: 'bn', flag: '🇧🇩', label: 'বাংলা' },
+                      { key: 'tl', flag: '🇵🇭', label: 'Filipino' },
+                      { key: 'id', flag: '🇮🇩', label: 'Indonesia' },
+                      { key: 'pa', flag: '🇮🇳', label: 'ਪੰਜਾਬੀ' },
+                      { key: 'ta', flag: '🇮🇳', label: 'தமிழ்' },
+                      { key: 'ms', flag: '🇲🇾', label: 'Bahasa Melayu' },
+                      { key: 'th', flag: '🇹🇭', label: 'ภาษาไทย' },
+                      { key: 'ne', flag: '🇳🇵', label: 'नेपाली' },
+                      { key: 'el', flag: '🇬🇷', label: 'Ελληνικά' },
+                      { key: 'it', flag: '🇮🇹', label: 'Italiano' },
+                      { key: 'es', flag: '🇪🇸', label: 'Español' },
+                      { key: 'fa', flag: '🇮🇷', label: 'فارسی' },
                     ].filter(l => previewTranslations[l.key]).map(l => (
                       <button
                         key={l.key}

@@ -15,6 +15,7 @@ import { Plus, Trash2, Loader2, AlertTriangle, Play } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { logAction } from '@/shared/lib/auditLog';
+import { useTranslation } from '@/shared/lib/i18n';
 
 type TriggerType =
   | 'lead_going_cold'
@@ -74,6 +75,7 @@ const TRIGGER_ORDER: TriggerType[] = [
 ];
 
 export default function AgencyAutomationsPage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [agencyId, setAgencyId] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);
@@ -181,8 +183,8 @@ export default function AgencyAutomationsPage() {
     setRunning(false);
     if (error) { toast.error(error.message); return; }
     const summary = (data as any)?.summary ?? {};
-    const totalFired = Object.values(summary).reduce((s: number, x: any) => s + (x?.fired ?? 0), 0);
-    toast.success(`Run complete — ${totalFired} action${totalFired === 1 ? '' : 's'} fired`);
+    const totalFired: number = Object.values(summary).reduce<number>((s, x: any) => s + (x?.fired ?? 0), 0);
+    toast.success(t(totalFired === 1 ? 'agent.automations.runComplete_one' : 'agent.automations.runComplete', { count: totalFired }));
     fetchAll();
   };
 
@@ -193,19 +195,19 @@ export default function AgencyAutomationsPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Agency automations</h1>
+          <h1 className="text-2xl font-bold">{t('agent.automations.pageTitle')}</h1>
           <p className="text-sm text-muted-foreground">
-            Rule-based triggers that watch your CRM and fire actions automatically. Runs every 15 minutes.
+            {t('agent.automations.pageSubtitle')}
           </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={runNow} disabled={running}>
             {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-            Run now
+            {t('agent.automations.runNow')}
           </Button>
           {isAdmin && (
             <Button size="sm" onClick={() => setAddOpen(true)}>
-              <Plus className="h-4 w-4" /> Add rule
+              <Plus className="h-4 w-4" /> {t('agent.automations.addRule')}
             </Button>
           )}
         </div>
@@ -213,7 +215,7 @@ export default function AgencyAutomationsPage() {
 
       {!isAdmin && (
         <Card><CardContent className="p-4 text-sm text-muted-foreground">
-          You're viewing in read-only mode. Owner/admin/principal can edit rules.
+          {t('agent.automations.readOnly')}
         </CardContent></Card>
       )}
 

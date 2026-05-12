@@ -17,6 +17,7 @@ import MessageTemplatesSettings from './MessageTemplatesSettings';
 import NotificationPreferencesSettings from './NotificationPreferencesSettings';
 import { MFAManager } from '@/features/auth/components/MFAManager';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
+import { useTranslation } from '@/shared/lib/i18n';
 
 interface AgentProfile {
   id: string;
@@ -29,6 +30,7 @@ interface AgentProfile {
 }
 
 const SettingsPage = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -173,8 +175,8 @@ const SettingsPage = () => {
   return (
     <div className="p-4 sm:p-6 max-w-3xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#0a0f1e] tracking-tight">Settings</h1>
-        <p className="text-sm font-light text-[#6B7280] mt-1">Manage your agent profile and preferences</p>
+        <h1 className="text-2xl font-bold text-[#0a0f1e] tracking-tight">{t('agent.settings.pageTitle')}</h1>
+        <p className="text-sm font-light text-[#6B7280] mt-1">{t('agent.settings.pageSubtitle')}</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
@@ -186,31 +188,31 @@ const SettingsPage = () => {
             value="profile"
             className="text-sm px-4 py-2 rounded-[8px] data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium"
           >
-            Profile
+            {t('agent.settings.nav.profile')}
           </TabsTrigger>
           <TabsTrigger
             value="pipeline"
             className="text-sm px-4 py-2 rounded-[8px] gap-1.5 data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium"
           >
-            <GitBranch size={14} /> Pipeline
+            <GitBranch size={14} /> {t('agent.settings.nav.pipeline')}
           </TabsTrigger>
           <TabsTrigger
             value="suppliers"
             className="text-sm px-4 py-2 rounded-[8px] gap-1.5 data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium"
           >
-            <Package size={14} /> Suppliers
+            <Package size={14} /> {t('agent.settings.nav.suppliers')}
           </TabsTrigger>
           <TabsTrigger
             value="templates"
             className="text-sm px-4 py-2 rounded-[8px] gap-1.5 data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium"
           >
-            <Languages size={14} /> Templates
+            <Languages size={14} /> {t('agent.settings.nav.templates')}
           </TabsTrigger>
           <TabsTrigger
             value="security"
             className="text-sm px-4 py-2 rounded-[8px] gap-1.5 data-[state=active]:bg-[#EFF6FF] data-[state=active]:text-[#2563EB] data-[state=active]:font-semibold text-[#6B7280] font-medium"
           >
-            <ShieldCheck size={14} /> Security
+            <ShieldCheck size={14} /> {t('agent.settings.nav.security')}
           </TabsTrigger>
         </TabsList>
 
@@ -219,10 +221,10 @@ const SettingsPage = () => {
           <div className="bg-white rounded-[12px] p-6" style={{ border: '1px solid #E5E7EB' }}>
             <div className="mb-5">
               <h3 className="text-base font-bold text-[#0a0f1e] flex items-center gap-2">
-                <User size={16} /> Agent Profile
+                <User size={16} /> {t('agent.settings.profile.title')}
               </h3>
               <p className="text-xs text-[#6B7280] mt-1 font-light">
-                Your public-facing identity for buyers and across the platform.
+                {t('agent.settings.profile.subtitle')}
               </p>
             </div>
 
@@ -261,14 +263,14 @@ const SettingsPage = () => {
                 </button>
               </div>
               <div>
-                <p className="text-sm font-semibold text-[#0a0f1e]">Profile Photo</p>
-                <p className="text-xs text-[#6B7280] mt-0.5 font-light">PNG, JPG up to 5MB. Click photo to upload.</p>
+                <p className="text-sm font-semibold text-[#0a0f1e]">{t('agent.settings.profile.photo')}</p>
+                <p className="text-xs text-[#6B7280] mt-0.5 font-light">{t('agent.settings.profile.photoHint')}</p>
               </div>
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <Label className="text-xs font-semibold text-[#374151]">Full Name</Label>
+                <Label className="text-xs font-semibold text-[#374151]">{t('agent.settings.profile.fullName')}</Label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
@@ -276,7 +278,7 @@ const SettingsPage = () => {
                 />
               </div>
               <div>
-                <Label className="text-xs font-semibold text-[#374151]">Agency</Label>
+                <Label className="text-xs font-semibold text-[#374151]">{t('agent.settings.profile.agency')}</Label>
                 <Input
                   value={formData.agency}
                   onChange={(e) => setFormData(prev => ({ ...prev, agency: e.target.value }))}
@@ -284,7 +286,7 @@ const SettingsPage = () => {
                 />
               </div>
               <div>
-                <Label className="text-xs font-semibold text-[#374151]">Email</Label>
+                <Label className="text-xs font-semibold text-[#374151]">{t('agent.settings.account.email')}</Label>
                 <Input
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
@@ -292,7 +294,7 @@ const SettingsPage = () => {
                 />
               </div>
               <div>
-                <Label className="text-xs font-semibold text-[#374151]">Phone</Label>
+                <Label className="text-xs font-semibold text-[#374151]">{t('agent.settings.profile.phone')}</Label>
                 <Input
                   value={formData.phone}
                   onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
@@ -311,10 +313,10 @@ const SettingsPage = () => {
           {/* Territory */}
           <div className="bg-white rounded-[12px] p-6" style={{ border: '1px solid #E5E7EB' }}>
             <h3 className="text-base font-bold text-[#0a0f1e] flex items-center gap-2 mb-1">
-              <Globe size={16} /> Territory
+              <Globe size={16} /> {t('agent.settings.profile.territory')}
             </h3>
             <p className="text-xs text-[#6B7280] mb-4 font-light">
-              Your primary suburbs for voice lead matching.
+              {t('agent.settings.profile.territoryHint')}
             </p>
             <div className="flex flex-wrap gap-1.5 mb-4">
               {['Berwick', 'Narre Warren', 'Officer', 'Clyde North', 'Pakenham'].map((s) => (
@@ -329,7 +331,7 @@ const SettingsPage = () => {
             <button
               className="bg-white border border-[#E5E7EB] text-[#374151] hover:bg-[#F9FAFB] font-semibold rounded-[10px] px-4 py-2 text-sm transition-all"
             >
-              Edit Suburbs
+              {t('agent.settings.profile.editSuburbs')}
             </button>
           </div>
 
@@ -338,7 +340,7 @@ const SettingsPage = () => {
             disabled={saving}
             className="w-full rounded-[10px] px-4 py-3 text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
           >
-            {saving ? <><Loader2 size={16} className="animate-spin" /> Saving…</> : 'Save Changes'}
+            {saving ? <><Loader2 size={16} className="animate-spin" /> {t('agent.settings.profile.saving')}</> : t('agent.settings.account.saveChanges')}
           </button>
         </TabsContent>
 

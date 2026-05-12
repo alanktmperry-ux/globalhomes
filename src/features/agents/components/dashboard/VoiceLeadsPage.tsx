@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useSaveContact } from '@/features/agents/hooks/useSaveContact';
 import { formatDistanceToNow } from 'date-fns';
+import { useTranslation } from '@/shared/lib/i18n';
 
 /* ── Types ───────────────────────────────────────────────────── */
 
@@ -68,6 +69,7 @@ const URGENCY_CONFIG = {
 /* ── Component ───────────────────────────────────────────────── */
 
 const VoiceLeadsPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { saveContact, isSaved, isSaving } = useSaveContact();
@@ -172,7 +174,7 @@ const VoiceLeadsPage = () => {
 
   return (
     <div>
-      <DashboardHeader title="Voice Leads" subtitle={`${leads.length} inquiries from voice searches`} />
+      <DashboardHeader title={t('agent.voiceListing.pageTitle')} subtitle={t('agent.voiceListing.pageSubtitle', { count: leads.length })} />
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
@@ -187,8 +189,8 @@ const VoiceLeadsPage = () => {
               <EmptyState
                 variant="compact"
                 icon="solar:microphone-linear"
-                title="No voice enquiries yet"
-                body="Buyers who search by voice in any language land here automatically."
+                title={t('agent.voiceListing.empty.title')}
+                body={t('agent.voiceListing.empty.body')}
               />
             )}
             {leads.map((lead) => {
@@ -294,7 +296,7 @@ const VoiceLeadsPage = () => {
 
               {/* Buyer Profile */}
               <div>
-                <h3 className="text-sm font-semibold mb-2">Buyer Profile</h3>
+                <h3 className="text-sm font-semibold mb-2">{t('agent.voiceListing.buyerProfile')}</h3>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="bg-secondary rounded-xl p-3">
                     <p className="text-[10px] text-muted-foreground mb-0.5">Name</p>

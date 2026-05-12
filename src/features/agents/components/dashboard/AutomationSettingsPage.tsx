@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Mail, Play, Pencil, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { useTranslation } from '@/shared/lib/i18n';
 
 type Rule = {
   id: string;
@@ -71,6 +72,7 @@ function triggerLabel(rule: Rule): string {
 }
 
 const AutomationSettingsPage = () => {
+  const { t } = useTranslation();
   const agentId = useAgentId();
   const [rules, setRules] = useState<Rule[]>([]);
   const [log, setLog] = useState<LogEntry[]>([]);
@@ -152,9 +154,9 @@ const AutomationSettingsPage = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Automation</h1>
+        <h1 className="text-2xl font-bold">{t('agent.automations.pmTitle')}</h1>
         <p className="text-sm text-muted-foreground">
-          Multi-step communication sequences for property management. Toggle individual steps on or off, edit templates, or run a sequence now to test.
+          {t('agent.automations.pmSubtitle')}
         </p>
       </div>
 

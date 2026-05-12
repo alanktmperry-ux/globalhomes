@@ -106,9 +106,18 @@ export function LanguageSwitcher() {
     document.documentElement.dir = item.code === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = item.code;
     try {
+      localStorage.setItem('listhq.locale', toAllowedLocale(item.code));
+    } catch { /* */ }
+    try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        await supabase.from('profiles').update({ language_preference: item.code }).eq('id', user.id);
+        await supabase
+          .from('profiles')
+          .update({
+            language_preference: item.code,
+            locale: toAllowedLocale(item.code),
+          })
+          .eq('id', user.id);
       }
     } catch (err) {
       if (import.meta.env.DEV) console.warn('[LanguageSwitcher] persist failed', err);

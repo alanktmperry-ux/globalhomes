@@ -30,7 +30,7 @@ const TermsPage = () => {
   return (
     <>
       <SEO
-        title="Terms of Service | ListHQ"
+        title="Terms of Service"
         description="Terms of Service for ListHQ — Australian real estate platform connecting agents, buyers, renters, vendors and property managers."
         path="/terms"
       />

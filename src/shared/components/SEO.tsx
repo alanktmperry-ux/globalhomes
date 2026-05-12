@@ -57,7 +57,7 @@ export function SEO({
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />
       {HREFLANGS.map((code) => (
-        <link key={code} rel="alternate" hrefLang={code} href={`${SITE_URL}/`} />
+        <link key={code} rel="alternate" hrefLang={code} href={url} />
       ))}
     </Helmet>
   );

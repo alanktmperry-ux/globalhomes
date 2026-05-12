@@ -210,7 +210,17 @@ async function handlePriceDrop(
             <a href="${APP_URL}/property/${propertyId}" style="display:inline-block;background:#1a1a1a;color:white;padding:12px 24px;border-radius:8px;text-decoration:none">View Property →</a>
           </div>
         `;
-    const translated = await translateEmail({ subject, bodyHtml, targetLanguage: recipientLanguage });
+    let translated;
+    try {
+      translated = await translateEmailPayload(
+        { subject, body: bodyHtml, isHtml: true, sourceLang: 'en' },
+        recipientLanguage,
+      );
+    } catch (err) {
+      console.error('[send-search-alerts] translation failed (price drop), sending original', err, { email, recipientLocale: recipientLanguage });
+      translated = { subject, body: bodyHtml, wasTranslated: false, sourceLang: 'en', targetLang: recipientLanguage, cached: false };
+    }
+    console.log('[send-search-alerts] price_drop sending', { email, recipientLocale: recipientLanguage, wasTranslated: translated.wasTranslated });
 
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -222,7 +232,11 @@ async function handlePriceDrop(
         from: EMAIL_FROM,
         to: [email],
         subject: translated.subject,
-        html: translated.bodyHtml,
+        html: translated.body,
+        headers: {
+          'X-ListHQ-Locale': translated.targetLang,
+          'X-ListHQ-Translated': translated.wasTranslated ? 'true' : 'false',
+        },
       }),
     });
 

@@ -1,6 +1,7 @@
 // AI-powered property search edge function
 // Extracts buyer intent via Lovable AI, queries properties, and persists buyer_intent + activity event.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { enforceRateLimit } from "../_shared/rateLimit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -54,6 +55,15 @@ const PROPERTIES_WITH_AGENTS =
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const rlBlocked = await enforceRateLimit(req, {
+    endpoint: "ai-property-search",
+    userMaxPerWindow: 120,
+    ipMaxPerWindow: 40,
+    windowSeconds: 60,
+    punishScrapers: true,
+  }, corsHeaders);
+  if (rlBlocked) return rlBlocked;
 
   try {
     // Public endpoint — rate-limit by IP to prevent abuse

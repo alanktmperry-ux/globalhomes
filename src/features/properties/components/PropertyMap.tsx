@@ -60,6 +60,7 @@ export function PropertyMap({
   properties, onPropertySelect, selectedPropertyId, onAreaSearch, centerOn, onMapMoved, onScrollToProperty, formatPrice, onGeolocate,
   hideDrawingTools, hideSearchArea, hideGeolocation, initialZoom, height, schoolMarkers,
 }: PropertyMapProps) {
+  const { t } = useTranslation();
 
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);

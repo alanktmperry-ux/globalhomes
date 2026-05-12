@@ -22,7 +22,32 @@
     <link rel="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="preload" as="image" type="image/avif" imagesrcset="/hero/auburn-480.avif 480w, /hero/auburn-960.avif 960w, /hero/auburn-1440.avif 1440w" imagesizes="(max-width: 768px) 100vw, 60vw" fetchpriority="high" />
     <link rel="preload" as="font" type="font/woff2" href="/fonts/plus-jakarta-sans-variable.woff2" crossorigin="anonymous" />
-    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <!-- iconify-icon web component: deferred to idle so it doesn't block first paint.
+         Homepage doesn't use it; lazy routes (tools, halo, auth) wait for it to register. -->
+    <script>
+      (function () {
+        function loadIconify() {
+          if (window.__iconifyLoaded) return;
+          window.__iconifyLoaded = true;
+          var s = document.createElement('script');
+          s.src = 'https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js';
+          s.async = true;
+          document.head.appendChild(s);
+        }
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadIconify, { timeout: 2500 });
+        } else {
+          setTimeout(loadIconify, 1200);
+        }
+        // Also load on first interaction in case idle never fires
+        var evs = ['pointerdown', 'keydown', 'touchstart'];
+        function onFirst() {
+          evs.forEach(function (e) { window.removeEventListener(e, onFirst, true); });
+          loadIconify();
+        }
+        evs.forEach(function (e) { window.addEventListener(e, onFirst, { capture: true, passive: true, once: true }); });
+      })();
+    </script>
     <link rel="manifest" href="/manifest.json" />
     <title>ListHQ — Australia's multilingual property platform</title>
     <meta name="description" content="ListHQ gives Australian real estate agents AI tools to find sellers, match buyers, generate offer letters, and purchase qualified leads. Start free." />

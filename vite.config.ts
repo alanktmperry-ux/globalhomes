@@ -10,6 +10,11 @@ export default defineConfig(({ mode }) => {
   const SUPABASE_PUBLISHABLE_KEY = env.VITE_SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_ANON_KEY;
   const SUPABASE_PROJECT_ID = env.VITE_SUPABASE_PROJECT_ID;
 
+  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+    throw new Error(
+      "Missing Supabase env vars. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in Lovable project settings before building."
+    );
+  }
   return ({
   define: {
     'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(SUPABASE_URL),
@@ -40,6 +45,9 @@ export default defineConfig(({ mode }) => {
       output: {
         chunkFileNames: "assets/[name]-[hash].js",
         entryFileNames: "assets/[name]-[hash].js",
+        banner: mode === 'production'
+          ? '/*! ListHQ — Proprietary code © ' + new Date().getFullYear() + ' ListHQ Pty Ltd. All rights reserved. Reproduction or reverse-engineering prohibited under Australian copyright and trade secret law. */'
+          : undefined,
         manualChunks(id) {
           if (!id.includes("node_modules")) return;
 

@@ -1,6 +1,7 @@
 import "../_shared/email-footer.ts";
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { translateEmailPayload, resolveRecipientLocale } from "../_shared/translateEmailPayload.ts";
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get("Origin"));

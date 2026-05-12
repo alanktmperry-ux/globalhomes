@@ -33,6 +33,11 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'ru',    name: 'Русский' },
   { code: 'ne',    name: 'नेपाली' },
   { code: 'pl',    name: 'Polski' },
+  { code: 'zh',    name: '中文' },
+  { code: 'ja',    name: '日本語' },
+  { code: 'tr',    name: 'Türkçe' },
+  { code: 'de',    name: 'Deutsch' },
+  { code: 'el',    name: 'Ελληνικά' },
 ] as const;
 
 export type SupportedLanguageCode = typeof SUPPORTED_LANGUAGES[number]['code'];

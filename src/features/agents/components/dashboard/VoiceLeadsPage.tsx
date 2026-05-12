@@ -296,7 +296,7 @@ const VoiceLeadsPage = () => {
 
               {/* Buyer Profile */}
               <div>
-                <h3 className="text-sm font-semibold mb-2">Buyer Profile</h3>
+                <h3 className="text-sm font-semibold mb-2">{t('agent.voiceListing.buyerProfile')}</h3>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="bg-secondary rounded-xl p-3">
                     <p className="text-[10px] text-muted-foreground mb-0.5">Name</p>

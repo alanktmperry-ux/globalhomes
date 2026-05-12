@@ -1,10 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { autocomplete } from '@/shared/lib/googleMapsService';
+import { useTranslation } from '@/shared/lib/i18n';
 import type { AgentFilters } from '../types';
 
 const AU_STATES = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT'];
-const SPECIALTIES = ['Residential', 'Commercial', 'Rural', 'Off-Market', 'Auctions', 'Property Management'];
+const SPECIALTIES: Array<{ value: string; key: string }> = [
+  { value: 'Residential', key: 'agent.search.specialty.residential' },
+  { value: 'Commercial', key: 'agent.search.specialty.commercial' },
+  { value: 'Rural', key: 'agent.search.specialty.rural' },
+  { value: 'Off-Market', key: 'agent.search.specialty.offMarket' },
+  { value: 'Auctions', key: 'agent.search.specialty.auctions' },
+  { value: 'Property Management', key: 'agent.search.specialty.propertyManagement' },
+];
 
 interface Props {
   filters: AgentFilters;

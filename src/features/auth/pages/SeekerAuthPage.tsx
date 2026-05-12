@@ -362,6 +362,8 @@ const SeekerAuthPage = () => {
             size="invisible"
             ref={captchaRef}
             onVerify={setCaptchaToken}
+            onError={() => { setPendingSignup(false); setError('Verification failed — please try again.'); }}
+            onExpire={() => { setCaptchaToken(null); setPendingSignup(false); captchaRef.current?.resetCaptcha(); }}
           />
 
           <button

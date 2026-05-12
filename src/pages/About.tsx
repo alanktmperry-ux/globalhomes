@@ -52,7 +52,7 @@ export default function About() {
     { term: 'Website', def: 'listhq.com.au' },
     { term: t('about.factType'), def: 'SaaS / marketplace' },
     { term: t('about.factMarket'), def: 'Australian residential and commercial real estate' },
-    { term: t('about.factLanguages'), def: '6 (English, Mandarin Simplified, Traditional Chinese, Vietnamese, Korean, Japanese)' },
+    { term: t('about.factLanguages'), def: '30+ buyer languages supported across listings and search' },
     { term: 'Key compliance', def: 'Agents Financial Administration Act 2014 (AFA 2014) trust accounting' },
     { term: 'Core differentiator', def: "Australia's first multilingual real estate platform" },
     { term: 'AI capabilities', def: 'Multilingual listing generation, voice-to-listing transcription' },

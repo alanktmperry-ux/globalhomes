@@ -408,3 +408,14 @@ const handler = {
     return withSecurityHeaders(botRes, env);
   },
 };
+
+// Wrapper: stamp X-Worker-Version on every response so a curl -I against
+// listhq.com.au can confirm a fresh worker deploy is actually live.
+export default {
+  async fetch(request, env, ctx) {
+    const res = await handler.fetch(request, env, ctx);
+    const headers = new Headers(res.headers);
+    headers.set('X-Worker-Version', WORKER_VERSION);
+    return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+  },
+};

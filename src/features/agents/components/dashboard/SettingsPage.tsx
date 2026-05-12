@@ -30,6 +30,7 @@ interface AgentProfile {
 }
 
 const SettingsPage = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [searchParams, setSearchParams] = useSearchParams();

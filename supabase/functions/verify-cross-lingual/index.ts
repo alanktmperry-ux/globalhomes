@@ -209,6 +209,7 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           rawQuery: "三居室 Box Hill 100万以下",
           userLocale: "zh",
+          session_id: crypto.randomUUID(),
         }),
       });
       if (!res.ok) throw new Error(`search_${res.status}: ${(await res.text()).slice(0, 200)}`);

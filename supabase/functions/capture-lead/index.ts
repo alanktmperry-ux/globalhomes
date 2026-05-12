@@ -191,7 +191,17 @@ Deno.serve(async (req) => {
       message_original: messageOriginal,
       original_language: originalLanguage,
       message_en: messageEn,
+      original_message: newOriginalMessage,
+      original_lang: newOriginalLang,
+      translation_status: newOriginalMessage ? "pending" : "skipped",
     }]);
+
+    // Kick translate-enquiry directly (trigger also fires; this just reduces latency).
+    if (lead?.id && newOriginalMessage) {
+      supabase.functions
+        .invoke("translate-enquiry", { body: { enquiryId: lead.id } })
+        .catch((e) => console.warn("translate-enquiry invoke failed:", e));
+    }
 
     // ── Drip: enroll agent in lead follow-up sequence ──────────
     try {

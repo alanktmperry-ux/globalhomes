@@ -75,11 +75,7 @@ export default function About() {
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">{t('about.title')}</h1>
 
         <p className="text-lg leading-relaxed text-muted-foreground mb-10">
-          ListHQ (listhq.com.au) is Australia's first multilingual real estate platform, built for agents,
-          property managers, and buyers operating in Australia's multicultural property market. A single
-          listing published on ListHQ automatically appears in every language — English, Mandarin (Simplified),
-          Traditional Chinese, Vietnamese, Korean, and Japanese — without the agent translating a word.
-          ListHQ is a SaaS platform founded in Australia in 2026.
+          ListHQ (listhq.com.au) is Australia's multilingual real estate platform, built for agents, property managers, and buyers operating in Australia's multicultural property market. A single listing published on ListHQ automatically appears in every language — without the agent translating a word. ListHQ is a SaaS platform founded in Australia in 2026.
         </p>
 
         <h2 className="text-2xl font-semibold mt-10 mb-4">{t('about.problem')}</h2>

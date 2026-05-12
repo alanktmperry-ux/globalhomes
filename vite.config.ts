@@ -42,8 +42,30 @@ export default defineConfig(({ mode }) => {
     // Without this, Vite emits 60+ <link rel="modulepreload"> tags on the homepage
     // because every React.lazy() route gets its dep graph preloaded eagerly.
     modulePreload: {
+      polyfill: false,
       resolveDependencies: (_filename, deps) => {
-        return deps.filter((d) => /vendor|supabase/.test(d));
+        return deps.filter((dep) => {
+          if (dep.includes('feature-agents')) return false;
+          if (dep.includes('feature-admin')) return false;
+          if (dep.includes('feature-marketing')) return false;
+          if (dep.includes('feature-halo')) return false;
+          if (dep.includes('feature-auctions')) return false;
+          if (dep.includes('feature-rentals')) return false;
+          if (dep.includes('feature-messaging')) return false;
+          if (dep.includes('feature-trust')) return false;
+          if (dep.includes('charts')) return false;
+          if (dep.includes('stripe')) return false;
+          if (dep.includes('pdf')) return false;
+          if (dep.includes('rich-text')) return false;
+          if (dep.includes('icons')) return false;
+          if (dep.includes('maps')) return false;
+          if (dep.includes('motion')) return false;
+          if (dep.includes('datepicker')) return false;
+          if (dep.includes('sentry')) return false;
+          if (dep.includes('supabase-realtime')) return false;
+          if (dep.match(/\/locales\/(?!en)/)) return false;
+          return true;
+        });
       },
     },
     rollupOptions: {

@@ -22,6 +22,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { usePageTitle } from '@/lib/usePageTitle';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
 function ListingsSkeleton() {
   return (
@@ -433,32 +434,33 @@ const StatusTabs = ({
   setActiveTab: (v: string) => void;
   counts: Record<string, number>;
 }) => {
+  const { t } = useTranslation();
   const items = [
-    { key: 'all', label: 'All' },
-    { key: 'pending', label: 'Pending' },
-    { key: 'whisper', label: 'Whisper' },
-    { key: 'coming-soon', label: 'Coming Soon' },
-    { key: 'public', label: 'Public' },
-    { key: 'sold', label: 'Sold' },
+    { key: 'all', label: t('agent.listings.tab.all') },
+    { key: 'pending', label: t('agent.listings.tab.pending') },
+    { key: 'whisper', label: t('agent.listings.tab.whisper') },
+    { key: 'coming-soon', label: t('agent.listings.tab.comingSoon') },
+    { key: 'public', label: t('agent.listings.tab.public') },
+    { key: 'sold', label: t('agent.listings.tab.sold') },
   ];
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      {items.map((t) => {
-        const active = activeTab === t.key;
-        const count = t.key !== 'all' ? counts[t.key] : undefined;
+      {items.map((tab) => {
+        const active = activeTab === tab.key;
+        const count = tab.key !== 'all' ? counts[tab.key] : undefined;
         return (
           <button
-            key={t.key}
+            key={tab.key}
             type="button"
-            onClick={() => setActiveTab(t.key)}
+            onClick={() => setActiveTab(tab.key)}
             className={
               active
                 ? 'px-4 py-2 rounded-full text-[13px] font-semibold bg-[#0a0f1e] text-white transition-all'
                 : 'px-4 py-2 rounded-full text-[13px] font-semibold bg-[#F9FAFB] text-[#6a6a6a] hover:bg-[#EFF6FF] hover:text-[#1E40AF] transition-all'
             }
           >
-            {t.label}
-            {count ? <span className={active ? 'ml-1.5 opacity-70 font-normal' : 'ml-1.5 text-[#9CA3AF] font-normal'}>· {count}</span> : null}
+            {tab.label}
+            {count ? <span className={active ? 'ms-1.5 opacity-70 font-normal' : 'ms-1.5 text-[#9CA3AF] font-normal'}>· {count}</span> : null}
           </button>
         );
       })}
@@ -469,6 +471,7 @@ const StatusTabs = ({
 const ARCHIVED_STATUSES = new Set(['sold', 'leased']);
 
 const ListingsPage = () => {
+  const { t } = useTranslation();
   usePageTitle('My Listings');
   const navigate = useNavigate();
   const sub = useSubscription();
@@ -709,10 +712,10 @@ const ListingsPage = () => {
   const totalCount = listings.filter((l) => !deletedIds.has(l.id)).length;
 
   const SORT_LABELS: Record<typeof sortBy, string> = {
-    newest: 'Newest first',
-    oldest: 'Oldest first',
-    price_high: 'Price · High to low',
-    price_low: 'Price · Low to high',
+    newest: t('agent.listings.sort.newest'),
+    oldest: t('agent.listings.sort.oldest'),
+    price_high: t('agent.listings.sort.priceHigh'),
+    price_low: t('agent.listings.sort.priceLow'),
   };
 
   const portfolioHeader = (
@@ -720,13 +723,13 @@ const ListingsPage = () => {
       <div>
         <div className="flex items-center gap-3 flex-wrap">
           <h1 className="font-extrabold tracking-[-0.04em] text-[#0a0f1e]" style={{ fontSize: 'clamp(32px, 4vw, 48px)', lineHeight: 1.05 }}>
-            Portfolio
+            {t('agent.listings.pageTitle')}
           </h1>
           <span className="bg-[#EFF6FF] border border-[#2563EB]/15 text-[#1E40AF] rounded-full px-3 py-1 text-[12px] font-bold">
-            {totalCount} {totalCount === 1 ? 'listing' : 'listings'}
+            {totalCount} {totalCount === 1 ? t('agent.listings.countSingular') : t('agent.listings.countPlural')}
           </span>
         </div>
-        <p className="text-[14px] text-[#6a6a6a] font-medium mt-2">Manage every property you list</p>
+        <p className="text-[14px] text-[#6a6a6a] font-medium mt-2">{t('agent.listings.pageSubtitle')}</p>
       </div>
       <div className="flex items-center gap-2 flex-wrap">
         {viewToggle}
@@ -735,7 +738,7 @@ const ListingsPage = () => {
           onClick={() => navigate('/dashboard/listings/import')}
           className="text-[#374151] border border-[#E5E5E5] rounded-full px-4 py-2 text-[13px] font-bold hover:border-[#2563EB] hover:text-[#2563EB] transition-all bg-white"
         >
-          Import from CSV
+          {t('agent.listings.importFromCsv')}
         </button>
         <button
           type="button"
@@ -743,7 +746,7 @@ const ListingsPage = () => {
           className="rounded-full px-5 py-2.5 text-[14px] font-bold text-white flex items-center gap-2 transition-all hover:shadow-[0_8px_24px_rgba(37,99,235,0.3)]"
           style={{ background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)' }}
         >
-          <Ico icon="solar:add-square-bold" size={16} color="#fff" /> Add new listing
+          <Ico icon="solar:add-square-bold" size={16} color="#fff" /> {t('agent.listings.addNewListing')}
         </button>
       </div>
     </div>
@@ -818,7 +821,7 @@ const ListingsPage = () => {
                   : 'bg-white border border-[#E5E5E5] text-[#6a6a6a] hover:border-[#2563EB] hover:text-[#2563EB]',
               )}
             >
-              {tab === 'active' ? `Active · ${activeWithStatus.length}` : `Archived · ${archivedWithStatus.length}`}
+              {tab === 'active' ? `${t('agent.listings.lifecycle.active')} · ${activeWithStatus.length}` : `${t('agent.listings.lifecycle.archived')} · ${archivedWithStatus.length}`}
             </button>
           ))}
           <span className="w-px h-6 bg-[#E5E5E5] mx-1" />
@@ -832,7 +835,7 @@ const ListingsPage = () => {
                 : 'bg-white border border-[#E5E5E5] text-[#6a6a6a] hover:border-[#2563EB] hover:text-[#2563EB]',
             )}
           >
-            <Home size={12} /> Sales · {salesListings.length}
+            <Home size={12} /> {t('agent.listings.mode.sales')} · {salesListings.length}
           </button>
           <button
             type="button"
@@ -844,7 +847,7 @@ const ListingsPage = () => {
                 : 'bg-white border border-[#E5E5E5] text-[#6a6a6a] hover:border-[#2563EB] hover:text-[#2563EB]',
             )}
           >
-            <Building size={12} /> Rentals · {rentalListings.length}
+            <Building size={12} /> {t('agent.listings.mode.rentals')} · {rentalListings.length}
           </button>
         </div>
 
@@ -862,7 +865,7 @@ const ListingsPage = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by address, suburb, or reference..."
+              placeholder={t('agent.listings.searchPlaceholder')}
               className="w-full bg-[#F9FAFB] border-0 rounded-full pl-10 pr-4 py-2.5 text-[14px] text-[#0a0f1e] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20"
             />
           </div>

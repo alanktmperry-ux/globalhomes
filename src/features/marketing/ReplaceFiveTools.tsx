@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Layers } from "lucide-react";
 import { useTranslation } from "@/shared/lib/i18n";
+import { cardImageProps } from "@/shared/lib/optimizeImageUrl";
 
 /**
  * "Replace five tools with one." — Bose-signature visual moment.

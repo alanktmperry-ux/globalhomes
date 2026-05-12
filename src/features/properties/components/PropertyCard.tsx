@@ -13,6 +13,7 @@ import { useInvestorMode } from '@/context/InvestorModeContext';
 import { QuickYieldBadge } from '@/components/investor/QuickYieldBadge';
 import { useListingTranslation } from '@/features/properties/hooks/useListingTranslation';
 import { formatAddress } from '@/shared/lib/formatAddress';
+import { cardImageProps } from '@/shared/lib/optimizeImageUrl';
 
 function VerificationBadge({ level }: { level?: string }) {
   const { t } = useTranslation();

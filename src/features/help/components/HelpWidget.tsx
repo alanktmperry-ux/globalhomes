@@ -38,7 +38,7 @@ export function HelpWidget() {
         <button
           onClick={() => setOpen(true)}
           className="fixed bottom-[80px] md:bottom-6 right-4 z-50 w-11 h-11 md:w-12 md:h-12 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:bg-primary/90 transition-colors"
-          aria-label="Help"
+          aria-label={t('help.widget.openAria')}
         >
           <HelpCircle size={20} />
         </button>
@@ -48,14 +48,14 @@ export function HelpWidget() {
       {open && (
         <div className="fixed bottom-[80px] md:bottom-6 right-4 z-50 w-80 bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
           <div className="flex items-center justify-between p-4 border-b border-border bg-secondary/30">
-            <h3 className="text-sm font-semibold text-foreground">Help</h3>
+            <h3 className="text-sm font-semibold text-foreground">{t('help.widget.title')}</h3>
             <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">
               <X size={16} />
             </button>
           </div>
 
           <div className="p-3">
-            <HelpSearch placeholder="Search help..." className="mb-3" />
+            <HelpSearch placeholder={t('help.widget.searchPlaceholder')} className="mb-3" />
 
             <div className="space-y-1">
               {contextLinks.map((item) => (
@@ -77,14 +77,14 @@ export function HelpWidget() {
               onClick={() => setOpen(false)}
               className="flex-1 text-center text-xs font-medium text-primary hover:underline py-1.5"
             >
-              View all help
+              {t('help.widget.viewAll')}
             </Link>
             <Link
               to="/help/contact"
               onClick={() => setOpen(false)}
               className="flex-1 text-center text-xs font-medium text-muted-foreground hover:text-foreground py-1.5"
             >
-              Contact support
+              {t('help.widget.contactSupport')}
             </Link>
           </div>
         </div>

@@ -103,4 +103,9 @@ export const FROM_LEGACY_CODE_MAP: Record<string, SupportedLanguageCode> = {
   'ru':    'ru',
   'ne':    'ne' as SupportedLanguageCode,
   'pl':    'pl' as SupportedLanguageCode,
+  'zh':    'zh' as SupportedLanguageCode,
+  'ja':    'ja' as SupportedLanguageCode,
+  'tr':    'tr' as SupportedLanguageCode,
+  'de':    'de' as SupportedLanguageCode,
+  'el':    'el' as SupportedLanguageCode,
 };

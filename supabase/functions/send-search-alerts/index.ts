@@ -1,7 +1,7 @@
 import "../_shared/email-footer.ts";
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getCorsHeaders } from "../_shared/cors.ts";
-import { translateEmail } from "../_shared/translateEmail.ts";
+import { translateEmailPayload, resolveRecipientLocale } from "../_shared/translateEmailPayload.ts";
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -108,7 +108,18 @@ async function handleNewListing(propertyId: string) {
           </div>
         `;
 
-    const translated = await translateEmail({ subject, bodyHtml, targetLanguage: recipientLanguage });
+    const recipientLocale = recipientLanguage;
+    let translated;
+    try {
+      translated = await translateEmailPayload(
+        { subject, body: bodyHtml, isHtml: true, sourceLang: 'en' },
+        recipientLocale,
+      );
+    } catch (err) {
+      console.error('[send-search-alerts] translation failed (new match), sending original', err, { email: match.buyer_email, recipientLocale });
+      translated = { subject, body: bodyHtml, wasTranslated: false, sourceLang: 'en', targetLang: recipientLocale, cached: false };
+    }
+    console.log('[send-search-alerts] new_match sending', { email: match.buyer_email, recipientLocale, wasTranslated: translated.wasTranslated });
 
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -120,7 +131,11 @@ async function handleNewListing(propertyId: string) {
         from: EMAIL_FROM,
         to: [match.buyer_email],
         subject: translated.subject,
-        html: translated.bodyHtml,
+        html: translated.body,
+        headers: {
+          'X-ListHQ-Locale': translated.targetLang,
+          'X-ListHQ-Translated': translated.wasTranslated ? 'true' : 'false',
+        },
       }),
     });
 
@@ -195,7 +210,17 @@ async function handlePriceDrop(
             <a href="${APP_URL}/property/${propertyId}" style="display:inline-block;background:#1a1a1a;color:white;padding:12px 24px;border-radius:8px;text-decoration:none">View Property →</a>
           </div>
         `;
-    const translated = await translateEmail({ subject, bodyHtml, targetLanguage: recipientLanguage });
+    let translated;
+    try {
+      translated = await translateEmailPayload(
+        { subject, body: bodyHtml, isHtml: true, sourceLang: 'en' },
+        recipientLanguage,
+      );
+    } catch (err) {
+      console.error('[send-search-alerts] translation failed (price drop), sending original', err, { email, recipientLocale: recipientLanguage });
+      translated = { subject, body: bodyHtml, wasTranslated: false, sourceLang: 'en', targetLang: recipientLanguage, cached: false };
+    }
+    console.log('[send-search-alerts] price_drop sending', { email, recipientLocale: recipientLanguage, wasTranslated: translated.wasTranslated });
 
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -207,7 +232,11 @@ async function handlePriceDrop(
         from: EMAIL_FROM,
         to: [email],
         subject: translated.subject,
-        html: translated.bodyHtml,
+        html: translated.body,
+        headers: {
+          'X-ListHQ-Locale': translated.targetLang,
+          'X-ListHQ-Translated': translated.wasTranslated ? 'true' : 'false',
+        },
       }),
     });
 
@@ -284,19 +313,30 @@ async function handleDigest(mode: 'daily' | 'weekly') {
             </p>
           </div>
         `;
-    const translated = await translateEmail({ subject, bodyHtml, targetLanguage: recipientLanguage });
+    let translated;
+    try {
+      translated = await translateEmailPayload(
+        { subject, body: bodyHtml, isHtml: true, sourceLang: 'en' },
+        recipientLanguage,
+      );
+    } catch (err) {
+      console.error('[send-search-alerts] translation failed (digest), sending original', err, { email, recipientLocale: recipientLanguage });
+      translated = { subject, body: bodyHtml, wasTranslated: false, sourceLang: 'en', targetLang: recipientLanguage, cached: false };
+    }
+    console.log('[send-search-alerts] digest sending', { email, recipientLocale: recipientLanguage, wasTranslated: translated.wasTranslated });
 
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${RESEND_KEY}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Authorization': `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         from: EMAIL_FROM,
         to: [email],
         subject: translated.subject,
-        html: translated.bodyHtml,
+        html: translated.body,
+        headers: {
+          'X-ListHQ-Locale': translated.targetLang,
+          'X-ListHQ-Translated': translated.wasTranslated ? 'true' : 'false',
+        },
       }),
     });
 

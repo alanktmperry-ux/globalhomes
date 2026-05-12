@@ -1,5 +1,6 @@
 import "../_shared/email-footer.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { translateEmailPayload, resolveRecipientLocale } from "../_shared/translateEmailPayload.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -117,6 +118,20 @@ Deno.serve(async (req) => {
       </div>
     `;
 
+    const subject = 'Your Halo is live — agents can now find you';
+    const recipientLocale = await resolveRecipientLocale({ userId: seeker_id, email: recipientEmail });
+    let translated;
+    try {
+      translated = await translateEmailPayload(
+        { subject, body: html, isHtml: true, sourceLang: 'en' },
+        recipientLocale,
+      );
+    } catch (err) {
+      console.error('[send-halo-confirmation] translation failed, sending original', err, { recipientEmail, recipientLocale });
+      translated = { subject, body: html, wasTranslated: false, sourceLang: 'en', targetLang: recipientLocale, cached: false };
+    }
+    console.log('[send-halo-confirmation] sending', { recipientEmail, recipientLocale, wasTranslated: translated.wasTranslated });
+
     const resp = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -126,8 +141,12 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: Deno.env.get('EMAIL_FROM') ?? 'ListHQ <hello@listhq.com.au>',
         to: [recipientEmail],
-        subject: 'Your Halo is live — agents can now find you',
-        html,
+        subject: translated.subject,
+        html: translated.body,
+        headers: {
+          'X-ListHQ-Locale': translated.targetLang,
+          'X-ListHQ-Translated': translated.wasTranslated ? 'true' : 'false',
+        },
       }),
     });
 

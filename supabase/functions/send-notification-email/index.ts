@@ -2,6 +2,7 @@ import "../_shared/email-footer.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
 import { logApiUsage, costFor } from "../_shared/usageLog.ts";
+import { translateEmailPayload, resolveRecipientLocale } from "../_shared/translateEmailPayload.ts";
 
 interface DirectPayload {
   to: string;
@@ -60,6 +61,26 @@ async function sendViaResend(to: string, subject: string, html: string) {
   }
   const from = Deno.env.get("EMAIL_FROM") || "ListHQ <hello@listhq.com.au>";
   const htmlWithFooter = appendUnsubscribeFooter(html, to);
+
+  // Resolve recipient locale + translate (no-op for English)
+  const recipientLocale = await resolveRecipientLocale({ email: to });
+  let translated;
+  try {
+    translated = await translateEmailPayload(
+      { subject, body: htmlWithFooter, isHtml: true, sourceLang: 'en' },
+      recipientLocale,
+    );
+  } catch (err) {
+    console.error('[send-notification-email] translation failed, sending original', err, { to, recipientLocale });
+    translated = { subject, body: htmlWithFooter, wasTranslated: false, sourceLang: 'en', targetLang: recipientLocale, cached: false };
+  }
+  // Sanity check: unsubscribe link must survive translation
+  if (!translated.body.includes('/unsubscribe')) {
+    console.warn('[send-notification-email] unsubscribe link missing from translation, falling back', { recipientLocale });
+    translated = { subject, body: htmlWithFooter, wasTranslated: false, sourceLang: 'en', targetLang: recipientLocale, cached: false };
+  }
+  console.log('[send-notification-email] sending', { to, recipientLocale, wasTranslated: translated.wasTranslated });
+
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -69,8 +90,12 @@ async function sendViaResend(to: string, subject: string, html: string) {
     body: JSON.stringify({
       from,
       to: [to],
-      subject,
-      html: htmlWithFooter,
+      subject: translated.subject,
+      html: translated.body,
+      headers: {
+        'X-ListHQ-Locale': translated.targetLang,
+        'X-ListHQ-Translated': translated.wasTranslated ? 'true' : 'false',
+      },
     }),
   });
   if (!res.ok) {
@@ -78,13 +103,13 @@ async function sendViaResend(to: string, subject: string, html: string) {
     console.error(`Resend email failed [${res.status}]:`, errText);
     return { ok: false, reason: errText };
   }
-  console.log(`Email sent to ${to}: ${subject}`);
+  console.log(`Email sent to ${to}: ${translated.subject}`);
   await logApiUsage({
     service: "resend",
     action: "email_sent",
     units: 1,
     cost_estimate: costFor.resend(),
-    metadata: { subject },
+    metadata: { subject: translated.subject, locale: translated.targetLang, translated: translated.wasTranslated },
   });
   return { ok: true };
 }

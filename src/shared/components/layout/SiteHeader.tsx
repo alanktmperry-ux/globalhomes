@@ -130,6 +130,9 @@ export function SiteHeader() {
           <LanguageSwitcher />
           <Link
             to="/login"
+            onMouseEnter={prefetchLogin}
+            onFocus={prefetchLogin}
+            onTouchStart={prefetchLogin}
             className="text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors"
           >
             Sign in

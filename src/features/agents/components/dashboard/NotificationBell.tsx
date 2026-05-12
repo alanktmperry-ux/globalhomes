@@ -238,7 +238,6 @@ export function NotificationBell() {
                       </button>
                     );
                   })
-                  ))
                 )}
               </div>
 

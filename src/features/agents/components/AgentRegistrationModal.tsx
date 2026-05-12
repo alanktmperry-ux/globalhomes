@@ -382,7 +382,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                       return (
                         <div key={req.key} className="flex items-center gap-2 text-xs">
                           <CheckCircle2 size={14} className={met ? 'text-green-500' : 'text-muted-foreground/40'} />
-                          <span className={met ? 'text-green-600' : 'text-muted-foreground'}>{req.label}</span>
+                          <span className={met ? 'text-green-600' : 'text-muted-foreground'}>{t(req.labelKey)}</span>
                         </div>
                       );
                     })}

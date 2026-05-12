@@ -15716,6 +15716,10 @@ export type Database = {
         Args: { property_id: string }
         Returns: undefined
       }
+      increment_email_cache_hit: {
+        Args: { p_hash: string }
+        Returns: undefined
+      }
       increment_halo_credits: {
         Args: { p_agent_id: string; p_credits: number }
         Returns: number

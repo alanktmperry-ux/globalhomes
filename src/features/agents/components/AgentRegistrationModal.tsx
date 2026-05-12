@@ -16,7 +16,12 @@ interface Props {
   onOpenChange: (v: boolean) => void;
 }
 
-const PROPERTY_TYPES = ['Residential', 'Commercial', 'Land', 'Luxury ($2M+)'];
+const PROPERTY_TYPES: Array<{ value: string; key: string }> = [
+  { value: 'Residential', key: 'agent.registration.form.propertyType.residential' },
+  { value: 'Commercial', key: 'agent.registration.form.propertyType.commercial' },
+  { value: 'Land', key: 'agent.registration.form.propertyType.land' },
+  { value: 'Luxury ($2M+)', key: 'agent.registration.form.propertyType.luxury' },
+];
 
 const SUBURBS_OPTIONS = [
   'Toorak', 'South Yarra', 'Richmond', 'Carlton', 'Fitzroy',
@@ -25,10 +30,10 @@ const SUBURBS_OPTIONS = [
 ];
 
 const PASSWORD_REQUIREMENTS = [
-  { key: 'length', label: 'At least 8 characters', test: (p: string) => p.length >= 8 },
-  { key: 'upper', label: 'At least one uppercase letter', test: (p: string) => /[A-Z]/.test(p) },
-  { key: 'number', label: 'At least one number', test: (p: string) => /[0-9]/.test(p) },
-  { key: 'special', label: 'At least one special character (!@#$%^&*)', test: (p: string) => /[!@#$%^&*]/.test(p) },
+  { key: 'length', labelKey: 'agent.registration.password.req.length', test: (p: string) => p.length >= 8 },
+  { key: 'upper', labelKey: 'agent.registration.password.req.upper', test: (p: string) => /[A-Z]/.test(p) },
+  { key: 'number', labelKey: 'agent.registration.password.req.number', test: (p: string) => /[0-9]/.test(p) },
+  { key: 'special', labelKey: 'agent.registration.password.req.special', test: (p: string) => /[!@#$%^&*]/.test(p) },
 ];
 
 const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {

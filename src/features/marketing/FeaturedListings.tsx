@@ -4,6 +4,7 @@ import { Bed, Bath, Car, Sparkles, ArrowRight, MapPin } from "lucide-react";
 import { useGeoLocation } from "./useGeoLocation";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "@/shared/lib/i18n";
+import { optimizeUnsplashUrl, unsplashSrcSet } from "@/shared/lib/optimizeImageUrl";
 
 interface FeaturedRow {
   id: string;

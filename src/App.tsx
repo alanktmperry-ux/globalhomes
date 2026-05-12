@@ -393,6 +393,10 @@ const App = () => (
                 <Route path="/agents/login" element={<AgentAuthPage />} />
                 {/* Legacy URL — older notification emails link to /agent-auth */}
                 <Route path="/agent-auth" element={<Navigate to="/agents/login" replace />} />
+                {/* Legacy /auth/* paths — redirect stale bookmarks to current routes */}
+                <Route path="/auth/login" element={<Navigate to="/login" replace />} />
+                <Route path="/auth/signin" element={<Navigate to="/login" replace />} />
+                <Route path="/auth/signup" element={<Navigate to="/signup" replace />} />
                 <Route path="/agents/demo" element={<DemoAccessPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />

@@ -85,14 +85,14 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error(t('agent.registration.password.mismatch'));
       return;
     }
     setPasswordLoading(true);
     try {
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
-      toast.success('Password set successfully');
+      toast.success(t('agent.registration.toast.passwordSet'));
       setStep('prepare');
     } catch (err: unknown) {
       toast.error(`Could not set password — ${getErrorMessage(err)}`);
@@ -104,7 +104,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.fullName || !form.email || !form.licenseNumber || !form.mobile) {
-      toast.error('Missing fields — Please fill in all required fields.');
+      toast.error(t('agent.registration.toast.missing'));
       return;
     }
     setLoading(true);
@@ -165,7 +165,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
     if (e) e.preventDefault();
     if (!emailInput.trim()) return;
     if (!captchaToken) {
-      toast.error('Please complete the verification');
+      toast.error(t('agent.registration.email.completeCaptcha'));
       return;
     }
     setEmailSubmitting(true);
@@ -238,10 +238,10 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
             >
               <DialogHeader className="mb-5">
                 <DialogTitle className="font-display text-2xl font-extrabold">
-                  Join ListHQ.
+                  {t('agent.registration.join.title')}
                 </DialogTitle>
                 <DialogDescription>
-                  Start your free 60-day trial. No credit card required.
+                  {t('agent.registration.join.subtitle')}
                 </DialogDescription>
               </DialogHeader>
 
@@ -249,7 +249,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
               <div className="bg-secondary/50 rounded-xl p-4 mb-5">
                 <div className="flex items-center gap-2 text-sm font-semibold text-foreground mb-3">
                   <ListChecks size={16} className="text-primary" />
-                  Have these ready before you begin
+                  {t('agent.registration.haveReady')}
                 </div>
                 <div className="space-y-2">
                   {[
@@ -268,7 +268,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
 
               <form onSubmit={handleEmailSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="regEmailStart">Your email address *</Label>
+                  <Label htmlFor="regEmailStart">{t('agent.registration.email.label')}</Label>
                   <Input
                     id="regEmailStart"
                     required
@@ -277,7 +277,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') handleEmailSubmit(e); }}
-                    placeholder="jane@agency.com.au"
+                    placeholder={t('agent.registration.email.placeholder')}
                   />
                   <p className="text-xs text-muted-foreground mt-1.5">
                     We'll send a confirmation link to this address before you continue.
@@ -301,15 +301,15 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                   className="w-full py-5 rounded-xl text-base font-bold"
                 >
                   {emailSubmitting
-                    ? 'Sending confirmation...'
+                    ? t('agent.registration.email.sending')
                     : !captchaToken
-                      ? 'Please complete the verification'
-                      : 'Continue — confirm my email'}
+                      ? t('agent.registration.email.completeCaptcha')
+                      : t('agent.registration.email.continue')}
                 </Button>
 
                 <p className="text-center text-xs text-muted-foreground">
-                  Already have an account?{' '}
-                  <a href="/login" className="text-primary hover:underline">Sign in here</a>
+                  {t('agent.registration.email.alreadyAccount')}{' '}
+                  <a href="/login" className="text-primary hover:underline">{t('agent.registration.email.signIn')}</a>
                 </p>
               </form>
             </motion.div>
@@ -320,8 +320,8 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                   <Mail size={32} className="text-primary" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-foreground">Check your inbox</h2>
-                  <p className="text-sm text-muted-foreground mt-1">We've sent a confirmation link to:</p>
+                  <h2 className="text-xl font-bold text-foreground">{t('agent.registration.check.title')}</h2>
+                  <p className="text-sm text-muted-foreground mt-1">{t('agent.registration.check.sentTo')}</p>
                   <p className="font-semibold text-foreground text-sm mt-1">{emailInput}</p>
                 </div>
                 <div className="bg-muted/50 border border-border rounded-xl p-4 text-xs text-muted-foreground text-left space-y-1.5">
@@ -331,10 +331,10 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                   <p>· The confirmation link expires after 24 hours</p>
                 </div>
                 <Button variant="outline" className="w-full" onClick={handleResendEmail} disabled={emailSubmitting}>
-                  {emailSubmitting ? 'Sending...' : 'Resend confirmation email'}
+                  {emailSubmitting ? t('agent.registration.check.sending') : t('agent.registration.check.resend')}
                 </Button>
                 <button onClick={() => { setStep('email'); setEmailInput(''); }} className="text-xs text-muted-foreground hover:text-foreground">
-                  Wrong email? Go back and change it
+                  {t('agent.registration.check.wrongEmail')}
                 </button>
               </div>
             </motion.div>
@@ -345,10 +345,10 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                   <Lock size={28} className="text-primary" />
                 </div>
                 <DialogTitle className="font-display text-2xl font-extrabold text-center">
-                  Create your password
+                  {t('agent.registration.password.title')}
                 </DialogTitle>
                 <DialogDescription className="text-center">
-                  Set a secure password for your ListHQ account.
+                  {t('agent.registration.password.subtitle')}
                 </DialogDescription>
               </DialogHeader>
 
@@ -363,7 +363,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                       autoFocus
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="Enter your password"
+                      placeholder={t('agent.registration.password.placeholder')}
                       className="pr-10"
                     />
                     <button
@@ -390,17 +390,17 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                 </div>
 
                 <div>
-                  <Label htmlFor="confirmPassword">Confirm password *</Label>
+                  <Label htmlFor="confirmPassword">{t('agent.registration.password.confirm')}</Label>
                   <Input
                     id="confirmPassword"
                     required
                     type={showPassword ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Re-enter your password"
+                    placeholder={t('agent.registration.password.confirmPlaceholder')}
                   />
                   {confirmPassword && newPassword !== confirmPassword && (
-                    <p className="text-xs text-destructive mt-1">Passwords do not match</p>
+                    <p className="text-xs text-destructive mt-1">{t('agent.registration.password.mismatch')}</p>
                   )}
                 </div>
 
@@ -409,7 +409,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                   disabled={passwordLoading}
                   className="w-full py-5 rounded-xl text-base font-bold"
                 >
-                  {passwordLoading ? 'Setting password...' : 'Set password & continue'}
+                  {passwordLoading ? t('agent.registration.password.setting') : t('agent.registration.password.submit')}
                 </Button>
               </form>
             </motion.div>
@@ -423,10 +423,10 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
             >
               <DialogHeader className="mb-5">
                 <DialogTitle className="font-display text-2xl font-extrabold">
-                  Before you begin
+                  {t('agent.registration.prepare.title')}
                 </DialogTitle>
                 <DialogDescription>
-                  Have these details handy — it'll make setup quick and painless.
+                  {t('agent.registration.prepare.subtitle')}
                 </DialogDescription>
               </DialogHeader>
 
@@ -460,11 +460,11 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                 className="flex items-center gap-2 text-sm text-primary hover:underline mb-6"
               >
                 <Play size={16} />
-                Watch our 3-minute setup walkthrough →
+                {t('agent.registration.prepare.watch')}
               </a>
 
               <Button className="w-full" onClick={() => setStep('trust-info')}>
-                I'm ready — let's go
+                {t('agent.registration.prepare.ready')}
               </Button>
             </motion.div>
           ) : step === 'trust-info' ? (
@@ -477,10 +477,10 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
             >
               <DialogHeader className="mb-5">
                 <DialogTitle className="font-display text-2xl font-extrabold">
-                  About your trust account
+                  {t('agent.registration.trust.title')}
                 </DialogTitle>
                 <DialogDescription>
-                  If your agency holds a statutory trust account, have the details ready.
+                  {t('agent.registration.trust.subtitle')}
                 </DialogDescription>
               </DialogHeader>
 
@@ -513,10 +513,10 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
 
               <div className="flex gap-3">
                 <Button variant="outline" className="flex-1" onClick={() => setStep('prepare')}>
-                  Back
+                  {t('agent.registration.back')}
                 </Button>
                 <Button className="flex-1" onClick={() => setStep('cutover')}>
-                  Continue
+                  {t('agent.registration.continue')}
                 </Button>
               </div>
             </motion.div>
@@ -530,10 +530,10 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
             >
               <DialogHeader className="mb-5">
                 <DialogTitle className="font-display text-2xl font-extrabold">
-                  Choosing your cut-over date
+                  {t('agent.registration.cutover.title')}
                 </DialogTitle>
                 <DialogDescription>
-                  Only relevant if you're migrating from another trust accounting system. Otherwise, skip ahead.
+                  {t('agent.registration.cutover.subtitle')}
                 </DialogDescription>
               </DialogHeader>
 
@@ -562,18 +562,18 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                 className="flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors mb-6"
               >
                 <Download size={16} className="shrink-0 text-primary" />
-                Download Migration Pre-Import Checklist (.xlsx)
+                {t('agent.registration.cutover.download')}
               </a>
 
               <div className="flex gap-3">
                 <Button variant="outline" className="flex-1" onClick={() => setStep('trust-info')}>
-                  Back
+                  {t('agent.registration.back')}
                 </Button>
                 <Button variant="outline" className="flex-1" onClick={() => setStep('form')}>
-                  Skip — starting fresh
+                  {t('agent.registration.skipFresh')}
                 </Button>
                 <Button className="flex-1" onClick={() => setStep('import-wizard')}>
-                  Continue
+                  {t('agent.registration.continue')}
                 </Button>
               </div>
             </motion.div>
@@ -587,10 +587,10 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
             >
               <DialogHeader className="mb-5">
                 <DialogTitle className="font-display text-2xl font-extrabold">
-                  About the Trust Import Wizard
+                  {t('agent.registration.import.title')}
                 </DialogTitle>
                 <DialogDescription>
-                  Bring your existing trust ledger data into ListHQ. You can also do this later.
+                  {t('agent.registration.import.subtitle')}
                 </DialogDescription>
               </DialogHeader>
 
@@ -619,13 +619,13 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
 
               <div className="flex gap-3">
                 <Button variant="outline" className="flex-1" onClick={() => setStep('cutover')}>
-                  Back
+                  {t('agent.registration.back')}
                 </Button>
                 <Button variant="outline" className="flex-1" onClick={() => setStep('form')}>
-                  Skip for now
+                  {t('agent.registration.skipForNow')}
                 </Button>
                 <Button className="flex-1" onClick={() => setStep('form')}>
-                  Continue
+                  {t('agent.registration.continue')}
                 </Button>
               </div>
             </motion.div>
@@ -639,10 +639,10 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
             >
               <DialogHeader className="mb-4">
                 <DialogTitle className="font-display text-2xl font-extrabold">
-                  Join the Agent Network
+                  {t('agent.registration.form.title')}
                 </DialogTitle>
                 <DialogDescription>
-                  Start receiving voice-qualified leads for your territory.
+                  {t('agent.registration.form.subtitle')}
                 </DialogDescription>
               </DialogHeader>
 
@@ -650,7 +650,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
               <details className="mb-4 rounded-lg border border-border bg-muted/50 text-sm">
                 <summary className="flex cursor-pointer items-center gap-2 px-4 py-3 font-medium text-foreground select-none">
                   <Info size={16} className="shrink-0 text-primary" />
-                  What you need for this step
+                  {t('agent.registration.form.whatYouNeed')}
                 </summary>
                 <div className="px-4 pb-4 pt-1 space-y-2.5 text-muted-foreground">
                   <p>
@@ -682,22 +682,22 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                 {/* Name & Agency */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="fullName">Full Name *</Label>
+                    <Label htmlFor="fullName">{t('agent.registration.form.fullName')}</Label>
                     <Input
                       id="fullName"
                       required
                       value={form.fullName}
                       onChange={(e) => update('fullName', e.target.value)}
-                      placeholder="Jane Smith"
+                      placeholder={t('agent.registration.form.fullNamePlaceholder')}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="agencyName">Agency Name</Label>
+                    <Label htmlFor="agencyName">{t('agent.registration.form.agencyName')}</Label>
                     <Input
                       id="agencyName"
                       value={form.agencyName}
                       onChange={(e) => update('agencyName', e.target.value)}
-                      placeholder="Ray White"
+                      placeholder={t('agent.registration.form.agencyPlaceholder')}
                     />
                   </div>
                 </div>
@@ -705,44 +705,44 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                 {/* License & Mobile */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="license">License Number *</Label>
+                    <Label htmlFor="license">{t('agent.registration.form.license')}</Label>
                     <Input
                       id="license"
                       required
                       value={form.licenseNumber}
                       onChange={(e) => update('licenseNumber', e.target.value)}
-                      placeholder="VIC-12345"
+                      placeholder={t('agent.registration.form.licensePlaceholder')}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="mobile">Mobile *</Label>
+                    <Label htmlFor="mobile">{t('agent.registration.form.mobile')}</Label>
                     <Input
                       id="mobile"
                       required
                       type="tel"
                       value={form.mobile}
                       onChange={(e) => update('mobile', e.target.value)}
-                      placeholder="+61 4XX XXX XXX"
+                      placeholder={t('agent.registration.form.mobilePlaceholder')}
                     />
                   </div>
                 </div>
 
                 {/* Email */}
                 <div>
-                  <Label htmlFor="regEmail">Email *</Label>
+                  <Label htmlFor="regEmail">{t('agent.registration.form.email')}</Label>
                   <Input
                     id="regEmail"
                     required
                     type="email"
                     value={form.email}
                     onChange={(e) => update('email', e.target.value)}
-                    placeholder="jane@agency.com.au"
+                    placeholder={t('agent.registration.email.placeholder')}
                   />
                 </div>
 
                 {/* Primary Suburbs */}
                 <div>
-                  <Label>Primary Suburbs (max 5 for territory protection)</Label>
+                  <Label>{t('agent.registration.form.suburbs')}</Label>
                   <div className="flex flex-wrap gap-2 mt-1.5">
                     {SUBURBS_OPTIONS.map((s) => {
                       const selected = form.suburbs.includes(s);
@@ -762,13 +762,13 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                       );
                     })}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">{form.suburbs.length}/5 selected</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('agent.registration.form.suburbsCount', { count: form.suburbs.length })}</p>
                 </div>
 
                 {/* Experience & Property Type */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="experience">Years Experience</Label>
+                    <Label htmlFor="experience">{t('agent.registration.form.experience')}</Label>
                     <Input
                       id="experience"
                       type="number"
@@ -779,7 +779,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                     />
                   </div>
                   <div>
-                    <Label>I primarily sell:</Label>
+                    <Label>{t('agent.registration.form.primarilySell')}</Label>
                     <div className="flex flex-wrap gap-1.5 mt-1.5">
                       {PROPERTY_TYPES.map((pt) => (
                         <button
@@ -802,9 +802,9 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                 {/* Trust Signals */}
                 <div className="bg-secondary/50 rounded-xl p-4 space-y-2">
                   {[
-                    { icon: <ShieldCheck size={14} />, text: 'Your license is verified securely' },
-                    { icon: <Ban size={14} />, text: 'We never spam your clients' },
-                    { icon: <Clock size={14} />, text: 'Cancel anytime, no lock-in contracts' },
+                    { icon: <ShieldCheck size={14} />, text: t('agent.registration.form.trust.verified') },
+                    { icon: <Ban size={14} />, text: t('agent.registration.form.trust.noSpam') },
+                    { icon: <Clock size={14} />, text: t('agent.registration.form.trust.cancel') },
                   ].map((t) => (
                     <div key={t.text} className="flex items-center gap-2 text-xs text-muted-foreground">
                       <span className="text-success">{t.icon}</span>
@@ -814,7 +814,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                 </div>
 
                 <Button type="submit" disabled={loading} className="w-full py-5 rounded-xl text-base font-bold">
-                  {loading ? 'Creating your account...' : 'Join the Network'}
+                  {loading ? t('agent.registration.form.creating') : t('agent.registration.form.submit')}
                 </Button>
               </form>
             </motion.div>
@@ -828,9 +828,9 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
               <div className="w-16 h-16 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-5">
                 <CheckCircle2 size={32} className="text-success" />
               </div>
-              <h3 className="font-display text-2xl font-extrabold text-center mb-1">You're all set!</h3>
+              <h3 className="font-display text-2xl font-extrabold text-center mb-1">{t('agent.registration.success.title')}</h3>
               <p className="text-muted-foreground text-sm text-center mb-6">
-                Your trust account has been created with a $0.00 opening balance. Here's what to do next.
+                {t('agent.registration.success.subtitle')}
               </p>
 
               <ul className="space-y-3 text-sm text-foreground mb-6">
@@ -856,7 +856,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                 className="w-full"
                 onClick={handleClose}
               >
-                Go to Dashboard
+                {t('agent.registration.success.goDashboard')}
               </Button>
             </motion.div>
           )}

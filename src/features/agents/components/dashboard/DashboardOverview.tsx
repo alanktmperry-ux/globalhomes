@@ -253,36 +253,47 @@ const DashboardOverview = () => {
 
         <AgentOnboardingProgress />
 
-        {/* Stat cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-10">
-          <StatCard
-            icon="solar:buildings-linear"
-            label="Active Listings"
-            value={activeListings}
-            trendDir={listingsTrend?.dir}
-            trendValue={listingsTrend?.value}
-          />
-          <StatCard
-            icon="solar:flame-bold"
-            iconColor="#F59E0B"
-            label="Hot Leads"
-            value={hotLeads}
-            trendDir={hotLeadsTrend?.dir}
-            trendValue={hotLeadsTrend?.value}
-          />
-          <StatCard
-            icon="solar:users-group-rounded-linear"
-            label="Buyer Matches"
-            value={buyerMatches}
-            trendDir={matchesTrend?.dir}
-            trendValue={matchesTrend?.value}
-          />
-          <StatCard
-            icon="solar:bolt-bold"
-            label="Halo Credits"
-            value={haloCredits}
-          />
-        </div>
+        {statsLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-10">
+            {[0,1,2,3].map(i => (
+              <div key={i} className="bg-white rounded-3xl border border-[#E5E5E5] p-6 animate-pulse">
+                <div className="h-2.5 w-28 bg-[#F3F4F6] rounded-full mb-5" />
+                <div className="h-10 w-14 bg-[#F3F4F6] rounded-xl mb-5" />
+                <div className="h-2.5 w-20 bg-[#F3F4F6] rounded-full" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-10">
+            <StatCard
+              icon="solar:buildings-linear"
+              label="Active Listings"
+              value={activeListings}
+              trendDir={listingsTrend?.dir}
+              trendValue={listingsTrend?.value}
+            />
+            <StatCard
+              icon="solar:flame-bold"
+              iconColor="#F59E0B"
+              label="Hot Leads"
+              value={hotLeads}
+              trendDir={hotLeadsTrend?.dir}
+              trendValue={hotLeadsTrend?.value}
+            />
+            <StatCard
+              icon="solar:users-group-rounded-linear"
+              label="Buyer Matches"
+              value={buyerMatches}
+              trendDir={matchesTrend?.dir}
+              trendValue={matchesTrend?.value}
+            />
+            <StatCard
+              icon="solar:bolt-bold"
+              label="Halo Credits"
+              value={haloCredits}
+            />
+          </div>
+        )}
 
         {/* Two-column section */}
         <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6 mt-8">

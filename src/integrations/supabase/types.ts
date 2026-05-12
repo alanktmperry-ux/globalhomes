@@ -4997,6 +4997,48 @@ export type Database = {
           },
         ]
       }
+      csp_violations: {
+        Row: {
+          blocked_uri: string | null
+          column_number: number | null
+          document_uri: string | null
+          effective_directive: string | null
+          id: string
+          line_number: number | null
+          raw_report: Json | null
+          reported_at: string
+          source_file: string | null
+          user_agent: string | null
+          violated_directive: string | null
+        }
+        Insert: {
+          blocked_uri?: string | null
+          column_number?: number | null
+          document_uri?: string | null
+          effective_directive?: string | null
+          id?: string
+          line_number?: number | null
+          raw_report?: Json | null
+          reported_at?: string
+          source_file?: string | null
+          user_agent?: string | null
+          violated_directive?: string | null
+        }
+        Update: {
+          blocked_uri?: string | null
+          column_number?: number | null
+          document_uri?: string | null
+          effective_directive?: string | null
+          id?: string
+          line_number?: number | null
+          raw_report?: Json | null
+          reported_at?: string
+          source_file?: string | null
+          user_agent?: string | null
+          violated_directive?: string | null
+        }
+        Relationships: []
+      }
       dedup_config: {
         Row: {
           agency_id: string

@@ -2,3 +2,6 @@ project_id = "ngrkbohpmkzjonaofgbb"
 
 [functions.get-geo]
 verify_jwt = false
+
+[functions.csp-report]
+verify_jwt = false

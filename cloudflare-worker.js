@@ -103,6 +103,88 @@ function buildAgentHead(a, appUrl) {
     <meta name="twitter:card" content="summary" />`;
 }
 
+// =============================================================================
+// Browser security headers
+// CSP is in REPORT-ONLY mode until 19 May 2026. Switch to enforce mode (use
+// 'Content-Security-Policy' header name instead of 'Content-Security-Policy-Report-Only')
+// after reviewing the csp_violations table for 7 days of clean reports.
+// =============================================================================
+function buildSecurityHeaders(env) {
+  const supabaseUrl = (env.SUPABASE_URL || '').replace(/\/$/, '');
+  const supabaseHost = supabaseUrl.replace(/^https?:\/\//, '');
+  const reportRef = env.SUPABASE_PROJECT_REF || supabaseHost.split('.')[0];
+
+  const csp = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://js.stripe.com https://maps.googleapis.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com data:",
+    `img-src 'self' data: blob: https: https://${supabaseHost} https://images.unsplash.com https://*.googleapis.com https://maps.gstatic.com`,
+    `connect-src 'self' ${supabaseUrl} wss://${supabaseHost} https://api.stripe.com https://maps.googleapis.com https://generativelanguage.googleapis.com`,
+    "frame-src 'self' https://js.stripe.com https://challenges.cloudflare.com https://www.youtube.com https://player.vimeo.com",
+    "media-src 'self' blob: data:",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'self'",
+    "manifest-src 'self'",
+    "worker-src 'self' blob:",
+    "upgrade-insecure-requests",
+    `report-uri https://${reportRef}.supabase.co/functions/v1/csp-report`,
+  ].join('; ');
+
+  return {
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+    'X-Frame-Options': 'SAMEORIGIN',
+    'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'X-XSS-Protection': '0',
+    'Permissions-Policy': [
+      'accelerometer=()',
+      'autoplay=()',
+      'camera=()',
+      'cross-origin-isolated=()',
+      'display-capture=()',
+      'encrypted-media=()',
+      'fullscreen=(self)',
+      'geolocation=(self)',
+      'gyroscope=()',
+      'keyboard-map=()',
+      'magnetometer=()',
+      'microphone=(self)',
+      'midi=()',
+      'payment=(self)',
+      'picture-in-picture=()',
+      'publickey-credentials-get=(self)',
+      'screen-wake-lock=()',
+      'sync-xhr=()',
+      'usb=()',
+      'web-share=(self)',
+      'xr-spatial-tracking=()',
+    ].join(', '),
+    'Cross-Origin-Opener-Policy': 'same-origin',
+    'Cross-Origin-Resource-Policy': 'same-site',
+    'Server': 'ListHQ',
+    'Content-Security-Policy-Report-Only': csp,
+  };
+}
+
+function withSecurityHeaders(response, env) {
+  const contentType = response.headers.get('content-type') || '';
+  // Only inject on HTML responses — JSON / JS / CSS / images pass through.
+  if (!contentType.includes('text/html')) return response;
+
+  const headers = new Headers(response.headers);
+  const secHeaders = buildSecurityHeaders(env);
+  for (const [k, v] of Object.entries(secHeaders)) headers.set(k, v);
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -136,7 +218,8 @@ export default {
     }
 
     if (!isBot(userAgent)) {
-      return fetch(request);
+      const humanRes = await fetch(request);
+      return withSecurityHeaders(humanRes, env);
     }
 
     const originRes = await fetch(new Request(APP_ORIGIN + url.pathname + url.search, request));
@@ -159,12 +242,13 @@ export default {
       html = html.replace('<head>', `<head>\n${injected}`);
     }
 
-    return new Response(html, {
+    const botRes = new Response(html, {
       headers: {
         ...Object.fromEntries(originRes.headers),
         'Content-Type': 'text/html; charset=utf-8',
         'Cache-Control': 'public, max-age=60, s-maxage=300',
       },
     });
+    return withSecurityHeaders(botRes, env);
   },
 };

@@ -190,6 +190,7 @@ const HelpContactPage = React.lazy(() => import("./pages/HelpContactPage"));
 const CRMPage = React.lazy(() => import("./features/crm/pages/CRMPage"));
 const ContactImportPage = React.lazy(() => import("./features/agents/components/dashboard/ContactImportPage"));
 const SavedSearchesPage = React.lazy(() => import("./features/alerts/pages/SavedSearchesPage"));
+const HaloLandingPage = React.lazy(() => import("./pages/halo/HaloLandingPage"));
 const CreateHaloPage = React.lazy(() => import("./pages/halo/CreateHaloPage"));
 const EditHaloPage = React.lazy(() => import("./pages/halo/EditHaloPage"));
 const HaloSuccessPage = React.lazy(() => import("./pages/halo/HaloSuccessPage"));

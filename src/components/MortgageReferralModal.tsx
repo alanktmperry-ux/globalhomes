@@ -33,6 +33,7 @@ export function MortgageReferralModal({
   propertyId,
   purchasePrice,
 }: MortgageReferralModalProps) {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');

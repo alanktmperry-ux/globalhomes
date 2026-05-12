@@ -33,6 +33,7 @@ interface MortgageBrokerModalProps {
 export function MortgageBrokerModal({
   open, onOpenChange, sourcePage, defaultPrice, defaultName, defaultEmail, defaultPhone, propertyId, agentId,
 }: MortgageBrokerModalProps) {
+  const { t } = useTranslation();
   const [name, setName] = useState(defaultName ?? '');
   const [email, setEmail] = useState(defaultEmail ?? '');
   const [phone, setPhone] = useState(defaultPhone ?? '');

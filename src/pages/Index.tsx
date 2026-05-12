@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback, lazy, Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { Mic, Search, Play, X, ArrowRight, Unlock } from 'lucide-react';
@@ -7,14 +7,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import LiveActivityTicker from '@/components/LiveActivityTicker';
 import HomeCountUp from '@/components/HomeCountUp';
-import FeaturedListings from '@/features/marketing/FeaturedListings';
-import ReplaceFiveTools from '@/features/marketing/ReplaceFiveTools';
-import VoiceListingShowcase from '@/features/marketing/VoiceListingShowcase';
-import HaloBoardPreview from '@/features/marketing/HaloBoardPreview';
-// PricingSection removed from homepage; lives on /for-agents/pricing
-import FinalCTA from '@/features/marketing/FinalCTA';
+// All marketing sections are below the fold; lazy-loading them keeps the
+// feature-marketing chunk (and any heavy deps it pulls) out of the entry chunk.
+const FeaturedListings = lazy(() => import('@/features/marketing/FeaturedListings'));
+const ReplaceFiveTools = lazy(() => import('@/features/marketing/ReplaceFiveTools'));
+const VoiceListingShowcase = lazy(() => import('@/features/marketing/VoiceListingShowcase'));
+const HaloBoardPreview = lazy(() => import('@/features/marketing/HaloBoardPreview'));
+const FinalCTA = lazy(() => import('@/features/marketing/FinalCTA'));
 import HeroSearchPreview from '@/components/home/HeroSearchPreview';
 import { cardImageProps } from '@/shared/lib/optimizeImageUrl';
+
+const SectionFallback = () => <div style={{ minHeight: 200 }} aria-hidden />;
 
 // ============================================================
 // Wave 17 V8 — Buyer-first multilingual homepage
@@ -624,17 +627,19 @@ const Index = () => {
           `}</style>
         </div>
 
-        {/* ═══ Featured in [Location] — boosted listings (static seed) ═══ */}
-        <FeaturedListings />
+        <Suspense fallback={<SectionFallback />}>
+          {/* ═══ Featured in [Location] — boosted listings (static seed) ═══ */}
+          <FeaturedListings />
 
-        {/* ═══ Replace five tools with one — Bose-signature visual ═══ */}
-        <ReplaceFiveTools />
+          {/* ═══ Replace five tools with one — Bose-signature visual ═══ */}
+          <ReplaceFiveTools />
 
-        {/* ═══ Voice Listing showcase — blue gradient stage ═══ */}
-        <VoiceListingShowcase />
+          {/* ═══ Voice Listing showcase — blue gradient stage ═══ */}
+          <VoiceListingShowcase />
 
-        {/* ═══ Halo Board preview — reverse marketplace ═══ */}
-        <HaloBoardPreview />
+          {/* ═══ Halo Board preview — reverse marketplace ═══ */}
+          <HaloBoardPreview />
+        </Suspense>
 
         {/* ═══ SECTION 4b — Featured Listings ═══ */}
         <section style={{ background: '#fff', padding: '72px 24px' }}>
@@ -856,7 +861,9 @@ const Index = () => {
         {/* Agent pricing moved to /for-agents/pricing */}
 
         {/* ═══ Final CTA — dark ink with blue glow ═══ */}
-        <FinalCTA />
+        <Suspense fallback={<SectionFallback />}>
+          <FinalCTA />
+        </Suspense>
 
         {/* ═══ Search modal ═══ */}
         {modalOpen && (

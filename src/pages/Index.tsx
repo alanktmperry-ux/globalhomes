@@ -462,7 +462,7 @@ const Index = () => {
         <title>ListHQ — Find your home in any language. Multilingual property search Australia</title>
         <meta name="description" content="Australia's only multilingual property platform. Listings auto-translated into any language. Free for buyers, always." />
         <link rel="canonical" href="https://listhq.com.au/" />
-        <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,700;1,800&display=swap" rel="stylesheet" />
+        
       </Helmet>
 
       <style>{`

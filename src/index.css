@@ -1,4 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url('/fonts/plus-jakarta-sans-variable.woff2') format('woff2-variations'),
+       url('/fonts/plus-jakarta-sans-variable.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url('/fonts/plus-jakarta-sans-italic-variable.woff2') format('woff2-variations'),
+       url('/fonts/plus-jakarta-sans-italic-variable.woff2') format('woff2');
+}
 
 @tailwind base;
 @tailwind components;

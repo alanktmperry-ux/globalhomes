@@ -222,6 +222,9 @@ function cacheControlFor(url, contentType) {
   if (/\/assets\/[^/]+-[a-zA-Z0-9_-]{6,}\.(js|css|woff2?|ttf|otf)$/.test(url.pathname)) {
     return 'public, max-age=31536000, immutable';
   }
+  if (url.pathname.startsWith('/hero/') || url.pathname.startsWith('/fonts/')) {
+    return 'public, max-age=31536000, immutable';
+  }
   if (/\.(jpg|jpeg|png|webp|avif|svg|gif|ico)$/.test(url.pathname)) {
     return 'public, max-age=604800';
   }

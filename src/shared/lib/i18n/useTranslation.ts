@@ -42,6 +42,9 @@ const loaders: Partial<Record<SupportedLanguageCode, () => Promise<unknown>>> = 
   'tr':    () => import('./locales/tr'),
   'de':    () => import('./locales/de'),
   'el':    () => import('./locales/el'),
+  'ur':    () => import('./locales/ur'),
+  'mr':    () => import('./locales/mr'),
+  'te':    () => import('./locales/te'),
 };
 
 const cache: Partial<Record<SupportedLanguageCode, LocaleDict>> = { en: en as LocaleDict };

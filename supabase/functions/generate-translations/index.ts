@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
 import { logApiUsage, costFor } from "../_shared/usageLog.ts";
+import { enforceRateLimit } from "../_shared/rateLimit.ts";
 
 const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-2.5-pro";
@@ -530,6 +531,15 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
+
+  const rlBlocked = await enforceRateLimit(req, {
+    endpoint: "generate-translations",
+    userMaxPerWindow: 30,
+    ipMaxPerWindow: 0,
+    windowSeconds: 60,
+    punishScrapers: true,
+  }, corsHeaders);
+  if (rlBlocked) return rlBlocked;
 
   try {
     const body = await req.json();

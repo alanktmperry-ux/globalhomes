@@ -1,4 +1,5 @@
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { enforceRateLimit } from "../_shared/rateLimit.ts";
 
 const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-2.5-pro";
@@ -13,6 +14,15 @@ function jsonResponse(body: unknown, status = 200) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const rlBlocked = await enforceRateLimit(req, {
+    endpoint: "translate-listing-preview",
+    userMaxPerWindow: 60,
+    ipMaxPerWindow: 30,
+    windowSeconds: 60,
+    punishScrapers: true,
+  }, corsHeaders);
+  if (rlBlocked) return rlBlocked;
 
   let body: any;
   try { body = await req.json(); } catch { return jsonResponse({ error: "Invalid JSON" }, 400); }

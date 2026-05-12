@@ -86,6 +86,16 @@ Return ONLY a JSON object with this exact shape:
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const { enforceRateLimit } = await import("../_shared/rateLimit.ts");
+  const rlBlocked = await enforceRateLimit(req, {
+    endpoint: "translate-notification",
+    userMaxPerWindow: 200,
+    ipMaxPerWindow: 0,
+    windowSeconds: 60,
+    punishScrapers: true,
+  }, corsHeaders);
+  if (rlBlocked) return rlBlocked;
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "method_not_allowed" }), {
       status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" },

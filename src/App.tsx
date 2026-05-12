@@ -436,6 +436,7 @@ const App = () => (
                 <Route path="/my-applications" element={<ProtectedRoute><MyApplicationsPage /></ProtectedRoute>} />
 
                 {/* Halo — seeker reverse marketplace */}
+                <Route path="/halo" element={<HaloLandingPage />} />
                 <Route path="/halo/new" element={<ProtectedRoute><CreateHaloPage /></ProtectedRoute>} />
                 <Route path="/halo/success" element={<ProtectedRoute><HaloSuccessPage /></ProtectedRoute>} />
                 <Route path="/halo/edit" element={<ProtectedRoute><EditHaloPage /></ProtectedRoute>} />

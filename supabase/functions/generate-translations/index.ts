@@ -16,7 +16,7 @@ let corsHeaders: Record<string, string> = getCorsHeaders(null);
 type GlossarySupportedLanguage =
   | 'zh_simplified' | 'zh_traditional' | 'vi' | 'ko' | 'ar' | 'hi' | 'bn'
   | 'pa' | 'ta' | 'ja' | 'id' | 'ms' | 'th' | 'tl' | 'it' | 'es' | 'fr'
-  | 'pt' | 'ru' | 'el';
+  | 'pt' | 'ru' | 'el' | 'ne' | 'si' | 'fa' | 'de' | 'tr' | 'ur' | 'mr' | 'te';
 
 type GlossaryEntry = {
   source: string;
@@ -254,7 +254,7 @@ LISTING DATA:
 - Features: ${listing.features ? JSON.stringify(listing.features) : "None listed"}
 - Year Built: ${listing.year_built || "N/A"}
 
-TRANSLATIONS — provide for each of these language keys: "zh_simplified" (Simplified Chinese), "zh_traditional" (Traditional Chinese), "vi" (Vietnamese), "ko" (Korean), "ar" (Arabic), "ja" (Japanese), "hi" (Hindi), "pa" (Punjabi - Gurmukhi script), "ta" (Tamil), "bn" (Bengali), "tl" (Tagalog/Filipino), "id" (Indonesian), "ms" (Malay), "th" (Thai), "ne" (Nepali - Devanagari script), "si" (Sinhala), "el" (Greek), "it" (Italian), "es" (Spanish - Australian/international context), "fa" (Farsi/Persian - right-to-left)
+TRANSLATIONS — provide for each of these language keys: "zh_simplified" (Simplified Chinese), "zh_traditional" (Traditional Chinese), "vi" (Vietnamese), "ko" (Korean), "ar" (Arabic), "ja" (Japanese), "hi" (Hindi), "pa" (Punjabi - Gurmukhi script), "ta" (Tamil), "bn" (Bengali), "tl" (Tagalog/Filipino), "id" (Indonesian), "ms" (Malay), "th" (Thai), "ne" (Nepali - Devanagari script), "si" (Sinhala), "el" (Greek), "it" (Italian), "es" (Spanish - Australian/international context), "fa" (Farsi/Persian - right-to-left), "fr" (French), "ru" (Russian), "pt" (Portuguese), "de" (German), "tr" (Turkish), "ur" (Urdu), "mr" (Marathi), "te" (Telugu)
 Each language must contain:
 - title: translated property title
 - description: full translated description (natural, not word-for-word)
@@ -269,7 +269,7 @@ For Indian-buyer-relevant features specifically, consider noting (only when genu
 - Distance to Indian community centres or cultural associations
 For Tamil buyers specifically, also consider proximity to South Indian temples and Carnatic music/dance schools where genuinely nearby.
 
-CRITICAL: All 20 language keys MUST be present in the "translations" object. For Arabic, ensure right-to-left natural phrasing. For Hindi, Punjabi, Tamil, and Bengali, use natural Indian-Australian property terminology where appropriate. Use 'lakh' and 'crore' phrasing for Indian buyers when prices fit those denominations, alongside the AUD figure.
+CRITICAL: All 28 language keys MUST be present in the "translations" object. For Arabic and Farsi, ensure right-to-left natural phrasing. For Hindi, Punjabi, Tamil, Bengali, Marathi, Telugu, and Urdu, use natural Indian-Australian property terminology where appropriate. Use 'lakh' and 'crore' phrasing for Indian buyers when prices fit those denominations, alongside the AUD figure.
 REMINDER: Preserve every <<G:N>> sentinel verbatim in every translated title, description, and summary.
 
 AGENT INSIGHTS — in English, under key "agent_insights":

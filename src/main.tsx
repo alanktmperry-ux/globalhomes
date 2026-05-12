@@ -57,6 +57,29 @@ if (rootEl.getAttribute('data-hydrate') === '1') {
   createRoot(rootEl).render(tree);
 }
 
+// Forward pre-mount focus/typing to the live React search input.
+if (preHadFocus || preTypedValue) {
+  const tryForward = (attempt = 0) => {
+    const liveInput = document.querySelector(
+      'input[placeholder*="uburb"], input[placeholder*="ddress"]'
+    );
+    if (liveInput instanceof HTMLInputElement) {
+      if (preTypedValue) {
+        const setter = Object.getOwnPropertyDescriptor(
+          window.HTMLInputElement.prototype,
+          'value'
+        )?.set;
+        setter?.call(liveInput, preTypedValue);
+        liveInput.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+      if (preHadFocus) liveInput.focus();
+    } else if (attempt < 20) {
+      requestAnimationFrame(() => tryForward(attempt + 1));
+    }
+  };
+  requestAnimationFrame(() => tryForward());
+}
+
 // Warm likely-next chunks during browser idle so the first navigation off the
 // homepage doesn't pay the chunk-download cost on click. All ignored on error
 // (e.g. offline / chunk hash mismatch after a deploy).

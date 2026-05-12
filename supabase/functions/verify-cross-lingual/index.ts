@@ -283,7 +283,8 @@ Deno.serve(async (req) => {
       if (!zh) throw new Error("translated_bodies.zh missing");
       const properNounsPreserved =
         /Box Hill/i.test(zh) && /Bellevue Rd/i.test(zh) &&
-        /1\.85M|1,850,000|\$1\.85/i.test(zh) && /2pm/i.test(zh);
+        /1\.85M|1,850,000|\$1\.85|185\s*万|1\.85\s*百万/i.test(zh) &&
+        /2\s*pm|下午\s*2|2:00/i.test(zh);
       geminiCallsMade += 1;
       if (!properNounsPreserved) {
         throw new Error(`proper_nouns_not_preserved: ${zh.slice(0, 200)}`);

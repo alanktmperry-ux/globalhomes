@@ -139,6 +139,7 @@ const DashboardOverview = () => {
   const [buyerMatches, setBuyerMatches] = useState(0);
   const [buyerMatchesPrev, setBuyerMatchesPrev] = useState(0);
   const [haloCredits, setHaloCredits] = useState(0);
+  const [statsLoading, setStatsLoading] = useState(true);
 
   const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
   const [boostedListings, setBoostedListings] = useState<BoostedListing[]>([]);

@@ -821,7 +821,7 @@ const ListingsPage = () => {
                   : 'bg-white border border-[#E5E5E5] text-[#6a6a6a] hover:border-[#2563EB] hover:text-[#2563EB]',
               )}
             >
-              {tab === 'active' ? `Active · ${activeWithStatus.length}` : `Archived · ${archivedWithStatus.length}`}
+              {tab === 'active' ? `${t('agent.listings.lifecycle.active')} · ${activeWithStatus.length}` : `${t('agent.listings.lifecycle.archived')} · ${archivedWithStatus.length}`}
             </button>
           ))}
           <span className="w-px h-6 bg-[#E5E5E5] mx-1" />
@@ -835,7 +835,7 @@ const ListingsPage = () => {
                 : 'bg-white border border-[#E5E5E5] text-[#6a6a6a] hover:border-[#2563EB] hover:text-[#2563EB]',
             )}
           >
-            <Home size={12} /> Sales · {salesListings.length}
+            <Home size={12} /> {t('agent.listings.mode.sales')} · {salesListings.length}
           </button>
           <button
             type="button"
@@ -847,7 +847,7 @@ const ListingsPage = () => {
                 : 'bg-white border border-[#E5E5E5] text-[#6a6a6a] hover:border-[#2563EB] hover:text-[#2563EB]',
             )}
           >
-            <Building size={12} /> Rentals · {rentalListings.length}
+            <Building size={12} /> {t('agent.listings.mode.rentals')} · {rentalListings.length}
           </button>
         </div>
 
@@ -865,7 +865,7 @@ const ListingsPage = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by address, suburb, or reference..."
+              placeholder={t('agent.listings.searchPlaceholder')}
               className="w-full bg-[#F9FAFB] border-0 rounded-full pl-10 pr-4 py-2.5 text-[14px] text-[#0a0f1e] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20"
             />
           </div>

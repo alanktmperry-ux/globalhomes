@@ -244,12 +244,12 @@ const AgentAuthPage = () => {
   }
 
   const heading =
-    step === 'register' ? 'Join ListHQ'
+    step === 'register' ? 'Start your 60-day free trial'
       : step === 'password' ? 'Welcome back'
         : 'Welcome back';
 
   const sub =
-    step === 'register' ? 'Start your free 60-day trial. No contracts, cancel anytime.'
+    step === 'register' ? "Join Australia's multilingual property platform. No credit card required."
       : step === 'password' ? email
         : 'Sign in to manage your portfolio';
 

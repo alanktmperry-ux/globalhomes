@@ -25,12 +25,11 @@ const PRICING: Array<[string, string, string]> = [
 ];
 
 const LANGUAGES = [
-  'English',
-  'Mandarin (Simplified Chinese)',
-  'Traditional Chinese',
-  'Vietnamese',
-  'Korean',
-  'Japanese',
+  'English', 'Mandarin (Simplified Chinese)', 'Traditional Chinese', 'Vietnamese',
+  'Korean', 'Japanese', 'Arabic', 'Hindi', 'Punjabi', 'Tamil', 'Bengali',
+  'Tagalog (Filipino)', 'Indonesian', 'Malay', 'Thai', 'Farsi (Persian)', 'Urdu',
+  'Marathi', 'Telugu', 'Nepali', 'Sinhalese', 'Burmese', 'Khmer', 'French',
+  'Spanish', 'Portuguese', 'Italian', 'Greek', 'German', 'Russian',
 ];
 
 const FEATURES = [
@@ -77,6 +76,14 @@ export default function About() {
         <p className="text-lg leading-relaxed text-muted-foreground mb-10">
           ListHQ (listhq.com.au) is Australia's multilingual real estate platform, built for agents, property managers, and buyers operating in Australia's multicultural property market. A single listing published on ListHQ automatically appears in every language — without the agent translating a word. ListHQ is a SaaS platform founded in Australia in 2026.
         </p>
+
+        <h2 className="text-2xl font-semibold mt-10 mb-4">Why ListHQ exists</h2>
+        <p className="leading-relaxed text-muted-foreground mb-4">Three years ago, a friend decided to open a real estate agency.</p>
+        <p className="leading-relaxed text-muted-foreground mb-4">Helping set it up meant navigating realestate.com.au and Domain onboarding, comparing CRMs, and stitching four or five separate tools into something that functioned like a business. The listing fees alone were a shock — Australian agents pay some of the highest portal costs in the world, for platforms that haven't meaningfully changed in a decade.</p>
+        <p className="leading-relaxed text-muted-foreground mb-4">But the harder discovery came later. Working in suburbs where Mandarin, Vietnamese, Korean, and Arabic were spoken as often as English, it became clear that the buyers most active in the market were also the most invisible to it. Every tool, every portal, every communication system was built as if multicultural Australia didn't exist.</p>
+        <p className="leading-relaxed text-muted-foreground mb-4">Thirty per cent of Australians were born overseas. In parts of Melbourne and Sydney, that figure is closer to fifty. These buyers search in their language, negotiate in their language, and make the most significant financial decision of their lives in their language. The platforms they were supposed to use had no idea how to meet them.</p>
+        <p className="leading-relaxed text-muted-foreground mb-4">That gap — between the Australia that exists and the tools built to serve it — is why ListHQ was built.</p>
+        <p className="leading-relaxed text-muted-foreground mb-10">Not a feature. Not a plugin. A platform built from the ground up for the way Australian real estate actually works: diverse, multilingual, and long overdue for something better.</p>
 
         <h2 className="text-2xl font-semibold mt-10 mb-4">{t('about.problem')}</h2>
         <p className="leading-relaxed text-muted-foreground mb-4">

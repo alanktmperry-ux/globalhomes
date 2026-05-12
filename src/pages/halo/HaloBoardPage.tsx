@@ -241,21 +241,21 @@ export default function HaloBoardPage() {
               className="font-extrabold tracking-[-0.04em] text-[#0a0f1e]"
               style={{ fontSize: 'clamp(32px,4vw,48px)', lineHeight: 1.05 }}
             >
-              Halo Board
+              {t('agent.halo.pageTitle')}
             </h1>
             {!loading && (
               <span className="bg-[#EFF6FF] border border-[#2563EB]/15 text-[#1E40AF] rounded-full px-3 py-1 text-[12px] font-bold">
-                {activeCount} active brief{activeCount === 1 ? '' : 's'}
+                {t(activeCount === 1 ? 'agent.halo.activeBriefs.one' : 'agent.halo.activeBriefs.other', { count: activeCount })}
               </span>
             )}
             {tab === 'pocket' && pocketMatchIds.size > 0 && (
               <span className="bg-[#FEF3C7] border border-[#F59E0B]/30 text-[#92400E] rounded-full px-3 py-1 text-[12px] font-bold">
-                {pocketMatchIds.size} pocket
+                {t('agent.halo.pocketCount', { count: pocketMatchIds.size })}
               </span>
             )}
           </div>
           <p className="text-[14px] text-[#6a6a6a] font-medium mt-2">
-            Buyers who told you what they want. Unlock the ones that match your listings.
+            {t('agent.halo.pageSubtitle')}
           </p>
         </div>
 
@@ -263,7 +263,7 @@ export default function HaloBoardPage() {
           <div className="bg-white border border-[#E5E5E5] rounded-full px-4 py-2 inline-flex items-center gap-2.5">
             <Ico icon="solar:bolt-bold" size={18} color="#2563EB" />
             <span className="text-[16px] font-extrabold text-[#0a0f1e] tabular-nums">{balance}</span>
-            <span className="text-[12px] text-[#6a6a6a] font-medium">credits</span>
+            <span className="text-[12px] text-[#6a6a6a] font-medium">{t('agent.halo.credits.label')}</span>
           </div>
           <button
             type="button"
@@ -272,7 +272,7 @@ export default function HaloBoardPage() {
             style={{ background: 'linear-gradient(135deg,#2563EB,#1D4ED8)' }}
           >
             <Ico icon="solar:add-square-bold" size={16} />
-            <span className="hidden sm:inline">Buy credits</span>
+            <span className="hidden sm:inline">{t('agent.halo.credits.buy')}</span>
           </button>
         </div>
       </div>
@@ -361,9 +361,9 @@ export default function HaloBoardPage() {
               <div className="flex justify-center">
                 <Ico icon="solar:streets-linear" size={56} color="#E5E7EB" />
               </div>
-              <h3 className="text-[22px] font-bold text-[#0a0f1e] mt-6">No buyer briefs match</h3>
+              <h3 className="text-[22px] font-bold text-[#0a0f1e] mt-6">{t('agent.halo.empty.title')}</h3>
               <p className="text-[14px] text-[#6a6a6a] max-w-[480px] mx-auto leading-[1.55] mt-3">
-                Try widening your filters or check back soon. New briefs are posted every day from buyers in any language.
+                {t('agent.halo.empty.body')}
               </p>
               {hasFilters && (
                 <button
@@ -371,7 +371,7 @@ export default function HaloBoardPage() {
                   onClick={() => setFilters(DEFAULT_FILTERS)}
                   className="mt-6 bg-white border border-[#E5E5E5] rounded-full px-5 py-2.5 text-[13px] font-bold text-[#0a0f1e] hover:bg-[#F9FAFB] transition"
                 >
-                  Clear filters
+                  {t('agent.halo.empty.clearFilters')}
                 </button>
               )}
             </div>
@@ -396,9 +396,9 @@ export default function HaloBoardPage() {
                 <Ico icon="solar:lightbulb-bolt-bold" size={24} color="#2563EB" />
               </div>
               <div>
-                <div className="text-[16px] font-extrabold text-[#1E40AF]">How Halo works</div>
+                <div className="text-[16px] font-extrabold text-[#1E40AF]">{t('agent.halo.how.title')}</div>
                 <div className="text-[13px] text-[#1E40AF]/85 mt-1 leading-[1.55]">
-                  Buyers post structured briefs in their own language. You unlock the ones that match your listings. No cold calling, no chasing.
+                  {t('agent.halo.how.body')}
                 </div>
               </div>
             </div>

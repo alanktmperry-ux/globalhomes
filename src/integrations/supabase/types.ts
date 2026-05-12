@@ -7856,8 +7856,14 @@ export type Database = {
           is_read: boolean
           lead_id: string | null
           message: string | null
+          original_body: string
+          original_lang: string
+          original_title: string
           property_id: string | null
           title: string
+          translated_bodies: Json
+          translated_titles: Json
+          translation_status: string
           type: string
         }
         Insert: {
@@ -7867,8 +7873,14 @@ export type Database = {
           is_read?: boolean
           lead_id?: string | null
           message?: string | null
+          original_body: string
+          original_lang?: string
+          original_title: string
           property_id?: string | null
           title: string
+          translated_bodies?: Json
+          translated_titles?: Json
+          translation_status?: string
           type?: string
         }
         Update: {
@@ -7878,8 +7890,14 @@ export type Database = {
           is_read?: boolean
           lead_id?: string | null
           message?: string | null
+          original_body?: string
+          original_lang?: string
+          original_title?: string
           property_id?: string | null
           title?: string
+          translated_bodies?: Json
+          translated_titles?: Json
+          translation_status?: string
           type?: string
         }
         Relationships: [

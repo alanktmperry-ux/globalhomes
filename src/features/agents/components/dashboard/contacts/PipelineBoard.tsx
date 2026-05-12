@@ -26,8 +26,27 @@ interface Props {
   addActivity?: (contactId: string, type: string, description: string) => Promise<void>;
 }
 
+type Stage = { key: string; label: string; color: string };
+
 const PipelineBoard = ({ contacts, pipelineType, onUpdateContact, onSelect, addActivity }: Props) => {
-  const stages = pipelineType === 'buyer' ? BUYER_STAGES : SELLER_STAGES;
+  const { t, language } = useTranslation();
+  const isRTL = RTL_LANGS.has(language);
+
+  const BUYER_STAGES: Stage[] = [
+    { key: 'cold_lead', label: t('agent.crm.pipeline.coldLead'), color: 'bg-muted' },
+    { key: 'active_buyer', label: t('agent.crm.pipeline.activeBuyer'), color: 'bg-blue-500/10' },
+    { key: 'under_contract', label: t('agent.crm.pipeline.underContract'), color: 'bg-orange-500/10' },
+    { key: 'settled', label: t('agent.crm.pipeline.settled'), color: 'bg-green-500/10' },
+  ];
+  const SELLER_STAGES: Stage[] = [
+    { key: 'cold_lead', label: t('agent.crm.pipeline.coldLead'), color: 'bg-muted' },
+    { key: 'appraisal', label: t('agent.crm.pipeline.appraisal'), color: 'bg-purple-500/10' },
+    { key: 'listing_authority', label: t('agent.crm.pipeline.listingAuthority'), color: 'bg-blue-500/10' },
+    { key: 'marketing', label: t('agent.crm.pipeline.marketing'), color: 'bg-yellow-500/10' },
+    { key: 'under_contract', label: t('agent.crm.pipeline.underContract'), color: 'bg-orange-500/10' },
+    { key: 'settled', label: t('agent.crm.pipeline.settled'), color: 'bg-green-500/10' },
+  ];
+  const stages: Stage[] = pipelineType === 'buyer' ? BUYER_STAGES : SELLER_STAGES;
   const stageField = pipelineType === 'buyer' ? 'buyer_pipeline_stage' : 'seller_pipeline_stage';
   const [draggedId, setDraggedId] = useState<string | null>(null);
 

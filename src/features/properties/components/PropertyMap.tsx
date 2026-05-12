@@ -6,6 +6,7 @@ import { loadGoogleMapsScript } from '@/shared/lib/googleMapsService';
 import { Loader2, Locate, Search, X, HelpCircle, MapPin } from 'lucide-react';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { useTranslation } from '@/shared/lib/i18n';
 
 
 const TYPE_COLORS: Record<string, string> = {

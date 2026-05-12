@@ -69,19 +69,22 @@ export function BottomNav() {
           </button>
         )}
 
-        {/* Messages — auth only */}
+        {/* Messages — auth only. Lazy child fetches unread count. */}
         {user && (
-          <button onClick={() => navigate('/messages')} className={itemClass('/messages')}>
-            <div className="relative">
+          <Suspense fallback={
+            <button onClick={() => navigate('/messages')} className={itemClass('/messages')}>
               <MessageCircle size={22} strokeWidth={iconStroke('/messages')} />
-              {totalUnread > 0 && (
-                <span className="absolute -top-1.5 -right-2.5 min-w-[15px] h-[15px] px-0.5 rounded-full bg-red-500 border-[1.5px] border-white text-[9px] font-bold text-white flex items-center justify-center">
-                  {totalUnread > 99 ? '99+' : totalUnread}
-                </span>
-              )}
-            </div>
-            <span className={labelClass('/messages')}>Messages</span>
-          </button>
+              <span className={labelClass('/messages')}>Messages</span>
+            </button>
+          }>
+            <MessagesTab
+              userId={user.id}
+              onClick={() => navigate('/messages')}
+              itemClassName={itemClass('/messages')}
+              labelClassName={labelClass('/messages')}
+              iconStroke={iconStroke('/messages')}
+            />
+          </Suspense>
         )}
 
         {/* Language */}

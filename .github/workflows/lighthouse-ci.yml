@@ -1,0 +1,75 @@
+name: Lighthouse CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Daily at 14:00 UTC (00:00 AEST) — catches drift even without commits.
+    - cron: '0 14 * * *'
+
+jobs:
+  lighthouse-desktop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install -g @lhci/cli@latest
+      - name: Wait for deployment to stabilise
+        run: sleep 30
+      - name: Run Lighthouse CI (Desktop)
+        run: lhci autorun --config=lighthouserc.json
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+  lighthouse-mobile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install -g @lhci/cli@latest
+      - name: Wait for deployment to stabilise
+        run: sleep 30
+      - name: Run Lighthouse CI (Mobile)
+        run: lhci autorun --config=lighthouserc.mobile.json
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+  bundle-size:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run build
+      - name: Check bundle sizes
+        run: |
+          MAX_INITIAL_KB=180
+          INITIAL_BUNDLE_SIZE_KB=$(find dist/assets -name 'index-*.js' -exec gzip -c {} \; | wc -c | awk '{print $1/1024}')
+          echo "Initial bundle size: ${INITIAL_BUNDLE_SIZE_KB}KB (gzipped)"
+          echo "Limit: ${MAX_INITIAL_KB}KB"
+          if (( $(echo "$INITIAL_BUNDLE_SIZE_KB > $MAX_INITIAL_KB" | bc -l) )); then
+            echo "❌ Initial bundle exceeds budget"
+            exit 1
+          fi
+          echo "✅ Initial bundle within budget"
+
+  notify-on-failure:
+    runs-on: ubuntu-latest
+    needs: [lighthouse-desktop, lighthouse-mobile, bundle-size]
+    if: failure()
+    steps:
+      - name: Slack/Discord notification
+        run: |
+          if [ -n "${{ secrets.PERF_REGRESSION_WEBHOOK_URL }}" ]; then
+            curl -X POST -H "Content-Type: application/json" \
+              -d '{"text":"⚠️ Lighthouse CI failed on listhq.com.au. Performance regression detected. Inspect: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+              ${{ secrets.PERF_REGRESSION_WEBHOOK_URL }}
+          fi

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -23,9 +23,11 @@ const AgentAuthPage = () => {
   usePageTitle('Log In');
   const navigate = useNavigate();
   const { user, isAgent, isAdmin, loading: authLoading } = useAuth();
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get('mode') ?? 'login';
 
   const [pendingRedirect, setPendingRedirect] = useState<'dashboard' | null>(null);
-  const [step, setStep] = useState<Step>('email');
+  const [step, setStep] = useState<Step>(mode === 'signup' ? 'register' : 'email');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [regEmail, setRegEmail] = useState('');
@@ -242,12 +244,12 @@ const AgentAuthPage = () => {
   }
 
   const heading =
-    step === 'register' ? 'Join ListHQ'
+    step === 'register' ? 'Start your 60-day free trial'
       : step === 'password' ? 'Welcome back'
         : 'Welcome back';
 
   const sub =
-    step === 'register' ? 'Start your free 60-day trial. No contracts, cancel anytime.'
+    step === 'register' ? "Join Australia's multilingual property platform. No credit card required."
       : step === 'password' ? email
         : 'Sign in to manage your portfolio';
 
@@ -427,19 +429,20 @@ const AgentAuthPage = () => {
             >
               {emailSubmitting
                 ? <><AuthSpinner /> Sending confirmation…</>
-                : 'Continue — confirm my email'}
+                : 'Start free trial'}
             </button>
           </form>
 
           <p className={s.footer} style={s.footerStyle}>
             Already have an account?
-            <button
-              type="button"
-              onClick={() => { setStep('email'); setRegEmail(''); setFormError(null); }}
-              className={`${s.link} ml-1`}
-            >
-              Sign in
-            </button>
+            <Link to="/agents/login" className={`${s.link} ml-1`}>
+              Sign in →
+            </Link>
+          </p>
+          <p className="text-center text-sm font-light mt-2" style={s.footerStyle}>
+            <Link to="/signup" className={s.link}>
+              I'm a buyer, not an agent →
+            </Link>
           </p>
         </>
       )}

@@ -434,32 +434,33 @@ const StatusTabs = ({
   setActiveTab: (v: string) => void;
   counts: Record<string, number>;
 }) => {
+  const { t } = useTranslation();
   const items = [
-    { key: 'all', label: 'All' },
-    { key: 'pending', label: 'Pending' },
-    { key: 'whisper', label: 'Whisper' },
-    { key: 'coming-soon', label: 'Coming Soon' },
-    { key: 'public', label: 'Public' },
-    { key: 'sold', label: 'Sold' },
+    { key: 'all', label: t('agent.listings.tab.all') },
+    { key: 'pending', label: t('agent.listings.tab.pending') },
+    { key: 'whisper', label: t('agent.listings.tab.whisper') },
+    { key: 'coming-soon', label: t('agent.listings.tab.comingSoon') },
+    { key: 'public', label: t('agent.listings.tab.public') },
+    { key: 'sold', label: t('agent.listings.tab.sold') },
   ];
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      {items.map((t) => {
-        const active = activeTab === t.key;
-        const count = t.key !== 'all' ? counts[t.key] : undefined;
+      {items.map((tab) => {
+        const active = activeTab === tab.key;
+        const count = tab.key !== 'all' ? counts[tab.key] : undefined;
         return (
           <button
-            key={t.key}
+            key={tab.key}
             type="button"
-            onClick={() => setActiveTab(t.key)}
+            onClick={() => setActiveTab(tab.key)}
             className={
               active
                 ? 'px-4 py-2 rounded-full text-[13px] font-semibold bg-[#0a0f1e] text-white transition-all'
                 : 'px-4 py-2 rounded-full text-[13px] font-semibold bg-[#F9FAFB] text-[#6a6a6a] hover:bg-[#EFF6FF] hover:text-[#1E40AF] transition-all'
             }
           >
-            {t.label}
-            {count ? <span className={active ? 'ml-1.5 opacity-70 font-normal' : 'ml-1.5 text-[#9CA3AF] font-normal'}>· {count}</span> : null}
+            {tab.label}
+            {count ? <span className={active ? 'ms-1.5 opacity-70 font-normal' : 'ms-1.5 text-[#9CA3AF] font-normal'}>· {count}</span> : null}
           </button>
         );
       })}

@@ -587,7 +587,7 @@ export function PropertyMap({
             <button
               onClick={handleGeolocate}
               className="absolute bottom-4 left-4 z-20 w-10 h-10 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated flex items-center justify-center hover:bg-card transition-colors"
-              aria-label="Find properties near me"
+              aria-label={t('property.map.geolocateAria')}
             >
               {locating ? (
                 <Loader2 size={16} className="animate-spin text-primary" />
@@ -596,7 +596,7 @@ export function PropertyMap({
               )}
             </button>
           </TooltipTrigger>
-          <TooltipContent>Use your current location to find nearby properties</TooltipContent>
+          <TooltipContent>{t('property.map.geolocateTooltip')}</TooltipContent>
         </Tooltip>
       )}
     </div>

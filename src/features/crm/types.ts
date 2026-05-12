@@ -54,11 +54,17 @@ export interface CRMLead {
   activity_count?: number;
   open_tasks?: number;
 
-  // Phase 3A-UI: multilingual buyer enquiry message
+  // Phase 3A-UI: multilingual buyer enquiry message (legacy)
   message?: string | null;
   message_original?: string | null;
   original_language?: string | null;
   message_en?: string | null;
+
+  // Phase 3B: any-to-any translation pipeline
+  original_message?: string | null;
+  original_lang?: string | null;
+  translated_messages?: Record<string, string> | null;
+  translation_status?: 'pending' | 'translating' | 'complete' | 'failed' | 'skipped' | null;
 
   /**
    * Backward-compatible accessor fields, populated at fetch time by

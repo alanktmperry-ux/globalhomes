@@ -4694,11 +4694,15 @@ export type Database = {
           message_en: string | null
           message_original: string | null
           notes: string | null
+          original_lang: string | null
           original_language: string | null
+          original_message: string | null
           priority: string
           source_property_id: string | null
           stage: string
           tags: string[]
+          translated_messages: Json
+          translation_status: string
           updated_at: string
         }
         Insert: {
@@ -4739,11 +4743,15 @@ export type Database = {
           message_en?: string | null
           message_original?: string | null
           notes?: string | null
+          original_lang?: string | null
           original_language?: string | null
+          original_message?: string | null
           priority?: string
           source_property_id?: string | null
           stage?: string
           tags?: string[]
+          translated_messages?: Json
+          translation_status?: string
           updated_at?: string
         }
         Update: {
@@ -4784,11 +4792,15 @@ export type Database = {
           message_en?: string | null
           message_original?: string | null
           notes?: string | null
+          original_lang?: string | null
           original_language?: string | null
+          original_message?: string | null
           priority?: string
           source_property_id?: string | null
           stage?: string
           tags?: string[]
+          translated_messages?: Json
+          translation_status?: string
           updated_at?: string
         }
         Relationships: [
@@ -6933,7 +6945,9 @@ export type Database = {
           message: string | null
           message_en: string | null
           message_original: string | null
+          original_lang: string | null
           original_language: string | null
+          original_message: string | null
           pre_approval_status: string | null
           preferred_contact: string | null
           property_id: string
@@ -6944,6 +6958,8 @@ export type Database = {
           source: string | null
           status: string | null
           timeframe: string | null
+          translated_messages: Json
+          translation_status: string
           urgency: string | null
           user_email: string
           user_id: string | null
@@ -6963,7 +6979,9 @@ export type Database = {
           message?: string | null
           message_en?: string | null
           message_original?: string | null
+          original_lang?: string | null
           original_language?: string | null
+          original_message?: string | null
           pre_approval_status?: string | null
           preferred_contact?: string | null
           property_id: string
@@ -6974,6 +6992,8 @@ export type Database = {
           source?: string | null
           status?: string | null
           timeframe?: string | null
+          translated_messages?: Json
+          translation_status?: string
           urgency?: string | null
           user_email: string
           user_id?: string | null
@@ -6993,7 +7013,9 @@ export type Database = {
           message?: string | null
           message_en?: string | null
           message_original?: string | null
+          original_lang?: string | null
           original_language?: string | null
+          original_message?: string | null
           pre_approval_status?: string | null
           preferred_contact?: string | null
           property_id?: string
@@ -7004,6 +7026,8 @@ export type Database = {
           source?: string | null
           status?: string | null
           timeframe?: string | null
+          translated_messages?: Json
+          translation_status?: string
           urgency?: string | null
           user_email?: string
           user_id?: string | null

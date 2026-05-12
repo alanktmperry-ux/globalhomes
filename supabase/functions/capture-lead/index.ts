@@ -118,6 +118,14 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Phase 3B: new any-to-any translation pipeline. Populate the new
+    // original_message / original_lang / translation_status columns so the
+    // translate-enquiry trigger picks this up. We still write the legacy
+    // message_en / message_original / original_language columns above for
+    // backward compatibility with older UI code paths.
+    const newOriginalLang = originalLanguage || "en";
+    const newOriginalMessage = message || storedMessage || null;
+
     const { data: lead, error } = await supabase
       .from("leads")
       .insert([{
@@ -130,6 +138,9 @@ Deno.serve(async (req) => {
         message_original: messageOriginal,
         original_language: originalLanguage,
         message_en: messageEn,
+        original_message: newOriginalMessage,
+        original_lang: newOriginalLang,
+        translation_status: newOriginalMessage ? "pending" : "skipped",
         search_context: searchContext || null,
         preferred_contact: preferredContact || "email",
         urgency: urgency || "just_browsing",
@@ -180,7 +191,17 @@ Deno.serve(async (req) => {
       message_original: messageOriginal,
       original_language: originalLanguage,
       message_en: messageEn,
+      original_message: newOriginalMessage,
+      original_lang: newOriginalLang,
+      translation_status: newOriginalMessage ? "pending" : "skipped",
     }]);
+
+    // Kick translate-enquiry directly (trigger also fires; this just reduces latency).
+    if (lead?.id && newOriginalMessage) {
+      supabase.functions
+        .invoke("translate-enquiry", { body: { enquiryId: lead.id } })
+        .catch((e) => console.warn("translate-enquiry invoke failed:", e));
+    }
 
     // ── Drip: enroll agent in lead follow-up sequence ──────────
     try {

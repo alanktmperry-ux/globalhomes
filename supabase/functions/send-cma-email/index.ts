@@ -53,14 +53,8 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ error: 'No recipient email' }), { status: 400, headers: corsHeaders })
   }
 
-  await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: `${agent?.name ?? 'ListHQ'} via ListHQ <noreply@listhq.com.au>`,
-      to: toEmail,
-      subject: `Your Property Market Analysis — ${cma.subject_address}`,
-      html: `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px">
+  const subject = `Your Property Market Analysis — ${cma.subject_address}`;
+  const html = `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px">
         <h1 style="font-size:20px;margin-bottom:8px">Your Comparative Market Analysis</h1>
         <p>Hi ${recipient_name || cma.vendor_name || 'there'},</p>
         <p>${agent?.name ?? 'Your agent'} has prepared a market analysis for:</p>
@@ -68,7 +62,42 @@ Deno.serve(async (req) => {
         ${priceFormatted ? `<p>Recommended price: <strong>${priceFormatted}</strong></p>` : ''}
         <a href="${cmaUrl}" style="display:inline-block;background:#2563eb;color:white;padding:10px 24px;border-radius:8px;text-decoration:none;margin:16px 0">View Your Market Analysis</a>
         <p style="font-size:12px;color:#888;margin-top:24px">Powered by ListHQ</p>
-      </div>`
+      </div>`;
+
+  // Translate to vendor locale (CMA recipients are vendors, not agents)
+  const recipientLocale = await resolveRecipientLocale({
+    userId: cma.vendor_id || undefined,
+    email: toEmail,
+  });
+  let translated;
+  try {
+    translated = await translateEmailPayload(
+      { subject, body: html, isHtml: true, sourceLang: 'en' },
+      recipientLocale,
+    );
+  } catch (err) {
+    console.error('[send-cma-email] translation failed, sending original', err, { toEmail, recipientLocale });
+    translated = { subject, body: html, wasTranslated: false, sourceLang: 'en', targetLang: recipientLocale, cached: false };
+  }
+  // Sanity check: share URL must survive translation
+  if (!translated.body.includes(cmaUrl)) {
+    console.warn('[send-cma-email] CMA URL missing from translation, falling back', { recipientLocale });
+    translated = { subject, body: html, wasTranslated: false, sourceLang: 'en', targetLang: recipientLocale, cached: false };
+  }
+  console.log('[send-cma-email] sending', { toEmail, recipientLocale, wasTranslated: translated.wasTranslated });
+
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: `${agent?.name ?? 'ListHQ'} via ListHQ <noreply@listhq.com.au>`,
+      to: toEmail,
+      subject: translated.subject,
+      html: translated.body,
+      headers: {
+        'X-ListHQ-Locale': translated.targetLang,
+        'X-ListHQ-Translated': translated.wasTranslated ? 'true' : 'false',
+      },
     })
   })
 

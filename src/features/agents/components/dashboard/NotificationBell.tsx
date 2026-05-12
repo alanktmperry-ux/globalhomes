@@ -88,6 +88,15 @@ export function NotificationBell() {
       )
       .on(
         'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'notifications', filter: `agent_id=eq.${agentId}` },
+        (payload) => {
+          setNotifications((prev) => prev.map((n) =>
+            n.id === (payload.new as Notification).id ? { ...n, ...(payload.new as Notification) } : n
+          ));
+        }
+      )
+      .on(
+        'postgres_changes',
         { event: 'DELETE', schema: 'public', table: 'notifications' },
         (payload) => {
           setNotifications((prev) => prev.filter((n) => n.id !== (payload.old as { id: string }).id));

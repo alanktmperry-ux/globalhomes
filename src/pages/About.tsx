@@ -64,7 +64,7 @@ export default function About() {
     <>
       <SEO
         title="About ListHQ — Australia's First Multilingual Real Estate Platform"
-        description="ListHQ is Australia's first multilingual real estate platform. One listing, every language: English, Mandarin, Traditional Chinese, Vietnamese, Korean, and Japanese."
+        description="ListHQ is Australia's multilingual real estate platform — one listing published in every buyer language, built for the 30% of Australians born overseas."
         path="/about"
       />
       <Helmet>

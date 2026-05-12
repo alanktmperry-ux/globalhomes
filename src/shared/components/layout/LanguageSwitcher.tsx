@@ -43,6 +43,19 @@ const DISPLAY_LANGUAGES: DisplayLang[] = [
 
 const MANUAL_SET_KEY = 'listhq_language_manually_set';
 
+const ALLOWED_LOCALES = new Set([
+  'en','zh','vi','ko','ar','hi','ja','it','de','es','fr','pt','ru','th','id','fil','el','pl','ne','tr','fa','uk','my','km',
+]);
+
+export function toAllowedLocale(code: string): string {
+  if (!code) return 'en';
+  const lower = code.toLowerCase();
+  // Treat all Chinese variants (zh-CN, zh-TW, yue) as 'zh' for the profile locale
+  if (lower === 'yue' || lower.startsWith('zh')) return 'zh';
+  const short = lower.split('-')[0];
+  return ALLOWED_LOCALES.has(short) ? short : 'en';
+}
+
 export function LanguageSwitcher() {
   const { language, setLanguage } = useTranslation();
   const [open, setOpen] = useState(false);

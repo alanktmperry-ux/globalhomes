@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { Suspense, lazy, useState } from 'react';
 import { Search, Heart, MessageCircle, User, LogIn, Building2, Globe, Users, ShieldCheck } from 'lucide-react';
 import { useTranslation, languageNames, type Language } from '@/shared/lib/i18n';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { useConversations } from '@/features/messaging/hooks/useConversations';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+
+// useConversations lives in feature-messaging — only relevant when signed in.
+// Wrapping it in a lazy child component keeps the messaging chunk out of the
+// public/cold-paint entry bundle.
+const MessagesTab = lazy(() => import('./BottomNavMessagesTab'));
 
 export function BottomNav() {
   const { t, language, setLanguage } = useTranslation();
@@ -13,7 +17,6 @@ export function BottomNav() {
   const navigate = useNavigate();
   const { user, isAdmin, isAgent, loading } = useAuth();
   const [showLangPicker, setShowLangPicker] = useState(false);
-  const { totalUnread } = useConversations(user?.id);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -66,19 +69,22 @@ export function BottomNav() {
           </button>
         )}
 
-        {/* Messages — auth only */}
+        {/* Messages — auth only. Lazy child fetches unread count. */}
         {user && (
-          <button onClick={() => navigate('/messages')} className={itemClass('/messages')}>
-            <div className="relative">
+          <Suspense fallback={
+            <button onClick={() => navigate('/messages')} className={itemClass('/messages')}>
               <MessageCircle size={22} strokeWidth={iconStroke('/messages')} />
-              {totalUnread > 0 && (
-                <span className="absolute -top-1.5 -right-2.5 min-w-[15px] h-[15px] px-0.5 rounded-full bg-red-500 border-[1.5px] border-white text-[9px] font-bold text-white flex items-center justify-center">
-                  {totalUnread > 99 ? '99+' : totalUnread}
-                </span>
-              )}
-            </div>
-            <span className={labelClass('/messages')}>Messages</span>
-          </button>
+              <span className={labelClass('/messages')}>Messages</span>
+            </button>
+          }>
+            <MessagesTab
+              userId={user.id}
+              onClick={() => navigate('/messages')}
+              itemClassName={itemClass('/messages')}
+              labelClassName={labelClass('/messages')}
+              iconStroke={iconStroke('/messages')}
+            />
+          </Suspense>
         )}
 
         {/* Language */}

@@ -28,3 +28,22 @@ createRoot(document.getElementById("root")!).render(
     </InvestorModeProvider>
   </ThemeProvider>
 );
+
+// Warm likely-next chunks during browser idle so the first navigation off the
+// homepage doesn't pay the chunk-download cost on click. All ignored on error
+// (e.g. offline / chunk hash mismatch after a deploy).
+type IdleWindow = Window & {
+  requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => void;
+};
+const w = window as IdleWindow;
+const warm = () => {
+  import('@/pages/SeekerAuthPage').catch(() => {});
+  import('@/pages/properties/PropertySearchPage').catch(() => {});
+  import('@/features/marketing/FeaturedListings').catch(() => {});
+};
+if (typeof w.requestIdleCallback === 'function') {
+  w.requestIdleCallback(warm, { timeout: 5000 });
+} else {
+  setTimeout(warm, 3000);
+}
+

@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import { visualizer } from "rollup-plugin-visualizer";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -86,11 +87,14 @@ export default defineConfig(({ mode }) => {
             if (id.includes("jspdf") || id.includes("pdf-lib") || id.includes("html2canvas") || id.includes("pdfjs")) return "pdf";
             if (id.includes("@tiptap") || id.includes("prosemirror") || /[\\/]slate[\\/]/.test(id)) return "rich-text";
             if (id.includes("mapbox-gl") || id.includes("@googlemaps") || id.includes("@react-google-maps")) return "maps";
-            if (id.includes("react-day-picker") || id.includes("date-fns")) return "datepicker";
+            if (id.includes("react-day-picker") || id.includes("date-fns") || id.includes("dayjs")) return "vendor-date";
             if (id.includes("@sentry")) return "sentry";
             if (id.includes("@iconify")) return "icons";
             if (id.includes("framer-motion")) return "motion";
             if (id.includes("i18next") || id.includes("react-i18next")) return "vendor-i18n";
+            if (id.includes("@tanstack/react-query")) return "vendor-react-query";
+            if (id.includes("react-hook-form") || id.includes("@hookform")) return "vendor-forms";
+            if (id.includes("zod")) return "vendor-validation";
             // NOTE: Do NOT split @radix-ui into its own chunk. Radix modules call
             // React.forwardRef at module-evaluation time, so they must live in the
             // same chunk as React (vendor). A separate "radix" chunk loads before
@@ -125,7 +129,20 @@ export default defineConfig(({ mode }) => {
       'recharts',
     ],
   },
-  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+  plugins: [
+    react(),
+    mode === "development" && componentTagger(),
+    // Writes dist/stats.html — open after build to inspect chunk composition
+    // as a treemap with gzip + brotli sizes. Safe in prod; just generates a
+    // static report alongside the bundle.
+    mode === "production" && visualizer({
+      filename: "dist/stats.html",
+      gzipSize: true,
+      brotliSize: true,
+      open: false,
+      template: "treemap",
+    }),
+  ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

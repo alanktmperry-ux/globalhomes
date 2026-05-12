@@ -7,8 +7,15 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 // with CSS transitions for the same visual effect at zero JS cost.
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { NotificationBell } from '@/features/agents/components/dashboard/NotificationBell';
-import { SeekerNotificationBell } from '@/components/halo/SeekerNotificationBell';
+// Notification bells only render for signed-in users — keep them out of the
+// public/cold-paint critical path so they don't pull feature-agents / halo
+// chunks into the entry bundle.
+const NotificationBell = lazy(() =>
+  import('@/features/agents/components/dashboard/NotificationBell').then(m => ({ default: m.NotificationBell }))
+);
+const SeekerNotificationBell = lazy(() =>
+  import('@/components/halo/SeekerNotificationBell').then(m => ({ default: m.SeekerNotificationBell }))
+);
 import { LanguageSwitcher } from '@/shared/components/layout/LanguageSwitcher';
 import { SUPPORTED_LANGUAGES, LEGACY_CODE_MAP, FROM_LEGACY_CODE_MAP } from '@/shared/lib/i18n/config';
 import { useTranslation, type Language } from '@/shared/lib/i18n';
@@ -211,8 +218,8 @@ export function SiteHeader() {
           )}
 
           {/* Notification bell — agent or seeker variant */}
-          {isAgentLike && <NotificationBell />}
-          {isSeeker && <SeekerNotificationBell />}
+          {isAgentLike && <Suspense fallback={null}><NotificationBell /></Suspense>}
+          {isSeeker && <Suspense fallback={null}><SeekerNotificationBell /></Suspense>}
 
           {/* Admin shortcut stays distinct */}
           {user && isAdmin && (
@@ -310,7 +317,7 @@ export function SiteHeader() {
               <LayoutDashboard size={16} />
             </button>
           )}
-          {user && isAgent && <NotificationBell />}
+          {user && isAgent && <Suspense fallback={null}><NotificationBell /></Suspense>}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <button

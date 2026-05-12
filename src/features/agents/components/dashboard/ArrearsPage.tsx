@@ -17,6 +17,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
+import { useTranslation } from '@/shared/lib/i18n';
 
 type ArrearsStatus = 'none' | 'notice_sent' | 'responded' | 'escalated' | 'resolved';
 
@@ -71,6 +72,7 @@ const STATUS_META: Record<ArrearsStatus, { label: string; tone: APlusBadgeTone }
 const fmtMoney = (n: number) => `$${Math.round(n).toLocaleString()}`;
 
 const ArrearsPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { agent } = useCurrentAgent();
   const [loading, setLoading] = useState(true);
@@ -255,7 +257,7 @@ ${agencyName || ''}`.trim();
 
   return (
     <div className="p-4 md:p-6">
-      <APlusPageHeader title="Arrears" subtitle="Tenants with outstanding rent" />
+      <APlusPageHeader title={t('agent.pm.arrears.title')} subtitle={t('agent.pm.arrears.subtitle')} />
 
       {summary.count > 0 && (
         <APlusArrearsBanner

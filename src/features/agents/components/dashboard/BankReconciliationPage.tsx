@@ -15,6 +15,7 @@ import {
   RefreshCw, FileText, Check,
 } from 'lucide-react';
 import DashboardHeader from './DashboardHeader';
+import { useTranslation } from '@/shared/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/AuthProvider';
 import { toast } from 'sonner';
@@ -54,6 +55,7 @@ const STATUS_CONFIG: Record<string, { variant: 'default' | 'secondary' | 'outlin
 };
 
 const BankReconciliationPage = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [items, setItems] = useState<Reconciliation[]>([]);
   const [receipts, setReceipts] = useState<MatchCandidate[]>([]);
@@ -544,7 +546,7 @@ const BankReconciliationPage = () => {
   if (loading) {
     return (
       <div>
-        <DashboardHeader title="Bank Reconciliation" subtitle="Match bank statements to trust entries" />
+        <DashboardHeader title={t('agent.bankRecon.pageTitle')} subtitle={t('agent.bankRecon.pageSubtitle')} />
         <div className="p-6 text-center text-muted-foreground">Loading…</div>
       </div>
     );
@@ -553,8 +555,8 @@ const BankReconciliationPage = () => {
   return (
     <div>
       <DashboardHeader
-        title="Bank Reconciliation"
-        subtitle="Match bank statement entries to trust receipts & payments"
+        title={t('agent.bankRecon.pageTitle')}
+        subtitle={t('agent.bankRecon.pageSubtitle')}
         actions={
           <div className="flex gap-2">
             <Button size="sm" variant="outline" onClick={exportCsv} className="gap-1.5 text-xs">

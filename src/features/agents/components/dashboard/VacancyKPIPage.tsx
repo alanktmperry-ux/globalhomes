@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Loader2, Home, AlertTriangle, Clock, TrendingDown, Activity, Flag, Plus } from 'lucide-react';
 import { format, differenceInDays, addDays } from 'date-fns';
+import { useTranslation } from '@/shared/lib/i18n';
 
 interface Tenancy {
   id: string;
@@ -44,6 +45,7 @@ const fmtAUD = (n: number) =>
   new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 }).format(n);
 
 const VacancyKPIPage = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -175,8 +177,8 @@ const VacancyKPIPage = () => {
   return (
     <div className="flex-1 p-6 lg:p-10 max-w-7xl space-y-8">
       <div>
-        <h1 className="font-display text-2xl font-bold text-foreground mb-1">Vacancy KPIs</h1>
-        <p className="text-sm text-muted-foreground">Real-time vacancy performance across your portfolio.</p>
+        <h1 className="font-display text-2xl font-bold text-foreground mb-1">{t('agent.pm.vacancy.title')}</h1>
+        <p className="text-sm text-muted-foreground">{t('agent.pm.vacancy.subtitle')}</p>
       </div>
 
       {/* KPI cards */}

@@ -18,6 +18,7 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import DashboardHeader from './DashboardHeader';
+import { useTranslation } from '@/shared/lib/i18n';
 import { addDays, addMonths, differenceInDays, differenceInMonths, format, parseISO } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -114,6 +115,7 @@ interface UpcomingInspection {
 }
 
 const RentRollPage = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -705,16 +707,16 @@ const RentRollPage = () => {
               className="font-extrabold tracking-[-0.04em] text-[#0a0f1e]"
               style={{ fontSize: 'clamp(32px,4vw,48px)', lineHeight: 1.05 }}
             >
-              Tenancies
+              {t('agent.pm.rentRoll.title')}
             </h1>
             {!loading && !noAgent && (
               <span className="bg-[#EFF6FF] border border-[#2563EB]/15 text-[#1E40AF] rounded-full px-3 py-1 text-[12px] font-bold">
-                {activeTenancies.length} active lease{activeTenancies.length === 1 ? '' : 's'}
+                {activeTenancies.length} {activeTenancies.length === 1 ? t('agent.pm.leases.active').replace(/s$/, '') : t('agent.pm.leases.active')}
               </span>
             )}
           </div>
           <p className="text-[14px] text-[#6a6a6a] font-medium mt-2">
-            Your rent roll, arrears, inspections, and maintenance — one place.
+            {t('agent.pm.pageSubtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">

@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import DashboardHeader from '@/features/agents/components/dashboard/DashboardHeader';
 import { format } from 'date-fns';
 import { Loader2, Plus, ArrowLeft, Scale, AlertTriangle, Copy, FileText, Trash2 } from 'lucide-react';
+import { useTranslation } from '@/shared/lib/i18n';
 
 type ClaimStatus = 'draft' | 'submitted' | 'approved' | 'partial' | 'disputed' | 'closed';
 
@@ -98,6 +99,7 @@ const AUTHORITY_BY_STATE: Record<string, string> = {
 const fmt$ = (n: number) => `$${(n || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
 
 const BondClaimsPage = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [agentId, setAgentId] = useState<string | null>(null);

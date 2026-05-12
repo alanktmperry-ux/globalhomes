@@ -1047,7 +1047,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
         {translateDone ? (
           <div className="flex items-center gap-2 text-sm text-emerald-600">
             <CheckCircle2 size={15} />
-            Translated — visible to buyers in Chinese, Vietnamese, Korean, Arabic &amp; Japanese.
+            Translated — visible to buyers in 20 languages.
           </div>
         ) : (
           <>

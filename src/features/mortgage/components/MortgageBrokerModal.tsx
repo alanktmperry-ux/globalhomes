@@ -76,7 +76,7 @@ export function MortgageBrokerModal({
     });
     if (error) {
       setSubmitting(false);
-      toast.error('Could not submit. Please try again.');
+      toast.error(t('common.errors.couldNotSubmit'));
       return;
     }
 

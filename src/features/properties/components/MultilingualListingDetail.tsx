@@ -5,7 +5,7 @@ import { MortgageBrokerCard } from './MortgageBrokerCard';
 import { capture } from '@/shared/lib/posthog';
 import { useTranslation, type Language, formatCurrency } from '@/shared/lib/i18n';
 
-type LanguageKey = 'en' | 'zh_simplified' | 'zh_traditional' | 'vi' | 'ko' | 'ar' | 'ja' | 'hi' | 'bn' | 'tl' | 'id';
+type LanguageKey = 'en' | 'zh_simplified' | 'zh_traditional' | 'vi' | 'ko' | 'ar' | 'ja' | 'hi' | 'bn' | 'tl' | 'id' | 'pa' | 'ta' | 'ms' | 'th' | 'ne' | 'el' | 'it' | 'es' | 'fa';
 
 interface Translation {
   title: string;
@@ -55,9 +55,18 @@ const LANGUAGES: { key: LanguageKey; flag: string; label: string }[] = [
   { key: 'bn', flag: '🇧🇩', label: 'বাংলা' },
   { key: 'tl', flag: '🇵🇭', label: 'Filipino' },
   { key: 'id', flag: '🇮🇩', label: 'Indonesia' },
+  { key: 'pa', flag: '🇮🇳', label: 'ਪੰਜਾਬੀ' },
+  { key: 'ta', flag: '🇮🇳', label: 'தமிழ்' },
+  { key: 'ms', flag: '🇲🇾', label: 'Bahasa Melayu' },
+  { key: 'th', flag: '🇹🇭', label: 'ภาษาไทย' },
+  { key: 'ne', flag: '🇳🇵', label: 'नेपाली' },
+  { key: 'el', flag: '🇬🇷', label: 'Ελληνικά' },
+  { key: 'it', flag: '🇮🇹', label: 'Italiano' },
+  { key: 'es', flag: '🇪🇸', label: 'Español' },
+  { key: 'fa', flag: '🇮🇷', label: 'فارسی' },
 ];
 
-const TRANSLATABLE_LANGS: LanguageKey[] = ['zh_simplified', 'zh_traditional', 'vi', 'ko', 'ar', 'ja', 'hi', 'bn', 'tl', 'id'];
+const TRANSLATABLE_LANGS: LanguageKey[] = ['zh_simplified', 'zh_traditional', 'vi', 'ko', 'ar', 'ja', 'hi', 'bn', 'tl', 'id', 'pa', 'ta', 'ms', 'th', 'ne', 'el', 'it', 'es', 'fa'];
 
 const LANGUAGE_DISPLAY_NAMES: Record<LanguageKey, string> = {
   en: 'English',
@@ -71,6 +80,15 @@ const LANGUAGE_DISPLAY_NAMES: Record<LanguageKey, string> = {
   bn: 'Bengali',
   tl: 'Filipino',
   id: 'Indonesian',
+  pa: 'Punjabi',
+  ta: 'Tamil',
+  ms: 'Malay',
+  th: 'Thai',
+  ne: 'Nepali',
+  el: 'Greek',
+  it: 'Italian',
+  es: 'Spanish',
+  fa: 'Persian',
 };
 
 /** Map the i18n Language codes to this component's LanguageKey */
@@ -88,6 +106,15 @@ function i18nLangToListingLang(lang: Language | string): LanguageKey {
     case 'fil':
     case 'tl':    return 'tl';
     case 'id':    return 'id';
+    case 'pa':    return 'pa';
+    case 'ta':    return 'ta';
+    case 'ms':    return 'ms';
+    case 'th':    return 'th';
+    case 'ne':    return 'ne';
+    case 'el':    return 'el';
+    case 'it':    return 'it';
+    case 'es':    return 'es';
+    case 'fa':    return 'fa';
     default:      return 'en';
   }
 }

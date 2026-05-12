@@ -1047,7 +1047,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
         {translateDone ? (
           <div className="flex items-center gap-2 text-sm text-emerald-600">
             <CheckCircle2 size={15} />
-            Translated — visible to buyers in Chinese, Vietnamese, Korean, Arabic &amp; Japanese.
+            Translated — visible to buyers in 20 languages.
           </div>
         ) : (
           <>
@@ -1093,6 +1093,15 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               { lang: 'bn', flag: '🇧🇩', label: 'Bengali' },
               { lang: 'tl', flag: '🇵🇭', label: 'Filipino' },
               { lang: 'id', flag: '🇮🇩', label: 'Indonesian' },
+              { lang: 'pa', flag: '🇮🇳', label: 'Punjabi' },
+              { lang: 'ta', flag: '🇮🇳', label: 'Tamil' },
+              { lang: 'ms', flag: '🇲🇾', label: 'Malay' },
+              { lang: 'th', flag: '🇹🇭', label: 'Thai' },
+              { lang: 'ne', flag: '🇳🇵', label: 'Nepali' },
+              { lang: 'el', flag: '🇬🇷', label: 'Greek' },
+              { lang: 'it', flag: '🇮🇹', label: 'Italian' },
+              { lang: 'es', flag: '🇪🇸', label: 'Spanish' },
+              { lang: 'fa', flag: '🇮🇷', label: 'Persian' },
             ].map(({ lang, flag, label }) => (
               <button
                 key={lang}
@@ -1141,6 +1150,19 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                       { key: 'ko', flag: '🇰🇷', label: '한국어' },
                       { key: 'ar', flag: '🇸🇦', label: 'العربية' },
                       { key: 'ja', flag: '🇯🇵', label: '日本語' },
+                      { key: 'hi', flag: '🇮🇳', label: 'हिन्दी' },
+                      { key: 'bn', flag: '🇧🇩', label: 'বাংলা' },
+                      { key: 'tl', flag: '🇵🇭', label: 'Filipino' },
+                      { key: 'id', flag: '🇮🇩', label: 'Indonesia' },
+                      { key: 'pa', flag: '🇮🇳', label: 'ਪੰਜਾਬੀ' },
+                      { key: 'ta', flag: '🇮🇳', label: 'தமிழ்' },
+                      { key: 'ms', flag: '🇲🇾', label: 'Bahasa Melayu' },
+                      { key: 'th', flag: '🇹🇭', label: 'ภาษาไทย' },
+                      { key: 'ne', flag: '🇳🇵', label: 'नेपाली' },
+                      { key: 'el', flag: '🇬🇷', label: 'Ελληνικά' },
+                      { key: 'it', flag: '🇮🇹', label: 'Italiano' },
+                      { key: 'es', flag: '🇪🇸', label: 'Español' },
+                      { key: 'fa', flag: '🇮🇷', label: 'فارسی' },
                     ].filter(l => previewTranslations[l.key]).map(l => (
                       <button
                         key={l.key}

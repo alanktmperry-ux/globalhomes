@@ -82,7 +82,7 @@ export const LEGACY_CODE_MAP: Record<SupportedLanguageCode, string> = {
 
 export const FROM_LEGACY_CODE_MAP: Record<string, SupportedLanguageCode> = {
   'en':    'en',
-  'zh':    'zh-CN',
+  // 'zh' → 'zh' (added below with new locales)
   'zh-TW': 'zh-TW',
   'yue':   'yue',
   'vi':    'vi',

@@ -159,7 +159,17 @@ const AgentAuthPage = () => {
         options: {
           emailRedirectTo: window.location.origin + '/auth/confirm',
           captchaToken,
-          data: { registered_as: 'agent', registration_started: true },
+          data: {
+            registered_as: 'agent',
+            registration_started: true,
+            locale: (() => {
+              try {
+                const stored = localStorage.getItem('listhq.locale');
+                if (stored) return stored;
+              } catch { /* */ }
+              return (navigator.language || 'en').split('-')[0].toLowerCase();
+            })(),
+          },
         },
       });
       if (signUpErr) throw signUpErr;

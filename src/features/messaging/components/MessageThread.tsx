@@ -79,8 +79,18 @@ export function MessageThread({ conversationId, onMarkRead }: MessageThreadProps
                     ? 'bg-primary text-primary-foreground rounded-tr-sm'
                     : 'bg-muted text-foreground rounded-tl-sm'
                 }`}>
-                  {msg.content}
+                  {msg.displayBody}
                 </div>
+                {msg.isTranslated && (
+                  <span className="text-[10px] text-muted-foreground mt-0.5 px-1">
+                    🌐 Translated from {msg.translationSource?.toUpperCase()}
+                  </span>
+                )}
+                {!msg.isTranslated && msg.translationSource && (msg.translation_status === 'pending' || msg.translation_status === 'translating') && (
+                  <span className="text-[10px] text-muted-foreground mt-0.5 px-1 italic">
+                    Translating…
+                  </span>
+                )}
                 <span className="text-[10px] text-muted-foreground mt-0.5 px-1">
                   {formatDistanceToNow(new Date(msg.created_at), { addSuffix: true })}
                 </span>

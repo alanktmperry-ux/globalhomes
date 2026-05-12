@@ -44,12 +44,15 @@ const DISPLAY_LANGUAGES: DisplayLang[] = [
   { code: 'tr',    legacy: 'tr' as Language, short: 'TR', flag: '🇹🇷', name: 'Türkçe',          available: true },
   { code: 'de',    legacy: 'de' as Language, short: 'DE', flag: '🇩🇪', name: 'Deutsch',          available: true },
   { code: 'el',    legacy: 'el' as Language, short: 'EL', flag: '🇬🇷', name: 'Ελληνικά',         available: true },
+  { code: 'ur',    legacy: 'ur' as Language, short: 'UR', flag: '🇵🇰', name: 'اردو · Urdu',      available: true },
+  { code: 'mr',    legacy: 'mr' as Language, short: 'MR', flag: '🇮🇳', name: 'मराठी · Marathi',  available: true },
+  { code: 'te',    legacy: 'te' as Language, short: 'TE', flag: '🇮🇳', name: 'తెలుగు · Telugu',  available: true },
 ];
 
 const MANUAL_SET_KEY = 'listhq_language_manually_set';
 
 const ALLOWED_LOCALES = new Set([
-  'en','zh','vi','ko','ar','hi','ja','it','de','es','fr','pt','ru','th','id','fil','el','pl','ne','tr','fa','uk','my','km',
+  'en','zh','vi','ko','ar','hi','ja','it','de','es','fr','pt','ru','th','id','fil','el','pl','ne','tr','fa','uk','my','km','ur','mr','te',
 ]);
 
 export function toAllowedLocale(code: string): string {
@@ -80,7 +83,7 @@ export function LanguageSwitcher() {
     DISPLAY_LANGUAGES[0];
 
   useEffect(() => {
-    try { document.documentElement.dir = active.code === 'ar' ? 'rtl' : 'ltr'; } catch { /* */ }
+    try { document.documentElement.dir = ['ar', 'fa', 'ur'].includes(active.code) ? 'rtl' : 'ltr'; } catch { /* */ }
   }, [active.code]);
 
   useEffect(() => {
@@ -121,7 +124,7 @@ export function LanguageSwitcher() {
       localStorage.setItem(MANUAL_SET_KEY, item.code === 'en' ? 'false' : 'true');
     } catch { /* non-fatal */ }
     setOpen(false);
-    document.documentElement.dir = item.code === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.dir = ['ar', 'fa', 'ur'].includes(item.code) ? 'rtl' : 'ltr';
     document.documentElement.lang = item.code;
     try {
       localStorage.setItem('listhq.locale', toAllowedLocale(item.code));

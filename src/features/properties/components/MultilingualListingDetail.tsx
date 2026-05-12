@@ -5,7 +5,7 @@ import { MortgageBrokerCard } from './MortgageBrokerCard';
 import { capture } from '@/shared/lib/posthog';
 import { useTranslation, type Language, formatCurrency } from '@/shared/lib/i18n';
 
-type LanguageKey = 'en' | 'zh_simplified' | 'zh_traditional' | 'vi' | 'ko' | 'ar' | 'ja' | 'hi' | 'bn' | 'tl' | 'id' | 'pa' | 'ta' | 'ms' | 'th' | 'ne' | 'el' | 'it' | 'es' | 'fa';
+type LanguageKey = 'en' | 'zh_simplified' | 'zh_traditional' | 'vi' | 'ko' | 'ar' | 'ja' | 'hi' | 'bn' | 'tl' | 'id' | 'pa' | 'ta' | 'ms' | 'th' | 'ne' | 'el' | 'it' | 'es' | 'fa' | 'fr' | 'ru' | 'pt' | 'de' | 'tr' | 'ur' | 'mr' | 'te';
 
 interface Translation {
   title: string;
@@ -64,9 +64,17 @@ const LANGUAGES: { key: LanguageKey; flag: string; label: string }[] = [
   { key: 'it', flag: '🇮🇹', label: 'Italiano' },
   { key: 'es', flag: '🇪🇸', label: 'Español' },
   { key: 'fa', flag: '🇮🇷', label: 'فارسی' },
+  { key: 'fr', flag: '🇫🇷', label: 'Français' },
+  { key: 'ru', flag: '🇷🇺', label: 'Русский' },
+  { key: 'pt', flag: '🇵🇹', label: 'Português' },
+  { key: 'de', flag: '🇩🇪', label: 'Deutsch' },
+  { key: 'tr', flag: '🇹🇷', label: 'Türkçe' },
+  { key: 'ur', flag: '🇵🇰', label: 'اردو' },
+  { key: 'mr', flag: '🇮🇳', label: 'मराठी' },
+  { key: 'te', flag: '🇮🇳', label: 'తెలుగు' },
 ];
 
-const TRANSLATABLE_LANGS: LanguageKey[] = ['zh_simplified', 'zh_traditional', 'vi', 'ko', 'ar', 'ja', 'hi', 'bn', 'tl', 'id', 'pa', 'ta', 'ms', 'th', 'ne', 'el', 'it', 'es', 'fa'];
+const TRANSLATABLE_LANGS: LanguageKey[] = ['zh_simplified', 'zh_traditional', 'vi', 'ko', 'ar', 'ja', 'hi', 'bn', 'tl', 'id', 'pa', 'ta', 'ms', 'th', 'ne', 'el', 'it', 'es', 'fa', 'fr', 'ru', 'pt', 'de', 'tr', 'ur', 'mr', 'te'];
 
 const LANGUAGE_DISPLAY_NAMES: Record<LanguageKey, string> = {
   en: 'English',
@@ -89,6 +97,14 @@ const LANGUAGE_DISPLAY_NAMES: Record<LanguageKey, string> = {
   it: 'Italian',
   es: 'Spanish',
   fa: 'Persian',
+  fr: 'French',
+  ru: 'Russian',
+  pt: 'Portuguese',
+  de: 'German',
+  tr: 'Turkish',
+  ur: 'Urdu',
+  mr: 'Marathi',
+  te: 'Telugu',
 };
 
 /** Map the i18n Language codes to this component's LanguageKey */
@@ -115,6 +131,14 @@ function i18nLangToListingLang(lang: Language | string): LanguageKey {
     case 'it':    return 'it';
     case 'es':    return 'es';
     case 'fa':    return 'fa';
+    case 'fr':    return 'fr';
+    case 'ru':    return 'ru';
+    case 'pt':    return 'pt';
+    case 'de':    return 'de';
+    case 'tr':    return 'tr';
+    case 'ur':    return 'ur';
+    case 'mr':    return 'mr';
+    case 'te':    return 'te';
     default:      return 'en';
   }
 }
@@ -295,7 +319,7 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
       )}
 
       {/* Title */}
-      <div className="flex items-start gap-3 flex-wrap" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+      <div className="flex items-start gap-3 flex-wrap" dir={['ar', 'fa', 'ur'].includes(language) ? 'rtl' : 'ltr'}>
         <h1 className="font-display text-2xl font-bold text-foreground leading-tight flex-1">
           {title}
         </h1>
@@ -309,12 +333,12 @@ const MultilingualListingDetail = ({ listing, isAgent = false }: Props) => {
 
       {/* Summary */}
       {summary && (
-        <p className="text-base text-muted-foreground italic" dir={language === 'ar' ? 'rtl' : 'ltr'}>{summary}</p>
+        <p className="text-base text-muted-foreground italic" dir={['ar', 'fa', 'ur'].includes(language) ? 'rtl' : 'ltr'}>{summary}</p>
       )}
 
       {/* Description */}
       {description && (
-        <div className="prose prose-sm max-w-none text-foreground dark:prose-invert" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="prose prose-sm max-w-none text-foreground dark:prose-invert" dir={['ar', 'fa', 'ur'].includes(language) ? 'rtl' : 'ltr'}>
           {description.split('\n').map((p, i) => (
             <p key={i}>{p}</p>
           ))}

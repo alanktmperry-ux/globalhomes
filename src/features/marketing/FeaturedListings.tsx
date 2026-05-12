@@ -216,7 +216,7 @@ export default function FeaturedListings() {
                   <div className="relative h-[220px] w-full overflow-hidden bg-[#F3F4F6]">
                     <img
                       src={optimizeUnsplashUrl(l.imageUrl, 640)}
-                      srcSet={`${optimizeUnsplashUrl(l.imageUrl, 320)} 320w, ${optimizeUnsplashUrl(l.imageUrl, 640)} 640w, ${optimizeUnsplashUrl(l.imageUrl, 1280)} 1280w`}
+                      srcSet={unsplashSrcSet(l.imageUrl)}
                       sizes="(max-width: 768px) 100vw, 33vw"
                       alt={`${l.address}, ${l.suburb}`}
                       width={640}

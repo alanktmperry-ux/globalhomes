@@ -322,13 +322,39 @@ export default function HeroSearchPreview() {
             }}
           >
             <div style={{ position: 'relative', aspectRatio: '4 / 5', width: '100%' }}>
-              <img
-                src={heroImg ?? '/hero-fallback-auburn.jpg'}
-                alt="Renovated north-facing family home in Auburn, NSW"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                loading="eager"
-                {...({ fetchpriority: 'high' } as any)}
-              />
+              {heroImg ? (
+                <img
+                  src={heroImg}
+                  alt="Renovated north-facing family home in Auburn, NSW"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  loading="eager"
+                  decoding="async"
+                  {...({ fetchpriority: 'high' } as any)}
+                />
+              ) : (
+                <picture>
+                  <source
+                    type="image/avif"
+                    srcSet="/hero/auburn-480.avif 480w, /hero/auburn-960.avif 960w, /hero/auburn-1440.avif 1440w"
+                    sizes="(max-width: 768px) 100vw, 60vw"
+                  />
+                  <source
+                    type="image/webp"
+                    srcSet="/hero/auburn-480.webp 480w, /hero/auburn-960.webp 960w, /hero/auburn-1440.webp 1440w"
+                    sizes="(max-width: 768px) 100vw, 60vw"
+                  />
+                  <img
+                    src="/hero/auburn-1440.jpg"
+                    alt="Renovated north-facing family home in Auburn, NSW"
+                    width={1440}
+                    height={1800}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    loading="eager"
+                    decoding="async"
+                    {...({ fetchpriority: 'high' } as any)}
+                  />
+                </picture>
+              )}
               {/* Gradient overlay */}
               <div style={{
                 position: 'absolute', inset: 0, pointerEvents: 'none',

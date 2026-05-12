@@ -113,32 +113,33 @@ Source body:
 ${payload.body}`;
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.2,
-            maxOutputTokens: 8192,
-            responseMimeType: 'application/json',
-          },
-        }),
+    const response = await fetch(AI_GATEWAY, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        'Content-Type': 'application/json',
       },
-    );
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          { role: 'system', content: 'You translate Australian real estate emails. Return ONLY a JSON object with shape {"subject":"...","body":"..."}. No preamble, no markdown fences.' },
+          { role: 'user', content: prompt },
+        ],
+      }),
+    });
 
     if (!response.ok) {
-      throw new Error(`Gemini ${response.status}: ${await response.text()}`);
+      throw new Error(`gateway_${response.status}: ${(await response.text()).slice(0, 200)}`);
     }
 
     const result = await response.json();
-    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error('Gemini empty response');
+    let text: string = result?.choices?.[0]?.message?.content ?? '';
+    if (!text || typeof text !== 'string') throw new Error('empty completion');
+    // Strip code fences if model added them
+    text = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
 
     const parsed = JSON.parse(text);
-    if (!parsed.subject || !parsed.body) throw new Error('Gemini malformed response');
+    if (!parsed.subject || !parsed.body) throw new Error('malformed response');
 
     supabase
       .from('email_translation_cache')

@@ -68,7 +68,7 @@ const PLANS: Plan[] = [
   },
 ];
 
-const SUPPORT_EMAIL = 'alan@squaredevelopment.com.au';
+const SUPPORT_EMAIL = 'hello@listhq.com.au';
 
 const PLAN_ID_TO_FRONTEND: Record<string, Plan['id']> = {
   solo: 'starter',

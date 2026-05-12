@@ -211,9 +211,10 @@ const DashboardOverview = () => {
       setHaloCredits(Number((creditsRes.data as any)?.balance) || 0);
       setRecentActivities((activitiesRes.data as any) || []);
       setBoostedListings((boostedRes.data as any) || []);
+      setStatsLoading(false);
     };
 
-    load().catch(() => { /* silent */ });
+    load().catch(() => { if (!cancelled) setStatsLoading(false); });
     return () => { cancelled = true; };
   }, [user]);
 

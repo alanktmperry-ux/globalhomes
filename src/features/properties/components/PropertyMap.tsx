@@ -540,10 +540,10 @@ export function PropertyMap({
               className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-4 py-2 rounded-full bg-card/90 backdrop-blur-md border border-border shadow-elevated text-sm font-medium text-foreground hover:bg-card transition-colors"
             >
               <Search size={14} className="text-primary" />
-              Search this area
+              {t('property.map.searchThisArea')}
             </button>
           </TooltipTrigger>
-          <TooltipContent>Search for properties visible in this map area</TooltipContent>
+          <TooltipContent>{t('property.map.searchThisAreaTooltip')}</TooltipContent>
         </Tooltip>
       )}
 

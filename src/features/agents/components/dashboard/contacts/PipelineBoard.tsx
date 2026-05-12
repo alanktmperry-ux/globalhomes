@@ -6,28 +6,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Flame, Thermometer, Snowflake, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Contact } from '@/features/agents/hooks/useContacts';
-
-const BUYER_STAGES = [
-  { key: 'cold_lead', label: 'Cold Lead', color: 'bg-muted' },
-  { key: 'active_buyer', label: 'Active Buyer', color: 'bg-blue-500/10' },
-  { key: 'under_contract', label: 'Under Contract', color: 'bg-orange-500/10' },
-  { key: 'settled', label: 'Settled', color: 'bg-green-500/10' },
-];
-
-const SELLER_STAGES = [
-  { key: 'cold_lead', label: 'Cold Lead', color: 'bg-muted' },
-  { key: 'appraisal', label: 'Appraisal', color: 'bg-purple-500/10' },
-  { key: 'listing_authority', label: 'Listing Authority', color: 'bg-blue-500/10' },
-  { key: 'marketing', label: 'Marketing', color: 'bg-yellow-500/10' },
-  { key: 'under_contract', label: 'Under Contract', color: 'bg-orange-500/10' },
-  { key: 'settled', label: 'Settled', color: 'bg-green-500/10' },
-];
+import { useTranslation } from '@/shared/lib/i18n';
 
 const RANKING_ICON: Record<string, React.ReactNode> = {
   hot: <Flame size={10} className="text-destructive" />,
   warm: <Thermometer size={10} className="text-primary" />,
   cold: <Snowflake size={10} className="text-muted-foreground" />,
 };
+
+const RTL_LANGS = new Set(['ar', 'fa', 'ur', 'he']);
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 });
 

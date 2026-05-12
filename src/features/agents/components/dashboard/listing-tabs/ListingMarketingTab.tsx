@@ -383,7 +383,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
         body: { mode: 'full_listing', listing_id: listing.id },
       });
       setTranslateDone(true);
-      toast.success('Translations generated — buyers can now read this listing in 6 languages.');
+      toast.success('Translations generated — buyers can now read this listing in 28 languages.');
     } catch {
       toast.error('Translation failed — please try again.');
     } finally {
@@ -1047,7 +1047,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
         {translateDone ? (
           <div className="flex items-center gap-2 text-sm text-emerald-600">
             <CheckCircle2 size={15} />
-            Translated — visible to buyers in 20 languages.
+            Translated — visible to buyers in 28 languages.
           </div>
         ) : (
           <>
@@ -1163,6 +1163,14 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                       { key: 'it', flag: '🇮🇹', label: 'Italiano' },
                       { key: 'es', flag: '🇪🇸', label: 'Español' },
                       { key: 'fa', flag: '🇮🇷', label: 'فارسی' },
+                      { key: 'fr', flag: '🇫🇷', label: 'Français' },
+                      { key: 'ru', flag: '🇷🇺', label: 'Русский' },
+                      { key: 'pt', flag: '🇵🇹', label: 'Português' },
+                      { key: 'de', flag: '🇩🇪', label: 'Deutsch' },
+                      { key: 'tr', flag: '🇹🇷', label: 'Türkçe' },
+                      { key: 'ur', flag: '🇵🇰', label: 'اردو' },
+                      { key: 'mr', flag: '🇮🇳', label: 'मराठी' },
+                      { key: 'te', flag: '🇮🇳', label: 'తెలుగు' },
                     ].filter(l => previewTranslations[l.key]).map(l => (
                       <button
                         key={l.key}
@@ -1180,7 +1188,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                   </div>
                   <div
                     className="bg-muted/30 rounded-xl p-4 space-y-2"
-                    dir={previewLang === 'ar' ? 'rtl' : 'ltr'}
+                    dir={['ar', 'fa', 'ur'].includes(previewLang) ? 'rtl' : 'ltr'}
                   >
                     {previewTranslations[previewLang]?.title && (
                       <p className="font-semibold text-foreground text-sm leading-snug">

@@ -15508,6 +15508,19 @@ export type Database = {
         Args: { listing_id: string; new_status: string }
         Returns: undefined
       }
+      bump_rate_limit: {
+        Args: {
+          p_bucket_key: string
+          p_max_requests: number
+          p_window_seconds: number
+        }
+        Returns: {
+          allowed: boolean
+          blocked_until: string
+          request_count: number
+          window_start: string
+        }[]
+      }
       check_webhook_config: { Args: never; Returns: Json }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       close_trust_period:

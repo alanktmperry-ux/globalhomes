@@ -27,6 +27,12 @@ function isActiveRoute(current: string, target: string) {
   return current === target || current.startsWith(target + '/');
 }
 
+// Prefetch the seeker login chunk on hover/focus/touchstart so cold mobile
+// navigation to /login doesn't pay the chunk download cost on click.
+const prefetchLogin = () => {
+  import('@/pages/SeekerAuthPage').catch(() => { /* ignore */ });
+};
+
 export function SiteHeader() {
   const { user, isAgent, isAdmin, loading, userRole, signOut } = useAuth();
   const { t } = useTranslation();
@@ -130,6 +136,9 @@ export function SiteHeader() {
           <LanguageSwitcher />
           <Link
             to="/login"
+            onMouseEnter={prefetchLogin}
+            onFocus={prefetchLogin}
+            onTouchStart={prefetchLogin}
             className="text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors"
           >
             Sign in

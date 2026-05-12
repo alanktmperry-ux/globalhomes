@@ -45,7 +45,7 @@ export default function RentalPropertyPage() {
   if (loading) return <div className="animate-pulse h-96 bg-secondary m-8 rounded-2xl" />;
   if (!property) return <p className="text-center py-16 text-muted-foreground">Property not found.</p>;
 
-  const title = `${property.address}, ${property.suburb} ${property.state} — For Rent | ListHQ`;
+  const title = `${property.address}, ${property.suburb} ${property.state} — For Rent`;
   const desc = `Rent this ${property.beds}bd ${property.property_type || 'property'} in ${property.suburb}, ${property.state} for $${property.rental_weekly}/wk. Apply online on ListHQ.`;
   const imgUrl = property.images?.[0] || property.image_url;
 

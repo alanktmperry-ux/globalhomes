@@ -107,11 +107,10 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
         {/* Image */}
         <div className="relative aspect-[4/3] overflow-hidden" onClick={() => { onSelect(property); navigate(`/property/${property.id}`); }}>
           <img
-            src={property.imageUrl}
-            alt={property.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            {...cardImageProps(property.imageUrl, property.title)}
             loading={priority ? 'eager' : 'lazy'}
-            fetchPriority={priority ? 'high' : 'auto'}
+            fetchpriority={priority ? 'high' : 'low'}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           {badge && (
             <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase shadow-sm ${badge.className}`}>

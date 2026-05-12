@@ -14,6 +14,7 @@ import HaloBoardPreview from '@/features/marketing/HaloBoardPreview';
 // PricingSection removed from homepage; lives on /for-agents/pricing
 import FinalCTA from '@/features/marketing/FinalCTA';
 import HeroSearchPreview from '@/components/home/HeroSearchPreview';
+import { cardImageProps } from '@/shared/lib/optimizeImageUrl';
 
 // ============================================================
 // Wave 17 V8 — Buyer-first multilingual homepage

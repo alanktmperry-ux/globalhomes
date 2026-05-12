@@ -6,7 +6,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getCorsHeaders } from '../_shared/cors.ts';
 import { renderEmail, buildUnsubscribeToken } from '../_shared/email-frame.ts';
-import { translateEmail } from '../_shared/translateEmail.ts';
+import { translateEmailPayload, resolveRecipientLocale } from '../_shared/translateEmailPayload.ts';
 
 const RESEND_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? 'ListHQ <hello@listhq.com.au>';

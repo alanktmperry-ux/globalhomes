@@ -1699,7 +1699,6 @@ export const pa: Partial<Record<TranslationKey, string>> = {
   'hero.headline.line2': "ਕਿਸੇ ਵੀ ਭਾਸ਼ਾ ਵਿੱਚ।",
 
   // Homepage hero (Phase 4)
-  'hero.eyebrow': 'ਆਸਟਰੇਲੀਆ ਦਾ ਬਹੁ-ਭਾਸ਼ਾਈ ਪ੍ਰਾਪਰਟੀ ਪਲੇਟਫਾਰਮ',
   'hero.h1': 'ਆਪਣਾ ਘਰ ਲੱਭੋ।',
   'hero.cyclingLine': 'ਕਿਸੇ ਵੀ ਭਾਸ਼ਾ ਵਿੱਚ।',
   'hero.sub': 'ਆਸਟਰੇਲੀਆ ਵਿੱਚ ਇੱਕੋ-ਇੱਕ ਪ੍ਰਾਪਰਟੀ ਖੋਜ ਜੋ ਤੁਹਾਡੇ ਖਰੀਦਦਾਰ ਦੀ ਭਾਸ਼ਾ ਬੋਲਦੀ ਹੈ।',

@@ -1695,7 +1695,6 @@ export const ko: Partial<Record<TranslationKey, string>> = {
   'hero.headline.line2': "어떤 언어로든.",
 
   // Homepage hero (Phase 4)
-  'hero.eyebrow': '호주의 다국어 부동산 플랫폼',
   'hero.h1': '당신의 집을 찾으세요.',
   'hero.cyclingLine': '어떤 언어로든.',
   'hero.sub': '오스트레일리아에서 유일하게 모든 구매자 언어로 소통하는 부동산 검색.',

@@ -1699,7 +1699,6 @@ export const ne: Partial<Record<TranslationKey, string>> = {
   'hero.headline.line2': 'जुनसुकै भाषामा।',
 
   // Homepage hero (Phase 4)
-  'hero.eyebrow': 'अस्ट्रेलियाको बहुभाषिक सम्पत्ति प्लेटफर्म',
   'hero.h1': 'आफ्नो घर फेला पार्नुहोस्।',
   'hero.cyclingLine': 'कुनै पनि भाषामा।',
   'hero.sub': 'अस्ट्रेलियामा तपाईंको खरिदकर्ताको भाषा बोल्ने एकमात्र सम्पत्ति खोज।',

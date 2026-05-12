@@ -1699,7 +1699,6 @@ export const el: Partial<Record<TranslationKey, string>> = {
   'hero.headline.line2': 'Σε οποιαδήποτε γλώσσα.',
 
   // Homepage hero (Phase 4)
-  'hero.eyebrow': 'Η πολυγλωσσική πλατφόρμα ακινήτων της Αυστραλίας',
   'hero.h1': 'Βρες το σπίτι σου.',
   'hero.cyclingLine': 'Σε οποιαδήποτε γλώσσα.',
   'hero.sub': 'Η μοναδική αναζήτηση ακινήτων στην Αυστραλία που μιλά τη γλώσσα του αγοραστή σας.',

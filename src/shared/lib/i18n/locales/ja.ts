@@ -1699,7 +1699,6 @@ export const ja: Partial<Record<TranslationKey, string>> = {
   'hero.headline.line2': 'あらゆる言語で。',
 
   // Homepage hero (Phase 4)
-  'hero.eyebrow': 'オーストラリアの多言語不動産プラットフォーム',
   'hero.h1': 'あなたの家を見つけよう。',
   'hero.cyclingLine': 'どんな言語でも。',
   'hero.sub': 'オーストラリア唯一、すべてのバイヤー言語を話す不動産検索。',

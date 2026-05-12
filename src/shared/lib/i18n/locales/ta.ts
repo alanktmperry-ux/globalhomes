@@ -1695,7 +1695,6 @@ export const ta: Partial<Record<TranslationKey, string>> = {
   'hero.headline.line2': "எந்த மொழியிலும்.",
 
   // Homepage hero (Phase 4)
-  'hero.eyebrow': 'ஆஸ்திரேலியாவின் பன்மொழி சொத்து தளம்',
   'hero.h1': 'உங்கள் வீட்டைக் கண்டுபிடிக்கவும்.',
   'hero.cyclingLine': 'எந்த மொழியிலும்.',
   'hero.sub': 'ஆஸ்திரேலியாவில் உங்கள் வாங்குபவரின் மொழியைப் பேசும் ஒரே சொத்து தேடல்.',

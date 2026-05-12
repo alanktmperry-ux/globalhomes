@@ -1699,7 +1699,6 @@ export const tr: Partial<Record<TranslationKey, string>> = {
   'hero.headline.line2': 'Dilediğiniz dilde.',
 
   // Homepage hero (Phase 4)
-  'hero.eyebrow': 'Avustralya\'nın çok dilli emlak platformu',
   'hero.h1': 'Evini bul.',
   'hero.cyclingLine': 'Herhangi bir dilde.',
   'hero.sub': 'Avustralya\'da alıcınızın dilini konuşan tek emlak araması.',

@@ -1699,7 +1699,6 @@ export const bn: Partial<Record<keyof typeof EnBase, string>> = {
   'hero.headline.line2': "যেকোনো ভাষায়।",
 
   // Homepage hero (Phase 4)
-  'hero.eyebrow': 'অস্ট্রেলিয়ার বহুভাষিক সম্পত্তি প্ল্যাটফর্ম',
   'hero.h1': 'আপনার বাড়ি খুঁজুন।',
   'hero.cyclingLine': 'যেকোনো ভাষায়।',
   'hero.sub': 'অস্ট্রেলিয়ার একমাত্র সম্পত্তি অনুসন্ধান যা আপনার ক্রেতার ভাষা বলে।',

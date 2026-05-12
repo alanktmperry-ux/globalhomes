@@ -1699,7 +1699,6 @@ export const zh: Partial<Record<TranslationKey, string>> = {
   'hero.headline.line2': '支持任何语言。',
 
   // Homepage hero (Phase 4)
-  'hero.eyebrow': '澳大利亚多语言房产平台',
   'hero.h1': '找到您的家。',
   'hero.cyclingLine': '任何语言。',
   'hero.sub': '澳大利亚唯一懂您买家语言的房产搜索。',

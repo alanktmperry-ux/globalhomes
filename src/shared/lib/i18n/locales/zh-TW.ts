@@ -1710,7 +1710,6 @@ export const zhTW: Partial<Record<keyof typeof EnBase, string>> = {
   'hero.headline.line2': "任何語言。",
 
   // Homepage hero (Phase 4)
-  'hero.eyebrow': '澳洲多語言房地產平台',
   'hero.h1': '找到您的家。',
   'hero.cyclingLine': '任何語言。',
   'hero.sub': '澳洲唯一懂您買家語言的房地產搜尋。',

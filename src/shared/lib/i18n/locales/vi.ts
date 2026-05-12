@@ -1695,7 +1695,6 @@ export const vi: Partial<Record<TranslationKey, string>> = {
   'hero.headline.line2': "Bằng bất kỳ ngôn ngữ.",
 
   // Homepage hero (Phase 4)
-  'hero.eyebrow': 'Nền tảng bất động sản đa ngôn ngữ của Úc',
   'hero.h1': 'Tìm ngôi nhà của bạn.',
   'hero.cyclingLine': 'Bằng bất kỳ ngôn ngữ nào.',
   'hero.sub': 'Tìm kiếm bất động sản duy nhất tại Úc nói ngôn ngữ của người mua.',

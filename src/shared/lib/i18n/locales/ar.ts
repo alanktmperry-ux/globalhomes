@@ -1695,7 +1695,6 @@ export const ar: Partial<Record<TranslationKey, string>> = {
   'hero.headline.line2': "بأي لغة.",
 
   // Homepage hero (Phase 4)
-  'hero.eyebrow': 'منصة العقارات متعددة اللغات في أستراليا',
   'hero.h1': 'اعثر على منزلك.',
   'hero.cyclingLine': 'بأي لغة.',
   'hero.sub': 'بحث العقارات الوحيد في أستراليا الذي يتحدث لغة المشتري.',

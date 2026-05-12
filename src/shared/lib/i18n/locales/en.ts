@@ -1929,7 +1929,6 @@ export const en = {
   'hero.headline.line2': 'In any language.',
 
   // Homepage hero (Phase 4)
-  'hero.eyebrow': 'Australia\'s multilingual property platform',
   'hero.h1': 'Find your home.',
   'hero.cyclingLine': 'In any language.',
   'hero.sub': 'The only property search in Australia that speaks every language your buyer does.',

@@ -1699,7 +1699,6 @@ export const it: Partial<Record<TranslationKey, string>> = {
   'hero.headline.line2': "In qualsiasi lingua.",
 
   // Homepage hero (Phase 4)
-  'hero.eyebrow': 'La piattaforma immobiliare multilingue dell\'Australia',
   'hero.h1': 'Trova la tua casa.',
   'hero.cyclingLine': 'In qualsiasi lingua.',
   'hero.sub': 'L\'unica ricerca immobiliare in Australia che parla la lingua del tuo acquirente.',

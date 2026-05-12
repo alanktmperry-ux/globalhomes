@@ -1699,7 +1699,6 @@ export const fil: Partial<Record<TranslationKey, string>> = {
   'hero.headline.line2': "Sa anumang wika.",
 
   // Homepage hero (Phase 4)
-  'hero.eyebrow': 'Multilingual property platform ng Australia',
   'hero.h1': 'Hanapin ang iyong tahanan.',
   'hero.cyclingLine': 'Sa anumang wika.',
   'hero.sub': 'Ang tanging paghahanap ng ari-arian sa Australia na nagsasalita ng wika ng iyong mamimili.',

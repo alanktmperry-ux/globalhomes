@@ -223,7 +223,6 @@ export default function NotificationPreferencesSettings() {
                   <th className="text-left px-3 py-2 font-medium">Event</th>
                   <th className="px-2 py-2 font-medium w-16">In-app</th>
                   <th className="px-2 py-2 font-medium w-16">Email</th>
-                  <th className="px-2 py-2 font-medium w-16" title="Push notifications coming soon">Push</th>
                   <th className="px-2 py-2 font-medium w-32">Frequency</th>
                 </tr>
               </thead>

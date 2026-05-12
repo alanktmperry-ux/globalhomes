@@ -1927,6 +1927,26 @@ export const en = {
   'halo.credits.checkoutError': 'Could not start checkout. Please try again.',
   'hero.headline.line1': 'Find your home.',
   'hero.headline.line2': 'In any language.',
+
+  // Homepage hero (Phase 4)
+  'hero.eyebrow': 'Australia\'s multilingual property platform',
+  'hero.h1': 'Find your home.',
+  'hero.cyclingLine': 'In any language.',
+  'hero.sub': 'The only property search in Australia that speaks every language your buyer does.',
+  'hero.searchPlaceholder': 'Suburb, postcode, or address',
+  'hero.searchButton': 'Search',
+  'hero.chips.melbourne': 'Melbourne',
+  'hero.chips.sydney': 'Sydney',
+  'hero.chips.under1m': 'Under $1M',
+  'hero.chips.threeBed': '3+ bed',
+  'hero.chips.house': 'House',
+  'hero.freeForBuyers': 'Free for buyers · No account needed',
+  'hero.card.badge': 'any language · auto-translated',
+  'hero.card.suburb': 'AUBURN · NSW',
+  'hero.card.title': 'Renovated North-Facing Family Home',
+  'hero.card.priceSuffix': 'AUD',
+  'hero.card.liveEnquiryTitle': 'New enquiry in Mandarin',
+  'hero.card.liveEnquiryMeta': '14 Bellevue Rd · 2 min ago',
 } as const;
 
 export type TranslationKey = keyof typeof en;

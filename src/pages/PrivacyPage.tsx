@@ -14,7 +14,7 @@ export function PrivacyPage() {
         <section className="space-y-2">
           <h2 className="text-xl font-semibold text-foreground">Who we are</h2>
           <p className="text-foreground/90 leading-relaxed">
-            ListHQ is operated by Square Development Pty Ltd (ABN to be added). We provide
+            ListHQ is operated by Square Development Pty Ltd (trading as ListHQ) (ABN pending registration). We provide
             a property listing and buyer-matching platform for Australian real estate
             agents and property seekers.
           </p>
@@ -64,9 +64,10 @@ export function PrivacyPage() {
         <section className="space-y-2">
           <h2 className="text-xl font-semibold text-foreground">Contact</h2>
           <p className="text-foreground/90 leading-relaxed">
-            Square Development Pty Ltd<br />
-            <a href="mailto:support@listhq.com.au" className="underline">
-              support@listhq.com.au
+            Square Development Pty Ltd (trading as ListHQ)<br />
+            Australia<br />
+            <a href="mailto:privacy@listhq.com.au" className="underline">
+              privacy@listhq.com.au
             </a>
           </p>
         </section>

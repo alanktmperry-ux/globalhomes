@@ -53,7 +53,7 @@ const TermsPage = () => {
           <div className="prose prose-neutral max-w-none">
             <section id="about">
               <h2>1. About ListHQ</h2>
-              <p>ListHQ is an Australian real estate platform connecting agents, buyers, renters, vendors and property managers. Operated by ListHQ Pty Ltd, Australia.</p>
+              <p>ListHQ is an Australian real estate platform connecting agents, buyers, renters, vendors and property managers. Operated by Square Development Pty Ltd (trading as ListHQ), Australia.</p>
             </section>
 
             <section id="acceptance">
@@ -93,7 +93,7 @@ const TermsPage = () => {
             <section id="ip">
               <h2>6. Intellectual Property</h2>
               <ul>
-                <li>All platform content, design and code is owned by ListHQ Pty Ltd.</li>
+                <li>All platform content, design and code is owned by Square Development Pty Ltd (trading as ListHQ).</li>
                 <li>Agents retain ownership of their listing content and photos.</li>
                 <li>By uploading content, agents grant ListHQ a licence to display it on the platform.</li>
               </ul>

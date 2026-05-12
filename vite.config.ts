@@ -129,7 +129,20 @@ export default defineConfig(({ mode }) => {
       'recharts',
     ],
   },
-  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+  plugins: [
+    react(),
+    mode === "development" && componentTagger(),
+    // Writes dist/stats.html — open after build to inspect chunk composition
+    // as a treemap with gzip + brotli sizes. Safe in prod; just generates a
+    // static report alongside the bundle.
+    mode === "production" && visualizer({
+      filename: "dist/stats.html",
+      gzipSize: true,
+      brotliSize: true,
+      open: false,
+      template: "treemap",
+    }),
+  ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

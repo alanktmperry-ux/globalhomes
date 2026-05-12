@@ -551,11 +551,11 @@ const BondClaimsPage = () => {
   return (
     <div className="space-y-4 pb-20">
       <DashboardHeader
-        title="Bond Claims"
-        subtitle="Track bond deductions and claims with authorities"
+        title={t('agent.bondClaims.pageTitle')}
+        subtitle={t('agent.bondClaims.pageSubtitle')}
         actions={
           <Button size="sm" onClick={() => setShowNew(true)}>
-            <Plus size={14} className="mr-1" /> New Bond Claim
+            <Plus size={14} className="mr-1" /> {t('agent.bondClaims.newClaim')}
           </Button>
         }
       />

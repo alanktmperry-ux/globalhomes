@@ -383,7 +383,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
         body: { mode: 'full_listing', listing_id: listing.id },
       });
       setTranslateDone(true);
-      toast.success('Translations generated — buyers can now read this listing in 28 languages.');
+      toast.success('Translations generated — buyers can now read this listing in 30+ languages.');
     } catch {
       toast.error('Translation failed — please try again.');
     } finally {
@@ -1047,7 +1047,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
         {translateDone ? (
           <div className="flex items-center gap-2 text-sm text-emerald-600">
             <CheckCircle2 size={15} />
-            Translated — visible to buyers in 28 languages.
+            Translated — visible to buyers in 30+ languages.
           </div>
         ) : (
           <>

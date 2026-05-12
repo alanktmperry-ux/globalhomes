@@ -268,8 +268,10 @@ For Indian-buyer-relevant features specifically, consider noting (only when genu
 - Vegetarian-friendly kitchen layout (separate stove space, large pantry)
 - Distance to Indian community centres or cultural associations
 For Tamil buyers specifically, also consider proximity to South Indian temples and Carnatic music/dance schools where genuinely nearby.
+For Marathi buyers, consider proximity to Maharashtrian cultural associations, vegetarian amenities, and multigenerational living spaces.
+For Telugu buyers, consider proximity to Telugu cultural centres and South Indian temples where genuinely applicable.
 
-CRITICAL: All 28 language keys MUST be present in the "translations" object. For Arabic and Farsi, ensure right-to-left natural phrasing. For Hindi, Punjabi, Tamil, Bengali, Marathi, Telugu, and Urdu, use natural Indian-Australian property terminology where appropriate. Use 'lakh' and 'crore' phrasing for Indian buyers when prices fit those denominations, alongside the AUD figure.
+CRITICAL: All 28 language keys MUST be present in the "translations" object. For Arabic, Farsi, and Urdu, ensure right-to-left natural phrasing. For Hindi, Punjabi, Tamil, Bengali, Marathi, Telugu, and Urdu, use natural Indian-Australian property terminology where appropriate. Use 'lakh' and 'crore' phrasing for Indian buyers when prices fit those denominations, alongside the AUD figure.
 REMINDER: Preserve every <<G:N>> sentinel verbatim in every translated title, description, and summary.
 
 AGENT INSIGHTS — in English, under key "agent_insights":

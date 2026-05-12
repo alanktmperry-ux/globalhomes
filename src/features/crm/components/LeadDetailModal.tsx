@@ -249,25 +249,51 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
           )}
         </div>
 
-        {/* Buyer's enquiry message (Phase 3A-UI multilingual) */}
-        {lead.message && (
+        {/* Buyer's enquiry message — any-to-any translation aware */}
+        {(originalMessage || lead.message) && (
           <div className="mx-5 mt-4 rounded-lg border border-border bg-muted/30 p-3">
             <div className="flex items-center gap-2 mb-2">
               <p className="text-xs font-semibold text-foreground">Buyer's enquiry message</p>
-              {lead.original_language && lead.original_language !== 'en' && (
-                <BuyerLanguageBadge language={lead.original_language} />
+              {origLang && origLang !== 'en' && (
+                <BuyerLanguageBadge language={origLang} />
               )}
             </div>
-            <p className="text-sm text-foreground whitespace-pre-wrap">{lead.message}</p>
-            {lead.message_original && lead.original_language && lead.original_language !== 'en' && (
-              <details className="mt-2">
-                <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
-                  Show original ({lead.original_language})
-                </summary>
-                <p className="mt-2 text-sm text-muted-foreground whitespace-pre-wrap border-l-2 border-border pl-3">
-                  {lead.message_original}
-                </p>
-              </details>
+
+            {isTranslating && (
+              <div className="flex items-center gap-1.5 mb-1.5 text-xs text-muted-foreground italic">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                <span>Translating…</span>
+              </div>
+            )}
+
+            <p
+              dir={isRTL ? 'rtl' : 'ltr'}
+              lang={renderedLang}
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+              className="text-sm text-foreground whitespace-pre-wrap break-words"
+            >
+              {displayMessage}
+            </p>
+
+            {hasTranslation && !isFailed && (
+              <div className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5 flex-wrap">
+                <span aria-hidden>🌐</span>
+                <span>Translated from {getLanguageName(origLang)}</span>
+                <span aria-hidden>·</span>
+                <button
+                  type="button"
+                  onClick={() => setShowOriginal((p) => !p)}
+                  className="underline hover:no-underline focus:outline-none focus:ring-1 focus:ring-primary/40 rounded-sm"
+                >
+                  {showOriginal ? 'View translation' : 'View original'}
+                </button>
+              </div>
+            )}
+
+            {isFailed && (
+              <p className="text-xs italic text-muted-foreground mt-2">
+                Translation unavailable · showing original
+              </p>
             )}
           </div>
         )}

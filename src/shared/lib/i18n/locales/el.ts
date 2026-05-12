@@ -1697,4 +1697,23 @@ export const el: Partial<Record<TranslationKey, string>> = {
   'halo.credits.checkoutError': 'Δεν ήταν δυνατή η έναρξη της διαδικασίας checkout. Παρακαλούμε δοκιμάστε ξανά.',
   'hero.headline.line1': 'Βρείτε το σπίτι σας.',
   'hero.headline.line2': 'Σε οποιαδήποτε γλώσσα.',
+
+  // Homepage hero (Phase 4)
+  'hero.h1': 'Βρες το σπίτι σου.',
+  'hero.cyclingLine': 'Σε οποιαδήποτε γλώσσα.',
+  'hero.sub': 'Η μοναδική αναζήτηση ακινήτων στην Αυστραλία που μιλά τη γλώσσα του αγοραστή σας.',
+  'hero.searchPlaceholder': 'Προάστιο, ταχ. κώδικας ή διεύθυνση',
+  'hero.searchButton': 'Αναζήτηση',
+  'hero.chips.melbourne': 'Μελβούρνη',
+  'hero.chips.sydney': 'Σίδνεϊ',
+  'hero.chips.under1m': 'Κάτω από $1M',
+  'hero.chips.threeBed': '3+ υπνοδωμάτια',
+  'hero.chips.house': 'Σπίτι',
+  'hero.freeForBuyers': 'Δωρεάν για αγοραστές · Χωρίς λογαριασμό',
+  'hero.card.badge': 'οποιαδήποτε γλώσσα · αυτόματη μετάφραση',
+  'hero.card.suburb': 'AUBURN · NSW',
+  'hero.card.title': 'Ανακαινισμένο σπίτι με βορινό προσανατολισμό',
+  'hero.card.priceSuffix': 'AUD',
+  'hero.card.liveEnquiryTitle': 'Νέο ερώτημα στα Μανδαρινικά',
+  'hero.card.liveEnquiryMeta': '14 Bellevue Rd · πριν 2 λεπτά',
 };

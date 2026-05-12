@@ -1697,4 +1697,23 @@ export const th: Partial<Record<TranslationKey, string>> = {
   'halo.credits.checkoutError': 'ไม่สามารถเริ่มขั้นตอนการชำระเงินได้ โปรดลองอีกครั้ง',
   'hero.headline.line1': "ค้นหาบ้านของคุณ.",
   'hero.headline.line2': "ในภาษาใดก็ได้.",
+
+  // Homepage hero (Phase 4)
+  'hero.h1': 'ค้นหาบ้านของคุณ',
+  'hero.cyclingLine': 'ในทุกภาษา',
+  'hero.sub': 'การค้นหาอสังหาริมทรัพย์เดียวในออสเตรเลียที่พูดภาษาของผู้ซื้อ',
+  'hero.searchPlaceholder': 'เขต, รหัสไปรษณีย์ หรือที่อยู่',
+  'hero.searchButton': 'ค้นหา',
+  'hero.chips.melbourne': 'เมลเบิร์น',
+  'hero.chips.sydney': 'ซิดนีย์',
+  'hero.chips.under1m': 'ต่ำกว่า $1M',
+  'hero.chips.threeBed': '3+ ห้องนอน',
+  'hero.chips.house': 'บ้าน',
+  'hero.freeForBuyers': 'ฟรีสำหรับผู้ซื้อ · ไม่ต้องสมัครบัญชี',
+  'hero.card.badge': 'ทุกภาษา · แปลอัตโนมัติ',
+  'hero.card.suburb': 'AUBURN · NSW',
+  'hero.card.title': 'บ้านครอบครัวหันหน้าทิศเหนือปรับปรุงใหม่',
+  'hero.card.priceSuffix': 'AUD',
+  'hero.card.liveEnquiryTitle': 'คำถามใหม่ในภาษาจีนกลาง',
+  'hero.card.liveEnquiryMeta': '14 Bellevue Rd · 2 นาทีที่แล้ว',
 };

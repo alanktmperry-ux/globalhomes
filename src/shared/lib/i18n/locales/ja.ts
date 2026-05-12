@@ -1697,4 +1697,23 @@ export const ja: Partial<Record<TranslationKey, string>> = {
   'halo.credits.checkoutError': 'チェックアウトを開始できませんでした。もう一度お試しください。',
   'hero.headline.line1': '理想の住まいを見つけましょう。',
   'hero.headline.line2': 'あらゆる言語で。',
+
+  // Homepage hero (Phase 4)
+  'hero.h1': 'あなたの家を見つけよう。',
+  'hero.cyclingLine': 'どんな言語でも。',
+  'hero.sub': 'オーストラリア唯一、すべてのバイヤー言語を話す不動産検索。',
+  'hero.searchPlaceholder': '地区、郵便番号、住所',
+  'hero.searchButton': '検索',
+  'hero.chips.melbourne': 'メルボルン',
+  'hero.chips.sydney': 'シドニー',
+  'hero.chips.under1m': '100万ドル以下',
+  'hero.chips.threeBed': '3寝室以上',
+  'hero.chips.house': '一戸建て',
+  'hero.freeForBuyers': 'バイヤーは無料 · アカウント不要',
+  'hero.card.badge': 'どんな言語でも · 自動翻訳',
+  'hero.card.suburb': 'AUBURN · NSW',
+  'hero.card.title': 'リノベーション済み北向きファミリーホーム',
+  'hero.card.priceSuffix': 'AUD',
+  'hero.card.liveEnquiryTitle': '北京語で新しい問い合わせ',
+  'hero.card.liveEnquiryMeta': '14 Bellevue Rd · 2分前',
 };

@@ -1693,4 +1693,23 @@ export const ta: Partial<Record<TranslationKey, string>> = {
   'halo.credits.checkoutError': 'பணம் செலுத்தும் செயல்முறையைத் தொடங்க முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.',
   'hero.headline.line1': "உங்கள் வீட்டைக் கண்டுபிடியுங்கள்.",
   'hero.headline.line2': "எந்த மொழியிலும்.",
+
+  // Homepage hero (Phase 4)
+  'hero.h1': 'உங்கள் வீட்டைக் கண்டுபிடிக்கவும்.',
+  'hero.cyclingLine': 'எந்த மொழியிலும்.',
+  'hero.sub': 'ஆஸ்திரேலியாவில் உங்கள் வாங்குபவரின் மொழியைப் பேசும் ஒரே சொத்து தேடல்.',
+  'hero.searchPlaceholder': 'புறநகர், அஞ்சல் குறியீடு அல்லது முகவரி',
+  'hero.searchButton': 'தேடு',
+  'hero.chips.melbourne': 'மெல்போர்ன்',
+  'hero.chips.sydney': 'சிட்னி',
+  'hero.chips.under1m': '$1M-க்கு கீழ்',
+  'hero.chips.threeBed': '3+ படுக்கையறை',
+  'hero.chips.house': 'வீடு',
+  'hero.freeForBuyers': 'வாங்குபவர்களுக்கு இலவசம் · கணக்கு தேவையில்லை',
+  'hero.card.badge': 'எந்த மொழியும் · தானியங்கி மொழிபெயர்ப்பு',
+  'hero.card.suburb': 'AUBURN · NSW',
+  'hero.card.title': 'புதுப்பிக்கப்பட்ட வடக்கு நோக்கிய குடும்ப வீடு',
+  'hero.card.priceSuffix': 'AUD',
+  'hero.card.liveEnquiryTitle': 'மாண்டரின் மொழியில் புதிய விசாரணை',
+  'hero.card.liveEnquiryMeta': '14 Bellevue Rd · 2 நிமிடம் முன்பு',
 };

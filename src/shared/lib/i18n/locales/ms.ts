@@ -1697,4 +1697,23 @@ export const ms: Partial<Record<TranslationKey, string>> = {
   'halo.credits.checkoutError': 'Tidak dapat memulakan pembayaran. Sila cuba lagi.',
   'hero.headline.line1': "Cari rumah anda.",
   'hero.headline.line2': "Dalam apa-apa bahasa.",
+
+  // Homepage hero (Phase 4)
+  'hero.h1': 'Cari rumah anda.',
+  'hero.cyclingLine': 'Dalam mana-mana bahasa.',
+  'hero.sub': 'Satu-satunya carian hartanah di Australia yang bertutur dalam bahasa pembeli anda.',
+  'hero.searchPlaceholder': 'Pinggir bandar, poskod atau alamat',
+  'hero.searchButton': 'Cari',
+  'hero.chips.melbourne': 'Melbourne',
+  'hero.chips.sydney': 'Sydney',
+  'hero.chips.under1m': 'Di bawah $1J',
+  'hero.chips.threeBed': '3+ bilik',
+  'hero.chips.house': 'Rumah',
+  'hero.freeForBuyers': 'Percuma untuk pembeli · Tiada akaun diperlukan',
+  'hero.card.badge': 'mana-mana bahasa · terjemahan automatik',
+  'hero.card.suburb': 'AUBURN · NSW',
+  'hero.card.title': 'Rumah keluarga menghadap utara yang diubah suai',
+  'hero.card.priceSuffix': 'AUD',
+  'hero.card.liveEnquiryTitle': 'Pertanyaan baru dalam bahasa Mandarin',
+  'hero.card.liveEnquiryMeta': '14 Bellevue Rd · 2 minit lalu',
 };

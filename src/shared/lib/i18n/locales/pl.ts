@@ -1697,4 +1697,23 @@ export const pl: Partial<Record<TranslationKey, string>> = {
   'halo.credits.checkoutError': 'Nie udało się rozpocząć procesu płatności. Proszę spróbować ponownie.',
   'hero.headline.line1': 'Znajdź swój dom.',
   'hero.headline.line2': 'W dowolnym języku.',
+
+  // Homepage hero (Phase 4)
+  'hero.h1': 'Znajdź swój dom.',
+  'hero.cyclingLine': 'W dowolnym języku.',
+  'hero.sub': 'Jedyna wyszukiwarka nieruchomości w Australii mówiąca językiem Twojego kupującego.',
+  'hero.searchPlaceholder': 'Dzielnica, kod pocztowy lub adres',
+  'hero.searchButton': 'Szukaj',
+  'hero.chips.melbourne': 'Melbourne',
+  'hero.chips.sydney': 'Sydney',
+  'hero.chips.under1m': 'Poniżej $1M',
+  'hero.chips.threeBed': '3+ sypialnie',
+  'hero.chips.house': 'Dom',
+  'hero.freeForBuyers': 'Bezpłatne dla kupujących · Bez konta',
+  'hero.card.badge': 'dowolny język · automatyczne tłumaczenie',
+  'hero.card.suburb': 'AUBURN · NSW',
+  'hero.card.title': 'Odnowiony dom rodzinny z północną wystawą',
+  'hero.card.priceSuffix': 'AUD',
+  'hero.card.liveEnquiryTitle': 'Nowe zapytanie w mandaryńskim',
+  'hero.card.liveEnquiryMeta': '14 Bellevue Rd · 2 min temu',
 };

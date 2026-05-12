@@ -1697,4 +1697,23 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'halo.credits.checkoutError': 'No se pudo iniciar el proceso de pago. Inténtelo de nuevo.',
   'hero.headline.line1': "Encuentra tu hogar.",
   'hero.headline.line2': "En cualquier idioma.",
+
+  // Homepage hero (Phase 4)
+  'hero.h1': 'Encuentra tu hogar.',
+  'hero.cyclingLine': 'En cualquier idioma.',
+  'hero.sub': 'La única búsqueda inmobiliaria en Australia que habla el idioma de tu comprador.',
+  'hero.searchPlaceholder': 'Barrio, código postal o dirección',
+  'hero.searchButton': 'Buscar',
+  'hero.chips.melbourne': 'Melbourne',
+  'hero.chips.sydney': 'Sídney',
+  'hero.chips.under1m': 'Menos de $1M',
+  'hero.chips.threeBed': '3+ habitaciones',
+  'hero.chips.house': 'Casa',
+  'hero.freeForBuyers': 'Gratis para compradores · Sin cuenta',
+  'hero.card.badge': 'cualquier idioma · traducido automáticamente',
+  'hero.card.suburb': 'AUBURN · NSW',
+  'hero.card.title': 'Casa familiar renovada orientada al norte',
+  'hero.card.priceSuffix': 'AUD',
+  'hero.card.liveEnquiryTitle': 'Nueva consulta en mandarín',
+  'hero.card.liveEnquiryMeta': '14 Bellevue Rd · hace 2 min',
 };

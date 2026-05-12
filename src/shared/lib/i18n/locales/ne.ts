@@ -1697,4 +1697,23 @@ export const ne: Partial<Record<TranslationKey, string>> = {
   'halo.credits.checkoutError': 'चेकआउट सुरु गर्न सकिएन। कृपया फेरि प्रयास गर्नुहोस्।',
   'hero.headline.line1': 'तपाईंको घर खोज्नुहोस्।',
   'hero.headline.line2': 'जुनसुकै भाषामा।',
+
+  // Homepage hero (Phase 4)
+  'hero.h1': 'आफ्नो घर फेला पार्नुहोस्।',
+  'hero.cyclingLine': 'कुनै पनि भाषामा।',
+  'hero.sub': 'अस्ट्रेलियामा तपाईंको खरिदकर्ताको भाषा बोल्ने एकमात्र सम्पत्ति खोज।',
+  'hero.searchPlaceholder': 'उपनगर, पिनकोड वा ठेगाना',
+  'hero.searchButton': 'खोज्नुहोस्',
+  'hero.chips.melbourne': 'मेलबर्न',
+  'hero.chips.sydney': 'सिड्नी',
+  'hero.chips.under1m': '$1M भन्दा कम',
+  'hero.chips.threeBed': '3+ शयनकक्ष',
+  'hero.chips.house': 'घर',
+  'hero.freeForBuyers': 'खरिदकर्ताका लागि निःशुल्क · खाता आवश्यक छैन',
+  'hero.card.badge': 'कुनै पनि भाषा · स्वचालित अनुवादित',
+  'hero.card.suburb': 'AUBURN · NSW',
+  'hero.card.title': 'नवीकृत उत्तर-मुखी पारिवारिक घर',
+  'hero.card.priceSuffix': 'AUD',
+  'hero.card.liveEnquiryTitle': 'मन्डारिनमा नयाँ सोधपुछ',
+  'hero.card.liveEnquiryMeta': '14 Bellevue Rd · 2 मिनेट अघि',
 };

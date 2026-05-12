@@ -1697,4 +1697,23 @@ export const bn: Partial<Record<keyof typeof EnBase, string>> = {
   'halo.credits.checkoutError': 'চেকআউট শুরু করা যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।',
   'hero.headline.line1': "আপনার বাড়ি খুঁজুন।",
   'hero.headline.line2': "যেকোনো ভাষায়।",
+
+  // Homepage hero (Phase 4)
+  'hero.h1': 'আপনার বাড়ি খুঁজুন।',
+  'hero.cyclingLine': 'যেকোনো ভাষায়।',
+  'hero.sub': 'অস্ট্রেলিয়ার একমাত্র সম্পত্তি অনুসন্ধান যা আপনার ক্রেতার ভাষা বলে।',
+  'hero.searchPlaceholder': 'উপশহর, পিনকোড বা ঠিকানা',
+  'hero.searchButton': 'অনুসন্ধান',
+  'hero.chips.melbourne': 'মেলবোর্ন',
+  'hero.chips.sydney': 'সিডনি',
+  'hero.chips.under1m': '$১০ লক্ষের নিচে',
+  'hero.chips.threeBed': '৩+ বেডরুম',
+  'hero.chips.house': 'বাড়ি',
+  'hero.freeForBuyers': 'ক্রেতাদের জন্য বিনামূল্যে · কোনো অ্যাকাউন্ট প্রয়োজন নেই',
+  'hero.card.badge': 'যেকোনো ভাষা · স্বয়ংক্রিয় অনুবাদ',
+  'hero.card.suburb': 'AUBURN · NSW',
+  'hero.card.title': 'সংস্কার করা উত্তরমুখী পারিবারিক বাড়ি',
+  'hero.card.priceSuffix': 'AUD',
+  'hero.card.liveEnquiryTitle': 'ম্যান্ডারিনে নতুন অনুসন্ধান',
+  'hero.card.liveEnquiryMeta': '14 Bellevue Rd · 2 মিনিট আগে',
 };

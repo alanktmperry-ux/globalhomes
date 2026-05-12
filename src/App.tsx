@@ -310,6 +310,7 @@ const App = () => (
             <DefaultSEOHead />
             <Sonner position="top-center" richColors closeButton duration={5000} />
              <ImpersonationBanner />
+             <UserLocaleSync />
             <ScrollToTop />
              <IdleTimeoutWatcher />
              <HelpWidget />

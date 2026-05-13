@@ -410,9 +410,12 @@ export default function PMInspectionsPage() {
 
   // Handlers
   const openSchedule = (tenancyId?: string) => {
+    const seed = tenancyId ? activeTenancies.find(t => t.id === tenancyId) : null;
     setScheduleForm({
       ...emptySchedule(),
+      property_id: seed?.property_id || '',
       tenancy_id: tenancyId || '',
+      inspector_name: agentName || '',
     });
   };
 
@@ -421,22 +424,62 @@ export default function PMInspectionsPage() {
     return activeTenancies.find(t => t.id === scheduleForm.tenancy_id) || null;
   }, [scheduleForm, activeTenancies]);
 
+  const propertiesForSchedule = useMemo(() => {
+    const map = new Map<string, { id: string; address: string; suburb: string | null; state: string | null }>();
+    for (const t of activeTenancies) {
+      if (!t.property_id) continue;
+      if (!map.has(t.property_id)) {
+        map.set(t.property_id, {
+          id: t.property_id,
+          address: t.properties?.address || 'Property',
+          suburb: t.properties?.suburb || null,
+          state: t.properties?.state || null,
+        });
+      }
+    }
+    return Array.from(map.values());
+  }, [activeTenancies]);
+
+  const tenanciesForProperty = useMemo(() => {
+    if (!scheduleForm?.property_id) return [];
+    return activeTenancies.filter(t => t.property_id === scheduleForm.property_id);
+  }, [scheduleForm, activeTenancies]);
+
   const selectedRule = useMemo(() => ruleFor(selectedTenancy?.properties?.state), [selectedTenancy]);
   const selectedMinDate = useMemo(() => ruleMinDate(selectedRule), [selectedRule]);
 
+  const routineMinDate = useMemo(() => addDays(new Date(), 7), []);
+  const effectiveMinDate = useMemo(() => {
+    if (scheduleForm?.inspection_type === 'routine') {
+      return selectedTenancy && selectedMinDate > routineMinDate ? selectedMinDate : routineMinDate;
+    }
+    return selectedTenancy ? selectedMinDate : new Date();
+  }, [scheduleForm, selectedTenancy, selectedMinDate, routineMinDate]);
+
+  const dateError = useMemo(() => {
+    if (!scheduleForm?.scheduled_date) return null;
+    if (scheduleForm.inspection_type === 'routine' && scheduleForm.scheduled_date < routineMinDate) {
+      return `Routine inspections require at least 7 days notice (earliest: ${format(routineMinDate, 'd MMM yyyy')})`;
+    }
+    return null;
+  }, [scheduleForm, routineMinDate]);
+
   const submitSchedule = async (opts: { startReport?: boolean } = {}) => {
     if (!scheduleForm || !agentId) return;
+    if (!scheduleForm.property_id) { toast.error('Select a property'); return; }
     if (!scheduleForm.tenancy_id) { toast.error('Select a tenancy'); return; }
     if (!scheduleForm.scheduled_date) { toast.error('Select a date'); return; }
+    if (dateError) { toast.error(dateError); return; }
     const t = activeTenancies.find(x => x.id === scheduleForm.tenancy_id);
     setSavingSchedule(true);
     const { data: inserted, error } = await supabase.from('property_inspections').insert({
       tenancy_id: scheduleForm.tenancy_id,
-      property_id: t?.property_id,
+      property_id: t?.property_id || scheduleForm.property_id,
       agent_id: agentId,
       inspection_type: scheduleForm.inspection_type,
       scheduled_date: format(scheduleForm.scheduled_date, 'yyyy-MM-dd'),
       status: 'scheduled',
+      inspector_name: scheduleForm.inspector_name.trim() || null,
       overall_notes: scheduleForm.notes.trim() || null,
     } as any).select('id').maybeSingle();
     setSavingSchedule(false);

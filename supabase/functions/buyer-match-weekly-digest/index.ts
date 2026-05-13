@@ -1,11 +1,7 @@
 // Weekly digest of new buyer matches for each agent.
 // Scheduled via pg_cron — Mondays 8am AEST (Sun 22:00 UTC).
 import { createClient } from "npm:@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders } from '../_shared/cors.ts';
 
 const APP_URL = Deno.env.get('APP_URL') ?? 'https://listhq.com.au';
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
@@ -61,6 +57,7 @@ async function sendEmail(to: string, subject: string, html: string) {
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const cronSecret = Deno.env.get("CRON_SECRET");

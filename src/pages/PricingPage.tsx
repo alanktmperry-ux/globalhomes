@@ -344,6 +344,12 @@ export default function PricingPage() {
         {/* ─── PRICING CARDS ─── */}
         <section className="px-6 md:px-8 pb-24 bg-white">
           <div className="max-w-[1280px] mx-auto">
+            <div className="mb-8 rounded-2xl border border-[#E5E5E5] bg-[#F9FAFB] p-5 md:p-6 text-center">
+              <p className="text-[15px] md:text-[17px] font-extrabold text-[#0a0f1e]">Replace 5 tools with one platform</p>
+              <p className="text-[13px] text-[#6a6a6a] mt-1.5 leading-[1.55]">
+                REA Agent + PropertyMe + AgentBox + lead gen = $800–$1,400/month · ListHQ Agency = $999/month full price
+              </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
               {PLANS.map((p, i) => (
                 <PlanCard key={p.key} plan={p} billing={billing} index={i} />

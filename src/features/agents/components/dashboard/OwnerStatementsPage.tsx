@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Loader2, Mail, X, FileText, Download } from 'lucide-react';
+import { Plus, Loader2, Mail, X, FileText, Download, Calculator } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, parseISO, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import DashboardHeader from './DashboardHeader';
@@ -45,6 +45,55 @@ export default function OwnerStatementsPage() {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [autoFilling, setAutoFilling] = useState(false);
+
+  const autoFillFromLedger = async () => {
+    if (!form.property_id || !form.period_start || !form.period_end) {
+      toast.error('Please select a property and statement period first');
+      return;
+    }
+    if (!agentId) return;
+    setAutoFilling(true);
+    try {
+      const [{ data: receipts, error: rErr }, { data: payments, error: pErr }] = await Promise.all([
+        supabase
+          .from('trust_receipts')
+          .select('amount, description, date_received')
+          .eq('agent_id', agentId)
+          .eq('property_id', form.property_id)
+          .gte('date_received', form.period_start)
+          .lte('date_received', form.period_end),
+        supabase
+          .from('trust_payments')
+          .select('amount, description, date_paid')
+          .eq('agent_id', agentId)
+          .eq('property_id', form.property_id)
+          .gte('date_paid', form.period_start)
+          .lte('date_paid', form.period_end),
+      ]);
+      if (rErr) throw rErr;
+      if (pErr) throw pErr;
+
+      const totalRentReceived = (receipts || [])
+        .filter((r: any) => (r.description || '').toLowerCase().includes('rent'))
+        .reduce((s: number, r: any) => s + Number(r.amount || 0), 0);
+      const totalExpenses = (payments || []).reduce((s: number, p: any) => s + Number(p.amount || 0), 0);
+      const pct = feeSource?.percent ?? 0;
+      const managementFeeAud = pct ? Math.round(totalRentReceived * (pct / 100) * 100) / 100 : 0;
+
+      setForm(f => ({
+        ...f,
+        gross_rent_aud: Math.round(totalRentReceived * 100) / 100,
+        maintenance_costs_aud: Math.round(totalExpenses * 100) / 100,
+        management_fee_aud: managementFeeAud,
+      }));
+      toast.success('Statement pre-filled from trust ledger');
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to auto-fill from ledger');
+    } finally {
+      setAutoFilling(false);
+    }
+  };
 
   const lastMonth = subMonths(new Date(), 1);
   const [form, setForm] = useState({
@@ -320,6 +369,17 @@ export default function OwnerStatementsPage() {
               <div><Label className="text-xs">Period start</Label><Input type="date" value={form.period_start} onChange={(e) => setForm({ ...form, period_start: e.target.value })} /></div>
               <div><Label className="text-xs">Period end</Label><Input type="date" value={form.period_end} onChange={(e) => setForm({ ...form, period_end: e.target.value })} /></div>
             </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={autoFillFromLedger}
+              disabled={autoFilling}
+              className="flex items-center gap-1.5 w-full"
+            >
+              {autoFilling ? <Loader2 size={14} className="animate-spin" /> : <Calculator size={14} />}
+              Auto-fill from Trust Ledger
+            </Button>
             <div className="grid grid-cols-2 gap-3">
               <div><Label className="text-xs">Gross rent (AUD)</Label><Input type="number" step="0.01" value={form.gross_rent_aud} onChange={(e) => setForm({ ...form, gross_rent_aud: Number(e.target.value) })} /></div>
               <div><Label className="text-xs">Management fee (AUD)</Label><Input type="number" step="0.01" value={form.management_fee_aud} onChange={(e) => setForm({ ...form, management_fee_aud: Number(e.target.value) })} /><p className="text-[10px] text-muted-foreground mt-0.5">{feeSource ? (feeSource.fromTenancy ? `From tenancy record: ${feeSource.percent}%` : `Default: ${feeSource.percent}%`) : 'Select a property to load fee'}</p></div>

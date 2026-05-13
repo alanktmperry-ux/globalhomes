@@ -54,7 +54,7 @@ interface InsightsData {
   momGrowthPct: number | null;
   churnRatePct: number;
   ltv: number;
-  cac: number;
+  cac: number | null;
   paybackMonths: number | null;
   cohorts: CohortRow[];
   funnel: FunnelStage[];
@@ -189,8 +189,9 @@ export default function InsightsPage() {
       const monthlyChurnRate = churnRatePct / 100;
       const ltv =
         monthlyChurnRate > 0 ? avgRevenuePerAgent / monthlyChurnRate : avgRevenuePerAgent * 24;
-      const cac = 0; // placeholder
-      const paybackMonths = avgRevenuePerAgent > 0 && cac > 0 ? cac / avgRevenuePerAgent : null;
+      // CAC requires marketing spend tracking, which isn't wired yet.
+      const cac: number | null = null;
+      const paybackMonths = avgRevenuePerAgent > 0 && cac != null && cac > 0 ? cac / avgRevenuePerAgent : null;
 
       // === Cohorts: last 12 months ===
       const cohortMap = new Map<string, any[]>();
@@ -417,7 +418,12 @@ export default function InsightsPage() {
             sub="cancelled / (paid + cancelled)"
           />
           <KPI label="Customer LTV" value={fmtMoney(data.ltv)} icon={Users} sub="ARPU ÷ churn" />
-          <KPI label="Avg CAC" value={fmtMoney(data.cac)} icon={Target} sub="placeholder — wire later" />
+          <KPI
+            label="Avg CAC"
+            value={data.cac == null ? 'N/A' : fmtMoney(data.cac)}
+            icon={Target}
+            sub={data.cac == null ? 'Set up ad spend tracking to calculate' : 'marketing spend ÷ new paid agents'}
+          />
           <KPI
             label="Payback period"
             value={data.paybackMonths == null ? '—' : `${data.paybackMonths.toFixed(1)} mo`}

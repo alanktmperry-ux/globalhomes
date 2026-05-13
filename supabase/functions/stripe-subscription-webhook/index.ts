@@ -89,6 +89,23 @@ Deno.serve(async (req) => {
       const periodEnd = new Date(sub.current_period_end * 1000).toISOString();
       await admin.from('agents').update({ subscription_status: sub.status }).eq('id', agent.id);
       await admin.from('agent_subscriptions').update({ subscription_end: periodEnd, auto_renew: !sub.cancel_at_period_end }).eq('agent_id', agent.id);
+
+      const planId = (sub.metadata as any)?.plan_id || (sub.items?.data?.[0]?.price?.metadata as any)?.plan_id;
+      const PLAN_LIMITS: Record<string, { plan_type: string; listing_limit: number; seat_limit: number }> = {
+        solo:       { plan_type: 'solo',       listing_limit: 3,   seat_limit: 1  },
+        agency:     { plan_type: 'agency',     listing_limit: 999, seat_limit: 5  },
+        agency_pro: { plan_type: 'agency_pro', listing_limit: 999, seat_limit: 15 },
+      };
+      if (planId && PLAN_LIMITS[planId]) {
+        await admin
+          .from('agent_subscriptions')
+          .update({
+            plan_type: PLAN_LIMITS[planId].plan_type,
+            listing_limit: PLAN_LIMITS[planId].listing_limit,
+            seat_limit: PLAN_LIMITS[planId].seat_limit,
+          })
+          .eq('agent_id', agent.id);
+      }
     }
   }
 

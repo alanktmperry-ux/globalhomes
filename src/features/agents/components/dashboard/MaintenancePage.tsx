@@ -315,7 +315,33 @@ export default function MaintenancePage() {
           </>
         )}
       </nav>
-      <DashboardHeader title={t('agent.pm.maintenance.title')} subtitle={t('agent.pm.maintenance.subtitle')} />
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <DashboardHeader title={t('agent.pm.maintenance.title')} subtitle={t('agent.pm.maintenance.subtitle')} />
+        <div className="flex items-end gap-2 shrink-0">
+          <div className="flex flex-col gap-1">
+            <Label className="text-xs text-muted-foreground">Auto-approve jobs under</Label>
+            <div className="relative">
+              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+              <Input
+                type="number"
+                min={0}
+                value={thresholdInput}
+                onChange={(e) => setThresholdInput(e.target.value)}
+                className="w-24 h-9 pl-5 text-sm"
+                disabled={loadingSettings || savingThreshold}
+              />
+            </div>
+          </div>
+          <Button
+            size="sm"
+            onClick={saveThreshold}
+            disabled={savingThreshold || loadingSettings || thresholdInput === String(autoApproveThreshold)}
+            className="h-9"
+          >
+            {savingThreshold ? <Loader2 size={14} className="animate-spin" /> : 'Save'}
+          </Button>
+        </div>
+      </div>
 
       <div className="flex items-center gap-2 flex-wrap">
         <Select value={statusFilter} onValueChange={setStatusFilter}>

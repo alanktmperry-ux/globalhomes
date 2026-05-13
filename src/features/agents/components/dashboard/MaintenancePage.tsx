@@ -388,7 +388,16 @@ export default function MaintenancePage() {
                         {daysOpen}d
                       </TableCell>
                       <TableCell>{priorityBadge(j.priority)}</TableCell>
-                      <TableCell>{statusBadge(j.status)}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {statusBadge(j.status)}
+                          {j.auto_approved && (
+                            <Badge className="bg-blue-500 hover:bg-blue-500 text-white text-[10px] px-1.5 py-0 h-5">
+                              Auto-approved
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell className="text-sm">{j.supplier_name || j.assigned_to || <span className="text-muted-foreground">Unassigned</span>}</TableCell>
                       <TableCell>{expanded === j.id ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}</TableCell>
                     </TableRow>

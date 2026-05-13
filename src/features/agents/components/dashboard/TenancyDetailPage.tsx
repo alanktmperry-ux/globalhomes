@@ -328,6 +328,7 @@ const TenancyDetailPage = () => {
     if (pRes.data) setPayments(pRes.data as RentPayment[]);
     if (jRes.data) setJobs(jRes.data as MaintenanceJob[]);
     if (iRes.data) setInspections(iRes.data as any);
+    if (cRes.data) setComms(cRes.data as any);
     setLoading(false);
   }, [user, tenancyId]);
 

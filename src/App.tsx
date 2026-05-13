@@ -446,6 +446,7 @@ const App = () => (
                 <Route path="/halo/new" element={<ProtectedRoute><CreateHaloPage /></ProtectedRoute>} />
                 <Route path="/halo/success" element={<ProtectedRoute><HaloSuccessPage /></ProtectedRoute>} />
                 <Route path="/halo/edit" element={<ProtectedRoute><EditHaloPage /></ProtectedRoute>} />
+                <Route path="/halo/board" element={<Navigate to="/dashboard/halo-board" replace />} />
                 <Route path="/dashboard/my-halos" element={<ProtectedRoute><MyHalosPage /></ProtectedRoute>} />
 
                 {/* Agent */}

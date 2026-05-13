@@ -166,7 +166,7 @@ Deno.serve(async (req) => {
 
     // Wrap sendViaResend to also log to tenancy_communications when payload.tenancy_id is provided.
     const sendAndLog = async (to: string, subject: string, html: string) => {
-      const result = await sendAndLog(to, subject, html);
+      const result = await sendViaResend(to, subject, html);
       try {
         if (payload?.tenancy_id) {
           await supabase.from('tenancy_communications').insert({

@@ -3707,6 +3707,24 @@ export type Database = {
           },
         ]
       }
+      compliance_archive_users: {
+        Row: {
+          archive_user_id: string
+          created_at: string
+          source_user_id: string
+        }
+        Insert: {
+          archive_user_id: string
+          created_at?: string
+          source_user_id: string
+        }
+        Update: {
+          archive_user_id?: string
+          created_at?: string
+          source_user_id?: string
+        }
+        Relationships: []
+      }
       concierge_usage: {
         Row: {
           action: string

@@ -378,7 +378,7 @@ export const fil: Partial<Record<TranslationKey, string>> = {
   'home.agents.feature2': 'Naka-embed na CRM at pipeline',
   'home.agents.feature3': 'I-access ang multilingual buyer pool',
   'home.agents.feature4': 'Network na hindi pang-merkado',
-  'home.sliver.agents': 'Mga ahente ng real estate: maabot ang 7M+ na multilingual na mamimili na hindi mahahanap ng ibang portal',
+  'home.sliver.agents': 'Mga ahente ng real estate: maabot ang multilingual na mamimili na hindi mahahanap ng ibang portal',
   'home.sliver.translation': 'Mga listahang awtomatikong isinalin sa 20 wika',
   'home.sliver.price': 'Mula $299/buwan',
   'home.sliver.free': '60 araw na libre',

@@ -51,7 +51,7 @@ const PLANS: Plan[] = [
     features: [
       '1 agent seat',
       'Up to 5 active listings',
-      'multilingual auto-translation',
+      'Multilingual auto-translation',
       'CRM — up to 250 contacts',
       'Property management — up to 10 properties',
       'Trust accounting (full ledger)',
@@ -127,7 +127,7 @@ const FAQS = [
 const COMPARE_ROWS: Array<{ feature: string; solo: boolean | string; agency: boolean | string; pro: boolean | string }> = [
   { feature: 'Agent seats', solo: '1', agency: '5', pro: '15' },
   { feature: 'Active listings', solo: '5', agency: 'Unlimited', pro: 'Unlimited' },
-  { feature: 'multilingual auto-translation', solo: true, agency: true, pro: true },
+  { feature: 'Multilingual auto-translation', solo: true, agency: true, pro: true },
   { feature: 'Voice search', solo: true, agency: true, pro: true },
   { feature: 'CRM contacts', solo: '250', agency: 'Unlimited', pro: 'Unlimited' },
   { feature: 'Property management', solo: '10 props', agency: 'Unlimited', pro: 'Unlimited' },
@@ -264,7 +264,7 @@ export default function PricingPage() {
         <title>Pricing — Replace your entire stack · ListHQ</title>
         <meta
           name="description"
-          content="CRM, property management, trust accounting and multilingual portal — all in one platform. Plans from $799/mo. No contracts. Cancel anytime."
+          content="Australia's multilingual real estate platform — listings auto-translated into 30+ languages. Trust accounting, CRM, property management, and Halo buyer matching. 60-day free trial."
         />
       </Helmet>
 

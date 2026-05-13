@@ -20,7 +20,7 @@ const CYCLING_LINES = [
   'who speak every language.',
 ];
 
-const FEATURES: Array<{ component: React.ComponentType<{ size?: number }>; titleKey: string; bodyKey: string; badge: 'unique' | 'automated' }> = [
+const FEATURES: Array<{ component: React.ComponentType<any>; titleKey: string; bodyKey: string; badge: 'unique' | 'automated' }> = [
   { component: MapPin,      titleKey: 'agentLanding.feature1Title', bodyKey: 'agentLanding.feature1Body', badge: 'unique' },
   { component: Wand2,       titleKey: 'agentLanding.feature2Title', bodyKey: 'agentLanding.feature2Body', badge: 'automated' },
   { component: Globe,       titleKey: 'agentLanding.feature3Title', bodyKey: 'agentLanding.feature3Body', badge: 'unique' },

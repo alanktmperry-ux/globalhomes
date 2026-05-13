@@ -206,9 +206,14 @@ const VacancyKPIPage = () => {
 
   return (
     <div className="flex-1 p-6 lg:p-10 max-w-7xl space-y-8">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-foreground mb-1">{t('agent.pm.vacancy.title')}</h1>
-        <p className="text-sm text-muted-foreground">{t('agent.pm.vacancy.subtitle')}</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="font-display text-2xl font-bold text-foreground mb-1">{t('agent.pm.vacancy.title')}</h1>
+          <p className="text-sm text-muted-foreground">{t('agent.pm.vacancy.subtitle')}</p>
+        </div>
+        <Button onClick={() => setShowAddEvent(true)} className="shrink-0 flex items-center gap-1.5">
+          <Plus size={16} /> Log Event
+        </Button>
       </div>
 
       {/* KPI cards */}

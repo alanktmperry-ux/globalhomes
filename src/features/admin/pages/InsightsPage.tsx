@@ -418,7 +418,12 @@ export default function InsightsPage() {
             sub="cancelled / (paid + cancelled)"
           />
           <KPI label="Customer LTV" value={fmtMoney(data.ltv)} icon={Users} sub="ARPU ÷ churn" />
-          <KPI label="Avg CAC" value={fmtMoney(data.cac)} icon={Target} sub="placeholder — wire later" />
+          <KPI
+            label="Avg CAC"
+            value={data.cac == null ? 'N/A' : fmtMoney(data.cac)}
+            icon={Target}
+            sub={data.cac == null ? 'Set up ad spend tracking to calculate' : 'marketing spend ÷ new paid agents'}
+          />
           <KPI
             label="Payback period"
             value={data.paybackMonths == null ? '—' : `${data.paybackMonths.toFixed(1)} mo`}

@@ -219,6 +219,10 @@ export function useTrustAccounting() {
   }, [user]);
 
   useEffect(() => {
+    fetchAgentId();
+  }, [fetchAgentId]);
+
+  useEffect(() => {
     const load = async () => {
       setLoading(true);
       try {

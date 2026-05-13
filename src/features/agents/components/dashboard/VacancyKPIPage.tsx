@@ -99,23 +99,23 @@ const VacancyKPIPage = () => {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleAddEvent = async () => {
-    if (!agentId || !eventForm.event_type || !eventForm.event_date) {
-      toast.error('Please fill in event type and date');
+    if (!agentId || !eventForm.property_id) {
+      toast.error('Please select a property');
       return;
     }
     setSavingEvent(true);
     const { error } = await supabase.from('vacancy_events' as any).insert({
       agent_id: agentId,
+      property_id: eventForm.property_id,
       event_type: eventForm.event_type,
       event_date: eventForm.event_date,
-      property_id: eventForm.property_id || null,
       notes: eventForm.notes || null,
     });
     setSavingEvent(false);
-    if (error) { toast.error('Failed to save event: ' + error.message); return; }
-    toast.success('Event logged');
+    if (error) { toast.error(error.message); return; }
+    toast.success('Vacancy event recorded');
     setShowAddEvent(false);
-    setEventForm({ event_type: '', property_id: '', event_date: format(new Date(), 'yyyy-MM-dd'), notes: '' });
+    setEventForm({ event_type: 'listed', property_id: '', event_date: format(new Date(), 'yyyy-MM-dd'), notes: '' });
     fetchData();
   };
 

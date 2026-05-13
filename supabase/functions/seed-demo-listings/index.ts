@@ -1,11 +1,6 @@
 // Seed 68 demo Melbourne property listings tagged 'demo_batch:alan_2026'
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
+import { getCorsHeaders } from '../_shared/cors.ts';
 
 const AGENT_ID = Deno.env.get('SEED_AGENT_ID');
 const TAG = 'demo_batch:alan_2026';
@@ -121,6 +116,7 @@ const listings: L[] = [
 const premierIdx = new Set([0, 14, 25, 27, 39, 51, 57, 63]);
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const authHeader = req.headers.get("Authorization");

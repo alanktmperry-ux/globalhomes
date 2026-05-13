@@ -1,3 +1,4 @@
+import { getCorsHeaders } from '../_shared/cors.ts';
 // Purge the Cloudflare edge cache for listhq.com.au.
 //
 // Call this after Publish → Update if you need the new HTML live immediately.
@@ -12,13 +13,8 @@
 //   curl -X POST -H "Authorization: Bearer $CACHE_PURGE_SECRET" \
 //     https://<project-ref>.supabase.co/functions/v1/purge-edge-cache
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
-
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const purgeSecret = Deno.env.get('CACHE_PURGE_SECRET');

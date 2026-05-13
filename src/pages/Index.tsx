@@ -466,6 +466,49 @@ const Index = () => {
         <title>ListHQ — Multilingual Property Search & Real Estate Agent Software Australia</title>
         <meta name="description" content="Australia's multilingual real estate platform. Search property in 30+ languages as a buyer. Or run your agency — trust accounting, CRM, Halo buyer matching and AI listings — all in one platform." />
         <link rel="canonical" href="https://listhq.com.au/" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="ListHQ — Multilingual Property Search & Real Estate Agent Software Australia" />
+        <meta property="og:description" content="Australia's multilingual real estate platform. Search property in 30+ languages as a buyer. Or run your agency — trust accounting, CRM, Halo buyer matching and AI listings — all in one platform." />
+        <meta property="og:url" content="https://listhq.com.au/" />
+        <meta property="og:image" content="https://listhq.com.au/og-image.png" />
+        <meta property="og:site_name" content="ListHQ" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="ListHQ — Multilingual Property Search & Real Estate Agent Software Australia" />
+        <meta name="twitter:description" content="Australia's multilingual real estate platform. Search property in 30+ languages as a buyer. Or run your agency — trust accounting, CRM, Halo buyer matching and AI listings — all in one platform." />
+        <meta name="twitter:image" content="https://listhq.com.au/og-image.png" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              "@id": "https://listhq.com.au/#organization",
+              "name": "ListHQ",
+              "url": "https://listhq.com.au",
+              "logo": { "@type": "ImageObject", "url": "https://listhq.com.au/og-image.png" },
+              "sameAs": [
+                "https://www.instagram.com/list_hq",
+                "https://www.linkedin.com/company/listhq",
+                "https://www.youtube.com/@ListHQ-u8w"
+              ],
+              "description": "Australia's multilingual real estate platform — one listing published in every language for agents serving multicultural Australia."
+            },
+            {
+              "@type": "WebApplication",
+              "@id": "https://listhq.com.au/#webapp",
+              "name": "ListHQ",
+              "url": "https://listhq.com.au",
+              "applicationCategory": "BusinessApplication",
+              "operatingSystem": "Web",
+              "offers": {
+                "@type": "Offer",
+                "price": "799",
+                "priceCurrency": "AUD",
+                "description": "Solo plan — individual agents"
+              },
+              "description": "Multilingual real estate platform with trust accounting, CRM, property management, and Halo buyer matching for Australian agents."
+            }
+          ]
+        })}</script>
         {['x-default','en','zh','zh-TW','vi','ko','ar','hi','fil','id','th','ms','ta','ur','bn','te','ml','gu','mr','pa','ja','fr','de','es','pt'].map((code) => (
           <link key={code} rel="alternate" hrefLang={code} href="https://listhq.com.au/" />
         ))}

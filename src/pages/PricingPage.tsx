@@ -269,6 +269,13 @@ export default function PricingPage() {
         <meta property="og:title" content="Real Estate Agent Software Pricing | ListHQ" />
         <meta property="og:description" content="Replace your entire agent stack — trust accounting, CRM, Halo buyer matching, AI listings — from $299/month. 60-day free trial, no card required." />
         <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://listhq.com.au/og-image.png" />
+        <meta property="og:url" content="https://listhq.com.au/for-agents/pricing" />
+        <meta property="og:site_name" content="ListHQ" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Real Estate Agent Software Pricing | ListHQ" />
+        <meta name="twitter:description" content="Replace your entire agent stack — trust accounting, CRM, Halo buyer matching, AI listings — from $799/month. 60-day free trial, no card required." />
+        <meta name="twitter:image" content="https://listhq.com.au/og-image.png" />
       </Helmet>
 
       <div className="bg-white text-black">

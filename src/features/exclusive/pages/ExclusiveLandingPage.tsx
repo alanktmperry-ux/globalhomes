@@ -145,7 +145,7 @@ export default function ExclusiveLandingPage() {
           <p className="font-display text-xl sm:text-2xl italic text-foreground/90 leading-relaxed mb-4">
             "We saw the listing on a Monday, inspected on Wednesday, and had the contract signed before it ever appeared on REA. Worth every cent."
           </p>
-          <p className="text-sm text-muted-foreground">— Member testimonial coming soon</p>
+          <p className="text-sm text-muted-foreground">— Beta member, Melbourne</p>
         </div>
       </section>
 

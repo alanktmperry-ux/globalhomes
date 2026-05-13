@@ -885,8 +885,8 @@ const Index = () => {
               <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
                 {featuredListings.length === 0 ? (
                   <div style={{ padding:'28px 16px', textAlign:'center', border:`1px dashed ${T.border}`, borderRadius:14, background:T.off }}>
-                    <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:6 }}>Listings coming soon</div>
-                    <div style={{ fontSize:12, color:T.muted }}>First agents are getting their pocket listings ready.</div>
+                    <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:6 }}>Be the first to list here</div>
+                    <div style={{ fontSize:12, color:T.muted }}>Agents on the platform are setting up their pocket listings. Check back soon.</div>
                   </div>
                 ) : featuredListings.slice(0, 4).map((p: any) => {
                   const img = (p.images && p.images[0]) || p.image_url;

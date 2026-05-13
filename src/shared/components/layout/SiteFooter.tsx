@@ -129,7 +129,6 @@ export function SiteFooter() {
           </p>
           <div className="flex justify-between items-center flex-wrap gap-3">
             <span>{t('layout.footer.legal.copyright', { year })}</span>
-            <span>{t('layout.footer.legal.abn', { abn: '12 345 678 901' })}</span>
           </div>
         </div>
       </div>

@@ -50,6 +50,14 @@ export function CurrencySwitcher() {
       >
         <Coins size={16} />
         <span className="hidden sm:inline">{currency.code}</span>
+        {showStaleWarning && (
+          <span
+            title="Exchange rates unavailable — indicative only"
+            className="hidden sm:inline text-[10px] font-medium px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200"
+          >
+            indicative
+          </span>
+        )}
         <ChevronDown size={14} />
       </button>
 

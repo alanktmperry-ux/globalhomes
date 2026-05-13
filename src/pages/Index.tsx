@@ -566,10 +566,10 @@ const Index = () => {
         <div style={{ background:'#fff', borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}`, padding:'72px 24px' }}>
           <div className="trust-strip" style={{ maxWidth:1280, margin:'0 auto' }}>
             {[
-              { type:'count' as const, target: 50000, format: (v:number)=>v.toLocaleString(), label:'ACTIVE LISTINGS' },
-              { type:'static' as const, text:'Any language',                                  label:'AUTO-TRANSLATED' },
-              { type:'count' as const, target: 7,     format: (v:number)=>`${v}M+`,           label:'MULTILINGUAL BUYERS' },
-              { type:'static' as const, text:'Free',                                          label:'COST FOR BUYERS' },
+              { type:'static' as const, text:'30+',          label:'BUYER LANGUAGES' },
+              { type:'static' as const, text:'Any language', label:'AUTO-TRANSLATED' },
+              { type:'static' as const, text:'60 days',      label:'FREE TRIAL' },
+              { type:'static' as const, text:'Free',         label:'COST FOR BUYERS' },
             ].map((s, i) => (
               <div
                 key={i}
@@ -577,9 +577,8 @@ const Index = () => {
                 style={{ textAlign:'center', padding:'12px 16px' }}
               >
                 <HomeCountUp
-                  target={s.type === 'count' ? s.target : 0}
-                  format={s.type === 'count' ? s.format : undefined}
-                  staticText={s.type === 'static' ? s.text : undefined}
+                  target={0}
+                  staticText={s.text}
                   className={`${s.label === 'AUTO-TRANSLATED' ? 'trust-value--auto-translated' : 'text-[clamp(48px,6vw,88px)]'} font-extrabold tabular-nums`}
                   style={{
                     background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)',

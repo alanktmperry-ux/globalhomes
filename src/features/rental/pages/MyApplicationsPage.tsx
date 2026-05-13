@@ -127,7 +127,7 @@ const MyApplicationsPage = () => {
           {applications.map(app => {
             const statusInfo = STATUS_MAP[app.status] || { label: app.status, variant: 'outline' as const };
             const statusColorClass =
-              app.status === 'pending' ? 'bg-amber-100 text-amber-800 border-amber-200' :
+              app.status === 'pending' || app.status === 'submitted' ? 'bg-amber-100 text-amber-800 border-amber-200' :
               app.status === 'shortlisted' ? 'bg-blue-100 text-blue-800 border-blue-200' :
               app.status === 'approved' ? 'bg-green-100 text-green-800 border-green-200' :
               'bg-muted text-muted-foreground';

@@ -113,6 +113,8 @@ const InspectionReportPage = () => {
   const [addRoomName, setAddRoomName] = useState('');
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const [showComparison, setShowComparison] = useState(false);
+  const [bondDeductions, setBondDeductions] = useState<BondDeduction[]>([]);
 
   const isReadOnly = inspection?.status === 'completed';
 

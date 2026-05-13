@@ -1,10 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 import Stripe from 'https://esm.sh/stripe@14.21.0?target=deno';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders } from '../_shared/cors.ts';
 
 const APP_URL = Deno.env.get('APP_URL') ?? 'https://listhq.com.au';
 
@@ -15,6 +11,7 @@ const PLAN_CONFIG: Record<string, { name: string; monthlyAud: number; listingLim
 };
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   try {
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');

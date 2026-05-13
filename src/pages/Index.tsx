@@ -913,7 +913,7 @@ const Index = () => {
                   return (
                     <div key={p.id} onClick={() => { closeModal(); navigate(`/property/${p.id}`); }} style={{ display:'flex', gap:14, padding:12, border:`1px solid ${T.border}`, borderRadius:14, cursor:'pointer' }}>
                       <div style={{ width:96, height:72, borderRadius:10, background: img ? `center/cover no-repeat url(${img})` : FALLBACK_GRADIENTS[0], flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                        {!img && <img src={HOUSE_PLACEHOLDER_SVG} alt="" aria-hidden="true" style={{ width:48, height:48, opacity:0.9 }} />}
+                        {!img && <img src={HOUSE_PLACEHOLDER_SVG} alt="" aria-hidden="true" loading="lazy" decoding="async" style={{ width:48, height:48, opacity:0.9 }} />}
                       </div>
                       <div style={{ flex:1, minWidth:0 }}>
                         <div style={{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:4, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{p.title || p.address || `${p.suburb ?? ''}${p.state ? `, ${p.state}` : ''}`}</div>

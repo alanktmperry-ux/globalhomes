@@ -346,6 +346,7 @@ const App = () => (
                   <Route path="/sign/:token" element={<SigningPage />} />
                   <Route path="/privacy" element={<PrivacyPage />} />
                   <Route path="/contact" element={<Navigate to="/help/contact" replace />} />
+                  <Route path="/faq" element={<Navigate to="/help/faq" replace />} />
                   <Route path="/cookies" element={<Navigate to="/privacy" replace />} />
                   <Route path="/compliance" element={<Navigate to="/privacy" replace />} />
                   <Route path="/unsubscribe" element={<UnsubscribePage />} />

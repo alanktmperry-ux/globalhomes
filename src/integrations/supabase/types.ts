@@ -7386,6 +7386,7 @@ export type Database = {
           owner_approval_status: string | null
           owner_approved_at: string | null
           owner_decline_reason: string | null
+          photo_urls: string[]
           priority: string
           property_id: string
           quote_document_url: string | null
@@ -7418,6 +7419,7 @@ export type Database = {
           owner_approval_status?: string | null
           owner_approved_at?: string | null
           owner_decline_reason?: string | null
+          photo_urls?: string[]
           priority?: string
           property_id: string
           quote_document_url?: string | null
@@ -7450,6 +7452,7 @@ export type Database = {
           owner_approval_status?: string | null
           owner_approved_at?: string | null
           owner_decline_reason?: string | null
+          photo_urls?: string[]
           priority?: string
           property_id?: string
           quote_document_url?: string | null

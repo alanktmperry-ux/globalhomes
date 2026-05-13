@@ -531,7 +531,28 @@ const InspectionReportPage = () => {
   };
 
   return (
-    <div className="space-y-4 pb-20">
+    <div className="space-y-4 pb-20 print:space-y-2 print:pb-0 print:max-w-none print:w-full print:block">
+      <style>{`
+        @media print {
+          nav, aside, header[role="banner"], .app-sidebar, [data-sidebar], .no-print { display: none !important; }
+          body { background: white !important; }
+          .print-only { display: block !important; }
+        }
+      `}</style>
+
+      {/* Print-only header */}
+      <div className="hidden print:block px-6 pb-4 mb-4 border-b">
+        <h1 className="text-2xl font-bold">ListHQ Inspection Report</h1>
+        <p className="text-sm mt-1">{propertyAddress}</p>
+        <p className="text-xs mt-1">
+          {inspection.inspection_type.charAt(0).toUpperCase() + inspection.inspection_type.slice(1)} Inspection
+          {inspection.conducted_date ? ` — Conducted ${format(parseISO(inspection.conducted_date), 'dd MMM yyyy')}` : ` — Scheduled ${format(parseISO(inspection.scheduled_date), 'dd MMM yyyy')}`}
+        </p>
+        {agentName && <p className="text-xs">Inspector: {agentName}</p>}
+        <p className="text-xs">Printed: {format(new Date(), 'dd MMM yyyy')}</p>
+      </div>
+
+      <div className="print:hidden">
       <DashboardHeader
         title="Condition Report"
         subtitle={propertyAddress}
@@ -540,13 +561,16 @@ const InspectionReportPage = () => {
             <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard/rent-roll')}>
               <ArrowLeft size={14} className="mr-1" /> Back
             </Button>
+            <Button variant="outline" size="sm" onClick={() => window.print()}>
+              <Download size={14} className="mr-1" /> Download PDF
+            </Button>
             {isReadOnly && (
               <Button variant="outline" size="sm" onClick={handleDownloadPDF}>
-                <Download size={14} className="mr-1" /> Download PDF
+                <Download size={14} className="mr-1" /> Download PDF (jsPDF)
               </Button>
             )}
             {inspection.inspection_type === 'exit' && entryReport && (
-              <Button variant="outline" size="sm" onClick={() => setShowComparison(s => !s)}>
+              <Button variant="outline" size="sm" onClick={() => setShowComparison(s => !s)} className="print:hidden">
                 <GitCompare size={14} className="mr-1" />
                 {showComparison ? 'Hide Comparison' : 'Compare with Entry Report'}
               </Button>

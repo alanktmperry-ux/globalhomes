@@ -106,6 +106,15 @@ const frequencyDays = (freq: string): number => {
   return 30;
 };
 
+const getArrearsThreshold = (frequency: string): number => {
+  switch (frequency) {
+    case 'weekly': return 7;
+    case 'fortnightly': return 14;
+    case 'monthly': return 32;
+    default: return 14;
+  }
+};
+
 type TabKey = 'all' | 'arrears' | 'expiring' | 'renewals' | 'inspections';
 
 interface UpcomingInspection {
@@ -314,15 +323,16 @@ const RentRollPage = () => {
     const weeksOwed = daysBehind / 7;
     const owed = weeklyRent * weeksOwed;
 
-    if (daysBehind <= 14) return { label: `${daysBehind}d ($${owed.toFixed(0)})`, variant: 'secondary' as const, days: daysBehind, owed };
+    const threshold = getArrearsThreshold(t.rent_frequency);
+    if (daysBehind <= threshold) return { label: `${daysBehind}d ($${owed.toFixed(0)})`, variant: 'secondary' as const, days: daysBehind, owed };
     return { label: `${daysBehind}d ($${owed.toFixed(0)})`, variant: 'destructive' as const, days: daysBehind, owed };
   };
 
-  // In arrears = latest payment period_to is >14 days ago
+  // In arrears = latest payment period_to is older than the frequency-based threshold
   const overdueCount = activeTenancies.filter(t => {
     const latest = latestPaymentMap.get(t.id);
     if (!latest) return false;
-    return differenceInDays(today, new Date(latest.period_to)) > 14;
+    return differenceInDays(today, new Date(latest.period_to)) > getArrearsThreshold(t.rent_frequency);
   }).length;
 
   // Map tenancy_id → next upcoming inspection within 30 days

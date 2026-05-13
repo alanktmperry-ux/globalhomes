@@ -7,6 +7,7 @@ import { usePageTitle } from '@/lib/usePageTitle';
 import { WelcomeModal } from './WelcomeModal';
 import { AgentOnboardingProgress } from '@/features/agents/components/onboarding/AgentOnboardingProgress';
 import { differenceInDays, formatDistanceToNow } from 'date-fns';
+import { useI18n } from '@/shared/lib/i18n/legacy-core';
 
 // iconify-icon is a globally loaded web component (see index.html)
 const Ico = ({ icon, size = 18, color, className }: { icon: string; size?: number; color?: string; className?: string }) => (
@@ -36,8 +37,14 @@ interface BoostedListing {
 
 
 
-const formatAUDate = (d: Date) =>
-  d.toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+const LANG_TO_LOCALE: Record<string, string> = {
+  en: 'en-AU', zh: 'zh-CN', 'zh-TW': 'zh-TW', vi: 'vi-VN', ko: 'ko-KR', ja: 'ja-JP',
+  ms: 'ms-MY', es: 'es-ES', ar: 'ar', hi: 'hi-IN', fr: 'fr-FR', pt: 'pt-PT', bn: 'bn-BD',
+  ru: 'ru-RU', de: 'de-DE', id: 'id-ID', nl: 'nl-NL', pl: 'pl-PL', th: 'th-TH', tr: 'tr-TR',
+  sv: 'sv-SE', da: 'da-DK', no: 'nb-NO', fil: 'fil-PH', it: 'it-IT', pa: 'pa-IN', ta: 'ta-IN', ne: 'ne-NP',
+};
+const formatLocaleDate = (d: Date, language: string) =>
+  d.toLocaleDateString(LANG_TO_LOCALE[language] || language || 'en-AU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
 const ACTIVITY_ICON: Record<string, string> = {
   enquiry: 'solar:chat-round-line-linear',
@@ -128,6 +135,7 @@ const DashboardOverview = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { listings } = useAgentListings();
+  const { language } = useI18n();
 
   const [agentName, setAgentName] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);
@@ -224,7 +232,7 @@ const DashboardOverview = () => {
     return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
   }, [agentName]);
 
-  const today = useMemo(() => formatAUDate(new Date()), []);
+  const today = useMemo(() => formatLocaleDate(new Date(), language), [language]);
 
   const trend = (curr: number, prev: number): { dir: 'up' | 'down' | 'flat'; value: string } | undefined => {
     if (!prev && !curr) return undefined;

@@ -1057,15 +1057,41 @@ const TrustAccountingPage = () => {
                 </div>
               </div>
 
-              <div className="overflow-x-auto w-full">
               <Table>
                 <TableHeader>
                   <TableRow>
-...
+                    <TableHead className="w-[40px]"></TableHead>
+                    <TableHead className="text-xs">Client</TableHead>
+                    <TableHead className="text-xs">Property</TableHead>
+                    <TableHead className="text-xs text-right">Amount</TableHead>
+                    <TableHead className="text-xs">BSB / Account</TableHead>
+                    <TableHead className="text-xs">Ref</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pendingPayments.map(p => (
+                    <TableRow key={p.id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedPaymentIds.has(p.id)}
+                          onCheckedChange={(checked) => {
+                            const next = new Set(selectedPaymentIds);
+                            if (checked) next.add(p.id); else next.delete(p.id);
+                            setSelectedPaymentIds(next);
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell className="text-xs font-medium">{p.client_name}</TableCell>
+                      <TableCell className="text-xs max-w-[180px] truncate">{p.property_address}</TableCell>
+                      <TableCell className="text-xs text-right font-semibold">{AUD.format(p.amount)}</TableCell>
+                      <TableCell className="text-xs font-mono text-muted-foreground">
+                        {p.bsb || '—'} {p.account_number || ''}
+                      </TableCell>
+                      <TableCell className="text-xs font-mono">{p.reference || p.payment_number}</TableCell>
+                    </TableRow>
                   ))}
                 </TableBody>
               </Table>
-              </div>
 
               <div className="flex items-center justify-between pt-1 border-t border-border">
                 <p className="text-xs text-muted-foreground">

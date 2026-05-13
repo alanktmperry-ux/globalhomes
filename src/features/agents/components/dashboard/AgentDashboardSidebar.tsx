@@ -387,6 +387,7 @@ const AgentDashboardSidebar = () => {
   const activeSectionTitle = useMemo(() => {
     for (const s of NAV_SECTIONS) {
       if (s.children?.some((c) => isActive(c.url))) return s.title;
+      if (s.subgroups?.some((g) => g.items.some((c) => isActive(c.url)))) return s.title;
       if (isActive(s.url) && s.url !== '/dashboard') return s.title;
     }
     return null;

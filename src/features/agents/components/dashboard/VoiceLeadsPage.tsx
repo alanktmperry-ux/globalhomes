@@ -209,7 +209,7 @@ const VoiceLeadsPage = () => {
                       {u.icon} {u.label}
                     </Badge>
                     <span className="text-[10px] text-muted-foreground">{lead.time}</span>
-                    <span className="ml-auto text-xs font-bold text-primary">{lead.score}%</span>
+                    <span className="ml-auto text-xs font-bold text-primary">{lead.score == null || lead.score === 0 ? <span className="text-muted-foreground">—</span> : `${lead.score}%`}</span>
                   </div>
                   <p className="text-sm font-medium line-clamp-2 mb-1">&quot;{lead.transcript}&quot;</p>
                   <div className="flex items-center justify-between">

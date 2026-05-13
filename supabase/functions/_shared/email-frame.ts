@@ -68,7 +68,8 @@ export function renderEmail(c: FrameContent): { subject: string; html: string; t
 
 // HMAC-signed unsubscribe token: base64url(user_id:category:ts:sig)
 export async function buildUnsubscribeToken(userId: string, category: string): Promise<string> {
-  const secret = Deno.env.get('UNSUBSCRIBE_SECRET') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || 'listhq-fallback-secret';
+  const secret = Deno.env.get('UNSUBSCRIBE_SECRET') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (!secret) throw new Error('UNSUBSCRIBE_SECRET env var is required');
   const ts = Date.now().toString();
   const payload = `${userId}:${category}:${ts}`;
   const sig = await hmac(payload, secret);
@@ -77,7 +78,8 @@ export async function buildUnsubscribeToken(userId: string, category: string): P
 
 export async function verifyUnsubscribeToken(token: string): Promise<{ valid: boolean; userId?: string; category?: string; expired?: boolean }> {
   try {
-    const secret = Deno.env.get('UNSUBSCRIBE_SECRET') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || 'listhq-fallback-secret';
+    const secret = Deno.env.get('UNSUBSCRIBE_SECRET') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    if (!secret) throw new Error('UNSUBSCRIBE_SECRET env var is required');
     const decoded = base64urlDecode(token);
     const parts = decoded.split(':');
     if (parts.length !== 4) return { valid: false };

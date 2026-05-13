@@ -1,7 +1,7 @@
 // Universal image transform helper.
 // Handles Unsplash query params, Supabase Storage render transforms, and
 // passes through local/static URLs unchanged.
-const SUPABASE_HOST = 'ngrkbohpmkzjonaofgbb.supabase.co';
+const SUPABASE_HOST = (import.meta.env.VITE_SUPABASE_URL ?? '').replace('https://', '');
 
 export function optimizeImageUrl(url: string, width = 640, quality = 70): string {
   if (!url) return url;

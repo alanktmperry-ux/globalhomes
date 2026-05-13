@@ -12884,6 +12884,50 @@ export type Database = {
           },
         ]
       }
+      tenancy_communications: {
+        Row: {
+          agent_id: string | null
+          id: string
+          metadata: Json | null
+          recipient_email: string | null
+          sent_at: string
+          status: string
+          subject: string | null
+          tenancy_id: string
+          type: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          id?: string
+          metadata?: Json | null
+          recipient_email?: string | null
+          sent_at?: string
+          status?: string
+          subject?: string | null
+          tenancy_id: string
+          type?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          id?: string
+          metadata?: Json | null
+          recipient_email?: string | null
+          sent_at?: string
+          status?: string
+          subject?: string | null
+          tenancy_id?: string
+          type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenancy_communications_tenancy_id_fkey"
+            columns: ["tenancy_id"]
+            isOneToOne: false
+            referencedRelation: "tenancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenancy_contacts: {
         Row: {
           contact_type: string

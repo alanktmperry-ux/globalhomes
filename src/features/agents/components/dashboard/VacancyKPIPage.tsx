@@ -412,7 +412,12 @@ const VacancyKPIPage = () => {
 
       {/* Event log */}
       <section>
-        <h2 className="font-display text-lg font-bold text-foreground mb-3">Vacancy Event Log</h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-display text-lg font-bold text-foreground">Vacancy Event Log</h2>
+          <Button size="sm" onClick={() => setShowAddEvent(true)} className="flex items-center gap-1.5">
+            <Plus size={14} /> Log Event
+          </Button>
+        </div>
         <Card>
           <CardContent className="p-0">
             {events.length === 0 ? (

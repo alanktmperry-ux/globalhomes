@@ -333,6 +333,7 @@ const App = () => (
                   <Route path="/agents/:agentId" element={<AgentProfilePublic />} />
                   <Route path="/brokers" element={<FindBrokerPage />} />
                   <Route path="/for-agents" element={<AgentLandingPage />} />
+                  <Route path="/for-buyers" element={<ForBuyersPage />} />
                   <Route path="/for-agents/pricing" element={<PricingPage />} />
                   <Route path="/pricing" element={<Navigate to="/for-agents/pricing" replace />} />
                   <Route path="/about" element={<AboutPage />} />

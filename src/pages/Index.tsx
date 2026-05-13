@@ -566,10 +566,10 @@ const Index = () => {
         <div style={{ background:'#fff', borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}`, padding:'72px 24px' }}>
           <div className="trust-strip" style={{ maxWidth:1280, margin:'0 auto' }}>
             {[
-              { type:'count' as const, target: 50000, format: (v:number)=>v.toLocaleString(), label:'ACTIVE LISTINGS' },
-              { type:'static' as const, text:'Any language',                                  label:'AUTO-TRANSLATED' },
-              { type:'count' as const, target: 7,     format: (v:number)=>`${v}M+`,           label:'MULTILINGUAL BUYERS' },
-              { type:'static' as const, text:'Free',                                          label:'COST FOR BUYERS' },
+              { type:'static' as const, text:'30+',          label:'BUYER LANGUAGES' },
+              { type:'static' as const, text:'Any language', label:'AUTO-TRANSLATED' },
+              { type:'static' as const, text:'60 days',      label:'FREE TRIAL' },
+              { type:'static' as const, text:'Free',         label:'COST FOR BUYERS' },
             ].map((s, i) => (
               <div
                 key={i}

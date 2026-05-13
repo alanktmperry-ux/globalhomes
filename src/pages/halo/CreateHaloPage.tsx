@@ -124,14 +124,24 @@ export default function CreateHaloPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-save
+  // Auto-save (debounced)
   useEffect(() => {
-    try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
-    } catch {
-      /* ignore */
-    }
-  }, [data]);
+    if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
+    draftSaveTimer.current = setTimeout(() => {
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+      } catch { /* ignore */ }
+      if (user?.id) {
+        supabase
+          .from('halo_drafts')
+          .upsert({ seeker_id: user.id, draft_data: data as any, updated_at: new Date().toISOString() }, { onConflict: 'seeker_id' })
+          .then(() => {});
+      }
+    }, 500);
+    return () => {
+      if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
+    };
+  }, [data, user?.id]);
 
   const update = (patch: Partial<HaloFormData>) => {
     setStepError(null);

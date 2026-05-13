@@ -59,6 +59,7 @@ const faqs = [
   { q: 'What is the Lead Marketplace?', a: 'Buyer leads captured through our consumer search platform are scored by intent and made available for purchase. You see their budget, suburb preferences, and property type before buying.' },
   { q: 'Do you offer a refund?', a: 'Refunds are assessed on a case-by-case basis under Australian Consumer Law. Contact support within 14 days of purchase.' },
   { q: 'How do I get started?', a: 'Click "Start Free Demo" — no credit card required. You\'ll get access to 5 listings and 1 AI build for 14 days.' },
+  { q: 'Does ListHQ syndicate to REA Group and Domain?', a: 'Portal syndication to REA and Domain is coming soon. Your listings publish on ListHQ.com.au now, and we\'ll notify you when syndication launches.' },
 ];
 
 export default function MarketingLandingPage() {

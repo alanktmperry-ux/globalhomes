@@ -45,6 +45,55 @@ export default function OwnerStatementsPage() {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [autoFilling, setAutoFilling] = useState(false);
+
+  const autoFillFromLedger = async () => {
+    if (!form.property_id || !form.period_start || !form.period_end) {
+      toast.error('Please select a property and statement period first');
+      return;
+    }
+    if (!agentId) return;
+    setAutoFilling(true);
+    try {
+      const [{ data: receipts, error: rErr }, { data: payments, error: pErr }] = await Promise.all([
+        supabase
+          .from('trust_receipts')
+          .select('amount, description, date_received')
+          .eq('agent_id', agentId)
+          .eq('property_id', form.property_id)
+          .gte('date_received', form.period_start)
+          .lte('date_received', form.period_end),
+        supabase
+          .from('trust_payments')
+          .select('amount, description, date_paid')
+          .eq('agent_id', agentId)
+          .eq('property_id', form.property_id)
+          .gte('date_paid', form.period_start)
+          .lte('date_paid', form.period_end),
+      ]);
+      if (rErr) throw rErr;
+      if (pErr) throw pErr;
+
+      const totalRentReceived = (receipts || [])
+        .filter((r: any) => (r.description || '').toLowerCase().includes('rent'))
+        .reduce((s: number, r: any) => s + Number(r.amount || 0), 0);
+      const totalExpenses = (payments || []).reduce((s: number, p: any) => s + Number(p.amount || 0), 0);
+      const pct = feeSource?.percent ?? 0;
+      const managementFeeAud = pct ? Math.round(totalRentReceived * (pct / 100) * 100) / 100 : 0;
+
+      setForm(f => ({
+        ...f,
+        gross_rent_aud: Math.round(totalRentReceived * 100) / 100,
+        maintenance_costs_aud: Math.round(totalExpenses * 100) / 100,
+        management_fee_aud: managementFeeAud,
+      }));
+      toast.success('Statement pre-filled from trust ledger');
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to auto-fill from ledger');
+    } finally {
+      setAutoFilling(false);
+    }
+  };
 
   const lastMonth = subMonths(new Date(), 1);
   const [form, setForm] = useState({

@@ -567,12 +567,21 @@ const AgentDashboardSidebar = () => {
               </div>
             )}
             <div className="min-w-0">
-              <p className="font-display text-sm font-bold leading-none truncate">
-                {agencyName || 'ListHQ'}
-              </p>
-              <p className="text-[10px] text-muted-foreground truncate mt-0.5">
-                {agentName || 'Agent Platform'}
-              </p>
+              {agencyName || agentName ? (
+                <>
+                  <p className="font-display text-sm font-bold leading-none truncate">
+                    {agencyName || '—'}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground truncate mt-0.5">
+                    {agentName || '—'}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="h-3.5 w-28 bg-white/10 rounded animate-pulse mb-1.5" />
+                  <div className="h-2.5 w-20 bg-white/10 rounded animate-pulse" />
+                </>
+              )}
               {plan && (
                 <div className="flex items-center gap-1 mt-1">
                   <Badge variant="outline" className={`text-[10px] px-1 py-0 h-4 ${

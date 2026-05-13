@@ -56,12 +56,17 @@ export default function PendingApprovalPage() {
           >
             Sign out
           </button>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground mt-4">
+            Approvals typically take 1–2 business days. You'll receive a confirmation email at the address you signed up with.
+          </p>
+          <p className="text-xs text-muted-foreground mt-4">
             Questions? Email{" "}
             <a href="mailto:hello@listhq.com.au" className="underline">
               hello@listhq.com.au
             </a>
           </p>
+          <a href="mailto:support@listhq.com.au" className="text-primary text-sm underline mt-2 block">Contact support</a>
+          <a href="/" className="text-muted-foreground text-sm underline mt-4 block">Back to home</a>
         </div>
       </div>
     </>

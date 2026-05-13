@@ -10915,6 +10915,7 @@ export type Database = {
           has_pets: boolean | null
           id: string
           id_document_number: string | null
+          identity_document_path: string | null
           identity_document_type: string | null
           identity_document_url: string | null
           income_verified: boolean | null
@@ -10962,6 +10963,7 @@ export type Database = {
           has_pets?: boolean | null
           id?: string
           id_document_number?: string | null
+          identity_document_path?: string | null
           identity_document_type?: string | null
           identity_document_url?: string | null
           income_verified?: boolean | null
@@ -11009,6 +11011,7 @@ export type Database = {
           has_pets?: boolean | null
           id?: string
           id_document_number?: string | null
+          identity_document_path?: string | null
           identity_document_type?: string | null
           identity_document_url?: string | null
           income_verified?: boolean | null

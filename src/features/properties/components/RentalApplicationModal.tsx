@@ -110,6 +110,7 @@ export function RentalApplicationModal({ property, open, onClose }: Props) {
 
       // Upload identity document if provided
       let identityUrl: string | null = null;
+      let identityPath: string | null = null;
       if (form.identityFile) {
         const ext = form.identityFile.name.split('.').pop() || 'jpg';
         const path = `${property.id}/${userId || 'anon'}/${Date.now()}.${ext}`;
@@ -117,8 +118,12 @@ export function RentalApplicationModal({ property, open, onClose }: Props) {
           .from('rental-applications')
           .upload(path, form.identityFile, { cacheControl: '3600', upsert: false });
         if (uploadErr) throw uploadErr;
-        const { data: urlData } = supabase.storage.from('rental-applications').getPublicUrl(path);
-        identityUrl = urlData.publicUrl;
+        const { data: signedData, error: signErr } = await supabase.storage
+          .from('rental-applications')
+          .createSignedUrl(path, 60 * 60 * 24 * 7); // 7-day expiry
+        if (signErr) throw signErr;
+        identityUrl = signedData.signedUrl;
+        identityPath = path;
       }
 
       // Generate reference number
@@ -143,6 +148,7 @@ export function RentalApplicationModal({ property, open, onClose }: Props) {
         previous_landlord_contact: form.previousLandlordContact || null,
         reason_for_leaving: form.reasonForLeaving || null,
         identity_document_url: identityUrl,
+        identity_document_path: identityPath,
         identity_document_type: form.identityDocType,
         message_to_landlord: form.message || null,
         status: 'pending',

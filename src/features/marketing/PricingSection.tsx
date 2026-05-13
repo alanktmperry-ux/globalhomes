@@ -15,7 +15,7 @@ type Plan = {
 const PLANS: Plan[] = [
   {
     name: "Solo",
-    price: "$799",
+    price: "$299",
     descriptionKey: "marketing.pricing.solo.description",
     featureKeys: [
       "marketing.pricing.solo.feat1",
@@ -26,7 +26,7 @@ const PLANS: Plan[] = [
   },
   {
     name: "Agency",
-    price: "$1,999",
+    price: "$599",
     descriptionKey: "marketing.pricing.agency.description",
     featureKeys: [
       "marketing.pricing.agency.feat1",
@@ -39,7 +39,7 @@ const PLANS: Plan[] = [
   },
   {
     name: "Agency Pro",
-    price: "$3,499",
+    price: "$1,199",
     descriptionKey: "marketing.pricing.agencyPro.description",
     featureKeys: [
       "marketing.pricing.agencyPro.feat1",

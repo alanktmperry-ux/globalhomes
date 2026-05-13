@@ -2,10 +2,20 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 const DOMAIN = "https://listhq.com.au";
 
+const TODAY = new Date().toISOString().split("T")[0];
+
 const STATIC_PAGES = [
   { url: "/",                        changefreq: "daily",   priority: "1.0" },
   { url: "/for-agents",              changefreq: "monthly", priority: "0.8" },
   { url: "/agents",                  changefreq: "weekly",  priority: "0.8" },
+  { url: "/agents/login",            changefreq: "weekly",  priority: "0.8" },
+  { url: "/agents/register",         changefreq: "weekly",  priority: "0.8" },
+  { url: "/pricing",                 changefreq: "weekly",  priority: "0.8" },
+  { url: "/about",                   changefreq: "weekly",  priority: "0.8" },
+  { url: "/contact",                 changefreq: "weekly",  priority: "0.8" },
+  { url: "/halo",                    changefreq: "weekly",  priority: "0.8" },
+  { url: "/listings",                changefreq: "daily",   priority: "0.9" },
+  { url: "/blog",                    changefreq: "weekly",  priority: "0.8" },
   { url: "/rent",                    changefreq: "daily",   priority: "0.9" },
   { url: "/buy",                     changefreq: "daily",   priority: "0.9" },
   { url: "/suburbs",                 changefreq: "weekly",  priority: "0.7" },

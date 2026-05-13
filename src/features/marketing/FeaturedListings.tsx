@@ -106,7 +106,7 @@ export default function FeaturedListings() {
         }
 
         if (!cancelled) {
-          setListings(rows.map(mapRow));
+          setListings(rows.filter(r => !!r.display_image_url).map(mapRow));
           setLoading(false);
         }
       } catch {

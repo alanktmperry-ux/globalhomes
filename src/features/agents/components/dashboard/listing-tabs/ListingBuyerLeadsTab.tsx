@@ -39,10 +39,19 @@ const ListingBuyerLeadsTab = ({ listing }: Props) => {
   useEffect(() => {
     const fetchLeads = async () => {
       setLoading(true);
+      if (!user) { setLeads([]); setLoading(false); return; }
+      const { data: agentData } = await supabase
+        .from('agents')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      const agentId = agentData?.id;
+      if (!agentId) { setLeads([]); setLoading(false); return; }
       const { data } = await supabase
         .from('leads')
         .select('*')
         .eq('property_id', listing.id)
+        .eq('agent_id', agentId)
         .order('created_at', { ascending: false });
       setLeads(data || []);
       const drafts: Record<string, string> = {};
@@ -51,7 +60,7 @@ const ListingBuyerLeadsTab = ({ listing }: Props) => {
       setLoading(false);
     };
     fetchLeads();
-  }, [listing.id]);
+  }, [listing.id, user?.id]);
 
   const saveNote = async (leadId: string) => {
     setSavingNote(leadId);

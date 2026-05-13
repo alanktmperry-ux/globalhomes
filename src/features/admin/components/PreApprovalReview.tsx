@@ -68,13 +68,18 @@ const PreApprovalReview = () => {
 
   const handleReject = async (id: string) => {
     setActionId(id);
-    await supabase
+    const { error } = await supabase
       .from('buyer_pre_approvals')
       .update({
         status: 'rejected',
         rejection_reason: rejectionNote || 'Document could not be verified. Please resubmit with a clear, legible pre-approval letter.',
       } as any)
       .eq('id', id);
+    if (error) {
+      toast({ title: 'Failed to reject', description: error.message, variant: 'destructive' });
+      setActionId(null);
+      return;
+    }
     await supabase.functions.invoke('notify-pre-approval-result', {
       body: { approval_id: id },
     });

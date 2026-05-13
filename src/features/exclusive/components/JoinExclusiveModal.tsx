@@ -147,7 +147,7 @@ export function JoinExclusiveModal({ open, onOpenChange, onJoined }: Props) {
             Join ListHQ Exclusive — $29/month
           </Button>
           <p className="text-[11px] text-muted-foreground text-center">
-            Payment integration coming soon. You'll receive matching alerts immediately.
+            Founding member rate locked in at $29/month. You'll receive matching property alerts immediately — billing begins when payments launch.
           </p>
         </form>
       </DialogContent>

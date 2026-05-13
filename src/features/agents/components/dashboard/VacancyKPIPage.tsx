@@ -9,6 +9,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Loader2, Home, AlertTriangle, Clock, TrendingDown, Activity, Flag, Plus } from 'lucide-react';
 import { format, differenceInDays, addDays } from 'date-fns';
 import { useTranslation } from '@/shared/lib/i18n';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
 
 interface Tenancy {
   id: string;
@@ -53,6 +59,9 @@ const VacancyKPIPage = () => {
   const [tenancies, setTenancies] = useState<Tenancy[]>([]);
   const [events, setEvents] = useState<VacancyEvent[]>([]);
   const [propertyMap, setPropertyMap] = useState<Record<string, string>>({});
+  const [showAddEvent, setShowAddEvent] = useState(false);
+  const [eventForm, setEventForm] = useState({ event_type: '', property_id: '', event_date: format(new Date(), 'yyyy-MM-dd'), notes: '' });
+  const [savingEvent, setSavingEvent] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!user) return;
@@ -88,6 +97,27 @@ const VacancyKPIPage = () => {
   }, [user]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  const handleAddEvent = async () => {
+    if (!agentId || !eventForm.event_type || !eventForm.event_date) {
+      toast.error('Please fill in event type and date');
+      return;
+    }
+    setSavingEvent(true);
+    const { error } = await supabase.from('vacancy_events' as any).insert({
+      agent_id: agentId,
+      event_type: eventForm.event_type,
+      event_date: eventForm.event_date,
+      property_id: eventForm.property_id || null,
+      notes: eventForm.notes || null,
+    });
+    setSavingEvent(false);
+    if (error) { toast.error('Failed to save event: ' + error.message); return; }
+    toast.success('Event logged');
+    setShowAddEvent(false);
+    setEventForm({ event_type: '', property_id: '', event_date: format(new Date(), 'yyyy-MM-dd'), notes: '' });
+    fetchData();
+  };
 
   const kpis = useMemo(() => {
     const today = new Date();
@@ -382,7 +412,12 @@ const VacancyKPIPage = () => {
 
       {/* Event log */}
       <section>
-        <h2 className="font-display text-lg font-bold text-foreground mb-3">Vacancy Event Log</h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-display text-lg font-bold text-foreground">Vacancy Event Log</h2>
+          <Button size="sm" onClick={() => setShowAddEvent(true)} className="flex items-center gap-1.5">
+            <Plus size={14} /> Log Event
+          </Button>
+        </div>
         <Card>
           <CardContent className="p-0">
             {events.length === 0 ? (
@@ -404,6 +439,58 @@ const VacancyKPIPage = () => {
           </CardContent>
         </Card>
       </section>
+
+      <Dialog open={showAddEvent} onOpenChange={setShowAddEvent}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Log Vacancy Event</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label>Event Type *</Label>
+              <Select value={eventForm.event_type} onValueChange={(v) => setEventForm(f => ({ ...f, event_type: v }))}>
+                <SelectTrigger><SelectValue placeholder="Select event type" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="inspection_booked">Inspection Booked</SelectItem>
+                  <SelectItem value="photos_taken">Photos Taken</SelectItem>
+                  <SelectItem value="listing_published">Listing Published</SelectItem>
+                  <SelectItem value="application_received">Application Received</SelectItem>
+                  <SelectItem value="tenant_approved">Tenant Approved</SelectItem>
+                  <SelectItem value="lease_signed">Lease Signed</SelectItem>
+                  <SelectItem value="keys_handed_over">Keys Handed Over</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Property</Label>
+              <Select value={eventForm.property_id} onValueChange={(v) => setEventForm(f => ({ ...f, property_id: v }))}>
+                <SelectTrigger><SelectValue placeholder="Select property (optional)" /></SelectTrigger>
+                <SelectContent>
+                  {Object.entries(propertyMap).map(([id, addr]) => (
+                    <SelectItem key={id} value={id}>{addr}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Event Date *</Label>
+              <Input type="date" value={eventForm.event_date} onChange={(e) => setEventForm(f => ({ ...f, event_date: e.target.value }))} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Notes</Label>
+              <Textarea value={eventForm.notes} onChange={(e) => setEventForm(f => ({ ...f, notes: e.target.value }))} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddEvent(false)}>Cancel</Button>
+            <Button onClick={handleAddEvent} disabled={savingEvent}>
+              {savingEvent ? <Loader2 size={14} className="animate-spin mr-1" /> : null}
+              Save Event
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

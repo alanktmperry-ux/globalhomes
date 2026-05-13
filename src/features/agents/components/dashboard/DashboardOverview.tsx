@@ -7,6 +7,7 @@ import { usePageTitle } from '@/lib/usePageTitle';
 import { WelcomeModal } from './WelcomeModal';
 import { AgentOnboardingProgress } from '@/features/agents/components/onboarding/AgentOnboardingProgress';
 import { differenceInDays, formatDistanceToNow } from 'date-fns';
+import { useI18n } from '@/shared/lib/i18n/legacy-core';
 
 // iconify-icon is a globally loaded web component (see index.html)
 const Ico = ({ icon, size = 18, color, className }: { icon: string; size?: number; color?: string; className?: string }) => (

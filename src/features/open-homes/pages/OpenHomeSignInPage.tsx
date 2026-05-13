@@ -12,6 +12,7 @@ export default function OpenHomeSignInPage() {
   const [property, setProperty] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState('');
+  const [visitorName, setVisitorName] = useState('');
   const [signingIn, setSigningIn] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +62,7 @@ export default function OpenHomeSignInPage() {
       await supabase.from('open_home_registrations').insert({
         open_home_id: session.id,
         email: normalizedEmail,
-        name: normalizedEmail.split('@')[0],
+        name: (visitorName.trim() || normalizedEmail.split('@')[0]),
         attended: true,
         attended_at: new Date().toISOString(),
         on_waitlist: false,
@@ -71,7 +72,7 @@ export default function OpenHomeSignInPage() {
     // Fire-and-forget: CRM ingest + thank-you email
     void ingestOpenHomeLead({
       propertyId: session.property_id,
-      name: normalizedEmail.split('@')[0],
+      name: (visitorName.trim() || normalizedEmail.split('@')[0]),
       email: normalizedEmail,
       openHomeStartsAt: session.starts_at,
     });
@@ -128,6 +129,17 @@ export default function OpenHomeSignInPage() {
           ) : (
             <>
               <div>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">
+                  Your name <span className="text-muted-foreground text-xs">(optional)</span>
+                </label>
+                <Input
+                  type="text"
+                  value={visitorName}
+                  onChange={(e) => setVisitorName(e.target.value)}
+                  placeholder="e.g. Sarah Chen"
+                  className="mb-4"
+                  disabled={signingIn}
+                />
                 <label className="text-sm font-medium text-foreground mb-1.5 block">
                   Your email to sign in
                 </label>

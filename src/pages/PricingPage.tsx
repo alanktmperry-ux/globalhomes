@@ -304,13 +304,13 @@ export default function PricingPage() {
               <Icon icon="solar:tag-linear" size={13} />
               PRICING
             </div>
-            <h1 className="text-[clamp(48px,8vw,120px)] font-extrabold leading-[0.92] tracking-[-0.05em] text-black mt-6">
-              Pick your
+            <h1 className="text-[clamp(40px,7vw,96px)] font-extrabold leading-[0.98] tracking-[-0.04em] text-black mt-6">
+              Replace your entire stack.
               <br />
-              <span style={gradientText}>plan.</span>
+              <span style={gradientText}>From $799/month.</span>
             </h1>
-            <p className="text-[17px] md:text-[19px] text-[#4a4a4a] mt-6 max-w-[640px] mx-auto leading-[1.55]">
-              {t('pricing.subheadline') || '60-day free trial · No charge until day 61 · Founding pricing locked for 24 months.'}
+            <p className="text-[17px] md:text-[19px] text-[#4a4a4a] mt-6 max-w-[720px] mx-auto leading-[1.55]">
+              One subscription replaces REA listing fees ($1,500–$7,000/listing), your CRM ($300–$600/mo), and your PM software ($200–$400/mo). 60-day free trial for founding agents.
             </p>
             <p className="text-xs text-muted-foreground text-center mt-2">All prices exclude GST. ABN holders may claim GST credits.</p>
 

@@ -540,6 +540,62 @@ const AgentDashboardSidebar = () => {
               </SidebarGroupContent>
             </CollapsibleContent>
           )}
+
+          {hasSubgroups && !collapsed && (
+            <CollapsibleContent>
+              <SidebarGroupContent className="pl-3">
+                {section.subgroups!.map((group) => (
+                  <div key={group.label} className="mt-2 first:mt-0">
+                    <div className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-white/40">
+                      {group.label}
+                    </div>
+                    <SidebarMenu>
+                      {group.items.map((item) => (
+                        <SidebarMenuItem key={item.title + item.url}>
+                          <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                            <button
+                              onClick={() => {
+                                navigate(item.url);
+                                if (isMobile) setOpenMobile(false);
+                              }}
+                              onMouseEnter={() => prefetchRoute(item.url)}
+                              className={`flex items-center gap-2 w-full px-3 py-2 rounded-[10px] text-[13px] transition-all ${
+                                isActive(item.url)
+                                  ? 'bg-white text-[#2563EB] font-medium'
+                                  : 'text-white/55 hover:text-white hover:bg-white/10'
+                              }`}
+                            >
+                              <item.icon
+                                size={14}
+                                className={`shrink-0 ${
+                                  item.alertWhenBadge && item.badgeKey && badgeValues[item.badgeKey]
+                                    ? 'text-amber-600'
+                                    : ''
+                                }`}
+                              />
+                              <span className={`flex-1 text-left ${
+                                item.alertWhenBadge && item.badgeKey && badgeValues[item.badgeKey]
+                                  ? 'text-amber-700 font-medium'
+                                  : ''
+                              }`}>{item.title}</span>
+                              {item.badgeKey && badgeValues[item.badgeKey] && (
+                                <Badge
+                                  variant={item.alertWhenBadge ? 'destructive' : 'secondary'}
+                                  className="text-[10px] px-1.5 py-0 h-5"
+                                >
+                                  {badgeValues[item.badgeKey]}
+                                </Badge>
+                              )}
+                            </button>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      ))}
+                    </SidebarMenu>
+                  </div>
+                ))}
+              </SidebarGroupContent>
+            </CollapsibleContent>
+          )}
         </SidebarGroup>
       </Collapsible>
     );

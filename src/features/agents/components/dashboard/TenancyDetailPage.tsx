@@ -312,6 +312,11 @@ const TenancyDetailPage = () => {
         .select('id, inspection_type, scheduled_date, conducted_date, status, finalised_at, report_token, overall_notes')
         .eq('tenancy_id', tenancyId)
         .order('scheduled_date', { ascending: false }),
+      supabase
+        .from('tenancy_communications' as any)
+        .select('id, type, subject, sent_at, recipient_email, status')
+        .eq('tenancy_id', tenancyId)
+        .order('sent_at', { ascending: false }),
     ]);
 
     if (tRes.data) {

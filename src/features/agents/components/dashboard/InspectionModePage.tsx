@@ -135,7 +135,7 @@ const InspectionModePage = () => {
             agent_id: agent.id,
             property_id: activeInspection.propertyId,
             user_name: `${v.firstName} ${v.lastName}`.trim(),
-            user_email: v.email || `${v.firstName.toLowerCase()}@inspection.local`,
+            user_email: v.email || null,
             user_phone: v.phone || null,
             status: 'new' as const,
             message: `Checked in at open home. Interest: ${v.interest}`,

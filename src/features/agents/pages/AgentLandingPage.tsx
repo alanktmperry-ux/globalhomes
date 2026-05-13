@@ -246,7 +246,7 @@ export default function AgentLandingPage() {
                   className="flex items-start gap-3 py-3 border-b border-[#F3F4F6] last:border-0 text-[14px] text-[#0a0f1e] font-medium"
                 >
                   <span className="mt-0.5 flex-shrink-0">
-                    <Icon icon="solar:check-circle-bold" size={16} color="#2563EB" />
+                    <CheckCircle2 size={16} color="#2563EB" />
                   </span>
                   <span>{t(k)}</span>
                 </div>

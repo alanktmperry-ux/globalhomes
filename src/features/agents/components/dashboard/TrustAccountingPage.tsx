@@ -1057,6 +1057,7 @@ const TrustAccountingPage = () => {
                 </div>
               </div>
 
+              <div className="overflow-x-auto w-full">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -1092,6 +1093,7 @@ const TrustAccountingPage = () => {
                   ))}
                 </TableBody>
               </Table>
+              </div>
 
               <div className="flex items-center justify-between pt-1 border-t border-border">
                 <p className="text-xs text-muted-foreground">
@@ -1163,6 +1165,7 @@ const TrustAccountingPage = () => {
 
             {/* Table */}
             <Card>
+              <div className="overflow-x-auto w-full">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -1222,6 +1225,7 @@ const TrustAccountingPage = () => {
                   )}
                 </TableBody>
               </Table>
+              </div>
               {hasMoreTx && (
                 <div className="flex justify-center py-3 border-t border-border">
                   <Button variant="outline" size="sm" onClick={loadMoreTransactions} disabled={loading}>

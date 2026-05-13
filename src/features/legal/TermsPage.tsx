@@ -72,8 +72,13 @@ const TermsPage = () => {
               </ul>
             </section>
 
+            <section id="billing">
+              <h2>4. Subscriptions, Billing & Refunds</h2>
+              <p>All paid plans include a 60-day free trial. Your nominated payment method will be charged on day 61 unless you cancel before that date. Subscriptions renew monthly unless cancelled. You may cancel at any time via your billing dashboard. Refunds are not provided for partial billing periods. For billing disputes, contact <a href="mailto:support@listhq.com.au" className="text-primary hover:underline">support@listhq.com.au</a> within 30 days of the charge.</p>
+            </section>
+
             <section id="agents">
-              <h2>4. Agent Obligations</h2>
+              <h2>5. Agent Obligations</h2>
               <ul>
                 <li>Listings must be accurate and not misleading.</li>
                 <li>Agents must hold a valid real estate licence in their operating state.</li>

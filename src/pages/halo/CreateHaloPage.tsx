@@ -62,6 +62,7 @@ export default function CreateHaloPage() {
   }>({});
   const [submitting, setSubmitting] = useState(false);
   const [stepError, setStepError] = useState<string | null>(null);
+  const draftSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Rehydrate draft
   useEffect(() => {

@@ -31,7 +31,7 @@ function decorate(row: any): CRMLead & Record<string, any> {
     source: row.enquiry_source,
     budget_max: contact.budget_max ?? null,
     budget_min: contact.budget_min ?? null,
-    pre_approved: false,
+    pre_approved: row.pre_approved ?? contact.pre_approved ?? false,
     property_id: row.source_property_id ?? null,
   };
 }

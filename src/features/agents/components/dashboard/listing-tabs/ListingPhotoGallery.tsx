@@ -84,6 +84,15 @@ const ListingPhotoGallery = ({ listing }: Props) => {
       toast.error('Could not remove photo');
     } else {
       setImages(updated);
+      // Remove file from storage so we don't leak orphaned objects
+      try {
+        const bucketName = 'property-images';
+        const pathStart = url.indexOf(bucketName + '/');
+        if (pathStart !== -1) {
+          const storagePath = url.slice(pathStart + bucketName.length + 1).split('?')[0];
+          await supabase.storage.from(bucketName).remove([storagePath]);
+        }
+      } catch { /* non-blocking */ }
       toast.success('Photo removed');
     }
   };

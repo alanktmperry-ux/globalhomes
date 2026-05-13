@@ -19,7 +19,7 @@ interface VoiceLead {
   id: string;
   transcript: string;
   urgency: 'hot' | 'warm' | 'cold';
-  score: number;
+  score: number | null;
   time: string;
   createdAt: string;
   buyerLocation: string;
@@ -117,7 +117,7 @@ const VoiceLeadsPage = () => {
           leadId: lead.id,
           transcript,
           urgency: deriveUrgency(lead.score, lead.timeframe),
-          score: lead.score || 30,
+          score: lead.score ?? null,
           time: formatDistanceToNow(new Date(lead.created_at), { addSuffix: true }),
           createdAt: lead.created_at,
           buyerLocation: ctx?.currentQuery || lead.timeframe || 'Unknown',
@@ -147,7 +147,7 @@ const VoiceLeadsPage = () => {
             leadId: null as string | null,
             transcript: vs.transcript || '',
             urgency: 'cold' as const,
-            score: 20,
+            score: null as number | null,
             time: formatDistanceToNow(new Date(vs.created_at), { addSuffix: true }),
             createdAt: vs.created_at,
             buyerLocation: loc?.city || loc?.suburb || parsed?.location || 'Unknown',
@@ -209,7 +209,7 @@ const VoiceLeadsPage = () => {
                       {u.icon} {u.label}
                     </Badge>
                     <span className="text-[10px] text-muted-foreground">{lead.time}</span>
-                    <span className="ml-auto text-xs font-bold text-primary">{lead.score}%</span>
+                    <span className="ml-auto text-xs font-bold text-primary">{lead.score == null || lead.score === 0 ? <span className="text-muted-foreground">—</span> : `${lead.score}%`}</span>
                   </div>
                   <p className="text-sm font-medium line-clamp-2 mb-1">&quot;{lead.transcript}&quot;</p>
                   <div className="flex items-center justify-between">
@@ -244,34 +244,44 @@ const VoiceLeadsPage = () => {
               </button>
 
               {/* AI Score */}
-              <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center gap-4">
-                <div className="relative w-14 h-14 shrink-0">
-                  <svg className="w-14 h-14 -rotate-90" viewBox="0 0 56 56">
-                    <circle cx="28" cy="28" r="24" fill="none" stroke="hsl(var(--border))" strokeWidth="4" />
-                    <circle
-                      cx="28" cy="28" r="24" fill="none"
-                      stroke="hsl(var(--primary))" strokeWidth="4"
-                      strokeDasharray={`${(selected.score / 100) * 150.8} 150.8`}
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  <span className="absolute inset-0 flex items-center justify-center font-display text-sm font-extrabold">
-                    {selected.score}%
-                  </span>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold flex items-center gap-1">
-                    <Sparkles size={14} className="text-primary" /> AI Lead Score
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {selected.score >= 80
-                      ? `This lead is ${selected.score}% likely to transact within 14 days`
-                      : selected.score >= 50
-                      ? 'Moderate intent — follow up within 48 hours'
-                      : 'Low urgency — add to nurture list'}
-                  </p>
-                </div>
-              </div>
+              {(() => {
+                const hasScore = selected.score != null && selected.score > 0;
+                const scoreVal = hasScore ? (selected.score as number) : 0;
+                return (
+                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center gap-4">
+                    <div className="relative w-14 h-14 shrink-0">
+                      <svg className="w-14 h-14 -rotate-90" viewBox="0 0 56 56">
+                        <circle cx="28" cy="28" r="24" fill="none" stroke="hsl(var(--border))" strokeWidth="4" />
+                        {hasScore && (
+                          <circle
+                            cx="28" cy="28" r="24" fill="none"
+                            stroke="hsl(var(--primary))" strokeWidth="4"
+                            strokeDasharray={`${(scoreVal / 100) * 150.8} 150.8`}
+                            strokeLinecap="round"
+                          />
+                        )}
+                      </svg>
+                      <span className="absolute inset-0 flex items-center justify-center font-display text-sm font-extrabold">
+                        {hasScore ? `${scoreVal}%` : <span className="text-muted-foreground">—</span>}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold flex items-center gap-1">
+                        <Sparkles size={14} className="text-primary" /> AI Lead Score
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {!hasScore
+                          ? 'Unscored — not enough signal yet to rank this lead'
+                          : scoreVal >= 80
+                          ? `This lead is ${scoreVal}% likely to transact within 14 days`
+                          : scoreVal >= 50
+                          ? 'Moderate intent — follow up within 48 hours'
+                          : 'Low urgency — add to nurture list'}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Transcript */}
               <div>
@@ -337,7 +347,7 @@ const VoiceLeadsPage = () => {
               </div>
 
               {/* Create Halo from high-score lead */}
-              {selected.score >= 70 && (
+              {selected.score != null && selected.score >= 70 && (
                 <Button
                   size="sm"
                   variant="outline"

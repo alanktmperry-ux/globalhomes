@@ -772,6 +772,31 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
     <div className="bg-card border border-border rounded-2xl flex flex-col max-h-[calc(100vh-12rem)] min-h-0">
       {/* Progress */}
       <div className="px-4 pt-4 pb-2">
+        {/* Step breadcrumb */}
+        <div className="flex items-center gap-1 mb-2 overflow-x-auto scrollbar-none">
+          {STEPS.map((s, i) => {
+            const done = i < step;
+            const active = i === step;
+            return (
+              <React.Fragment key={s}>
+                <span
+                  className={`text-[10px] font-semibold whitespace-nowrap px-1.5 py-0.5 rounded-full transition-colors ${
+                    active
+                      ? 'bg-primary text-primary-foreground'
+                      : done
+                      ? 'bg-primary/15 text-primary'
+                      : 'text-muted-foreground'
+                  }`}
+                >
+                  {s}
+                </span>
+                {i < STEPS.length - 1 && (
+                  <span className={`text-[9px] ${done ? 'text-primary/60' : 'text-muted-foreground/40'}`}>›</span>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
           <span>Step {step + 1} of {STEPS.length}: <strong className="text-foreground">{STEPS[step]}</strong></span>
            {!editPropertyId && !duplicatePropertyId && (

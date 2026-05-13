@@ -105,6 +105,7 @@ export default function MaintenancePage() {
       ...j,
       property_address: j.properties ? `${j.properties.address}, ${j.properties.suburb}` : null,
       tenant_name: j.tenancies?.tenant_name || null,
+      tenant_portal_token: j.tenancies?.tenant_portal_token || null,
       supplier_name: j.supplier?.business_name || null,
     }));
     setJobs(list);

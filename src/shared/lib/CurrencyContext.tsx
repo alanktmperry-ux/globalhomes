@@ -140,7 +140,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   }, [convertPrice, currency, language]);
 
   return (
-    <CurrencyContext.Provider value={{ currency, setCurrencyCode, convertPrice, formatPrice, listingMode, setListingMode, isLiveRates }}>
+    <CurrencyContext.Provider value={{ currency, setCurrencyCode, convertPrice, formatPrice, listingMode, setListingMode, isLiveRates, lastUpdated }}>
       {children}
     </CurrencyContext.Provider>
   );

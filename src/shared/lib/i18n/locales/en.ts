@@ -450,7 +450,7 @@ export const en = {
   'home.agents.feature4': 'Off-market network',
 
   // ── Sliver bar ──
-  'home.sliver.agents': 'Real estate agents: reach 7M+ multilingual buyers no other portal can find',
+  'home.sliver.agents': 'Real estate agents: reach buyers across 30+ languages no other portal can find',
   'home.sliver.translation': 'Auto-translated listings in any language',
   'home.sliver.price': 'From $299/mo',
   'home.sliver.free': '60 days free',

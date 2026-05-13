@@ -164,6 +164,28 @@ Deno.serve(async (req) => {
 
     const payload = await req.json();
 
+    // Wrap sendViaResend to also log to tenancy_communications when payload.tenancy_id is provided.
+    const sendAndLog = async (to: string, subject: string, html: string) => {
+      const result = await sendViaResend(to, subject, html);
+      try {
+        if (payload?.tenancy_id) {
+          await supabase.from('tenancy_communications').insert({
+            tenancy_id: payload.tenancy_id,
+            agent_id: payload.agent_id || null,
+            type: payload.type || null,
+            subject,
+            recipient_email: to,
+            status: result.ok ? 'sent' : 'failed',
+            metadata: result.ok ? null : { reason: result.reason || null },
+          });
+        }
+      } catch (e) {
+        console.error('[send-notification-email] tenancy_communications log failed', e);
+      }
+      return result;
+    };
+
+
     // Direct send mode requires privileged caller
     if (payload.to && payload.subject && payload.html) {
       if (!isPrivileged) {

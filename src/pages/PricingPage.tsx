@@ -321,8 +321,9 @@ export default function PricingPage() {
                 <PlanCard key={p.key} plan={p} billing={billing} index={i} />
               ))}
             </div>
+            <p className="text-xs text-center text-muted-foreground mt-2">All prices in AUD, excluding GST.</p>
             <p className="text-center text-[13px] text-[#6a6a6a] mt-10">
-              All plans include 60-day listing guarantee · ACCC-compliant trust accounting · Australian data residency
+              All plans include 60-day free trial · Trust accounting built for Australian compliance · Australian data residency
             </p>
           </div>
         </section>

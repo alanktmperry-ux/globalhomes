@@ -690,7 +690,7 @@ const Index = () => {
                   <img src={HOUSE_PLACEHOLDER_SVG} alt="" aria-hidden="true" style={{ width: 44, height: 44, opacity: 0.95 }} />
                 </div>
                 <div style={{ fontSize: 20, fontWeight: 800, color: T.ink, marginBottom: 8 }}>
-                  Listings coming soon
+                  No listings yet — founding agents are setting up now
                 </div>
                 <div style={{ fontSize: 14, color: T.muted, maxWidth: 480, margin: '0 auto' }}>
                   First agents are getting their pocket listings ready. Check back shortly — or join early to be notified when new properties go live.

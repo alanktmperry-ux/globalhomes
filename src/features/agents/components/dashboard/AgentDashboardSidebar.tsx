@@ -278,13 +278,14 @@ const AgentDashboardSidebar = () => {
 
   const badgeValues: Record<string, string> = {
     listings: activeCount > 0 ? String(activeCount) : '',
-    leads: '',
+    leads: leadsCount > 0 ? String(leadsCount) : '',
     arrears: arrearsCount > 0 ? String(arrearsCount) : '',
     renewals: renewalsCount > 0 ? String(renewalsCount) : '',
     buyerMatches: buyerMatchesCount > 0 ? String(buyerMatchesCount) : '',
     disputes: disputeCount > 0 ? String(disputeCount) : '',
     smokeAlarms: smokeAlarmOverdue > 0 ? String(smokeAlarmOverdue) : '',
     haloCredits: location.pathname.startsWith('/dashboard/halo-board') ? '' : (haloCredits > 0 ? `${haloCredits}` : ''),
+    inbox: inboxCount > 0 ? String(inboxCount) : '',
   };
 
   const ACCOUNT_NAV: NavItem[] = [

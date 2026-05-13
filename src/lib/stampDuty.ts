@@ -7,6 +7,7 @@ export interface StampDutyResult {
   breakdown: string;
   fhbExemption: number;
   fhbGrant: number;
+  fhbGrantNote?: string | null;
   totalCashNeeded: number;
   notes: string[];
 }

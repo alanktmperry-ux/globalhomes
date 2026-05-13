@@ -179,8 +179,8 @@ const PocketListingPage = () => {
                 <ArrowLeft size={18} />
               </button>
               <div>
-                <h1 className="font-display text-lg font-bold">Pocket Listings</h1>
-                <p className="text-xs text-muted-foreground">Agent Dashboard</p>
+                <h1 className="font-display text-lg font-bold">{editId ? 'Edit Listing' : 'New Listing'}</h1>
+                <p className="text-xs text-muted-foreground">{editId ? 'Update your listing details' : 'Create and publish your property listing'}</p>
               </div>
             </div>
 

@@ -114,11 +114,10 @@ export default function OwnerStatementsPage() {
 
   // Auto-calc mgmt fee from tenancy/default percent when gross rent changes
   useEffect(() => {
-    if (form.gross_rent_aud > 0 && feeSource) {
+    if (form.gross_rent_aud > 0 && feeSource && (form.management_fee_aud === 0 || (form.management_fee_aud as any) === '')) {
       setForm((f) => ({ ...f, management_fee_aud: Math.round(Number(f.gross_rent_aud) * (feeSource.percent / 100) * 100) / 100 }));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.gross_rent_aud, feeSource?.percent]);
+  }, [form.gross_rent_aud, form.management_fee_aud, feeSource?.percent]);
 
   const handleGeneratePdf = async (statement: Statement) => {
     if (statement.pdf_url) return; // already available — link will render

@@ -26,8 +26,8 @@ interface Props {
 
 const PLAN_MRR: Record<string, number> = {
   solo: 299,
-  agency: 899,
-  agency_pro: 1999,
+  agency: 599,
+  agency_pro: 1199,
   enterprise: 4999,
   demo: 0,
 };

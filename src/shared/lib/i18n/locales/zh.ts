@@ -208,7 +208,7 @@ export const zh: Partial<Record<TranslationKey, string>> = {
   'referral.dashboard.yourLink': '您的推荐链接',
   'referral.dashboard.link': '链接',
   'referral.dashboard.copyLink': '复制推荐链接',
-  'referral.dashboard.copied': '链接已复制修粗密',
+  'referral.dashboard.copied': '链接已复制',
   'referral.dashboard.goToDashboard': '进入控制面板修',
   'referral.dashboard.backToHome': '回到首页修粗密',
   'referral.dashboard.realtime': '实时修粗密',

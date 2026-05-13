@@ -23,6 +23,7 @@ const DashboardHeader = ({ title, subtitle, actions }: Props) => (
       </div>
       <div className="flex items-center gap-2">
         {actions}
+        <LanguageSwitcher />
         <NotificationBell />
       </div>
     </div>

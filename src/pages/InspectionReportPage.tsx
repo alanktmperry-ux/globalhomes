@@ -564,7 +564,118 @@ const InspectionReportPage = () => {
         </CardContent>
       </Card>
 
-      {/* Entry vs Exit Comparison — only for exit inspections */}
+      {/* Side-by-side Entry vs Exit comparison (toggle) */}
+      {inspection.inspection_type === 'exit' && entryReport && showComparison && (() => {
+        const entryByName = new Map<string, EntryReportData['rooms'][number]>();
+        entryReport.rooms.forEach(r => entryByName.set(r.room_name.trim().toLowerCase(), r));
+        const totalDeductions = bondDeductions.reduce((s, d) => s + (Number(d.amount) || 0), 0);
+        const addDeduction = () => setBondDeductions(prev => [...prev, { id: crypto.randomUUID(), description: '', amount: 0 }]);
+        const updateDeduction = (id: string, patch: Partial<BondDeduction>) =>
+          setBondDeductions(prev => prev.map(d => d.id === id ? { ...d, ...patch } : d));
+        const removeDeduction = (id: string) =>
+          setBondDeductions(prev => prev.filter(d => d.id !== id));
+        return (
+          <Card className="mx-4 sm:mx-6 inspection-comparison-print">
+            <CardContent className="p-4 space-y-4">
+              <div className="grid grid-cols-2 gap-3 pb-2 border-b">
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-emerald-500/15 text-emerald-700 border-0">Entry</Badge>
+                  <span className="text-sm font-medium">
+                    Entry Inspection — {entryReport.inspection.conducted_date
+                      ? format(parseISO(entryReport.inspection.conducted_date), 'dd MMM yyyy')
+                      : '—'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-amber-500/15 text-amber-700 border-0">Exit</Badge>
+                  <span className="text-sm font-medium">
+                    Exit Inspection — {format(parseISO(inspection.scheduled_date), 'dd MMM yyyy')}
+                  </span>
+                </div>
+              </div>
+
+              {rooms.length === 0 ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <Textarea readOnly rows={6} value={entryReport.rooms.map(r => `${r.room_name}: ${r.notes || '—'}`).join('\n')} />
+                  <Textarea readOnly rows={6} value={rooms.map(r => `${r.room_name}: ${r.notes || '—'}`).join('\n')} />
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {rooms.map(exitRoom => {
+                    const entry = entryByName.get(exitRoom.room_name.trim().toLowerCase());
+                    const entryCond = entry?.condition || '—';
+                    const exitCond = exitRoom.condition || '—';
+                    const changed = (entry?.condition || null) !== (exitRoom.condition || null);
+                    return (
+                      <div key={exitRoom.id} className="grid grid-cols-2 gap-0 rounded-md border overflow-hidden">
+                        <div className="p-3 bg-emerald-500/5">
+                          <div className="text-xs font-medium text-muted-foreground">{exitRoom.room_name}</div>
+                          <div className="mt-1 text-sm capitalize">{entryCond}</div>
+                          {entry?.notes && <div className="text-xs text-muted-foreground mt-1">{entry.notes}</div>}
+                        </div>
+                        <div className={cn('p-3', changed ? 'bg-amber-50 border-l-2 border-amber-400' : 'bg-background border-l')}>
+                          <div className="text-xs font-medium text-muted-foreground">{exitRoom.room_name}</div>
+                          <div className="mt-1 text-sm capitalize">{exitCond}</div>
+                          {exitRoom.notes && <div className="text-xs text-muted-foreground mt-1">{exitRoom.notes}</div>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="pt-3 border-t">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-semibold">Potential Bond Deductions</h3>
+                  <Button size="sm" variant="outline" onClick={addDeduction}>
+                    <Plus size={14} className="mr-1" /> Add line
+                  </Button>
+                </div>
+                {bondDeductions.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">No deductions added.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {bondDeductions.map(d => (
+                      <div key={d.id} className="flex items-center gap-2">
+                        <Input
+                          placeholder="Description"
+                          value={d.description}
+                          onChange={e => updateDeduction(d.id, { description: e.target.value })}
+                          className="flex-1"
+                        />
+                        <Input
+                          type="number"
+                          min={0}
+                          step="0.01"
+                          placeholder="Amount"
+                          value={d.amount || ''}
+                          onChange={e => updateDeduction(d.id, { amount: parseFloat(e.target.value) || 0 })}
+                          className="w-32"
+                        />
+                        <Button size="icon" variant="ghost" onClick={() => removeDeduction(d.id)}>
+                          <Trash2 size={14} />
+                        </Button>
+                      </div>
+                    ))}
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t">
+                      <span className="text-sm text-muted-foreground">Total:</span>
+                      <span className="text-base font-semibold">${totalDeductions.toFixed(2)}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end no-print">
+                <Button variant="outline" size="sm" onClick={() => window.print()}>
+                  <Download size={14} className="mr-1" /> Download Comparison PDF
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })()}
+
+
       {inspection.inspection_type === 'exit' && (() => {
         if (!entryReport) {
           return (

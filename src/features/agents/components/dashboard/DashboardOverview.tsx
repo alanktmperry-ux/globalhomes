@@ -37,8 +37,14 @@ interface BoostedListing {
 
 
 
-const formatAUDate = (d: Date) =>
-  d.toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+const LANG_TO_LOCALE: Record<string, string> = {
+  en: 'en-AU', zh: 'zh-CN', 'zh-TW': 'zh-TW', vi: 'vi-VN', ko: 'ko-KR', ja: 'ja-JP',
+  ms: 'ms-MY', es: 'es-ES', ar: 'ar', hi: 'hi-IN', fr: 'fr-FR', pt: 'pt-PT', bn: 'bn-BD',
+  ru: 'ru-RU', de: 'de-DE', id: 'id-ID', nl: 'nl-NL', pl: 'pl-PL', th: 'th-TH', tr: 'tr-TR',
+  sv: 'sv-SE', da: 'da-DK', no: 'nb-NO', fil: 'fil-PH', it: 'it-IT', pa: 'pa-IN', ta: 'ta-IN', ne: 'ne-NP',
+};
+const formatLocaleDate = (d: Date, language: string) =>
+  d.toLocaleDateString(LANG_TO_LOCALE[language] || language || 'en-AU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
 const ACTIVITY_ICON: Record<string, string> = {
   enquiry: 'solar:chat-round-line-linear',

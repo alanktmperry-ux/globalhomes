@@ -114,6 +114,17 @@ async function sendViaResend(to: string, subject: string, html: string) {
   return { ok: true };
 }
 
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  const aBytes = new TextEncoder().encode(a);
+  const bBytes = new TextEncoder().encode(b);
+  let diff = 0;
+  for (let i = 0; i < aBytes.length; i++) {
+    diff |= aBytes[i] ^ bBytes[i];
+  }
+  return diff === 0;
+}
+
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get("Origin"));
 
@@ -131,7 +142,7 @@ Deno.serve(async (req) => {
     const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
     let callerUser: { id: string } | null = null;
     let isPrivileged = false; // admin or agent
-    if (bearer === serviceRoleKey) {
+    if (timingSafeEqual(bearer, serviceRoleKey)) {
       isPrivileged = true;
     } else if (bearer) {
       const authClient = createClient(

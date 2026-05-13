@@ -290,7 +290,7 @@ const TenancyDetailPage = () => {
     setAgentId(agentData.id);
     setAgentInfo(agentData);
 
-    const [tRes, pRes, jRes, iRes] = await Promise.all([
+    const [tRes, pRes, jRes, iRes, cRes] = await Promise.all([
       supabase
         .from('tenancies')
         .select('*, properties(address, suburb, state, owner_portal_token, owner_name, owner_email)')

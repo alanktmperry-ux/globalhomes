@@ -763,11 +763,16 @@ const TenancyDetailPage = () => {
           <TabsContent value="overview" className="mt-4">
             <Card>
               <CardContent className="p-5">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
                   <h3 className="text-sm font-semibold">Tenancy Details</h3>
-                  <Button size="sm" variant="outline" onClick={() => { setEditForm(tenancy); setShowEdit(true); }}>
-                    <Edit size={14} className="mr-1" /> Edit
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button size="sm" variant="outline" onClick={openRentIncrease}>
+                      <FileText size={14} className="mr-1" /> Rent Increase
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => { setEditForm(tenancy); setShowEdit(true); }}>
+                      <Edit size={14} className="mr-1" /> Edit
+                    </Button>
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-sm">
                   <Field label="Tenant" value={tenancy.tenant_name} />

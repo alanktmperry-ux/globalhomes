@@ -664,7 +664,7 @@ export const de: Partial<Record<TranslationKey, string>> = {
   'nav.haloBoard': 'Halo Board',
   'nav.listings': 'Inserate',
   'nav.trustAccounting': 'Treuhandbuchhaltung',
-  'nav.browseSuburbs': 'Vororte durchsuchen Konstantin}]} engine: {checked_at: 1740150965} \n \nNote for item 57, 59: I have removed the placeholder names used in my draft. Corrected translations below:\n{id:57,translation:',
+  'nav.browseSuburbs': 'Vororte durchsuchen',
   'nav.findBroker': 'Makler finden',
   'nav.pricing': 'Preise',
   'nav.exclusive': 'Exklusiv',

@@ -141,7 +141,8 @@ const InspectionModePage = () => {
             message: `Checked in at open home. Interest: ${v.interest}`,
             urgency: v.interest === 'hot' ? 'ready_to_buy' : v.interest === 'warm' ? 'actively_looking' : 'just_browsing',
           }));
-          await supabase.from('leads').insert(leadsToInsert);
+          const { error } = await supabase.from('leads').insert(leadsToInsert);
+          if (error) toast.error('Failed to save visitor leads — ' + error.message);
         }
       } catch (e) {
         console.error('Failed to save leads', e);

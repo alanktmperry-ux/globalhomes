@@ -768,81 +768,8 @@ export default function AgencyOnboardingPage() {
     </div>
   );
 
-  const showPasswordStep = needsPassword && !passwordDone;
-
   const renderStep = () => {
-    // PASSWORD STEP — shown before step 0 for email-signup users
-    if (showPasswordStep) {
-      return (
-        <div className="space-y-6">
-          <div className="text-center space-y-2">
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
-              <Lock size={28} className="text-primary" />
-            </div>
-            <h2 className="text-xl font-bold">{t('agentOnboarding.password.heading')}</h2>
-            <p className="text-sm text-muted-foreground">{t('agentOnboarding.password.sub')}</p>
-          </div>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="new-password" className="text-xs font-semibold">{t('agentOnboarding.password.label')}</Label>
-              <div className="relative">
-                <Input
-                  id="new-password"
-                  type={showPw ? 'text' : 'password'}
-                  placeholder={t('agentOnboarding.password.placeholder')}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  autoFocus
-                  className="pe-10"
-                />
-                <button type="button" onClick={() => setShowPw(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1}>
-                  {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-              {/* Live requirements checklist */}
-              <ul className="space-y-1 mt-2">
-                {pwReqs.map((req, i) => (
-                  <li key={i} className={`flex items-center gap-1.5 text-xs transition-colors ${req.met ? 'text-emerald-600' : 'text-muted-foreground'}`}>
-                    <span>{req.met ? '✓' : '✗'}</span>
-                    <span>{req.label}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="scroll-mt-4">
-              <Label htmlFor="confirm-password" className="text-xs font-semibold">{t('agentOnboarding.password.confirmLabel')}</Label>
-              <div className="relative">
-                <Input
-                  id="confirm-password"
-                  type={showConfirmPw ? 'text' : 'password'}
-                  placeholder={t('agentOnboarding.password.confirmPlaceholder')}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  onFocus={(e) => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-                  className="pe-10"
-                />
-                <button type="button" onClick={() => setShowConfirmPw(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1}>
-                  {showConfirmPw ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </div>
-            {passwordError && (
-              <p className="text-sm text-destructive">{passwordError}</p>
-            )}
-          </div>
-          <Button
-            className="w-full"
-            disabled={!allPwReqsMet || !confirmPassword || newPassword !== confirmPassword || passwordLoading}
-            onClick={handleSetPassword}
-          >
-            {passwordLoading && <Loader2 size={14} className="me-1 animate-spin" />}
-            {t('agentOnboarding.password.cta')}
-          </Button>
-        </div>
-      );
-    }
 
-    // STEP 0 — Welcome & path selection
     if (step === 0) {
       return (
         <div className="space-y-6">

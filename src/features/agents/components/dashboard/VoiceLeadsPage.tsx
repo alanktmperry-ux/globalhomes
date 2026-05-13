@@ -117,7 +117,7 @@ const VoiceLeadsPage = () => {
           leadId: lead.id,
           transcript,
           urgency: deriveUrgency(lead.score, lead.timeframe),
-          score: lead.score || 30,
+          score: lead.score ?? null,
           time: formatDistanceToNow(new Date(lead.created_at), { addSuffix: true }),
           createdAt: lead.created_at,
           buyerLocation: ctx?.currentQuery || lead.timeframe || 'Unknown',

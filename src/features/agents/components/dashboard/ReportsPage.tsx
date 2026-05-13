@@ -463,7 +463,7 @@ const ReportsPage = () => {
   };
 
   if (!subLoading && !canAccessTrust) {
-    return <UpgradeGate requiredPlan="Pro or above" message="Advanced reports are available on the Pro plan and above. Export listings, leads, trust, and contacts data as CSV." />;
+    return <UpgradeGate requiredPlan="any paid plan" message="Advanced reports are included with every ListHQ paid plan. Export listings, leads, trust, and contacts data as CSV." />;
   }
 
   return (

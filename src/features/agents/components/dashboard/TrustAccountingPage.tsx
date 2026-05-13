@@ -496,7 +496,7 @@ const TrustAccountingPage = () => {
   // otherwise non-eligible agents can open the "Create Trust Account" modal
   // from the empty state and only hit the paywall on submit.
   if (!subLoading && !canAccessTrust) {
-    return <UpgradeGate requiredPlan="Pro or above" message="Trust accounting is available on the Pro plan and above. Record deposits, manage client ledgers, generate compliance-ready statements, and import your opening balance from PropertyMe." />;
+    return <UpgradeGate requiredPlan="any paid plan" message="Trust accounting is included with every ListHQ paid plan. Start your 60-day free trial to access the full ledger, client statements, and AFA 2014-compliant reporting." />;
   }
 
   if (showImportWizard) {

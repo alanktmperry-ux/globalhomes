@@ -37,7 +37,7 @@ const FEATURES = [
   'Voice-to-listing: agents record a voice note describing a property and the platform writes the listing description.',
   'Pocket Listings allow agents to publish off-market properties to a qualified buyer pool without a public listing.',
   'The Halo system lets buyers post exactly what they are looking for — price, suburb, property type — and agents respond directly.',
-  'Trust accounting is built into the platform and is compliant with the Agents Financial Administration Act 2014 (AFA 2014).',
+  'Trust accounting is built into the platform and designed to support the record-keeping requirements of the Agents Financial Administration Act 2014 (AFA 2014) and equivalent state legislation. Licence holders remain responsible for their own statutory trust accounting obligations.',
   'Property managers have dedicated tools for managing multilingual landlord and tenant relationships.',
   'An integrated CRM handles agent lead management and buyer communication in one place.',
   'Search alerts notify buyers the moment a listing matching their criteria is published, in their preferred language.',

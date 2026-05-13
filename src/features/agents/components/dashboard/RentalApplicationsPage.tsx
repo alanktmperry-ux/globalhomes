@@ -47,6 +47,7 @@ interface Application {
   previous_landlord_contact: string | null;
   reason_for_leaving: string | null;
   identity_document_url: string | null;
+  identity_document_path: string | null;
   identity_document_type: string | null;
   message_to_landlord: string | null;
   status: string;
@@ -293,12 +294,31 @@ const RentalApplicationsPage = () => {
                               <Detail label="Landlord Contact" value={app.previous_landlord_contact} />
                               <Detail label="Reason for Leaving" value={app.reason_for_leaving} />
                               <Detail label="ID Type" value={app.identity_document_type?.replace('_', ' ')} />
-                              {app.identity_document_url && (
+                              {(app.identity_document_path || app.identity_document_url) && (
                                 <div>
                                   <span className="text-xs text-muted-foreground">ID Document</span>
-                                  <a href={app.identity_document_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-primary underline underline-offset-2 mt-0.5">
+                                  <button
+                                    type="button"
+                                    onClick={async () => {
+                                      const path = app.identity_document_path
+                                        ?? (app.identity_document_url?.split('/rental-applications/')[1]?.split('?')[0] ?? null);
+                                      if (!path) {
+                                        toast.error('Document path unavailable');
+                                        return;
+                                      }
+                                      const { data, error } = await supabase.storage
+                                        .from('rental-applications')
+                                        .createSignedUrl(path, 3600);
+                                      if (error || !data?.signedUrl) {
+                                        toast.error('Could not open document');
+                                        return;
+                                      }
+                                      window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
+                                    }}
+                                    className="flex items-center gap-1 text-xs text-primary underline underline-offset-2 mt-0.5"
+                                  >
                                     <FileText size={12} /> View document
-                                  </a>
+                                  </button>
                                 </div>
                               )}
                               {app.message_to_landlord && (

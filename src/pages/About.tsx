@@ -18,9 +18,9 @@ const SCHEMA = {
 };
 
 const PRICING: Array<[string, string, string]> = [
-  ['Solo', '$299/month', 'Individual agents'],
-  ['Agency', '$899/month', 'Small to mid-size agencies'],
-  ['Agency Pro', '$1,999/month', 'High-volume agencies'],
+  ['Solo', '$799/month', 'Individual agents'],
+  ['Agency', '$1,999/month', 'Small to mid-size agencies'],
+  ['Agency Pro', '$3,499/month', 'High-volume agencies'],
   ['Enterprise', 'Custom pricing', 'Large networks and franchises'],
 ];
 

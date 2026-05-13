@@ -301,7 +301,7 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
   const thumb = getListingThumb(l);
   const enquiries = stats.enquiries[l.id] ?? l.contact_clicks ?? 0;
   const views = stats.views[l.id] ?? l.views ?? 0;
-  const langCount = Array.isArray(l.images) ? 20 : 20; // listings auto-translate into any language
+  
   const overlayKey = isRental && l._status === 'public' ? 'rent' : l._status;
   const overlay = STATUS_OVERLAY[overlayKey] || STATUS_OVERLAY.public;
   const isBoosted = (l as any).is_featured === true || (l as any).boost_ends_at;
@@ -337,7 +337,7 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
         {/* Language pill bottom-left */}
         <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 bg-white/95 backdrop-blur rounded-full px-2.5 py-1 text-[11px] font-bold text-[#0a0f1e]">
           <Ico icon="solar:earth-bold" size={12} color="#2563EB" />
-          {langCount} languages
+          Any language
         </span>
       </div>
 

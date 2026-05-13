@@ -334,6 +334,20 @@ const RentalApplicationsPage = () => {
                                 </Button>
                               </div>
                             )}
+
+                            {app.status === 'approved' && !app.tenancy_id && (
+                              <div className="flex gap-2 pt-3 border-t border-border">
+                                <Button size="sm" variant="default" onClick={() => openConvert(app)} className="gap-1.5">
+                                  <ArrowRight size={14} /> Convert to Tenancy
+                                </Button>
+                              </div>
+                            )}
+
+                            {(app.status === 'converted' || app.tenancy_id) && (
+                              <div className="flex gap-2 pt-3 border-t border-border">
+                                <Badge className="bg-emerald-500/15 text-emerald-700 border-emerald-500/30">Tenancy Created</Badge>
+                              </div>
+                            )}
                           </div>
                         )}
                       </TableCell>

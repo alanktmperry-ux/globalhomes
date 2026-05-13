@@ -53,7 +53,7 @@ export function useCRMLeads(filters: Filters = {}) {
       .select(`
         *,
         contact:contacts!crm_leads_contact_id_fkey (
-          first_name, last_name, email, phone, mobile,
+          first_name, last_name, email, phone, mobile, pre_approved,
           budget_min, budget_max, ranking, contact_type
         ),
         properties:properties!crm_leads_source_property_id_fkey (

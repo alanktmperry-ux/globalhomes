@@ -117,6 +117,7 @@ const TenancyDetailPage = () => {
     report_token: string | null;
     overall_notes: string | null;
   }>>([]);
+  const [comms, setComms] = useState<Array<{ id: string; type: string | null; subject: string | null; sent_at: string; recipient_email: string | null; status: string | null }>>([]);
   const [loading, setLoading] = useState(true);
   const [agentId, setAgentId] = useState<string | null>(null);
   const [agentInfo, setAgentInfo] = useState<{ name: string; agency: string | null; license_number: string | null } | null>(null);

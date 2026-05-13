@@ -23,6 +23,7 @@ interface Application {
 
 const STATUS_MAP: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
   pending: { label: 'Under Review', variant: 'outline' },
+  submitted: { label: 'Under Review', variant: 'outline' },
   shortlisted: { label: 'Shortlisted', variant: 'default' },
   approved: { label: 'Approved', variant: 'default' },
   declined: { label: 'Not Successful', variant: 'secondary' },
@@ -126,7 +127,7 @@ const MyApplicationsPage = () => {
           {applications.map(app => {
             const statusInfo = STATUS_MAP[app.status] || { label: app.status, variant: 'outline' as const };
             const statusColorClass =
-              app.status === 'pending' ? 'bg-amber-100 text-amber-800 border-amber-200' :
+              app.status === 'pending' || app.status === 'submitted' ? 'bg-amber-100 text-amber-800 border-amber-200' :
               app.status === 'shortlisted' ? 'bg-blue-100 text-blue-800 border-blue-200' :
               app.status === 'approved' ? 'bg-green-100 text-green-800 border-green-200' :
               'bg-muted text-muted-foreground';

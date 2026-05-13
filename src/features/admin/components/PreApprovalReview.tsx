@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ShieldCheck, X, Eye } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface PendingApproval {
   id: string;
@@ -20,6 +21,7 @@ const PreApprovalReview = () => {
   const [actionId, setActionId] = useState<string | null>(null);
   const [rejectionNote, setRejectionNote] = useState('');
   const [showRejectFor, setShowRejectFor] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     supabase
@@ -27,7 +29,12 @@ const PreApprovalReview = () => {
       .select('id, user_id, document_url, document_type, lender_name, approved_amount, expiry_date, issue_date, submitted_at')
       .eq('status', 'pending')
       .order('submitted_at', { ascending: true })
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) {
+          setLoading(false);
+          toast({ title: 'Failed to load applications', description: error.message, variant: 'destructive' });
+          return;
+        }
         setPending((data as unknown as PendingApproval[]) ?? []);
         setLoading(false);
       });
@@ -42,10 +49,15 @@ const PreApprovalReview = () => {
 
   const handleVerify = async (id: string) => {
     setActionId(id);
-    await supabase
+    const { error } = await supabase
       .from('buyer_pre_approvals')
       .update({ status: 'verified', verified_at: new Date().toISOString() } as any)
       .eq('id', id);
+    if (error) {
+      toast({ title: 'Failed to verify', description: error.message, variant: 'destructive' });
+      setActionId(null);
+      return;
+    }
     // Notify buyer
     await supabase.functions.invoke('notify-pre-approval-result', {
       body: { approval_id: id },
@@ -56,13 +68,18 @@ const PreApprovalReview = () => {
 
   const handleReject = async (id: string) => {
     setActionId(id);
-    await supabase
+    const { error } = await supabase
       .from('buyer_pre_approvals')
       .update({
         status: 'rejected',
         rejection_reason: rejectionNote || 'Document could not be verified. Please resubmit with a clear, legible pre-approval letter.',
       } as any)
       .eq('id', id);
+    if (error) {
+      toast({ title: 'Failed to reject', description: error.message, variant: 'destructive' });
+      setActionId(null);
+      return;
+    }
     await supabase.functions.invoke('notify-pre-approval-result', {
       body: { approval_id: id },
     });

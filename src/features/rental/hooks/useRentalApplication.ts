@@ -72,7 +72,7 @@ export function useRentalApplication(propertyId: string) {
           declaration_accepted: true,
           pm_notes: null,
           reference_number: ref,
-          status: 'submitted',
+          status: 'pending',
         });
       if (err) throw err;
       setSubmitted(true);

@@ -158,8 +158,8 @@ export default function MaintenancePage() {
   };
 
   const copyTenantLink = (j: Job) => {
-    if (!j.tenancy_id) { toast.error('Job not linked to a tenancy'); return; }
-    const url = `${window.location.origin}/maintenance/request?token=${j.tenancy_id}`;
+    if (!j.tenant_portal_token) { toast.error('Portal link unavailable — no tenant assigned.'); return; }
+    const url = `${window.location.origin}/maintenance/request?token=${j.tenant_portal_token}`;
     navigator.clipboard.writeText(url);
     toast.success('Tenant request link copied');
   };

@@ -52,7 +52,7 @@ export default function About() {
     { term: t('about.factType'), def: 'SaaS / marketplace' },
     { term: t('about.factMarket'), def: 'Australian residential and commercial real estate' },
     { term: t('about.factLanguages'), def: '30+ buyer languages supported across listings and search' },
-    { term: 'Key compliance', def: 'Agents Financial Administration Act 2014 (AFA 2014) trust accounting' },
+    { term: 'Key compliance', def: 'Built to support AFA 2014 and state trust accounting record-keeping requirements (QLD, NSW, VIC, SA, WA)' },
     { term: 'Core differentiator', def: "Australia's first multilingual real estate platform" },
     { term: 'AI capabilities', def: 'Multilingual listing generation, voice-to-listing transcription' },
     { term: 'Unique products', def: 'Pocket Listings (off-market), Halo buyer-matching system' },

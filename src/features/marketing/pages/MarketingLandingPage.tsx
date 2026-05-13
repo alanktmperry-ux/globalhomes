@@ -46,11 +46,9 @@ const aiBuilds = [
 ];
 
 const pricingPlans = [
-  { name: 'Demo', price: 'Free', period: '', features: ['5 listings', '1 AI build', 'Basic CRM', '14-day trial'], cta: 'Start Free Demo', highlight: false },
-  { name: 'Starter', price: '$79', period: '/mo', features: ['25 listings', '2 AI builds', 'Full CRM', 'Trust accounting', 'Email support'], cta: 'Get Started', highlight: false },
-  { name: 'Pro', price: '$149', period: '/mo', features: ['Unlimited listings', 'All 4 AI builds', 'Lead marketplace access', 'Priority support', 'Team seats (3)'], cta: 'Go Pro', highlight: true },
-  { name: 'Agency', price: '$349', period: '/mo', features: ['Everything in Pro', 'Unlimited seats', 'White-label reports', 'Partner portal', 'Dedicated onboarding'], cta: 'Contact Sales', highlight: false },
-  { name: 'Enterprise', price: '$999', period: '/mo', features: ['Multi-office support', 'Custom integrations', 'SLA guarantee', 'API access', 'Account manager'], cta: 'Talk to Us', highlight: false },
+  { name: 'Solo', price: '$799', period: '/mo', features: ['3 active listings', 'AI listing descriptions', 'Basic CRM (200 contacts)', 'Multilingual search (20 languages)', 'Halo Board access'], cta: 'Start Free Trial', highlight: false },
+  { name: 'Agency', price: '$1,999', period: '/mo', features: ['Unlimited listings', 'Buyer Concierge (100 matches/mo)', 'Full CRM', 'Trust accounting', 'Bank reconciliation', '5 seats'], cta: 'Start Free Trial', highlight: true },
+  { name: 'Agency Pro', price: '$3,499', period: '/mo', features: ['Everything in Agency', 'Unlimited buyer matches', 'Performance analytics', 'Commission calculator', 'Dedicated account manager', '15 seats'], cta: 'Talk to Us', highlight: false },
 ];
 
 const faqs = [

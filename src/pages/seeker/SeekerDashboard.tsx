@@ -280,7 +280,7 @@ export default function SeekerDashboard() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                {filtered.map((h) => <HaloCard key={h.id} halo={h} />)}
+                {filtered.map((h) => <HaloCard key={h.id} halo={h} seekerId={user.id} onChanged={loadHalos} />)}
               </div>
             )}
           </div>

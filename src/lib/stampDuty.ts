@@ -247,13 +247,13 @@ function ntDuty(price: number, isFirstHome: boolean): StampDutyResult {
 
 // ─── PUBLIC API ─────────────────────────────────────────────────────────────
 
-export function calculateStampDuty(price: number, state: AustralianState, buyerType: BuyerType, isFirstHome: boolean): StampDutyResult {
+export function calculateStampDuty(price: number, state: AustralianState, buyerType: BuyerType, isFirstHome: boolean, isNewBuild: boolean = false): StampDutyResult {
   if (!price || price <= 0) {
     return { duty: 0, effectiveRate: 0, breakdown: '', fhbExemption: 0, fhbGrant: 0, totalCashNeeded: 0, notes: [] };
   }
   switch (state) {
-    case 'NSW': return nswDuty(price, isFirstHome);
-    case 'VIC': return vicDuty(price, isFirstHome);
+    case 'NSW': return nswDuty(price, isFirstHome, isNewBuild);
+    case 'VIC': return vicDuty(price, isFirstHome, buyerType, isNewBuild);
     case 'QLD': return qldDuty(price, isFirstHome, buyerType);
     case 'WA': return waDuty(price, isFirstHome);
     case 'SA': return saDuty(price, isFirstHome);

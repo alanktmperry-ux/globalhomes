@@ -85,7 +85,7 @@ const PartnerArrearsPage = () => {
       if (!hasOverdue && daysBehind <= 0) continue;
 
       const weekly = toWeekly(t.rent_amount, t.rent_frequency);
-      const weeksOwed = Math.max(1, Math.ceil(daysBehind / 7));
+      const weeksOwed = daysBehind / 7;
       const agency = agencyMap.get(t.agent_id);
 
       results.push({

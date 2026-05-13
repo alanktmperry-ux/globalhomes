@@ -232,7 +232,7 @@ const DashboardOverview = () => {
     return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
   }, [agentName]);
 
-  const today = useMemo(() => formatAUDate(new Date()), []);
+  const today = useMemo(() => formatLocaleDate(new Date(), language), [language]);
 
   const trend = (curr: number, prev: number): { dir: 'up' | 'down' | 'flat'; value: string } | undefined => {
     if (!prev && !curr) return undefined;

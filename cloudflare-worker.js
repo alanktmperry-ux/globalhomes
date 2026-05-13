@@ -93,6 +93,85 @@ function buildPropertyHead(p, appUrl) {
     ${img ? `<meta name="twitter:image" content="${img}" />` : ''}`;
 }
 
+// Landing language data — duplicated from src/config/landingLanguages.ts
+// (Worker build context can't import from src/, keep in sync manually.)
+const LANDING_LANGUAGES = [
+  {
+    slug: 'mandarin',
+    nativeName: '中文',
+    englishName: 'Mandarin',
+    isoCode: 'zh',
+    heroHeadlineNative: '在澳大利亚买房 — 用您的语言',
+    popularSuburbs: ['Box Hill', 'Glen Waverley', 'Chatswood', 'Eastwood', 'Hurstville', 'Burwood', 'Carlingford'],
+    metaTitle: 'Buy Property in Australia in Mandarin | 在澳大利亚买房 | ListHQ',
+    metaDescription:
+      "Australia's only property platform with full Mandarin support. Search listings, find Chinese-speaking agents, and post a buyer brief in 中文.",
+  },
+];
+
+function findLandingLanguage(slug) {
+  if (!slug) return null;
+  const s = String(slug).toLowerCase();
+  return LANDING_LANGUAGES.find((l) => l.slug === s) || null;
+}
+
+async function handleLandingLanguage(request, env, lang) {
+  const APP_ORIGIN = env.APP_ORIGIN;
+  const url = new URL(request.url);
+  const originRes = await fetch(APP_ORIGIN + url.pathname + url.search, {
+    headers: { 'User-Agent': request.headers.get('User-Agent') || 'ListHQ-Edge' },
+  });
+  if (originRes.status !== 200) return null;
+  const ct = originRes.headers.get('content-type') || '';
+  if (!ct.includes('text/html')) return null;
+  let html = await originRes.text();
+
+  const title = esc(lang.metaTitle);
+  const desc = esc(lang.metaDescription);
+  const pageUrl = `https://listhq.com.au/property-australia/${lang.slug}`;
+
+  html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${title}</title>`);
+  html = html.replace(
+    /<meta\s+name="description"\s+content="[^"]*"/i,
+    `<meta name="description" content="${desc}"`
+  );
+  html = html.replace(
+    /<meta\s+property="og:title"\s+content="[^"]*"/i,
+    `<meta property="og:title" content="${title}"`
+  );
+  html = html.replace(
+    /<meta\s+property="og:description"\s+content="[^"]*"/i,
+    `<meta property="og:description" content="${desc}"`
+  );
+  html = html.replace(/(<html[^>]*\slang=")[^"]*"/i, `$1${lang.isoCode}"`);
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: lang.metaTitle,
+    description: lang.metaDescription,
+    inLanguage: lang.isoCode,
+    url: pageUrl,
+    isPartOf: { '@id': 'https://listhq.com.au/#website' },
+    about: {
+      '@type': 'Thing',
+      name: `Australian real estate for ${lang.englishName}-speaking buyers`,
+    },
+  };
+  const ld = `<script type="application/ld+json">${JSON.stringify(schema)}</script>`;
+  html = html.replace('</head>', `${ld}\n</head>`);
+
+  const res = new Response(html, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'public, max-age=300, s-maxage=600, stale-while-revalidate=3600',
+      'X-Landing-Lang': lang.slug,
+    },
+  });
+  return withSecurityHeaders(res, env);
+}
+
 function buildAgentHead(a, appUrl) {
   const title = `${a.name}${a.agency ? ' · ' + a.agency : ''} | Real Estate Agent | ListHQ`;
   const desc = (a.bio ?? `${a.name} is a real estate agent.`).slice(0, 200);

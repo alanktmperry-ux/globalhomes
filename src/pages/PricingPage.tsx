@@ -261,11 +261,14 @@ export default function PricingPage() {
   return (
     <>
       <Helmet>
-        <title>Pricing — Replace your entire stack · ListHQ</title>
+        <title>Real Estate Agent Software Pricing — 60-Day Free Trial | ListHQ</title>
         <meta
           name="description"
           content="Australia's multilingual real estate platform — listings auto-translated into 30+ languages. Trust accounting, CRM, property management, and Halo buyer matching. 60-day free trial."
         />
+        <meta property="og:title" content="Real Estate Agent Software Pricing | ListHQ" />
+        <meta property="og:description" content="Replace your entire agent stack — trust accounting, CRM, Halo buyer matching, AI listings — from $299/month. 60-day free trial, no card required." />
+        <meta property="og:type" content="website" />
       </Helmet>
 
       <div className="bg-white text-black">

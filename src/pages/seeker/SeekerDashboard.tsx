@@ -407,6 +407,53 @@ function HaloCard({ halo, seekerId, onChanged }: { halo: HaloRow; seekerId: stri
           </button>
         )}
       </div>
+
+      {/* Lifecycle controls */}
+      {!isFulfilled && (
+        <div className="flex flex-wrap gap-2 pt-3 border-t border-[#F1F5F9]">
+          {isPaused ? (
+            <Button
+              size="sm" variant="outline" disabled={busy !== null}
+              onClick={() => updateStatus('active', 'Resumed', 'resume')}
+              className="gap-1.5"
+            >
+              <PlayCircle size={14} /> Resume
+            </Button>
+          ) : (
+            <Button
+              size="sm" variant="outline" disabled={busy !== null}
+              onClick={() => updateStatus('paused', 'Paused', 'pause')}
+              className="gap-1.5"
+            >
+              <PauseCircle size={14} /> Pause
+            </Button>
+          )}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="sm" variant="outline" disabled={busy !== null} className="gap-1.5">
+                <CheckCircle2 size={14} /> Mark as Fulfilled
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Mark this Halo as fulfilled?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure? This will close your brief and agents will no longer be able to respond.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => updateStatus('fulfilled', 'Marked as fulfilled', 'fulfil')}>
+                  Confirm
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          {isPaused && (
+            <Badge variant="secondary" className="self-center text-[10px]">Paused</Badge>
+          )}
+        </div>
+      )}
     </article>
   );
 }

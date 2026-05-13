@@ -51,10 +51,18 @@ Deno.serve(async (req) => {
       const archiveEmail = `compliance-archive+${targetUserId}@${ARCHIVE_EMAIL_DOMAIN}`;
 
       const findExistingUser = async () => {
-        for (let page = 1; page <= 10; page += 1) {
+        // Check cached lookup table first
+        const { data: cached } = await supabase
+          .from('compliance_archive_users')
+          .select('archive_user_id')
+          .eq('source_user_id', targetUserId)
+          .maybeSingle();
+        if (cached?.archive_user_id) return cached.archive_user_id;
+
+        // Full scan fallback (no page cap — relies on length < perPage to terminate)
+        for (let page = 1; ; page += 1) {
           const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 1000 });
           if (error) throw error;
-
           const match = data.users.find((u) => u.email?.toLowerCase() === archiveEmail);
           if (match) return match.id;
           if (data.users.length < 1000) break;

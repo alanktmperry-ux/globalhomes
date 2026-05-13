@@ -463,18 +463,12 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>ListHQ — Find your home in any language. Multilingual property search Australia</title>
-        <meta name="description" content="Australia's only multilingual property platform. Listings auto-translated into any language. Free for buyers, always." />
+        <title>ListHQ — Multilingual Property Search & Real Estate Agent Software Australia</title>
+        <meta name="description" content="Australia's multilingual real estate platform. Search property in 30+ languages as a buyer. Or run your agency — trust accounting, CRM, Halo buyer matching and AI listings — all in one platform." />
         <link rel="canonical" href="https://listhq.com.au/" />
-        <link rel="alternate" hrefLang="en" href="https://listhq.com.au/" />
-        <link rel="alternate" hrefLang="zh" href="https://listhq.com.au/" />
-        <link rel="alternate" hrefLang="vi" href="https://listhq.com.au/" />
-        <link rel="alternate" hrefLang="ko" href="https://listhq.com.au/" />
-        <link rel="alternate" hrefLang="ar" href="https://listhq.com.au/" />
-        <link rel="alternate" hrefLang="hi" href="https://listhq.com.au/" />
-        <link rel="alternate" hrefLang="fil" href="https://listhq.com.au/" />
-        <link rel="alternate" hrefLang="id" href="https://listhq.com.au/" />
-        <link rel="alternate" hrefLang="x-default" href="https://listhq.com.au/" />
+        {['x-default','en','zh','zh-TW','vi','ko','ar','hi','fil','id','th','ms','ta','ur','bn','te','ml','gu','mr','pa','ja','fr','de','es','pt'].map((code) => (
+          <link key={code} rel="alternate" hrefLang={code} href="https://listhq.com.au/" />
+        ))}
       </Helmet>
 
       <style>{`

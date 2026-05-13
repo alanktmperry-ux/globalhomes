@@ -44,6 +44,7 @@ interface Job {
   supplier_name?: string | null;
   scheduled_entry_date: string | null;
   entry_notice_sent_at: string | null;
+  photo_urls: string[];
 }
 
 interface Supplier { id: string; business_name: string; trade_category: string; email: string | null; }

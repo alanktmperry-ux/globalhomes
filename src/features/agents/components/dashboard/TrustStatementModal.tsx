@@ -52,7 +52,7 @@ export default function TrustStatementModal({ open, onOpenChange }: TrustStateme
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [openingBalance, setOpeningBalance] = useState(0);
-  const [agentInfo, setAgentInfo] = useState<{ name: string; agency: string; license_number: string } | null>(null);
+  const [agentInfo, setAgentInfo] = useState<{ name: string; agency: string; license_number: string; state: string | null } | null>(null);
 
   // Month picker
   const now = new Date();
@@ -80,7 +80,7 @@ export default function TrustStatementModal({ open, onOpenChange }: TrustStateme
 
     const { data: agent } = await supabase
       .from('agents')
-      .select('id, name, agency, license_number')
+      .select('id, name, agency, license_number, state')
       .eq('user_id', user.id)
       .maybeSingle();
 

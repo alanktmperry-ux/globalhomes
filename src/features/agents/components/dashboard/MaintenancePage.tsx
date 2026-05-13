@@ -383,6 +383,46 @@ export default function MaintenancePage() {
                             {j.estimated_cost && (
                               <p className="text-xs text-muted-foreground">Quote: {AUD.format(j.estimated_cost)}{j.actual_cost ? ` · Actual: ${AUD.format(j.actual_cost)}` : ''}</p>
                             )}
+                            <div className="space-y-2 pt-2 border-t border-border/50">
+                              <Label className="text-xs flex items-center gap-1.5">
+                                <Upload size={12} /> Photos
+                              </Label>
+                              <label
+                                htmlFor={`photos-${j.id}`}
+                                className="flex flex-col items-center justify-center gap-1 px-3 py-4 border-2 border-dashed border-border rounded-md cursor-pointer hover:bg-accent/40 transition-colors text-xs text-muted-foreground"
+                              >
+                                {uploadingFor === j.id ? (
+                                  <><Loader2 size={14} className="animate-spin" /> Uploading…</>
+                                ) : (
+                                  <>Click to upload photos or drag and drop</>
+                                )}
+                                <input
+                                  id={`photos-${j.id}`}
+                                  type="file"
+                                  accept="image/*"
+                                  multiple
+                                  className="hidden"
+                                  disabled={uploadingFor === j.id}
+                                  onChange={(e) => { uploadJobPhotos(j, e.target.files); e.currentTarget.value = ''; }}
+                                />
+                              </label>
+                              {j.photo_urls && j.photo_urls.length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                  {j.photo_urls.map((url, idx) => (
+                                    <a
+                                      key={idx}
+                                      href={url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="block w-20 h-20 rounded-lg overflow-hidden border border-border cursor-pointer hover:opacity-80"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <img src={url} alt={`Job photo ${idx + 1}`} className="w-full h-full object-cover" />
+                                    </a>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </TableCell>
                       </TableRow>

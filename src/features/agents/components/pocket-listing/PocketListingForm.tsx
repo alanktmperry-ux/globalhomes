@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Suspense, lazy } from 'react';
+import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBuyerMatching } from '@/features/agents/hooks/useBuyerMatching';
 import { ArrowLeft, ArrowRight, Save, Loader2, FileText, Trash2, Share2 } from 'lucide-react';

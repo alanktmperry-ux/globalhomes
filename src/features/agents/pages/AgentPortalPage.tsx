@@ -74,31 +74,15 @@ const AgentPortalPage = () => {
     if (!user) { toast({ title: 'Please log in first' }); return; }
     setSubscribing(true);
     try {
-      // Get or create agent record
-      let { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
-      if (!agent) {
-        const { data: newAgent, error } = await supabase.from('agents').insert({ user_id: user.id, name: user.email || 'Agent', email: user.email }).select('id').maybeSingle();
-        if (error) throw error;
-        if (!newAgent) throw new Error('Could not create agent profile. Please try again.');
-        agent = newAgent;
+      const { data, error } = await supabase.functions.invoke('create-subscription-checkout', {
+        body: { planId: 'agency', annual: false },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+        return;
       }
-
-      // Create subscription
-      const subEnd = new Date();
-      subEnd.setMonth(subEnd.getMonth() + 1);
-      await supabase.from('agent_subscriptions').upsert({
-        agent_id: agent!.id,
-        plan_type: 'agency',
-        listing_limit: 75,
-        subscription_end: subEnd.toISOString(),
-        auto_renew: true,
-      }, { onConflict: 'agent_id' });
-
-      // Mark agent as subscribed
-      await supabase.from('agents').update({ is_subscribed: true, subscription_expires_at: subEnd.toISOString() }).eq('id', agent!.id);
-
-      setIsSubscribed(true);
-      toast({ title: 'Subscribed!', description: 'You now have Agency plan access.' });
+      throw new Error(data?.error ?? 'Could not start checkout');
     } catch (err: unknown) {
       toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
     } finally {

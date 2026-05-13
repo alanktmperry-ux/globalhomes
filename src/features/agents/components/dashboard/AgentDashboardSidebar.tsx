@@ -26,6 +26,11 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 import { useHaloCreditsBalance } from '@/features/halo/hooks/useHaloCreditsBalance';
 
+interface NavSubgroup {
+  label: string;
+  items: NavItem[];
+}
+
 interface NavSection {
   title: string;
   url: string;
@@ -33,6 +38,7 @@ interface NavSection {
   badgeKey?: string;
   alertWhenBadge?: boolean;
   children?: NavItem[];
+  subgroups?: NavSubgroup[];
 }
 
 // Six top-level sections. Each top-level item is clickable AND expands to show its sub-items.
@@ -67,15 +73,34 @@ const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
-    title: 'Tenancies',
+    title: 'Property Management',
     url: '',
     icon: Home,
-    children: [
-      { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home },
-      { title: 'Rental Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
-      { title: 'Vacancies', url: '/dashboard/vacancies', icon: Building2 },
-      { title: 'Vacancy KPIs', url: '/dashboard/vacancy-kpi', icon: Activity },
-      { title: 'Renewals Due', url: '/dashboard/rent-roll?filter=renewals', icon: RefreshCw, badgeKey: 'renewals', alertWhenBadge: true },
+    subgroups: [
+      {
+        label: 'Tenancies',
+        items: [
+          { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home },
+          { title: 'Inspections', url: '/dashboard/pm-inspections', icon: CalendarDays, badgeKey: 'disputes', alertWhenBadge: true },
+          { title: 'Vacancies', url: '/dashboard/vacancies', icon: Building2 },
+        ],
+      },
+      {
+        label: 'Operations',
+        items: [
+          { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
+          { title: 'Owner Statements', url: '/dashboard/statements', icon: FileText },
+          { title: 'Vacancy KPIs', url: '/dashboard/vacancy-kpi', icon: Activity },
+        ],
+      },
+      {
+        label: 'Trust Accounting',
+        items: [
+          { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
+          { title: 'Trust Ledger', url: '/dashboard/trust-ledger', icon: BookOpen },
+          { title: 'Bank Reconciliation', url: '/dashboard/bank-reconciliation', icon: Landmark },
+        ],
+      },
     ],
   },
   {
@@ -362,6 +387,7 @@ const AgentDashboardSidebar = () => {
   const activeSectionTitle = useMemo(() => {
     for (const s of NAV_SECTIONS) {
       if (s.children?.some((c) => isActive(c.url))) return s.title;
+      if (s.subgroups?.some((g) => g.items.some((c) => isActive(c.url)))) return s.title;
       if (isActive(s.url) && s.url !== '/dashboard') return s.title;
     }
     return null;
@@ -379,12 +405,17 @@ const AgentDashboardSidebar = () => {
 
   const renderSection = (section: NavSection) => {
     const hasChildren = !!section.children?.length;
+    const hasSubgroups = !!section.subgroups?.length;
+    const hasNested = hasChildren || hasSubgroups;
     const isOpen = !!openSections[section.title] || activeSectionTitle === section.title;
-    const sectionActive = isActive(section.url) || (hasChildren && section.children!.some((c) => isActive(c.url)));
+    const sectionActive =
+      isActive(section.url) ||
+      (hasChildren && section.children!.some((c) => isActive(c.url))) ||
+      (hasSubgroups && section.subgroups!.some((g) => g.items.some((c) => isActive(c.url))));
     const Icon = section.icon;
     const badgeVal = section.badgeKey ? badgeValues[section.badgeKey] : '';
 
-    const toggleOnlySections = ['Portfolio', 'Finance', 'Tenancies', 'Compliance', 'Market Tools', 'Halo Board'];
+    const toggleOnlySections = ['Portfolio', 'Finance', 'Tenancies', 'Compliance', 'Market Tools', 'Halo Board', 'Property Management'];
     const isToggleOnly = toggleOnlySections.includes(section.title);
     const canNavigate = !!section.url && !isToggleOnly;
 
@@ -395,8 +426,8 @@ const AgentDashboardSidebar = () => {
       }
 
       navigate(section.url);
-      if (hasChildren) toggleSection(section.title);
-      if (isMobile && !hasChildren) setOpenMobile(false);
+      if (hasNested) toggleSection(section.title);
+      if (isMobile && !hasNested) setOpenMobile(false);
     };
 
     return (
@@ -442,7 +473,7 @@ const AgentDashboardSidebar = () => {
                       </>
                     )}
                   </button>
-                  {hasChildren && !collapsed && (
+                  {hasNested && !collapsed && (
                     <CollapsibleTrigger asChild>
                       <button
                         type="button"
@@ -506,6 +537,62 @@ const AgentDashboardSidebar = () => {
                     </SidebarMenuItem>
                   ))}
                 </SidebarMenu>
+              </SidebarGroupContent>
+            </CollapsibleContent>
+          )}
+
+          {hasSubgroups && !collapsed && (
+            <CollapsibleContent>
+              <SidebarGroupContent className="pl-3">
+                {section.subgroups!.map((group) => (
+                  <div key={group.label} className="mt-2 first:mt-0">
+                    <div className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-white/40">
+                      {group.label}
+                    </div>
+                    <SidebarMenu>
+                      {group.items.map((item) => (
+                        <SidebarMenuItem key={item.title + item.url}>
+                          <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                            <button
+                              onClick={() => {
+                                navigate(item.url);
+                                if (isMobile) setOpenMobile(false);
+                              }}
+                              onMouseEnter={() => prefetchRoute(item.url)}
+                              className={`flex items-center gap-2 w-full px-3 py-2 rounded-[10px] text-[13px] transition-all ${
+                                isActive(item.url)
+                                  ? 'bg-white text-[#2563EB] font-medium'
+                                  : 'text-white/55 hover:text-white hover:bg-white/10'
+                              }`}
+                            >
+                              <item.icon
+                                size={14}
+                                className={`shrink-0 ${
+                                  item.alertWhenBadge && item.badgeKey && badgeValues[item.badgeKey]
+                                    ? 'text-amber-600'
+                                    : ''
+                                }`}
+                              />
+                              <span className={`flex-1 text-left ${
+                                item.alertWhenBadge && item.badgeKey && badgeValues[item.badgeKey]
+                                  ? 'text-amber-700 font-medium'
+                                  : ''
+                              }`}>{item.title}</span>
+                              {item.badgeKey && badgeValues[item.badgeKey] && (
+                                <Badge
+                                  variant={item.alertWhenBadge ? 'destructive' : 'secondary'}
+                                  className="text-[10px] px-1.5 py-0 h-5"
+                                >
+                                  {badgeValues[item.badgeKey]}
+                                </Badge>
+                              )}
+                            </button>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      ))}
+                    </SidebarMenu>
+                  </div>
+                ))}
               </SidebarGroupContent>
             </CollapsibleContent>
           )}

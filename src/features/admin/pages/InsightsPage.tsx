@@ -54,7 +54,7 @@ interface InsightsData {
   momGrowthPct: number | null;
   churnRatePct: number;
   ltv: number;
-  cac: number;
+  cac: number | null;
   paybackMonths: number | null;
   cohorts: CohortRow[];
   funnel: FunnelStage[];

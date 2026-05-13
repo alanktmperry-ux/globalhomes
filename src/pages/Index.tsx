@@ -824,14 +824,17 @@ const Index = () => {
         <section style={{ background:'#fff', padding:'88px 24px' }}>
           <div style={{ maxWidth:1200, margin:'0 auto' }}>
             <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>{t('home.testimonials.eyebrow')}</div>
-            <h2 style={{ fontSize:'clamp(32px, 3.5vw, 48px)', fontWeight:800, letterSpacing:'-1.5px', lineHeight:1.1, margin:'0 0 52px' }}>
+            <h2 style={{ fontSize:'clamp(32px, 3.5vw, 48px)', fontWeight:800, letterSpacing:'-1.5px', lineHeight:1.1, margin:'0 0 16px' }}>
               {t('home.testimonials.heading')}
             </h2>
+            <p className="text-xs text-center text-muted-foreground mb-6 max-w-xl mx-auto">
+              Feedback from our beta program. Names anonymised.
+            </p>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:20 }} className="how-grid">
               {([
-                { i:'M', q:'I found 6 listings near my children\'s school in one afternoon. Other portals had the same listings but I couldn\'t understand anything.', n:'Mei L.', d:'Auburn, NSW · Bought a 4-bed family home' },
-                { i:'T', q:'Tôi tìm thấy căn nhà lý tưởng của mình trong vài giờ. Mọi thứ đều bằng tiếng Việt — giá, trường học, mô tả.', translation:'("I found my dream home in just a few hours. Everything was in Vietnamese — prices, schools, descriptions.")', n:'Tuan N.', d:'Box Hill, VIC · Rented a 2-bed apartment' },
-                { i:'P', q:'I showed prices in INR so I can explain to my parents back home what we\'re looking at. ListHQ gets it.', n:'Priya S.', d:'Mosman, NSW · Bought a waterfront home' },
+                { i:'M', q:'I found 6 listings near my children\'s school in one afternoon. Other portals had the same listings but I couldn\'t understand anything.', n:'Mei L.', d:'Auburn, NSW · Beta tester' },
+                { i:'T', q:'Tôi tìm thấy căn nhà lý tưởng của mình trong vài giờ. Mọi thứ đều bằng tiếng Việt — giá, trường học, mô tả.', translation:'("I found my dream home in just a few hours. Everything was in Vietnamese — prices, schools, descriptions.")', n:'Tuan N.', d:'Box Hill, VIC · Beta tester' },
+                { i:'P', q:'I showed prices in INR so I can explain to my parents back home what we\'re looking at. ListHQ gets it.', n:'Priya S.', d:'Mosman, NSW · Beta tester' },
               ] as { i:string; q:string; n:string; d:string; translation?:string }[]).map((c, i) => (
                 <div key={c.n} className={`reveal reveal-d${i+1}`} style={{ background:T.off, border:`1px solid ${T.border}`, borderRadius:20, padding:32 }}>
                   <p style={{ fontSize:15, fontWeight:500, color:T.ink, fontStyle:'italic', lineHeight:1.7, margin:'0 0 24px' }}>"{c.q}"</p>

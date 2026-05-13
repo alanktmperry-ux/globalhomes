@@ -83,7 +83,7 @@ Deno.serve(async () => {
 
     // Static pages
     for (const page of STATIC_PAGES) {
-      entries.push(urlEntry(`${DOMAIN}${page.url}`, undefined, page.changefreq, page.priority));
+      entries.push(urlEntry(`${DOMAIN}${page.url}`, TODAY, page.changefreq, page.priority));
     }
 
     // Suburb pages — buy and rent variants

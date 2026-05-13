@@ -98,6 +98,27 @@ const VacancyKPIPage = () => {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  const handleAddEvent = async () => {
+    if (!agentId || !eventForm.event_type || !eventForm.event_date) {
+      toast.error('Please fill in event type and date');
+      return;
+    }
+    setSavingEvent(true);
+    const { error } = await supabase.from('vacancy_events' as any).insert({
+      agent_id: agentId,
+      event_type: eventForm.event_type,
+      event_date: eventForm.event_date,
+      property_id: eventForm.property_id || null,
+      notes: eventForm.notes || null,
+    });
+    setSavingEvent(false);
+    if (error) { toast.error('Failed to save event: ' + error.message); return; }
+    toast.success('Event logged');
+    setShowAddEvent(false);
+    setEventForm({ event_type: '', property_id: '', event_date: format(new Date(), 'yyyy-MM-dd'), notes: '' });
+    fetchData();
+  };
+
   const kpis = useMemo(() => {
     const today = new Date();
     const totalManaged = tenancies.length;

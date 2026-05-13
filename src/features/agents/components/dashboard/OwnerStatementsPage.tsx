@@ -369,6 +369,17 @@ export default function OwnerStatementsPage() {
               <div><Label className="text-xs">Period start</Label><Input type="date" value={form.period_start} onChange={(e) => setForm({ ...form, period_start: e.target.value })} /></div>
               <div><Label className="text-xs">Period end</Label><Input type="date" value={form.period_end} onChange={(e) => setForm({ ...form, period_end: e.target.value })} /></div>
             </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={autoFillFromLedger}
+              disabled={autoFilling}
+              className="flex items-center gap-1.5 w-full"
+            >
+              {autoFilling ? <Loader2 size={14} className="animate-spin" /> : <Calculator size={14} />}
+              Auto-fill from Trust Ledger
+            </Button>
             <div className="grid grid-cols-2 gap-3">
               <div><Label className="text-xs">Gross rent (AUD)</Label><Input type="number" step="0.01" value={form.gross_rent_aud} onChange={(e) => setForm({ ...form, gross_rent_aud: Number(e.target.value) })} /></div>
               <div><Label className="text-xs">Management fee (AUD)</Label><Input type="number" step="0.01" value={form.management_fee_aud} onChange={(e) => setForm({ ...form, management_fee_aud: Number(e.target.value) })} /><p className="text-[10px] text-muted-foreground mt-0.5">{feeSource ? (feeSource.fromTenancy ? `From tenancy record: ${feeSource.percent}%` : `Default: ${feeSource.percent}%`) : 'Select a property to load fee'}</p></div>

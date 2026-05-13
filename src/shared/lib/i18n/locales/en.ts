@@ -2680,7 +2680,7 @@ export const en = {
   'marketing.replaceTools.callout.buyers': "Multilingual buyers reached",
   'marketing.replaceTools.mobile.language': "Language",
   'marketing.replaceTools.mobile.voice': "Voice listing",
-  'marketing.replaceTools.mobile.buyers': "Buyers reached",
+  'marketing.replaceTools.mobile.buyers': "Buyer languages",
 
   // Voice listing showcase
   'marketing.voice.eyebrow': "FOR AGENTS",

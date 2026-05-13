@@ -44,7 +44,7 @@ const PLANS: Plan[] = [
     tagline: 'For independent agents starting out',
     monthly: 799,
     annual: 7670,
-    trialBadge: '30-day free trial',
+    trialBadge: '60-day free trial',
     ctaLabel: 'Start free trial',
     ctaHref: '/for-agents#register',
     microcopy: 'Credit card required · Cancels anytime before day 31',

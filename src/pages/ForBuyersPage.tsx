@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
-import SiteHeader from '@/shared/components/layout/SiteHeader';
-import SiteFooter from '@/shared/components/layout/SiteFooter';
+import { SiteHeader } from '@/shared/components/layout/SiteHeader';
+import { SiteFooter } from '@/shared/components/layout/SiteFooter';
 import { Globe, MessageSquare, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 

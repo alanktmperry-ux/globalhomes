@@ -16,7 +16,7 @@ ListHQ is a two-sided multilingual property marketplace built for the Australian
 
 - Agent plans: Solo ($299/mo), Agency ($599/mo), Agency Pro ($1,199/mo)
 
-- Key differentiator: Only Australian property platform with native multilingual data model — not translation overlay
+- Key differentiator: Only Australian property platform with native multilingual data model — not a translation overlay
 
 - Unique feature: Halo reverse marketplace — buyers post what they want, agents find them
 

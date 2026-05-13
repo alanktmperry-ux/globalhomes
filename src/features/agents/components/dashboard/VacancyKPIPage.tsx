@@ -59,6 +59,9 @@ const VacancyKPIPage = () => {
   const [tenancies, setTenancies] = useState<Tenancy[]>([]);
   const [events, setEvents] = useState<VacancyEvent[]>([]);
   const [propertyMap, setPropertyMap] = useState<Record<string, string>>({});
+  const [showAddEvent, setShowAddEvent] = useState(false);
+  const [eventForm, setEventForm] = useState({ event_type: '', property_id: '', event_date: format(new Date(), 'yyyy-MM-dd'), notes: '' });
+  const [savingEvent, setSavingEvent] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!user) return;

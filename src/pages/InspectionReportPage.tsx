@@ -18,8 +18,10 @@ import DashboardHeader from '@/features/agents/components/dashboard/DashboardHea
 import { format, parseISO } from 'date-fns';
 import {
   Loader2, Camera, Plus, ChevronDown, AlertTriangle, Wrench, CheckCircle2, X, ArrowLeft,
-  ArrowDown, ArrowUp, Minus, Scale, FileWarning, ClipboardList, Download,
+  ArrowDown, ArrowUp, Minus, Scale, FileWarning, ClipboardList, Download, GitCompare, Trash2,
 } from 'lucide-react';
+
+interface BondDeduction { id: string; description: string; amount: number }
 
 const CONDITION_RANK: Record<string, number> = {
   excellent: 5, good: 4, fair: 3, poor: 2, damaged: 1, na: 0,

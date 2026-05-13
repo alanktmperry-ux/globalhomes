@@ -1322,7 +1322,7 @@ export default function AgencyOnboardingPage() {
         <Card className="flex-1 min-h-0 overflow-y-auto">
           <CardContent className="p-4 sm:p-6">
             <motion.div
-              key={showPasswordStep ? 'password-step' : step}
+              key={step}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.25 }}

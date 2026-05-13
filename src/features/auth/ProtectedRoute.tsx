@@ -26,7 +26,7 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
     (async () => {
       const { data } = await supabase
         .from('agents')
-        .select('id, is_approved')
+        .select('id, approval_status')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -34,7 +34,7 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
 
       if (!data) {
         setApprovalState('none');
-      } else if (!data.is_approved) {
+      } else if (data.approval_status !== 'approved') {
         setApprovalState('pending');
       } else {
         setApprovalState('approved');

@@ -999,8 +999,8 @@ const ListingsPage = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-[15px] font-extrabold text-[#0a0f1e] tabular-nums hidden sm:inline">{l.price_formatted}</span>
-                    <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] hidden md:inline ${overlay.className}`}>
+                    <span className="text-[15px] font-extrabold text-[#0a0f1e] tabular-nums ">{l.price_formatted}</span>
+                    <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em]  ${overlay.className}`}>
                       {overlay.label}
                     </span>
                     <div onClick={(e) => e.stopPropagation()}>

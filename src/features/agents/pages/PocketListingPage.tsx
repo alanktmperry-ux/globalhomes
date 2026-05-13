@@ -185,7 +185,7 @@ const PocketListingPage = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="hidden sm:flex gap-1.5 text-xs" onClick={() => {
+              <Button variant="outline" size="sm" className="flex gap-1.5 text-xs" onClick={() => {
                 const realListing = listings.find(l => '_source' in l && l._source === 'db');
                 if (realListing) {
                   navigate(`/pocket-listing?duplicate=${realListing.id}`);

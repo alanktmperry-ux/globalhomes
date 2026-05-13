@@ -93,11 +93,6 @@ const NAV_SECTIONS: NavSection[] = [
         ],
       },
       {
-        label: '_removed_',
-        items: [
-        ],
-      },
-      {
         label: 'Trust Accounting',
         items: [
           { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },

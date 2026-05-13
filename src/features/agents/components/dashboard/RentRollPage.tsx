@@ -106,6 +106,15 @@ const frequencyDays = (freq: string): number => {
   return 30;
 };
 
+const getArrearsThreshold = (frequency: string): number => {
+  switch (frequency) {
+    case 'weekly': return 7;
+    case 'fortnightly': return 14;
+    case 'monthly': return 32;
+    default: return 14;
+  }
+};
+
 type TabKey = 'all' | 'arrears' | 'expiring' | 'renewals' | 'inspections';
 
 interface UpcomingInspection {

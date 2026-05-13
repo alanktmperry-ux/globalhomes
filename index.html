@@ -105,11 +105,14 @@
 
     <link rel="preconnect" href="https://ngrkbohpmkzjonaofgbb.supabase.co" crossorigin />
 
-    <!-- Analytics — deferred to idle so they don't block first paint.
-         GA4 + PostHog still capture pageviews on init; capture_pageview is true. -->
+    <!-- Analytics — consent-gated (Privacy Act APP 11). Only loads after the
+         CookieConsentBanner dispatches 'cookie-consent-accepted'. -->
     <script>
       (function () {
+        var loaded = false;
         function loadAnalytics() {
+          if (loaded) return;
+          loaded = true;
           // Google Analytics GA4
           var ga = document.createElement('script');
           ga.async = true;
@@ -121,13 +124,20 @@
           gtag('js', new Date());
           gtag('config', 'G-W7XWRWDC15');
 
-          // PostHog now initialised via posthog-js in src/main.tsx (EU host)
+          // PostHog initialised via posthog-js in src/main.tsx (also consent-gated there)
         }
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(loadAnalytics, { timeout: 3000 });
-        } else {
-          setTimeout(loadAnalytics, 1500);
-        }
+        // Honour previously-granted consent (persisted by CookieConsentBanner)
+        try {
+          var prior = localStorage.getItem('cookie-consent');
+          if (prior === 'accepted') {
+            if ('requestIdleCallback' in window) {
+              requestIdleCallback(loadAnalytics, { timeout: 3000 });
+            } else {
+              setTimeout(loadAnalytics, 1500);
+            }
+          }
+        } catch (e) {}
+        window.addEventListener('cookie-consent-accepted', loadAnalytics);
       })();
     </script>
   </head>

@@ -312,6 +312,7 @@ export default function PricingPage() {
             <p className="text-[17px] md:text-[19px] text-[#4a4a4a] mt-6 max-w-[640px] mx-auto leading-[1.55]">
               {t('pricing.subheadline') || '60-day free trial · No charge until day 61 · Founding pricing locked for 24 months.'}
             </p>
+            <p className="text-xs text-muted-foreground text-center mt-2">All prices exclude GST. ABN holders may claim GST credits.</p>
 
             {/* Billing toggle */}
             <div className="inline-flex items-center bg-[#F9FAFB] rounded-full p-1 mt-10 border border-[#E5E5E5]">

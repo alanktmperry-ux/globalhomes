@@ -170,6 +170,7 @@ export default function MarketingLandingPage() {
           <div className="text-center mb-16">
             <h2 className="font-display text-3xl sm:text-4xl font-extrabold mb-3">Simple, Transparent Pricing</h2>
             <p className="text-muted-foreground max-w-lg mx-auto">60-day free trial for founding agents. No hidden fees. No lock-in contracts. Cancel anytime.</p>
+            <p className="text-xs text-muted-foreground text-center mt-2">All prices exclude GST. ABN holders may claim GST credits.</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 max-w-6xl mx-auto">

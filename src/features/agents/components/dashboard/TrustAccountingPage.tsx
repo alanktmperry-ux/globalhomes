@@ -1366,7 +1366,7 @@ const TrustAccountingPage = () => {
         <div className="mt-3 py-3 px-4 rounded-lg bg-muted/50 border border-border flex items-center justify-center gap-3">
           <CheckCircle2 size={14} className="text-primary shrink-0" />
           <p className="text-[11px] text-muted-foreground text-center">
-            Audit-ready exports &middot; Voided entries preserved &middot; Compliant with Australian trust accounting legislation
+            Audit-ready exports &middot; Voided entries preserved &middot; Managed in accordance with the Property, Stock and Business Agents Act 2002 (NSW), Estate Agents Act 1980 (VIC), Property Occupations Act 2014 (QLD), and equivalent state legislation.
           </p>
         </div>
       </div>

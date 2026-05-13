@@ -70,10 +70,15 @@ const StepTranslate = ({ draft, update }: Props) => {
       const t = data.translations[active.responseKey];
       if (!t) throw new Error(`No translation for ${active.label}`);
 
-      update({
+      const newFields = {
         [active.titleField]: t.title || '',
         [active.descField]: t.description || '',
-      } as Partial<ListingDraft>);
+      } as Partial<ListingDraft>;
+      update(newFields);
+      // Immediately persist so a browser crash can't lose the translation
+      try {
+        localStorage.setItem('pocket-listing-draft', JSON.stringify({ ...draft, ...newFields }));
+      } catch { /* ignore */ }
 
       toast.success(`Translated to ${active.label}`);
     } catch (e) {

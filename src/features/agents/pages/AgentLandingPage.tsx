@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, MapPin, Wand2, Globe, Lock, Mic, Clock, BarChart2, Wallet, XCircle, CheckCircle2 } from 'lucide-react';
 
 import { SEO } from '@/shared/components/SEO';
 import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';

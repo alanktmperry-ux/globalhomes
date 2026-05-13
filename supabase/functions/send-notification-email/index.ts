@@ -363,6 +363,31 @@ Deno.serve(async (req) => {
       if (recipientEmail) await sendAndLog(recipientEmail, subject, html);
       return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
+    } else if (type === 'agent_rejected') {
+      recipientEmail = payload.recipient_email || null;
+      const agentName = (payload.agent_name || 'there').toString().replace(/[<>]/g, (c: string) => c === '<' ? '&lt;' : '&gt;');
+      const reason = (payload.rejection_reason || 'Not specified').toString().replace(/[<>]/g, (c: string) => c === '<' ? '&lt;' : '&gt;');
+      const subject = 'Your ListHQ agent application';
+      const html = `<!doctype html><html><body style="font-family:Arial,sans-serif;background:#f6f7f9;padding:24px;margin:0;">
+<div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+  <div style="background:#1a1a2e;padding:24px 28px;">
+    <h1 style="font-size:20px;color:#ffffff;margin:0;font-weight:600;">ListHQ</h1>
+  </div>
+  <div style="padding:28px;">
+    <h2 style="font-size:18px;color:#0f172a;margin:0 0 16px;">Your ListHQ agent application</h2>
+    <p style="font-size:14px;color:#374151;line-height:1.6;margin:0 0 14px;">Hi ${agentName},</p>
+    <p style="font-size:14px;color:#374151;line-height:1.6;margin:0 0 14px;">Thank you for applying to join ListHQ. After reviewing your application, we're unable to approve your account at this time.</p>
+    <div style="background:#f9fafb;border-left:3px solid #1a1a2e;padding:12px 14px;margin:0 0 18px;font-size:13px;color:#374151;">
+      <strong style="display:block;margin-bottom:4px;color:#0f172a;">Reason</strong>
+      ${reason}
+    </div>
+    <p style="font-size:14px;color:#374151;line-height:1.6;margin:0 0 14px;">If you believe this is an error or would like to reapply in the future, please contact <a href="mailto:support@listhq.com.au" style="color:#1a1a2e;">support@listhq.com.au</a>.</p>
+    <p style="font-size:12px;color:#6b7280;margin:24px 0 0;">— The ListHQ Team</p>
+  </div>
+</div></body></html>`;
+      if (recipientEmail) await sendAndLog(recipientEmail, subject, html);
+      return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
     } else if (type === 'tenant_dispute') {
       recipientEmail = payload.recipient_email || null;
       const propAddr = payload.property_address || 'your managed property';

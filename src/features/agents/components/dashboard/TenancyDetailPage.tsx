@@ -1345,6 +1345,64 @@ const TenancyDetailPage = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* ═══ Rent Increase Dialog ═══ */}
+      <Dialog open={showRentIncrease} onOpenChange={setShowRentIncrease}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Record Rent Increase</DialogTitle></DialogHeader>
+          <div className="space-y-3 py-2">
+            <div>
+              <Label>Current Weekly Rent</Label>
+              <p className="text-sm text-muted-foreground">${tenancy?.rent_amount?.toLocaleString() || 0}</p>
+            </div>
+            <div>
+              <Label>New Weekly Rent *</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={rentIncreaseForm.new_rent_amount}
+                onChange={e => setRentIncreaseForm(f => ({ ...f, new_rent_amount: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label>Effective Date *</Label>
+              <Input
+                type="date"
+                value={rentIncreaseForm.effective_date}
+                onChange={e => setRentIncreaseForm(f => ({ ...f, effective_date: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label>Notice Sent Date *</Label>
+              <Input
+                type="date"
+                value={rentIncreaseForm.notice_sent_date}
+                onChange={e => setRentIncreaseForm(f => ({ ...f, notice_sent_date: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label>Notes</Label>
+              <Textarea
+                rows={3}
+                value={rentIncreaseForm.notes}
+                onChange={e => setRentIncreaseForm(f => ({ ...f, notes: e.target.value }))}
+                placeholder="Optional notes for the file"
+              />
+            </div>
+            <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-[11px] text-amber-900 leading-relaxed">
+              Minimum 60 days notice is required between Notice Sent Date and Effective Date in NSW, VIC and QLD.
+              Most states also limit increases to once per 12 months. Always confirm with your state legislation.
+            </div>
+            <div className="flex justify-end gap-2 pt-1">
+              <Button variant="outline" onClick={() => setShowRentIncrease(false)} disabled={rentIncreaseSaving}>Cancel</Button>
+              <Button onClick={submitRentIncrease} disabled={rentIncreaseSaving}>
+                {rentIncreaseSaving ? <Loader2 className="animate-spin mr-2" size={14} /> : null}
+                Record & Notify
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

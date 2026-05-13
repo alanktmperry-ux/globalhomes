@@ -151,7 +151,7 @@ const BuyerConciergePage = () => {
   const [sortKey, setSortKey] = useState<'match' | 'readiness' | 'recent'>('match');
 
   const navigate = useNavigate();
-  const { canAccessBuyerConcierge, conciergeMatchesPerMonth, conciergeIntrosPerMonth } = useSubscription();
+  const { canAccessBuyerConcierge, conciergeMatchesPerMonth, conciergeIntrosPerMonth, loading: subLoading } = useSubscription();
   const { agent } = useCurrentAgent();
   const { matchesUsed, introsUsed, refresh: refreshUsage } = useConciergeUsage(agent?.id || null);
   const recordConciergeAction = useRecordConciergeAction();

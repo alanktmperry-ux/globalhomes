@@ -52,6 +52,7 @@ interface CurrencyContextType {
   listingMode: ListingMode;
   setListingMode: (mode: ListingMode) => void;
   isLiveRates: boolean;
+  lastUpdated: Date | null;
 }
 
 const CurrencyContext = createContext<CurrencyContextType | null>(null);

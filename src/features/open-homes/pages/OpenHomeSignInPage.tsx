@@ -72,7 +72,7 @@ export default function OpenHomeSignInPage() {
     // Fire-and-forget: CRM ingest + thank-you email
     void ingestOpenHomeLead({
       propertyId: session.property_id,
-      name: normalizedEmail.split('@')[0],
+      name: (visitorName.trim() || normalizedEmail.split('@')[0]),
       email: normalizedEmail,
       openHomeStartsAt: session.starts_at,
     });

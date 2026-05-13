@@ -98,6 +98,13 @@ export default function VacanciesPage() {
 
   const submitNotice = async () => {
     if (!noticeFor) return;
+    if (vacateDate) {
+      const days = Math.ceil((new Date(vacateDate).getTime() - new Date().setHours(0,0,0,0)) / 86400000);
+      if (days < 60) {
+        toast.error('Vacate date must be at least 60 days from today — required under Australian tenancy law (NSW/VIC/QLD). Check your state legislation for the exact requirement.');
+        return;
+      }
+    }
     await setVacancyStatus(noticeFor, 'notice_given', { vacate_date: vacateDate || null });
     setNoticeFor(null); setVacateDate('');
   };

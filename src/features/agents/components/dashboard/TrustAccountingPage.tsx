@@ -764,6 +764,10 @@ const TrustAccountingPage = () => {
         </div>
       </div>
 
+      <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 mb-6 text-[12px] text-amber-900 leading-[1.55]">
+        <strong>Disclaimer:</strong> Trust accounting records are for property management purposes only and do not constitute financial, legal, or tax advice. Always consult a licensed accountant or solicitor for professional guidance.
+      </div>
+
       {urlPropertyId && filteredPropertyAddress && (
         <div className="bg-[#EFF6FF] border border-[#2563EB]/15 text-[#1E40AF] rounded-2xl px-4 py-2.5 mb-6 flex items-center gap-2 text-[13px] font-semibold">
           <Ico icon="solar:filter-bold" size={14} color="#1E40AF" />

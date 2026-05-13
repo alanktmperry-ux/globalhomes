@@ -141,13 +141,15 @@ const ruleMinDate = (r: StateRule): Date => {
 };
 
 interface ScheduleForm {
+  property_id: string;
   tenancy_id: string;
   inspection_type: InspectionType;
   scheduled_date?: Date;
+  inspector_name: string;
   notes: string;
 }
 const emptySchedule = (): ScheduleForm => ({
-  tenancy_id: '', inspection_type: 'routine', notes: '',
+  property_id: '', tenancy_id: '', inspection_type: 'routine', inspector_name: '', notes: '',
 });
 
 interface CompleteForm {

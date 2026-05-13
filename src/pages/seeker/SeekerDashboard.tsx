@@ -309,9 +309,29 @@ function StatTile({ label, value, highlight, small }: { label: string; value: st
   );
 }
 
-function HaloCard({ halo }: { halo: HaloRow }) {
+function HaloCard({ halo, seekerId, onChanged }: { halo: HaloRow; seekerId: string; onChanged: () => void | Promise<void> }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [busy, setBusy] = useState<null | 'pause' | 'resume' | 'fulfil'>(null);
+  const isPaused = halo.status === 'paused';
+  const isFulfilled = halo.status === 'fulfilled';
+
+  const updateStatus = async (status: 'paused' | 'active' | 'fulfilled', label: string, key: 'pause' | 'resume' | 'fulfil') => {
+    setBusy(key);
+    const { error } = await supabase
+      .from('halos')
+      .update({ status } as any)
+      .eq('id', halo.id)
+      .eq('seeker_id', seekerId);
+    setBusy(null);
+    if (error) {
+      toast.error(`Could not ${label.toLowerCase()} this Halo`);
+      return;
+    }
+    toast.success(`${label} successful`);
+    await onChanged();
+  };
+
   const days = daysBetween(new Date(halo.expires_at), new Date());
   const suburb = halo.suburbs?.[0] ?? t('seeker.haloCard.suburb.anywhere');
   const propType = halo.property_types?.[0] ?? t('seeker.haloCard.type.default');

@@ -49,10 +49,15 @@ const PreApprovalReview = () => {
 
   const handleVerify = async (id: string) => {
     setActionId(id);
-    await supabase
+    const { error } = await supabase
       .from('buyer_pre_approvals')
       .update({ status: 'verified', verified_at: new Date().toISOString() } as any)
       .eq('id', id);
+    if (error) {
+      toast({ title: 'Failed to verify', description: error.message, variant: 'destructive' });
+      setActionId(null);
+      return;
+    }
     // Notify buyer
     await supabase.functions.invoke('notify-pre-approval-result', {
       body: { approval_id: id },

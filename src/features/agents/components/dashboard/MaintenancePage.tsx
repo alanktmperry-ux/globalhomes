@@ -40,7 +40,10 @@ interface Job {
   completed_at: string | null;
   property_address?: string | null;
   tenant_name?: string | null;
+  tenant_email?: string | null;
   supplier_name?: string | null;
+  scheduled_entry_date: string | null;
+  entry_notice_sent_at: string | null;
 }
 
 interface Supplier { id: string; business_name: string; trade_category: string; email: string | null; }
@@ -90,13 +93,17 @@ export default function MaintenancePage() {
   const [quoteFor, setQuoteFor] = useState<Job | null>(null);
   const [quoteAmount, setQuoteAmount] = useState('');
 
+  const [entryFor, setEntryFor] = useState<Job | null>(null);
+  const [entryDate, setEntryDate] = useState('');
+  const [entrySaving, setEntrySaving] = useState(false);
+
   const load = async () => {
     if (!agentId) return;
     setLoading(true);
     const [{ data: js }, { data: sups }] = await Promise.all([
       supabase
         .from('maintenance_jobs')
-        .select('*, properties:property_id(address, suburb), tenancies:tenancy_id(tenant_name, tenant_portal_token), supplier:assigned_supplier_id(business_name)')
+        .select('*, properties:property_id(address, suburb), tenancies:tenancy_id(tenant_name, tenant_email, tenant_portal_token), supplier:assigned_supplier_id(business_name)')
         .eq('agent_id', agentId)
         .order('created_at', { ascending: false }),
       supabase.from('suppliers' as any).select('id, business_name, trade_category, email').eq('agent_id', agentId).eq('status', 'active'),
@@ -105,6 +112,7 @@ export default function MaintenancePage() {
       ...j,
       property_address: j.properties ? `${j.properties.address}, ${j.properties.suburb}` : null,
       tenant_name: j.tenancies?.tenant_name || null,
+      tenant_email: j.tenancies?.tenant_email || null,
       tenant_portal_token: j.tenancies?.tenant_portal_token || null,
       supplier_name: j.supplier?.business_name || null,
     }));
@@ -130,12 +138,53 @@ export default function MaintenancePage() {
 
   const submitAssign = async () => {
     if (!assignFor || !assignSupplierId) return;
-    await supabase.from('maintenance_jobs').update({
+    const { error } = await supabase.from('maintenance_jobs').update({
       assigned_supplier_id: assignSupplierId,
       status: assignFor.status === 'new' ? 'assigned' : assignFor.status,
     } as any).eq('id', assignFor.id);
+    if (error) { toast.error(error.message || 'Failed to assign'); return; }
     toast.success('Supplier assigned');
+    const justAssigned = { ...assignFor, assigned_supplier_id: assignSupplierId };
     setAssignFor(null); setAssignSupplierId('');
+    setEntryFor(justAssigned);
+    setEntryDate('');
+    load();
+  };
+
+  const submitEntryNotice = async () => {
+    if (!entryFor || !entryDate) { toast.error('Select an entry date'); return; }
+    const days = differenceInDays(parseISO(entryDate), new Date());
+    if (days < 2) {
+      toast.error('Entry date must be at least 2 days from today to comply with NSW notice requirements. VIC/QLD/SA/WA minimum is 24 hours.');
+      return;
+    }
+    setEntrySaving(true);
+    const nowIso = new Date().toISOString();
+    const { error } = await supabase.from('maintenance_jobs').update({
+      scheduled_entry_date: entryDate,
+      entry_notice_sent_at: nowIso,
+    } as any).eq('id', entryFor.id);
+    if (error) { setEntrySaving(false); toast.error(error.message || 'Failed to record entry notice'); return; }
+
+    if (entryFor.tenant_email) {
+      const formattedEntryDate = format(parseISO(entryDate), 'EEEE d MMMM yyyy');
+      supabase.functions.invoke('send-notification-email', {
+        body: {
+          agent_id: agentId,
+          type: 'entry_notice',
+          recipient_email: entryFor.tenant_email,
+          recipient_name: entryFor.tenant_name,
+          property_address: entryFor.property_address,
+          title: 'Entry Notice — Maintenance Access Required',
+          message: `Notice is given that a contractor will enter the property at ${entryFor.property_address} on ${formattedEntryDate} to carry out: ${entryFor.title}. If you have any questions please contact your property manager.`,
+        },
+      }).catch(() => {});
+    }
+
+    setEntrySaving(false);
+    setEntryFor(null);
+    setEntryDate('');
+    toast.success('Entry notice scheduled and tenant notified');
     load();
   };
 
@@ -334,6 +383,32 @@ export default function MaintenancePage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setAssignFor(null)}>Discard</Button>
             <Button onClick={submitAssign} disabled={!assignSupplierId}>Assign</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Schedule entry notice dialog */}
+      <Dialog open={!!entryFor} onOpenChange={o => { if (!o) { setEntryFor(null); setEntryDate(''); } }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>Schedule entry & notify tenant</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label className="text-xs">Planned entry date</Label>
+              <Input type="date" value={entryDate} onChange={e => setEntryDate(e.target.value)} />
+            </div>
+            <div className="rounded-lg bg-amber-50 border border-amber-200 p-2.5 text-[11px] text-amber-900 leading-relaxed">
+              Entry notice required — NSW: 2 business days · VIC: 24 hours · SA/WA/QLD: 24 hours
+            </div>
+            {entryFor && !entryFor.tenant_email && (
+              <p className="text-[11px] text-muted-foreground">No tenant email on file — record will be saved but no email will be sent.</p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setEntryFor(null); setEntryDate(''); }} disabled={entrySaving}>Skip</Button>
+            <Button onClick={submitEntryNotice} disabled={entrySaving || !entryDate}>
+              {entrySaving ? <Loader2 className="animate-spin mr-2" size={14} /> : null}
+              Send Notice
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

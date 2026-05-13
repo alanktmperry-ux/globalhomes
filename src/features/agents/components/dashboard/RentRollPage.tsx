@@ -1138,6 +1138,120 @@ const RentRollPage = () => {
               </div>
           </motion.div>
 
+          {/* Bond Register */}
+          <Card>
+            <button
+              type="button"
+              onClick={() => setBondRegisterOpen(o => !o)}
+              className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-muted/40 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <ClipboardCheck size={16} className="text-primary" />
+                <span className="text-sm font-semibold">Bond Register</span>
+                <Badge variant="outline" className="text-[10px]">{bonds.length}</Badge>
+              </div>
+              {bondRegisterOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
+            {bondRegisterOpen && (
+              <CardContent className="p-0 border-t">
+                <div className="px-4 py-3 bg-amber-50 border-b border-amber-200 text-[11px] text-amber-900 leading-relaxed">
+                  <strong>Compliance:</strong> All bonds must be lodged with the relevant state authority within 10 business days of receipt.
+                  NSW: NSW Fair Trading · VIC: RTBA · QLD: RTA · WA: Bond Administrator · SA: CBS
+                </div>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Property</TableHead>
+                        <TableHead>Tenant</TableHead>
+                        <TableHead className="text-right">Bond Amount</TableHead>
+                        <TableHead>Lodgement #</TableHead>
+                        <TableHead>Lease Start</TableHead>
+                        <TableHead>Lodge By</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="w-32"></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {bonds.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={8} className="text-center py-8 text-sm text-muted-foreground">
+                            No bonds recorded.
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        bonds.map(b => {
+                          const leaseStart = parseISO(b.lease_start);
+                          const lodgeBy = addDays(leaseStart, 14);
+                          const lodged = !!b.bond_lodgment_number;
+                          const overdue = !lodged && today > lodgeBy;
+                          return (
+                            <TableRow key={b.id}>
+                              <TableCell className="text-xs">
+                                <div className="font-medium">{b.properties?.address || '—'}</div>
+                                <div className="text-muted-foreground">{b.properties?.suburb || ''}</div>
+                              </TableCell>
+                              <TableCell className="text-xs">{b.tenant_name}</TableCell>
+                              <TableCell className="text-right text-xs font-medium">${Number(b.bond_amount).toLocaleString()}</TableCell>
+                              <TableCell className="text-xs">{b.bond_lodgment_number || <span className="text-muted-foreground">—</span>}</TableCell>
+                              <TableCell className="text-xs">{format(leaseStart, 'dd MMM yyyy')}</TableCell>
+                              <TableCell className="text-xs">{format(lodgeBy, 'dd MMM yyyy')}</TableCell>
+                              <TableCell>
+                                {lodged ? (
+                                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-[10px]">Lodged</Badge>
+                                ) : overdue ? (
+                                  <Badge className="bg-red-100 text-red-800 hover:bg-red-100 text-[10px]">Overdue</Badge>
+                                ) : (
+                                  <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100 text-[10px]">Pending</Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {!lodged && (
+                                  <Popover
+                                    open={bondLodgeOpen === b.id}
+                                    onOpenChange={(o) => {
+                                      setBondLodgeOpen(o ? b.id : null);
+                                      if (!o) setBondLodgeNumber('');
+                                    }}
+                                  >
+                                    <PopoverTrigger asChild>
+                                      <Button size="sm" variant="outline" className="h-7 text-[10px]">
+                                        Record Lodgement
+                                      </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-72 p-3" align="end">
+                                      <div className="space-y-2">
+                                        <Label className="text-xs">Lodgement / Receipt Number</Label>
+                                        <Input
+                                          value={bondLodgeNumber}
+                                          onChange={e => setBondLodgeNumber(e.target.value)}
+                                          placeholder="e.g. BL-2024-123456"
+                                          autoFocus
+                                        />
+                                        <Button
+                                          size="sm"
+                                          className="w-full"
+                                          disabled={bondLodgeSaving || !bondLodgeNumber.trim()}
+                                          onClick={() => recordBondLodgement(b.id)}
+                                        >
+                                          {bondLodgeSaving ? <Loader2 size={12} className="animate-spin" /> : 'Save'}
+                                        </Button>
+                                      </div>
+                                    </PopoverContent>
+                                  </Popover>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            )}
+          </Card>
+
         </>
       )}
 

@@ -1201,6 +1201,52 @@ const TenancyDetailPage = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* ═══ TAB 5: Communications ═══ */}
+          <TabsContent value="communications" className="mt-4">
+            <Card>
+              <CardContent className="p-5">
+                <h3 className="text-sm font-semibold mb-4">Communications History</h3>
+                {comms.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-6 text-center">
+                    No communications sent yet for this tenancy.
+                  </p>
+                ) : (
+                  <ol className="space-y-3">
+                    {comms.map(c => {
+                      const t = (c.type || '').toLowerCase();
+                      const Icon = t.includes('reminder') || t.includes('arrears')
+                        ? Bell
+                        : t.includes('notice')
+                          ? FileText
+                          : Mail;
+                      const status = (c.status || 'sent').toLowerCase();
+                      const badgeClass = status === 'sent'
+                        ? 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30'
+                        : status === 'failed'
+                          ? 'bg-red-500/15 text-red-700 border-red-500/30'
+                          : 'bg-amber-500/15 text-amber-700 border-amber-500/30';
+                      return (
+                        <li key={c.id} className="flex items-start gap-3 p-3 rounded-lg border bg-card">
+                          <div className="shrink-0 w-9 h-9 rounded-full bg-muted flex items-center justify-center">
+                            <Icon size={16} className="text-muted-foreground" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-sm truncate">{c.subject || c.type || 'Communication'}</div>
+                            <div className="text-xs text-muted-foreground truncate">{c.recipient_email || '—'}</div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {format(parseISO(c.sent_at), 'dd/MM/yyyy HH:mm')}
+                            </div>
+                          </div>
+                          <Badge variant="outline" className={cn('capitalize', badgeClass)}>{status}</Badge>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </motion.div>
 

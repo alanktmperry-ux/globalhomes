@@ -202,6 +202,13 @@ function PlanCard({ plan, billing, index }: { plan: Plan; billing: BillingCycle;
         {formatPrice(priceNumber)}
         <span className="text-[16px] md:text-[18px] font-bold text-[#6a6a6a] ml-1">{periodLabel}</span>
       </div>
+      {billing === 'monthly' && (
+        <p className="text-xs text-muted-foreground mt-1">
+          {plan.key === 'solo' && 'incl. GST $878.90'}
+          {plan.key === 'agency' && 'incl. GST $1,098.90'}
+          {plan.key === 'pro' && 'incl. GST $2,198.90'}
+        </p>
+      )}
 
       {billing === 'annual' && (
         <div className="mt-2 text-[12px] text-[#065F46] inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#ECFDF5] font-bold">

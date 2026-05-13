@@ -505,6 +505,15 @@ const InspectionReportPage = () => {
                 <Download size={14} className="mr-1" /> Download PDF
               </Button>
             )}
+            {inspection.inspection_type === 'exit' && entryReport && (
+              <Button variant="outline" size="sm" onClick={() => setShowComparison(s => !s)}>
+                <GitCompare size={14} className="mr-1" />
+                {showComparison ? 'Hide Comparison' : 'Compare with Entry Report'}
+              </Button>
+            )}
+            {inspection.inspection_type === 'exit' && !entryReport && (
+              <span className="text-xs text-muted-foreground">No entry inspection found for comparison</span>
+            )}
             {!isReadOnly && (
               <Button
                 size="sm"

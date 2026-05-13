@@ -62,6 +62,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   const [listingMode, setListingMode] = useState<ListingMode>('sale');
   const [currencies, setCurrencies] = useState<CurrencyInfo[]>(FALLBACK_CURRENCIES);
   const [isLiveRates, setIsLiveRates] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   // Live FX rates are only needed when the user is actually viewing prices in
   // a non-AUD currency. We skip the network call entirely on the default AUD

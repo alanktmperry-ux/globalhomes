@@ -795,7 +795,9 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
 
       {/* Step content */}
       <div className="p-5 overflow-y-auto flex-1 min-h-0">
-        {stepContent()}
+        <Suspense fallback={<div className="flex items-center justify-center h-48"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>}>
+          {stepContent()}
+        </Suspense>
       </div>
 
       {/* Nav — always visible */}

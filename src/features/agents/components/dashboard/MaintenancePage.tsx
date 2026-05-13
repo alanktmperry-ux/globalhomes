@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Wrench, Loader2, Copy, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
+import { Wrench, Loader2, Copy, ChevronDown, ChevronUp, CheckCircle2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, parseISO, differenceInDays } from 'date-fns';
 import DashboardHeader from './DashboardHeader';
@@ -44,6 +44,7 @@ interface Job {
   supplier_name?: string | null;
   scheduled_entry_date: string | null;
   entry_notice_sent_at: string | null;
+  photo_urls: string[];
 }
 
 interface Supplier { id: string; business_name: string; trade_category: string; email: string | null; }
@@ -84,6 +85,39 @@ export default function MaintenancePage() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [uploadingFor, setUploadingFor] = useState<string | null>(null);
+
+  const uploadJobPhotos = async (job: Job, files: FileList | null) => {
+    if (!files || files.length === 0 || !agentId) return;
+    setUploadingFor(job.id);
+    try {
+      const newUrls: string[] = [];
+      for (const file of Array.from(files)) {
+        const safeName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+        const path = `${agentId}/${job.id}/${safeName}`;
+        const { error: upErr } = await supabase.storage
+          .from('maintenance-photos')
+          .upload(path, file, { contentType: file.type });
+        if (upErr) throw upErr;
+        const { data: signed } = await supabase.storage
+          .from('maintenance-photos')
+          .createSignedUrl(path, 60 * 60 * 24 * 365);
+        if (signed?.signedUrl) newUrls.push(signed.signedUrl);
+      }
+      const merged = [...(job.photo_urls || []), ...newUrls];
+      const { error: updErr } = await supabase
+        .from('maintenance_jobs')
+        .update({ photo_urls: merged } as any)
+        .eq('id', job.id);
+      if (updErr) throw updErr;
+      setJobs(prev => prev.map(j => j.id === job.id ? { ...j, photo_urls: merged } : j));
+      toast.success('Photos uploaded');
+    } catch (e: any) {
+      toast.error(e?.message || 'Upload failed');
+    } finally {
+      setUploadingFor(null);
+    }
+  };
 
   // assign dialog
   const [assignFor, setAssignFor] = useState<Job | null>(null);
@@ -110,6 +144,7 @@ export default function MaintenancePage() {
     ]);
     const list: Job[] = (js || []).map((j: any) => ({
       ...j,
+      photo_urls: Array.isArray(j.photo_urls) ? j.photo_urls : [],
       property_address: j.properties ? `${j.properties.address}, ${j.properties.suburb}` : null,
       tenant_name: j.tenancies?.tenant_name || null,
       tenant_email: j.tenancies?.tenant_email || null,
@@ -348,6 +383,46 @@ export default function MaintenancePage() {
                             {j.estimated_cost && (
                               <p className="text-xs text-muted-foreground">Quote: {AUD.format(j.estimated_cost)}{j.actual_cost ? ` · Actual: ${AUD.format(j.actual_cost)}` : ''}</p>
                             )}
+                            <div className="space-y-2 pt-2 border-t border-border/50">
+                              <Label className="text-xs flex items-center gap-1.5">
+                                <Upload size={12} /> Photos
+                              </Label>
+                              <label
+                                htmlFor={`photos-${j.id}`}
+                                className="flex flex-col items-center justify-center gap-1 px-3 py-4 border-2 border-dashed border-border rounded-md cursor-pointer hover:bg-accent/40 transition-colors text-xs text-muted-foreground"
+                              >
+                                {uploadingFor === j.id ? (
+                                  <><Loader2 size={14} className="animate-spin" /> Uploading…</>
+                                ) : (
+                                  <>Click to upload photos or drag and drop</>
+                                )}
+                                <input
+                                  id={`photos-${j.id}`}
+                                  type="file"
+                                  accept="image/*"
+                                  multiple
+                                  className="hidden"
+                                  disabled={uploadingFor === j.id}
+                                  onChange={(e) => { uploadJobPhotos(j, e.target.files); e.currentTarget.value = ''; }}
+                                />
+                              </label>
+                              {j.photo_urls && j.photo_urls.length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                  {j.photo_urls.map((url, idx) => (
+                                    <a
+                                      key={idx}
+                                      href={url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="block w-20 h-20 rounded-lg overflow-hidden border border-border cursor-pointer hover:opacity-80"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <img src={url} alt={`Job photo ${idx + 1}`} className="w-full h-full object-cover" />
+                                    </a>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </TableCell>
                       </TableRow>

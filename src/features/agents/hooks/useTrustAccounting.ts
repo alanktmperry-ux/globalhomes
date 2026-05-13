@@ -59,6 +59,7 @@ const TX_PAGE_SIZE = 100;
 
 export function useTrustAccounting() {
   const { user } = useAuth();
+  const [agentId, setAgentId] = useState<string | null>(null);
   const [accounts, setAccounts] = useState<TrustAccount[]>([]);
   const [transactions, setTransactions] = useState<TrustTransaction[]>([]);
   const [contacts, setContacts] = useState<ContactOption[]>([]);
@@ -67,12 +68,23 @@ export function useTrustAccounting() {
   const [txPage, setTxPage] = useState(0);
   const [hasMoreTx, setHasMoreTx] = useState(false);
 
-  const fetchAccounts = useCallback(async () => {
+  const fetchAgentId = useCallback(async () => {
     if (!user) return;
+    const { data } = await supabase
+      .from('agents')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    setAgentId((data as any)?.id ?? null);
+  }, [user]);
+
+  const fetchAccounts = useCallback(async () => {
+    if (!agentId) return;
     try {
       const { data, error } = await supabase
         .from('trust_accounts')
         .select('*')
+        .eq('agent_id', agentId)
         .order('created_at', { ascending: false });
       if (error) throw error;
       if (data) setAccounts(data as unknown as TrustAccount[]);
@@ -80,20 +92,18 @@ export function useTrustAccounting() {
       console.error('Failed to fetch trust accounts:', err);
       toast.error('Failed to load trust accounts');
     }
-  }, [user]);
+  }, [agentId]);
 
   const fetchTransactionsPage = useCallback(async (page: number, append: boolean) => {
-    if (!user) return;
+    if (!agentId) return;
     try {
-      // Fetch a page of receipts and a page of payments, then merge.
-      // Each table is ranged independently; combined "hasMore" is true if
-      // either side returned a full page.
       const from = page * TX_PAGE_SIZE;
       const to = from + TX_PAGE_SIZE - 1;
 
       const { data: receipts, error: rErr } = await supabase
         .from('trust_receipts')
         .select('*')
+        .eq('agent_id', agentId)
         .order('date_received', { ascending: false })
         .range(from, to);
       if (rErr) throw rErr;
@@ -101,6 +111,7 @@ export function useTrustAccounting() {
       const { data: payments, error: pErr } = await supabase
         .from('trust_payments')
         .select('*')
+        .eq('agent_id', agentId)
         .order('date_paid', { ascending: false })
         .range(from, to);
       if (pErr) throw pErr;
@@ -165,7 +176,7 @@ export function useTrustAccounting() {
       console.error('Failed to fetch trust transactions:', err);
       toast.error('Failed to load trust transactions');
     }
-  }, [user]);
+  }, [agentId]);
 
   const fetchTransactions = useCallback(async () => {
     setTxPage(0);
@@ -206,6 +217,10 @@ export function useTrustAccounting() {
       console.error('Failed to fetch properties:', err);
     }
   }, [user]);
+
+  useEffect(() => {
+    fetchAgentId();
+  }, [fetchAgentId]);
 
   useEffect(() => {
     const load = async () => {

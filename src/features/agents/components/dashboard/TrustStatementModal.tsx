@@ -78,54 +78,47 @@ export default function TrustStatementModal({ open, onOpenChange }: TrustStateme
     if (!user || !open) return;
     setLoading(true);
 
-    const [{ data: agent }, { data: recs }, { data: pays }] = await Promise.all([
-      supabase.from('agents').select('name, agency, license_number').eq('user_id', user.id).maybeSingle(),
+    const { data: agent } = await supabase
+      .from('agents')
+      .select('id, name, agency, license_number')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (!agent) {
+      setAgentInfo(null);
+      setReceipts([]);
+      setPayments([]);
+      setOpeningBalance(0);
+      setLoading(false);
+      return;
+    }
+
+    setAgentInfo(agent as any);
+    const agentId = (agent as any).id;
+
+    const [{ data: recs }, { data: pays }, { data: prevR }, { data: prevP }] = await Promise.all([
       supabase.from('trust_receipts')
         .select('receipt_number, client_name, property_address, amount, gst_amount, payment_method, purpose, date_received, status')
+        .eq('agent_id', agentId)
         .gte('date_received', startDate)
         .lt('date_received', endDate)
         .order('date_received'),
       supabase.from('trust_payments')
         .select('payment_number, client_name, property_address, amount, gst_amount, payment_method, purpose, date_paid, status, payee_name, reference')
+        .eq('agent_id', agentId)
         .gte('date_paid', startDate)
         .lt('date_paid', endDate)
         .order('date_paid'),
+      supabase.from('trust_receipts').select('amount').eq('agent_id', agentId).lt('date_received', startDate),
+      supabase.from('trust_payments').select('amount').eq('agent_id', agentId).lt('date_paid', startDate),
     ]);
 
-    if (agent) setAgentInfo(agent as any);
     setReceipts((recs || []) as unknown as Receipt[]);
     setPayments((pays || []) as unknown as Payment[]);
 
-    // Fetch period opening balance
-    const { data: agentRow } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
-    if (agentRow) {
-      const { data: acct } = await supabase.from('trust_accounts').select('id').eq('agent_id', (agentRow as any).id).limit(1).maybeSingle();
-      if (acct) {
-        const { data: bal } = await supabase
-          .from('trust_account_balances')
-          .select('opening_balance')
-          .eq('trust_account_id', (acct as any).id)
-          .eq('period_year', year)
-          .eq('period_month', month + 1)
-          .maybeSingle();
-        if ((bal as any)?.opening_balance != null) {
-          setOpeningBalance((bal as any).opening_balance);
-        } else {
-          // Compute carry-forward from all transactions before this period
-          const [{ data: prevR }, { data: prevP }] = await Promise.all([
-            supabase.from('trust_receipts').select('amount').eq('agent_id', (agentRow as any).id).lt('date_received', startDate),
-            supabase.from('trust_payments').select('amount').eq('agent_id', (agentRow as any).id).lt('date_paid', startDate),
-          ]);
-          const histIn = (prevR || []).reduce((s: number, r: any) => s + r.amount, 0);
-          const histOut = (prevP || []).reduce((s: number, p: any) => s + p.amount, 0);
-          setOpeningBalance(histIn - histOut);
-        }
-      } else {
-        setOpeningBalance(0);
-      }
-    } else {
-      setOpeningBalance(0);
-    }
+    const histIn = (prevR || []).reduce((s: number, r: any) => s + Number(r.amount || 0), 0);
+    const histOut = (prevP || []).reduce((s: number, p: any) => s + Number(p.amount || 0), 0);
+    setOpeningBalance(histIn - histOut);
 
     setLoading(false);
   }, [user, open, startDate, endDate, year, month]);

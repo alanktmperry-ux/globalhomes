@@ -1713,7 +1713,7 @@ export const en = {
   'agentLanding.pricing2.heading': 'Built for the way you work.',
   'agentLanding.pricing2.includes': 'All plans include any language · trust accounting · AI matching',
   'agentLanding.pricing2.callout.heading': 'Why $299/mo is a no-brainer for agents',
-  'agentLanding.pricing2.callout.body': 'REA.com.au and Domain charge $1,500–$7,000 per listing. A CRM costs $300–$600/mo. Property management software another $200–$400/mo. ListHQ replaces all three — CRM, PM platform, and multilingual listing portal — in one subscription, reaching 7M+ multilingual buyers no other portal can find.',
+  'agentLanding.pricing2.callout.body': 'REA.com.au and Domain charge $1,500–$7,000 per listing. A CRM costs $300–$600/mo. Property management software another $200–$400/mo. ListHQ replaces all three — CRM, PM platform, and multilingual listing portal — in one subscription, reaching buyers across 30+ languages no other portal can find.',
   'agentLanding.pricing2.mostPopular': 'Most popular',
   'agentLanding.pricing2.foundingMember': 'Founding member — locked for life',
   'agentLanding.pricing2.solo.name': 'Solo',

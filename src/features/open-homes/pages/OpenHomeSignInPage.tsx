@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { CheckCircle, MapPin, Clock, Users } from 'lucide-react';
+import { CheckCircle, MapPin, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ingestOpenHomeLead } from '@/features/open-homes/lib/ingestOpenHomeLead';
 
 export default function OpenHomeSignInPage() {
   const { token } = useParams<{ token: string }>();
@@ -66,6 +67,14 @@ export default function OpenHomeSignInPage() {
         on_waitlist: false,
       } as any);
     }
+
+    // Fire-and-forget: CRM ingest + thank-you email
+    void ingestOpenHomeLead({
+      propertyId: session.property_id,
+      name: normalizedEmail.split('@')[0],
+      email: normalizedEmail,
+      openHomeStartsAt: session.starts_at,
+    });
 
     setSignedIn(true);
     setSigningIn(false);

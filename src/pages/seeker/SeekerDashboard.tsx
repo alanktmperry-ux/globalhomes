@@ -1,11 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Loader2, Home as HomeIcon, Key, PiggyBank, Wallet, Shield, Zap, Scale, Pencil, Plus, Search, MapPin, Inbox } from 'lucide-react';
+import { Loader2, Home as HomeIcon, Key, PiggyBank, Wallet, Shield, Zap, Scale, Pencil, Plus, Search, MapPin, Inbox, PauseCircle, PlayCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import type { Halo } from '@/types/halo';
 import { usePageTitle } from '@/lib/usePageTitle';
@@ -61,50 +65,47 @@ export default function SeekerDashboard() {
     return () => { cancelled = true; };
   }, [user]);
 
-  useEffect(() => {
+  const loadHalos = useCallback(async () => {
     if (!user) return;
-    let cancelled = false;
-    (async () => {
-      const { data: haloRows, error } = await supabase
-        .from('halos')
-        .select('*')
-        .eq('seeker_id', user.id)
-        .neq('status', 'deleted')
-        .order('created_at', { ascending: false });
-      if (cancelled) return;
-      if (error) {
-        console.error('[SeekerDashboard] halos:', error);
-        setHalos([]);
-        return;
-      }
-      const ids = (haloRows ?? []).map((h: any) => h.id);
-      if (ids.length === 0) {
-        setHalos([]);
-        setUnreadTotal(0);
-        return;
-      }
-      const { data: respRows } = await supabase
-        .from('halo_responses')
-        .select('halo_id, viewed_by_seeker')
-        .in('halo_id', ids);
-      const counts = new Map<string, { total: number; unread: number }>();
-      (respRows ?? []).forEach((r: any) => {
-        const c = counts.get(r.halo_id) ?? { total: 0, unread: 0 };
-        c.total += 1;
-        if (!r.viewed_by_seeker) c.unread += 1;
-        counts.set(r.halo_id, c);
-      });
-      let unread = 0;
-      const enriched = (haloRows as any[]).map((h) => {
-        const c = counts.get(h.id) ?? { total: 0, unread: 0 };
-        unread += c.unread;
-        return { ...h, response_count: c.total, unread_count: c.unread } as HaloRow;
-      });
-      setHalos(enriched);
-      setUnreadTotal(unread);
-    })();
-    return () => { cancelled = true; };
+    const { data: haloRows, error } = await supabase
+      .from('halos')
+      .select('*')
+      .eq('seeker_id', user.id)
+      .neq('status', 'deleted')
+      .order('created_at', { ascending: false });
+    if (error) {
+      console.error('[SeekerDashboard] halos:', error);
+      setHalos([]);
+      return;
+    }
+    const ids = (haloRows ?? []).map((h: any) => h.id);
+    if (ids.length === 0) {
+      setHalos([]);
+      setUnreadTotal(0);
+      return;
+    }
+    const { data: respRows } = await supabase
+      .from('halo_responses')
+      .select('halo_id, viewed_by_seeker')
+      .in('halo_id', ids);
+    const counts = new Map<string, { total: number; unread: number }>();
+    (respRows ?? []).forEach((r: any) => {
+      const c = counts.get(r.halo_id) ?? { total: 0, unread: 0 };
+      c.total += 1;
+      if (!r.viewed_by_seeker) c.unread += 1;
+      counts.set(r.halo_id, c);
+    });
+    let unread = 0;
+    const enriched = (haloRows as any[]).map((h) => {
+      const c = counts.get(h.id) ?? { total: 0, unread: 0 };
+      unread += c.unread;
+      return { ...h, response_count: c.total, unread_count: c.unread } as HaloRow;
+    });
+    setHalos(enriched);
+    setUnreadTotal(unread);
   }, [user]);
+
+  useEffect(() => { loadHalos(); }, [loadHalos]);
 
   // Auth gating
   if (loading) {
@@ -279,7 +280,7 @@ export default function SeekerDashboard() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                {filtered.map((h) => <HaloCard key={h.id} halo={h} />)}
+                {filtered.map((h) => <HaloCard key={h.id} halo={h} seekerId={user.id} onChanged={loadHalos} />)}
               </div>
             )}
           </div>
@@ -308,9 +309,29 @@ function StatTile({ label, value, highlight, small }: { label: string; value: st
   );
 }
 
-function HaloCard({ halo }: { halo: HaloRow }) {
+function HaloCard({ halo, seekerId, onChanged }: { halo: HaloRow; seekerId: string; onChanged: () => void | Promise<void> }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [busy, setBusy] = useState<null | 'pause' | 'resume' | 'fulfil'>(null);
+  const isPaused = halo.status === 'paused';
+  const isFulfilled = halo.status === 'fulfilled';
+
+  const updateStatus = async (status: 'paused' | 'active' | 'fulfilled', label: string, key: 'pause' | 'resume' | 'fulfil') => {
+    setBusy(key);
+    const { error } = await supabase
+      .from('halos')
+      .update({ status } as any)
+      .eq('id', halo.id)
+      .eq('seeker_id', seekerId);
+    setBusy(null);
+    if (error) {
+      toast.error(`Could not ${label.toLowerCase()} this Halo`);
+      return;
+    }
+    toast.success(`${label} successful`);
+    await onChanged();
+  };
+
   const days = daysBetween(new Date(halo.expires_at), new Date());
   const suburb = halo.suburbs?.[0] ?? t('seeker.haloCard.suburb.anywhere');
   const propType = halo.property_types?.[0] ?? t('seeker.haloCard.type.default');
@@ -386,6 +407,53 @@ function HaloCard({ halo }: { halo: HaloRow }) {
           </button>
         )}
       </div>
+
+      {/* Lifecycle controls */}
+      {!isFulfilled && (
+        <div className="flex flex-wrap gap-2 pt-3 border-t border-[#F1F5F9]">
+          {isPaused ? (
+            <Button
+              size="sm" variant="outline" disabled={busy !== null}
+              onClick={() => updateStatus('active', 'Resumed', 'resume')}
+              className="gap-1.5"
+            >
+              <PlayCircle size={14} /> Resume
+            </Button>
+          ) : (
+            <Button
+              size="sm" variant="outline" disabled={busy !== null}
+              onClick={() => updateStatus('paused', 'Paused', 'pause')}
+              className="gap-1.5"
+            >
+              <PauseCircle size={14} /> Pause
+            </Button>
+          )}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="sm" variant="outline" disabled={busy !== null} className="gap-1.5">
+                <CheckCircle2 size={14} /> Mark as Fulfilled
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Mark this Halo as fulfilled?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure? This will close your brief and agents will no longer be able to respond.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => updateStatus('fulfilled', 'Marked as fulfilled', 'fulfil')}>
+                  Confirm
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          {isPaused && (
+            <Badge variant="secondary" className="self-center text-[10px]">Paused</Badge>
+          )}
+        </div>
+      )}
     </article>
   );
 }

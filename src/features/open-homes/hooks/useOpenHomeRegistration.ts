@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { ingestOpenHomeLead } from '@/features/open-homes/lib/ingestOpenHomeLead';
 
 export function useOpenHomeRegistration(openHomeId: string, isFull: boolean) {
   const { user } = useAuth();
@@ -13,13 +14,14 @@ export function useOpenHomeRegistration(openHomeId: string, isFull: boolean) {
     setLoading(true);
     setError(null);
 
+    const normalizedEmail = email.toLowerCase().trim();
     const { error: err } = await supabase
       .from('open_home_registrations')
       .upsert({
         open_home_id: openHomeId,
         user_id: user?.id ?? null,
         name,
-        email: email.toLowerCase().trim(),
+        email: normalizedEmail,
         phone: phone || null,
         on_waitlist: isFull,
       } as any, { onConflict: 'open_home_id,email' });
@@ -29,6 +31,25 @@ export function useOpenHomeRegistration(openHomeId: string, isFull: boolean) {
     } else {
       setRegistered(true);
       setOnWaitlist(isFull);
+      // Fire-and-forget: CRM ingest + confirmation email (skip for waitlist)
+      if (!isFull) {
+        try {
+          const { data: oh } = await supabase
+            .from('open_homes')
+            .select('property_id, starts_at')
+            .eq('id', openHomeId)
+            .maybeSingle();
+          if (oh?.property_id) {
+            void ingestOpenHomeLead({
+              propertyId: oh.property_id,
+              name,
+              email: normalizedEmail,
+              phone,
+              openHomeStartsAt: oh.starts_at,
+            });
+          }
+        } catch { /* non-blocking */ }
+      }
     }
     setLoading(false);
   };

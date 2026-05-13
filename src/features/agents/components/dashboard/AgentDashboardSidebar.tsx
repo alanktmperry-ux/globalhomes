@@ -405,12 +405,17 @@ const AgentDashboardSidebar = () => {
 
   const renderSection = (section: NavSection) => {
     const hasChildren = !!section.children?.length;
+    const hasSubgroups = !!section.subgroups?.length;
+    const hasNested = hasChildren || hasSubgroups;
     const isOpen = !!openSections[section.title] || activeSectionTitle === section.title;
-    const sectionActive = isActive(section.url) || (hasChildren && section.children!.some((c) => isActive(c.url)));
+    const sectionActive =
+      isActive(section.url) ||
+      (hasChildren && section.children!.some((c) => isActive(c.url))) ||
+      (hasSubgroups && section.subgroups!.some((g) => g.items.some((c) => isActive(c.url))));
     const Icon = section.icon;
     const badgeVal = section.badgeKey ? badgeValues[section.badgeKey] : '';
 
-    const toggleOnlySections = ['Portfolio', 'Finance', 'Tenancies', 'Compliance', 'Market Tools', 'Halo Board'];
+    const toggleOnlySections = ['Portfolio', 'Finance', 'Tenancies', 'Compliance', 'Market Tools', 'Halo Board', 'Property Management'];
     const isToggleOnly = toggleOnlySections.includes(section.title);
     const canNavigate = !!section.url && !isToggleOnly;
 
@@ -421,8 +426,8 @@ const AgentDashboardSidebar = () => {
       }
 
       navigate(section.url);
-      if (hasChildren) toggleSection(section.title);
-      if (isMobile && !hasChildren) setOpenMobile(false);
+      if (hasNested) toggleSection(section.title);
+      if (isMobile && !hasNested) setOpenMobile(false);
     };
 
     return (

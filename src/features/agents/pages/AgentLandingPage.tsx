@@ -178,7 +178,7 @@ export default function AgentLandingPage() {
                 {f.badge === 'unique' ? t('agentLanding.badgeUnique') || 'Unique' : t('agentLanding.badgeAutomated') || 'Automated'}
               </span>
               <div className="w-12 h-12 rounded-2xl bg-[#EFF6FF] flex items-center justify-center text-[#2563EB] mb-5">
-                <Icon icon={f.icon} size={24} />
+                <f.component size={24} />
               </div>
               <h3 className="text-[18px] font-extrabold text-black tracking-[-0.02em] leading-tight">
                 {t(f.titleKey)}

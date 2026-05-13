@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ShieldCheck, X, Eye } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface PendingApproval {
   id: string;

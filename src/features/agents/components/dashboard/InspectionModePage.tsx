@@ -135,13 +135,14 @@ const InspectionModePage = () => {
             agent_id: agent.id,
             property_id: activeInspection.propertyId,
             user_name: `${v.firstName} ${v.lastName}`.trim(),
-            user_email: v.email || `${v.firstName.toLowerCase()}@inspection.local`,
+            user_email: v.email || null,
             user_phone: v.phone || null,
             status: 'new' as const,
             message: `Checked in at open home. Interest: ${v.interest}`,
             urgency: v.interest === 'hot' ? 'ready_to_buy' : v.interest === 'warm' ? 'actively_looking' : 'just_browsing',
           }));
-          await supabase.from('leads').insert(leadsToInsert);
+          const { error } = await supabase.from('leads').insert(leadsToInsert);
+          if (error) toast.error('Failed to save visitor leads — ' + error.message);
         }
       } catch (e) {
         console.error('Failed to save leads', e);

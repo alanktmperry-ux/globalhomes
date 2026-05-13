@@ -52,6 +52,7 @@ interface CurrencyContextType {
   listingMode: ListingMode;
   setListingMode: (mode: ListingMode) => void;
   isLiveRates: boolean;
+  lastUpdated: Date | null;
 }
 
 const CurrencyContext = createContext<CurrencyContextType | null>(null);
@@ -61,6 +62,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   const [listingMode, setListingMode] = useState<ListingMode>('sale');
   const [currencies, setCurrencies] = useState<CurrencyInfo[]>(FALLBACK_CURRENCIES);
   const [isLiveRates, setIsLiveRates] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   // Live FX rates are only needed when the user is actually viewing prices in
   // a non-AUD currency. We skip the network call entirely on the default AUD
@@ -84,8 +86,9 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
         setCurrencies(updated);
         CURRENCIES = updated;
         setIsLiveRates(true);
+        setLastUpdated(new Date());
       } catch {
-        // fallback silently
+        // fallback silently — lastUpdated stays null to signal stale rates
       }
     };
 
@@ -137,7 +140,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   }, [convertPrice, currency, language]);
 
   return (
-    <CurrencyContext.Provider value={{ currency, setCurrencyCode, convertPrice, formatPrice, listingMode, setListingMode, isLiveRates }}>
+    <CurrencyContext.Provider value={{ currency, setCurrencyCode, convertPrice, formatPrice, listingMode, setListingMode, isLiveRates, lastUpdated }}>
       {children}
     </CurrencyContext.Provider>
   );

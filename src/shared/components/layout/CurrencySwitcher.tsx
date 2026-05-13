@@ -4,7 +4,8 @@ import { Coins, ChevronDown } from 'lucide-react';
 import { useCurrency, CURRENCY_REGIONS, CURRENCIES, type CurrencyCode } from '@/shared/lib/CurrencyContext';
 
 export function CurrencySwitcher() {
-  const { currency, setCurrencyCode } = useCurrency();
+  const { currency, setCurrencyCode, lastUpdated } = useCurrency();
+  const showStaleWarning = currency.code !== 'AUD' && lastUpdated === null;
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -49,6 +50,14 @@ export function CurrencySwitcher() {
       >
         <Coins size={16} />
         <span className="hidden sm:inline">{currency.code}</span>
+        {showStaleWarning && (
+          <span
+            title="Exchange rates unavailable — indicative only"
+            className="hidden sm:inline text-[10px] font-medium px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200"
+          >
+            indicative
+          </span>
+        )}
         <ChevronDown size={14} />
       </button>
 
@@ -59,6 +68,11 @@ export function CurrencySwitcher() {
           style={{ position: 'fixed', top: dropdownPos.top, right: dropdownPos.right }}
           className="z-[100] min-w-[240px] max-h-[70vh] overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg p-2"
         >
+          {showStaleWarning && (
+            <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-2 py-1.5 mb-2">
+              Exchange rates unavailable — indicative only
+            </div>
+          )}
           {CURRENCY_REGIONS.map(region => (
             <div key={region.region} className="mb-2 last:mb-0">
               <div className="text-[10px] uppercase tracking-wider text-slate-400 px-2 py-1 font-semibold">

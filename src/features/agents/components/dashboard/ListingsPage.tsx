@@ -337,7 +337,7 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
         {/* Language pill bottom-left */}
         <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 bg-white/95 backdrop-blur rounded-full px-2.5 py-1 text-[11px] font-bold text-[#0a0f1e]">
           <Ico icon="solar:earth-bold" size={12} color="#2563EB" />
-          {langCount} languages
+          Any language
         </span>
       </div>
 

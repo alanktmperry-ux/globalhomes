@@ -321,7 +321,6 @@ export default function AdminBrokers() {
                 <KpiCard
                   label="ListHQ Platform Fees"
                   value={AUD(revenue.totalPlatformFees)}
-                  helper="(platform fee tracking coming soon)"
                 />
                 <KpiCard label="Settled This Month" value={String(revenue.thisMonthSettled)} />
               </div>

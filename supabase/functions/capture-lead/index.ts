@@ -44,25 +44,30 @@ Deno.serve(async (req) => {
 
     // --- hCaptcha verification (required when HCAPTCHA_SECRET_KEY is configured) ---
     const hcaptchaSecret = Deno.env.get("HCAPTCHA_SECRET_KEY");
-    if (hcaptchaSecret) {
-      if (!hcaptcha_token) {
-        return new Response(
-          JSON.stringify({ error: "Captcha required" }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      const verifyResp = await fetch("https://hcaptcha.com/siteverify", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `secret=${encodeURIComponent(hcaptchaSecret)}&response=${encodeURIComponent(hcaptcha_token)}`,
-      });
-      const verifyResult = await verifyResp.json();
-      if (verifyResult.success !== true) {
-        return new Response(
-          JSON.stringify({ error: "CAPTCHA verification failed" }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
+    if (!hcaptchaSecret) {
+      console.error("HCAPTCHA_SECRET_KEY not configured — rejecting all requests");
+      return new Response(
+        JSON.stringify({ error: "Service unavailable" }),
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    if (!hcaptcha_token) {
+      return new Response(
+        JSON.stringify({ error: "Captcha required" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    const verifyResp = await fetch("https://hcaptcha.com/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `secret=${encodeURIComponent(hcaptchaSecret)}&response=${encodeURIComponent(hcaptcha_token)}`,
+    });
+    const verifyResult = await verifyResp.json();
+    if (verifyResult.success !== true) {
+      return new Response(
+        JSON.stringify({ error: "CAPTCHA verification failed" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
     // --- End hCaptcha verification ---
 

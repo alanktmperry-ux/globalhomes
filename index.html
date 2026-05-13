@@ -67,6 +67,21 @@
     <meta property="og:url" content="https://listhq.com.au" />
     <link rel="canonical" href="https://listhq.com.au" />
 
+    <!-- WebSite JSON-LD with SearchAction -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "ListHQ",
+      "url": "https://listhq.com.au",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://listhq.com.au/listings?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
     <!-- Organization JSON-LD (site-wide) -->
     <script type="application/ld+json">
     {

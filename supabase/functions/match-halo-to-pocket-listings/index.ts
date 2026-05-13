@@ -1,10 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
-};
+import { getCorsHeaders } from '../_shared/cors.ts';
 
 const APP_URL = Deno.env.get("APP_URL") ?? "https://listhq.com.au";
 const FROM = Deno.env.get("EMAIL_FROM") ?? "ListHQ <noreply@listhq.com.au>";
@@ -39,6 +34,7 @@ async function sendEmail(resendKey: string, to: string, subject: string, html: s
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('Origin'));
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {

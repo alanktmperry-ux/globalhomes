@@ -390,6 +390,21 @@ async function processMaintenance(
     error_text: res.ok ? null : res.reason,
     meta: { job_id: jobId, status },
   } as any);
+  if (res.ok) {
+    try {
+      await supabase.from("tenancy_communications").insert({
+        tenancy_id: tenancy.id,
+        agent_id: (job as any).agent_id,
+        type: "maintenance_update",
+        subject,
+        recipient_email: tenancy.tenant_email,
+        status: "sent",
+        sent_at: new Date().toISOString(),
+      } as any);
+    } catch (e) {
+      console.error("tenancy_communications insert failed:", (e as Error).message);
+    }
+  }
   return { processed: 1 };
 }
 

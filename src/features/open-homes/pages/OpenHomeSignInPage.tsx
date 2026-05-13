@@ -62,7 +62,7 @@ export default function OpenHomeSignInPage() {
       await supabase.from('open_home_registrations').insert({
         open_home_id: session.id,
         email: normalizedEmail,
-        name: normalizedEmail.split('@')[0],
+        name: (visitorName.trim() || normalizedEmail.split('@')[0]),
         attended: true,
         attended_at: new Date().toISOString(),
         on_waitlist: false,

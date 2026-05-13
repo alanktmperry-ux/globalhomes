@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
-import { ChevronDown, ChevronUp, Check, X as XIcon, FileText } from 'lucide-react';
+import { ChevronDown, ChevronUp, Check, X as XIcon, FileText, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import DashboardHeader from './DashboardHeader';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';

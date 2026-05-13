@@ -130,6 +130,17 @@ export default function OpenHomeSignInPage() {
             <>
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">
+                  Your name <span className="text-muted-foreground text-xs">(optional)</span>
+                </label>
+                <Input
+                  type="text"
+                  value={visitorName}
+                  onChange={(e) => setVisitorName(e.target.value)}
+                  placeholder="e.g. Sarah Chen"
+                  className="mb-4"
+                  disabled={signingIn}
+                />
+                <label className="text-sm font-medium text-foreground mb-1.5 block">
                   Your email to sign in
                 </label>
                 <Input

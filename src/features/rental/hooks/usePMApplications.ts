@@ -68,6 +68,34 @@ export function usePMApplications(propertyId: string) {
         .update({ status, ...(notes ? { pm_notes: notes } : {}) })
         .eq('id', appId);
       if (updateError) throw updateError;
+
+      // Notify applicant on terminal decisions
+      if (status === 'approved' || status === 'declined') {
+        const application = apps.find(a => a.id === appId);
+        if (application?.email) {
+          try {
+            // Best-effort lookup of property address if not already on the application row
+            let propertyAddress = (application as any).property_address as string | undefined;
+            if (!propertyAddress && application.property_id) {
+              const { data: prop } = await (supabase as any)
+                .from('properties')
+                .select('address, suburb')
+                .eq('id', application.property_id)
+                .maybeSingle();
+              propertyAddress = [prop?.address, prop?.suburb].filter(Boolean).join(', ') || undefined;
+            }
+            await supabase.functions.invoke('send-notification-email', {
+              body: {
+                type: status === 'approved' ? 'rental_approved' : 'rental_declined',
+                recipient_email: application.email,
+                recipient_name: application.full_name || (application as any).first_name || 'there',
+                property_address: propertyAddress || 'the property',
+              },
+            });
+          } catch { /* non-blocking */ }
+        }
+      }
+
       fetchApps();
     } catch (e: any) {
       toast.error(e.message ?? 'Failed to update application status');

@@ -89,7 +89,7 @@ export default function MarketingLandingPage() {
       {/* ─── FOUNDING AGENT BANNER ─── */}
       {spotsRemaining > 0 && (
         <div className="bg-primary text-primary-foreground text-center py-2.5 text-sm font-medium">
-          🚀 Founding Agent Offer — First 100 agents get 60 days free, no credit card required.{' '}
+          Founding Agent Offer — 60 days free, no credit card required.{' '}
           <span className="font-bold">{spotsRemaining} spots remaining.</span>
         </div>
       )}

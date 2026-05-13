@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { Helmet } from 'react-helmet-async';
+
 import { SEO } from '@/shared/components/SEO';
 import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';

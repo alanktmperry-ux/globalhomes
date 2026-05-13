@@ -282,7 +282,7 @@ export default function PricingPage() {
               <span style={gradientText}>plan.</span>
             </h1>
             <p className="text-[17px] md:text-[19px] text-[#4a4a4a] mt-6 max-w-[640px] mx-auto leading-[1.55]">
-              {t('pricing.subheadline') || '60-day free trial · No credit card · Locked founding pricing for 12 months.'}
+              {t('pricing.subheadline') || '60-day free trial · No credit card required · Founding pricing locked for 12 months.'}
             </p>
 
             {/* Billing toggle */}

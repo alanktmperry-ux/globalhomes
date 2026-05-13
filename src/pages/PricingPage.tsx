@@ -47,7 +47,7 @@ const PLANS: Plan[] = [
     trialBadge: '60-day free trial',
     ctaLabel: 'Start free trial',
     ctaHref: '/for-agents#register',
-    microcopy: 'Credit card required · Cancels anytime before day 31',
+    microcopy: 'No credit card required · Cancel anytime before day 61',
     features: [
       '1 agent seat',
       'Up to 5 active listings',

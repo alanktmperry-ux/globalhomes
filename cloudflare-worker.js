@@ -388,6 +388,19 @@ const handler = {
       }
     }
 
+    // Multilingual landing pages: /property-australia/:language
+    // Inject page-specific head (title/desc/og/lang/JSON-LD) for AI crawlers
+    // and search engines. React still hydrates and renders the page normally.
+    const landingMatch = url.pathname.match(/^\/property-australia\/([a-z-]+)\/?$/i);
+    if (landingMatch) {
+      const lang = findLandingLanguage(landingMatch[1]);
+      if (lang) {
+        const landingRes = await handleLandingLanguage(request, env, lang);
+        if (landingRes) return landingRes;
+      }
+      // unknown slug → fall through to React app (which redirects to /buy)
+    }
+
     const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
     const bot = isBot(userAgent);
     if (bot && checkRateLimit(ip)) {

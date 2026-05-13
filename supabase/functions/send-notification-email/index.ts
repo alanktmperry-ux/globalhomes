@@ -167,8 +167,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Legacy type-based mode: any authenticated user is allowed
-    if (!isPrivileged && !callerUser) {
+    // Legacy type-based mode: privileged callers only (admin or agent role)
+    if (!isPrivileged) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });

@@ -984,11 +984,6 @@ function AgentBand() {
             <p style={{ fontSize:16, color:'rgba(255,255,255,.6)', lineHeight:1.6, margin:'0 0 22px', maxWidth:620 }}>
               {t('home.agentBand.para')}
             </p>
-            <div style={{ display:'flex', gap:24, flexWrap:'wrap' }}>
-              {['McGrath','Belle Property','LJ Hooker','Raine & Horne'].map((b) => (
-                <span key={b} style={{ fontSize:13, fontWeight:700, color:'rgba(255,255,255,.65)', letterSpacing:'.04em' }}>{b}</span>
-              ))}
-            </div>
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
             <button onClick={() => navigate('/for-agents/pricing')} style={{ background:'#fff', color:T.ink, border:'none', padding:'14px 28px', borderRadius:12, fontSize:15, fontWeight:700, cursor:'pointer' }}>{t('home.agents.cta')} →</button>

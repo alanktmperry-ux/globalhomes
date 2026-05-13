@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Wrench, Loader2, Copy, ChevronDown, ChevronUp, CheckCircle2, Upload } from 'lucide-react';
+import { Wrench, Loader2, Copy, ChevronDown, ChevronUp, CheckCircle2, Upload, Receipt, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, parseISO, differenceInDays } from 'date-fns';
 import DashboardHeader from './DashboardHeader';
@@ -45,6 +45,7 @@ interface Job {
   scheduled_entry_date: string | null;
   entry_notice_sent_at: string | null;
   photo_urls: string[];
+  invoice_url: string | null;
 }
 
 interface Supplier { id: string; business_name: string; trade_category: string; email: string | null; }
@@ -421,6 +422,26 @@ export default function MaintenancePage() {
                                     </a>
                                   ))}
                                 </div>
+                              )}
+                            </div>
+                            <div className="space-y-2 pt-2 border-t border-border/50">
+                              <Label className="text-xs flex items-center gap-1.5">
+                                <Receipt size={12} /> Supplier Invoice
+                              </Label>
+                              {j.invoice_url ? (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    window.open(j.invoice_url!, '_blank', 'noopener,noreferrer');
+                                  }}
+                                  className="gap-1.5"
+                                >
+                                  <ExternalLink size={14} /> View Invoice
+                                </Button>
+                              ) : (
+                                <p className="text-xs text-muted-foreground">No invoice uploaded yet</p>
                               )}
                             </div>
                           </div>

@@ -96,7 +96,7 @@ export default function MaintenancePage() {
     const [{ data: js }, { data: sups }] = await Promise.all([
       supabase
         .from('maintenance_jobs')
-        .select('*, properties:property_id(address, suburb), tenancies:tenancy_id(tenant_name), supplier:assigned_supplier_id(business_name)')
+        .select('*, properties:property_id(address, suburb), tenancies:tenancy_id(tenant_name, tenant_portal_token), supplier:assigned_supplier_id(business_name)')
         .eq('agent_id', agentId)
         .order('created_at', { ascending: false }),
       supabase.from('suppliers' as any).select('id, business_name, trade_category, email').eq('agent_id', agentId).eq('status', 'active'),

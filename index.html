@@ -140,6 +140,87 @@
         window.addEventListener('cookie-consent-accepted', loadAnalytics);
       })();
     </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://listhq.com.au/#organization",
+          "name": "ListHQ",
+          "url": "https://listhq.com.au",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://listhq.com.au/og-image.png",
+            "width": 1200,
+            "height": 630
+          },
+          "description": "Australia's only multilingual property platform. Search listings in 20+ languages, manage trust accounting, and connect with buyers through the Halo reverse marketplace. Built for Australian real estate agents, buyers, renters, and property managers.",
+          "foundingDate": "2024",
+          "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "AU"
+          },
+          "areaServed": "AU",
+          "knowsAbout": [
+            "Australian real estate",
+            "Multilingual property search",
+            "Property management",
+            "Trust accounting",
+            "Real estate CRM",
+            "Buyer matching",
+            "Property listings"
+          ],
+          "sameAs": [
+            "https://twitter.com/ListHQ"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://listhq.com.au/#website",
+          "name": "ListHQ",
+          "url": "https://listhq.com.au",
+          "description": "Australia's multilingual property platform",
+          "publisher": {
+            "@id": "https://listhq.com.au/#organization"
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://listhq.com.au/listings?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://listhq.com.au/#app",
+          "name": "ListHQ",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web",
+          "description": "Multilingual Australian real estate platform combining property listings, agent CRM, property management, trust accounting, and the Halo buyer reverse marketplace.",
+          "offers": {
+            "@type": "AggregateOffer",
+            "priceCurrency": "AUD",
+            "lowPrice": "299",
+            "highPrice": "1999",
+            "offerCount": "3"
+          },
+          "featureList": [
+            "Multilingual property search in 20+ languages",
+            "AI voice listing creation",
+            "Halo reverse buyer marketplace",
+            "Full trust accounting AFA 2014 compliant",
+            "Property management and rent roll",
+            "AI buyer concierge and readiness scoring",
+            "CMA comparative market analysis tool",
+            "No-login tenant and owner portals"
+          ]
+        }
+      ]
+    }
+    </script>
   </head>
 
   <body>

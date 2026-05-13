@@ -724,7 +724,7 @@ const Index = () => {
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}
                 >
-                  <img src={HOUSE_PLACEHOLDER_SVG} alt="" aria-hidden="true" style={{ width: 44, height: 44, opacity: 0.95 }} />
+                  <img src={HOUSE_PLACEHOLDER_SVG} alt="" aria-hidden="true" loading="lazy" decoding="async" style={{ width: 44, height: 44, opacity: 0.95 }} />
                 </div>
                 <div style={{ fontSize: 20, fontWeight: 800, color: T.ink, marginBottom: 8 }}>
                   No listings yet — founding agents are setting up now

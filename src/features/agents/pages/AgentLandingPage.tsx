@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, MapPin, Wand2, Globe, Lock, Mic, Clock, BarChart2, Wallet, XCircle, CheckCircle2 } from 'lucide-react';
 
 import { SEO } from '@/shared/components/SEO';
 import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
@@ -11,11 +11,6 @@ import FinalCTA from '@/features/marketing/FinalCTA';
 
 const GRAD = 'linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%)';
 
-// iconify-icon is a globally loaded web component
-const Icon = ({ icon, size = 20, color }: { icon: string; size?: number; color?: string }) => (
-  // @ts-expect-error — iconify-icon is a web component
-  <iconify-icon icon={icon} style={{ fontSize: `${size}px`, color, display: 'inline-flex', lineHeight: 1 }} />
-);
 
 const CYCLING_LINES = [
   'who move fast.',
@@ -25,15 +20,15 @@ const CYCLING_LINES = [
   'who speak every language.',
 ];
 
-const FEATURES: Array<{ icon: string; titleKey: string; bodyKey: string; badge: 'unique' | 'automated' }> = [
-  { icon: 'solar:streets-linear',         titleKey: 'agentLanding.feature1Title', bodyKey: 'agentLanding.feature1Body', badge: 'unique' },
-  { icon: 'solar:magic-stick-3-linear',   titleKey: 'agentLanding.feature2Title', bodyKey: 'agentLanding.feature2Body', badge: 'automated' },
-  { icon: 'solar:earth-linear',           titleKey: 'agentLanding.feature3Title', bodyKey: 'agentLanding.feature3Body', badge: 'unique' },
-  { icon: 'solar:lock-keyhole-linear',    titleKey: 'agentLanding.feature4Title', bodyKey: 'agentLanding.feature4Body', badge: 'unique' },
-  { icon: 'solar:microphone-3-linear',    titleKey: 'agentLanding.feature5Title', bodyKey: 'agentLanding.feature5Body', badge: 'unique' },
-  { icon: 'solar:clock-circle-linear',    titleKey: 'agentLanding.feature6Title', bodyKey: 'agentLanding.feature6Body', badge: 'unique' },
-  { icon: 'solar:chart-square-linear',    titleKey: 'agentLanding.feature7Title', bodyKey: 'agentLanding.feature7Body', badge: 'automated' },
-  { icon: 'solar:wallet-2-linear',        titleKey: 'agentLanding.feature8Title', bodyKey: 'agentLanding.feature8Body', badge: 'automated' },
+const FEATURES: Array<{ component: React.ComponentType<any>; titleKey: string; bodyKey: string; badge: 'unique' | 'automated' }> = [
+  { component: MapPin,      titleKey: 'agentLanding.feature1Title', bodyKey: 'agentLanding.feature1Body', badge: 'unique' },
+  { component: Wand2,       titleKey: 'agentLanding.feature2Title', bodyKey: 'agentLanding.feature2Body', badge: 'automated' },
+  { component: Globe,       titleKey: 'agentLanding.feature3Title', bodyKey: 'agentLanding.feature3Body', badge: 'unique' },
+  { component: Lock,        titleKey: 'agentLanding.feature4Title', bodyKey: 'agentLanding.feature4Body', badge: 'unique' },
+  { component: Mic,         titleKey: 'agentLanding.feature5Title', bodyKey: 'agentLanding.feature5Body', badge: 'unique' },
+  { component: Clock,       titleKey: 'agentLanding.feature6Title', bodyKey: 'agentLanding.feature6Body', badge: 'unique' },
+  { component: BarChart2,   titleKey: 'agentLanding.feature7Title', bodyKey: 'agentLanding.feature7Body', badge: 'automated' },
+  { component: Wallet,      titleKey: 'agentLanding.feature8Title', bodyKey: 'agentLanding.feature8Body', badge: 'automated' },
 ];
 
 const CON_KEYS = ['agentLanding.con1','agentLanding.con2','agentLanding.con3','agentLanding.con4','agentLanding.con5','agentLanding.con6','agentLanding.con7'];
@@ -119,7 +114,7 @@ export default function AgentLandingPage() {
               onClick={() => navigate('/signup?role=agent')}
               className="text-[13px] font-bold text-[#4a4a4a] hover:text-[#2563EB] transition-colors inline-flex items-center gap-1.5"
             >
-              <Icon icon="solar:lock-keyhole-linear" size={14} />
+              <Lock size={14} />
               {t('agentLanding.ctaLogin') || 'Sign in to your account'}
             </button>
             <p className="text-[12px] text-[#9CA3AF] mt-2">
@@ -183,7 +178,7 @@ export default function AgentLandingPage() {
                 {f.badge === 'unique' ? t('agentLanding.badgeUnique') || 'Unique' : t('agentLanding.badgeAutomated') || 'Automated'}
               </span>
               <div className="w-12 h-12 rounded-2xl bg-[#EFF6FF] flex items-center justify-center text-[#2563EB] mb-5">
-                <Icon icon={f.icon} size={24} />
+                <f.component size={24} />
               </div>
               <h3 className="text-[18px] font-extrabold text-black tracking-[-0.02em] leading-tight">
                 {t(f.titleKey)}
@@ -217,7 +212,7 @@ export default function AgentLandingPage() {
             {/* LEFT — Other portals */}
             <div className="bg-white border border-[#E5E5E5] rounded-3xl p-8">
               <div className="flex items-center gap-3 mb-6 pb-5 border-b border-[#E5E5E5]">
-                <Icon icon="solar:close-circle-linear" size={24} color="#6a6a6a" />
+                <XCircle size={24} color="#6a6a6a" />
                 <div className="text-[16px] font-bold text-[#0a0f1e]">REA / Domain / PropertyMe</div>
               </div>
               {CON_KEYS.map((k) => (
@@ -226,7 +221,7 @@ export default function AgentLandingPage() {
                   className="flex items-start gap-3 py-3 border-b border-[#F3F4F6] last:border-0 text-[14px] text-[#6a6a6a]"
                 >
                   <span className="mt-0.5 flex-shrink-0">
-                    <Icon icon="solar:close-circle-linear" size={16} color="#F87171" />
+                    <XCircle size={16} color="#F87171" />
                   </span>
                   <span>{t(k)}</span>
                 </div>
@@ -242,7 +237,7 @@ export default function AgentLandingPage() {
                 Most chosen
               </span>
               <div className="flex items-center gap-3 mb-6 pb-5 border-b border-[#E5E5E5]">
-                <Icon icon="solar:check-circle-linear" size={24} color="#2563EB" />
+                <CheckCircle2 size={24} color="#2563EB" />
                 <div className="text-[16px] font-bold text-[#0a0f1e]">ListHQ</div>
               </div>
               {PRO_KEYS.map((k) => (
@@ -251,7 +246,7 @@ export default function AgentLandingPage() {
                   className="flex items-start gap-3 py-3 border-b border-[#F3F4F6] last:border-0 text-[14px] text-[#0a0f1e] font-medium"
                 >
                   <span className="mt-0.5 flex-shrink-0">
-                    <Icon icon="solar:check-circle-bold" size={16} color="#2563EB" />
+                    <CheckCircle2 size={16} color="#2563EB" />
                   </span>
                   <span>{t(k)}</span>
                 </div>

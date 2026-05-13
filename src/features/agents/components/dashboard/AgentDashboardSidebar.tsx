@@ -222,6 +222,51 @@ const AgentDashboardSidebar = () => {
     return () => { if (channel) supabase.removeChannel(channel); };
   }, [agent?.id]);
 
+  // New leads badge count + realtime
+  useEffect(() => {
+    if (!agent?.id) return;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    const refresh = async () => {
+      const { count } = await supabase
+        .from('crm_leads')
+        .select('id', { count: 'exact', head: true })
+        .eq('agent_id', agent.id)
+        .eq('stage', 'new');
+      setLeadsCount(count || 0);
+    };
+    refresh();
+    channel = supabase
+      .channel('sidebar-leads-' + agent.id)
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'crm_leads', filter: `agent_id=eq.${agent.id}` },
+        () => { refresh(); })
+      .subscribe();
+    return () => { if (channel) supabase.removeChannel(channel); };
+  }, [agent?.id]);
+
+  // Unread inbox badge count + realtime
+  useEffect(() => {
+    if (!agent?.agency_id) return;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    const refresh = async () => {
+      const { count } = await supabase
+        .from('inbox_threads' as any)
+        .select('id', { count: 'exact', head: true })
+        .eq('agency_id', agent.agency_id)
+        .eq('is_unread', true)
+        .neq('status', 'closed');
+      setInboxCount(count || 0);
+    };
+    refresh();
+    channel = supabase
+      .channel('sidebar-inbox-' + agent.agency_id)
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'inbox_threads', filter: `agency_id=eq.${agent.agency_id}` },
+        () => { refresh(); })
+      .subscribe();
+    return () => { if (channel) supabase.removeChannel(channel); };
+  }, [agent?.agency_id]);
+
   // Halo credits badge is provided by the shared `useHaloCreditsBalance` hook
   // (cached + realtime). The previous duplicate fetch + channel was removed
   // so the sidebar and Halo Board page share a single network call.

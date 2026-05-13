@@ -19,7 +19,7 @@ interface VoiceLead {
   id: string;
   transcript: string;
   urgency: 'hot' | 'warm' | 'cold';
-  score: number;
+  score: number | null;
   time: string;
   createdAt: string;
   buyerLocation: string;

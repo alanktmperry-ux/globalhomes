@@ -35,6 +35,7 @@ interface Tenancy {
   rent_amount: number;
   rent_frequency: string;
   bond_amount: number;
+  bond_lodgment_number?: string | null;
   management_fee_percent: number;
   status: string;
   notes: string | null;

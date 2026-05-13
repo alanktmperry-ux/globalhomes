@@ -1,11 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Loader2, Home as HomeIcon, Key, PiggyBank, Wallet, Shield, Zap, Scale, Pencil, Plus, Search, MapPin, Inbox } from 'lucide-react';
+import { Loader2, Home as HomeIcon, Key, PiggyBank, Wallet, Shield, Zap, Scale, Pencil, Plus, Search, MapPin, Inbox, PauseCircle, PlayCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import type { Halo } from '@/types/halo';
 import { usePageTitle } from '@/lib/usePageTitle';

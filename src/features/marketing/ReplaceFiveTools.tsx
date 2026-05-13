@@ -122,7 +122,7 @@ export default function ReplaceFiveTools() {
         <div className="replace-mobile-stats hidden grid-cols-3 gap-3 max-w-[640px] mx-auto mt-8">
           <MobileStat number="Any" label={t("marketing.replaceTools.mobile.language")} />
           <MobileStat number="AI" label={t("marketing.replaceTools.mobile.voice")} />
-          <MobileStat number="7M+" label={t("marketing.replaceTools.mobile.buyers")} />
+          <MobileStat number="30+" label={t("marketing.replaceTools.mobile.buyers")} />
         </div>
 
         {/* The 5 tools being replaced */}

@@ -450,7 +450,7 @@ export const en = {
   'home.agents.feature4': 'Off-market network',
 
   // ── Sliver bar ──
-  'home.sliver.agents': 'Real estate agents: reach 7M+ multilingual buyers no other portal can find',
+  'home.sliver.agents': 'Real estate agents: reach buyers across 30+ languages no other portal can find',
   'home.sliver.translation': 'Auto-translated listings in any language',
   'home.sliver.price': 'From $299/mo',
   'home.sliver.free': '60 days free',
@@ -517,7 +517,7 @@ export const en = {
   'home.pricing.heading': 'Built for the way you work.',
   'home.pricing.subtext': 'All plans include any language · trust accounting · AI matching',
   'home.pricing.calloutTitle': 'Why $299/mo is a no-brainer for agents',
-  'home.pricing.calloutBody': 'REA.com.au and Domain charge $1,500–$7,000 per listing. A CRM costs $300–$600/mo. Property management software another $200–$400/mo. ListHQ replaces all three — CRM, PM platform, and multilingual listing portal — in one subscription, reaching 7M+ multilingual buyers no other portal can find.',
+  'home.pricing.calloutBody': 'REA.com.au and Domain charge $1,500–$7,000 per listing. A CRM costs $300–$600/mo. Property management software another $200–$400/mo. ListHQ replaces all three — CRM, PM platform, and multilingual listing portal — in one subscription, reaching buyers across 30+ languages no other portal can find.',
   'home.pricing.monthly': 'Monthly',
   'home.pricing.annual': 'Annual — save 20%',
   'home.pricing.mostPopular': 'Most popular',
@@ -542,7 +542,7 @@ export const en = {
   // ── Closing CTA ──
   'home.closingCta.eyebrow': 'Start today',
   'home.closingCta.heading': '60 days free. No contracts. Cancel anytime.',
-  'home.closingCta.body': 'Join agents already reaching 7M+ multilingual buyers across Australia.',
+  'home.closingCta.body': 'Join agents already reaching buyers across 30+ languages around Australia.',
   'home.closingCta.primary': 'Start free 60-day trial →',
   'home.closingCta.secondary': 'Talk to sales',
   'home.closingCta.finePrint': 'No credit card required · Australian data storage · Cancel anytime',
@@ -1713,7 +1713,7 @@ export const en = {
   'agentLanding.pricing2.heading': 'Built for the way you work.',
   'agentLanding.pricing2.includes': 'All plans include any language · trust accounting · AI matching',
   'agentLanding.pricing2.callout.heading': 'Why $299/mo is a no-brainer for agents',
-  'agentLanding.pricing2.callout.body': 'REA.com.au and Domain charge $1,500–$7,000 per listing. A CRM costs $300–$600/mo. Property management software another $200–$400/mo. ListHQ replaces all three — CRM, PM platform, and multilingual listing portal — in one subscription, reaching 7M+ multilingual buyers no other portal can find.',
+  'agentLanding.pricing2.callout.body': 'REA.com.au and Domain charge $1,500–$7,000 per listing. A CRM costs $300–$600/mo. Property management software another $200–$400/mo. ListHQ replaces all three — CRM, PM platform, and multilingual listing portal — in one subscription, reaching buyers across 30+ languages no other portal can find.',
   'agentLanding.pricing2.mostPopular': 'Most popular',
   'agentLanding.pricing2.foundingMember': 'Founding member — locked for life',
   'agentLanding.pricing2.solo.name': 'Solo',
@@ -2680,7 +2680,7 @@ export const en = {
   'marketing.replaceTools.callout.buyers': "Multilingual buyers reached",
   'marketing.replaceTools.mobile.language': "Language",
   'marketing.replaceTools.mobile.voice': "Voice listing",
-  'marketing.replaceTools.mobile.buyers': "Buyers reached",
+  'marketing.replaceTools.mobile.buyers': "Buyer languages",
 
   // Voice listing showcase
   'marketing.voice.eyebrow': "FOR AGENTS",

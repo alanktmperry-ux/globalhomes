@@ -45,6 +45,7 @@ interface Job {
   scheduled_entry_date: string | null;
   entry_notice_sent_at: string | null;
   photo_urls: string[];
+  invoice_url: string | null;
 }
 
 interface Supplier { id: string; business_name: string; trade_category: string; email: string | null; }

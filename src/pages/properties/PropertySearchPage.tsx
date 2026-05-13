@@ -308,8 +308,8 @@ export default function PropertySearchPage() {
               <div className="w-14 h-14 rounded-2xl bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center mx-auto">
                 <MapIcon size={28} strokeWidth={1.5} />
               </div>
-              <h2 className="text-[20px] font-bold text-[#0a0f1e] mt-4">Map view coming soon</h2>
-              <p className="text-[14px] text-[#6a6a6a] mt-2">Switch back to grid to browse listings.</p>
+              <h2 className="text-[20px] font-bold text-[#0a0f1e] mt-4">Map view launching soon</h2>
+              <p className="text-[14px] text-[#6a6a6a] mt-2">Use grid view to browse all listings while map view is in development.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">

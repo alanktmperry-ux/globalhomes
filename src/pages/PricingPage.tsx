@@ -116,7 +116,7 @@ const FAQS = [
   },
   {
     q: 'Does ListHQ replace PropertyMe or Console Cloud?',
-    a: 'Yes. ListHQ includes full trust accounting, property management, rent roll, arrears automation, inspection scheduling, and no-login portals for tenants, owners and suppliers — all state-specific and AFA 2014 compliant.',
+    a: 'Yes. ListHQ includes full trust accounting, property management, rent roll, arrears automation, inspection scheduling, and no-login portals for tenants, owners and suppliers — built to support state-specific trust accounting record-keeping requirements including AFA 2014 (QLD) and equivalent legislation in NSW, VIC, SA, and WA.',
   },
   {
     q: 'Can I change plans?',

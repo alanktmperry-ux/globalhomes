@@ -26,6 +26,11 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 import { useHaloCreditsBalance } from '@/features/halo/hooks/useHaloCreditsBalance';
 
+interface NavSubgroup {
+  label: string;
+  items: NavItem[];
+}
+
 interface NavSection {
   title: string;
   url: string;
@@ -33,6 +38,7 @@ interface NavSection {
   badgeKey?: string;
   alertWhenBadge?: boolean;
   children?: NavItem[];
+  subgroups?: NavSubgroup[];
 }
 
 // Six top-level sections. Each top-level item is clickable AND expands to show its sub-items.

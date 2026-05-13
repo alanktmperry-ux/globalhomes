@@ -90,7 +90,6 @@ const NAV_SECTIONS: NavSection[] = [
         items: [
           { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
           { title: 'Owner Statements', url: '/dashboard/statements', icon: FileText },
-          { title: 'Vacancy KPIs', url: '/dashboard/vacancy-kpi', icon: Activity },
         ],
       },
       {

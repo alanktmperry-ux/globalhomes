@@ -191,17 +191,20 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
             </span>
           </div>
         ) : (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onRespond(halo);
-            }}
-            className="bg-[#0a0f1e] text-white rounded-full px-5 py-2.5 text-[13px] font-bold inline-flex items-center gap-2 hover:bg-[#2563EB] transition"
-          >
-            <Ico icon="solar:lock-keyhole-bold" size={14} />
-            Unlock · 1 credit
-          </button>
+          <div className="flex flex-col items-end gap-1.5">
+            <span className="text-[11px] font-medium text-[#6a6a6a]">1 credit to unlock contact details</span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRespond(halo);
+              }}
+              className="bg-[#0a0f1e] text-white rounded-full px-5 py-2.5 text-[13px] font-bold inline-flex items-center gap-2 hover:bg-[#2563EB] transition"
+            >
+              <Ico icon="solar:lock-keyhole-bold" size={14} />
+              Unlock · 1 credit
+            </button>
+          </div>
         )}
       </div>
     </div>

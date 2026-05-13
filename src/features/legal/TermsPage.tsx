@@ -7,16 +7,17 @@ const sections = [
   { id: 'about', title: '1. About ListHQ' },
   { id: 'acceptance', title: '2. Acceptance of Terms' },
   { id: 'accounts', title: '3. User Accounts' },
-  { id: 'agents', title: '4. Agent Obligations' },
-  { id: 'buyers', title: '5. Buyer and Renter Obligations' },
-  { id: 'ip', title: '6. Intellectual Property' },
-  { id: 'referrals', title: '7. International Referral Program' },
-  { id: 'pm', title: '8. Property Management Features' },
-  { id: 'liability', title: '9. Limitation of Liability' },
-  { id: 'privacy', title: '10. Privacy' },
-  { id: 'law', title: '11. Governing Law' },
-  { id: 'changes', title: '12. Changes to Terms' },
-  { id: 'contact', title: '13. Contact' },
+  { id: 'billing', title: '4. Subscriptions, Billing & Refunds' },
+  { id: 'agents', title: '5. Agent Obligations' },
+  { id: 'buyers', title: '6. Buyer and Renter Obligations' },
+  { id: 'ip', title: '7. Intellectual Property' },
+  { id: 'referrals', title: '8. International Referral Program' },
+  { id: 'pm', title: '9. Property Management Features' },
+  { id: 'liability', title: '10. Limitation of Liability' },
+  { id: 'privacy', title: '11. Privacy' },
+  { id: 'law', title: '12. Governing Law' },
+  { id: 'changes', title: '13. Changes to Terms' },
+  { id: 'contact', title: '14. Contact' },
 ];
 
 const TermsPage = () => {
@@ -71,8 +72,13 @@ const TermsPage = () => {
               </ul>
             </section>
 
+            <section id="billing">
+              <h2>4. Subscriptions, Billing & Refunds</h2>
+              <p>All paid plans include a 60-day free trial. Your nominated payment method will be charged on day 61 unless you cancel before that date. Subscriptions renew monthly unless cancelled. You may cancel at any time via your billing dashboard. Refunds are not provided for partial billing periods. For billing disputes, contact <a href="mailto:support@listhq.com.au" className="text-primary hover:underline">support@listhq.com.au</a> within 30 days of the charge.</p>
+            </section>
+
             <section id="agents">
-              <h2>4. Agent Obligations</h2>
+              <h2>5. Agent Obligations</h2>
               <ul>
                 <li>Listings must be accurate and not misleading.</li>
                 <li>Agents must hold a valid real estate licence in their operating state.</li>
@@ -82,7 +88,7 @@ const TermsPage = () => {
             </section>
 
             <section id="buyers">
-              <h2>5. Buyer and Renter Obligations</h2>
+              <h2>6. Buyer and Renter Obligations</h2>
               <ul>
                 <li>Users must not submit false enquiries or applications.</li>
                 <li>Foreign buyers are solely responsible for obtaining FIRB approval where required.</li>
@@ -91,7 +97,7 @@ const TermsPage = () => {
             </section>
 
             <section id="ip">
-              <h2>6. Intellectual Property</h2>
+              <h2>7. Intellectual Property</h2>
               <ul>
                 <li>All platform content, design and code is owned by Square Development Pty Ltd (trading as ListHQ).</li>
                 <li>Agents retain ownership of their listing content and photos.</li>
@@ -100,7 +106,7 @@ const TermsPage = () => {
             </section>
 
             <section id="referrals">
-              <h2>7. International Referral Program</h2>
+              <h2>8. International Referral Program</h2>
               <ul>
                 <li>Referral commissions are paid on settled transactions only.</li>
                 <li>Commission amounts are as displayed in the referral program tier schedule.</li>
@@ -110,7 +116,7 @@ const TermsPage = () => {
             </section>
 
             <section id="pm">
-              <h2>8. Property Management Features</h2>
+              <h2>9. Property Management Features</h2>
               <ul>
                 <li>PM tools including trust accounting, rent roll and tenant portals are provided as software only.</li>
                 <li>Agents using trust accounting features must comply with their state's trust accounting legislation.</li>
@@ -120,7 +126,7 @@ const TermsPage = () => {
             </section>
 
             <section id="liability">
-              <h2>9. Limitation of Liability</h2>
+              <h2>10. Limitation of Liability</h2>
               <ul>
                 <li>ListHQ provides the platform "as is" without warranty.</li>
                 <li>To the maximum extent permitted by Australian law, ListHQ's liability is limited to the subscription fees paid in the prior 3 months.</li>
@@ -129,22 +135,22 @@ const TermsPage = () => {
             </section>
 
             <section id="privacy">
-              <h2>10. Privacy</h2>
+              <h2>11. Privacy</h2>
               <p>Your use of ListHQ is also governed by our <a href="/privacy" className="text-primary hover:underline">Privacy Policy</a>.</p>
             </section>
 
             <section id="law">
-              <h2>11. Governing Law</h2>
+              <h2>12. Governing Law</h2>
               <p>These terms are governed by the laws of Victoria, Australia. Disputes are subject to the exclusive jurisdiction of Victorian courts.</p>
             </section>
 
             <section id="changes">
-              <h2>12. Changes to Terms</h2>
+              <h2>13. Changes to Terms</h2>
               <p>ListHQ may update these terms at any time. Continued use after notice of changes constitutes acceptance.</p>
             </section>
 
             <section id="contact">
-              <h2>13. Contact</h2>
+              <h2>14. Contact</h2>
               <p>Legal enquiries: <a href="mailto:legal@listhq.com.au" className="text-primary hover:underline">legal@listhq.com.au</a></p>
             </section>
           </div>

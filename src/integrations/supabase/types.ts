@@ -10125,6 +10125,7 @@ export type Database = {
           finalised_at: string | null
           id: string
           inspection_type: string
+          inspector_name: string | null
           keys_count: number | null
           notice_sent_at: string | null
           overall_notes: string | null
@@ -10153,6 +10154,7 @@ export type Database = {
           finalised_at?: string | null
           id?: string
           inspection_type: string
+          inspector_name?: string | null
           keys_count?: number | null
           notice_sent_at?: string | null
           overall_notes?: string | null
@@ -10181,6 +10183,7 @@ export type Database = {
           finalised_at?: string | null
           id?: string
           inspection_type?: string
+          inspector_name?: string | null
           keys_count?: number | null
           notice_sent_at?: string | null
           overall_notes?: string | null

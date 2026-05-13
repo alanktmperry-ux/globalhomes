@@ -1,0 +1,1 @@
+ALTER TABLE public.property_inspections ADD COLUMN IF NOT EXISTS inspector_name text;

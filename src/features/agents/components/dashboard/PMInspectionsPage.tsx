@@ -141,13 +141,15 @@ const ruleMinDate = (r: StateRule): Date => {
 };
 
 interface ScheduleForm {
+  property_id: string;
   tenancy_id: string;
   inspection_type: InspectionType;
   scheduled_date?: Date;
+  inspector_name: string;
   notes: string;
 }
 const emptySchedule = (): ScheduleForm => ({
-  tenancy_id: '', inspection_type: 'routine', notes: '',
+  property_id: '', tenancy_id: '', inspection_type: 'routine', inspector_name: '', notes: '',
 });
 
 interface CompleteForm {
@@ -408,9 +410,12 @@ export default function PMInspectionsPage() {
 
   // Handlers
   const openSchedule = (tenancyId?: string) => {
+    const seed = tenancyId ? activeTenancies.find(t => t.id === tenancyId) : null;
     setScheduleForm({
       ...emptySchedule(),
+      property_id: seed?.property_id || '',
       tenancy_id: tenancyId || '',
+      inspector_name: agentName || '',
     });
   };
 
@@ -419,22 +424,62 @@ export default function PMInspectionsPage() {
     return activeTenancies.find(t => t.id === scheduleForm.tenancy_id) || null;
   }, [scheduleForm, activeTenancies]);
 
+  const propertiesForSchedule = useMemo(() => {
+    const map = new Map<string, { id: string; address: string; suburb: string | null; state: string | null }>();
+    for (const t of activeTenancies) {
+      if (!t.property_id) continue;
+      if (!map.has(t.property_id)) {
+        map.set(t.property_id, {
+          id: t.property_id,
+          address: t.properties?.address || 'Property',
+          suburb: t.properties?.suburb || null,
+          state: t.properties?.state || null,
+        });
+      }
+    }
+    return Array.from(map.values());
+  }, [activeTenancies]);
+
+  const tenanciesForProperty = useMemo(() => {
+    if (!scheduleForm?.property_id) return [];
+    return activeTenancies.filter(t => t.property_id === scheduleForm.property_id);
+  }, [scheduleForm, activeTenancies]);
+
   const selectedRule = useMemo(() => ruleFor(selectedTenancy?.properties?.state), [selectedTenancy]);
   const selectedMinDate = useMemo(() => ruleMinDate(selectedRule), [selectedRule]);
 
+  const routineMinDate = useMemo(() => addDays(new Date(), 7), []);
+  const effectiveMinDate = useMemo(() => {
+    if (scheduleForm?.inspection_type === 'routine') {
+      return selectedTenancy && selectedMinDate > routineMinDate ? selectedMinDate : routineMinDate;
+    }
+    return selectedTenancy ? selectedMinDate : new Date();
+  }, [scheduleForm, selectedTenancy, selectedMinDate, routineMinDate]);
+
+  const dateError = useMemo(() => {
+    if (!scheduleForm?.scheduled_date) return null;
+    if (scheduleForm.inspection_type === 'routine' && scheduleForm.scheduled_date < routineMinDate) {
+      return `Routine inspections require at least 7 days notice (earliest: ${format(routineMinDate, 'd MMM yyyy')})`;
+    }
+    return null;
+  }, [scheduleForm, routineMinDate]);
+
   const submitSchedule = async (opts: { startReport?: boolean } = {}) => {
     if (!scheduleForm || !agentId) return;
+    if (!scheduleForm.property_id) { toast.error('Select a property'); return; }
     if (!scheduleForm.tenancy_id) { toast.error('Select a tenancy'); return; }
     if (!scheduleForm.scheduled_date) { toast.error('Select a date'); return; }
+    if (dateError) { toast.error(dateError); return; }
     const t = activeTenancies.find(x => x.id === scheduleForm.tenancy_id);
     setSavingSchedule(true);
     const { data: inserted, error } = await supabase.from('property_inspections').insert({
       tenancy_id: scheduleForm.tenancy_id,
-      property_id: t?.property_id,
+      property_id: t?.property_id || scheduleForm.property_id,
       agent_id: agentId,
       inspection_type: scheduleForm.inspection_type,
       scheduled_date: format(scheduleForm.scheduled_date, 'yyyy-MM-dd'),
       status: 'scheduled',
+      inspector_name: scheduleForm.inspector_name.trim() || null,
       overall_notes: scheduleForm.notes.trim() || null,
     } as any).select('id').maybeSingle();
     setSavingSchedule(false);
@@ -1107,16 +1152,33 @@ ${agencyName || ''}`.trim();
           {scheduleForm && (
             <div className="space-y-3">
               <div>
-                <Label>Property / Tenancy *</Label>
+                <Label>Property *</Label>
+                <Select
+                  value={scheduleForm.property_id}
+                  onValueChange={(v) => setScheduleForm({ ...scheduleForm, property_id: v, tenancy_id: '', scheduled_date: undefined })}
+                >
+                  <SelectTrigger><SelectValue placeholder="Select property" /></SelectTrigger>
+                  <SelectContent>
+                    {propertiesForSchedule.map(p => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.address}{p.suburb ? `, ${p.suburb}` : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Tenancy *</Label>
                 <Select
                   value={scheduleForm.tenancy_id}
                   onValueChange={(v) => setScheduleForm({ ...scheduleForm, tenancy_id: v, scheduled_date: undefined })}
+                  disabled={!scheduleForm.property_id}
                 >
-                  <SelectTrigger><SelectValue placeholder="Select tenancy" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={scheduleForm.property_id ? 'Select tenancy' : 'Select property first'} /></SelectTrigger>
                   <SelectContent>
-                    {activeTenancies.map(t => (
+                    {tenanciesForProperty.map(t => (
                       <SelectItem key={t.id} value={t.id}>
-                        {(t.tenant_name || 'Tenant')} — {t.properties?.address || 'Address'}
+                        {t.tenant_name || 'Tenant'}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -1126,7 +1188,7 @@ ${agencyName || ''}`.trim();
                 <Label>Inspection Type *</Label>
                 <Select
                   value={scheduleForm.inspection_type}
-                  onValueChange={(v) => setScheduleForm({ ...scheduleForm, inspection_type: v as InspectionType })}
+                  onValueChange={(v) => setScheduleForm({ ...scheduleForm, inspection_type: v as InspectionType, scheduled_date: undefined })}
                 >
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -1158,19 +1220,35 @@ ${agencyName || ''}`.trim();
                       mode="single"
                       selected={scheduleForm.scheduled_date}
                       onSelect={(d) => setScheduleForm({ ...scheduleForm, scheduled_date: d || undefined })}
-                      disabled={(date) => selectedTenancy ? date < selectedMinDate : date < new Date()}
+                      disabled={(date) => date < effectiveMinDate}
                       initialFocus
                       className={cn('p-3 pointer-events-auto')}
                     />
                   </PopoverContent>
                 </Popover>
-                {selectedTenancy && (
+                {scheduleForm.inspection_type === 'routine' && (
+                  <p className="text-[11px] text-muted-foreground mt-1">
+                    Routine inspections require 7 days notice — earliest: {format(routineMinDate, 'd MMM yyyy')}
+                  </p>
+                )}
+                {selectedTenancy && scheduleForm.inspection_type !== 'routine' && (
                   <p className="text-[11px] text-muted-foreground mt-1">
                     {(selectedTenancy.properties?.state || '').toUpperCase() || 'Default'} requires{' '}
                     {ruleNoticeText(selectedRule)} notice — earliest date:{' '}
                     {format(selectedMinDate, 'd MMM yyyy')}
                   </p>
                 )}
+                {dateError && (
+                  <p className="text-[11px] text-red-600 mt-1">{dateError}</p>
+                )}
+              </div>
+              <div>
+                <Label>Inspector Name</Label>
+                <Input
+                  value={scheduleForm.inspector_name}
+                  onChange={e => setScheduleForm({ ...scheduleForm, inspector_name: e.target.value })}
+                  placeholder="Optional"
+                />
               </div>
               <div>
                 <Label>Notes</Label>

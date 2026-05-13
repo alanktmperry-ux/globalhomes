@@ -38,16 +38,13 @@ interface DisplayListing {
   agency: string;
 }
 
-const PLACEHOLDER_IMG =
-  "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&q=70&w=640&fm=avif";
-
 
 const SELECT_COLS =
   "id, display_image_url, display_address, display_suburb, display_state, display_price, display_beds, display_baths, display_cars, display_languages, agent_name, agent_initials, agent_agency";
 
 const mapRow = (r: FeaturedRow): DisplayListing => ({
   id: r.id,
-  imageUrl: r.display_image_url || PLACEHOLDER_IMG,
+  imageUrl: r.display_image_url ?? '',
   address: r.display_address,
   suburb: r.display_suburb,
   state: r.display_state,
@@ -109,7 +106,7 @@ export default function FeaturedListings() {
         }
 
         if (!cancelled) {
-          setListings(rows.map(mapRow));
+          setListings(rows.filter(r => !!r.display_image_url).map(mapRow));
           setLoading(false);
         }
       } catch {

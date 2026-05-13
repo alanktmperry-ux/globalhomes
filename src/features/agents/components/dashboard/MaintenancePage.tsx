@@ -268,11 +268,18 @@ export default function MaintenancePage() {
 
   const submitQuote = async () => {
     if (!quoteFor || !quoteAmount) return;
+    const cost = parseFloat(quoteAmount);
+    const shouldAutoApprove = !isNaN(cost) && cost <= autoApproveThreshold;
     await supabase.from('maintenance_jobs').update({
-      estimated_cost: parseFloat(quoteAmount),
-      status: 'quoted',
+      estimated_cost: cost,
+      status: shouldAutoApprove ? 'approved' : 'quoted',
+      ...(shouldAutoApprove ? { auto_approved: true } : {}),
     } as any).eq('id', quoteFor.id);
-    toast.success('Quote saved');
+    if (shouldAutoApprove) {
+      toast.success(`Job auto-approved (under $${autoApproveThreshold} threshold)`);
+    } else {
+      toast.success('Quote saved');
+    }
     setQuoteFor(null); setQuoteAmount('');
     load();
   };

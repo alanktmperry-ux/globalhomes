@@ -473,7 +473,7 @@ const AgentDashboardSidebar = () => {
                       </>
                     )}
                   </button>
-                  {hasChildren && !collapsed && (
+                  {hasNested && !collapsed && (
                     <CollapsibleTrigger asChild>
                       <button
                         type="button"

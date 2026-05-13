@@ -335,6 +335,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       } catch (err) {
         console.error('[Auth] fetchRoles error:', err);
+        toast.error('Could not load your account permissions. Please refresh the page or sign out and back in.');
       } finally {
         isFetching.current = false;
         if (!cancelled) {

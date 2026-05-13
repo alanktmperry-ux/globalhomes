@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { X, CheckCircle2, ShieldCheck, Ban, Clock, Download, FileText, CreditCard, Building2, Play, Info, ExternalLink, Landmark, AlertTriangle, CalendarCheck, ListChecks, PlusCircle, Globe, Users, HelpCircle, Upload, BookOpen, Scale, Mail, ArrowRight, Lock, Eye, EyeOff } from 'lucide-react';
@@ -38,6 +39,7 @@ const PASSWORD_REQUIREMENTS = [
 
 const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [step, setStep] = useState<'email' | 'check-email' | 'set-password' | 'prepare' | 'trust-info' | 'cutover' | 'import-wizard' | 'form' | 'success'>('email');
   const [emailInput, setEmailInput] = useState('');
   const [emailSubmitting, setEmailSubmitting] = useState(false);
@@ -854,7 +856,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
 
               <Button
                 className="w-full"
-                onClick={handleClose}
+                onClick={() => { handleClose(); navigate('/dashboard'); }}
               >
                 {t('agent.registration.success.goDashboard')}
               </Button>

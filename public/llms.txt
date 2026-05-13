@@ -77,3 +77,25 @@ ListHQ is a two-sided multilingual property marketplace built for the Australian
 - Agent enquiries: https://listhq.com.au/agent-auth
 
 - Referral program: https://listhq.com.au/referral/join
+
+## Multilingual Property Search Pages
+- [Mandarin](https://listhq.com.au/find-property-in-australia/mandarin) — 普通话房产搜索
+- [Cantonese](https://listhq.com.au/find-property-in-australia/cantonese) — 廣東話搵樓
+- [Vietnamese](https://listhq.com.au/find-property-in-australia/vietnamese) — Tìm kiếm tiếng Việt
+- [Korean](https://listhq.com.au/find-property-in-australia/korean) — 한국어 부동산 검색
+- [Arabic](https://listhq.com.au/find-property-in-australia/arabic) — بالعربية
+- [Hindi](https://listhq.com.au/find-property-in-australia/hindi) — हिंदी में
+- [Punjabi](https://listhq.com.au/find-property-in-australia/punjabi) — ਪੰਜਾਬੀ ਵਿੱਚ
+- [Tamil](https://listhq.com.au/find-property-in-australia/tamil) — தமிழில்
+- [Indonesian](https://listhq.com.au/find-property-in-australia/indonesian) — Bahasa Indonesia
+- [Malay](https://listhq.com.au/find-property-in-australia/malay) — Bahasa Melayu
+- [Thai](https://listhq.com.au/find-property-in-australia/thai) — ภาษาไทย
+- [Filipino](https://listhq.com.au/find-property-in-australia/filipino) — Filipino
+- [Japanese](https://listhq.com.au/find-property-in-australia/japanese) — 日本語
+- [Spanish](https://listhq.com.au/find-property-in-australia/spanish) — Español
+- [French](https://listhq.com.au/find-property-in-australia/french) — Français
+- [Portuguese](https://listhq.com.au/find-property-in-australia/portuguese) — Português
+- [Italian](https://listhq.com.au/find-property-in-australia/italian) — Italiano
+- [Greek](https://listhq.com.au/find-property-in-australia/greek) — Ελληνικά
+- [Urdu](https://listhq.com.au/find-property-in-australia/urdu) — اردو
+- [Bengali](https://listhq.com.au/find-property-in-australia/bengali) — বাংলা

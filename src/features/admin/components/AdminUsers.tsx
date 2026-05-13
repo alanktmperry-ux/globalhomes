@@ -1056,8 +1056,8 @@ const UsersDashboard = ({ users, loading }: UsersDashboardProps) => {
                 <SelectContent>
                   <SelectItem value="demo">Trial</SelectItem>
                   <SelectItem value="solo">Solo — $299/mo</SelectItem>
-                  <SelectItem value="agency">Agency — $899/mo</SelectItem>
-                  <SelectItem value="agency_pro">Agency Pro — $1,999/mo</SelectItem>
+                  <SelectItem value="agency">Agency — $599/mo</SelectItem>
+                  <SelectItem value="agency_pro">Agency Pro — $1,199/mo</SelectItem>
                   <SelectItem value="enterprise">Enterprise — Custom</SelectItem>
                 </SelectContent>
               </Select>

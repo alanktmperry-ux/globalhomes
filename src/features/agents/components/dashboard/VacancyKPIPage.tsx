@@ -60,7 +60,7 @@ const VacancyKPIPage = () => {
   const [events, setEvents] = useState<VacancyEvent[]>([]);
   const [propertyMap, setPropertyMap] = useState<Record<string, string>>({});
   const [showAddEvent, setShowAddEvent] = useState(false);
-  const [eventForm, setEventForm] = useState({ event_type: '', property_id: '', event_date: format(new Date(), 'yyyy-MM-dd'), notes: '' });
+  const [eventForm, setEventForm] = useState({ event_type: 'listed', property_id: '', event_date: format(new Date(), 'yyyy-MM-dd'), notes: '' });
   const [savingEvent, setSavingEvent] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -99,23 +99,23 @@ const VacancyKPIPage = () => {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleAddEvent = async () => {
-    if (!agentId || !eventForm.event_type || !eventForm.event_date) {
-      toast.error('Please fill in event type and date');
+    if (!agentId || !eventForm.property_id) {
+      toast.error('Please select a property');
       return;
     }
     setSavingEvent(true);
     const { error } = await supabase.from('vacancy_events' as any).insert({
       agent_id: agentId,
+      property_id: eventForm.property_id,
       event_type: eventForm.event_type,
       event_date: eventForm.event_date,
-      property_id: eventForm.property_id || null,
       notes: eventForm.notes || null,
     });
     setSavingEvent(false);
-    if (error) { toast.error('Failed to save event: ' + error.message); return; }
-    toast.success('Event logged');
+    if (error) { toast.error(error.message); return; }
+    toast.success('Vacancy event recorded');
     setShowAddEvent(false);
-    setEventForm({ event_type: '', property_id: '', event_date: format(new Date(), 'yyyy-MM-dd'), notes: '' });
+    setEventForm({ event_type: 'listed', property_id: '', event_date: format(new Date(), 'yyyy-MM-dd'), notes: '' });
     fetchData();
   };
 
@@ -206,9 +206,14 @@ const VacancyKPIPage = () => {
 
   return (
     <div className="flex-1 p-6 lg:p-10 max-w-7xl space-y-8">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-foreground mb-1">{t('agent.pm.vacancy.title')}</h1>
-        <p className="text-sm text-muted-foreground">{t('agent.pm.vacancy.subtitle')}</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="font-display text-2xl font-bold text-foreground mb-1">{t('agent.pm.vacancy.title')}</h1>
+          <p className="text-sm text-muted-foreground">{t('agent.pm.vacancy.subtitle')}</p>
+        </div>
+        <Button onClick={() => setShowAddEvent(true)} className="shrink-0 flex items-center gap-1.5">
+          <Plus size={16} /> Log Event
+        </Button>
       </div>
 
       {/* KPI cards */}
@@ -412,16 +417,11 @@ const VacancyKPIPage = () => {
 
       {/* Event log */}
       <section>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-display text-lg font-bold text-foreground">Vacancy Event Log</h2>
-          <Button size="sm" onClick={() => setShowAddEvent(true)} className="flex items-center gap-1.5">
-            <Plus size={14} /> Log Event
-          </Button>
-        </div>
+        <h2 className="font-display text-lg font-bold text-foreground mb-3">Vacancy Event Log</h2>
         <Card>
           <CardContent className="p-0">
             {events.length === 0 ? (
-              <p className="p-6 text-sm text-muted-foreground text-center">No vacancy events recorded yet.</p>
+              <p className="p-6 text-sm text-muted-foreground text-center">No vacancy events logged yet. Use Log Event to track your vacancy pipeline.</p>
             ) : (
               <div className="divide-y divide-border">
                 {events.map(e => (
@@ -451,13 +451,12 @@ const VacancyKPIPage = () => {
               <Select value={eventForm.event_type} onValueChange={(v) => setEventForm(f => ({ ...f, event_type: v }))}>
                 <SelectTrigger><SelectValue placeholder="Select event type" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="inspection_booked">Inspection Booked</SelectItem>
-                  <SelectItem value="photos_taken">Photos Taken</SelectItem>
-                  <SelectItem value="listing_published">Listing Published</SelectItem>
+                  <SelectItem value="listed">Listed</SelectItem>
+                  <SelectItem value="inspection_held">Inspection Held</SelectItem>
                   <SelectItem value="application_received">Application Received</SelectItem>
-                  <SelectItem value="tenant_approved">Tenant Approved</SelectItem>
-                  <SelectItem value="lease_signed">Lease Signed</SelectItem>
-                  <SelectItem value="keys_handed_over">Keys Handed Over</SelectItem>
+                  <SelectItem value="application_approved">Application Approved</SelectItem>
+                  <SelectItem value="re_let">Re-let</SelectItem>
+                  <SelectItem value="vacant">Vacant</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>

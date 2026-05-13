@@ -73,15 +73,34 @@ const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
-    title: 'Tenancies',
+    title: 'Property Management',
     url: '',
     icon: Home,
-    children: [
-      { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home },
-      { title: 'Rental Applications', url: '/dashboard/rental-applications', icon: ClipboardList },
-      { title: 'Vacancies', url: '/dashboard/vacancies', icon: Building2 },
-      { title: 'Vacancy KPIs', url: '/dashboard/vacancy-kpi', icon: Activity },
-      { title: 'Renewals Due', url: '/dashboard/rent-roll?filter=renewals', icon: RefreshCw, badgeKey: 'renewals', alertWhenBadge: true },
+    subgroups: [
+      {
+        label: 'Tenancies',
+        items: [
+          { title: 'Rent Roll', url: '/dashboard/rent-roll', icon: Home },
+          { title: 'Inspections', url: '/dashboard/pm-inspections', icon: CalendarDays, badgeKey: 'disputes', alertWhenBadge: true },
+          { title: 'Vacancies', url: '/dashboard/vacancies', icon: Building2 },
+        ],
+      },
+      {
+        label: 'Operations',
+        items: [
+          { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
+          { title: 'Owner Statements', url: '/dashboard/statements', icon: FileText },
+          { title: 'Vacancy KPIs', url: '/dashboard/vacancy-kpi', icon: Activity },
+        ],
+      },
+      {
+        label: 'Trust Accounting',
+        items: [
+          { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
+          { title: 'Trust Ledger', url: '/dashboard/trust-ledger', icon: BookOpen },
+          { title: 'Bank Reconciliation', url: '/dashboard/bank-reconciliation', icon: Landmark },
+        ],
+      },
     ],
   },
   {

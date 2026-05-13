@@ -136,6 +136,12 @@ const InspectionReportPage = () => {
       });
       if (insertError) throw insertError;
 
+      if (!tenantEmail) {
+        toast.error('No tenant email on file — bond claim saved but tenant could not be notified. Add an email address to the tenancy record.');
+        setBondClaimSubmitted(true);
+        return;
+      }
+
       await supabase.functions.invoke('send-notification-email', {
         body: {
           type: 'bond_claim_notice',

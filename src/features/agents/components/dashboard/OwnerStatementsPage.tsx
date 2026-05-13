@@ -236,7 +236,9 @@ export default function OwnerStatementsPage() {
             },
           });
           await supabase.from('owner_statements' as any).update({ emailed_to_owner: true, emailed_at: new Date().toISOString() } as any).eq('id', (data as any).id);
-        } catch {/* ignore */}
+        } catch (emailErr: any) {
+          toast.error('Statement saved but email failed to send: ' + (emailErr?.message || 'Unknown error'));
+        }
       }
     }
 

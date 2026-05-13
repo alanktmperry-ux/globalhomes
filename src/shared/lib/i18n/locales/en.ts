@@ -542,7 +542,7 @@ export const en = {
   // ── Closing CTA ──
   'home.closingCta.eyebrow': 'Start today',
   'home.closingCta.heading': '60 days free. No contracts. Cancel anytime.',
-  'home.closingCta.body': 'Join agents already reaching 7M+ multilingual buyers across Australia.',
+  'home.closingCta.body': 'Join agents already reaching buyers across 30+ languages around Australia.',
   'home.closingCta.primary': 'Start free 60-day trial →',
   'home.closingCta.secondary': 'Talk to sales',
   'home.closingCta.finePrint': 'No credit card required · Australian data storage · Cancel anytime',

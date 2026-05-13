@@ -1152,16 +1152,33 @@ ${agencyName || ''}`.trim();
           {scheduleForm && (
             <div className="space-y-3">
               <div>
-                <Label>Property / Tenancy *</Label>
+                <Label>Property *</Label>
+                <Select
+                  value={scheduleForm.property_id}
+                  onValueChange={(v) => setScheduleForm({ ...scheduleForm, property_id: v, tenancy_id: '', scheduled_date: undefined })}
+                >
+                  <SelectTrigger><SelectValue placeholder="Select property" /></SelectTrigger>
+                  <SelectContent>
+                    {propertiesForSchedule.map(p => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.address}{p.suburb ? `, ${p.suburb}` : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Tenancy *</Label>
                 <Select
                   value={scheduleForm.tenancy_id}
                   onValueChange={(v) => setScheduleForm({ ...scheduleForm, tenancy_id: v, scheduled_date: undefined })}
+                  disabled={!scheduleForm.property_id}
                 >
-                  <SelectTrigger><SelectValue placeholder="Select tenancy" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={scheduleForm.property_id ? 'Select tenancy' : 'Select property first'} /></SelectTrigger>
                   <SelectContent>
-                    {activeTenancies.map(t => (
+                    {tenanciesForProperty.map(t => (
                       <SelectItem key={t.id} value={t.id}>
-                        {(t.tenant_name || 'Tenant')} — {t.properties?.address || 'Address'}
+                        {t.tenant_name || 'Tenant'}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -1171,7 +1188,7 @@ ${agencyName || ''}`.trim();
                 <Label>Inspection Type *</Label>
                 <Select
                   value={scheduleForm.inspection_type}
-                  onValueChange={(v) => setScheduleForm({ ...scheduleForm, inspection_type: v as InspectionType })}
+                  onValueChange={(v) => setScheduleForm({ ...scheduleForm, inspection_type: v as InspectionType, scheduled_date: undefined })}
                 >
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -1203,19 +1220,35 @@ ${agencyName || ''}`.trim();
                       mode="single"
                       selected={scheduleForm.scheduled_date}
                       onSelect={(d) => setScheduleForm({ ...scheduleForm, scheduled_date: d || undefined })}
-                      disabled={(date) => selectedTenancy ? date < selectedMinDate : date < new Date()}
+                      disabled={(date) => date < effectiveMinDate}
                       initialFocus
                       className={cn('p-3 pointer-events-auto')}
                     />
                   </PopoverContent>
                 </Popover>
-                {selectedTenancy && (
+                {scheduleForm.inspection_type === 'routine' && (
+                  <p className="text-[11px] text-muted-foreground mt-1">
+                    Routine inspections require 7 days notice — earliest: {format(routineMinDate, 'd MMM yyyy')}
+                  </p>
+                )}
+                {selectedTenancy && scheduleForm.inspection_type !== 'routine' && (
                   <p className="text-[11px] text-muted-foreground mt-1">
                     {(selectedTenancy.properties?.state || '').toUpperCase() || 'Default'} requires{' '}
                     {ruleNoticeText(selectedRule)} notice — earliest date:{' '}
                     {format(selectedMinDate, 'd MMM yyyy')}
                   </p>
                 )}
+                {dateError && (
+                  <p className="text-[11px] text-red-600 mt-1">{dateError}</p>
+                )}
+              </div>
+              <div>
+                <Label>Inspector Name</Label>
+                <Input
+                  value={scheduleForm.inspector_name}
+                  onChange={e => setScheduleForm({ ...scheduleForm, inspector_name: e.target.value })}
+                  placeholder="Optional"
+                />
               </div>
               <div>
                 <Label>Notes</Label>

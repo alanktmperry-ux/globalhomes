@@ -985,6 +985,11 @@ export default function AgencyOnboardingPage() {
               'Enter your licence number exactly as it appears on your licence certificate',
             ]}
           />
+          <p className="text-[11px] leading-relaxed text-muted-foreground border-t border-border pt-4 mt-2">
+            ListHQ collects your agency name, ABN, licence number, and contact details to create and operate your account, verify your identity, and comply with real estate licensing requirements. Your information is handled in accordance with the Australian Privacy Act 1988 (Cth) and our{' '}
+            <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Privacy Policy</a>.
+            You may request access to or correction of your personal information at any time via privacy@listhq.com.au.
+          </p>
         </div>
       );
     }

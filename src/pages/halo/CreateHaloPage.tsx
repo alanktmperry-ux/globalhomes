@@ -78,7 +78,20 @@ export default function CreateHaloPage() {
     } catch {
       /* ignore */
     }
-  }, []);
+    if (user?.id) {
+      supabase
+        .from('halo_drafts')
+        .select('draft_data')
+        .eq('seeker_id', user.id)
+        .maybeSingle()
+        .then(({ data: row }) => {
+          if (row?.draft_data && typeof row.draft_data === 'object') {
+            setData((d) => ({ ...d, ...(row.draft_data as Partial<HaloFormData>) }));
+            setRestored(true);
+          }
+        });
+    }
+  }, [user?.id]);
 
   // Apply query-param prefill (Listing CTA, CRM invite, voice lead, rent roll)
   useEffect(() => {

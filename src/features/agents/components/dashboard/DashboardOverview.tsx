@@ -135,6 +135,7 @@ const DashboardOverview = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { listings } = useAgentListings();
+  const { language } = useI18n();
 
   const [agentName, setAgentName] = useState<string | null>(null);
   const [agentId, setAgentId] = useState<string | null>(null);

@@ -108,7 +108,7 @@ const PLANS: Plan[] = [
 const FAQS = [
   {
     q: 'What happens after my Solo trial?',
-    a: "Seven days before your 30-day trial ends you'll receive an email and an in-app notification. At day 31 your card is charged for the first month. Cancel any time before day 31 to avoid charges.",
+    a: "Seven days before your 60-day trial ends you'll receive an email and an in-app notification. At day 61 your card is charged for the first month. Cancel any time before day 61 to avoid charges.",
   },
   {
     q: 'What are Halo credits?',

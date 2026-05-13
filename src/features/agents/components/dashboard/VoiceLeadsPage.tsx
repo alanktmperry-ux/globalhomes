@@ -347,7 +347,7 @@ const VoiceLeadsPage = () => {
               </div>
 
               {/* Create Halo from high-score lead */}
-              {selected.score >= 70 && (
+              {selected.score != null && selected.score >= 70 && (
                 <Button
                   size="sm"
                   variant="outline"

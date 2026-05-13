@@ -68,6 +68,14 @@ export default function OpenHomeSignInPage() {
       } as any);
     }
 
+    // Fire-and-forget: CRM ingest + thank-you email
+    void ingestOpenHomeLead({
+      propertyId: session.property_id,
+      name: normalizedEmail.split('@')[0],
+      email: normalizedEmail,
+      openHomeStartsAt: session.starts_at,
+    });
+
     setSignedIn(true);
     setSigningIn(false);
   };

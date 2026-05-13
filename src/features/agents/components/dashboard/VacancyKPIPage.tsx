@@ -451,13 +451,12 @@ const VacancyKPIPage = () => {
               <Select value={eventForm.event_type} onValueChange={(v) => setEventForm(f => ({ ...f, event_type: v }))}>
                 <SelectTrigger><SelectValue placeholder="Select event type" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="inspection_booked">Inspection Booked</SelectItem>
-                  <SelectItem value="photos_taken">Photos Taken</SelectItem>
-                  <SelectItem value="listing_published">Listing Published</SelectItem>
+                  <SelectItem value="listed">Listed</SelectItem>
+                  <SelectItem value="inspection_held">Inspection Held</SelectItem>
                   <SelectItem value="application_received">Application Received</SelectItem>
-                  <SelectItem value="tenant_approved">Tenant Approved</SelectItem>
-                  <SelectItem value="lease_signed">Lease Signed</SelectItem>
-                  <SelectItem value="keys_handed_over">Keys Handed Over</SelectItem>
+                  <SelectItem value="application_approved">Application Approved</SelectItem>
+                  <SelectItem value="re_let">Re-let</SelectItem>
+                  <SelectItem value="vacant">Vacant</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>

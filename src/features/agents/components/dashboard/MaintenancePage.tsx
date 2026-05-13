@@ -26,6 +26,7 @@ interface Job {
   id: string;
   property_id: string;
   tenancy_id: string | null;
+  tenant_portal_token?: string | null;
   title: string;
   description: string | null;
   priority: string;

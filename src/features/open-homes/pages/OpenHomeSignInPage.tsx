@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { CheckCircle, MapPin, Clock, Users } from 'lucide-react';
+import { CheckCircle, MapPin, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ingestOpenHomeLead } from '@/features/open-homes/lib/ingestOpenHomeLead';
 
 export default function OpenHomeSignInPage() {
   const { token } = useParams<{ token: string }>();

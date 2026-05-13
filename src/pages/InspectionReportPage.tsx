@@ -115,6 +115,46 @@ const InspectionReportPage = () => {
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const [showComparison, setShowComparison] = useState(false);
   const [bondDeductions, setBondDeductions] = useState<BondDeduction[]>([]);
+  const [bondClaimSubmitted, setBondClaimSubmitted] = useState(false);
+  const [submittingClaim, setSubmittingClaim] = useState(false);
+
+  const handleRaiseBondClaim = async () => {
+    if (!inspection) return;
+    setSubmittingClaim(true);
+    try {
+      const deductionsPayload = bondDeductions.map(d => ({ description: d.description, amount: Number(d.amount) || 0 }));
+      const total_claimed = deductionsPayload.reduce((s, d) => s + (Number(d.amount) || 0), 0);
+      const { error: insertError } = await supabase.from('bond_claims').insert({
+        inspection_id: inspection.id,
+        property_id: inspection.property_id,
+        tenancy_id: inspection.tenancy_id,
+        agent_id: inspection.agent_id,
+        deductions: deductionsPayload,
+        total_claimed,
+        status: 'pending',
+        created_at: new Date().toISOString(),
+      });
+      if (insertError) throw insertError;
+
+      await supabase.functions.invoke('send-notification-email', {
+        body: {
+          type: 'bond_claim_notice',
+          recipient_email: tenantEmail,
+          inspection_id: inspection.id,
+          property_address: propertyAddress,
+          deductions: deductionsPayload,
+          total_claimed,
+        },
+      });
+
+      setBondClaimSubmitted(true);
+      toast.success('Bond claim raised and tenant notified');
+    } catch (error: any) {
+      toast.error('Failed to raise bond claim: ' + (error?.message || 'Unknown error'));
+    } finally {
+      setSubmittingClaim(false);
+    }
+  };
 
   const isReadOnly = inspection?.status === 'completed';
 
@@ -661,6 +701,23 @@ const InspectionReportPage = () => {
                       <span className="text-sm text-muted-foreground">Total:</span>
                       <span className="text-base font-semibold">${totalDeductions.toFixed(2)}</span>
                     </div>
+                    {inspection.inspection_type === 'exit' && bondDeductions.length > 0 && (
+                      <div className="flex justify-end pt-2 no-print">
+                        {bondClaimSubmitted ? (
+                          <Badge className="bg-emerald-500/15 text-emerald-700">Bond Claim Raised ✓</Badge>
+                        ) : (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={handleRaiseBondClaim}
+                            disabled={submittingClaim}
+                          >
+                            {submittingClaim ? <Loader2 size={14} className="mr-1 animate-spin" /> : <Scale size={14} className="mr-1" />}
+                            Raise Bond Claim
+                          </Button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

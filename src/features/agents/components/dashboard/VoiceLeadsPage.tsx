@@ -244,34 +244,44 @@ const VoiceLeadsPage = () => {
               </button>
 
               {/* AI Score */}
-              <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center gap-4">
-                <div className="relative w-14 h-14 shrink-0">
-                  <svg className="w-14 h-14 -rotate-90" viewBox="0 0 56 56">
-                    <circle cx="28" cy="28" r="24" fill="none" stroke="hsl(var(--border))" strokeWidth="4" />
-                    <circle
-                      cx="28" cy="28" r="24" fill="none"
-                      stroke="hsl(var(--primary))" strokeWidth="4"
-                      strokeDasharray={`${(selected.score / 100) * 150.8} 150.8`}
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  <span className="absolute inset-0 flex items-center justify-center font-display text-sm font-extrabold">
-                    {selected.score}%
-                  </span>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold flex items-center gap-1">
-                    <Sparkles size={14} className="text-primary" /> AI Lead Score
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {selected.score >= 80
-                      ? `This lead is ${selected.score}% likely to transact within 14 days`
-                      : selected.score >= 50
-                      ? 'Moderate intent — follow up within 48 hours'
-                      : 'Low urgency — add to nurture list'}
-                  </p>
-                </div>
-              </div>
+              {(() => {
+                const hasScore = selected.score != null && selected.score > 0;
+                const scoreVal = hasScore ? (selected.score as number) : 0;
+                return (
+                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center gap-4">
+                    <div className="relative w-14 h-14 shrink-0">
+                      <svg className="w-14 h-14 -rotate-90" viewBox="0 0 56 56">
+                        <circle cx="28" cy="28" r="24" fill="none" stroke="hsl(var(--border))" strokeWidth="4" />
+                        {hasScore && (
+                          <circle
+                            cx="28" cy="28" r="24" fill="none"
+                            stroke="hsl(var(--primary))" strokeWidth="4"
+                            strokeDasharray={`${(scoreVal / 100) * 150.8} 150.8`}
+                            strokeLinecap="round"
+                          />
+                        )}
+                      </svg>
+                      <span className="absolute inset-0 flex items-center justify-center font-display text-sm font-extrabold">
+                        {hasScore ? `${scoreVal}%` : <span className="text-muted-foreground">—</span>}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold flex items-center gap-1">
+                        <Sparkles size={14} className="text-primary" /> AI Lead Score
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {!hasScore
+                          ? 'Unscored — not enough signal yet to rank this lead'
+                          : scoreVal >= 80
+                          ? `This lead is ${scoreVal}% likely to transact within 14 days`
+                          : scoreVal >= 50
+                          ? 'Moderate intent — follow up within 48 hours'
+                          : 'Low urgency — add to nurture list'}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Transcript */}
               <div>

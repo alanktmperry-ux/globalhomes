@@ -701,6 +701,23 @@ const InspectionReportPage = () => {
                       <span className="text-sm text-muted-foreground">Total:</span>
                       <span className="text-base font-semibold">${totalDeductions.toFixed(2)}</span>
                     </div>
+                    {inspection.inspection_type === 'exit' && bondDeductions.length > 0 && (
+                      <div className="flex justify-end pt-2 no-print">
+                        {bondClaimSubmitted ? (
+                          <Badge className="bg-emerald-500/15 text-emerald-700">Bond Claim Raised ✓</Badge>
+                        ) : (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={handleRaiseBondClaim}
+                            disabled={submittingClaim}
+                          >
+                            {submittingClaim ? <Loader2 size={14} className="mr-1 animate-spin" /> : <Scale size={14} className="mr-1" />}
+                            Raise Bond Claim
+                          </Button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

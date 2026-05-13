@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
-import { ChevronDown, ChevronUp, Check, X as XIcon, FileText } from 'lucide-react';
+import { ChevronDown, ChevronUp, Check, X as XIcon, FileText, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import DashboardHeader from './DashboardHeader';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
@@ -20,11 +24,13 @@ const STATUS_STYLES: Record<string, { variant: 'default' | 'secondary' | 'destru
   declined: { variant: 'destructive', label: 'Declined' },
   withdrawn: { variant: 'secondary', label: 'Withdrawn' },
   pending: { variant: 'secondary', label: 'Pending' },
+  converted: { variant: 'outline', label: 'Converted' },
 };
 
 interface Application {
   id: string;
   reference_number: string;
+  tenancy_id: string | null;
   property_id: string;
   agent_id: string;
   full_name: string;
@@ -56,6 +62,61 @@ const RentalApplicationsPage = () => {
   const [noAgent, setNoAgent] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [acting, setActing] = useState<string | null>(null);
+  const [convertApp, setConvertApp] = useState<Application | null>(null);
+  const today = () => new Date().toISOString().split('T')[0];
+  const plus12mo = () => { const d = new Date(); d.setFullYear(d.getFullYear() + 1); return d.toISOString().split('T')[0]; };
+  const [convertForm, setConvertForm] = useState({ leaseStart: today(), leaseEnd: plus12mo(), rentAmount: 0, rentFrequency: 'weekly', bondAmount: 0 });
+  const [creatingTenancy, setCreatingTenancy] = useState(false);
+
+  const openConvert = (app: Application) => {
+    const weekly = (app.properties as any)?.rental_weekly || 0;
+    setConvertForm({
+      leaseStart: today(),
+      leaseEnd: plus12mo(),
+      rentAmount: weekly,
+      rentFrequency: 'weekly',
+      bondAmount: weekly * 4,
+    });
+    setConvertApp(app);
+  };
+
+  const handleCreateTenancy = async () => {
+    if (!convertApp) return;
+    setCreatingTenancy(true);
+    try {
+      const { data: tenancy, error: tErr } = await supabase.from('tenancies').insert({
+        property_id: convertApp.property_id,
+        agent_id: convertApp.agent_id,
+        tenant_name: convertApp.full_name,
+        tenant_email: convertApp.email,
+        tenant_phone: convertApp.phone || undefined,
+        lease_start: convertForm.leaseStart,
+        lease_end: convertForm.leaseEnd,
+        rent_amount: convertForm.rentAmount,
+        rent_frequency: convertForm.rentFrequency,
+        bond_amount: convertForm.bondAmount,
+        management_fee_percent: 8,
+        status: 'active',
+        source_application_id: convertApp.id,
+      } as any).select('id').maybeSingle();
+      if (tErr) throw tErr;
+
+      const { error: uErr } = await (supabase as any)
+        .from('rental_applications')
+        .update({ tenancy_id: tenancy?.id, status: 'converted' })
+        .eq('id', convertApp.id);
+      if (uErr) throw uErr;
+
+      toast.success('Tenancy created successfully');
+      setConvertApp(null);
+      fetchApplications();
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err) || 'Failed to create tenancy');
+    } finally {
+      setCreatingTenancy(false);
+    }
+  };
+
 
   const fetchApplications = async () => {
     if (!user) return;
@@ -273,6 +334,20 @@ const RentalApplicationsPage = () => {
                                 </Button>
                               </div>
                             )}
+
+                            {app.status === 'approved' && !app.tenancy_id && (
+                              <div className="flex gap-2 pt-3 border-t border-border">
+                                <Button size="sm" variant="default" onClick={() => openConvert(app)} className="gap-1.5">
+                                  <ArrowRight size={14} /> Convert to Tenancy
+                                </Button>
+                              </div>
+                            )}
+
+                            {(app.status === 'converted' || app.tenancy_id) && (
+                              <div className="flex gap-2 pt-3 border-t border-border">
+                                <Badge className="bg-emerald-500/15 text-emerald-700 border-emerald-500/30">Tenancy Created</Badge>
+                              </div>
+                            )}
                           </div>
                         )}
                       </TableCell>
@@ -285,6 +360,56 @@ const RentalApplicationsPage = () => {
         </div>
       </div>
       )}
+
+      <Dialog open={!!convertApp} onOpenChange={o => !o && setConvertApp(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Convert to Tenancy</DialogTitle>
+            <DialogDescription>
+              This will create a new tenancy record pre-filled with {convertApp?.full_name}'s details. You can review and adjust before saving.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3 py-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs">Lease Start</Label>
+                <Input type="date" value={convertForm.leaseStart} onChange={e => setConvertForm(f => ({ ...f, leaseStart: e.target.value }))} />
+              </div>
+              <div>
+                <Label className="text-xs">Lease End</Label>
+                <Input type="date" value={convertForm.leaseEnd} onChange={e => setConvertForm(f => ({ ...f, leaseEnd: e.target.value }))} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs">Rent Amount</Label>
+                <Input type="number" min={0} value={convertForm.rentAmount} onChange={e => setConvertForm(f => ({ ...f, rentAmount: parseFloat(e.target.value) || 0 }))} />
+              </div>
+              <div>
+                <Label className="text-xs">Frequency</Label>
+                <Select value={convertForm.rentFrequency} onValueChange={v => setConvertForm(f => ({ ...f, rentFrequency: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="fortnightly">Fortnightly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs">Bond Amount</Label>
+              <Input type="number" min={0} value={convertForm.bondAmount} onChange={e => setConvertForm(f => ({ ...f, bondAmount: parseFloat(e.target.value) || 0 }))} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConvertApp(null)} disabled={creatingTenancy}>Cancel</Button>
+            <Button onClick={handleCreateTenancy} disabled={creatingTenancy}>
+              {creatingTenancy ? 'Creating…' : 'Create Tenancy'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

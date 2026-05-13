@@ -10930,6 +10930,7 @@ export type Database = {
           reference_number: string
           status: string
           submitted_at: string | null
+          tenancy_id: string | null
           time_at_address: string | null
           updated_at: string
           user_id: string | null
@@ -10976,6 +10977,7 @@ export type Database = {
           reference_number: string
           status?: string
           submitted_at?: string | null
+          tenancy_id?: string | null
           time_at_address?: string | null
           updated_at?: string
           user_id?: string | null
@@ -11022,6 +11024,7 @@ export type Database = {
           reference_number?: string
           status?: string
           submitted_at?: string | null
+          tenancy_id?: string | null
           time_at_address?: string | null
           updated_at?: string
           user_id?: string | null
@@ -11074,6 +11077,13 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rental_applications_tenancy_id_fkey"
+            columns: ["tenancy_id"]
+            isOneToOne: false
+            referencedRelation: "tenancies"
             referencedColumns: ["id"]
           },
         ]
@@ -12722,6 +12732,7 @@ export type Database = {
           rent_amount: number
           rent_frequency: string
           rent_paid_to_date: string | null
+          source_application_id: string | null
           status: string
           tenant_contact_id: string | null
           tenant_email: string | null
@@ -12768,6 +12779,7 @@ export type Database = {
           rent_amount: number
           rent_frequency?: string
           rent_paid_to_date?: string | null
+          source_application_id?: string | null
           status?: string
           tenant_contact_id?: string | null
           tenant_email?: string | null
@@ -12814,6 +12826,7 @@ export type Database = {
           rent_amount?: number
           rent_frequency?: string
           rent_paid_to_date?: string | null
+          source_application_id?: string | null
           status?: string
           tenant_contact_id?: string | null
           tenant_email?: string | null
@@ -12879,6 +12892,13 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenancies_source_application_id_fkey"
+            columns: ["source_application_id"]
+            isOneToOne: false
+            referencedRelation: "rental_applications"
             referencedColumns: ["id"]
           },
           {

@@ -12,6 +12,7 @@ export default function OpenHomeSignInPage() {
   const [property, setProperty] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState('');
+  const [visitorName, setVisitorName] = useState('');
   const [signingIn, setSigningIn] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
   const [error, setError] = useState<string | null>(null);

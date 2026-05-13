@@ -477,7 +477,7 @@ const AgentAuthPage = () => {
               By signing up with Google or Apple you agree to our{' '}
               <a href="/privacy" className="text-blue-600 underline">Privacy Policy</a> and{' '}
               <a href="/terms" className="text-blue-600 underline">Terms of Service</a>.
-              Your agent account data is stored securely in Australia (AWS Sydney region).
+              Your agent account data is stored securely in accordance with our Privacy Policy.
             </p>
             <div className="flex gap-3">
               <button

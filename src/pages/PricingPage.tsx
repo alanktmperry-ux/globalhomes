@@ -202,6 +202,13 @@ function PlanCard({ plan, billing, index }: { plan: Plan; billing: BillingCycle;
         {formatPrice(priceNumber)}
         <span className="text-[16px] md:text-[18px] font-bold text-[#6a6a6a] ml-1">{periodLabel}</span>
       </div>
+      {billing === 'monthly' && (
+        <p className="text-xs text-muted-foreground mt-1">
+          {plan.key === 'solo' && 'incl. GST $878.90'}
+          {plan.key === 'agency' && 'incl. GST $1,098.90'}
+          {plan.key === 'pro' && 'incl. GST $2,198.90'}
+        </p>
+      )}
 
       {billing === 'annual' && (
         <div className="mt-2 text-[12px] text-[#065F46] inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#ECFDF5] font-bold">
@@ -267,14 +274,14 @@ export default function PricingPage() {
           content="Australia's multilingual real estate platform — listings auto-translated into 30+ languages. Trust accounting, CRM, property management, and Halo buyer matching. 60-day free trial."
         />
         <meta property="og:title" content="Real Estate Agent Software Pricing | ListHQ" />
-        <meta property="og:description" content="Replace your entire agent stack — trust accounting, CRM, Halo buyer matching, AI listings — from $799/month. 60-day free trial, no card required." />
+        <meta property="og:description" content="from $799/month founding · No charge until day 61." />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://listhq.com.au/og-image.png" />
         <meta property="og:url" content="https://listhq.com.au/for-agents/pricing" />
         <meta property="og:site_name" content="ListHQ" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Real Estate Agent Software Pricing | ListHQ" />
-        <meta name="twitter:description" content="Replace your entire agent stack — trust accounting, CRM, Halo buyer matching, AI listings — from $799/month. 60-day free trial, no card required." />
+        <meta name="twitter:description" content="from $799/month founding · No charge until day 61." />
         <meta name="twitter:image" content="https://listhq.com.au/og-image.png" />
       </Helmet>
 

@@ -85,19 +85,32 @@ const VIC_BRACKETS: Bracket[] = [
   { min: 960000, max: null, base: 52670, rate: 0.055 },
 ];
 
-function vicDuty(price: number, isFirstHome: boolean): StampDutyResult {
+function vicDuty(price: number, isFirstHome: boolean, buyerType: BuyerType, isNewBuild: boolean): StampDutyResult {
   const standard = applyBrackets(price, VIC_BRACKETS);
   const notes: string[] = [];
   let duty = standard;
   let fhbExemption = 0;
   if (isFirstHome) {
-    if (price <= 600000) { fhbExemption = standard; duty = 0; }
-    else if (price <= 750000) {
+    if (price <= 600000) {
+      if (isNewBuild) {
+        fhbExemption = standard;
+        duty = 0;
+      } else {
+        // VIC FHBDS 2021: 50% duty reduction for established homes
+        fhbExemption = Math.round(standard * 0.5);
+        duty = standard - fhbExemption;
+        notes.push('50% FHB duty concession applied (established home, ≤ $600k under VIC FHBDS 2021)');
+      }
+    } else if (price <= 750000) {
       const factor = (750000 - price) / 150000;
       fhbExemption = Math.round(standard * factor);
       duty = standard - fhbExemption;
     }
     notes.push('Regional first home buyers may be eligible for additional VIC concessions');
+  }
+  if (buyerType === 'investor' && price > 3000000) {
+    duty += price * 0.01; // 1% additional duty on investment properties over $3M
+    notes.push('1% investor surcharge applied on portion of price above standard schedule (price > $3M)');
   }
   const fhbGrant = isFirstHome && price <= 750000 ? 10000 : 0;
   return { duty, effectiveRate: price > 0 ? (duty / price) * 100 : 0, breakdown: formatBrackets(price, VIC_BRACKETS), fhbExemption, fhbGrant, totalCashNeeded: Math.max(0, duty), notes };

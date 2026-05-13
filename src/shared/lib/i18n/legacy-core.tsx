@@ -865,7 +865,7 @@ const translations: Record<Exclude<Language, 'ne'>, Record<string, string>> & { 
     'hero.eyebrow': 'Plateforme immobilière IA d\'Australie',
     'hero.headline': 'Annonces multilingues',
     'hero.headline2': 'pour les agents australiens',
-    'hero.subheadline': 'Recherchez en 20 langues. Voyez les prix dans votre devise.',
+    'hero.subheadline': 'Recherchez en 30+ langues. Voyez les prix dans votre devise.',
     'hero.forSale': 'À Vendre',
     'hero.forRent': 'À Louer',
     'hero.search': 'Rechercher',

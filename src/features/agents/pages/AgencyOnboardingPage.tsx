@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import DOMPurify from 'dompurify';
-import { ArrowLeft, ArrowRight, Building2, Upload, CheckCircle2, Landmark, Calendar, Loader2, Download, Settings2, BookOpen, ChevronDown, Lock, Eye, EyeOff, PlusCircle, Globe, Users, HelpCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Building2, Upload, CheckCircle2, Landmark, Calendar, Loader2, Download, Settings2, BookOpen, ChevronDown, PlusCircle, Globe, Users, HelpCircle } from 'lucide-react';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -59,59 +59,6 @@ export default function AgencyOnboardingPage() {
   const [showRentRollWizard, setShowRentRollWizard] = useState(false);
   
   const [guideOpen, setGuideOpen] = useState(false);
-
-  // Password step state
-  const [needsPassword, setNeedsPassword] = useState<boolean | null>(null);
-  const [passwordDone, setPasswordDone] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [passwordLoading, setPasswordLoading] = useState(false);
-  const [showPw, setShowPw] = useState(false);
-  const [showConfirmPw, setShowConfirmPw] = useState(false);
-
-  // Password is now always set during signup (email + password flow).
-  // The legacy "Create your password" pre-step is removed — verified agents land directly on the Welcome/Agency flow.
-  useEffect(() => {
-    if (!user) return;
-    setNeedsPassword(false);
-    setPasswordDone(true);
-  }, [user]);
-
-  // Password requirements
-  const pwReqs = [
-    { label: t('agentOnboarding.password.rule.length'), met: newPassword.length >= 8 },
-    { label: t('agentOnboarding.password.rule.uppercase'), met: /[A-Z]/.test(newPassword) },
-    { label: t('agentOnboarding.password.rule.number'), met: /[0-9]/.test(newPassword) },
-    { label: t('agentOnboarding.password.rule.special'), met: /[!@#$%^&*]/.test(newPassword) },
-  ];
-  const allPwReqsMet = pwReqs.every(r => r.met);
-
-  const handleSetPassword = async () => {
-    setPasswordError('');
-    const missing = pwReqs.filter(r => !r.met).map(r => r.label);
-    if (missing.length > 0) {
-      toast.error('Password requirements not met', {
-        description: missing.join(' · '),
-      });
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setPasswordError('Passwords do not match');
-      return;
-    }
-    setPasswordLoading(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
-      if (error) throw error;
-      setPasswordDone(true);
-      toast.success('Password set successfully');
-    } catch (err: unknown) {
-      setPasswordError(getErrorMessage(err) || 'Failed to set password');
-    } finally {
-      setPasswordLoading(false);
-    }
-  };
 
   // Step 2 — Agency details
   const [agencyName, setAgencyName] = useState('');
@@ -821,81 +768,8 @@ export default function AgencyOnboardingPage() {
     </div>
   );
 
-  const showPasswordStep = needsPassword && !passwordDone;
-
   const renderStep = () => {
-    // PASSWORD STEP — shown before step 0 for email-signup users
-    if (showPasswordStep) {
-      return (
-        <div className="space-y-6">
-          <div className="text-center space-y-2">
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
-              <Lock size={28} className="text-primary" />
-            </div>
-            <h2 className="text-xl font-bold">{t('agentOnboarding.password.heading')}</h2>
-            <p className="text-sm text-muted-foreground">{t('agentOnboarding.password.sub')}</p>
-          </div>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="new-password" className="text-xs font-semibold">{t('agentOnboarding.password.label')}</Label>
-              <div className="relative">
-                <Input
-                  id="new-password"
-                  type={showPw ? 'text' : 'password'}
-                  placeholder={t('agentOnboarding.password.placeholder')}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  autoFocus
-                  className="pe-10"
-                />
-                <button type="button" onClick={() => setShowPw(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1}>
-                  {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-              {/* Live requirements checklist */}
-              <ul className="space-y-1 mt-2">
-                {pwReqs.map((req, i) => (
-                  <li key={i} className={`flex items-center gap-1.5 text-xs transition-colors ${req.met ? 'text-emerald-600' : 'text-muted-foreground'}`}>
-                    <span>{req.met ? '✓' : '✗'}</span>
-                    <span>{req.label}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="scroll-mt-4">
-              <Label htmlFor="confirm-password" className="text-xs font-semibold">{t('agentOnboarding.password.confirmLabel')}</Label>
-              <div className="relative">
-                <Input
-                  id="confirm-password"
-                  type={showConfirmPw ? 'text' : 'password'}
-                  placeholder={t('agentOnboarding.password.confirmPlaceholder')}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  onFocus={(e) => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-                  className="pe-10"
-                />
-                <button type="button" onClick={() => setShowConfirmPw(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1}>
-                  {showConfirmPw ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </div>
-            {passwordError && (
-              <p className="text-sm text-destructive">{passwordError}</p>
-            )}
-          </div>
-          <Button
-            className="w-full"
-            disabled={!allPwReqsMet || !confirmPassword || newPassword !== confirmPassword || passwordLoading}
-            onClick={handleSetPassword}
-          >
-            {passwordLoading && <Loader2 size={14} className="me-1 animate-spin" />}
-            {t('agentOnboarding.password.cta')}
-          </Button>
-        </div>
-      );
-    }
 
-    // STEP 0 — Welcome & path selection
     if (step === 0) {
       return (
         <div className="space-y-6">
@@ -1404,8 +1278,8 @@ export default function AgencyOnboardingPage() {
     setStep(s => s + 1);
   };
 
-  const showBackButton = step > 0 && !showPasswordStep && (step < 3 || (path === 'migration' && step === 3));
-  const showNextButton = !showPasswordStep && (step < 3 || (path === 'migration' && step === 3));
+  const showBackButton = step > 0 && (step < 3 || (path === 'migration' && step === 3));
+  const showNextButton = step < 3 || (path === 'migration' && step === 3);
 
   const stepLabels = path === 'migration'
     ? [t('agentOnboarding.nav.label.welcome'), t('agentOnboarding.nav.label.agency'), t('agentOnboarding.nav.label.trust'), t('agentOnboarding.nav.label.cutover'), t('agentOnboarding.nav.label.import'), t('agentOnboarding.nav.label.complete')]
@@ -1428,7 +1302,7 @@ export default function AgencyOnboardingPage() {
               {t('agentOnboarding.nav.heading')}
             </h1>
             <p className="text-xs text-muted-foreground">
-              {showPasswordStep ? t('agentOnboarding.nav.securing') : t('agentOnboarding.nav.stepXofY', { current: step + 1, total: totalSteps })}
+              {t('agentOnboarding.nav.stepXofY', { current: step + 1, total: totalSteps })}
             </p>
           </div>
           <Progress value={progressPct} className="h-1.5" />
@@ -1448,7 +1322,7 @@ export default function AgencyOnboardingPage() {
         <Card className="flex-1 min-h-0 overflow-y-auto">
           <CardContent className="p-4 sm:p-6">
             <motion.div
-              key={showPasswordStep ? 'password-step' : step}
+              key={step}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.25 }}

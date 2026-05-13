@@ -86,8 +86,9 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
         setCurrencies(updated);
         CURRENCIES = updated;
         setIsLiveRates(true);
+        setLastUpdated(new Date());
       } catch {
-        // fallback silently
+        // fallback silently — lastUpdated stays null to signal stale rates
       }
     };
 

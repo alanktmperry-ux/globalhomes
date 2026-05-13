@@ -190,16 +190,16 @@ const TrustLedgerPage = () => {
 
 
   const fetchData = useCallback(async () => {
-    if (!user) return;
+    if (!agent?.id) return;
     setLoading(true);
     const [{ data: r }, { data: p }] = await Promise.all([
-      supabase.from('trust_receipts').select('*').order('created_at', { ascending: false }),
-      supabase.from('trust_payments').select('*').order('created_at', { ascending: false }),
+      supabase.from('trust_receipts').select('*').eq('agent_id', agent.id).order('created_at', { ascending: false }),
+      supabase.from('trust_payments').select('*').eq('agent_id', agent.id).order('created_at', { ascending: false }),
     ]);
     if (r) setReceipts(r as unknown as TrustReceipt[]);
     if (p) setPayments(p as unknown as TrustPayment[]);
     setLoading(false);
-  }, [user]);
+  }, [agent?.id]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 

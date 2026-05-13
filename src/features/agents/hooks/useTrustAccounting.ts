@@ -79,11 +79,12 @@ export function useTrustAccounting() {
   }, [user]);
 
   const fetchAccounts = useCallback(async () => {
-    if (!user) return;
+    if (!agentId) return;
     try {
       const { data, error } = await supabase
         .from('trust_accounts')
         .select('*')
+        .eq('agent_id', agentId)
         .order('created_at', { ascending: false });
       if (error) throw error;
       if (data) setAccounts(data as unknown as TrustAccount[]);
@@ -91,7 +92,7 @@ export function useTrustAccounting() {
       console.error('Failed to fetch trust accounts:', err);
       toast.error('Failed to load trust accounts');
     }
-  }, [user]);
+  }, [agentId]);
 
   const fetchTransactionsPage = useCallback(async (page: number, append: boolean) => {
     if (!user) return;

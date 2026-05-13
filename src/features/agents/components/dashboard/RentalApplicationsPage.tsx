@@ -24,11 +24,13 @@ const STATUS_STYLES: Record<string, { variant: 'default' | 'secondary' | 'destru
   declined: { variant: 'destructive', label: 'Declined' },
   withdrawn: { variant: 'secondary', label: 'Withdrawn' },
   pending: { variant: 'secondary', label: 'Pending' },
+  converted: { variant: 'outline', label: 'Converted' },
 };
 
 interface Application {
   id: string;
   reference_number: string;
+  tenancy_id: string | null;
   property_id: string;
   agent_id: string;
   full_name: string;

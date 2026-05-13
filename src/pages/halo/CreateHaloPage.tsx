@@ -241,6 +241,9 @@ export default function CreateHaloPage() {
       }
 
       localStorage.removeItem(DRAFT_KEY);
+      if (user?.id) {
+        supabase.from('halo_drafts').delete().eq('seeker_id', user.id).then(() => {});
+      }
       navigate('/halo/success');
     } catch (e) {
       console.error(e);

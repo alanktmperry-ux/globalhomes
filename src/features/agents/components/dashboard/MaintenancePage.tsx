@@ -85,6 +85,39 @@ export default function MaintenancePage() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [uploadingFor, setUploadingFor] = useState<string | null>(null);
+
+  const uploadJobPhotos = async (job: Job, files: FileList | null) => {
+    if (!files || files.length === 0 || !agentId) return;
+    setUploadingFor(job.id);
+    try {
+      const newUrls: string[] = [];
+      for (const file of Array.from(files)) {
+        const safeName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+        const path = `${agentId}/${job.id}/${safeName}`;
+        const { error: upErr } = await supabase.storage
+          .from('maintenance-photos')
+          .upload(path, file, { contentType: file.type });
+        if (upErr) throw upErr;
+        const { data: signed } = await supabase.storage
+          .from('maintenance-photos')
+          .createSignedUrl(path, 60 * 60 * 24 * 365);
+        if (signed?.signedUrl) newUrls.push(signed.signedUrl);
+      }
+      const merged = [...(job.photo_urls || []), ...newUrls];
+      const { error: updErr } = await supabase
+        .from('maintenance_jobs')
+        .update({ photo_urls: merged } as any)
+        .eq('id', job.id);
+      if (updErr) throw updErr;
+      setJobs(prev => prev.map(j => j.id === job.id ? { ...j, photo_urls: merged } : j));
+      toast.success('Photos uploaded');
+    } catch (e: any) {
+      toast.error(e?.message || 'Upload failed');
+    } finally {
+      setUploadingFor(null);
+    }
+  };
 
   // assign dialog
   const [assignFor, setAssignFor] = useState<Job | null>(null);

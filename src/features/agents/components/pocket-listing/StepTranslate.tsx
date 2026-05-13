@@ -28,6 +28,7 @@ type LangKey = typeof LANGUAGES[number]['key'];
 const TITLE_LIMIT = 120;
 
 const StepTranslate = ({ draft, update }: Props) => {
+  const { user } = useAuth();
   const [activeLang, setActiveLang] = useState<LangKey>('zh-CN');
   const [translating, setTranslating] = useState<LangKey | null>(null);
 

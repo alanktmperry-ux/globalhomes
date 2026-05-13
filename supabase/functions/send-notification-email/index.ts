@@ -452,6 +452,54 @@ Deno.serve(async (req) => {
       if (recipientEmail) await sendAndLog(recipientEmail, subject, html);
       return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
+    } else if (type === 'tenant_portal') {
+      recipientEmail = payload.recipient_email || null;
+      const name = payload.recipient_name || 'there';
+      const propAddr = payload.property_address || 'your property';
+      const portalUrl = (payload as any).portal_url || 'https://listhq.com.au';
+      const subject = `Your tenant portal is ready — ${propAddr}`;
+      const html = `<!doctype html><html><body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f5f5f4;padding:24px;color:#1c1917;">
+<div style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;">
+  <div style="background:#0f172a;padding:24px;text-align:center;color:#ffffff;font-size:20px;font-weight:700;">🌐 ListHQ</div>
+  <div style="padding:28px;">
+    <h1 style="font-size:18px;margin:0 0 12px;color:#0f172a;">Your tenant portal is ready</h1>
+    <p style="font-size:14px;line-height:1.6;margin:0 0 14px;">Hi ${name},</p>
+    <p style="font-size:14px;line-height:1.6;margin:0 0 14px;">Your property manager has set up a secure portal for your tenancy at <strong>${propAddr}</strong>. Use the link below to submit maintenance requests, view your lease, and more. No password required.</p>
+    <div style="text-align:center;margin:28px 0;">
+      <a href="${portalUrl}" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:13px 28px;border-radius:10px;">Access Your Portal</a>
+    </div>
+    <p style="font-size:12px;color:#6b7280;margin:24px 0 0;">If the button doesn't work, paste this link into your browser:<br><span style="color:#2563eb;word-break:break-all;">${portalUrl}</span></p>
+  </div>
+</div></body></html>`;
+      if (recipientEmail) await sendAndLog(recipientEmail, subject, html);
+      return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
+    } else if (type === 'rental_application') {
+      recipientEmail = payload.recipient_email || null;
+      const applicantName = (payload as any).applicant_name || 'an applicant';
+      const propAddr = payload.property_address || 'your listing';
+      const subject = `New rental application — ${propAddr}`;
+      const html = `<!doctype html><html><body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f5f5f4;padding:24px;color:#1c1917;">
+<div style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;">
+  <div style="background:#0f172a;padding:24px;text-align:center;color:#ffffff;font-size:20px;font-weight:700;">🌐 ListHQ</div>
+  <div style="padding:28px;">
+    <h1 style="font-size:18px;margin:0 0 12px;color:#0f172a;">New rental application received</h1>
+    <p style="font-size:14px;line-height:1.6;margin:0 0 14px;">A new application has been received from <strong>${applicantName}</strong> for <strong>${propAddr}</strong>. Log in to ListHQ to review their application.</p>
+    <div style="text-align:center;margin:28px 0;">
+      <a href="https://listhq.com.au/dashboard/applications" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:13px 28px;border-radius:10px;">Review Application</a>
+    </div>
+  </div>
+</div></body></html>`;
+      if (recipientEmail) await sendAndLog(recipientEmail, subject, html);
+      return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
+    } else if (type === 'broadcast') {
+      recipientEmail = payload.recipient_email || null;
+      const subject = (payload as any).subject || payload.title || 'A message from ListHQ';
+      const html = (payload as any).html_body || '';
+      if (recipientEmail) await sendAndLog(recipientEmail, subject, html);
+      return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
     } else if (type === 'tenant_dispute') {
       recipientEmail = payload.recipient_email || null;
       const propAddr = payload.property_address || 'your managed property';

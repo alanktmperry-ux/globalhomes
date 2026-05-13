@@ -272,7 +272,7 @@ export default function HaloBoardPage() {
             style={{ background: 'linear-gradient(135deg,#2563EB,#1D4ED8)' }}
           >
             <Ico icon="solar:add-square-bold" size={16} />
-            <span className="hidden sm:inline">{t('agent.halo.credits.buy')}</span>
+            <span>{t('agent.halo.credits.buy')}</span>
           </button>
         </div>
       </div>

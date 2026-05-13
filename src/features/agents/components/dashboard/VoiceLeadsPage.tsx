@@ -147,7 +147,7 @@ const VoiceLeadsPage = () => {
             leadId: null as string | null,
             transcript: vs.transcript || '',
             urgency: 'cold' as const,
-            score: null,
+            score: null as number | null,
             time: formatDistanceToNow(new Date(vs.created_at), { addSuffix: true }),
             createdAt: vs.created_at,
             buyerLocation: loc?.city || loc?.suburb || parsed?.location || 'Unknown',

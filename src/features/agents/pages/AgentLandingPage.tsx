@@ -11,11 +11,6 @@ import FinalCTA from '@/features/marketing/FinalCTA';
 
 const GRAD = 'linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%)';
 
-// iconify-icon is a globally loaded web component
-const Icon = ({ icon, size = 20, color }: { icon: string; size?: number; color?: string }) => (
-  // @ts-expect-error — iconify-icon is a web component
-  <iconify-icon icon={icon} style={{ fontSize: `${size}px`, color, display: 'inline-flex', lineHeight: 1 }} />
-);
 
 const CYCLING_LINES = [
   'who move fast.',

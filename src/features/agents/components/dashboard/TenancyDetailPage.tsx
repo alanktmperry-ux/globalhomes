@@ -764,6 +764,9 @@ const TenancyDetailPage = () => {
             <TabsTrigger value="payments">Rent Payments</TabsTrigger>
             <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
             <TabsTrigger value="statement">Owner Statement</TabsTrigger>
+            <TabsTrigger value="communications" className="flex items-center gap-1.5">
+              <MessageSquare size={14} /> Communications
+            </TabsTrigger>
           </TabsList>
 
           {/* ═══ TAB 1: Overview ═══ */}

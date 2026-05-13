@@ -10674,6 +10674,42 @@ export type Database = {
         }
         Relationships: []
       }
+      rent_increase_notices: {
+        Row: {
+          agent_id: string
+          created_at: string
+          effective_date: string
+          id: string
+          new_rent_amount: number
+          notes: string | null
+          notice_sent_date: string
+          old_rent_amount: number
+          tenancy_id: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          effective_date: string
+          id?: string
+          new_rent_amount: number
+          notes?: string | null
+          notice_sent_date: string
+          old_rent_amount: number
+          tenancy_id: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          effective_date?: string
+          id?: string
+          new_rent_amount?: number
+          notes?: string | null
+          notice_sent_date?: string
+          old_rent_amount?: number
+          tenancy_id?: string
+        }
+        Relationships: []
+      }
       rent_increases: {
         Row: {
           created_at: string

@@ -448,8 +448,8 @@ const Index = () => {
 
   // Initial card content (static — JS handles all subsequent updates via refs).
   // Falls back to a brand-gradient empty-state card pre-launch (no real listings yet).
-  const EMPTY_STATE_TITLE = 'Listings coming soon';
-  const EMPTY_STATE_PRICE = 'First agents are getting their pocket listings ready';
+  const EMPTY_STATE_TITLE = 'Be the first';
+  const EMPTY_STATE_PRICE = 'Join as a founding agent — publish the first listings';
   const initialFront: { img: string | null; gradient: string; title: string; price: string; meta: string } =
     heroCards[0] ?? {
       img: null,

@@ -424,6 +424,26 @@ export default function MaintenancePage() {
                                 </div>
                               )}
                             </div>
+                            <div className="space-y-2 pt-2 border-t border-border/50">
+                              <Label className="text-xs flex items-center gap-1.5">
+                                <Receipt size={12} /> Supplier Invoice
+                              </Label>
+                              {j.invoice_url ? (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    window.open(j.invoice_url!, '_blank', 'noopener,noreferrer');
+                                  }}
+                                  className="gap-1.5"
+                                >
+                                  <ExternalLink size={14} /> View Invoice
+                                </Button>
+                              ) : (
+                                <p className="text-xs text-muted-foreground">No invoice uploaded yet</p>
+                              )}
+                            </div>
                           </div>
                         </TableCell>
                       </TableRow>

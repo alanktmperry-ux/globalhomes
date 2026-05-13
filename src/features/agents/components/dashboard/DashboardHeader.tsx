@@ -1,5 +1,6 @@
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { NotificationBell } from './NotificationBell';
+import { LanguageSwitcher } from '@/shared/components/layout/LanguageSwitcher';
 
 interface Props {
   title: string;
@@ -22,6 +23,7 @@ const DashboardHeader = ({ title, subtitle, actions }: Props) => (
       </div>
       <div className="flex items-center gap-2">
         {actions}
+        <LanguageSwitcher />
         <NotificationBell />
       </div>
     </div>

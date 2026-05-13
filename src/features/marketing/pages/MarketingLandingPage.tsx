@@ -167,21 +167,7 @@ export default function MarketingLandingPage() {
       <section className="py-20 bg-secondary/30 border-y border-border">
         <div className="container mx-auto px-6 max-w-4xl">
           <h2 className="font-display text-2xl font-extrabold text-center mb-10">What Agents Are Saying</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            {[
-              { quote: '"The AI Seller Score found me 3 listings in my first week that I would have missed completely."', name: 'Founding Agent', location: 'Melbourne' },
-              { quote: '"Voice search brought in international buyers I didn\'t know existed in my suburb."', name: 'Early Access Agent', location: 'Sydney' },
-            ].map((t, i) => (
-              <div key={i} className="bg-card border border-border rounded-2xl p-8">
-                <div className="flex gap-1 mb-4">
-                  {Array.from({ length: 5 }).map((_, j) => <Star key={j} size={16} className="fill-primary text-primary" />)}
-                </div>
-                <blockquote className="font-display text-lg font-semibold italic leading-relaxed mb-4">{t.quote}</blockquote>
-                <p className="text-sm text-muted-foreground"><strong className="text-foreground">{t.name}</strong> · {t.location}</p>
-              </div>
-            ))}
-          </div>
-          <p className="text-center text-xs text-muted-foreground mt-6">More testimonials coming after our first 5 founding agents.</p>
+          <p className="text-center text-muted-foreground py-8 text-sm">Agent testimonials coming soon.</p>
         </div>
       </section>
 

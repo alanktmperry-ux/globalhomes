@@ -867,36 +867,7 @@ const Index = () => {
             <p className="text-xs text-center text-muted-foreground mb-6 max-w-xl mx-auto">
               Feedback from our beta program. Names anonymised.
             </p>
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:20 }} className="how-grid">
-              {([
-                { i:'M', q:'I found 6 listings near my children\'s school in one afternoon. Other portals had the same listings but I couldn\'t understand anything.', n:'Mei L.', d:'Auburn, NSW · Beta tester' },
-                { i:'T', q:'Tôi tìm thấy căn nhà lý tưởng của mình trong vài giờ. Mọi thứ đều bằng tiếng Việt — giá, trường học, mô tả.', translation:'("I found my dream home in just a few hours. Everything was in Vietnamese — prices, schools, descriptions.")', n:'Tuan N.', d:'Box Hill, VIC · Beta tester' },
-                { i:'P', q:'I showed prices in INR so I can explain to my parents back home what we\'re looking at. ListHQ gets it.', n:'Priya S.', d:'Mosman, NSW · Beta tester' },
-              ] as { i:string; q:string; n:string; d:string; translation?:string }[]).map((c, i) => (
-                <div key={c.n} className={`reveal reveal-d${i+1}`} style={{ background:T.off, border:`1px solid ${T.border}`, borderRadius:20, padding:32 }}>
-                  <p style={{ fontSize:15, fontWeight:500, color:T.ink, fontStyle:'italic', lineHeight:1.7, margin:'0 0 24px' }}>"{c.q}"</p>
-                  {c.translation && (
-                    <p style={{ fontSize:13, color:T.muted, fontStyle:'normal', lineHeight:1.6, margin:'-16px 0 24px', fontWeight:400 }}>
-                      {c.translation}
-                    </p>
-                  )}
-                  <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-                    <div style={{
-                      width:42, height:42, borderRadius:'50%',
-                      background: ['#FEF3C7','#ECFDF5','#EFF6FF'][i],
-                      color: ['#92400E','#065F46','#1E40AF'][i],
-                      fontWeight:800, fontSize:16,
-                      display:'flex', alignItems:'center', justifyContent:'center',
-                      border: `2px solid ${['#FDE68A','#A7F3D0','#BFDBFE'][i]}`,
-                    }}>{c.i}</div>
-                    <div>
-                      <div style={{ fontSize:13, fontWeight:700, color:T.ink }}>{c.n}</div>
-                      <div style={{ fontSize:12, color:T.muted }}>{c.d}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <p className="text-center text-muted-foreground py-8 text-sm">Agent testimonials coming soon — we're onboarding our first founding agents now.</p>
           </div>
         </section>
 
@@ -1013,11 +984,6 @@ function AgentBand() {
             <p style={{ fontSize:16, color:'rgba(255,255,255,.6)', lineHeight:1.6, margin:'0 0 22px', maxWidth:620 }}>
               {t('home.agentBand.para')}
             </p>
-            <div style={{ display:'flex', gap:24, flexWrap:'wrap' }}>
-              {['McGrath','Belle Property','LJ Hooker','Raine & Horne'].map((b) => (
-                <span key={b} style={{ fontSize:13, fontWeight:700, color:'rgba(255,255,255,.65)', letterSpacing:'.04em' }}>{b}</span>
-              ))}
-            </div>
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
             <button onClick={() => navigate('/for-agents/pricing')} style={{ background:'#fff', color:T.ink, border:'none', padding:'14px 28px', borderRadius:12, fontSize:15, fontWeight:700, cursor:'pointer' }}>{t('home.agents.cta')} →</button>

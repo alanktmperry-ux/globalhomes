@@ -4,7 +4,8 @@ import { Coins, ChevronDown } from 'lucide-react';
 import { useCurrency, CURRENCY_REGIONS, CURRENCIES, type CurrencyCode } from '@/shared/lib/CurrencyContext';
 
 export function CurrencySwitcher() {
-  const { currency, setCurrencyCode } = useCurrency();
+  const { currency, setCurrencyCode, lastUpdated } = useCurrency();
+  const showStaleWarning = currency.code !== 'AUD' && lastUpdated === null;
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);

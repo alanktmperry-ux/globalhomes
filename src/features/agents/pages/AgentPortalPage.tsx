@@ -191,8 +191,8 @@ const AgentPortalPage = () => {
               <p className="text-sm text-muted-foreground mt-2 mb-4">
                 Unlock direct leads, show your contact details to property seekers, and get analytics on your listings.
               </p>
-              <p className="font-display text-3xl font-bold text-foreground mb-1">$499<span className="text-base font-normal text-muted-foreground">/mo</span></p>
-              <p className="text-xs text-muted-foreground mb-5">Cancel anytime</p>
+              <p className="font-display text-3xl font-bold text-foreground mb-1">$799<span className="text-base font-normal text-muted-foreground">/mo</span></p>
+              <p className="text-xs text-muted-foreground mb-5">60-day free trial · cancel anytime</p>
               <button
                 onClick={handleSubscribe}
                 disabled={subscribing || isSubscribed}

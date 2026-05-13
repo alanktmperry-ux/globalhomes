@@ -95,17 +95,15 @@ export function useTrustAccounting() {
   }, [agentId]);
 
   const fetchTransactionsPage = useCallback(async (page: number, append: boolean) => {
-    if (!user) return;
+    if (!agentId) return;
     try {
-      // Fetch a page of receipts and a page of payments, then merge.
-      // Each table is ranged independently; combined "hasMore" is true if
-      // either side returned a full page.
       const from = page * TX_PAGE_SIZE;
       const to = from + TX_PAGE_SIZE - 1;
 
       const { data: receipts, error: rErr } = await supabase
         .from('trust_receipts')
         .select('*')
+        .eq('agent_id', agentId)
         .order('date_received', { ascending: false })
         .range(from, to);
       if (rErr) throw rErr;
@@ -113,6 +111,7 @@ export function useTrustAccounting() {
       const { data: payments, error: pErr } = await supabase
         .from('trust_payments')
         .select('*')
+        .eq('agent_id', agentId)
         .order('date_paid', { ascending: false })
         .range(from, to);
       if (pErr) throw pErr;
@@ -177,7 +176,7 @@ export function useTrustAccounting() {
       console.error('Failed to fetch trust transactions:', err);
       toast.error('Failed to load trust transactions');
     }
-  }, [user]);
+  }, [agentId]);
 
   const fetchTransactions = useCallback(async () => {
     setTxPage(0);

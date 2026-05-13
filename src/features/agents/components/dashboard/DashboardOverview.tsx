@@ -193,7 +193,7 @@ const DashboardOverview = () => {
         boostedRes,
       ] = await Promise.all([
         supabase.from('properties').select('id', { count: 'exact', head: true }).eq('agent_id', aId).eq('is_active', true),
-        supabase.from('properties').select('id', { count: 'exact', head: true }).eq('agent_id', aId).eq('is_active', true).lt('created_at', thirtyDaysAgo),
+        supabase.from('properties').select('id', { count: 'exact', head: true }).eq('agent_id', aId).eq('is_active', true).gte('created_at', sixtyDaysAgo).lt('created_at', thirtyDaysAgo),
         supabase.from('leads').select('id', { count: 'exact', head: true }).eq('agent_id', aId).gte('score', 70).gte('created_at', thirtyDaysAgo),
         supabase.from('leads').select('id', { count: 'exact', head: true }).eq('agent_id', aId).gte('score', 70).gte('created_at', sixtyDaysAgo).lt('created_at', thirtyDaysAgo),
         supabase.from('listing_buyer_matches').select('id', { count: 'exact', head: true }).eq('agent_id', aId),

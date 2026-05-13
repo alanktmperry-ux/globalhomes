@@ -189,8 +189,9 @@ export default function InsightsPage() {
       const monthlyChurnRate = churnRatePct / 100;
       const ltv =
         monthlyChurnRate > 0 ? avgRevenuePerAgent / monthlyChurnRate : avgRevenuePerAgent * 24;
-      const cac = 0; // placeholder
-      const paybackMonths = avgRevenuePerAgent > 0 && cac > 0 ? cac / avgRevenuePerAgent : null;
+      // CAC requires marketing spend tracking, which isn't wired yet.
+      const cac: number | null = null;
+      const paybackMonths = avgRevenuePerAgent > 0 && cac != null && cac > 0 ? cac / avgRevenuePerAgent : null;
 
       // === Cohorts: last 12 months ===
       const cohortMap = new Map<string, any[]>();

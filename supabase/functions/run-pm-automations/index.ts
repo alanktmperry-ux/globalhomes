@@ -72,6 +72,22 @@ async function logSend(
     status,
     error_text: errorText ?? null,
   } as any);
+
+  if (status === "sent" && tenancyId) {
+    try {
+      await supabase.from("tenancy_communications").insert({
+        tenancy_id: tenancyId,
+        agent_id: rule.agent_id,
+        type: rule.rule_type,
+        subject,
+        recipient_email: recipient,
+        status: "sent",
+        sent_at: new Date().toISOString(),
+      } as any);
+    } catch (e) {
+      console.error("tenancy_communications insert failed:", (e as Error).message);
+    }
+  }
 }
 
 // Has a similar send already gone out for this tenancy + rule in the last 7 days?

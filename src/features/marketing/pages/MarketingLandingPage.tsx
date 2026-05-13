@@ -84,7 +84,7 @@ export default function MarketingLandingPage() {
         <meta property="og:description" content="4 AI builds that replace hours of manual work. Seller scores, buyer matching, AI offers, and a lead marketplace. Built for Australian agents." />
         <meta property="og:url" content="https://listhq.com.au" />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://listhq.com.au" />
+        <link rel="canonical" href="https://listhq.com.au/launch" />
       </Helmet>
 
       {/* ─── FOUNDING AGENT BANNER ─── */}

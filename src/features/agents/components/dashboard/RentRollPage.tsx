@@ -95,7 +95,7 @@ const BSB_REGEX = /^\d{3}-?\d{3}$/;
 const toWeekly = (amount: number, freq: string): number => {
   if (freq === 'weekly') return amount;
   if (freq === 'fortnightly') return amount / 2;
-  if (freq === 'monthly') return (amount * 12) / 52;
+  if (freq === 'monthly') return ((amount * 12) / 365.25) * 7;
   return amount;
 };
 
@@ -310,7 +310,7 @@ const RentRollPage = () => {
     if (daysBehind <= 0) return { label: 'Current', variant: 'default' as const, days: 0, owed: 0 };
 
     const weeklyRent = toWeekly(t.rent_amount, t.rent_frequency);
-    const weeksOwed = Math.ceil(daysBehind / 7);
+    const weeksOwed = daysBehind / 7;
     const owed = weeklyRent * weeksOwed;
 
     if (daysBehind <= 14) return { label: `${daysBehind}d ($${owed.toFixed(0)})`, variant: 'secondary' as const, days: daysBehind, owed };

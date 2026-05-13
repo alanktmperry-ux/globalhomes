@@ -206,6 +206,9 @@ export default function VacanciesPage() {
             <div>
               <Label className="text-xs">Vacate date</Label>
               <Input type="date" value={vacateDate} onChange={e => setVacateDate(e.target.value)} />
+              <p className="mt-2 text-xs rounded-md border border-amber-200 bg-amber-50 text-amber-900 px-2.5 py-2 leading-relaxed">
+                Minimum 60 days notice required. NSW: 90 days end-of-term · VIC: 60 days · QLD: 60 days. Always confirm with your state legislation.
+              </p>
             </div>
             <p className="text-xs text-muted-foreground flex items-start gap-1.5"><AlertTriangle size={12} className="mt-0.5 text-amber-600"/>This sets vacancy status to <strong>notice given</strong>.</p>
           </div>

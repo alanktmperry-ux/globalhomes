@@ -1302,7 +1302,7 @@ export default function AgencyOnboardingPage() {
               {t('agentOnboarding.nav.heading')}
             </h1>
             <p className="text-xs text-muted-foreground">
-              {showPasswordStep ? t('agentOnboarding.nav.securing') : t('agentOnboarding.nav.stepXofY', { current: step + 1, total: totalSteps })}
+              {t('agentOnboarding.nav.stepXofY', { current: step + 1, total: totalSteps })}
             </p>
           </div>
           <Progress value={progressPct} className="h-1.5" />

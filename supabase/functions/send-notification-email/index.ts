@@ -287,6 +287,82 @@ Deno.serve(async (req) => {
       if (recipientEmail) await sendAndLog(recipientEmail, subject, buildLeaseExpiryHtml({ tenantName: payload.recipient_name || 'Tenant', propertyAddress: payload.property_address, leaseEndDate: payload.lease_end_date, daysRemaining: payload.days_remaining, agentName: payload.agent_name, agentPhone: payload.agent_phone }));
       return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
+    } else if (type === 'trust_statement') {
+      recipientEmail = payload.recipient_email || null;
+      const fmtAUD = (n: number) => new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(Number(n) || 0);
+      const fmtDate = (d: string) => {
+        try { return new Date(d).toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' }); } catch { return d; }
+      };
+      const esc = (s: any) => String(s ?? '').replace(/[<>&]/g, c => c === '<' ? '&lt;' : c === '>' ? '&gt;' : '&amp;');
+      const periodLabel = `${fmtDate(payload.period_start)} – ${fmtDate(payload.period_end)}`;
+      const txs: Array<{ date: string; description: string; type: string; amount: number }> = Array.isArray(payload.transactions) ? payload.transactions : [];
+      const txRows = txs.length === 0
+        ? `<tr><td colspan="4" style="border:1px solid #e5e7eb;padding:12px;text-align:center;color:#6b7280;font-size:13px;">No transactions for this period.</td></tr>`
+        : txs.map(t => {
+            const isReceipt = t.type === 'receipt';
+            const color = isReceipt ? '#047857' : '#b91c1c';
+            const sign = isReceipt ? '+' : '−';
+            return `<tr>
+              <td style="border:1px solid #e5e7eb;padding:8px;font-size:13px;color:#374151;">${esc(fmtDate(t.date))}</td>
+              <td style="border:1px solid #e5e7eb;padding:8px;font-size:13px;color:#374151;">${esc(t.description)}</td>
+              <td style="border:1px solid #e5e7eb;padding:8px;font-size:13px;color:${color};text-transform:capitalize;">${esc(t.type)}</td>
+              <td style="border:1px solid #e5e7eb;padding:8px;font-size:13px;color:${color};text-align:right;font-variant-numeric:tabular-nums;">${sign} ${fmtAUD(t.amount)}</td>
+            </tr>`;
+          }).join('');
+      const subject = `Trust Account Statement — ${payload.property_address || ''} ${periodLabel}`.trim();
+      const html = `<!doctype html><html><body style="margin:0;padding:0;background:#f6f7f9;font-family:Arial,sans-serif;">
+<div style="max-width:680px;margin:0 auto;background:#ffffff;">
+  <div style="background:#1a1a2e;color:#ffffff;padding:24px 28px;">
+    <div style="font-size:12px;letter-spacing:2px;color:#94a3b8;text-transform:uppercase;">ListHQ Trust Accounting</div>
+    <h1 style="margin:6px 0 0;font-size:22px;color:#ffffff;">Trust Account Statement</h1>
+  </div>
+  <div style="padding:24px 28px;">
+    <h2 style="margin:0;font-size:16px;color:#0f172a;">${esc(payload.property_address || '')}</h2>
+    <p style="margin:4px 0 20px;color:#6b7280;font-size:13px;">${esc(periodLabel)}</p>
+
+    <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
+      <thead>
+        <tr style="background:#f9fafb;">
+          <th style="border:1px solid #e5e7eb;padding:8px;text-align:left;font-size:12px;color:#6b7280;text-transform:uppercase;">Opening Balance</th>
+          <th style="border:1px solid #e5e7eb;padding:8px;text-align:left;font-size:12px;color:#6b7280;text-transform:uppercase;">Total Receipts</th>
+          <th style="border:1px solid #e5e7eb;padding:8px;text-align:left;font-size:12px;color:#6b7280;text-transform:uppercase;">Total Payments</th>
+          <th style="border:1px solid #e5e7eb;padding:8px;text-align:left;font-size:12px;color:#6b7280;text-transform:uppercase;">Closing Balance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="border:1px solid #e5e7eb;padding:10px;font-size:14px;color:#0f172a;font-weight:600;">${fmtAUD(payload.opening_balance)}</td>
+          <td style="border:1px solid #e5e7eb;padding:10px;font-size:14px;color:#047857;font-weight:600;">${fmtAUD(payload.total_in)}</td>
+          <td style="border:1px solid #e5e7eb;padding:10px;font-size:14px;color:#b91c1c;font-weight:600;">${fmtAUD(payload.total_out)}</td>
+          <td style="border:1px solid #e5e7eb;padding:10px;font-size:14px;color:#0f172a;font-weight:700;">${fmtAUD(payload.closing_balance)}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin:0 0 8px;font-size:14px;color:#0f172a;">Transactions</h3>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:#f9fafb;">
+          <th style="border:1px solid #e5e7eb;padding:8px;text-align:left;font-size:12px;color:#6b7280;text-transform:uppercase;">Date</th>
+          <th style="border:1px solid #e5e7eb;padding:8px;text-align:left;font-size:12px;color:#6b7280;text-transform:uppercase;">Description</th>
+          <th style="border:1px solid #e5e7eb;padding:8px;text-align:left;font-size:12px;color:#6b7280;text-transform:uppercase;">Type</th>
+          <th style="border:1px solid #e5e7eb;padding:8px;text-align:right;font-size:12px;color:#6b7280;text-transform:uppercase;">Amount</th>
+        </tr>
+      </thead>
+      <tbody>${txRows}</tbody>
+    </table>
+
+    <div style="margin-top:28px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:12px;color:#6b7280;line-height:1.6;">
+      <div><strong style="color:#0f172a;">${esc(payload.agent_name || '')}</strong></div>
+      <div>${esc(payload.agency_name || '')}</div>
+      <div>Licence: ${esc(payload.agent_license || 'N/A')}</div>
+      <div style="margin-top:8px;">Prepared in accordance with the ${esc(payload.agent_state_legislation || '')}.</div>
+    </div>
+  </div>
+</div></body></html>`;
+      if (recipientEmail) await sendAndLog(recipientEmail, subject, html);
+      return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
     } else if (type === 'tenant_dispute') {
       recipientEmail = payload.recipient_email || null;
       const propAddr = payload.property_address || 'your managed property';

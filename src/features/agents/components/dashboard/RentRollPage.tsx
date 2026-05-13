@@ -404,6 +404,30 @@ const RentRollPage = () => {
     return !rs || rs === 'none' || rs === 'declined';
   }).length;
 
+  // Bond Register — tenancies with a bond amount
+  const bonds = useMemo(
+    () => tenancies.filter(t => Number(t.bond_amount) > 0),
+    [tenancies]
+  );
+  const [bondLodgeOpen, setBondLodgeOpen] = useState<string | null>(null);
+  const [bondLodgeNumber, setBondLodgeNumber] = useState('');
+  const [bondLodgeSaving, setBondLodgeSaving] = useState(false);
+  const [bondRegisterOpen, setBondRegisterOpen] = useState(false);
+
+  const recordBondLodgement = async (tenancyId: string) => {
+    if (!bondLodgeNumber.trim()) { toast.error('Enter a lodgement / receipt number'); return; }
+    setBondLodgeSaving(true);
+    const { error } = await supabase
+      .from('tenancies')
+      .update({ bond_lodgment_number: bondLodgeNumber.trim() } as any)
+      .eq('id', tenancyId);
+    setBondLodgeSaving(false);
+    if (error) { toast.error(error.message || 'Failed to record lodgement'); return; }
+    setTenancies(prev => prev.map(t => t.id === tenancyId ? { ...t, bond_lodgment_number: bondLodgeNumber.trim() } : t));
+    setBondLodgeOpen(null);
+    setBondLodgeNumber('');
+    toast.success('Bond lodgement recorded');
+  };
 
   const getNextDue = (t: Tenancy) => {
     const latest = latestPaymentMap.get(t.id);

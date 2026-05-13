@@ -201,6 +201,19 @@ export default function FeaturedListings() {
                   </div>
                 </div>
               ))
+            : listings.length === 0
+            ? (
+                <div className="col-span-1 sm:col-span-2 lg:col-span-3 flex flex-col items-center justify-center py-20 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center mx-auto mb-5">
+                    <MapPin size={24} strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-[18px] font-bold text-[#0a0f1e] mb-2">New listings arriving soon</h3>
+                  <p className="text-[14px] text-[#6a6a6a] max-w-sm">
+                    We're building our listing network in your area. Be the first agent to list here —{' '}
+                    <Link to="/agents" className="text-[#2563EB] hover:underline font-medium">join as a founding agent →</Link>
+                  </p>
+                </div>
+              )
             : listings.map((l, i) => (
                 <Link
                   key={l.id}

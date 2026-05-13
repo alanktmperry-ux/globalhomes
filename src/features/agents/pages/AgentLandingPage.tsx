@@ -140,7 +140,7 @@ export default function AgentLandingPage() {
             { target: 0, staticText: 'Active', label: 'Verified buyer network' },
             { target: 0, staticText: 'Any language', label: 'Auto-translated listings' },
             { target: 24, suffix: '', label: 'Communities served' },
-            { target: 0, staticText: '60 days', label: 'Free trial, then price-locked for 12 months' },
+            { target: 0, staticText: '60 days', label: 'Free trial, then price-locked for 24 months' },
           ].map((s) => (
             <div key={s.label}>
               <div
@@ -272,7 +272,7 @@ export default function AgentLandingPage() {
             FOUNDING 100 OFFER
           </div>
           <h3 className="text-[clamp(28px,4vw,42px)] font-extrabold leading-[1.05] tracking-[-0.03em] text-black mt-4">
-            Lock in 30% lower pricing for 12 months.
+            Lock in 30% lower pricing for 24 months.
           </h3>
           <p className="text-[15px] md:text-[16px] text-[#4a4a4a] mt-3 leading-[1.55] max-w-[640px]">
             First 100 paying agents get founding rates. Once they're gone, public pricing applies.

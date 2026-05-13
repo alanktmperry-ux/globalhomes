@@ -47,7 +47,7 @@ const PLANS: Plan[] = [
     trialBadge: '60-day free trial',
     ctaLabel: 'Start free trial',
     ctaHref: '/for-agents#register',
-    microcopy: 'No credit card required · Cancel anytime before day 61',
+    microcopy: 'No charge until day 61 · Cancel anytime · All prices excl. GST',
     features: [
       '1 agent seat',
       'Up to 5 active listings',
@@ -116,7 +116,7 @@ const FAQS = [
   },
   {
     q: 'Does ListHQ replace PropertyMe or Console Cloud?',
-    a: 'Yes. ListHQ includes full trust accounting, property management, rent roll, arrears automation, inspection scheduling, and no-login portals for tenants, owners and suppliers — all state-specific and AFA 2014 compliant.',
+    a: 'Yes. ListHQ includes full trust accounting, property management, rent roll, arrears automation, inspection scheduling, and no-login portals for tenants, owners and suppliers — built to support state-specific trust accounting record-keeping requirements including AFA 2014 (QLD) and equivalent legislation in NSW, VIC, SA, and WA.',
   },
   {
     q: 'Can I change plans?',
@@ -282,7 +282,7 @@ export default function PricingPage() {
               <span style={gradientText}>plan.</span>
             </h1>
             <p className="text-[17px] md:text-[19px] text-[#4a4a4a] mt-6 max-w-[640px] mx-auto leading-[1.55]">
-              {t('pricing.subheadline') || '60-day free trial · No credit card required · Founding pricing locked for 12 months.'}
+              {t('pricing.subheadline') || '60-day free trial · No charge until day 61 · Founding pricing locked for 24 months.'}
             </p>
 
             {/* Billing toggle */}
@@ -321,8 +321,9 @@ export default function PricingPage() {
                 <PlanCard key={p.key} plan={p} billing={billing} index={i} />
               ))}
             </div>
+            <p className="text-xs text-center text-muted-foreground mt-2">All prices in AUD, excluding GST.</p>
             <p className="text-center text-[13px] text-[#6a6a6a] mt-10">
-              All plans include 60-day listing guarantee · ACCC-compliant trust accounting · Australian data residency
+              All plans include 60-day free trial · Trust accounting built for Australian compliance · Australian data residency
             </p>
           </div>
         </section>

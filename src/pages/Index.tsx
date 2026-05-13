@@ -1159,7 +1159,7 @@ function PricingSection({ navigate, T }: { navigate: NavFn; T: Theme }) {
         'Halo™ buyer matching board',
         'Email support',
       ],
-      cta: 'Start 30-day free trial →',
+      cta: 'Start 60-day free trial →',
       sub: 'No credit card required',
       action: () => navigate('/contact'),
       style: 'filled' as const,

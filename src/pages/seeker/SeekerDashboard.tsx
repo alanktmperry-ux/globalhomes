@@ -65,50 +65,47 @@ export default function SeekerDashboard() {
     return () => { cancelled = true; };
   }, [user]);
 
-  useEffect(() => {
+  const loadHalos = useCallback(async () => {
     if (!user) return;
-    let cancelled = false;
-    (async () => {
-      const { data: haloRows, error } = await supabase
-        .from('halos')
-        .select('*')
-        .eq('seeker_id', user.id)
-        .neq('status', 'deleted')
-        .order('created_at', { ascending: false });
-      if (cancelled) return;
-      if (error) {
-        console.error('[SeekerDashboard] halos:', error);
-        setHalos([]);
-        return;
-      }
-      const ids = (haloRows ?? []).map((h: any) => h.id);
-      if (ids.length === 0) {
-        setHalos([]);
-        setUnreadTotal(0);
-        return;
-      }
-      const { data: respRows } = await supabase
-        .from('halo_responses')
-        .select('halo_id, viewed_by_seeker')
-        .in('halo_id', ids);
-      const counts = new Map<string, { total: number; unread: number }>();
-      (respRows ?? []).forEach((r: any) => {
-        const c = counts.get(r.halo_id) ?? { total: 0, unread: 0 };
-        c.total += 1;
-        if (!r.viewed_by_seeker) c.unread += 1;
-        counts.set(r.halo_id, c);
-      });
-      let unread = 0;
-      const enriched = (haloRows as any[]).map((h) => {
-        const c = counts.get(h.id) ?? { total: 0, unread: 0 };
-        unread += c.unread;
-        return { ...h, response_count: c.total, unread_count: c.unread } as HaloRow;
-      });
-      setHalos(enriched);
-      setUnreadTotal(unread);
-    })();
-    return () => { cancelled = true; };
+    const { data: haloRows, error } = await supabase
+      .from('halos')
+      .select('*')
+      .eq('seeker_id', user.id)
+      .neq('status', 'deleted')
+      .order('created_at', { ascending: false });
+    if (error) {
+      console.error('[SeekerDashboard] halos:', error);
+      setHalos([]);
+      return;
+    }
+    const ids = (haloRows ?? []).map((h: any) => h.id);
+    if (ids.length === 0) {
+      setHalos([]);
+      setUnreadTotal(0);
+      return;
+    }
+    const { data: respRows } = await supabase
+      .from('halo_responses')
+      .select('halo_id, viewed_by_seeker')
+      .in('halo_id', ids);
+    const counts = new Map<string, { total: number; unread: number }>();
+    (respRows ?? []).forEach((r: any) => {
+      const c = counts.get(r.halo_id) ?? { total: 0, unread: 0 };
+      c.total += 1;
+      if (!r.viewed_by_seeker) c.unread += 1;
+      counts.set(r.halo_id, c);
+    });
+    let unread = 0;
+    const enriched = (haloRows as any[]).map((h) => {
+      const c = counts.get(h.id) ?? { total: 0, unread: 0 };
+      unread += c.unread;
+      return { ...h, response_count: c.total, unread_count: c.unread } as HaloRow;
+    });
+    setHalos(enriched);
+    setUnreadTotal(unread);
   }, [user]);
+
+  useEffect(() => { loadHalos(); }, [loadHalos]);
 
   // Auth gating
   if (loading) {

@@ -107,8 +107,12 @@ const BankReconciliationPage = () => {
       agentId
         ? supabase.from('trust_reconciliations').select('*').eq('agent_id', agentId).order('bank_date', { ascending: false })
         : Promise.resolve({ data: [] }),
-      supabase.from('trust_receipts').select('id, receipt_number, client_name, amount, date_received, payment_method'),
-      supabase.from('trust_payments').select('id, payment_number, client_name, amount, date_paid, payment_method'),
+      agentId
+        ? supabase.from('trust_receipts').select('id, receipt_number, client_name, amount, date_received, payment_method').eq('agent_id', agentId)
+        : Promise.resolve({ data: [] as any[] }) as any,
+      agentId
+        ? supabase.from('trust_payments').select('id, payment_number, client_name, amount, date_paid, payment_method').eq('agent_id', agentId)
+        : Promise.resolve({ data: [] as any[] }) as any,
     ]);
 
     if (recon) setItems(recon as unknown as Reconciliation[]);
@@ -296,7 +300,7 @@ const BankReconciliationPage = () => {
 
     toast.success(`${entries.length} entries imported. Running auto-match…`);
     // Refresh then auto-match
-    const { data: allRecon } = await supabase.from('trust_reconciliations').select('*').order('bank_date', { ascending: false });
+    const { data: allRecon } = await supabase.from('trust_reconciliations').select('*').eq('agent_id', agent.id).order('bank_date', { ascending: false });
     if (allRecon) {
       setItems(allRecon as unknown as Reconciliation[]);
       await runAutoMatch(allRecon as unknown as Reconciliation[]);

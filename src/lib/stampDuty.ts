@@ -57,7 +57,7 @@ const NSW_BRACKETS: Bracket[] = [
   { min: 1168000, max: null, base: 47295, rate: 0.055 },
 ];
 
-function nswDuty(price: number, isFirstHome: boolean): StampDutyResult {
+function nswDuty(price: number, isFirstHome: boolean, isNewBuild: boolean): StampDutyResult {
   const standard = applyBrackets(price, NSW_BRACKETS);
   const notes: string[] = ['NSW also offers a land tax (property tax) option for first home buyers as an alternative to stamp duty'];
   let duty = standard;
@@ -70,8 +70,11 @@ function nswDuty(price: number, isFirstHome: boolean): StampDutyResult {
       duty = standard - fhbExemption;
     }
   }
-  const fhbGrant = isFirstHome && price <= 750000 ? 10000 : 0;
-  return { duty, effectiveRate: price > 0 ? (duty / price) * 100 : 0, breakdown: formatBrackets(price, NSW_BRACKETS), fhbExemption, fhbGrant, totalCashNeeded: Math.max(0, duty), notes };
+  const fhbGrant = isFirstHome && isNewBuild && price <= 600000 ? 10000 : 0;
+  const fhbGrantNote = isFirstHome && price > 600000
+    ? 'FHOG applies to new builds under $600k only. Check eligibility at revenue.nsw.gov.au.'
+    : null;
+  return { duty, effectiveRate: price > 0 ? (duty / price) * 100 : 0, breakdown: formatBrackets(price, NSW_BRACKETS), fhbExemption, fhbGrant, fhbGrantNote, totalCashNeeded: Math.max(0, duty), notes };
 }
 
 // ─── VIC ────────────────────────────────────────────────────────────────────

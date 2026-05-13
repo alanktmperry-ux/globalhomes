@@ -102,8 +102,8 @@ export default function MarketingLandingPage() {
               Built for Australian Agents
             </motion.span>
             <motion.h1 variants={fadeUp} custom={1} className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.08] mb-6">
-              Your Unfair Advantage in{' '}
-              <span className="text-primary">Australian Real Estate</span>
+              One platform for every Australian agent.{' '}
+              <span className="text-primary">Every language.</span>
             </motion.h1>
             <motion.p variants={fadeUp} custom={2} className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
               4 AI builds that replace hours of manual work. Find sellers, match buyers, generate offers, and purchase qualified leads — all in one platform.

@@ -212,7 +212,7 @@ export default function AgentLandingPage() {
             {/* LEFT — Other portals */}
             <div className="bg-white border border-[#E5E5E5] rounded-3xl p-8">
               <div className="flex items-center gap-3 mb-6 pb-5 border-b border-[#E5E5E5]">
-                <Icon icon="solar:close-circle-linear" size={24} color="#6a6a6a" />
+                <XCircle size={24} color="#6a6a6a" />
                 <div className="text-[16px] font-bold text-[#0a0f1e]">REA / Domain / PropertyMe</div>
               </div>
               {CON_KEYS.map((k) => (

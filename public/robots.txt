@@ -67,5 +67,32 @@ Disallow: /dashboard/
 Disallow: /admin/
 Disallow: /partner/
 
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /partner/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /partner/
+
+User-agent: Amazonbot
+Allow: /
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /partner/
+
+User-agent: FacebookBot
+Allow: /
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /partner/
+
+User-agent: Bytespider
+Disallow: /
+
 # llms.txt
 LLMs: https://listhq.com.au/llms.txt

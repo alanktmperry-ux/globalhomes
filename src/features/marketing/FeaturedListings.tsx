@@ -44,7 +44,7 @@ const SELECT_COLS =
 
 const mapRow = (r: FeaturedRow): DisplayListing => ({
   id: r.id,
-  imageUrl: r.display_image_url || PLACEHOLDER_IMG,
+  imageUrl: r.display_image_url ?? '',
   address: r.display_address,
   suburb: r.display_suburb,
   state: r.display_state,

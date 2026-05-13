@@ -1,5 +1,6 @@
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { NotificationBell } from './NotificationBell';
+import { LanguageSwitcher } from '@/shared/components/layout/LanguageSwitcher';
 
 interface Props {
   title: string;

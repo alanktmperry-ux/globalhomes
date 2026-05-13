@@ -111,6 +111,7 @@ export default function MaintenancePage() {
     ]);
     const list: Job[] = (js || []).map((j: any) => ({
       ...j,
+      photo_urls: Array.isArray(j.photo_urls) ? j.photo_urls : [],
       property_address: j.properties ? `${j.properties.address}, ${j.properties.suburb}` : null,
       tenant_name: j.tenancies?.tenant_name || null,
       tenant_email: j.tenancies?.tenant_email || null,

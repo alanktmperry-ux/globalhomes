@@ -57,7 +57,7 @@ export default function About() {
     { term: 'AI capabilities', def: 'Multilingual listing generation, voice-to-listing transcription' },
     { term: 'Unique products', def: 'Pocket Listings (off-market), Halo buyer-matching system' },
     { term: 'Market context', def: "30% of Australia's population is overseas-born (2021 ABS Census)" },
-    { term: t('about.factPricingRange'), def: '$299/month (Solo) to custom (Enterprise)' },
+    { term: t('about.factPricingRange'), def: '$799/month (Solo) to custom (Enterprise)' },
   ];
   return (
     <>

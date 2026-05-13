@@ -151,7 +151,7 @@ const BuyerConciergePage = () => {
   const [sortKey, setSortKey] = useState<'match' | 'readiness' | 'recent'>('match');
 
   const navigate = useNavigate();
-  const { canAccessBuyerConcierge, conciergeMatchesPerMonth, conciergeIntrosPerMonth } = useSubscription();
+  const { canAccessBuyerConcierge, conciergeMatchesPerMonth, conciergeIntrosPerMonth, loading: subLoading } = useSubscription();
   const { agent } = useCurrentAgent();
   const { matchesUsed, introsUsed, refresh: refreshUsage } = useConciergeUsage(agent?.id || null);
   const recordConciergeAction = useRecordConciergeAction();
@@ -291,7 +291,7 @@ const BuyerConciergePage = () => {
     ? `Hi ${contactMatch.profile?.display_name?.split(' ')[0] || contactMatch.profile?.full_name?.split(' ')[0] || 'there'}, I noticed you've been searching in ${buyerSuburb(contactMatch)} — I have a listing that might suit you perfectly: ${contactMatch.listing?.address || ''}. Would you like me to send through more details or arrange an inspection?\n\nBest regards`
     : '';
 
-  if (!canAccessBuyerConcierge) {
+  if (!subLoading && !canAccessBuyerConcierge) {
     return (
       <div className="max-w-2xl mx-auto p-6 text-center space-y-4">
         <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">

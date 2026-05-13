@@ -139,7 +139,7 @@ export function useSubscription(): SubscriptionState {
       return;
     }
     if (!agent?.id) {
-      setState(prev => ({ ...prev, loading: false }));
+      // Agent still loading — keep subscription in loading state, don't default to demo
       return;
     }
 
@@ -148,7 +148,7 @@ export function useSubscription(): SubscriptionState {
       try {
         const { data: sub } = await supabase
           .from('agent_subscriptions')
-          .select('*')
+          .select('plan_type, subscription_end, trial_ends_at, auto_renew')
           .eq('agent_id', agent.id)
           .maybeSingle();
 

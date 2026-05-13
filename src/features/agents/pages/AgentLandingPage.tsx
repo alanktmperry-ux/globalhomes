@@ -140,7 +140,7 @@ export default function AgentLandingPage() {
             { target: 0, staticText: 'Active', label: 'Verified buyer network' },
             { target: 0, staticText: 'Any language', label: 'Auto-translated listings' },
             { target: 24, suffix: '', label: 'Communities served' },
-            { target: 0, staticText: '60 days', label: 'Free trial, then price-locked for 12 months' },
+            { target: 0, staticText: '60 days', label: 'Free trial, then price-locked for 24 months' },
           ].map((s) => (
             <div key={s.label}>
               <div

@@ -91,6 +91,10 @@ Deno.serve(async (req) => {
       }
 
       if (!data.user?.id) throw new Error("Failed to create compliance archive user");
+      await supabase.from('compliance_archive_users').upsert(
+        { source_user_id: targetUserId, archive_user_id: data.user.id },
+        { onConflict: 'source_user_id' }
+      ).then(() => {});
       return data.user.id;
     };
 

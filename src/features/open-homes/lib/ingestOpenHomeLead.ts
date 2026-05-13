@@ -36,11 +36,11 @@ export async function ingestOpenHomeLead({
     // Resolve listing agent + property address
     const { data: prop } = await supabase
       .from('properties')
-      .select('agent_id, address, suburb, agency_id')
+      .select('agent_id, address, suburb')
       .eq('id', propertyId)
-      .maybeSingle();
-    const agentId = (prop as any)?.agent_id || null;
-    const propertyAddress = [prop?.address, (prop as any)?.suburb].filter(Boolean).join(', ') || 'the property';
+      .maybeSingle() as any;
+    const agentId = prop?.agent_id || null;
+    const propertyAddress = [prop?.address, prop?.suburb].filter(Boolean).join(', ') || 'the property';
 
     if (agentId) {
       // Find-or-create contact by email

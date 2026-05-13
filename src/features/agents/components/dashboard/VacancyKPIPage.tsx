@@ -417,16 +417,11 @@ const VacancyKPIPage = () => {
 
       {/* Event log */}
       <section>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-display text-lg font-bold text-foreground">Vacancy Event Log</h2>
-          <Button size="sm" onClick={() => setShowAddEvent(true)} className="flex items-center gap-1.5">
-            <Plus size={14} /> Log Event
-          </Button>
-        </div>
+        <h2 className="font-display text-lg font-bold text-foreground mb-3">Vacancy Event Log</h2>
         <Card>
           <CardContent className="p-0">
             {events.length === 0 ? (
-              <p className="p-6 text-sm text-muted-foreground text-center">No vacancy events recorded yet.</p>
+              <p className="p-6 text-sm text-muted-foreground text-center">No vacancy events logged yet. Use Log Event to track your vacancy pipeline.</p>
             ) : (
               <div className="divide-y divide-border">
                 {events.map(e => (

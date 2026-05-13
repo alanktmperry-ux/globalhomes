@@ -33,8 +33,8 @@ Deno.serve(async (req) => {
       global: { headers: { Authorization: authHeader } },
     });
     const { data: userRes } = await userClient.auth.getUser();
-    const agentId = userRes?.user?.id;
-    if (!agentId) {
+    const authUserId = userRes?.user?.id;
+    if (!authUserId) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -42,6 +42,19 @@ Deno.serve(async (req) => {
     }
 
     const admin = createClient(supabaseUrl, serviceRoleKey);
+
+    const { data: agentRow, error: agentErr } = await admin
+      .from('agents')
+      .select('id')
+      .eq('user_id', authUserId)
+      .maybeSingle();
+    if (agentErr || !agentRow) {
+      return new Response(JSON.stringify({ error: 'Agent not found' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const agentId = agentRow.id;
 
     // Verify the agent has unlocked this halo
     const { data: response } = await admin

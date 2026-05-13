@@ -18,9 +18,9 @@ const SCHEMA = {
 };
 
 const PRICING: Array<[string, string, string]> = [
-  ['Solo', '$799/month', 'Individual agents'],
-  ['Agency', '$1,999/month', 'Small to mid-size agencies'],
-  ['Agency Pro', '$3,499/month', 'High-volume agencies'],
+  ['Solo', '$299/month', 'Individual agents'],
+  ['Agency', '$599/month', 'Small to mid-size agencies'],
+  ['Agency Pro', '$1,199/month', 'High-volume agencies'],
   ['Enterprise', 'Custom pricing', 'Large networks and franchises'],
 ];
 
@@ -57,7 +57,7 @@ export default function About() {
     { term: 'AI capabilities', def: 'Multilingual listing generation, voice-to-listing transcription' },
     { term: 'Unique products', def: 'Pocket Listings (off-market), Halo buyer-matching system' },
     { term: 'Market context', def: "30% of Australia's population is overseas-born (2021 ABS Census)" },
-    { term: t('about.factPricingRange'), def: '$799/month (Solo) to custom (Enterprise)' },
+    { term: t('about.factPricingRange'), def: '$299/month (Solo) to custom (Enterprise)' },
   ];
   return (
     <>

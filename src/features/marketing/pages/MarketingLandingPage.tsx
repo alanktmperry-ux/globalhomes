@@ -46,9 +46,9 @@ const aiBuilds = [
 ];
 
 const pricingPlans = [
-  { name: 'Solo', price: '$799', period: '/mo', features: ['3 active listings', 'AI listing descriptions', 'Basic CRM (200 contacts)', 'Multilingual search (20 languages)', 'Halo Board access'], cta: 'Start Free Trial', highlight: false },
-  { name: 'Agency', price: '$1,999', period: '/mo', features: ['Unlimited listings', 'Buyer Concierge (100 matches/mo)', 'Full CRM', 'Trust accounting', 'Bank reconciliation', '5 seats'], cta: 'Start Free Trial', highlight: true },
-  { name: 'Agency Pro', price: '$3,499', period: '/mo', features: ['Everything in Agency', 'Unlimited buyer matches', 'Performance analytics', 'Commission calculator', 'Dedicated account manager', '15 seats'], cta: 'Talk to Us', highlight: false },
+  { name: 'Solo', price: '$299', period: '/mo', features: ['3 active listings', 'AI listing descriptions', 'Basic CRM (200 contacts)', 'Multilingual search (20 languages)', 'Halo Board access'], cta: 'Start Free Trial', highlight: false },
+  { name: 'Agency', price: '$599', period: '/mo', features: ['Unlimited listings', 'Buyer Concierge (100 matches/mo)', 'Full CRM', 'Trust accounting', 'Bank reconciliation', '5 seats'], cta: 'Start Free Trial', highlight: true },
+  { name: 'Agency Pro', price: '$1,199', period: '/mo', features: ['Everything in Agency', 'Unlimited buyer matches', 'Performance analytics', 'Commission calculator', 'Dedicated account manager', '15 seats'], cta: 'Talk to Us', highlight: false },
 ];
 
 const faqs = [

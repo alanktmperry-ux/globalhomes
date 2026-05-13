@@ -62,6 +62,61 @@ const RentalApplicationsPage = () => {
   const [noAgent, setNoAgent] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [acting, setActing] = useState<string | null>(null);
+  const [convertApp, setConvertApp] = useState<Application | null>(null);
+  const today = () => new Date().toISOString().split('T')[0];
+  const plus12mo = () => { const d = new Date(); d.setFullYear(d.getFullYear() + 1); return d.toISOString().split('T')[0]; };
+  const [convertForm, setConvertForm] = useState({ leaseStart: today(), leaseEnd: plus12mo(), rentAmount: 0, rentFrequency: 'weekly', bondAmount: 0 });
+  const [creatingTenancy, setCreatingTenancy] = useState(false);
+
+  const openConvert = (app: Application) => {
+    const weekly = (app.properties as any)?.rental_weekly || 0;
+    setConvertForm({
+      leaseStart: today(),
+      leaseEnd: plus12mo(),
+      rentAmount: weekly,
+      rentFrequency: 'weekly',
+      bondAmount: weekly * 4,
+    });
+    setConvertApp(app);
+  };
+
+  const handleCreateTenancy = async () => {
+    if (!convertApp) return;
+    setCreatingTenancy(true);
+    try {
+      const { data: tenancy, error: tErr } = await supabase.from('tenancies').insert({
+        property_id: convertApp.property_id,
+        agent_id: convertApp.agent_id,
+        tenant_name: convertApp.full_name,
+        tenant_email: convertApp.email,
+        tenant_phone: convertApp.phone || undefined,
+        lease_start: convertForm.leaseStart,
+        lease_end: convertForm.leaseEnd,
+        rent_amount: convertForm.rentAmount,
+        rent_frequency: convertForm.rentFrequency,
+        bond_amount: convertForm.bondAmount,
+        management_fee_percent: 8,
+        status: 'active',
+        source_application_id: convertApp.id,
+      } as any).select('id').maybeSingle();
+      if (tErr) throw tErr;
+
+      const { error: uErr } = await (supabase as any)
+        .from('rental_applications')
+        .update({ tenancy_id: tenancy?.id, status: 'converted' })
+        .eq('id', convertApp.id);
+      if (uErr) throw uErr;
+
+      toast.success('Tenancy created successfully');
+      setConvertApp(null);
+      fetchApplications();
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err) || 'Failed to create tenancy');
+    } finally {
+      setCreatingTenancy(false);
+    }
+  };
+
 
   const fetchApplications = async () => {
     if (!user) return;

@@ -168,6 +168,114 @@ const TenancyDetailPage = () => {
   });
   const [emailingOwner, setEmailingOwner] = useState(false);
 
+  // Rent increase
+  const [showRentIncrease, setShowRentIncrease] = useState(false);
+  const [rentIncreaseSaving, setRentIncreaseSaving] = useState(false);
+  const [rentIncreaseForm, setRentIncreaseForm] = useState({
+    new_rent_amount: '',
+    effective_date: '',
+    notice_sent_date: format(new Date(), 'yyyy-MM-dd'),
+    notes: '',
+  });
+
+  const openRentIncrease = () => {
+    if (!tenancy) return;
+    setRentIncreaseForm({
+      new_rent_amount: String(tenancy.rent_amount),
+      effective_date: '',
+      notice_sent_date: format(new Date(), 'yyyy-MM-dd'),
+      notes: '',
+    });
+    setShowRentIncrease(true);
+  };
+
+  const submitRentIncrease = async () => {
+    if (!tenancy || !agentId) return;
+    const newAmount = parseFloat(rentIncreaseForm.new_rent_amount);
+    if (!newAmount || newAmount <= 0) { toast.error('Enter a valid new rent amount'); return; }
+    if (!rentIncreaseForm.effective_date) { toast.error('Effective date is required'); return; }
+    if (!rentIncreaseForm.notice_sent_date) { toast.error('Notice sent date is required'); return; }
+
+    const noticeDate = parseISO(rentIncreaseForm.notice_sent_date);
+    const effectiveDate = parseISO(rentIncreaseForm.effective_date);
+    const daysBetween = Math.floor((effectiveDate.getTime() - noticeDate.getTime()) / (1000 * 60 * 60 * 24));
+    if (daysBetween < 60) {
+      toast.error('Effective date must be at least 60 days from the notice date — required under NSW, VIC and QLD tenancy law. Check your state legislation.');
+      return;
+    }
+
+    setRentIncreaseSaving(true);
+
+    // Warn (non-blocking) if a rent increase has already been recorded in the last 12 months
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const { data: recent } = await supabase
+      .from('rent_increase_notices' as any)
+      .select('id')
+      .eq('tenancy_id', tenancy.id)
+      .gte('effective_date', oneYearAgo.toISOString().slice(0, 10))
+      .limit(1);
+    if (recent && recent.length > 0) {
+      toast.warning('Warning: most states limit rent increases to once per 12 months. Check your state legislation before proceeding.');
+    }
+
+    const { error: insertErr } = await supabase.from('rent_increase_notices' as any).insert({
+      tenancy_id: tenancy.id,
+      agent_id: agentId,
+      old_rent_amount: tenancy.rent_amount,
+      new_rent_amount: newAmount,
+      effective_date: rentIncreaseForm.effective_date,
+      notice_sent_date: rentIncreaseForm.notice_sent_date,
+      notes: rentIncreaseForm.notes || null,
+    } as any);
+
+    if (insertErr) {
+      setRentIncreaseSaving(false);
+      toast.error(insertErr.message || 'Failed to record rent increase');
+      return;
+    }
+
+    const { error: updateErr } = await supabase
+      .from('tenancies')
+      .update({ rent_amount: newAmount } as any)
+      .eq('id', tenancy.id);
+
+    if (updateErr) {
+      setRentIncreaseSaving(false);
+      toast.error(updateErr.message || 'Failed to update tenancy rent');
+      return;
+    }
+
+    if (tenancy.tenant_email) {
+      const propertyAddr = tenancy.properties
+        ? `${tenancy.properties.address}, ${tenancy.properties.suburb}`
+        : 'your property';
+      supabase.functions.invoke('send-notification-email', {
+        body: {
+          agent_id: agentId,
+          type: 'rent_increase_notice',
+          title: `Rent increase notice — ${propertyAddr}`,
+          message: `Hi ${tenancy.tenant_name}, this is formal notice of a rent increase for ${propertyAddr}. Current rent: $${tenancy.rent_amount}. New rent: $${newAmount}. Effective date: ${rentIncreaseForm.effective_date}.${agentInfo?.name ? ` Please contact ${agentInfo.name}${agentInfo.agency ? ` at ${agentInfo.agency}` : ''} with any questions.` : ''}`,
+          recipient_email: tenancy.tenant_email,
+          lead_name: tenancy.tenant_name,
+          property_address: propertyAddr,
+          old_rent: tenancy.rent_amount,
+          new_rent: newAmount,
+          effective_date: rentIncreaseForm.effective_date,
+          agent_name: agentInfo?.name,
+          agent_agency: agentInfo?.agency,
+          agent_license: agentInfo?.license_number,
+        },
+      }).catch(() => {});
+    }
+
+    setRentIncreaseSaving(false);
+    setShowRentIncrease(false);
+    toast.success('Rent increase notice recorded and tenant notified');
+    fetchAll();
+  };
+
+
   const fetchAll = useCallback(async () => {
     if (!user || !tenancyId) return;
     setLoading(true);

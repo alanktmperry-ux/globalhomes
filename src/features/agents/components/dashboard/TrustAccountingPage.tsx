@@ -208,10 +208,18 @@ const TrustAccountingPage = () => {
 
   const fetchDashboardStats = useCallback(async () => {
     if (!user) return;
+    const { data: agentData } = await supabase
+      .from('agents')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    if (!agentData) return;
+
     // New receipts (received status)
     const { count: rCount } = await supabase
       .from('trust_receipts')
       .select('id', { count: 'exact', head: true })
+      .eq('agent_id', agentData.id)
       .eq('status', 'received');
     setNewReceiptsCount(rCount || 0);
 
@@ -219,6 +227,7 @@ const TrustAccountingPage = () => {
     const { data: lastR } = await supabase
       .from('trust_receipts')
       .select('receipt_number')
+      .eq('agent_id', agentData.id)
       .order('created_at', { ascending: false })
       .limit(1);
     if (lastR?.[0]) setLastReceiptNumber(`#${lastR[0].receipt_number}`);
@@ -227,6 +236,7 @@ const TrustAccountingPage = () => {
     const { data: lastRecon } = await supabase
       .from('trust_reconciliations')
       .select('bank_date')
+      .eq('agent_id', agentData.id)
       .eq('status', 'matched')
       .order('bank_date', { ascending: false })
       .limit(1);
@@ -236,6 +246,7 @@ const TrustAccountingPage = () => {
     const { count: uCount } = await supabase
       .from('trust_reconciliations')
       .select('id', { count: 'exact', head: true })
+      .eq('agent_id', agentData.id)
       .eq('status', 'unmatched');
     setUnmatchedCount(uCount || 0);
   }, [user]);

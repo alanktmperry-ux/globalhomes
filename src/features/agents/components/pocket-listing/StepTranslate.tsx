@@ -89,7 +89,7 @@ const StepTranslate = ({ draft, update }: Props) => {
             .maybeSingle()
             .then(({ data: agentRow }) => {
               if (!agentRow?.id) return;
-              supabase
+              (supabase as any)
                 .from('pocket_listing_drafts')
                 .upsert(
                   { agent_id: agentRow.id, draft_data: merged as any, updated_at: new Date().toISOString() },

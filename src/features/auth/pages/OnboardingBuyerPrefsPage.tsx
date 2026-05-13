@@ -29,17 +29,6 @@ export default function OnboardingBuyerPrefsPage() {
     if (!loading && !user) navigate('/login', { replace: true });
   }, [user, loading, navigate]);
 
-  const sendWelcomeEmail = async () => {
-    try {
-      const { data: { user: u } } = await supabase.auth.getUser();
-      if (u?.id) {
-        await supabase.functions.invoke('send-welcome-email', {
-          body: { user_id: u.id, category: 'verified' },
-        });
-      }
-    } catch { /* non-fatal */ }
-  };
-
   const handleContinue = async () => {
     if (!seekingType) return;
     setSaving(true);
@@ -70,7 +59,6 @@ export default function OnboardingBuyerPrefsPage() {
       if (seekingType === 'rent') searchParams.set('type', 'rent');
       const qs = searchParams.toString();
       navigate(qs ? `/?${qs}` : '/', { replace: true });
-      sendWelcomeEmail();
     } catch (err) {
       toast.error(t('onboarding.buyerPrefs.savingErrorTitle'), { description: getErrorMessage(err) });
       setSaving(false);
@@ -79,7 +67,6 @@ export default function OnboardingBuyerPrefsPage() {
 
   const handleSkip = () => {
     navigate('/', { replace: true });
-    sendWelcomeEmail();
   };
 
   return (

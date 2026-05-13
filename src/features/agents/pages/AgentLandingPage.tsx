@@ -237,7 +237,7 @@ export default function AgentLandingPage() {
                 Most chosen
               </span>
               <div className="flex items-center gap-3 mb-6 pb-5 border-b border-[#E5E5E5]">
-                <Icon icon="solar:check-circle-linear" size={24} color="#2563EB" />
+                <CheckCircle2 size={24} color="#2563EB" />
                 <div className="text-[16px] font-bold text-[#0a0f1e]">ListHQ</div>
               </div>
               {PRO_KEYS.map((k) => (

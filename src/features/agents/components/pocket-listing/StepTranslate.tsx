@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Sparkles, Loader2, Languages, Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
+import { useAuth } from '@/features/auth/AuthProvider';
 import type { ListingDraft } from './PocketListingForm';
 
 interface Props {
@@ -27,6 +28,7 @@ type LangKey = typeof LANGUAGES[number]['key'];
 const TITLE_LIMIT = 120;
 
 const StepTranslate = ({ draft, update }: Props) => {
+  const { user } = useAuth();
   const [activeLang, setActiveLang] = useState<LangKey>('zh-CN');
   const [translating, setTranslating] = useState<LangKey | null>(null);
 
@@ -77,7 +79,25 @@ const StepTranslate = ({ draft, update }: Props) => {
       update(newFields);
       // Immediately persist so a browser crash can't lose the translation
       try {
-        localStorage.setItem('pocket-listing-draft', JSON.stringify({ ...draft, ...newFields }));
+        const merged = { ...draft, ...newFields };
+        localStorage.setItem('pocket-listing-draft', JSON.stringify(merged));
+        if (user?.id) {
+          supabase
+            .from('agents')
+            .select('id')
+            .eq('user_id', user.id)
+            .maybeSingle()
+            .then(({ data: agentRow }) => {
+              if (!agentRow?.id) return;
+              (supabase as any)
+                .from('pocket_listing_drafts')
+                .upsert(
+                  { agent_id: agentRow.id, draft_data: merged as any, updated_at: new Date().toISOString() },
+                  { onConflict: 'agent_id' }
+                )
+                .then(() => {});
+            });
+        }
       } catch { /* ignore */ }
 
       toast.success(`Translated to ${active.label}`);

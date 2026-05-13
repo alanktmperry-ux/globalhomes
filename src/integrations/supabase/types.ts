@@ -9175,6 +9175,56 @@ export type Database = {
           },
         ]
       }
+      pocket_listing_drafts: {
+        Row: {
+          agent_id: string
+          draft_data: Json
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          draft_data?: Json
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          draft_data?: Json
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pocket_listing_drafts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: true
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pocket_listing_drafts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: true
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pocket_listing_drafts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: true
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pocket_listing_drafts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: true
+            referencedRelation: "trust_account_balances_view"
+            referencedColumns: ["agent_id"]
+          },
+        ]
+      }
       pre_auction_offers: {
         Row: {
           accepted_at: string | null

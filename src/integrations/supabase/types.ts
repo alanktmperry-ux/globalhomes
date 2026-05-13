@@ -6006,6 +6006,27 @@ export type Database = {
         }
         Relationships: []
       }
+      halo_drafts: {
+        Row: {
+          draft_data: Json
+          id: string
+          seeker_id: string
+          updated_at: string
+        }
+        Insert: {
+          draft_data?: Json
+          id?: string
+          seeker_id: string
+          updated_at?: string
+        }
+        Update: {
+          draft_data?: Json
+          id?: string
+          seeker_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       halo_messages: {
         Row: {
           body: string

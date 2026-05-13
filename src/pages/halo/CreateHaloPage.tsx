@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -62,6 +62,7 @@ export default function CreateHaloPage() {
   }>({});
   const [submitting, setSubmitting] = useState(false);
   const [stepError, setStepError] = useState<string | null>(null);
+  const draftSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Rehydrate draft
   useEffect(() => {
@@ -77,7 +78,20 @@ export default function CreateHaloPage() {
     } catch {
       /* ignore */
     }
-  }, []);
+    if (user?.id) {
+      supabase
+        .from('halo_drafts')
+        .select('draft_data')
+        .eq('seeker_id', user.id)
+        .maybeSingle()
+        .then(({ data: row }) => {
+          if (row?.draft_data && typeof row.draft_data === 'object') {
+            setData((d) => ({ ...d, ...(row.draft_data as Partial<HaloFormData>) }));
+            setRestored(true);
+          }
+        });
+    }
+  }, [user?.id]);
 
   // Apply query-param prefill (Listing CTA, CRM invite, voice lead, rent roll)
   useEffect(() => {
@@ -110,14 +124,24 @@ export default function CreateHaloPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-save
+  // Auto-save (debounced)
   useEffect(() => {
-    try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
-    } catch {
-      /* ignore */
-    }
-  }, [data]);
+    if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
+    draftSaveTimer.current = setTimeout(() => {
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+      } catch { /* ignore */ }
+      if (user?.id) {
+        supabase
+          .from('halo_drafts')
+          .upsert({ seeker_id: user.id, draft_data: data as any, updated_at: new Date().toISOString() }, { onConflict: 'seeker_id' })
+          .then(() => {});
+      }
+    }, 500);
+    return () => {
+      if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
+    };
+  }, [data, user?.id]);
 
   const update = (patch: Partial<HaloFormData>) => {
     setStepError(null);
@@ -217,6 +241,9 @@ export default function CreateHaloPage() {
       }
 
       localStorage.removeItem(DRAFT_KEY);
+      if (user?.id) {
+        supabase.from('halo_drafts').delete().eq('seeker_id', user.id).then(() => {});
+      }
       navigate('/halo/success');
     } catch (e) {
       console.error(e);

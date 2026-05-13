@@ -32,6 +32,7 @@ const MessagesPage = React.lazy(() => import("./pages/MessagesPage"));
 const ProfilePage = React.lazy(() => import("./pages/ProfilePage"));
 const AgentPortalPage = React.lazy(() => import("./pages/AgentPortalPage"));
 const AgentLandingPage = React.lazy(() => import("./pages/AgentLandingPage"));
+const ForBuyersPage = React.lazy(() => import("./pages/ForBuyersPage"));
 const FindAgentPage = React.lazy(() => import("./features/agents/pages/FindAgentPage"));
 const FindBrokerPage = React.lazy(() => import("./features/brokers/pages/FindBrokerPage"));
 const PocketListingPage = React.lazy(() => import("./pages/PocketListingPage"));

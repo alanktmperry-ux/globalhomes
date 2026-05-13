@@ -59,6 +59,7 @@ const TX_PAGE_SIZE = 100;
 
 export function useTrustAccounting() {
   const { user } = useAuth();
+  const [agentId, setAgentId] = useState<string | null>(null);
   const [accounts, setAccounts] = useState<TrustAccount[]>([]);
   const [transactions, setTransactions] = useState<TrustTransaction[]>([]);
   const [contacts, setContacts] = useState<ContactOption[]>([]);
@@ -66,6 +67,16 @@ export function useTrustAccounting() {
   const [loading, setLoading] = useState(true);
   const [txPage, setTxPage] = useState(0);
   const [hasMoreTx, setHasMoreTx] = useState(false);
+
+  const fetchAgentId = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('agents')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    setAgentId((data as any)?.id ?? null);
+  }, [user]);
 
   const fetchAccounts = useCallback(async () => {
     if (!user) return;

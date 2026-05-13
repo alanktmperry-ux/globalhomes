@@ -164,6 +164,28 @@ export default function MarketingLandingPage() {
         </div>
       </section>
 
+      {/* ─── HALO ─── */}
+      <section className="py-20 bg-primary/5 border-y border-border">
+        <div className="container mx-auto px-6 max-w-4xl text-center">
+          <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wide mb-4">Only on ListHQ</span>
+          <h2 className="font-display text-3xl sm:text-4xl font-extrabold mb-4">Buyers find you. You don't chase them.</h2>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-8">Halo is a reverse marketplace. Buyers post exactly what they want — suburb, budget, property type, timeline. You browse live buyer briefs and unlock the ones that match your listings. Pre-qualified, intent-verified leads. No cold calls.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
+            {[
+              { title: 'Buyer posts a brief', desc: 'They tell you exactly what they want, their budget, suburb, and timeline.' },
+              { title: 'You browse the Halo Board', desc: 'Filter by suburb, budget, and property type. See briefs that match your listings.' },
+              { title: 'Unlock and connect', desc: 'Use Halo Credits to reveal contact details. One credit, one pre-qualified buyer.' },
+            ].map((step, i) => (
+              <div key={i} className="rounded-2xl bg-card border border-border p-6">
+                <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold mb-3">{i + 1}</div>
+                <h3 className="font-display font-bold mb-1">{step.title}</h3>
+                <p className="text-sm text-muted-foreground">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ─── PRICING ─── */}
       <section id="pricing" className="py-24">
         <div className="container mx-auto px-6">

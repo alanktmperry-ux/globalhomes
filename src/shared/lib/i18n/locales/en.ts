@@ -1725,7 +1725,7 @@ export const en = {
   'agentLanding.pricing2.solo.feat5': 'AI buyer matching + voice search',
   'agentLanding.pricing2.solo.feat6': 'Halo™ buyer matching board',
   'agentLanding.pricing2.solo.feat7': 'Email support',
-  'agentLanding.pricing2.solo.cta': 'Start 30-day free trial →',
+  'agentLanding.pricing2.solo.cta': 'Start 60-day free trial →',
   'agentLanding.pricing2.solo.sub': 'Credit card required · auto-charges $299 on day 31 · cancel anytime',
   'agentLanding.pricing2.agency.name': 'Agency',
   'agentLanding.pricing2.agency.desc': 'For growing agencies ready to scale',

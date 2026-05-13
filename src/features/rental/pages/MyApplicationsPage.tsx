@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -39,55 +39,67 @@ const MyApplicationsPage = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchApplications = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('rental_applications')
+      .select('id, property_id, status, created_at, reference_number')
+      .eq('applicant_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error || !data) {
+      if (import.meta.env.DEV) console.error('Failed to fetch applications:', error);
+      setLoading(false);
+      return;
+    }
+
+    const propertyIds = [...new Set(data.map(a => a.property_id))];
+    const { data: properties } = await supabase
+      .from('properties')
+      .select('id, address, suburb, images, rental_weekly')
+      .in('id', propertyIds);
+
+    const propertyMap = new Map(
+      (properties || []).map(p => [p.id, p])
+    );
+
+    const enriched: Application[] = data.map(app => {
+      const prop = propertyMap.get(app.property_id);
+      return {
+        ...app,
+        property_address: prop?.address || 'Address not available',
+        property_suburb: prop?.suburb || '',
+        property_image: prop?.images?.[0] || undefined,
+        rental_weekly: prop?.rental_weekly || undefined,
+      };
+    });
+
+    setApplications(enriched);
+    setLoading(false);
+  }, [user]);
+
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
       navigate('/seeker-auth', { replace: true });
       return;
     }
-
-    const fetchApplications = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('rental_applications')
-        .select('id, property_id, status, created_at, reference_number')
-        .eq('applicant_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error || !data) {
-        if (import.meta.env.DEV) console.error('Failed to fetch applications:', error);
-        setLoading(false);
-        return;
-      }
-
-      // Fetch property details for each application
-      const propertyIds = [...new Set(data.map(a => a.property_id))];
-      const { data: properties } = await supabase
-        .from('properties')
-        .select('id, address, suburb, images, rental_weekly')
-        .in('id', propertyIds);
-
-      const propertyMap = new Map(
-        (properties || []).map(p => [p.id, p])
-      );
-
-      const enriched: Application[] = data.map(app => {
-        const prop = propertyMap.get(app.property_id);
-        return {
-          ...app,
-          property_address: prop?.address || 'Address not available',
-          property_suburb: prop?.suburb || '',
-          property_image: prop?.images?.[0] || undefined,
-          rental_weekly: prop?.rental_weekly || undefined,
-        };
-      });
-
-      setApplications(enriched);
-      setLoading(false);
-    };
-
     fetchApplications();
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading, navigate, fetchApplications]);
+
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel('my-applications-' + user.id)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'rental_applications', filter: `applicant_id=eq.${user.id}` },
+        () => { fetchApplications(); }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user, fetchApplications]);
 
   if (authLoading || loading) {
     return (

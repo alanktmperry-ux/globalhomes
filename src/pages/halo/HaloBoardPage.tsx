@@ -56,10 +56,21 @@ export default function HaloBoardPage() {
               .eq('status', 'active')
               .order('created_at', { ascending: false });
 
+        const { data: agentData } = await supabase
+          .from('agents')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        const agentId = agentData?.id ?? null;
+
         const [halosRes, respRes, pmRes] = await Promise.all([
           halosPromise,
-          supabase.from('halo_responses').select('halo_id').eq('agent_id', user.id),
-          supabase.from('halo_pocket_matches').select('halo_id').eq('agent_id', user.id),
+          agentId
+            ? supabase.from('halo_responses').select('halo_id').eq('agent_id', agentId)
+            : Promise.resolve({ data: [] as any[] }),
+          agentId
+            ? supabase.from('halo_pocket_matches').select('halo_id').eq('agent_id', agentId)
+            : Promise.resolve({ data: [] as any[] }),
         ]);
         if (!active) return;
         if ((halosRes as any).error) throw (halosRes as any).error;

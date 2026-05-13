@@ -1,15 +1,60 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { getCorsHeaders } from "../_shared/cors.ts";
 
-Deno.serve(async (_req) => {
-  const admin = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-  );
+Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get("Origin"));
+
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
+  // --- Verify JWT and admin role before doing anything ---
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  const token = authHeader.replace("Bearer ", "").trim();
+
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const admin = createClient(supabaseUrl, serviceRoleKey);
+
+  const { data: userData, error: userError } = await admin.auth.getUser(token);
+  const caller = userData?.user;
+  if (userError || !caller) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const { data: roleCheck } = await admin
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", caller.id)
+    .eq("role", "admin")
+    .maybeSingle();
+
+  if (!roleCheck) {
+    return new Response(JSON.stringify({ error: "Forbidden" }), {
+      status: 403,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  // --- End auth check ---
 
   const email = "demo@listhq.com.au";
-  const password = "cydmeh-jusnI6-gicnok";
+  const password = Deno.env.get("DEMO_USER_PASSWORD");
+  if (!password) {
+    return new Response(JSON.stringify({ error: "DEMO_USER_PASSWORD secret not set" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
-  // Find existing
   const { data: list } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
   const existing = list.users.find((u) => u.email?.toLowerCase() === email);
 
@@ -19,7 +64,10 @@ Deno.serve(async (_req) => {
       password,
       email_confirm: true,
     });
-    if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    if (error) return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
     userId = existing.id;
   } else {
     const { data, error } = await admin.auth.admin.createUser({
@@ -27,14 +75,15 @@ Deno.serve(async (_req) => {
       password,
       email_confirm: true,
     });
-    if (error || !data.user) return new Response(JSON.stringify({ error: error?.message }), { status: 500 });
+    if (error || !data.user) return new Response(JSON.stringify({ error: error?.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
     userId = data.user.id;
   }
 
-  // Ensure profile
   await admin.from("profiles").upsert({ user_id: userId, display_name: "Demo Agent", phone: "" }, { onConflict: "user_id" });
 
-  // Ensure agent record
   const { data: agentExisting } = await admin.from("agents").select("id").eq("user_id", userId).maybeSingle();
   let agentId = agentExisting?.id;
   if (!agentId) {
@@ -57,14 +106,16 @@ Deno.serve(async (_req) => {
       handles_trust_accounting: false,
       is_demo: true,
     }).select("id").single();
-    if (agErr) return new Response(JSON.stringify({ error: agErr.message }), { status: 500 });
+    if (agErr) return new Response(JSON.stringify({ error: agErr.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
     agentId = ag.id;
   }
 
-  // Ensure agent role
   await admin.from("user_roles").upsert({ user_id: userId, role: "agent" }, { onConflict: "user_id,role" });
 
   return new Response(JSON.stringify({ ok: true, userId, agentId, email }), {
-    headers: { "Content-Type": "application/json" },
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 });

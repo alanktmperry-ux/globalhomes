@@ -88,7 +88,7 @@ export default function MarketingLandingPage() {
       {/* ─── FOUNDING AGENT BANNER ─── */}
       {spotsRemaining > 0 && (
         <div className="bg-primary text-primary-foreground text-center py-2.5 text-sm font-medium">
-          🚀 Founding Agent Offer — First 100 agents get 40% off forever.{' '}
+          🚀 Founding Agent Offer — First 100 agents get 60 days free, no credit card required.{' '}
           <span className="font-bold">{spotsRemaining} spots remaining.</span>
         </div>
       )}
@@ -268,7 +268,7 @@ export default function MarketingLandingPage() {
             Join {spotsRemaining > 0 ? `${spotsRemaining}` : '100'} Founding Agents
           </h2>
           <p className="text-primary-foreground/70 text-lg mb-8">
-            Limited spots at 40% off forever. No credit card required for your free demo.
+            60-day free trial for founding agents. No credit card required to get started.
           </p>
           <Button
             size="lg"

@@ -276,9 +276,20 @@ export default function MaintenancePage() {
                                   <CheckCircle2 size={12} className="mr-1"/> Mark complete
                                 </Button>
                               )}
-                              <Button size="sm" variant="ghost" onClick={() => copyTenantLink(j)}>
-                                <Copy size={12} className="mr-1"/> Copy tenant link
-                              </Button>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <span tabIndex={0}>
+                                      <Button size="sm" variant="ghost" onClick={() => copyTenantLink(j)} disabled={!j.tenant_portal_token}>
+                                        <Copy size={12} className="mr-1"/> Copy tenant link
+                                      </Button>
+                                    </span>
+                                  </TooltipTrigger>
+                                  {!j.tenant_portal_token && (
+                                    <TooltipContent>Portal link unavailable — no tenant assigned.</TooltipContent>
+                                  )}
+                                </Tooltip>
+                              </TooltipProvider>
                               {j.tenancy_id && (
                                 <Button size="sm" variant="ghost" onClick={() => navigate(`/dashboard/tenancies/${j.tenancy_id}`)}>
                                   Open tenancy →

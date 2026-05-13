@@ -300,7 +300,7 @@ const BankReconciliationPage = () => {
 
     toast.success(`${entries.length} entries imported. Running auto-match…`);
     // Refresh then auto-match
-    const { data: allRecon } = await supabase.from('trust_reconciliations').select('*').eq('agent_id', agentId).order('bank_date', { ascending: false });
+    const { data: allRecon } = await supabase.from('trust_reconciliations').select('*').eq('agent_id', agent.id).order('bank_date', { ascending: false });
     if (allRecon) {
       setItems(allRecon as unknown as Reconciliation[]);
       await runAutoMatch(allRecon as unknown as Reconciliation[]);

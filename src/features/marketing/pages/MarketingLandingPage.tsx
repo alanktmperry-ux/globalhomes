@@ -164,14 +164,6 @@ export default function MarketingLandingPage() {
         </div>
       </section>
 
-      {/* ─── SOCIAL PROOF ─── */}
-      <section className="py-20 bg-secondary/30 border-y border-border">
-        <div className="container mx-auto px-6 max-w-4xl">
-          <h2 className="font-display text-2xl font-extrabold text-center mb-10">What Agents Are Saying</h2>
-          <p className="text-center text-muted-foreground py-8 text-sm">Agent testimonials coming soon.</p>
-        </div>
-      </section>
-
       {/* ─── PRICING ─── */}
       <section id="pricing" className="py-24">
         <div className="container mx-auto px-6">

@@ -20,15 +20,15 @@ const CYCLING_LINES = [
   'who speak every language.',
 ];
 
-const FEATURES: Array<{ icon: string; titleKey: string; bodyKey: string; badge: 'unique' | 'automated' }> = [
-  { icon: 'solar:streets-linear',         titleKey: 'agentLanding.feature1Title', bodyKey: 'agentLanding.feature1Body', badge: 'unique' },
-  { icon: 'solar:magic-stick-3-linear',   titleKey: 'agentLanding.feature2Title', bodyKey: 'agentLanding.feature2Body', badge: 'automated' },
-  { icon: 'solar:earth-linear',           titleKey: 'agentLanding.feature3Title', bodyKey: 'agentLanding.feature3Body', badge: 'unique' },
-  { icon: 'solar:lock-keyhole-linear',    titleKey: 'agentLanding.feature4Title', bodyKey: 'agentLanding.feature4Body', badge: 'unique' },
-  { icon: 'solar:microphone-3-linear',    titleKey: 'agentLanding.feature5Title', bodyKey: 'agentLanding.feature5Body', badge: 'unique' },
-  { icon: 'solar:clock-circle-linear',    titleKey: 'agentLanding.feature6Title', bodyKey: 'agentLanding.feature6Body', badge: 'unique' },
-  { icon: 'solar:chart-square-linear',    titleKey: 'agentLanding.feature7Title', bodyKey: 'agentLanding.feature7Body', badge: 'automated' },
-  { icon: 'solar:wallet-2-linear',        titleKey: 'agentLanding.feature8Title', bodyKey: 'agentLanding.feature8Body', badge: 'automated' },
+const FEATURES: Array<{ component: React.ComponentType<{ size?: number }>; titleKey: string; bodyKey: string; badge: 'unique' | 'automated' }> = [
+  { component: MapPin,      titleKey: 'agentLanding.feature1Title', bodyKey: 'agentLanding.feature1Body', badge: 'unique' },
+  { component: Wand2,       titleKey: 'agentLanding.feature2Title', bodyKey: 'agentLanding.feature2Body', badge: 'automated' },
+  { component: Globe,       titleKey: 'agentLanding.feature3Title', bodyKey: 'agentLanding.feature3Body', badge: 'unique' },
+  { component: Lock,        titleKey: 'agentLanding.feature4Title', bodyKey: 'agentLanding.feature4Body', badge: 'unique' },
+  { component: Mic,         titleKey: 'agentLanding.feature5Title', bodyKey: 'agentLanding.feature5Body', badge: 'unique' },
+  { component: Clock,       titleKey: 'agentLanding.feature6Title', bodyKey: 'agentLanding.feature6Body', badge: 'unique' },
+  { component: BarChart2,   titleKey: 'agentLanding.feature7Title', bodyKey: 'agentLanding.feature7Body', badge: 'automated' },
+  { component: Wallet,      titleKey: 'agentLanding.feature8Title', bodyKey: 'agentLanding.feature8Body', badge: 'automated' },
 ];
 
 const CON_KEYS = ['agentLanding.con1','agentLanding.con2','agentLanding.con3','agentLanding.con4','agentLanding.con5','agentLanding.con6','agentLanding.con7'];

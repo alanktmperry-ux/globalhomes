@@ -147,6 +147,19 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
 
     await writeAuditLog('reject', agent, rejectionReason.trim());
 
+    try {
+      if (agent.user_id) {
+        await supabase.functions.invoke('send-notification-email', {
+          body: {
+            type: 'agent_rejected',
+            recipient_email: agent.email,
+            agent_name: agent.name,
+            rejection_reason: rejectionReason.trim(),
+          },
+        });
+      }
+    } catch { /* non-blocking */ }
+
     await dispatchNotification({
       agent_id: agent.id,
       event_key: 'agent_rejected',

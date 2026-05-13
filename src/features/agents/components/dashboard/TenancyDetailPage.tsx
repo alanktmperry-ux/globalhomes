@@ -243,7 +243,7 @@ const TenancyDetailPage = () => {
       notes: editForm.notes,
     } as any).eq('id', tenancyId);
     setSaving(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) { toast.error(error?.message || 'An unexpected error occurred'); return; }
     toast.success('Tenancy updated');
     setShowEdit(false);
     fetchAll();
@@ -285,7 +285,7 @@ const TenancyDetailPage = () => {
     }
 
     setSaving(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) { toast.error(error?.message || 'An unexpected error occurred'); return; }
 
     // Email receipt to tenant
     if (tenancy.tenant_email) {
@@ -330,7 +330,7 @@ const TenancyDetailPage = () => {
       estimated_cost: jobForm.estimated_cost ? parseFloat(jobForm.estimated_cost) : null,
     } as any);
     setSaving(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) { toast.error(error?.message || 'An unexpected error occurred'); return; }
     toast.success('Maintenance job created');
     setShowNewJob(false);
     setJobForm({ title: '', description: '', priority: 'routine', assigned_to: '', estimated_cost: '' });

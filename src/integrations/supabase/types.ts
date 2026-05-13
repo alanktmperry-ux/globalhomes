@@ -1005,6 +1005,7 @@ export type Database = {
           license_number: string | null
           lifecycle_stage: string | null
           linkedin_url: string | null
+          maintenance_auto_approve_threshold: number
           name: string
           office_address: string | null
           onboarding_complete: boolean | null
@@ -1065,6 +1066,7 @@ export type Database = {
           license_number?: string | null
           lifecycle_stage?: string | null
           linkedin_url?: string | null
+          maintenance_auto_approve_threshold?: number
           name: string
           office_address?: string | null
           onboarding_complete?: boolean | null
@@ -1125,6 +1127,7 @@ export type Database = {
           license_number?: string | null
           lifecycle_stage?: string | null
           linkedin_url?: string | null
+          maintenance_auto_approve_threshold?: number
           name?: string
           office_address?: string | null
           onboarding_complete?: boolean | null
@@ -7374,6 +7377,7 @@ export type Database = {
           assigned_phone: string | null
           assigned_supplier_id: string | null
           assigned_to: string | null
+          auto_approved: boolean
           completed_at: string | null
           completion_notes: string | null
           created_at: string
@@ -7407,6 +7411,7 @@ export type Database = {
           assigned_phone?: string | null
           assigned_supplier_id?: string | null
           assigned_to?: string | null
+          auto_approved?: boolean
           completed_at?: string | null
           completion_notes?: string | null
           created_at?: string
@@ -7440,6 +7445,7 @@ export type Database = {
           assigned_phone?: string | null
           assigned_supplier_id?: string | null
           assigned_to?: string | null
+          auto_approved?: boolean
           completed_at?: string | null
           completion_notes?: string | null
           created_at?: string

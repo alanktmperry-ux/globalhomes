@@ -283,6 +283,17 @@ export default function PricingPage() {
         <meta name="twitter:title" content="Real Estate Agent Software Pricing | ListHQ" />
         <meta name="twitter:description" content="from $799/month founding · No charge until day 61." />
         <meta name="twitter:image" content="https://listhq.com.au/og-image.png" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            { "@type": "Question", "name": "Is there a free trial?", "acceptedAnswer": { "@type": "Answer", "text": "Yes — all plans include a 60-day free trial. No charge until day 61." } },
+            { "@type": "Question", "name": "Can I cancel anytime?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Cancel anytime before day 61 and you won't be charged." } },
+            { "@type": "Question", "name": "Does ListHQ work with REA Group and Domain?", "acceptedAnswer": { "@type": "Answer", "text": "REA and Domain syndication is coming soon. Your listings will publish on ListHQ.com.au and we'll announce portal syndication when it launches." } },
+            { "@type": "Question", "name": "What languages does ListHQ support?", "acceptedAnswer": { "@type": "Answer", "text": "ListHQ supports 20 languages including Mandarin, Vietnamese, Cantonese, Hindi, Arabic, Korean, Japanese, and more." } },
+            { "@type": "Question", "name": "Is trust accounting included?", "acceptedAnswer": { "@type": "Answer", "text": "Yes — full trust accounting compliant with Australian state legislation is included in Agency and Agency Pro plans." } }
+          ]
+        })}</script>
       </Helmet>
 
       <div className="bg-white text-black">

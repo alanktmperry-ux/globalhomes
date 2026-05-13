@@ -301,7 +301,7 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
   const thumb = getListingThumb(l);
   const enquiries = stats.enquiries[l.id] ?? l.contact_clicks ?? 0;
   const views = stats.views[l.id] ?? l.views ?? 0;
-  const langCount = Array.isArray(l.images) ? 20 : 20; // listings auto-translate into any language
+  
   const overlayKey = isRental && l._status === 'public' ? 'rent' : l._status;
   const overlay = STATUS_OVERLAY[overlayKey] || STATUS_OVERLAY.public;
   const isBoosted = (l as any).is_featured === true || (l as any).boost_ends_at;

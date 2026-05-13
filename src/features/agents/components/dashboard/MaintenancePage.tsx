@@ -13,6 +13,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Wrench, Loader2, Copy, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, parseISO, differenceInDays } from 'date-fns';
@@ -25,6 +26,7 @@ interface Job {
   id: string;
   property_id: string;
   tenancy_id: string | null;
+  tenant_portal_token?: string | null;
   title: string;
   description: string | null;
   priority: string;
@@ -94,7 +96,7 @@ export default function MaintenancePage() {
     const [{ data: js }, { data: sups }] = await Promise.all([
       supabase
         .from('maintenance_jobs')
-        .select('*, properties:property_id(address, suburb), tenancies:tenancy_id(tenant_name), supplier:assigned_supplier_id(business_name)')
+        .select('*, properties:property_id(address, suburb), tenancies:tenancy_id(tenant_name, tenant_portal_token), supplier:assigned_supplier_id(business_name)')
         .eq('agent_id', agentId)
         .order('created_at', { ascending: false }),
       supabase.from('suppliers' as any).select('id, business_name, trade_category, email').eq('agent_id', agentId).eq('status', 'active'),
@@ -103,6 +105,7 @@ export default function MaintenancePage() {
       ...j,
       property_address: j.properties ? `${j.properties.address}, ${j.properties.suburb}` : null,
       tenant_name: j.tenancies?.tenant_name || null,
+      tenant_portal_token: j.tenancies?.tenant_portal_token || null,
       supplier_name: j.supplier?.business_name || null,
     }));
     setJobs(list);
@@ -155,8 +158,8 @@ export default function MaintenancePage() {
   };
 
   const copyTenantLink = (j: Job) => {
-    if (!j.tenancy_id) { toast.error('Job not linked to a tenancy'); return; }
-    const url = `${window.location.origin}/maintenance/request?token=${j.tenancy_id}`;
+    if (!j.tenant_portal_token) { toast.error('Portal link unavailable — no tenant assigned.'); return; }
+    const url = `${window.location.origin}/maintenance/request?token=${j.tenant_portal_token}`;
     navigator.clipboard.writeText(url);
     toast.success('Tenant request link copied');
   };
@@ -273,9 +276,20 @@ export default function MaintenancePage() {
                                   <CheckCircle2 size={12} className="mr-1"/> Mark complete
                                 </Button>
                               )}
-                              <Button size="sm" variant="ghost" onClick={() => copyTenantLink(j)}>
-                                <Copy size={12} className="mr-1"/> Copy tenant link
-                              </Button>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <span tabIndex={0}>
+                                      <Button size="sm" variant="ghost" onClick={() => copyTenantLink(j)} disabled={!j.tenant_portal_token}>
+                                        <Copy size={12} className="mr-1"/> Copy tenant link
+                                      </Button>
+                                    </span>
+                                  </TooltipTrigger>
+                                  {!j.tenant_portal_token && (
+                                    <TooltipContent>Portal link unavailable — no tenant assigned.</TooltipContent>
+                                  )}
+                                </Tooltip>
+                              </TooltipProvider>
                               {j.tenancy_id && (
                                 <Button size="sm" variant="ghost" onClick={() => navigate(`/dashboard/tenancies/${j.tenancy_id}`)}>
                                   Open tenancy →

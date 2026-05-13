@@ -360,6 +360,56 @@ const RentalApplicationsPage = () => {
         </div>
       </div>
       )}
+
+      <Dialog open={!!convertApp} onOpenChange={o => !o && setConvertApp(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Convert to Tenancy</DialogTitle>
+            <DialogDescription>
+              This will create a new tenancy record pre-filled with {convertApp?.full_name}'s details. You can review and adjust before saving.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3 py-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs">Lease Start</Label>
+                <Input type="date" value={convertForm.leaseStart} onChange={e => setConvertForm(f => ({ ...f, leaseStart: e.target.value }))} />
+              </div>
+              <div>
+                <Label className="text-xs">Lease End</Label>
+                <Input type="date" value={convertForm.leaseEnd} onChange={e => setConvertForm(f => ({ ...f, leaseEnd: e.target.value }))} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs">Rent Amount</Label>
+                <Input type="number" min={0} value={convertForm.rentAmount} onChange={e => setConvertForm(f => ({ ...f, rentAmount: parseFloat(e.target.value) || 0 }))} />
+              </div>
+              <div>
+                <Label className="text-xs">Frequency</Label>
+                <Select value={convertForm.rentFrequency} onValueChange={v => setConvertForm(f => ({ ...f, rentFrequency: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="fortnightly">Fortnightly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs">Bond Amount</Label>
+              <Input type="number" min={0} value={convertForm.bondAmount} onChange={e => setConvertForm(f => ({ ...f, bondAmount: parseFloat(e.target.value) || 0 }))} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConvertApp(null)} disabled={creatingTenancy}>Cancel</Button>
+            <Button onClick={handleCreateTenancy} disabled={creatingTenancy}>
+              {creatingTenancy ? 'Creating…' : 'Create Tenancy'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

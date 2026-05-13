@@ -22,6 +22,15 @@ export default function ForBuyersPage() {
         <title>For Buyers — Search Australian property in 30+ languages | ListHQ</title>
         <meta name="description" content="Search Australian property in 30+ languages. Listings auto-translated. Agents who speak your language. Always free for buyers." />
         <link rel="canonical" href="https://listhq.com.au/for-buyers" />
+        <link rel="alternate" hrefLang="en" href="https://listhq.com.au/for-buyers" />
+        <link rel="alternate" hrefLang="zh" href="https://listhq.com.au/for-buyers" />
+        <link rel="alternate" hrefLang="vi" href="https://listhq.com.au/for-buyers" />
+        <link rel="alternate" hrefLang="ko" href="https://listhq.com.au/for-buyers" />
+        <link rel="alternate" hrefLang="ar" href="https://listhq.com.au/for-buyers" />
+        <link rel="alternate" hrefLang="hi" href="https://listhq.com.au/for-buyers" />
+        <link rel="alternate" hrefLang="fil" href="https://listhq.com.au/for-buyers" />
+        <link rel="alternate" hrefLang="id" href="https://listhq.com.au/for-buyers" />
+        <link rel="alternate" hrefLang="x-default" href="https://listhq.com.au/for-buyers" />
       </Helmet>
 
       <SiteHeader />

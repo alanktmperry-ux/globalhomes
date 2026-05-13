@@ -466,7 +466,15 @@ const Index = () => {
         <title>ListHQ — Find your home in any language. Multilingual property search Australia</title>
         <meta name="description" content="Australia's only multilingual property platform. Listings auto-translated into any language. Free for buyers, always." />
         <link rel="canonical" href="https://listhq.com.au/" />
-        
+        <link rel="alternate" hrefLang="en" href="https://listhq.com.au/" />
+        <link rel="alternate" hrefLang="zh" href="https://listhq.com.au/" />
+        <link rel="alternate" hrefLang="vi" href="https://listhq.com.au/" />
+        <link rel="alternate" hrefLang="ko" href="https://listhq.com.au/" />
+        <link rel="alternate" hrefLang="ar" href="https://listhq.com.au/" />
+        <link rel="alternate" hrefLang="hi" href="https://listhq.com.au/" />
+        <link rel="alternate" hrefLang="fil" href="https://listhq.com.au/" />
+        <link rel="alternate" hrefLang="id" href="https://listhq.com.au/" />
+        <link rel="alternate" hrefLang="x-default" href="https://listhq.com.au/" />
       </Helmet>
 
       <style>{`

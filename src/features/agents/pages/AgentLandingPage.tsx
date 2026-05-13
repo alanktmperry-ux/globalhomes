@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { SEO } from '@/shared/components/SEO';
 import AgentRegistrationModal from '@/features/agents/components/AgentRegistrationModal';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
@@ -64,6 +65,10 @@ export default function AgentLandingPage() {
         description="Halo Board, AI buyer matching, multilingual translation, trust accounting, and CRM — built for Australian agents."
         path="/for-agents"
       />
+      <Helmet>
+        <link rel="alternate" hrefLang="en" href="https://listhq.com.au/for-agents" />
+        <link rel="alternate" hrefLang="x-default" href="https://listhq.com.au/for-agents" />
+      </Helmet>
 
       {/* ─── HERO ─── */}
       <section className="pt-[120px] md:pt-[140px] pb-20 px-6 md:px-8 bg-white">

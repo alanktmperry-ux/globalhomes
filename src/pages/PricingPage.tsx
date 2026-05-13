@@ -267,7 +267,7 @@ export default function PricingPage() {
           content="Australia's multilingual real estate platform — listings auto-translated into 30+ languages. Trust accounting, CRM, property management, and Halo buyer matching. 60-day free trial."
         />
         <meta property="og:title" content="Real Estate Agent Software Pricing | ListHQ" />
-        <meta property="og:description" content="Replace your entire agent stack — trust accounting, CRM, Halo buyer matching, AI listings — from $799/month. 60-day free trial, no card required." />
+        <meta property="og:description" content="from $799/month founding · No charge until day 61." />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://listhq.com.au/og-image.png" />
         <meta property="og:url" content="https://listhq.com.au/for-agents/pricing" />

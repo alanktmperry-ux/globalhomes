@@ -492,6 +492,7 @@ const App = () => (
                   <Route path="trust" element={<TrustAccountingPage />} />
                   <Route path="trust-ledger" element={<TrustLedgerPage />} />
                   <Route path="reconciliation" element={<BankReconciliationPage />} />
+                  <Route path="bank-reconciliation" element={<BankReconciliationPage />} />
                   <Route path="reports" element={<ReportsPage />} />
                   <Route path="performance" element={<PerformancePage />} />
                   <Route path="rent-roll" element={<RentRollPage />} />

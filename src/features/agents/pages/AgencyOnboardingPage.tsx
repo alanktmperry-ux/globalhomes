@@ -1278,8 +1278,8 @@ export default function AgencyOnboardingPage() {
     setStep(s => s + 1);
   };
 
-  const showBackButton = step > 0 && !showPasswordStep && (step < 3 || (path === 'migration' && step === 3));
-  const showNextButton = !showPasswordStep && (step < 3 || (path === 'migration' && step === 3));
+  const showBackButton = step > 0 && (step < 3 || (path === 'migration' && step === 3));
+  const showNextButton = step < 3 || (path === 'migration' && step === 3);
 
   const stepLabels = path === 'migration'
     ? [t('agentOnboarding.nav.label.welcome'), t('agentOnboarding.nav.label.agency'), t('agentOnboarding.nav.label.trust'), t('agentOnboarding.nav.label.cutover'), t('agentOnboarding.nav.label.import'), t('agentOnboarding.nav.label.complete')]

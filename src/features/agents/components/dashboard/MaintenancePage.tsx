@@ -387,6 +387,32 @@ export default function MaintenancePage() {
         </DialogContent>
       </Dialog>
 
+      {/* Schedule entry notice dialog */}
+      <Dialog open={!!entryFor} onOpenChange={o => { if (!o) { setEntryFor(null); setEntryDate(''); } }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>Schedule entry & notify tenant</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label className="text-xs">Planned entry date</Label>
+              <Input type="date" value={entryDate} onChange={e => setEntryDate(e.target.value)} />
+            </div>
+            <div className="rounded-lg bg-amber-50 border border-amber-200 p-2.5 text-[11px] text-amber-900 leading-relaxed">
+              Entry notice required — NSW: 2 business days · VIC: 24 hours · SA/WA/QLD: 24 hours
+            </div>
+            {entryFor && !entryFor.tenant_email && (
+              <p className="text-[11px] text-muted-foreground">No tenant email on file — record will be saved but no email will be sent.</p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setEntryFor(null); setEntryDate(''); }} disabled={entrySaving}>Skip</Button>
+            <Button onClick={submitEntryNotice} disabled={entrySaving || !entryDate}>
+              {entrySaving ? <Loader2 className="animate-spin mr-2" size={14} /> : null}
+              Send Notice
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Quote dialog */}
       <Dialog open={!!quoteFor} onOpenChange={o => !o && setQuoteFor(null)}>
         <DialogContent className="max-w-sm">

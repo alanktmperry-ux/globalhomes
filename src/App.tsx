@@ -37,6 +37,7 @@ const FindAgentPage = React.lazy(() => import("./features/agents/pages/FindAgent
 const FindBrokerPage = React.lazy(() => import("./features/brokers/pages/FindBrokerPage"));
 const PocketListingPage = React.lazy(() => import("./pages/PocketListingPage"));
 const PropertyLandingPage = React.lazy(() => import("./pages/PropertyLandingPage"));
+const LanguageLandingPage = React.lazy(() => import("./features/marketing/pages/LanguageLandingPage"));
 // AgentDashboardLayout is imported eagerly above
 const DedupTelemetryPage = React.lazy(() => import("./features/agents/pages/DedupTelemetryPage"));
 const MyAgenciesPage = React.lazy(() => import("./pages/MyAgenciesPage"));
@@ -335,6 +336,7 @@ const App = () => (
                   <Route path="/brokers" element={<FindBrokerPage />} />
                   <Route path="/for-agents" element={<AgentLandingPage />} />
                   <Route path="/for-buyers" element={<ForBuyersPage />} />
+                  <Route path="/find-property-in-australia/:lang" element={<LanguageLandingPage />} />
                   <Route path="/for-agents/pricing" element={<PricingPage />} />
                   <Route path="/pricing" element={<Navigate to="/for-agents/pricing" replace />} />
                   <Route path="/about" element={<AboutPage />} />

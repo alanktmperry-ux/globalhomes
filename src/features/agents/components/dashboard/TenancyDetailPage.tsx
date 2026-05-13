@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft, Loader2, Edit, Plus, AlertTriangle, Printer,
-  CheckCircle2, Clock, Wrench, ChevronDown, ChevronUp, Copy, Mail, ExternalLink, AlertCircle, RefreshCw, FileText,
+  CheckCircle2, Clock, Wrench, ChevronDown, ChevronUp, Copy, Mail, ExternalLink, AlertCircle, RefreshCw, FileText, MessageSquare, Bell,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -117,6 +117,7 @@ const TenancyDetailPage = () => {
     report_token: string | null;
     overall_notes: string | null;
   }>>([]);
+  const [comms, setComms] = useState<Array<{ id: string; type: string | null; subject: string | null; sent_at: string; recipient_email: string | null; status: string | null }>>([]);
   const [loading, setLoading] = useState(true);
   const [agentId, setAgentId] = useState<string | null>(null);
   const [agentInfo, setAgentInfo] = useState<{ name: string; agency: string | null; license_number: string | null } | null>(null);
@@ -289,7 +290,7 @@ const TenancyDetailPage = () => {
     setAgentId(agentData.id);
     setAgentInfo(agentData);
 
-    const [tRes, pRes, jRes, iRes] = await Promise.all([
+    const [tRes, pRes, jRes, iRes, cRes] = await Promise.all([
       supabase
         .from('tenancies')
         .select('*, properties(address, suburb, state, owner_portal_token, owner_name, owner_email)')
@@ -311,6 +312,11 @@ const TenancyDetailPage = () => {
         .select('id, inspection_type, scheduled_date, conducted_date, status, finalised_at, report_token, overall_notes')
         .eq('tenancy_id', tenancyId)
         .order('scheduled_date', { ascending: false }),
+      supabase
+        .from('tenancy_communications' as any)
+        .select('id, type, subject, sent_at, recipient_email, status')
+        .eq('tenancy_id', tenancyId)
+        .order('sent_at', { ascending: false }),
     ]);
 
     if (tRes.data) {
@@ -322,6 +328,7 @@ const TenancyDetailPage = () => {
     if (pRes.data) setPayments(pRes.data as RentPayment[]);
     if (jRes.data) setJobs(jRes.data as MaintenanceJob[]);
     if (iRes.data) setInspections(iRes.data as any);
+    if (cRes.data) setComms(cRes.data as any);
     setLoading(false);
   }, [user, tenancyId]);
 
@@ -757,6 +764,9 @@ const TenancyDetailPage = () => {
             <TabsTrigger value="payments">Rent Payments</TabsTrigger>
             <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
             <TabsTrigger value="statement">Owner Statement</TabsTrigger>
+            <TabsTrigger value="communications" className="flex items-center gap-1.5">
+              <MessageSquare size={14} /> Communications
+            </TabsTrigger>
           </TabsList>
 
           {/* ═══ TAB 1: Overview ═══ */}
@@ -1188,6 +1198,52 @@ const TenancyDetailPage = () => {
                     <Printer size={14} className="mr-1" /> Generate Statement
                   </Button>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ═══ TAB 5: Communications ═══ */}
+          <TabsContent value="communications" className="mt-4">
+            <Card>
+              <CardContent className="p-5">
+                <h3 className="text-sm font-semibold mb-4">Communications History</h3>
+                {comms.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-6 text-center">
+                    No communications sent yet for this tenancy.
+                  </p>
+                ) : (
+                  <ol className="space-y-3">
+                    {comms.map(c => {
+                      const t = (c.type || '').toLowerCase();
+                      const Icon = t.includes('reminder') || t.includes('arrears')
+                        ? Bell
+                        : t.includes('notice')
+                          ? FileText
+                          : Mail;
+                      const status = (c.status || 'sent').toLowerCase();
+                      const badgeClass = status === 'sent'
+                        ? 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30'
+                        : status === 'failed'
+                          ? 'bg-red-500/15 text-red-700 border-red-500/30'
+                          : 'bg-amber-500/15 text-amber-700 border-amber-500/30';
+                      return (
+                        <li key={c.id} className="flex items-start gap-3 p-3 rounded-lg border bg-card">
+                          <div className="shrink-0 w-9 h-9 rounded-full bg-muted flex items-center justify-center">
+                            <Icon size={16} className="text-muted-foreground" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-sm truncate">{c.subject || c.type || 'Communication'}</div>
+                            <div className="text-xs text-muted-foreground truncate">{c.recipient_email || '—'}</div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {format(parseISO(c.sent_at), 'dd/MM/yyyy HH:mm')}
+                            </div>
+                          </div>
+                          <Badge variant="outline" className={cn('capitalize', badgeClass)}>{status}</Badge>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

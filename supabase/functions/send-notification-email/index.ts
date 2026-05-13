@@ -164,6 +164,28 @@ Deno.serve(async (req) => {
 
     const payload = await req.json();
 
+    // Wrap sendViaResend to also log to tenancy_communications when payload.tenancy_id is provided.
+    const sendAndLog = async (to: string, subject: string, html: string) => {
+      const result = await sendViaResend(to, subject, html);
+      try {
+        if (payload?.tenancy_id) {
+          await supabase.from('tenancy_communications').insert({
+            tenancy_id: payload.tenancy_id,
+            agent_id: payload.agent_id || null,
+            type: payload.type || null,
+            subject,
+            recipient_email: to,
+            status: result.ok ? 'sent' : 'failed',
+            metadata: result.ok ? null : { reason: result.reason || null },
+          });
+        }
+      } catch (e) {
+        console.error('[send-notification-email] tenancy_communications log failed', e);
+      }
+      return result;
+    };
+
+
     // Direct send mode requires privileged caller
     if (payload.to && payload.subject && payload.html) {
       if (!isPrivileged) {
@@ -172,7 +194,7 @@ Deno.serve(async (req) => {
         });
       }
       const p = payload as DirectPayload;
-      const result = await sendViaResend(p.to, p.subject, p.html);
+      const result = await sendAndLog(p.to, p.subject, p.html);
       return new Response(JSON.stringify({ success: result.ok, reason: result.reason }), {
         status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -218,37 +240,37 @@ Deno.serve(async (req) => {
     } else if (type === 'new_message') {
       recipientEmail = payload.recipient_email || null;
       const subject = payload.title || 'You have a new message';
-      if (recipientEmail) await sendViaResend(recipientEmail, subject, buildNewMessageHtml({ recipientName: payload.lead_name || payload.recipient_name || 'there' }));
+      if (recipientEmail) await sendAndLog(recipientEmail, subject, buildNewMessageHtml({ recipientName: payload.lead_name || payload.recipient_name || 'there' }));
       return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     } else if (type === 'agent_lead') {
       recipientEmail = payload.recipient_email || null;
       const subject = payload.title || `New enquiry from ${payload.lead_name || 'a buyer'}`;
-      if (recipientEmail) await sendViaResend(recipientEmail, subject, buildAgentLeadHtml({ agentName: payload.recipient_name || payload.agent_name || 'Agent', buyerName: payload.lead_name, buyerEmail: payload.lead_email, buyerPhone: payload.lead_phone, buyerMessage: payload.lead_message || payload.message, propertyAddress: payload.property_address }));
+      if (recipientEmail) await sendAndLog(recipientEmail, subject, buildAgentLeadHtml({ agentName: payload.recipient_name || payload.agent_name || 'Agent', buyerName: payload.lead_name, buyerEmail: payload.lead_email, buyerPhone: payload.lead_phone, buyerMessage: payload.lead_message || payload.message, propertyAddress: payload.property_address }));
       return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     } else if (type === 'arrears_chase') {
       recipientEmail = payload.recipient_email || null;
       const subject = payload.title || 'Rent Payment Overdue — Action Required';
-      if (recipientEmail) await sendViaResend(recipientEmail, subject, buildArrearsHtml({ tenantName: payload.recipient_name || 'Tenant', propertyAddress: payload.property_address, amountOwed: payload.amount_owed, agentName: payload.agent_name, agentPhone: payload.agent_phone }));
+      if (recipientEmail) await sendAndLog(recipientEmail, subject, buildArrearsHtml({ tenantName: payload.recipient_name || 'Tenant', propertyAddress: payload.property_address, amountOwed: payload.amount_owed, agentName: payload.agent_name, agentPhone: payload.agent_phone }));
       return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     } else if (type === 'signature_request') {
       recipientEmail = payload.recipient_email || null;
       const subject = payload.title || `Signature Required: ${payload.document_name || 'Document'}`;
-      if (recipientEmail) await sendViaResend(recipientEmail, subject, buildSignatureRequestHtml({ recipientName: payload.recipient_name || 'there', documentName: payload.document_name, signingLink: payload.signing_link, agentName: payload.agent_name }));
+      if (recipientEmail) await sendAndLog(recipientEmail, subject, buildSignatureRequestHtml({ recipientName: payload.recipient_name || 'there', documentName: payload.document_name, signingLink: payload.signing_link, agentName: payload.agent_name }));
       return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     } else if (type === 'search_alert') {
       recipientEmail = payload.recipient_email || null;
       const subject = payload.title || `New listings matching your search`;
-      if (recipientEmail) await sendViaResend(recipientEmail, subject, buildSearchAlertHtml({ recipientName: payload.recipient_name || 'there', matchCount: payload.match_count || 1, suburb: payload.suburb, searchLink: payload.search_link }));
+      if (recipientEmail) await sendAndLog(recipientEmail, subject, buildSearchAlertHtml({ recipientName: payload.recipient_name || 'there', matchCount: payload.match_count || 1, suburb: payload.suburb, searchLink: payload.search_link }));
       return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     } else if (type === 'inspection_report') {
       recipientEmail = payload.recipient_email || null;
       const subject = payload.title || `Inspection Report — ${payload.property_address || 'Your Property'}`;
-      if (recipientEmail) await sendViaResend(recipientEmail, subject, buildInspectionReportHtml({ recipientName: payload.recipient_name || 'Owner', propertyAddress: payload.property_address, inspectionType: payload.inspection_type, conductedDate: payload.conducted_date, reportLink: payload.report_link, agentName: payload.agent_name, agentPhone: payload.agent_phone }));
+      if (recipientEmail) await sendAndLog(recipientEmail, subject, buildInspectionReportHtml({ recipientName: payload.recipient_name || 'Owner', propertyAddress: payload.property_address, inspectionType: payload.inspection_type, conductedDate: payload.conducted_date, reportLink: payload.report_link, agentName: payload.agent_name, agentPhone: payload.agent_phone }));
       return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     } else if (type === 'inspection_notice') {
@@ -256,13 +278,13 @@ Deno.serve(async (req) => {
       const tenantName = payload.tenant_name || payload.recipient_name || 'Tenant';
       const typeLabel = payload.inspection_type === 'entry' ? 'Entry/Move-in' : payload.inspection_type === 'exit' ? 'Exit/Move-out' : 'Routine';
       const subject = payload.title || `Inspection Notice — ${payload.property_address || 'Your Rental'}`;
-      if (recipientEmail) await sendViaResend(recipientEmail, subject, buildInspectionNoticeHtml({ tenantName, propertyAddress: payload.property_address, inspectionType: typeLabel, scheduledDate: payload.scheduled_date, agentName: payload.agent_name || 'Your Property Manager', agentPhone: payload.agent_phone, noticeDays: payload.notice_days || 7 }));
+      if (recipientEmail) await sendAndLog(recipientEmail, subject, buildInspectionNoticeHtml({ tenantName, propertyAddress: payload.property_address, inspectionType: typeLabel, scheduledDate: payload.scheduled_date, agentName: payload.agent_name || 'Your Property Manager', agentPhone: payload.agent_phone, noticeDays: payload.notice_days || 7 }));
       return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     } else if (type === 'lease_expiry') {
       recipientEmail = payload.recipient_email || null;
       const subject = payload.title || `Lease Expiry Notice — ${payload.property_address || 'Your Rental'}`;
-      if (recipientEmail) await sendViaResend(recipientEmail, subject, buildLeaseExpiryHtml({ tenantName: payload.recipient_name || 'Tenant', propertyAddress: payload.property_address, leaseEndDate: payload.lease_end_date, daysRemaining: payload.days_remaining, agentName: payload.agent_name, agentPhone: payload.agent_phone }));
+      if (recipientEmail) await sendAndLog(recipientEmail, subject, buildLeaseExpiryHtml({ tenantName: payload.recipient_name || 'Tenant', propertyAddress: payload.property_address, leaseEndDate: payload.lease_end_date, daysRemaining: payload.days_remaining, agentName: payload.agent_name, agentPhone: payload.agent_phone }));
       return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     } else if (type === 'tenant_dispute') {
@@ -280,7 +302,7 @@ Deno.serve(async (req) => {
   ${payload.report_link ? `<p style="margin:0 0 8px;"><a href="${payload.report_link}" style="display:inline-block;background:#0f172a;color:#ffffff;padding:10px 16px;border-radius:6px;text-decoration:none;font-size:14px;">View report</a></p>` : ''}
   <p style="font-size:12px;color:#6b7280;margin:24px 0 0;">You can mark the dispute as resolved from the Routine Inspections → Disputes tab in your dashboard.</p>
 </div></body></html>`;
-      if (recipientEmail) await sendViaResend(recipientEmail, subject, html);
+      if (recipientEmail) await sendAndLog(recipientEmail, subject, html);
       return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     } else {
@@ -350,7 +372,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const result = await sendViaResend(recipientEmail, title || 'ListHQ Notification', emailHtml);
+    const result = await sendAndLog(recipientEmail, title || 'ListHQ Notification', emailHtml);
     return new Response(JSON.stringify({ success: result.ok, reason: result.reason }), {
       status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

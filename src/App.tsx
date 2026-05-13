@@ -36,6 +36,7 @@ const ForBuyersPage = React.lazy(() => import("./pages/ForBuyersPage"));
 const FindAgentPage = React.lazy(() => import("./features/agents/pages/FindAgentPage"));
 const FindBrokerPage = React.lazy(() => import("./features/brokers/pages/FindBrokerPage"));
 const PocketListingPage = React.lazy(() => import("./pages/PocketListingPage"));
+const PropertyLandingPage = React.lazy(() => import("./pages/PropertyLandingPage"));
 // AgentDashboardLayout is imported eagerly above
 const DedupTelemetryPage = React.lazy(() => import("./features/agents/pages/DedupTelemetryPage"));
 const MyAgenciesPage = React.lazy(() => import("./pages/MyAgenciesPage"));

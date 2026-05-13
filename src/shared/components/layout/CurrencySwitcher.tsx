@@ -68,6 +68,11 @@ export function CurrencySwitcher() {
           style={{ position: 'fixed', top: dropdownPos.top, right: dropdownPos.right }}
           className="z-[100] min-w-[240px] max-h-[70vh] overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg p-2"
         >
+          {showStaleWarning && (
+            <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-2 py-1.5 mb-2">
+              Exchange rates unavailable — indicative only
+            </div>
+          )}
           {CURRENCY_REGIONS.map(region => (
             <div key={region.region} className="mb-2 last:mb-0">
               <div className="text-[10px] uppercase tracking-wider text-slate-400 px-2 py-1 font-semibold">

@@ -98,8 +98,8 @@ const NAV_SECTIONS: NavSection[] = [
     icon: Landmark,
     children: [
       { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
-      { title: 'Reconciliation', url: '/dashboard/reconciliation', icon: Receipt },
       { title: 'Trust Ledger', url: '/dashboard/trust-ledger', icon: BookOpen },
+      { title: 'Bank Reconciliation', url: '/dashboard/bank-reconciliation', icon: Landmark },
       { title: 'Owner Statements', url: '/dashboard/statements', icon: FileText },
       { title: 'Rent Increases', url: '/dashboard/rent-increases', icon: TrendingUp },
       { title: 'Arrears', url: '/dashboard/arrears', icon: AlertCircle, badgeKey: 'arrears', alertWhenBadge: true },

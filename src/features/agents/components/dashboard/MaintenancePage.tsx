@@ -82,6 +82,7 @@ const priorityBadge = (p: string) => (
 export default function MaintenancePage() {
   const { t } = useTranslation();
   const agentId = useAgentId();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -89,6 +90,45 @@ export default function MaintenancePage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [uploadingFor, setUploadingFor] = useState<string | null>(null);
+  const [autoApproveThreshold, setAutoApproveThreshold] = useState<number>(500);
+  const [thresholdInput, setThresholdInput] = useState<string>('500');
+  const [loadingSettings, setLoadingSettings] = useState(false);
+  const [savingThreshold, setSavingThreshold] = useState(false);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    (async () => {
+      setLoadingSettings(true);
+      const { data } = await supabase
+        .from('agents')
+        .select('maintenance_auto_approve_threshold')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (cancelled) return;
+      const t = (data as any)?.maintenance_auto_approve_threshold;
+      const val = t == null ? 500 : Number(t);
+      setAutoApproveThreshold(val);
+      setThresholdInput(String(val));
+      setLoadingSettings(false);
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id]);
+
+  const saveThreshold = async () => {
+    if (!user?.id) return;
+    const val = Math.max(0, Math.floor(Number(thresholdInput) || 0));
+    setSavingThreshold(true);
+    const { error } = await supabase
+      .from('agents')
+      .update({ maintenance_auto_approve_threshold: val } as any)
+      .eq('user_id', user.id);
+    setSavingThreshold(false);
+    if (error) { toast.error(error.message || 'Failed to save threshold'); return; }
+    setAutoApproveThreshold(val);
+    setThresholdInput(String(val));
+    toast.success('Threshold saved');
+  };
 
   const uploadJobPhotos = async (job: Job, files: FileList | null) => {
     if (!files || files.length === 0 || !agentId) return;

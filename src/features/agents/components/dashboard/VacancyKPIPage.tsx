@@ -439,6 +439,58 @@ const VacancyKPIPage = () => {
           </CardContent>
         </Card>
       </section>
+
+      <Dialog open={showAddEvent} onOpenChange={setShowAddEvent}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Log Vacancy Event</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label>Event Type *</Label>
+              <Select value={eventForm.event_type} onValueChange={(v) => setEventForm(f => ({ ...f, event_type: v }))}>
+                <SelectTrigger><SelectValue placeholder="Select event type" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="inspection_booked">Inspection Booked</SelectItem>
+                  <SelectItem value="photos_taken">Photos Taken</SelectItem>
+                  <SelectItem value="listing_published">Listing Published</SelectItem>
+                  <SelectItem value="application_received">Application Received</SelectItem>
+                  <SelectItem value="tenant_approved">Tenant Approved</SelectItem>
+                  <SelectItem value="lease_signed">Lease Signed</SelectItem>
+                  <SelectItem value="keys_handed_over">Keys Handed Over</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Property</Label>
+              <Select value={eventForm.property_id} onValueChange={(v) => setEventForm(f => ({ ...f, property_id: v }))}>
+                <SelectTrigger><SelectValue placeholder="Select property (optional)" /></SelectTrigger>
+                <SelectContent>
+                  {Object.entries(propertyMap).map(([id, addr]) => (
+                    <SelectItem key={id} value={id}>{addr}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Event Date *</Label>
+              <Input type="date" value={eventForm.event_date} onChange={(e) => setEventForm(f => ({ ...f, event_date: e.target.value }))} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Notes</Label>
+              <Textarea value={eventForm.notes} onChange={(e) => setEventForm(f => ({ ...f, notes: e.target.value }))} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddEvent(false)}>Cancel</Button>
+            <Button onClick={handleAddEvent} disabled={savingEvent}>
+              {savingEvent ? <Loader2 size={14} className="animate-spin mr-1" /> : null}
+              Save Event
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -23,6 +23,7 @@ interface Application {
 
 const STATUS_MAP: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
   pending: { label: 'Under Review', variant: 'outline' },
+  submitted: { label: 'Under Review', variant: 'outline' },
   shortlisted: { label: 'Shortlisted', variant: 'default' },
   approved: { label: 'Approved', variant: 'default' },
   declined: { label: 'Not Successful', variant: 'secondary' },

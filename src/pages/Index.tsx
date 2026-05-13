@@ -577,9 +577,8 @@ const Index = () => {
                 style={{ textAlign:'center', padding:'12px 16px' }}
               >
                 <HomeCountUp
-                  target={s.type === 'count' ? s.target : 0}
-                  format={s.type === 'count' ? s.format : undefined}
-                  staticText={s.type === 'static' ? s.text : undefined}
+                  target={0}
+                  staticText={s.text}
                   className={`${s.label === 'AUTO-TRANSLATED' ? 'trust-value--auto-translated' : 'text-[clamp(48px,6vw,88px)]'} font-extrabold tabular-nums`}
                   style={{
                     background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)',

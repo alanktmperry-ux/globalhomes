@@ -114,7 +114,7 @@ export default function AgentLandingPage() {
               onClick={() => navigate('/signup?role=agent')}
               className="text-[13px] font-bold text-[#4a4a4a] hover:text-[#2563EB] transition-colors inline-flex items-center gap-1.5"
             >
-              <Icon icon="solar:lock-keyhole-linear" size={14} />
+              <Lock size={14} />
               {t('agentLanding.ctaLogin') || 'Sign in to your account'}
             </button>
             <p className="text-[12px] text-[#9CA3AF] mt-2">

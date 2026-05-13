@@ -461,6 +461,8 @@ const RentRollPage = () => {
 
   const handleScheduleInspection = async (navigateAfter: boolean) => {
     if (!showScheduleModal || !agentId || !scheduleForm.scheduled_date) return;
+    const noticeWarning = getNoticePeriodWarning(showScheduleModal?.properties?.state, scheduleForm.scheduled_date);
+    if (noticeWarning) { toast.error(noticeWarning); setScheduleSaving(false); return; }
     setScheduleSaving(true);
     const { data, error } = await supabase.from('property_inspections').insert({
       tenancy_id: showScheduleModal.id,

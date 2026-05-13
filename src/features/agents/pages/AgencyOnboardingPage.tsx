@@ -60,59 +60,6 @@ export default function AgencyOnboardingPage() {
   
   const [guideOpen, setGuideOpen] = useState(false);
 
-  // Password step state
-  const [needsPassword, setNeedsPassword] = useState<boolean | null>(null);
-  const [passwordDone, setPasswordDone] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [passwordLoading, setPasswordLoading] = useState(false);
-  const [showPw, setShowPw] = useState(false);
-  const [showConfirmPw, setShowConfirmPw] = useState(false);
-
-  // Password is now always set during signup (email + password flow).
-  // The legacy "Create your password" pre-step is removed — verified agents land directly on the Welcome/Agency flow.
-  useEffect(() => {
-    if (!user) return;
-    setNeedsPassword(false);
-    setPasswordDone(true);
-  }, [user]);
-
-  // Password requirements
-  const pwReqs = [
-    { label: t('agentOnboarding.password.rule.length'), met: newPassword.length >= 8 },
-    { label: t('agentOnboarding.password.rule.uppercase'), met: /[A-Z]/.test(newPassword) },
-    { label: t('agentOnboarding.password.rule.number'), met: /[0-9]/.test(newPassword) },
-    { label: t('agentOnboarding.password.rule.special'), met: /[!@#$%^&*]/.test(newPassword) },
-  ];
-  const allPwReqsMet = pwReqs.every(r => r.met);
-
-  const handleSetPassword = async () => {
-    setPasswordError('');
-    const missing = pwReqs.filter(r => !r.met).map(r => r.label);
-    if (missing.length > 0) {
-      toast.error('Password requirements not met', {
-        description: missing.join(' · '),
-      });
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setPasswordError('Passwords do not match');
-      return;
-    }
-    setPasswordLoading(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
-      if (error) throw error;
-      setPasswordDone(true);
-      toast.success('Password set successfully');
-    } catch (err: unknown) {
-      setPasswordError(getErrorMessage(err) || 'Failed to set password');
-    } finally {
-      setPasswordLoading(false);
-    }
-  };
-
   // Step 2 — Agency details
   const [agencyName, setAgencyName] = useState('');
   const [abn, setAbn] = useState('');

@@ -63,7 +63,7 @@ export async function ingestOpenHomeLead({
             contact_type: 'buyer',
             source: 'open_home',
             assigned_agent_id: agentId,
-            agency_id: (prop as any)?.agency_id || null,
+            agency_id: prop?.agency_id || null,
             buyer_pipeline_stage: 'new',
           } as any)
           .select('id')

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBuyerMatching } from '@/features/agents/hooks/useBuyerMatching';
 import { ArrowLeft, ArrowRight, Save, Loader2, FileText, Trash2, Share2 } from 'lucide-react';
@@ -8,12 +8,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
 import StepAddress from './StepAddress';
-import StepBasics from './StepBasics';
-import StepPhotos from './StepPhotos';
-import StepVoice from './StepVoice';
-import StepTranslate from './StepTranslate';
-import StepSettings from './StepSettings';
-import StepPreview from './StepPreview';
+const StepBasics    = lazy(() => import('./StepBasics'));
+const StepPhotos    = lazy(() => import('./StepPhotos'));
+const StepVoice     = lazy(() => import('./StepVoice'));
+const StepTranslate = lazy(() => import('./StepTranslate'));
+const StepSettings  = lazy(() => import('./StepSettings'));
+const StepPreview   = lazy(() => import('./StepPreview'));
 
 function parseSuburbFallback(address: string): string {
   const segments = address.split(',').map(s => s.trim());

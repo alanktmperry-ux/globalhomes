@@ -590,6 +590,7 @@ const InspectionReportPage = () => {
           </div>
         }
       />
+      </div>
 
       {/* Header info */}
       <div className="px-4 sm:px-6 flex flex-wrap items-center gap-2">

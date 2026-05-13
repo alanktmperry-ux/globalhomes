@@ -1,0 +1,2 @@
+ALTER TABLE public.maintenance_jobs ADD COLUMN IF NOT EXISTS auto_approved boolean NOT NULL DEFAULT false;
+ALTER TABLE public.agents ADD COLUMN IF NOT EXISTS maintenance_auto_approve_threshold integer NOT NULL DEFAULT 500;

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAgentId } from '@/features/crm/hooks/useAgentId';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -46,6 +47,7 @@ interface Job {
   entry_notice_sent_at: string | null;
   photo_urls: string[];
   invoice_url: string | null;
+  auto_approved?: boolean;
 }
 
 interface Supplier { id: string; business_name: string; trade_category: string; email: string | null; }
@@ -80,6 +82,7 @@ const priorityBadge = (p: string) => (
 export default function MaintenancePage() {
   const { t } = useTranslation();
   const agentId = useAgentId();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -87,6 +90,45 @@ export default function MaintenancePage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [uploadingFor, setUploadingFor] = useState<string | null>(null);
+  const [autoApproveThreshold, setAutoApproveThreshold] = useState<number>(500);
+  const [thresholdInput, setThresholdInput] = useState<string>('500');
+  const [loadingSettings, setLoadingSettings] = useState(false);
+  const [savingThreshold, setSavingThreshold] = useState(false);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    (async () => {
+      setLoadingSettings(true);
+      const { data } = await supabase
+        .from('agents')
+        .select('maintenance_auto_approve_threshold')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (cancelled) return;
+      const t = (data as any)?.maintenance_auto_approve_threshold;
+      const val = t == null ? 500 : Number(t);
+      setAutoApproveThreshold(val);
+      setThresholdInput(String(val));
+      setLoadingSettings(false);
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id]);
+
+  const saveThreshold = async () => {
+    if (!user?.id) return;
+    const val = Math.max(0, Math.floor(Number(thresholdInput) || 0));
+    setSavingThreshold(true);
+    const { error } = await supabase
+      .from('agents')
+      .update({ maintenance_auto_approve_threshold: val } as any)
+      .eq('user_id', user.id);
+    setSavingThreshold(false);
+    if (error) { toast.error(error.message || 'Failed to save threshold'); return; }
+    setAutoApproveThreshold(val);
+    setThresholdInput(String(val));
+    toast.success('Threshold saved');
+  };
 
   const uploadJobPhotos = async (job: Job, files: FileList | null) => {
     if (!files || files.length === 0 || !agentId) return;
@@ -226,11 +268,18 @@ export default function MaintenancePage() {
 
   const submitQuote = async () => {
     if (!quoteFor || !quoteAmount) return;
+    const cost = parseFloat(quoteAmount);
+    const shouldAutoApprove = !isNaN(cost) && cost <= autoApproveThreshold;
     await supabase.from('maintenance_jobs').update({
-      estimated_cost: parseFloat(quoteAmount),
-      status: 'quoted',
+      estimated_cost: cost,
+      status: shouldAutoApprove ? 'approved' : 'quoted',
+      ...(shouldAutoApprove ? { auto_approved: true } : {}),
     } as any).eq('id', quoteFor.id);
-    toast.success('Quote saved');
+    if (shouldAutoApprove) {
+      toast.success(`Job auto-approved (under $${autoApproveThreshold} threshold)`);
+    } else {
+      toast.success('Quote saved');
+    }
     setQuoteFor(null); setQuoteAmount('');
     load();
   };
@@ -266,7 +315,33 @@ export default function MaintenancePage() {
           </>
         )}
       </nav>
-      <DashboardHeader title={t('agent.pm.maintenance.title')} subtitle={t('agent.pm.maintenance.subtitle')} />
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <DashboardHeader title={t('agent.pm.maintenance.title')} subtitle={t('agent.pm.maintenance.subtitle')} />
+        <div className="flex items-end gap-2 shrink-0">
+          <div className="flex flex-col gap-1">
+            <Label className="text-xs text-muted-foreground">Auto-approve jobs under</Label>
+            <div className="relative">
+              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+              <Input
+                type="number"
+                min={0}
+                value={thresholdInput}
+                onChange={(e) => setThresholdInput(e.target.value)}
+                className="w-24 h-9 pl-5 text-sm"
+                disabled={loadingSettings || savingThreshold}
+              />
+            </div>
+          </div>
+          <Button
+            size="sm"
+            onClick={saveThreshold}
+            disabled={savingThreshold || loadingSettings || thresholdInput === String(autoApproveThreshold)}
+            className="h-9"
+          >
+            {savingThreshold ? <Loader2 size={14} className="animate-spin" /> : 'Save'}
+          </Button>
+        </div>
+      </div>
 
       <div className="flex items-center gap-2 flex-wrap">
         <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -313,7 +388,16 @@ export default function MaintenancePage() {
                         {daysOpen}d
                       </TableCell>
                       <TableCell>{priorityBadge(j.priority)}</TableCell>
-                      <TableCell>{statusBadge(j.status)}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {statusBadge(j.status)}
+                          {j.auto_approved && (
+                            <Badge className="bg-blue-500 hover:bg-blue-500 text-white text-[10px] px-1.5 py-0 h-5">
+                              Auto-approved
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell className="text-sm">{j.supplier_name || j.assigned_to || <span className="text-muted-foreground">Unassigned</span>}</TableCell>
                       <TableCell>{expanded === j.id ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}</TableCell>
                     </TableRow>

@@ -831,7 +831,7 @@ export const en = {
   'agentLanding.feature1Body': "Buyers post structured intent briefs — suburbs, budget, finance status, must-haves, preferred language. You browse live, see who's serious, and unlock full contact details with credits. Access buyers before they look at a single listing.",
   'agentLanding.feature2Title': 'AI Buyer Concierge',
   'agentLanding.feature2Body': "The platform matches your listings to buyers automatically — from their voice searches, saved criteria, and Halos. Qualified leads arrive in your inbox while you're at an open home. No cold outreach required.",
-  'agentLanding.feature3Title': 'multilingual auto-translation',
+  'agentLanding.feature3Title': 'Multilingual auto-translation',
   'agentLanding.feature3Body': 'Every listing is translated into Mandarin, Vietnamese, Hindi, Arabic, Tagalog and 15 more languages the moment it goes live. Reach 1.2 million multilingual buyers that REA and Domain simply cannot serve.',
   'agentLanding.feature4Title': 'Pocket listings',
   'agentLanding.feature4Body': 'List without a public days-on-market counter. Tell your vendor: "We\'ll test the market privately first." No price history, no stigma if you adjust. A genuine edge in your next listing presentation.',

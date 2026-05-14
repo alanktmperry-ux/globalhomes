@@ -23,7 +23,7 @@ Deno.serve(async (req) => {
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const resendKey = Deno.env.get("RESEND_API_KEY");
-  const emailFrom = Deno.env.get("EMAIL_FROM") || "ListHQ <noreply@listhq.com.au>";
+  const emailFrom = Deno.env.get("EMAIL_FROM") || "ListHQ <hello@listhq.com.au>";
 
   const supabase = createClient(supabaseUrl, serviceKey);
 

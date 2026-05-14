@@ -34,19 +34,26 @@ function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
 }
 
-function bodyToHtml(body: string): string {
+function bodyToHtml(body: string, recipientEmail?: string): string {
   const escaped = escapeHtml(body).replace(/\n/g, "<br/>");
+  const unsubUrl = recipientEmail
+    ? `https://listhq.com.au/unsubscribe?email=${encodeURIComponent(recipientEmail)}`
+    : `https://listhq.com.au/unsubscribe`;
   return `<!doctype html><html><body style="margin:0;padding:24px;background:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#0f172a;">
     <div style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:28px;font-size:15px;line-height:1.55;">
       ${escaped}
       <hr style="border:0;border-top:1px solid #e2e8f0;margin:24px 0"/>
-      <div style="font-size:11px;color:#94a3b8">Sent automatically via ListHQ Property Management.</div>
+      <div style="font-size:11px;color:#94a3b8;line-height:1.6">
+        Sent on behalf of your property manager via ListHQ Property Management.<br/>
+        ListHQ Pty Ltd · Sydney, Australia · listhq.com.au<br/>
+        <a href="${unsubUrl}" style="color:#64748b;text-decoration:underline">Unsubscribe from non-essential updates</a>
+      </div>
     </div></body></html>`;
 }
 
 async function sendEmail(supabase: ReturnType<typeof createClient>, to: string, subject: string, body: string) {
   const { data, error } = await supabase.functions.invoke("send-notification-email", {
-    body: { to, subject, html: bodyToHtml(body) },
+    body: { to, subject, html: bodyToHtml(body, to) },
   });
   if (error) return { ok: false, reason: error.message };
   if (data && (data as any).success === false) return { ok: false, reason: (data as any).reason || "send failed" };

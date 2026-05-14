@@ -14,7 +14,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
     const RESEND = Deno.env.get('RESEND_API_KEY') ?? '';
-    const FROM = Deno.env.get('EMAIL_FROM') ?? 'ListHQ <noreply@listhq.com.au>';
+    const FROM = Deno.env.get('EMAIL_FROM') ?? 'ListHQ <hello@listhq.com.au>';
 
     const token = req.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);

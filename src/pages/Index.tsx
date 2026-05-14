@@ -878,6 +878,41 @@ const Index = () => {
 
         {/* Agent pricing moved to /for-agents/pricing */}
 
+        {/* ═══ Careers teaser ═══ */}
+        <section style={{ background: T.off, padding: '88px 24px', borderTop: `1px solid ${T.border}` }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 48, flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 60%', minWidth: 280 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: T.blue, textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 14 }}>
+                We're hiring
+              </div>
+              <h2 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: 36, fontWeight: 700, color: T.ink, lineHeight: 1.15, marginBottom: 12 }}>
+                Build the platform Australia's real estate has been waiting for.
+              </h2>
+              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 16, color: T.muted, lineHeight: 1.6, maxWidth: 560 }}>
+                5 founding-team roles open. Engineering, design, growth, sales, customer success.
+              </p>
+            </div>
+            <div style={{ flex: '0 0 auto' }}>
+              <button
+                onClick={() => navigate('/careers')}
+                style={{
+                  background: T.blue,
+                  color: '#fff',
+                  fontSize: 15,
+                  fontWeight: 600,
+                  padding: '14px 24px',
+                  borderRadius: 12,
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(37,99,235,.25)',
+                }}
+              >
+                View open roles →
+              </button>
+            </div>
+          </div>
+        </section>
+
         {/* ═══ Final CTA — dark ink with blue glow ═══ */}
         <Suspense fallback={<SectionFallback />}>
           <FinalCTA />

@@ -21,6 +21,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { callAdminFunction } from '@/features/admin/lib/adminApi';
 import { toast } from 'sonner';
+import { SearchIntelligenceTab } from '@/features/admin/insights/SearchIntelligenceTab';
 
 const PLAN_MRR: Record<string, number> = {
   solo: 299,
@@ -624,6 +625,12 @@ export default function InsightsPage() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Section — Search Intelligence */}
+      <section>
+        <h2 className="text-sm font-semibold text-foreground mb-3">Search Intelligence</h2>
+        <SearchIntelligenceTab />
       </section>
 
       <p className="text-[11px] text-muted-foreground text-right">

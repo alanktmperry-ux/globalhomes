@@ -439,11 +439,67 @@ const Index = () => {
     }
   }, [voiceState, openSearch]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isParsing, setIsParsing] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const q = searchQuery.trim();
-    if (!q) return;
-    navigate(`/buy?q=${encodeURIComponent(q)}`);
+    const trimmed = searchQuery.trim();
+    if (!trimmed) return;
+
+    setIsParsing(true);
+
+    // Fast path: single bare word that looks like a suburb → skip LLM
+    const isSingleWord =
+      !/\s/.test(trimmed) &&
+      trimmed.length < 30 &&
+      !/[^\p{L}\p{N}\-']/u.test(trimmed);
+    if (isSingleWord) {
+      setIsParsing(false);
+      navigate(`/buy?q=${encodeURIComponent(trimmed)}`);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.functions.invoke('parse-search-query', {
+        body: { query: trimmed, locale: language ?? 'en' },
+      });
+
+      if (error || !data?.parsed) {
+        console.warn('[Index hero] parser failed, falling back:', error);
+        navigate(`/buy?q=${encodeURIComponent(trimmed)}`);
+        return;
+      }
+
+      const p = data.parsed;
+      const params = new URLSearchParams();
+      if (p.suburb_or_locality) params.set('suburb', p.suburb_or_locality);
+      if (p.postcode) params.set('postcode', p.postcode);
+      if (p.state) params.set('state', p.state);
+      if (Array.isArray(p.property_types) && p.property_types.length) {
+        params.set('type', p.property_types.join(','));
+      }
+      if (p.beds_min != null) params.set('beds_min', String(p.beds_min));
+      if (p.beds_max != null) params.set('beds_max', String(p.beds_max));
+      if (p.baths_min != null) params.set('baths_min', String(p.baths_min));
+      if (p.parking_min != null) params.set('parking_min', String(p.parking_min));
+      if (p.min_price_aud != null) params.set('min_price', String(p.min_price_aud));
+      if (p.max_price_aud != null) params.set('max_price', String(p.max_price_aud));
+      if (Array.isArray(p.features) && p.features.length) {
+        params.set('features', p.features.join(','));
+      }
+      params.set('raw_q', trimmed);
+      if ((p.confidence ?? 0) < 0.5) {
+        params.set('q', trimmed);
+        params.set('low_confidence', '1');
+      }
+
+      navigate(`/buy?${params.toString()}`);
+    } catch (err) {
+      console.error('[Index hero] parse threw, falling back:', err);
+      navigate(`/buy?q=${encodeURIComponent(trimmed)}`);
+    } finally {
+      setIsParsing(false);
+    }
   };
 
   // Initial card content (static — JS handles all subsequent updates via refs).

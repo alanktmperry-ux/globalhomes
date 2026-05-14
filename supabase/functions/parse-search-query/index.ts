@@ -1,226 +1,213 @@
-import { createClient } from "npm:@supabase/supabase-js@2";
-import { getCorsHeaders } from "../_shared/cors.ts";
+// Smart Search — natural-language property query parser.
+// Uses the Lovable AI Gateway (LOVABLE_API_KEY) so we don't need a direct Gemini key.
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-Deno.serve(async (req) => {
-  const corsHeaders = getCorsHeaders(req.headers.get("Origin"));
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
 
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+const AI_MODEL = "google/gemini-2.5-flash";
+const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+
+const PARSER_SYSTEM_PROMPT = `You are a real estate query parser for the Australian market. Extract structured filters from natural-language buyer queries in ANY language (English, Mandarin Simplified/Traditional, Vietnamese with or without diacritics, Korean, Arabic, Hindi, Japanese, etc.).
+
+NUMBER FORMAT HANDLING:
+- "$2m", "2M", "2 million", "$2,000,000" → 2000000 (AUD)
+- "200万" (Mandarin ten-thousand) → 2000000 AUD
+- "200 vạn" (Vietnamese ten-thousand) → 2000000 AUD
+- "200만" (Korean man) → 2000000 (KRW) — convert with 1 KRW = 0.0011 AUD ≈ 2200 AUD. If the user clearly means KRW, return min_price_aud/max_price_aud in AUD after FX.
+- "1.2m" → 1200000
+- "under 1m" / "below $1M" → max_price_aud = 1000000
+- "between 500k and 800k" → min_price_aud=500000, max_price_aud=800000
+- "from 700k" → min_price_aud=700000
+
+SUBURB MATCHING (Australian context — Melbourne, Sydney, Brisbane, Perth, Adelaide):
+- Be lenient on typos: "Box Hil", "Bocks Hill", "boxhill" → Box Hill
+- Accept nicknames: "Cabra" → Cabramatta, "Glen Wav" → Glen Waverley, "Parra" → Parramatta
+- No-diacritics Vietnamese: "Cabra matta" → Cabramatta
+- Chinese suburb names: 墨尔本→Melbourne, 悉尼→Sydney, 博士山→Box Hill, 格兰韦弗利→Glen Waverley, 帕拉马塔→Parramatta, 卡布拉马塔→Cabramatta, 唐卡斯特→Doncaster, 伊斯特伍德→Eastwood, 斯特拉斯菲尔德→Strathfield, 赫斯特维尔→Hurstville, 查茨伍德→Chatswood
+- Korean: 시드니→Sydney, 멜버른→Melbourne, 이스트우드→Eastwood, 스트라스필드→Strathfield
+- DO NOT invent suburbs — if unclear, leave blank and add to unmatched_terms
+
+INTENT DETECTION:
+- "rent", "lease", "let", "租", "出租", "thuê", "임대", "إيجار" → "rent"
+- "buy", "purchase", "for sale", "买", "购买", "mua", "구매", "شراء" → "buy"
+- "sold", "售出", "đã bán" → "sold"
+- Default "buy" if unclear
+
+PROPERTY TYPE:
+- "house", "独立屋", "단독주택", "nhà phố", "villa" → "house"
+- "apartment", "unit", "公寓", "아파트", "căn hộ" → "apartment"
+- "townhouse", "联排", "타운하우스", "nhà liền kề" → "townhouse"
+- "land", "block", "土地", "땅", "đất" → "land"
+- "commercial", "shop", "office", "商铺", "상업용" → "commercial"
+
+CAR SPACES:
+- "2 car", "2 car garage", "double garage", "2车位", "2주차", "2 chỗ đậu xe" → parking_min=2
+
+FEATURES (extract to features array):
+- "pool", "swimming pool", "泳池", "수영장", "hồ bơi"
+- "north-facing", "north facing", "朝北", "북향"
+- "study", "office room", "书房", "서재"
+- "near schools", "good school zone", "学区房", "학군"
+- "pet friendly", "pets allowed", "宠物友好", "반려동물 가능"
+- "new build", "新建", "신축"
+- "period home", "old home", "老房子"
+
+DEAL BREAKERS (extract negations):
+- "no strata", "không có chung cư phí" → ["no strata"]
+- "not near highway", "不要靠近主路" → ["not near highway"]
+- "no ground floor", "không tầng trệt" → ["no ground floor"]
+
+EMOJI: ignore emojis but extract numbers next to them (🛏 next to 3 = beds_min: 3).
+
+ALL CAPS / no spaces: handle gracefully ("BOXHILLUNDER1M" → suburb=Box Hill, max_price_aud=1000000).
+
+Return ONLY valid JSON matching the exact schema below. No prose. No markdown. No code fences.
+
+SCHEMA:
+{
+  "intent": "buy" | "rent" | "sold" | "unknown",
+  "suburb_or_locality": string | null,
+  "postcode": string | null,
+  "state": "VIC" | "NSW" | "QLD" | "WA" | "SA" | "TAS" | "ACT" | "NT" | null,
+  "property_types": string[] | null,
+  "beds_min": number | null,
+  "beds_max": number | null,
+  "baths_min": number | null,
+  "parking_min": number | null,
+  "min_price_aud": number | null,
+  "max_price_aud": number | null,
+  "features": string[] | null,
+  "deal_breakers": string[] | null,
+  "raw_language": string,
+  "confidence": number,
+  "unmatched_terms": string[] | null
+}`;
+
+async function parseWithAI(query: string, locale: string) {
+  const res = await fetch(AI_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${LOVABLE_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: AI_MODEL,
+      messages: [
+        { role: "system", content: PARSER_SYSTEM_PROMPT },
+        { role: "user", content: `QUERY: ${query}\nUI_LOCALE: ${locale}` },
+      ],
+      temperature: 0.1,
+      response_format: { type: "json_object" },
+    }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`AI gateway ${res.status}: ${text}`);
   }
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content;
+  if (!text) throw new Error("Empty AI response");
+  return JSON.parse(text);
+}
 
-  const supabaseAuth = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-  );
-  const token = req.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
-  const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
-  if (authError || !user) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+async function hashQuery(query: string, locale: string): Promise<string> {
+  const enc = new TextEncoder().encode(`${locale}::${query.trim().toLowerCase()}`);
+  const buf = await crypto.subtle.digest("SHA-256", enc);
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const { query, listing_mode } = await req.json();
-
-    if (!query || typeof query !== "string" || query.trim().length === 0) {
-      return new Response(
-        JSON.stringify({ error: "No query provided" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    if (!LOVABLE_API_KEY) {
+      return new Response(JSON.stringify({ error: "AI gateway not configured" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    const trimmedQuery = query.trim().slice(0, 300);
-
-    // ── STEP 1: Use Lovable AI to extract structured intent ──
-    const apiKey = Deno.env.get("LOVABLE_API_KEY");
-    if (!apiKey) {
-      return new Response(
-        JSON.stringify({ error: "AI gateway not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const systemPrompt = `You are a real estate search query parser for an Australian property platform.
-Extract structured search intent from natural language queries.
-Always return valid JSON with no extra text. If a field is not mentioned, use null.
-Price values must be in AUD as integers (e.g. "1 million" = 1000000, "1.3 million" = 1300000, "850k" = 850000).
-Property types: house, apartment, unit, townhouse, land, rural, commercial.
-Australian states: NSW, VIC, QLD, WA, SA, TAS, ACT, NT.
-Bedrooms and bathrooms should be integers. "at least 3 bedrooms" → bedrooms_min=3, bedrooms_max=null.
-listing_type should be "sale" or "rent" based on context. If not mentioned, use null.`;
-
-    const userPrompt = `Parse this Australian property search query into structured JSON:
-"${trimmedQuery}"
-
-Return ONLY this JSON structure:
-{
-  "property_type": string or null,
-  "suburb": string or null,
-  "state": string or null,
-  "postcode": string or null,
-  "price_min": integer or null,
-  "price_max": integer or null,
-  "bedrooms_min": integer or null,
-  "bedrooms_max": integer or null,
-  "bathrooms_min": integer or null,
-  "listing_type": "sale" or "rent" or null,
-  "keywords": []
-}`;
-
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        temperature: 0,
-        max_tokens: 300,
-      }),
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const admin = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false },
     });
 
-    if (!aiResponse.ok) {
-      const status = aiResponse.status;
-      if (status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limit exceeded, please try again shortly." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      if (status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI credits exhausted. Please add funds." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      console.error("AI gateway error:", status, await aiResponse.text());
-      // Fall through with empty parsed intent
+    // Resolve user (optional — anonymous searches allowed)
+    let userId: string | null = null;
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader) {
+      const token = authHeader.replace("Bearer ", "");
+      const { data } = await admin.auth.getUser(token);
+      userId = data.user?.id ?? null;
     }
 
-    let parsed: Record<string, unknown> = {};
-    if (aiResponse.ok) {
-      try {
-        const aiData = await aiResponse.json();
-        let raw = aiData.choices?.[0]?.message?.content?.trim() ?? "";
-        // Strip markdown code fences if present
-        raw = raw.replace(/^```json?\s*/i, "").replace(/\s*```$/i, "");
-        parsed = JSON.parse(raw);
-      } catch (e) {
-        console.warn("Failed to parse AI response, using fallback:", e);
-      }
+    const { query, locale = "en" } = await req.json();
+    if (!query || typeof query !== "string" || query.length > 500) {
+      return new Response(JSON.stringify({ error: "Invalid query" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    // Apply listing_mode from frontend if AI didn't detect one
-    if (listing_mode && !parsed.listing_type) {
-      parsed.listing_type = listing_mode;
+    const hash = await hashQuery(query, locale);
+
+    // Cache lookup
+    const { data: cached } = await admin
+      .from("parsed_queries")
+      .select("parsed_filters, expires_at")
+      .eq("query_hash", hash)
+      .maybeSingle();
+
+    if (cached && new Date(cached.expires_at) > new Date()) {
+      return new Response(
+        JSON.stringify({ parsed: cached.parsed_filters, cached: true }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
 
-    // ── STEP 2: Query properties table with structured filters ──
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    // Cache miss — call AI
+    const parsed = await parseWithAI(query, locale);
 
-    let qb = supabase
-      .from("properties")
-      .select(`
-        id, title, address, suburb, state, country,
-        price, price_formatted, listing_type, property_type,
-        beds, baths, parking, sqm,
-        description, images, image_url, features,
-        is_featured, boost_tier, featured_until,
-        lat, lng, listed_date,
-        agent_id,
-        agents!inner ( id, name, agency, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count )
-      `)
-      .eq("is_active", true)
-      .eq("status", "public")
-      .limit(30);
-      // NOTE: agents.phone and agents.email are intentionally excluded — PII must not leak via public search
+    // Store in cache
+    await admin.from("parsed_queries").upsert({
+      query_hash: hash,
+      locale,
+      parsed_filters: parsed,
+      expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    });
 
-    if (parsed.listing_type) {
-      qb = qb.eq("listing_type", parsed.listing_type as string);
-    }
-    if (parsed.property_type) {
-      qb = qb.ilike("property_type", `%${parsed.property_type}%`);
-    }
-    if (parsed.suburb) {
-      qb = qb.ilike("suburb", `%${parsed.suburb}%`);
-    }
-    if (parsed.state) {
-      qb = qb.ilike("state", `%${parsed.state}%`);
-    }
-    if (parsed.price_min) {
-      qb = qb.gte("price", parsed.price_min as number);
-    }
-    if (parsed.price_max) {
-      qb = qb.lte("price", parsed.price_max as number);
-    }
-    if (parsed.bedrooms_min) {
-      qb = qb.gte("beds", parsed.bedrooms_min as number);
-    }
-    if (parsed.bedrooms_max) {
-      qb = qb.lte("beds", parsed.bedrooms_max as number);
-    }
-    if (parsed.bathrooms_min) {
-      qb = qb.gte("baths", parsed.bathrooms_min as number);
-    }
+    // Log to audit table
+    await admin.from("search_queries").insert({
+      user_id: userId,
+      raw_query: query,
+      detected_language: parsed.raw_language ?? locale,
+      parsed_filters: parsed,
+      confidence: parsed.confidence ?? null,
+    });
 
-    // Prefer featured listings first
-    qb = qb.order("is_featured", { ascending: false }).order("created_at", { ascending: false });
-
-    const { data: listings, error } = await qb;
-
-    let finalListings = listings ?? [];
-
-    // Fallback: if suburb filter yielded 0 results, try address ILIKE
-    if (finalListings.length === 0 && parsed.suburb) {
-      let fb = supabase
-        .from("properties")
-        .select(`
-        id, title, address, suburb, state, country,
-        price, price_formatted, listing_type, property_type,
-        beds, baths, parking, sqm,
-        description, images, image_url, features,
-        is_featured, boost_tier, featured_until,
-        lat, lng, listed_date,
-        agent_id,
-        agents!inner ( id, name, agency, avatar_url, is_subscribed, verification_badge_level, specialization, years_experience, rating, review_count )
-      `)
-      .eq("is_active", true)
-      .eq("status", "public")
-      .ilike("address", `%${parsed.suburb}%`)
-        .limit(30);
-
-      if (parsed.price_min) fb = fb.gte("price", parsed.price_min as number);
-      if (parsed.price_max) fb = fb.lte("price", parsed.price_max as number);
-      if (parsed.property_type) fb = fb.ilike("property_type", `%${parsed.property_type}%`);
-      if (parsed.listing_type) fb = fb.eq("listing_type", parsed.listing_type as string);
-
-      const { data: fallback } = await fb;
-      finalListings = fallback ?? [];
-    }
-
-    if (error) console.error("DB query error:", error);
-
+    return new Response(JSON.stringify({ parsed, cached: false }), {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    console.error("[parse-search-query] error:", err);
     return new Response(
-      JSON.stringify({
-        listings: finalListings,
-        parsed_intent: parsed,
-        result_count: finalListings.length,
-        original_query: trimmedQuery,
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
-  } catch (e) {
-    console.error("parse-search-query error:", e);
-    return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: "Parse failed", detail: String(err) }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
     );
   }
 });

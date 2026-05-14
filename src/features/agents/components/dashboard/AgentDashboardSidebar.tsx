@@ -89,15 +89,6 @@ const NAV_SECTIONS: NavSection[] = [
         label: 'Operations',
         items: [
           { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
-          { title: 'Owner Statements', url: '/dashboard/statements', icon: FileText },
-        ],
-      },
-      {
-        label: 'Trust Accounting',
-        items: [
-          { title: 'Trust Accounting', url: '/dashboard/trust', icon: Landmark },
-          { title: 'Trust Ledger', url: '/dashboard/trust-ledger', icon: BookOpen },
-          { title: 'Bank Reconciliation', url: '/dashboard/bank-reconciliation', icon: Landmark },
         ],
       },
     ],
@@ -107,12 +98,10 @@ const NAV_SECTIONS: NavSection[] = [
     url: '',
     icon: Shield,
     children: [
-      { title: 'Routine Inspections', url: '/dashboard/pm-inspections', icon: CalendarDays, badgeKey: 'disputes', alertWhenBadge: true },
       { title: 'Smoke Alarms', url: '/dashboard/smoke-alarms', icon: AlertCircle, badgeKey: 'smokeAlarms', alertWhenBadge: true },
       { title: 'Bond Claims', url: '/dashboard/bond-claims', icon: Scale },
       { title: 'Key Register', url: '/dashboard/keys', icon: Scale },
       { title: 'Documents', url: '/dashboard/property-documents', icon: FileText },
-      { title: 'Maintenance', url: '/dashboard/maintenance', icon: Wrench },
       { title: 'Suppliers', url: '/dashboard/suppliers', icon: Wrench },
     ],
   },

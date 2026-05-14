@@ -16,6 +16,25 @@ interface Props {
 export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePartner, requireSupport }: Props) => {
   const { user, loading, isAgent, isAdmin, isPartner, isSupport, rolesFetched } = useAuth();
   const [approvalState, setApprovalState] = useState<'loading' | 'pending' | 'approved' | 'none'>('loading');
+  const [authTimedOut, setAuthTimedOut] = useState(false);
+
+  // Safety net: if auth/roles never resolve within 7s (e.g. on direct URL load
+  // when the role fetch silently hangs), bounce to the right login screen
+  // instead of spinning forever.
+  useEffect(() => {
+    if (!loading && rolesFetched) return;
+    const t = window.setTimeout(() => setAuthTimedOut(true), 7000);
+    return () => window.clearTimeout(t);
+  }, [loading, rolesFetched]);
+
+  if (authTimedOut && (loading || !rolesFetched)) {
+    if (!user) {
+      return <Navigate to={requireAdmin ? '/admin/login' : '/login'} replace />;
+    }
+    if (requireAdmin && !isAdmin && !isSupport) return <Navigate to="/admin/login" replace />;
+    if (requireSupport && !isSupport && !isAdmin) return <Navigate to="/admin/login" replace />;
+    if (requirePartner && !isPartner) return <Navigate to="/" replace />;
+  }
 
   useEffect(() => {
     if (!user || !requireAgent || isAdmin) {

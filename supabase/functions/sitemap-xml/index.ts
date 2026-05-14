@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
       const isRental = p.listing_type === 'rent' || p.listing_type === 'rental';
       const path = isRental
         ? `/rent/property/${p.slug || p.id}`
-        : `/property/${p.slug || p.id}`;
+        : `/properties/${p.slug || p.id}`;
       return urlEntry(
         `${SITE_URL}${path}`,
         p.updated_at,

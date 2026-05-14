@@ -575,6 +575,7 @@ const BuyPage = () => {
                   minPrice: parsed.priceMin,
                   maxPrice: parsed.priceMax,
                   propertyType: parsed.propertyType,
+                  features: [],
                   sort: 'newest',
                 }));
               }}

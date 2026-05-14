@@ -146,16 +146,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
     contactTracked.current = true;
 
     supabase.rpc('increment_contact_clicks', { property_id: property.id }).then(({ error }) => {
-      if (error) {
-        // Fallback: direct update if the RPC doesn't exist yet
-        supabase
-          .from('properties')
-          .update({ contact_clicks: (property.contactClicks || 0) + 1 })
-          .eq('id', property.id)
-          .then(({ error: updateError }) => {
-            if (updateError && import.meta.env.DEV) console.warn('[AgentContactModal] contact_clicks increment failed:', updateError.message);
-          });
-      }
+      if (error && import.meta.env.DEV) console.warn('[AgentContactModal] contact_clicks RPC failed:', error.message);
     });
   }, [open, property.id, property.contactClicks]);
 

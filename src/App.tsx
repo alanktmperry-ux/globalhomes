@@ -18,6 +18,7 @@ import { PageSkeleton } from "@/shared/components/PageSkeleton";
 import { DefaultSEOHead } from "@/features/seo/components/DefaultSEOHead";
 import { HelpWidget } from "@/features/help/components/HelpWidget";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
+import { RouteTracker } from "@/shared/components/RouteTracker";
 import { useIdleTimeout } from "@/shared/hooks/useIdleTimeout";
 
 // Eager-loaded for first paint (homepage path)
@@ -322,6 +323,7 @@ const App = () => (
              <CookieConsentBanner />
              <Suspense fallback={<PageLoader />}>
               <BetaGate>
+              <RouteTracker />
               <Routes>
                 {/* Public with shared navbar/footer */}
                 <Route element={<PublicLayout />}>

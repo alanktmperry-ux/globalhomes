@@ -830,8 +830,10 @@ export type Database = {
       agent_subscriptions: {
         Row: {
           agent_id: string
+          amount_cents: number | null
           annual_billing: boolean
           auto_renew: boolean | null
+          canceled_at: string | null
           created_at: string
           featured_remaining: number
           id: string
@@ -847,8 +849,10 @@ export type Database = {
         }
         Insert: {
           agent_id: string
+          amount_cents?: number | null
           annual_billing?: boolean
           auto_renew?: boolean | null
+          canceled_at?: string | null
           created_at?: string
           featured_remaining?: number
           id?: string
@@ -864,8 +868,10 @@ export type Database = {
         }
         Update: {
           agent_id?: string
+          amount_cents?: number | null
           annual_billing?: boolean
           auto_renew?: boolean | null
+          canceled_at?: string | null
           created_at?: string
           featured_remaining?: number
           id?: string

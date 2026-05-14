@@ -141,7 +141,7 @@ export default function InsightsPage() {
       const [agentsRes, propsRes, leadsRes, demoRes, usersJson] = await Promise.all([
         supabase
           .from('agents')
-          .select('id, name, agency, agency_id, is_subscribed, created_at, updated_at, onboarding_complete, agent_subscriptions(plan_type)'),
+          .select('id, name, agency, agency_id, is_subscribed, created_at, updated_at, onboarding_complete, agent_subscriptions(plan_type, amount_cents, canceled_at)'),
         supabase.from('properties').select('id, agent_id, state, is_active, created_at'),
         supabase.from('leads').select('id, agent_id, created_at').gte('created_at', d30),
         (supabase.from('demo_requests' as any).select('id, status, created_at')) as any,
@@ -160,7 +160,11 @@ export default function InsightsPage() {
       // === Revenue ===
       const paid = agents.filter((a) => a.is_subscribed);
       const mrr = paid.reduce(
-        (s, a) => s + (PLAN_MRR[(a.agent_subscriptions?.plan_type || '').toLowerCase()] || 0),
+        (s, a) => {
+          const cents = (a.agent_subscriptions as any)?.amount_cents;
+          if (typeof cents === 'number' && cents > 0) return s + (cents / 100);
+          return s + (PLAN_MRR[(a.agent_subscriptions?.plan_type || '').toLowerCase()] || 0);
+        },
         0,
       );
       const arr = mrr * 12;
@@ -176,10 +180,11 @@ export default function InsightsPage() {
           ? Math.round(((paidThisMonthStart - paidPrevMonthStart) / paidPrevMonthStart) * 1000) / 10
           : null;
 
-      // Churn (last 30d): unsubscribed agents whose updated_at is in the last 30d & created earlier
-      const churned30d = agents.filter(
-        (a) => !a.is_subscribed && a.updated_at && a.updated_at >= d30 && a.created_at < d30,
-      ).length;
+      // Churn (last 30d): agents whose subscription canceled_at is in the last 30d
+      const churned30d = agents.filter((a) => {
+        const cancelAt = (a.agent_subscriptions as any)?.canceled_at;
+        return cancelAt && cancelAt >= d30;
+      }).length;
       const churnRatePct =
         paid.length + churned30d > 0
           ? Math.round((churned30d / (paid.length + churned30d)) * 1000) / 10
@@ -274,7 +279,11 @@ export default function InsightsPage() {
           };
         row.agents += 1;
         if (a.is_subscribed) {
-          row.mrr += PLAN_MRR[(a.agent_subscriptions?.plan_type || '').toLowerCase()] || 0;
+          row.mrr += (() => {
+            const cents = (a.agent_subscriptions as any)?.amount_cents;
+            if (typeof cents === 'number' && cents > 0) return cents / 100;
+            return PLAN_MRR[(a.agent_subscriptions?.plan_type || '').toLowerCase()] || 0;
+          })();
         }
         agencyMap.set(name, row);
       });

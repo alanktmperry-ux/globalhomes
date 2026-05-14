@@ -468,7 +468,7 @@ const App = () => (
                 <Route path="/agent-portal" element={<ProtectedRoute requireAgent><AgentPortalPage /></ProtectedRoute>} />
                 <Route path="/pocket-listing" element={<ProtectedRoute requireAgent><PocketListingPage /></ProtectedRoute>} />
                 {/* Onboarding — accessible to any authenticated user (no requireAgent) */}
-                <Route path="/dashboard/onboarding" element={<ProtectedRoute><AgencyOnboardingPage /></ProtectedRoute>} />
+                <Route path="/dashboard/onboarding" element={<ProtectedRoute blockSeekers><AgencyOnboardingPage /></ProtectedRoute>} />
 
                 <Route path="/dashboard" element={<ProtectedRoute requireAgent><AgentDashboardLayout /></ProtectedRoute>}>
                   <Route index element={<DashboardOverview />} />

@@ -21,6 +21,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { callAdminFunction } from '@/features/admin/lib/adminApi';
 import { toast } from 'sonner';
+import { SearchIntelligenceTab } from '@/features/admin/insights/SearchIntelligenceTab';
 
 const PLAN_MRR: Record<string, number> = {
   solo: 299,

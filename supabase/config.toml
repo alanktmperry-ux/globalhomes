@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.csp-report]
 verify_jwt = false
+
+[functions.parse-search-query]
+verify_jwt = false

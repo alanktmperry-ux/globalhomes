@@ -1,8 +1,10 @@
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Zap, CheckCircle, Users, Building2, DollarSign, Megaphone, Settings,
-  Shield, ArrowLeft, UserCog, LineChart, BookOpen, Wallet, HelpCircle, Landmark, Coins, Activity, BarChart3, Webhook, PhoneCall, Share2,
+  Shield, ArrowLeft, UserCog, LineChart, BookOpen, Wallet, HelpCircle, Landmark, Coins, Activity, BarChart3, Webhook, PhoneCall, Share2, Briefcase,
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/shared/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -60,6 +62,20 @@ function NavLinkItem({ item, active }: { item: NavItem; active: boolean }) {
 export default function AdminSidebar({ pendingApprovalsTotal = 0, isSupport = false }: AdminSidebarProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const [newCareersCount, setNewCareersCount] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      const { count } = await supabase
+        .from('careers_applications')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'new');
+      if (active) setNewCareersCount(count ?? 0);
+    };
+    load();
+    return () => { active = false; };
+  }, [pathname]);
 
   const isActive = (to: string, exact?: boolean) =>
     exact ? pathname === to || pathname === `${to}/` : pathname === to || pathname.startsWith(`${to}/`);
@@ -77,6 +93,7 @@ export default function AdminSidebar({ pendingApprovalsTotal = 0, isSupport = fa
     { to: '/admin/users', label: 'Accounts', icon: UserCog },
     { to: '/admin/agents', label: 'Agents', icon: Users },
     { to: '/admin/listings', label: 'Listings', icon: Building2 },
+    { to: '/admin/careers', label: 'Careers', icon: Briefcase, badge: newCareersCount },
     { to: '/admin/brokers', label: 'Brokers', icon: Landmark },
     { to: '/admin/referral-partners', label: 'Referral Partners', icon: Share2 },
     { to: '/admin/halo-credits', label: 'Halo Credits', icon: Coins },

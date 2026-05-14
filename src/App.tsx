@@ -61,6 +61,7 @@ const MultilingualGeneratorPage = React.lazy(() => import("./pages/tools/Multili
 const PartnerReferralPage = React.lazy(() => import("./features/public/PartnerReferralPage"));
 const ReferralPartnerDashboard = React.lazy(() => import("./features/referral/pages/ReferralPartnerDashboard"));
 const AdminListingsPage = React.lazy(() => import("./features/admin/pages/AdminListingsPage"));
+const AdminCareersPage = React.lazy(() => import("./features/admin/pages/AdminCareersPage"));
 const AdminInsightsPage = React.lazy(() => import("./features/admin/pages/InsightsPage"));
 const AdminOverviewPage = React.lazy(() => import("./features/admin/pages/AdminOverviewPage"));
 const AdminCostsPage = React.lazy(() => import("./features/admin/pages/CostsPage"));
@@ -556,6 +557,8 @@ const App = () => (
                   <Route path="users" element={<AdminUsersPage />} />
                   <Route path="agents" element={<AdminAgentsPage />} />
                   <Route path="listings" element={<AdminListingsPage />} />
+                  <Route path="careers" element={<AdminCareersPage />} />
+                  <Route path="careers/:id" element={<AdminCareersPage />} />
                   <Route path="insights" element={<AdminInsightsPage />} />
                   <Route path="costs" element={<AdminCostsPage />} />
                   <Route path="help" element={<AdminHelpPage />} />

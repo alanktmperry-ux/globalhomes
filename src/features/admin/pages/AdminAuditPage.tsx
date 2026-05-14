@@ -42,7 +42,7 @@ export default function AdminAuditPage() {
       .order('created_at', { ascending: false })
       .limit(PAGE_SIZE);
     if (error) console.error('[audit] load failed', error);
-    setRows((data as AuditRow[]) ?? []);
+    setRows(((data as unknown) as AuditRow[]) ?? []);
     setLoading(false);
   };
 

@@ -55,12 +55,20 @@ export default function HaloCreditsPage() {
         console.warn('[HaloCredits] could not fetch user emails', e);
       }
 
-      const rows: AgentRow[] = (agentsRes.data ?? []).map((a: any) => ({
-        user_id: a.user_id,
-        display_name: profileMap.get(a.user_id) ?? null,
-        email: emailMap.get(a.user_id) ?? null,
-        balance: creditMap.get(a.user_id) ?? 0,
-      }));
+      const rows: AgentRow[] = (agentsRes.data ?? [])
+        .map((a: any) => ({
+          user_id: a.user_id,
+          display_name: profileMap.get(a.user_id) ?? null,
+          email: emailMap.get(a.user_id) ?? null,
+          balance: creditMap.get(a.user_id) ?? 0,
+        }))
+        .filter((r) => {
+          const e = (r.email ?? '').toLowerCase();
+          if (!e) return true;
+          if (e.startsWith('compliance-archive+')) return false;
+          if (e.endsWith('@no-reply.invalid')) return false;
+          return true;
+        });
       rows.sort((x, y) => (y.balance - x.balance) || (x.display_name ?? '').localeCompare(y.display_name ?? ''));
       setAgents(rows);
     } finally {

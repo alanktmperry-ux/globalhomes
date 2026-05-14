@@ -27,6 +27,21 @@ export default function AdminLoginPage() {
   const [mode, setMode] = useState<"login" | "forgot">("login");
   const [resetEmail, setResetEmail] = useState("");
 
+  const auditLogin = async (
+    action: 'admin.login' | 'admin.login_failed',
+    actor_id: string | null,
+    actor_email: string,
+    notes?: string,
+  ) => {
+    try {
+      await supabase.functions.invoke('admin-login-audit', {
+        body: { action, actor_id, actor_email, notes: notes ?? null },
+      });
+    } catch (err) {
+      console.error('[audit] write failed', err);
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -43,53 +58,18 @@ export default function AdminLoginPage() {
 
       if (!isAdminUser) {
         await supabase.auth.signOut();
-        // Audit: failed admin login (not authorised)
-        try {
-          const { error: auditErr } = await supabase.from('admin_audit_log' as any).insert({
-            actor_id: data.user.id,
-            actor_email: normalised,
-            action: 'admin.login_failed',
-            notes: 'User authenticated but lacks admin role',
-            user_agent: navigator.userAgent,
-          });
-          if (auditErr) console.error('[audit] write failed', auditErr);
-        } catch (err) {
-          console.error('[audit] write failed', err);
-        }
+        await auditLogin('admin.login_failed', data.user.id, normalised, 'User authenticated but lacks admin role');
         toast.error("You are not authorised to access this area");
         return;
       }
 
-      // Audit: successful admin login
-      try {
-        const { error: auditErr } = await supabase.from('admin_audit_log' as any).insert({
-          actor_id: data.user.id,
-          actor_email: normalised,
-          action: 'admin.login',
-          user_agent: navigator.userAgent,
-        });
-        if (auditErr) console.error('[audit] write failed', auditErr);
-      } catch (err) {
-        console.error('[audit] write failed', err);
-      }
+      await auditLogin('admin.login', data.user.id, normalised);
 
       toast.success("Welcome back");
       navigate("/admin");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Login failed";
-      // Audit: failed admin login (bad credentials)
-      try {
-        const { error: auditErr } = await supabase.from('admin_audit_log' as any).insert({
-          actor_id: null,
-          actor_email: normalised || 'unknown',
-          action: 'admin.login_failed',
-          notes: msg,
-          user_agent: navigator.userAgent,
-        });
-        if (auditErr) console.error('[audit] write failed', auditErr);
-      } catch (e) {
-        console.error('[audit] write failed', e);
-      }
+      await auditLogin('admin.login_failed', null, normalised || 'unknown', msg);
       toast.error(msg);
     } finally {
       setLoading(false);

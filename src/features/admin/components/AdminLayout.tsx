@@ -30,6 +30,7 @@ const SECTION_LABELS: Record<string, string> = {
   partners: 'Partners',
   buyers: 'Buyers',
   users: 'Users',
+  team: 'Team',
 };
 
 function getSectionLabel(pathname: string): string {

@@ -58,6 +58,57 @@ export type Database = {
           },
         ]
       }
+      admin_audit_log: {
+        Row: {
+          action: string
+          actor_email: string
+          actor_id: string | null
+          after_state: Json | null
+          before_state: Json | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          notes: string | null
+          request_id: string | null
+          target_id: string | null
+          target_summary: string | null
+          target_type: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          actor_email: string
+          actor_id?: string | null
+          after_state?: Json | null
+          before_state?: Json | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          notes?: string | null
+          request_id?: string | null
+          target_id?: string | null
+          target_summary?: string | null
+          target_type?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          actor_email?: string
+          actor_id?: string | null
+          after_state?: Json | null
+          before_state?: Json | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          notes?: string | null
+          request_id?: string | null
+          target_id?: string | null
+          target_summary?: string | null
+          target_type?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       admin_impersonation_sessions: {
         Row: {
           admin_id: string

@@ -339,6 +339,7 @@ const App = () => (
                   <Route path="/brokers" element={<FindBrokerPage />} />
                   <Route path="/for-agents" element={<AgentLandingPage />} />
                   <Route path="/for-buyers" element={<ForBuyersPage />} />
+                  <Route path="/careers" element={<CareersPage />} />
                   <Route path="/find-property-in-australia/:lang" element={<LanguageLandingPage />} />
                   <Route path="/for-agents/pricing" element={<PricingPage />} />
                   <Route path="/pricing" element={<Navigate to="/for-agents/pricing" replace />} />

@@ -93,6 +93,46 @@ export default function CreateHaloPage() {
     }
   }, [user?.id]);
 
+  // Smart Search telemetry: mark search_queries.halo_clicked = true on arrival
+  useEffect(() => {
+    const fromSearch = searchParams.get('source') === 'search';
+    if (!fromSearch) return;
+    const rawQuery = searchParams.get('raw_q');
+    if (!rawQuery) return;
+    if (!user?.id) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data: rows, error: selErr } = await supabase
+          .from('search_queries' as any)
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('raw_query', rawQuery)
+          .order('created_at', { ascending: false })
+          .limit(1);
+        if (cancelled) return;
+        if (selErr) {
+          console.warn('[halo telemetry] search_queries lookup failed:', selErr);
+          return;
+        }
+        const rowId = (rows?.[0] as { id?: string } | undefined)?.id;
+        if (!rowId) return;
+        const { error: updErr } = await supabase
+          .from('search_queries' as any)
+          .update({ halo_clicked: true })
+          .eq('id', rowId);
+        if (updErr) console.warn('[halo telemetry] halo_clicked update failed:', updErr);
+      } catch (e) {
+        console.warn('[halo telemetry] unexpected error:', e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
   // Apply query-param prefill (Listing CTA, CRM invite, voice lead, rent roll, smart search)
   useEffect(() => {
     const intent = searchParams.get('intent');

@@ -173,10 +173,12 @@ function HealthTab() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {(result.services || []).map((svc) => (
-              <Card key={svc.name} className="p-4">
+            {(result.services || []).map((svc) => {
+              const svcName = svc.service || svc.name || 'unknown';
+              return (
+              <Card key={svcName} className="p-4">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium text-stone-900">{svc.name}</div>
+                  <div className="text-sm font-medium text-stone-900 capitalize">{svcName.replace(/_/g, ' ')}</div>
                   <span className={`text-[11px] font-semibold rounded-full px-2 py-0.5 ${statusBadge(svc.status)}`}>
                     {svc.status}
                   </span>

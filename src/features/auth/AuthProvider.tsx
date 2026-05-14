@@ -257,6 +257,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (isFetching.current) return;
 
     let cancelled = false;
+    let rolesFetched = false;
+    const watchdog = setTimeout(() => {
+      if (cancelled || rolesFetched) return;
+      console.warn('[AuthProvider] Role fetch exceeded 10s safety timeout — treating user as unauthenticated for admin routes');
+      clearRoles();
+      lastFetchedUserId.current = null;
+      isFetching.current = false;
+      setLoading(false);
+    }, 10000);
     const doFetch = async () => {
       if (isFetching.current) return;
       isFetching.current = true;
@@ -336,15 +345,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.error('[Auth] fetchRoles error:', err);
         toast.error('Could not load your account permissions. Please refresh the page or sign out and back in.');
       } finally {
+        rolesFetched = true;
+        clearTimeout(watchdog);
         isFetching.current = false;
         if (!cancelled) {
-          
           setLoading(false);
         }
       }
     };
     doFetch();
-    return () => { cancelled = true; };
+    return () => { cancelled = true; clearTimeout(watchdog); };
   }, [user, applyRoles, clearRoles]);
 
   // Auth listener

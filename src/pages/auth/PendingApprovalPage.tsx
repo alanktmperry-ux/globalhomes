@@ -18,11 +18,12 @@ export default function PendingApprovalPage() {
     if (!user?.id) return;
     supabase
       .from('agents')
-      .select('approval_status, agency_id, abn')
+      .select('approval_status, agency_id, agencies:agency_id(abn)')
       .eq('user_id', user.id)
       .maybeSingle()
       .then(({ data }) => {
-        if (!data || !data.agency_id || !data.abn) {
+        const abn = (data as any)?.agencies?.abn as string | undefined;
+        if (!data || !data.agency_id || !abn) {
           setStatus('incomplete');
         } else if (data.approval_status === 'approved') {
           navigate('/dashboard', { replace: true });

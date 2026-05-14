@@ -3233,6 +3233,60 @@ export type Database = {
         }
         Relationships: []
       }
+      careers_applications: {
+        Row: {
+          created_at: string
+          cv_storage_path: string | null
+          email: string
+          full_name: string
+          has_work_rights: boolean
+          id: string
+          linkedin_url: string
+          location: string
+          notes: string | null
+          portfolio_url: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          role_applied: string
+          status: string
+          why_listhq: string
+        }
+        Insert: {
+          created_at?: string
+          cv_storage_path?: string | null
+          email: string
+          full_name: string
+          has_work_rights: boolean
+          id?: string
+          linkedin_url: string
+          location: string
+          notes?: string | null
+          portfolio_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          role_applied: string
+          status?: string
+          why_listhq: string
+        }
+        Update: {
+          created_at?: string
+          cv_storage_path?: string | null
+          email?: string
+          full_name?: string
+          has_work_rights?: boolean
+          id?: string
+          linkedin_url?: string
+          location?: string
+          notes?: string | null
+          portfolio_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          role_applied?: string
+          status?: string
+          why_listhq?: string
+        }
+        Relationships: []
+      }
       cma_reports: {
         Row: {
           agent_commentary: string | null

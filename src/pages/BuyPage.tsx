@@ -442,7 +442,8 @@ const BuyPage = () => {
 
   const activeChipCount = useMemo(
     () => filters.suburbs.length
-      + [filters.minBeds, filters.minBaths, filters.minParking, filters.minPrice, filters.maxPrice, filters.propertyType]
+      + filters.features.length
+      + [filters.minBeds, filters.maxBeds, filters.minBaths, filters.minParking, filters.minPrice, filters.maxPrice, filters.propertyType, filters.state, filters.postcode]
         .filter(v => v !== undefined && v !== '').length,
     [filters],
   );

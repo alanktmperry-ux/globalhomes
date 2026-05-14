@@ -29,6 +29,9 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const { impersonating, impersonatedUser, stopImpersonation, isSupport, isAdmin } = useAuth();
   const [pendingTotal, setPendingTotal] = useState(0);
+  const [listingsPendingCount, setListingsPendingCount] = useState<number | undefined>(undefined);
+  const [agentsStuckCount, setAgentsStuckCount] = useState<number | undefined>(undefined);
+  const [failedPaymentsCount, setFailedPaymentsCount] = useState<number | undefined>(undefined);
   const [mfaRequired, setMfaRequired] = useState(false);
 
   useEffect(() => {
@@ -54,13 +57,9 @@ export default function AdminLayout() {
 
     async function loadCounts() {
       try {
-        // IMPORTANT: these filters MUST mirror what ApprovalsPage actually displays,
-        // otherwise the sidebar badge and the page list go out of sync.
-        // Listings auto-publish on submission and are not part of this count.
         const [agentsRes, demosRes, partnersRes] = await Promise.all([
           supabase.from('agents').select('id', { count: 'exact', head: true }).eq('approval_status', 'pending'),
           (supabase.from('demo_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
-          // Match PartnersTab: unverified partners
           (supabase.from('partners').select('id', { count: 'exact', head: true }).eq('is_verified', false)) as any,
         ]);
         if (cancelled) return;
@@ -69,7 +68,38 @@ export default function AdminLayout() {
       } catch {
         if (!cancelled) setPendingTotal(0);
       }
+
+      // Sidebar item badges — each guarded so a column-missing failure
+      // gracefully hides the badge instead of showing a fake zero.
+      try {
+        const r = await (supabase.from('properties') as any)
+          .select('id', { count: 'exact', head: true })
+          .eq('moderation_status', 'pending');
+        if (!cancelled) setListingsPendingCount(r.error ? undefined : (r.count ?? 0));
+      } catch {
+        if (!cancelled) setListingsPendingCount(undefined);
+      }
+      try {
+        const r = await (supabase.from('agents') as any)
+          .select('id', { count: 'exact', head: true })
+          .eq('approval_status', 'approved')
+          .eq('onboarding_complete', false);
+        if (!cancelled) setAgentsStuckCount(r.error ? undefined : (r.count ?? 0));
+      } catch {
+        if (!cancelled) setAgentsStuckCount(undefined);
+      }
+      try {
+        const since = new Date(Date.now() - 30 * 86400000).toISOString();
+        const r = await (supabase.from('agents') as any)
+          .select('id', { count: 'exact', head: true })
+          .not('payment_failed_at', 'is', null)
+          .gte('payment_failed_at', since);
+        if (!cancelled) setFailedPaymentsCount(r.error ? undefined : (r.count ?? 0));
+      } catch {
+        if (!cancelled) setFailedPaymentsCount(undefined);
+      }
     }
+
 
     loadCounts();
     const interval = window.setInterval(loadCounts, 2 * 60 * 1000);
@@ -80,7 +110,13 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-background flex">
-      <AdminSidebar pendingApprovalsTotal={pendingTotal} isSupport={isSupport && !isAdmin} />
+      <AdminSidebar
+        pendingApprovalsTotal={pendingTotal}
+        isSupport={isSupport && !isAdmin}
+        listingsPendingCount={listingsPendingCount}
+        agentsStuckCount={agentsStuckCount}
+        failedPaymentsCount={failedPaymentsCount}
+      />
 
       <main className="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">
         {/* Header strip */}

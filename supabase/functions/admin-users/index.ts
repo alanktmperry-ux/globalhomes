@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { logAdminAction } from "../_shared/adminAudit.ts";
 
 // --- Ad-hoc in-memory rate limiting (resets on cold start) ---
 const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
@@ -254,6 +255,14 @@ Deno.serve(async (req) => {
         });
       } catch (e) { console.error("audit log:", e); }
 
+      await logAdminAction({
+        actor_id: caller.id, actor_email: caller.email ?? 'unknown',
+        action: ban ? 'user.banned' : 'user.unbanned',
+        target_type: 'user', target_id: user_id,
+        target_summary: `User ${user_id}`,
+        request: req,
+      });
+
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -306,13 +315,16 @@ Deno.serve(async (req) => {
         });
       } catch (e) { console.error("audit log:", e); }
 
-      return new Response(
-        JSON.stringify({ success: true }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+      await logAdminAction({
+        actor_id: caller.id, actor_email: caller.email ?? 'unknown',
+        action: 'subscription.changed',
+        target_type: 'user', target_id: user_id,
+        target_summary: `User ${user_id} → ${plan_type}`,
+        after_state: { plan_type, listing_limit, seat_limit, founding_member },
+        request: req,
+      });
 
-    if (action === "verify_partner") {
+      return new Response(
       const { user_id, verify } = bodyParams;
       const { data: partner, error: findErr } = await supabase
         .from("partners")

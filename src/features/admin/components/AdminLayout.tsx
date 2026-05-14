@@ -12,12 +12,24 @@ import { AdminErrorBoundary } from './AdminErrorBoundary';
 
 const SECTION_LABELS: Record<string, string> = {
   '': 'Command Centre',
+  overview: 'Overview',
   approvals: 'Approvals',
   agents: 'Agents',
   listings: 'Listings',
   revenue: 'Revenue',
   outreach: 'Outreach',
   system: 'System',
+  insights: 'Insights',
+  support: 'Support',
+  careers: 'Careers',
+  halo: 'Halo',
+  brokers: 'Brokers',
+  costs: 'Costs',
+  'referral-partners': 'Referral Partners',
+  audit: 'Audit Log',
+  partners: 'Partners',
+  buyers: 'Buyers',
+  users: 'Users',
 };
 
 function getSectionLabel(pathname: string): string {

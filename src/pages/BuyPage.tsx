@@ -16,6 +16,7 @@ import { PropertyMap } from '@/features/properties/components/PropertyMap';
 import { Switch } from '@/components/ui/switch';
 import { SearchModeTabs } from '@/features/search/components/SearchModeTabs';
 import { SuburbChipInput } from '@/features/search/components/SuburbChipInput';
+import { SmartSearchBanner } from '@/features/search/SmartSearchBanner';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useSavedSearchesDB } from '@/features/alerts/hooks/useSavedSearchesDB';
 import { toast } from 'sonner';

@@ -628,38 +628,95 @@ const BuyPage = () => {
                 )}
               </div>
 
+              {/* Smart Search context (raw query + low-confidence hint) */}
+              {(filters.rawQuery || filters.lowConfidence) && (
+                <div className={`rounded-lg border px-3 py-2 text-xs ${filters.lowConfidence ? 'border-amber-300 bg-amber-50 text-amber-900' : 'border-primary/20 bg-primary/5 text-foreground'}`}>
+                  {filters.rawQuery && (
+                    <span><Sparkles className="inline h-3 w-3 mr-1 text-primary" />{t('Searched')}: <span className="font-medium">{filters.rawQuery}</span></span>
+                  )}
+                  {filters.lowConfidence && (
+                    <span className="ml-2">{t("We weren't fully sure — adjust the chips below if any are off.")}</span>
+                  )}
+                </div>
+              )}
+
               {/* Desktop: Inline sticky filter bar */}
               <div className="hidden md:block sticky top-0 z-30 bg-background/95 backdrop-blur py-3 -mx-4 px-4">
                 <FilterControls filters={filters} onChange={updateFilters} layout="inline" />
                 {hasActiveFilters && (
                   <div className="flex flex-wrap items-center gap-1.5 mt-2">
                     {filters.suburbs.map(s => (
-                      <span key={s} className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full"> {s}</span>
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => updateFilters(f => ({ ...f, suburbs: f.suburbs.filter(x => x !== s) }))}
+                        className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15"
+                      >
+                        {s} <X className="h-3 w-3" />
+                      </button>
                     ))}
+                    {filters.state && (
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, state: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        {filters.state} <X className="h-3 w-3" />
+                      </button>
+                    )}
+                    {filters.postcode && (
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, postcode: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        {filters.postcode} <X className="h-3 w-3" />
+                      </button>
+                    )}
                     {filters.minBeds && (
-                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{filters.minBeds}+ {t('beds')}</span>
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, minBeds: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        {filters.minBeds}+ {t('beds')} <X className="h-3 w-3" />
+                      </button>
+                    )}
+                    {filters.maxBeds && (
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, maxBeds: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        ≤ {filters.maxBeds} {t('beds')} <X className="h-3 w-3" />
+                      </button>
                     )}
                     {filters.minBaths && (
-                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{filters.minBaths}+ {t('baths')}</span>
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, minBaths: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        {filters.minBaths}+ {t('baths')} <X className="h-3 w-3" />
+                      </button>
                     )}
                     {filters.minParking && (
-                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{filters.minParking}+ {t('cars')}</span>
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, minParking: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        {filters.minParking}+ {t('cars')} <X className="h-3 w-3" />
+                      </button>
                     )}
                     {filters.maxPrice && (
-                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{t('Under')} {AUD.format(filters.maxPrice)}</span>
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, maxPrice: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        {t('Under')} {AUD.format(filters.maxPrice)} <X className="h-3 w-3" />
+                      </button>
                     )}
                     {filters.minPrice && (
-                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{t('Over')} {AUD.format(filters.minPrice)}</span>
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, minPrice: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        {t('Over')} {AUD.format(filters.minPrice)} <X className="h-3 w-3" />
+                      </button>
                     )}
                     {filters.propertyType && (
-                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{t(filters.propertyType)}</span>
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, propertyType: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        {t(filters.propertyType)} <X className="h-3 w-3" />
+                      </button>
                     )}
+                    {filters.features.map(feat => (
+                      <button
+                        key={feat}
+                        type="button"
+                        onClick={() => updateFilters(f => ({ ...f, features: f.features.filter(x => x !== feat) }))}
+                        className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15"
+                      >
+                        {t(feat)} <X className="h-3 w-3" />
+                      </button>
+                    ))}
                     <Button variant="ghost" size="sm" onClick={clearFilters} className="h-7 text-xs text-muted-foreground ml-1">
                       <X className="h-3 w-3 mr-1" /> {t('Clear all')}
                     </Button>
                   </div>
                 )}
               </div>
+
 
               {/* Results */}
               {isLoading ? (

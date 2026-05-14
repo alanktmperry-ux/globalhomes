@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Zap, CheckCircle, Users, Building2, DollarSign, Megaphone, Settings,
   Shield, ArrowLeft, LineChart, Wallet, Landmark, Sparkles, Share2, Briefcase,
-  Command,
+  Command, LifeBuoy,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -28,6 +28,8 @@ interface AdminSidebarProps {
   agentsStuckCount?: number;
   /** Failed payments in last 30 days (rendered as red badge) */
   failedPaymentsCount?: number;
+  /** Unresolved support tickets */
+  supportOpenCount?: number;
   /** @deprecated legacy props — ignored */
   tab?: unknown;
   setTab?: unknown;
@@ -86,6 +88,7 @@ export default function AdminSidebar({
   listingsPendingCount,
   agentsStuckCount,
   failedPaymentsCount,
+  supportOpenCount,
 }: AdminSidebarProps) {
   const { pathname, search } = useLocation();
   const navigate = useNavigate();
@@ -104,6 +107,7 @@ export default function AdminSidebar({
     { to: '/admin/approvals', label: 'Approvals', icon: CheckCircle, badge: pendingApprovalsTotal, badgeTone: 'destructive' },
     { to: '/admin/listings', label: 'Listings', icon: Building2, badge: listingsPendingCount },
     { to: '/admin/agents', label: 'Agents', icon: Users, badge: agentsStuckCount },
+    { to: '/admin/support', label: 'Support', icon: LifeBuoy, badge: supportOpenCount, badgeTone: 'destructive' },
     { to: '/admin/careers', label: 'Careers', icon: Briefcase },
   ];
   const growth: NavItem[] = [

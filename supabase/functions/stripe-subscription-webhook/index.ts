@@ -53,6 +53,7 @@ Deno.serve(async (req) => {
       annual_billing: annual,
       subscription_end: periodEnd,
       auto_renew: true,
+      amount_cents: stripeSubscription.items?.data?.[0]?.price?.unit_amount ?? null,
     };
     const { data: existing } = await admin.from('agent_subscriptions').select('id').eq('agent_id', agentId).maybeSingle();
     if (existing) {
@@ -68,7 +69,7 @@ Deno.serve(async (req) => {
     const agentId = sub.metadata?.agent_id || agentRow?.id;
     if (agentId) {
       await admin.from('agents').update({ is_subscribed: false, subscription_status: 'cancelled', stripe_subscription_id: null }).eq('id', agentId);
-      await admin.from('agent_subscriptions').update({ plan_type: 'demo', auto_renew: false }).eq('agent_id', agentId);
+      await admin.from('agent_subscriptions').update({ plan_type: 'demo', auto_renew: false, canceled_at: new Date().toISOString() }).eq('agent_id', agentId);
     }
   }
 

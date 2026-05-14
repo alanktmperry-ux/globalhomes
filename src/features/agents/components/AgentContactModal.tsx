@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Phone, Mail, MessageCircle, Calendar, CheckCircle2, BadgeCheck,
   Trophy, Zap, MapPin, Star, Loader2, ArrowRight, ArrowLeft, Shield,
-  DollarSign, TrendingUp
+  DollarSign
 } from 'lucide-react';
 import { Property } from '@/shared/lib/types';
 import type { SearchContext } from '@/features/properties/components/PropertyDrawer';

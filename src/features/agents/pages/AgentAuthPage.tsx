@@ -107,14 +107,14 @@ const AgentAuthPage = () => {
       setCaptchaToken(null);
       captchaRef.current?.resetCaptcha();
       if (error) {
-        setFormError("If an account exists with this email, you'll receive a login link.");
+        setFormError("Email or password is incorrect. Try again, or reset your password.");
         setLoading(false);
         return;
       }
       toast('Welcome back!');
       setPendingRedirect('dashboard');
     } catch {
-      setFormError("If an account exists with this email, you'll receive a login link.");
+      setFormError("Email or password is incorrect. Try again, or reset your password.");
       setLoading(false);
     }
   };

@@ -45,6 +45,7 @@ const AuthContext = createContext<AuthContextType>({
   impersonatedUserId: null,
   startImpersonation: async () => {},
   stopImpersonation: async () => {},
+  rolesFetched: false,
 });
 
 export const useAuth = () => useContext(AuthContext);

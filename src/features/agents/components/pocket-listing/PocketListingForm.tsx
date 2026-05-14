@@ -411,8 +411,17 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
   const progress = ((step + 1) / STEPS.length) * 100;
 
   const canNext = () => {
-    if (step === 0) return draft.address.length > 0;
-    return true;
+    // 0 Address, 1 Basics, 2 Photos, 3 Voice, 4 Translate, 5 Settings, 6 Preview
+    if (step === 0) return draft.address.length > 0 && draft.suburb.length > 0;
+    if (step === 1) {
+      if (draft.listingType === 'sale') {
+        return draft.beds > 0 && draft.baths > 0 && (draft.priceMin > 0 || draft.priceMax > 0);
+      }
+      return draft.beds > 0 && draft.baths > 0 && draft.rentalWeekly > 0;
+    }
+    if (step === 2) return draft.photos.length >= 1;
+    if (step === 3) return (draft.voiceTranscript?.trim().length ?? 0) > 0 || (draft.generatedTitle?.trim().length ?? 0) > 0;
+    return true; // Translate, Settings, Preview are optional
   };
 
   const handlePublish = async () => {

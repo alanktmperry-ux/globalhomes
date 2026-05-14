@@ -627,6 +627,12 @@ export default function InsightsPage() {
         </div>
       </section>
 
+      {/* Section — Search Intelligence */}
+      <section>
+        <h2 className="text-sm font-semibold text-foreground mb-3">Search Intelligence</h2>
+        <SearchIntelligenceTab />
+      </section>
+
       <p className="text-[11px] text-muted-foreground text-right">
         Updated {new Date(data.fetchedAt).toLocaleTimeString()}
       </p>

@@ -111,11 +111,7 @@ function HealthTab() {
     setLoading(true);
     setError(false);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData.session?.access_token;
-      const { data, error: err } = await (supabase as any).functions.invoke('admin-health-check', {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      });
+      const { data, error: err } = await supabase.functions.invoke('admin-health-check');
       if (err) throw err;
       setResult(data || null);
     } catch {

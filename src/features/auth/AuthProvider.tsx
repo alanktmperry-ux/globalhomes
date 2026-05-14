@@ -65,6 +65,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   
   const lastFetchedUserId = useRef<string | null>(null);
   const isFetching = useRef(false);
+  const rolesWatchdogRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+  const activeRolesRequestId = useRef(0);
+  const invalidatedRolesRequestId = useRef<number | null>(null);
   const [impersonating, setImpersonating] = useState(false);
   const [impersonatedUser, setImpersonatedUser] = useState<string | null>(null);
   const [impersonatedUserId, setImpersonatedUserId] = useState<string | null>(null);
@@ -216,6 +219,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setAgencyId(null);
   }, []);
 
+  const clearRolesWatchdog = useCallback((logCleared = false) => {
+    if (rolesWatchdogRef.current !== null) {
+      window.clearTimeout(rolesWatchdogRef.current);
+      rolesWatchdogRef.current = null;
+      if (logCleared) {
+        console.log('[AuthProvider] watchdog cleared (fetch completed first)');
+      }
+    }
+  }, []);
+
+  const startRolesWatchdog = useCallback((currentUserId: string, requestId: number) => {
+    clearRolesWatchdog();
+    rolesWatchdogRef.current = window.setTimeout(() => {
+      if (activeRolesRequestId.current !== requestId) return;
+      invalidatedRolesRequestId.current = requestId;
+      console.warn('[AuthProvider] 10s watchdog FIRED — forcing loading=false, treating user as no-roles');
+      clearRoles();
+      lastFetchedUserId.current = null;
+      isFetching.current = false;
+      updateLoading(false, `10s roles watchdog fired for user ${currentUserId}`);
+    }, 10000);
+  }, [clearRoles, clearRolesWatchdog, updateLoading]);
+
   const refreshRoles = useCallback(async () => {
     if (!user) return;
     lastFetchedUserId.current = null;
@@ -252,65 +278,76 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Fetch roles
   useEffect(() => {
-    let rolesFetched = false;
-    console.log('[AuthProvider] roles effect triggered, user.id:', user?.id, 'rolesFetched:', rolesFetched);
-    if (!user) {
+    const userId = user?.id ?? null;
+    const userEmail = user?.email ?? null;
+
+    console.log('[AuthProvider] roles effect triggered, user.id:', userId, 'alreadyFetched:', lastFetchedUserId.current === userId, 'isFetching:', isFetching.current);
+
+    if (!userId) {
+      activeRolesRequestId.current += 1;
+      invalidatedRolesRequestId.current = null;
+      clearRolesWatchdog();
       clearRoles();
       return;
     }
-    // Same user with roles already fetched — skip to avoid role flicker on navigation
-    if (lastFetchedUserId.current === user.id) return;
 
-    if (isFetching.current) return;
+    if (lastFetchedUserId.current === userId) {
+      console.log('[AuthProvider] roles already fetched for user:', userId);
+      return;
+    }
+
+    if (isFetching.current) {
+      console.log('[AuthProvider] roles fetch already in progress for user:', userId);
+      return;
+    }
 
     let cancelled = false;
-    const watchdog = setTimeout(() => {
-      if (cancelled || rolesFetched) return;
-      console.warn('[AuthProvider] 10s watchdog FIRED — forcing loading=false, treating user as no-roles');
-      clearRoles();
-      lastFetchedUserId.current = null;
-      isFetching.current = false;
-      updateLoading(false, '10s roles watchdog fired');
-    }, 10000);
+
     const doFetch = async () => {
       if (isFetching.current) return;
+
+      const requestId = activeRolesRequestId.current + 1;
+      activeRolesRequestId.current = requestId;
+      invalidatedRolesRequestId.current = null;
       isFetching.current = true;
-      lastFetchedUserId.current = user.id;
+      startRolesWatchdog(userId, requestId);
 
       try {
-        console.log('[AuthProvider] fetching roles for user:', user.id);
+        console.log('[AuthProvider] fetching roles for user:', userId);
         const [rolesResult, agentResult] = await Promise.all([
-          supabase.from('user_roles').select('role').eq('user_id', user.id),
+          supabase.from('user_roles').select('role').eq('user_id', userId),
           supabase
             .from('agents')
             .select('id, agency_role, agency_id, approval_status')
-            .eq('user_id', user.id)
+            .eq('user_id', userId)
             .maybeSingle(),
         ]);
-        if (cancelled) return;
+
+        if (cancelled || invalidatedRolesRequestId.current === requestId || activeRolesRequestId.current !== requestId) return;
 
         const { data: rolesData, error: rolesError } = rolesResult;
         if (rolesError) throw rolesError;
         console.log('[AuthProvider] roles fetched:', rolesData?.length ?? 0, 'rows');
         const roles = rolesData?.map((r) => r.role) || [];
 
-        // Fallback: if no agent role, check agents table — only honour it when approved
         const { data: agentData } = agentResult;
-        if (cancelled) return;
+        if (cancelled || invalidatedRolesRequestId.current === requestId || activeRolesRequestId.current !== requestId) return;
+
         const isAdminUser = roles.includes('admin');
         const isApprovedAgent = !!agentData && ((agentData as any).approval_status === 'approved' || isAdminUser);
-        // Stricter: an 'agent' role is only honoured when an approved agents row exists
         const filteredRoles = roles.filter((r) => {
           if (r !== 'agent') return true;
           return isApprovedAgent;
         });
+
         if (isApprovedAgent && !filteredRoles.includes('agent')) {
           filteredRoles.push('agent');
-          // Best-effort backfill of user_roles row
-          supabase.from('user_roles').insert({ user_id: user.id, role: 'agent' as any })
+          supabase.from('user_roles').insert({ user_id: userId, role: 'agent' as any })
             .then(({ error }) => { if (error && !String(error.message).includes('duplicate') && import.meta.env.DEV) console.warn('[Auth] backfill user_roles:', error.message); });
         }
-        applyRoles(filteredRoles, user.email);
+
+        applyRoles(filteredRoles, userEmail);
+
         if (agentData) {
           setAgencyRole((agentData as any).agency_role || null);
           setAgencyId(agentData.agency_id || null);
@@ -319,16 +356,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
           if (isApprovedAgent && !roles.includes('agent') && !roles.includes('admin')) {
             await supabase.from('user_roles').upsert(
-              { user_id: user.id, role: 'agent' as any },
+              { user_id: userId, role: 'agent' as any },
               { onConflict: 'user_id,role' }
             );
           }
         }
 
-        // Post-login redirect:
-        //   approved agents/admins → /dashboard or /admin
-        //   seekers (everyone else) → /seeker/dashboard, BUT only when they
-        //   logged in via /login or /auth (never auto-bounce them off public pages)
+        lastFetchedUserId.current = userId;
+
         const isAgentUser = filteredRoles.includes('agent') || filteredRoles.includes('admin');
         const path = window.location.pathname;
         const agentAuthPages = [
@@ -351,21 +386,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
         }
       } catch (err) {
+        if (cancelled || invalidatedRolesRequestId.current === requestId || activeRolesRequestId.current !== requestId) return;
+        lastFetchedUserId.current = null;
         console.error('[AuthProvider] role fetch error:', err);
         toast.error('Could not load your account permissions. Please refresh the page or sign out and back in.');
       } finally {
-        rolesFetched = true;
-        clearTimeout(watchdog);
-        console.log('[AuthProvider] watchdog cleared (fetch completed first)');
-        isFetching.current = false;
-        if (!cancelled) {
+        if (activeRolesRequestId.current === requestId) {
+          isFetching.current = false;
+        }
+        if (!cancelled && invalidatedRolesRequestId.current !== requestId && activeRolesRequestId.current === requestId) {
+          clearRolesWatchdog(true);
           updateLoading(false, 'roles fetch settled');
         }
       }
     };
-    doFetch();
-    return () => { cancelled = true; clearTimeout(watchdog); };
-  }, [user, applyRoles, clearRoles, updateLoading]);
+
+    void doFetch();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   // Auth listener
   useEffect(() => {

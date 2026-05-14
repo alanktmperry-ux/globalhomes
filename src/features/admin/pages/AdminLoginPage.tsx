@@ -30,8 +30,8 @@ export default function AdminLoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    const normalised = email.trim().toLowerCase();
     try {
-      const normalised = email.trim().toLowerCase();
       const { data, error } = await supabase.auth.signInWithPassword({
         email: normalised,
         password,
@@ -43,14 +43,53 @@ export default function AdminLoginPage() {
 
       if (!isAdminUser) {
         await supabase.auth.signOut();
+        // Audit: failed admin login (not authorised)
+        try {
+          const { error: auditErr } = await supabase.from('admin_audit_log' as any).insert({
+            actor_id: data.user.id,
+            actor_email: normalised,
+            action: 'admin.login_failed',
+            notes: 'User authenticated but lacks admin role',
+            user_agent: navigator.userAgent,
+          });
+          if (auditErr) console.error('[audit] write failed', auditErr);
+        } catch (err) {
+          console.error('[audit] write failed', err);
+        }
         toast.error("You are not authorised to access this area");
         return;
+      }
+
+      // Audit: successful admin login
+      try {
+        const { error: auditErr } = await supabase.from('admin_audit_log' as any).insert({
+          actor_id: data.user.id,
+          actor_email: normalised,
+          action: 'admin.login',
+          user_agent: navigator.userAgent,
+        });
+        if (auditErr) console.error('[audit] write failed', auditErr);
+      } catch (err) {
+        console.error('[audit] write failed', err);
       }
 
       toast.success("Welcome back");
       navigate("/admin");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Login failed";
+      // Audit: failed admin login (bad credentials)
+      try {
+        const { error: auditErr } = await supabase.from('admin_audit_log' as any).insert({
+          actor_id: null,
+          actor_email: normalised || 'unknown',
+          action: 'admin.login_failed',
+          notes: msg,
+          user_agent: navigator.userAgent,
+        });
+        if (auditErr) console.error('[audit] write failed', auditErr);
+      } catch (e) {
+        console.error('[audit] write failed', e);
+      }
       toast.error(msg);
     } finally {
       setLoading(false);

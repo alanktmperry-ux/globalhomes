@@ -89,8 +89,8 @@ function SectionHead({ title, sub }: { title: string; sub?: string }) {
 }
 
 // ─── Tab 1: Health ───────────────────────────────────────────
-type HealthService = { name: string; status: string; latency_ms?: number };
-type HealthResult = { status?: string; services?: HealthService[] } | null;
+type HealthService = { service?: string; name?: string; status: string; latency_ms?: number | null };
+type HealthResult = { overall?: string; status?: string; services?: HealthService[] } | null;
 
 function statusBadge(status?: string) {
   const s = (status || '').toLowerCase();
@@ -128,9 +128,9 @@ function HealthTab() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const overall = (result?.status || '').toLowerCase();
+  const overall = (result?.overall || result?.status || '').toLowerCase();
   const banner =
-    overall === 'ok'
+    overall === 'ok' || overall === 'healthy'
       ? { cls: 'bg-emerald-50 border-emerald-200 text-emerald-800', text: 'All systems operational' }
       : overall === 'degraded'
         ? { cls: 'bg-amber-50 border-amber-200 text-amber-800', text: 'Degraded performance' }
@@ -173,10 +173,12 @@ function HealthTab() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {(result.services || []).map((svc) => (
-              <Card key={svc.name} className="p-4">
+            {(result.services || []).map((svc) => {
+              const svcName = svc.service || svc.name || 'unknown';
+              return (
+              <Card key={svcName} className="p-4">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium text-stone-900">{svc.name}</div>
+                  <div className="text-sm font-medium text-stone-900 capitalize">{svcName.replace(/_/g, ' ')}</div>
                   <span className={`text-[11px] font-semibold rounded-full px-2 py-0.5 ${statusBadge(svc.status)}`}>
                     {svc.status}
                   </span>
@@ -187,7 +189,8 @@ function HealthTab() {
                   </div>
                 )}
               </Card>
-            ))}
+              );
+            })}
             {(!result.services || result.services.length === 0) && (
               <div className="text-sm text-stone-400">No service details returned.</div>
             )}

@@ -40,8 +40,8 @@ Deno.serve(async (req) => {
       const caller = userData?.user;
       if (caller) {
         const { data: roleCheck } = await supabase
-          .from('user_roles').select('role').eq('user_id', caller.id).eq('role', 'admin').maybeSingle();
-        if (roleCheck) isAuthorized = true;
+          .from('user_roles').select('role').eq('user_id', caller.id).in('role', ['admin', 'super_admin']);
+        if (roleCheck && roleCheck.length > 0) isAuthorized = true;
       }
     }
   }

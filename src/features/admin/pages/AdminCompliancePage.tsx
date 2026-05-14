@@ -75,17 +75,17 @@ function PrivacyRequestsPanel() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <ExportCSVButton<PrivacyRequest>
+          <ExportCSVButton
             filename={`privacy-requests-${format(new Date(), 'yyyy-MM-dd')}`}
-            rows={rows}
+            query={async () => rows}
             columns={[
-              { header: 'ID', accessor: 'id' },
-              { header: 'Created', accessor: (r) => format(new Date(r.created_at), 'yyyy-MM-dd HH:mm') },
-              { header: 'Email', accessor: 'email' },
-              { header: 'Type', accessor: 'request_type' },
-              { header: 'Status', accessor: 'status' },
-              { header: 'User ID', accessor: (r) => r.user_id ?? '' },
-              { header: 'Fulfilled at', accessor: (r) => r.fulfilled_at ?? '' },
+              { key: 'id', label: 'ID' },
+              { key: 'created_at', label: 'Created', format: (v) => format(new Date(v), 'yyyy-MM-dd HH:mm') },
+              { key: 'email', label: 'Email' },
+              { key: 'request_type', label: 'Type' },
+              { key: 'status', label: 'Status' },
+              { key: 'user_id', label: 'User ID', format: (v) => v ?? '' },
+              { key: 'fulfilled_at', label: 'Fulfilled at', format: (v) => v ?? '' },
             ]}
           />
           <Button size="sm" variant="ghost" onClick={() => void load()} className="gap-2">

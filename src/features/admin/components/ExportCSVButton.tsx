@@ -3,17 +3,17 @@ import { Download } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 
-export interface CSVColumn<T> {
-  header: string;
-  /** Either a key on the row or a function returning the cell value */
-  accessor: keyof T | ((row: T) => unknown);
+export interface ExportColumn {
+  key: string;
+  label: string;
+  format?: (v: any) => string;
 }
 
-interface Props<T> {
+interface Props {
   filename: string;
-  columns: CSVColumn<T>[];
-  /** Either a synchronous list, or a function that fetches all rows (used for pagination). */
-  rows: T[] | (() => Promise<T[]>);
+  /** Async function that returns all rows to export (handles pagination, etc). */
+  query: () => Promise<any[]>;
+  columns: ExportColumn[];
   label?: string;
   size?: 'sm' | 'default';
   variant?: 'default' | 'secondary' | 'outline' | 'ghost';
@@ -27,22 +27,21 @@ function escapeCsv(v: unknown): string {
   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
-export default function ExportCSVButton<T>({
-  filename, columns, rows, label = 'Export CSV', size = 'sm', variant = 'outline', disabled,
-}: Props<T>) {
+export default function ExportCSVButton({
+  filename, columns, query, label = 'Export CSV', size = 'sm', variant = 'outline', disabled,
+}: Props) {
   const [busy, setBusy] = useState(false);
 
   const onClick = async () => {
     if (busy) return;
     setBusy(true);
     try {
-      const data = typeof rows === 'function' ? await (rows as () => Promise<T[]>)() : rows;
-      const headerLine = columns.map((c) => escapeCsv(c.header)).join(',');
+      const data = await query();
+      const headerLine = columns.map((c) => escapeCsv(c.label)).join(',');
       const bodyLines = data.map((r) =>
         columns.map((c) => {
-          const value = typeof c.accessor === 'function'
-            ? (c.accessor as (row: T) => unknown)(r)
-            : (r as Record<string, unknown>)[c.accessor as string];
+          const raw = (r as Record<string, unknown>)[c.key];
+          const value = c.format ? c.format(raw) : raw;
           return escapeCsv(value);
         }).join(','),
       );

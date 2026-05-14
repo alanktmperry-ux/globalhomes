@@ -224,23 +224,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // `loading` or `user?.id` actually change.
   useEffect(() => {
     if (!loading || !user?.id) return;
-    const userId = user.id;
-    console.log('[AuthProvider] watchdog armed for user:', userId);
     const timeoutId = window.setTimeout(() => {
-      console.warn('[AuthProvider] 10s watchdog FIRED — forcing loading=false, treating user as no-roles');
+      console.warn('[AuthProvider] 10s watchdog FIRED — forcing loading=false, no roles');
       invalidatedRolesRequestId.current = activeRolesRequestId.current;
       clearRoles();
       lastFetchedUserId.current = null;
       isFetching.current = false;
-      updateLoading(false, `10s watchdog fired for user ${userId}`);
+      setLoading(false);
     }, 10000);
     rolesWatchdogRef.current = timeoutId;
     return () => {
       window.clearTimeout(timeoutId);
       if (rolesWatchdogRef.current === timeoutId) rolesWatchdogRef.current = null;
-      console.log('[AuthProvider] watchdog cleared (loading/user changed)');
     };
-  }, [loading, user?.id, clearRoles, updateLoading]);
+  }, [loading, user?.id, clearRoles]);
 
   const refreshRoles = useCallback(async () => {
     if (!user) return;
@@ -281,8 +278,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const userId = user?.id ?? null;
     const userEmail = user?.email ?? null;
 
-    console.log('[AuthProvider] roles effect triggered, user.id:', userId, 'alreadyFetched:', lastFetchedUserId.current === userId, 'isFetching:', isFetching.current);
-
     if (!userId) {
       activeRolesRequestId.current += 1;
       invalidatedRolesRequestId.current = null;
@@ -291,12 +286,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     if (lastFetchedUserId.current === userId) {
-      console.log('[AuthProvider] roles already fetched for user:', userId);
       return;
     }
 
     if (isFetching.current) {
-      console.log('[AuthProvider] roles fetch already in progress for user:', userId);
       return;
     }
 
@@ -312,7 +305,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
 
       try {
-        console.log('[AuthProvider] fetching roles for user:', userId);
         const [rolesResult, agentResult] = await Promise.all([
           supabase.from('user_roles').select('role').eq('user_id', userId),
           supabase
@@ -326,7 +318,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         const { data: rolesData, error: rolesError } = rolesResult;
         if (rolesError) throw rolesError;
-        console.log('[AuthProvider] roles fetched:', rolesData?.length ?? 0, 'rows');
         const roles = rolesData?.map((r) => r.role) || [];
 
         const { data: agentData } = agentResult;
@@ -387,7 +378,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } catch (err) {
         if (cancelled || invalidatedRolesRequestId.current === requestId || activeRolesRequestId.current !== requestId) return;
         lastFetchedUserId.current = null;
-        console.error('[AuthProvider] role fetch error:', err);
+        console.error('[AuthProvider] role fetch exception:', err);
         toast.error('Could not load your account permissions. Please refresh the page or sign out and back in.');
       } finally {
         const isCurrent = activeRolesRequestId.current === requestId;
@@ -395,9 +386,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (isCurrent) {
           isFetching.current = false;
         }
-        console.log('[AuthProvider] roles fetch settled', { requestId, cancelled, isCurrent, isInvalidated });
         if (!cancelled && !isInvalidated && isCurrent) {
-          updateLoading(false, 'roles fetch settled');
+          setLoading(false);
         }
       }
     };
@@ -411,11 +401,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Auth listener
   useEffect(() => {
-    console.log('[AuthProvider] mounted, subscribing to auth state changes');
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('[AuthProvider] auth event:', event, 'user:', session?.user?.id ?? 'null');
-
         // Explicit sign-out — only clear if there is no active session
         // (guards against spurious SIGNED_OUT from detectSessionInUrl on navigation)
         if (event === 'SIGNED_OUT') {
@@ -423,7 +410,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setSession(null);
           setUser(null);
           clearRoles();
-          updateLoading(false, 'SIGNED_OUT with no active session');
+          setLoading(false);
           return;
         }
 
@@ -432,7 +419,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
           setSession(session);
           setUser(session?.user ?? null);
-          if (!session?.user) updateLoading(false, event + ' without session user');
+          if (!session?.user) setLoading(false);
           return;
         }
 
@@ -441,8 +428,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const isNewUser = lastFetchedUserId.current !== session.user.id;
           if (isNewUser) {
             lastFetchedUserId.current = null;
-
-            updateLoading(true, 'SIGNED_IN for new user; awaiting role fetch');
+            setLoading(true);
           }
           // Clean up email confirmation hash from URL
           const hash = window.location.hash;
@@ -455,7 +441,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         setSession(session);
         setUser(session?.user ?? null);
-        if (!session?.user) updateLoading(false, 'auth event without session user');
+        if (!session?.user) setLoading(false);
 
         // Request notification permission after login (non-intrusive delay)
         if (session?.user && 'Notification' in window && Notification.permission === 'default') {
@@ -468,16 +454,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       setSession(session);
       setUser(session?.user ?? null);
-      if (!session?.user) updateLoading(false, 'initial getSession resolved without user');
+      if (!session?.user) setLoading(false);
     }).catch((err) => {
       console.error('[Auth] getSession failed:', err);
-      updateLoading(false, 'initial getSession failed');
+      setLoading(false);
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [clearRoles, updateLoading]);
+  }, [clearRoles]);
 
   const signOut = async () => {
     sessionStorage.removeItem('post_login_redirected');

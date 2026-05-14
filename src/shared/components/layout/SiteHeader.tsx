@@ -117,24 +117,14 @@ export function SiteHeader() {
           borderBottom: '1px solid rgba(229,231,235,0.6)',
         }}
       >
-        {/* Logo */}
-        <Link
-          to="/"
-          className="cursor-pointer hover:opacity-80 transition-opacity"
-          style={{
-            fontSize: 22,
-            fontWeight: 800,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)',
-            WebkitBackgroundClip: 'text',
-            backgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            color: 'transparent',
-          }}
-          aria-label="ListHQ home"
-        >
-          ListHQ
+        {/* Logo — globe icon in rounded square + ListHQ wordmark */}
+        <Link to="/" className="flex items-center gap-2 shrink-0" aria-label="ListHQ home">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-cyan-accent flex items-center justify-center shrink-0">
+            <Globe size={20} className="text-primary-foreground" />
+          </div>
+          <span className="font-display text-xl font-bold text-foreground tracking-tight">
+            ListHQ
+          </span>
         </Link>
 
         {/* Right cluster */}

@@ -28,6 +28,22 @@ export function UserLocaleSync(): null {
       try {
         // Respect a recent manual override on this device (set in the last 60s)
         // so we don't fight a user mid-click.
+        // Respect a manual override on this device — if the user has picked
+        // a language via the switcher, NEVER overwrite it from the profile.
+        // Profile-side locale is a *seed* for new sessions, not an enforced lock.
+        try {
+          const manualOverride =
+            localStorage.getItem('listhq_lang_user_set') === '1' ||
+            localStorage.getItem('listhq_language_manually_set') === '1';
+          if (manualOverride) return;
+        } catch { /* */ }
+
+        // Only seed once per device per user — re-logins should not flip the UI.
+        const syncedKey = `listhq_locale_synced_for_${user.id}`;
+        try {
+          if (localStorage.getItem(syncedKey) === '1') return;
+        } catch { /* */ }
+
         const { data } = await supabase
           .from('profiles')
           .select('locale')
@@ -40,6 +56,7 @@ export function UserLocaleSync(): null {
         try {
           localStorage.setItem('listhq.locale', data.locale);
           localStorage.setItem(LANGUAGE_STORAGE_KEY, legacy);
+          localStorage.setItem(syncedKey, '1');
           document.documentElement.lang = legacy;
           document.documentElement.dir = legacy === 'ar' ? 'rtl' : 'ltr';
         } catch { /* */ }

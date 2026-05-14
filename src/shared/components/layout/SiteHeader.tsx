@@ -206,8 +206,11 @@ export function SiteHeader() {
 
         {/* ─── Desktop right side actions (hidden below md) ─── */}
         <div className="hidden md:flex items-center gap-2 shrink-0">
-          {/* Combined globe/settings — currency + language */}
-          <SettingsMenu />
+          {/* Currency + language — single source of truth (LanguageSwitcher
+              is portaled at z-9999 so the dropdown is never clipped under the
+              sticky backdrop-blur header). */}
+          <CurrencySwitcher />
+          <LanguageSwitcher />
 
 
 
@@ -457,83 +460,6 @@ export function SiteHeader() {
  * desktop nav. Reuses the existing CurrencySwitcher and LanguageSwitcher
  * (each owns its own portal/dropdown state) inside a small popover.
  */
-function SettingsMenu() {
-  const { t } = useTranslation();
-  const { language, setLanguage } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        const target = e.target as HTMLElement;
-        if (target.closest('[data-settings-portal-ignore]')) return;
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [open]);
-
-  return (
-    <div ref={containerRef} className="relative">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-        aria-label="Language and currency"
-        title="Language & currency"
-      >
-        <Globe size={17} />
-      </button>
-      {open && (
-        <div
-          data-settings-portal-ignore
-          className="absolute right-0 top-full mt-1 w-56 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150 p-2 space-y-1"
-        >
-          <div className="px-2 pt-1 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
-            {t('nav.currency')}
-          </div>
-          <div className="px-1">
-            <CurrencySwitcher />
-          </div>
-          <div className="border-t border-border my-1" />
-          <div className="px-2 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
-            {t('nav.language')}
-          </div>
-          <div className="px-1 pb-1 max-h-72 overflow-y-auto flex flex-col gap-0.5">
-            {SUPPORTED_LANGUAGES.map(({ code, name }) => {
-              const activeCanonical = FROM_LEGACY_CODE_MAP[language] ?? 'en';
-              const isActive = code === activeCanonical;
-              return (
-                <button
-                  key={code}
-                  onClick={() => {
-                    const legacy = (LEGACY_CODE_MAP[code] ?? 'en') as Language;
-                    setLanguage(legacy);
-                    try {
-                      localStorage.setItem('listhq_language', code);
-                      sessionStorage.setItem('listhq_language', code);
-                      localStorage.setItem('i18n-language', LEGACY_CODE_MAP[code] ?? 'en');
-                      sessionStorage.setItem('i18n-language', LEGACY_CODE_MAP[code] ?? 'en');
-                      localStorage.setItem('listhq_lang_user_set', '1');
-                    } catch { /* non-fatal */ }
-                    setOpen(false);
-                    document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
-                  }}
-                  className={`text-sm px-3 py-1.5 rounded-lg text-start transition-colors ${
-                    isActive
-                      ? 'bg-accent font-medium text-foreground'
-                      : 'text-foreground hover:bg-accent'
-                  }`}
-                >
-                  {name}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+// SettingsMenu removed 2026-05-15 — duplicate language list conflicted with
+// the portaled <LanguageSwitcher /> chip and wrote an inconsistent set of
+// localStorage keys. Currency + language are now rendered inline above.

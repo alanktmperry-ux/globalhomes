@@ -151,10 +151,16 @@ export function SiteHeader() {
             Sign in
           </Link>
           <Link
-            to="/for-agents"
+            to="/agents/login"
             className="hidden md:inline text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors"
           >
-            List with us →
+            Agent login
+          </Link>
+          <Link
+            to="/for-agents"
+            className="hidden md:inline rounded-full bg-[#2563EB] text-white px-3 py-1.5 text-[12px] font-semibold hover:bg-[#1d4ed8] transition-colors"
+          >
+            List with us
           </Link>
         </div>
       </header>

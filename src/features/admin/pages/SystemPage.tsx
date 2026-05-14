@@ -130,7 +130,7 @@ function HealthTab() {
 
   const overall = (result?.overall || result?.status || '').toLowerCase();
   const banner =
-    overall === 'ok'
+    overall === 'ok' || overall === 'healthy'
       ? { cls: 'bg-emerald-50 border-emerald-200 text-emerald-800', text: 'All systems operational' }
       : overall === 'degraded'
         ? { cls: 'bg-amber-50 border-amber-200 text-amber-800', text: 'Degraded performance' }

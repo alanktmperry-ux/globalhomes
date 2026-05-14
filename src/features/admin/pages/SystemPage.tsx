@@ -189,7 +189,8 @@ function HealthTab() {
                   </div>
                 )}
               </Card>
-            ))}
+              );
+            })}
             {(!result.services || result.services.length === 0) && (
               <div className="text-sm text-stone-400">No service details returned.</div>
             )}

@@ -786,6 +786,15 @@ Deno.serve(async (req) => {
         });
       } catch (e) { console.error("audit log:", e); }
 
+      await logAdminAction({
+        actor_id: caller.id, actor_email: caller.email ?? 'unknown',
+        action: opName === 'grant_role' ? 'role.granted' : 'role.revoked',
+        target_type: 'user_role', target_id: userId,
+        target_summary: `User ${userId} role=${role}`,
+        after_state: { role, granted: opName === 'grant_role' },
+        request: req,
+      });
+
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

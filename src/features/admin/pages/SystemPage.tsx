@@ -128,7 +128,7 @@ function HealthTab() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const overall = (result?.status || '').toLowerCase();
+  const overall = (result?.overall || result?.status || '').toLowerCase();
   const banner =
     overall === 'ok'
       ? { cls: 'bg-emerald-50 border-emerald-200 text-emerald-800', text: 'All systems operational' }

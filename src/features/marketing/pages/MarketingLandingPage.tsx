@@ -75,7 +75,7 @@ export default function MarketingLandingPage() {
   const spotsRemaining = Math.max(0, 100 - (agentCount ?? 0));
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <main id="main" className="min-h-screen bg-background text-foreground">
       <Helmet>
         <title>ListHQ — AI-Powered Real Estate Platform for Australian Agents</title>
         <meta name="description" content="ListHQ gives Australian real estate agents AI tools to find sellers, match buyers, generate offer letters, and purchase qualified leads. Start free." />
@@ -282,6 +282,6 @@ export default function MarketingLandingPage() {
           </Button>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

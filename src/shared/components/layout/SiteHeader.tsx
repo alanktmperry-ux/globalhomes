@@ -249,8 +249,10 @@ export function SiteHeader() {
             <div ref={userMenuRef} className="relative">
               <button
                 onClick={() => setShowUserMenu(o => !o)}
-                className="w-9 h-9 rounded-full bg-[#EFF6FF] border border-[#E5E7EB] flex items-center justify-center text-[#2563EB] font-semibold text-sm cursor-pointer hover:border-[#2563EB] transition-all"
+                className="w-11 h-11 rounded-full bg-[#EFF6FF] border border-[#E5E7EB] flex items-center justify-center text-[#2563EB] font-semibold text-sm cursor-pointer hover:border-[#2563EB] transition-all"
                 aria-label="Account menu"
+                aria-expanded={showUserMenu}
+                aria-haspopup="menu"
               >
                 {(user.email?.[0] || 'U').toUpperCase()}
               </button>

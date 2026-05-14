@@ -68,7 +68,7 @@ export function SiteFooter() {
             >
               ListHQ
             </Link>
-            <p className="text-[13px] text-white/55 max-w-[280px] leading-[1.55] mt-4">
+            <p className="text-[13px] text-white/70 max-w-[280px] leading-[1.55] mt-4">
               {t('layout.footer.tagline')}
             </p>
             <div className="flex gap-2 mt-5">
@@ -83,7 +83,7 @@ export function SiteFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center border border-white/15 text-white/55 transition-colors hover:text-white hover:border-white/40"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center border border-white/15 text-white/70 transition-colors hover:text-white hover:border-white/40"
                 >
                   <Icon size={14} />
                 </a>
@@ -93,7 +93,7 @@ export function SiteFooter() {
 
           {COLUMNS.map((col) => (
             <div key={col.titleKey}>
-              <h4 className="text-[11px] font-bold tracking-[0.12em] uppercase text-white/40 mb-4">
+              <h4 className="text-[11px] font-bold tracking-[0.12em] uppercase text-white/70 mb-4">
                 {t(col.titleKey)}
               </h4>
               <ul className="flex flex-col gap-2.5">
@@ -123,8 +123,8 @@ export function SiteFooter() {
           ))}
         </div>
 
-        <div className="pt-6 flex flex-col gap-3 text-[12px] text-white/40">
-          <p className="text-white/50 leading-relaxed max-w-3xl">
+        <div className="pt-6 flex flex-col gap-3 text-[12px] text-white/70">
+          <p className="text-white/70 leading-relaxed max-w-3xl">
             {t('layout.footer.legal.acknowledgement')}
           </p>
           <div className="flex justify-between items-center flex-wrap gap-3">

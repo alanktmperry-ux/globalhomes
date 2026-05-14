@@ -166,6 +166,8 @@ export default function RevenueBilling() {
   const [loading, setLoading] = useState(true);
   const [planFilter, setPlanFilter] = useState('all');
   const [renewalWindow, setRenewalWindow] = useState<7 | 14 | 30>(30);
+  const [stripeStatus, setStripeStatus] = useState<StripeStatus | null>(null);
+  const isStripeLive = stripeStatus?.state === 'live';
 
   const fetchAll = useCallback(async () => {
     setLoading(true);

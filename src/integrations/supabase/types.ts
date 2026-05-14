@@ -8828,6 +8828,27 @@ export type Database = {
           },
         ]
       }
+      parsed_queries: {
+        Row: {
+          expires_at: string
+          locale: string
+          parsed_filters: Json
+          query_hash: string
+        }
+        Insert: {
+          expires_at?: string
+          locale: string
+          parsed_filters: Json
+          query_hash: string
+        }
+        Update: {
+          expires_at?: string
+          locale?: string
+          parsed_filters?: Json
+          query_hash?: string
+        }
+        Relationships: []
+      }
       partner_agencies: {
         Row: {
           accepted_at: string | null
@@ -11762,6 +11783,45 @@ export type Database = {
           suburb?: string
           type?: string
           website_url?: string | null
+        }
+        Relationships: []
+      }
+      search_queries: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          detected_language: string | null
+          halo_clicked: boolean | null
+          halo_offered: boolean | null
+          id: string
+          parsed_filters: Json | null
+          raw_query: string
+          result_count: number | null
+          user_id: string | null
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          detected_language?: string | null
+          halo_clicked?: boolean | null
+          halo_offered?: boolean | null
+          id?: string
+          parsed_filters?: Json | null
+          raw_query: string
+          result_count?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          detected_language?: string | null
+          halo_clicked?: boolean | null
+          halo_offered?: boolean | null
+          id?: string
+          parsed_filters?: Json | null
+          raw_query?: string
+          result_count?: number | null
+          user_id?: string | null
         }
         Relationships: []
       }

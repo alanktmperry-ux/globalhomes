@@ -81,38 +81,51 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
     if (!trimmed) return;
 
     setIsParsing(true);
-    try {
-      // Fast path: single short word — likely a suburb, skip the LLM
-      const isSingleWord = !/\s/.test(trimmed) && trimmed.length < 30;
-      if (isSingleWord) {
-        navigate(`/buy?q=${encodeURIComponent(trimmed)}`);
-        return;
-      }
 
+    // Fast path: single bare word that looks like a suburb → skip LLM
+    const isSingleWord =
+      !/\s/.test(trimmed) &&
+      trimmed.length < 30 &&
+      !/[^\p{L}\p{N}\-']/u.test(trimmed);
+    if (isSingleWord) {
+      setIsParsing(false);
+      navigate(`/buy?q=${encodeURIComponent(trimmed)}`);
+      return;
+    }
+
+    try {
       const { data, error } = await supabase.functions.invoke('parse-search-query', {
         body: { query: trimmed, locale: language ?? 'en' },
       });
 
-      if (error || !data?.parsed) {
+      if (error) {
+        console.warn('[SearchBar] parser error, falling back to literal:', error);
+        navigate(`/buy?q=${encodeURIComponent(trimmed)}`);
+        return;
+      }
+      if (!data?.parsed) {
+        console.warn('[SearchBar] parser returned no parsed object, falling back');
         navigate(`/buy?q=${encodeURIComponent(trimmed)}`);
         return;
       }
 
       const p = data.parsed;
-      const intent = p.intent === 'rent' ? 'rent' : 'buy';
-
       const params = new URLSearchParams();
       if (p.suburb_or_locality) params.set('suburb', p.suburb_or_locality);
       if (p.postcode) params.set('postcode', p.postcode);
       if (p.state) params.set('state', p.state);
-      if (p.property_types?.length) params.set('type', p.property_types.join(','));
+      if (Array.isArray(p.property_types) && p.property_types.length) {
+        params.set('type', p.property_types.join(','));
+      }
       if (p.beds_min != null) params.set('beds_min', String(p.beds_min));
       if (p.beds_max != null) params.set('beds_max', String(p.beds_max));
       if (p.baths_min != null) params.set('baths_min', String(p.baths_min));
       if (p.parking_min != null) params.set('parking_min', String(p.parking_min));
       if (p.min_price_aud != null) params.set('min_price', String(p.min_price_aud));
       if (p.max_price_aud != null) params.set('max_price', String(p.max_price_aud));
-      if (p.features?.length) params.set('features', p.features.join(','));
+      if (Array.isArray(p.features) && p.features.length) {
+        params.set('features', p.features.join(','));
+      }
       params.set('raw_q', trimmed);
 
       if ((p.confidence ?? 0) < 0.5) {
@@ -120,9 +133,10 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
         params.set('low_confidence', '1');
       }
 
-      navigate(`/${intent}?${params.toString()}`);
+      // Always navigate to /buy for now — rent routing is a separate prompt
+      navigate(`/buy?${params.toString()}`);
     } catch (err) {
-      console.error('[SearchBar] parse failed, falling back to literal:', err);
+      console.error('[SearchBar] parse threw, falling back:', err);
       navigate(`/buy?q=${encodeURIComponent(trimmed)}`);
     } finally {
       setIsParsing(false);

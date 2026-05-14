@@ -286,7 +286,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!userId) {
       activeRolesRequestId.current += 1;
       invalidatedRolesRequestId.current = null;
-      clearRolesWatchdog();
       clearRoles();
       return;
     }

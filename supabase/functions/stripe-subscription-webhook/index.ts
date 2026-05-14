@@ -76,9 +76,59 @@ Deno.serve(async (req) => {
   if (event.type === 'invoice.payment_failed') {
     const invoice = event.data.object as Stripe.Invoice;
     const customerId = invoice.customer as string;
-    const { data: agent } = await admin.from('agents').select('id').eq('stripe_customer_id', customerId).maybeSingle();
+    const { data: agent } = await admin
+      .from('agents')
+      .select('id, dunning_stage')
+      .eq('stripe_customer_id', customerId)
+      .maybeSingle();
     if (agent) {
-      await admin.from('agents').update({ payment_failed_at: new Date().toISOString(), subscription_status: 'past_due' }).eq('id', agent.id);
+      const now = new Date().toISOString();
+      // Only initialise dunning on the first failure of an episode.
+      const isNewEpisode = !agent.dunning_stage || agent.dunning_stage === 'none';
+      const updates: Record<string, unknown> = {
+        payment_failed_at: now,
+        subscription_status: 'past_due',
+      };
+      if (isNewEpisode) updates.dunning_stage = 'day1';
+
+      await admin.from('agents').update(updates).eq('id', agent.id);
+      await admin.from('dunning_events').insert({
+        agent_id: agent.id,
+        event_type: 'payment_failed',
+        stage: isNewEpisode ? 'day1' : agent.dunning_stage,
+        details: {
+          invoice_id: invoice.id,
+          amount_due: invoice.amount_due,
+          attempt_count: invoice.attempt_count,
+          next_payment_attempt: invoice.next_payment_attempt,
+        },
+      });
+    }
+  }
+
+  if (event.type === 'invoice.payment_succeeded') {
+    const invoice = event.data.object as Stripe.Invoice;
+    const customerId = invoice.customer as string;
+    const { data: agent } = await admin
+      .from('agents')
+      .select('id, dunning_stage, suspended_at')
+      .eq('stripe_customer_id', customerId)
+      .maybeSingle();
+    if (agent && (agent.dunning_stage && agent.dunning_stage !== 'none' || agent.suspended_at)) {
+      await admin.from('agents').update({
+        payment_failed_at: null,
+        subscription_status: 'active',
+        dunning_stage: 'none',
+        dunning_last_email_at: null,
+        suspended_at: null,
+        is_subscribed: true,
+      }).eq('id', agent.id);
+      await admin.from('dunning_events').insert({
+        agent_id: agent.id,
+        event_type: agent.suspended_at ? 'restored' : 'retry_succeeded',
+        stage: agent.dunning_stage,
+        details: { invoice_id: invoice.id, amount_paid: invoice.amount_paid },
+      });
     }
   }
 

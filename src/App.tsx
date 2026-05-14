@@ -79,6 +79,9 @@ const AdminUsersPage = React.lazy(() => import("./features/admin/pages/UsersPage
 const AdminSystemPage = React.lazy(() => import("./features/admin/pages/SystemPage"));
 const AdminWebhookDiagnosticPage = React.lazy(() => import("./features/admin/pages/WebhookDiagnosticPage"));
 const AdminCommsStatsPage = React.lazy(() => import("./features/admin/pages/AdminCommsStatsPage"));
+const AdminHaloShell = React.lazy(() => import("./features/admin/pages/HaloShell"));
+const AdminOutreachShell = React.lazy(() => import("./features/admin/pages/OutreachShell"));
+const AdminSystemShell = React.lazy(() => import("./features/admin/pages/SystemShell"));
 const SupportLoginPage = React.lazy(() => import("./features/admin/pages/SupportLoginPage"));
 const SupportDashboardLayout = React.lazy(() => import("./features/admin/pages/SupportDashboardLayout"));
 const SupportTicketsWrapper = React.lazy(() => import("./features/admin/pages/SupportTicketsWrapper"));
@@ -561,20 +564,23 @@ const App = () => (
                   <Route path="careers/:id" element={<AdminCareersPage />} />
                   <Route path="insights" element={<AdminInsightsPage />} />
                   <Route path="costs" element={<AdminCostsPage />} />
-                  <Route path="help" element={<AdminHelpPage />} />
                   <Route path="revenue" element={<AdminRevenuePage />} />
-                  <Route path="outreach" element={<AdminOutreachPage />} />
-                  <Route path="system" element={<AdminSystemPage />} />
-                  <Route path="system/webhooks" element={<AdminWebhookDiagnosticPage />} />
+                  <Route path="outreach" element={<AdminOutreachShell />} />
+                  <Route path="halo" element={<AdminHaloShell />} />
+                  <Route path="system" element={<AdminSystemShell />} />
                   <Route path="partners" element={<AdminPartnersPage />} />
                   <Route path="referral-partners" element={<AdminReferralPartnersPage />} />
                   <Route path="brokers" element={<AdminBrokers />} />
-                  <Route path="halo-credits" element={<AdminHaloCreditsPage />} />
-                  <Route path="halo-health" element={<AdminHaloHealthPage />} />
-                  <Route path="halo-analytics" element={<AdminHaloAnalyticsPage />} />
                   <Route path="support" element={<AdminSupportPage />} />
                   <Route path="buyers" element={<AdminBuyersPage />} />
-                  <Route path="comms-stats" element={<AdminCommsStatsPage />} />
+                  {/* Backward-compat redirects to consolidated tabbed pages */}
+                  <Route path="halo-credits" element={<Navigate to="/admin/halo?tab=credits" replace />} />
+                  <Route path="halo-health" element={<Navigate to="/admin/halo?tab=health" replace />} />
+                  <Route path="halo-analytics" element={<Navigate to="/admin/halo?tab=analytics" replace />} />
+                  <Route path="comms-stats" element={<Navigate to="/admin/outreach?tab=stats" replace />} />
+                  <Route path="system/webhooks" element={<Navigate to="/admin/system?tab=webhooks" replace />} />
+                  <Route path="help-faqs" element={<Navigate to="/admin/system?tab=help" replace />} />
+                  <Route path="help" element={<Navigate to="/admin/system?tab=help" replace />} />
                 </Route>
                 <Route path="/admin/legacy" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
 

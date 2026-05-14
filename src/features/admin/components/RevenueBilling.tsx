@@ -122,24 +122,7 @@ function KPI({ label, value, sub, icon: Icon, color = 'text-primary', trend }: {
   );
 }
 
-function StripeBanner() {
-  return (
-    <div className="bg-muted/40 border border-border rounded-xl p-3 flex items-start gap-3 mb-6">
-      <div className="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center flex-shrink-0">
-        <CreditCard size={16} className="text-amber-600" />
-      </div>
-      <div className="flex-1">
-        <p className="text-xs text-muted-foreground">
-          <span className="font-medium text-foreground">Stripe not yet connected</span> — showing estimated MRR from plan data. Connect Stripe to unlock real payment data and accurate MRR history.
-        </p>
-      </div>
-      <Button variant="outline" size="sm" className="gap-1.5 text-xs flex-shrink-0">
-        <Zap size={14} />
-        Connect Stripe
-      </Button>
-    </div>
-  );
-}
+// StripeBanner replaced by <StripeConnectionCard /> — connection-state-aware UI.
 
 function RenewalRow({ agent }: { agent: AgentBillingRow }) {
   const urgent = (agent.daysUntilRenewal ?? 999) <= 7;

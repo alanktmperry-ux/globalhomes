@@ -993,6 +993,8 @@ export type Database = {
           cpd_hours_completed: number | null
           cpd_hours_required: number | null
           created_at: string
+          dunning_last_email_at: string | null
+          dunning_stage: string | null
           email: string | null
           gci_budget_annual: number | null
           handles_trust_accounting: boolean | null
@@ -1032,6 +1034,7 @@ export type Database = {
           subscription_expires_at: string | null
           subscription_status: string | null
           support_pin: string | null
+          suspended_at: string | null
           title_position: string | null
           trust_setup_pending: boolean
           updated_at: string
@@ -1054,6 +1057,8 @@ export type Database = {
           cpd_hours_completed?: number | null
           cpd_hours_required?: number | null
           created_at?: string
+          dunning_last_email_at?: string | null
+          dunning_stage?: string | null
           email?: string | null
           gci_budget_annual?: number | null
           handles_trust_accounting?: boolean | null
@@ -1093,6 +1098,7 @@ export type Database = {
           subscription_expires_at?: string | null
           subscription_status?: string | null
           support_pin?: string | null
+          suspended_at?: string | null
           title_position?: string | null
           trust_setup_pending?: boolean
           updated_at?: string
@@ -1115,6 +1121,8 @@ export type Database = {
           cpd_hours_completed?: number | null
           cpd_hours_required?: number | null
           created_at?: string
+          dunning_last_email_at?: string | null
+          dunning_stage?: string | null
           email?: string | null
           gci_budget_annual?: number | null
           handles_trust_accounting?: boolean | null
@@ -1154,6 +1162,7 @@ export type Database = {
           subscription_expires_at?: string | null
           subscription_status?: string | null
           support_pin?: string | null
+          suspended_at?: string | null
           title_position?: string | null
           trust_setup_pending?: boolean
           updated_at?: string
@@ -5337,6 +5346,62 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "properties_public_safe"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      dunning_events: {
+        Row: {
+          agent_id: string
+          created_at: string
+          details: Json | null
+          event_type: string
+          id: string
+          stage: string | null
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          details?: Json | null
+          event_type: string
+          id?: string
+          stage?: string | null
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          details?: Json | null
+          event_type?: string
+          id?: string
+          stage?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dunning_events_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dunning_events_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dunning_events_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dunning_events_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "trust_account_balances_view"
+            referencedColumns: ["agent_id"]
           },
         ]
       }

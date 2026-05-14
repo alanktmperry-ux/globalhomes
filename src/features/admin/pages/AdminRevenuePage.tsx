@@ -1,4 +1,5 @@
 import RevenueBilling from '@/features/admin/components/RevenueBilling';
+import FailedPaymentsQueue from '@/features/admin/components/FailedPaymentsQueue';
 
 export default function AdminRevenuePage() {
   return (
@@ -10,6 +11,7 @@ export default function AdminRevenuePage() {
         </p>
       </div>
       <RevenueBilling />
+      <FailedPaymentsQueue />
     </div>
   );
 }

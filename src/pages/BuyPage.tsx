@@ -26,38 +26,65 @@ const PROPERTIES_WITH_AGENTS =
 interface BuyFilters {
   suburbs: string[];
   state?: string;
+  postcode?: string;
   minBeds?: number;
+  maxBeds?: number;
   minBaths?: number;
   minParking?: number;
   minPrice?: number;
   maxPrice?: number;
   propertyType?: string;
+  features: string[];
+  rawQuery?: string;
+  lowConfidence?: boolean;
   sort: 'newest' | 'price_asc' | 'price_desc';
 }
 
-const EMPTY_FILTERS: BuyFilters = { suburbs: [], sort: 'newest' };
+const EMPTY_FILTERS: BuyFilters = { suburbs: [], features: [], sort: 'newest' };
 
 function parseFiltersFromParams(sp: URLSearchParams): BuyFilters {
   const sort = sp.get('sort');
-  const q = sp.get('q');
-  const location = sp.get('location'); // e.g. ?location=St+Kilda from search bar
-  // Support `?q=Toorak,Hawthorn`, repeated `?suburb=`, or `?location=Prahran`
+  // Suburbs: support `?q=A,B`, `?suburb=A` (single, from Smart Search), `?location=A`, repeated `?suburb=`
   let suburbs: string[] = [];
-  if (q) {
+  const smartSuburb = sp.get('suburb');
+  const q = sp.get('q');
+  const location = sp.get('location');
+  if (smartSuburb && !sp.getAll('suburb').slice(1).length) {
+    suburbs = [smartSuburb];
+  } else if (sp.getAll('suburb').length > 0) {
+    suburbs = sp.getAll('suburb').filter(Boolean);
+  } else if (q) {
     suburbs = q.split(',').map(s => s.trim()).filter(Boolean);
   } else if (location) {
     suburbs = location.split(',').map(s => s.trim()).filter(Boolean);
-  } else {
-    suburbs = sp.getAll('suburb').filter(Boolean);
   }
+
+  // Smart Search uses `type` as comma-list of property types — keep first one for the existing single-select UI
+  const typeParam = sp.get('type');
+  const propertyType = typeParam ? typeParam.split(',')[0].trim() || undefined : undefined;
+
+  const features = sp.get('features')?.split(',').map(s => s.trim()).filter(Boolean) ?? [];
+
+  // Read both legacy (`beds`, `priceMin`) and Smart Search (`beds_min`, `min_price`) names
+  const num = (k: string) => {
+    const v = sp.get(k);
+    return v && !Number.isNaN(Number(v)) ? Number(v) : undefined;
+  };
+
   return {
     suburbs,
-    minBeds: sp.get('beds') ? Number(sp.get('beds')) : undefined,
-    minBaths: sp.get('baths') ? Number(sp.get('baths')) : undefined,
-    minParking: sp.get('parking') ? Number(sp.get('parking')) : undefined,
-    minPrice: sp.get('priceMin') ? Number(sp.get('priceMin')) : undefined,
-    maxPrice: sp.get('priceMax') ? Number(sp.get('priceMax')) : undefined,
-    propertyType: sp.get('type') || undefined,
+    state: sp.get('state') || undefined,
+    postcode: sp.get('postcode') || undefined,
+    minBeds: num('beds_min') ?? num('beds'),
+    maxBeds: num('beds_max'),
+    minBaths: num('baths_min') ?? num('baths'),
+    minParking: num('parking_min') ?? num('parking'),
+    minPrice: num('min_price') ?? num('priceMin'),
+    maxPrice: num('max_price') ?? num('priceMax'),
+    propertyType,
+    features,
+    rawQuery: sp.get('raw_q') || undefined,
+    lowConfidence: sp.get('low_confidence') === '1',
     sort: sort === 'price_asc' || sort === 'price_desc' ? sort : 'newest',
   };
 }
@@ -65,12 +92,17 @@ function parseFiltersFromParams(sp: URLSearchParams): BuyFilters {
 function filtersToParams(f: BuyFilters): Record<string, string> {
   const out: Record<string, string> = {};
   if (f.suburbs.length) out.q = f.suburbs.join(',');
+  if (f.state) out.state = f.state;
+  if (f.postcode) out.postcode = f.postcode;
   if (f.minBeds) out.beds = String(f.minBeds);
+  if (f.maxBeds) out.beds_max = String(f.maxBeds);
   if (f.minBaths) out.baths = String(f.minBaths);
   if (f.minParking) out.parking = String(f.minParking);
   if (f.minPrice) out.priceMin = String(f.minPrice);
   if (f.maxPrice) out.priceMax = String(f.maxPrice);
   if (f.propertyType) out.type = f.propertyType;
+  if (f.features.length) out.features = f.features.join(',');
+  if (f.rawQuery) out.raw_q = f.rawQuery;
   if (f.sort && f.sort !== 'newest') out.sort = f.sort;
   return out;
 }

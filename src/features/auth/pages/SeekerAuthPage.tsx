@@ -402,6 +402,13 @@ const SeekerAuthPage = () => {
         </button>
       </p>
 
+      <p className="text-center text-sm font-light mt-4 text-muted-foreground">
+        Are you a real estate agent?{' '}
+        <Link to="/agents/login" className="text-primary underline font-medium">
+          Sign in to your agent account →
+        </Link>
+      </p>
+
       {showOAuthConsentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6">

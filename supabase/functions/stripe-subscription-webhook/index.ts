@@ -107,6 +107,11 @@ Deno.serve(async (req) => {
           })
           .eq('agent_id', agent.id);
       }
+
+      const newAmountCents = sub.items?.data?.[0]?.price?.unit_amount;
+      if (typeof newAmountCents === 'number') {
+        await admin.from('agent_subscriptions').update({ amount_cents: newAmountCents }).eq('agent_id', agent.id);
+      }
     }
   }
 

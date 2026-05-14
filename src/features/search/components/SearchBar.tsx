@@ -133,7 +133,7 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
     <div ref={wrapperRef} className="relative w-full">
       <form onSubmit={handleSubmit}>
         <div className="relative flex items-center rounded-2xl bg-secondary border border-border shadow-card transition-shadow focus-within:shadow-elevated focus-within:border-primary/30">
-          {isTranslating ? (
+          {isParsing ? (
             <Loader2 className="absolute left-4 text-primary animate-spin" size={20} />
           ) : (
             <Search className="absolute left-4 text-muted-foreground" size={20} />

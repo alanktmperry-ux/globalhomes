@@ -309,7 +309,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       activeRolesRequestId.current = requestId;
       invalidatedRolesRequestId.current = null;
       isFetching.current = true;
-      startRolesWatchdog(userId, requestId);
+      
 
       try {
         console.log('[AuthProvider] fetching roles for user:', userId);

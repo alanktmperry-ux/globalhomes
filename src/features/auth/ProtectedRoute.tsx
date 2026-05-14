@@ -58,15 +58,6 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
     return <Navigate to={requireAdmin ? '/admin/login' : '/login'} replace />;
   }
 
-  // Wait for roles to be fetched before evaluating role-based access — otherwise newly
-  // logged-in admins get bounced to /login because isAdmin is still false momentarily.
-  if ((requireAdmin || requireSupport || requirePartner) && user && !rolesFetched) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="animate-spin text-primary" size={32} />
-      </div>
-    );
-  }
 
   if (user && !user.email_confirmed_at && !isAdmin) {
     return <Navigate to="/check-email" replace />;

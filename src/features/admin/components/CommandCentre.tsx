@@ -305,6 +305,10 @@ export default function CommandCentre() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [sendingDigest, setSendingDigest] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRange>(() => {
+    if (typeof window === 'undefined') return '30d';
+    return ((window.localStorage.getItem('cc_date_range') as DateRange) || '30d');
+  });
   const [monthlyMarketingSpend, setMonthlyMarketingSpend] = useState<number>(() => {
     if (typeof window === 'undefined') return 0;
     const v = window.localStorage.getItem('cc_marketing_spend');

@@ -394,7 +394,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           isFetching.current = false;
         }
         if (!cancelled && invalidatedRolesRequestId.current !== requestId && activeRolesRequestId.current === requestId) {
-          clearRolesWatchdog(true);
           updateLoading(false, 'roles fetch settled');
         }
       }

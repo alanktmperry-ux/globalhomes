@@ -103,6 +103,17 @@ Deno.serve(async (req) => {
     }
   } catch (e) { console.error('[reply-support-ticket] email send failed', e); }
 
+  await logAdminAction({
+    actor_id: userId,
+    actor_email: (claimsRes.claims.email as string) ?? 'unknown',
+    action: 'support_ticket.replied',
+    target_type: 'support_ticket', target_id: ticket.id,
+    target_summary: `Ticket: ${ticket.subject}`,
+    after_state: { status: targetStatus },
+    notes: body.length > 240 ? body.slice(0, 240) + '…' : body,
+    request: req,
+  });
+
   return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } });
 });
 

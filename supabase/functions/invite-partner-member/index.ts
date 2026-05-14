@@ -105,7 +105,7 @@ Deno.serve(async (req) => {
 
     // Send invitation email via Resend
     const resendKey = Deno.env.get("RESEND_API_KEY");
-    const emailFrom = Deno.env.get("EMAIL_FROM") || "ListHQ <noreply@listhq.com.au>";
+    const emailFrom = Deno.env.get("EMAIL_FROM") || "ListHQ <hello@listhq.com.au>";
     const joinUrl = existingUser
       ? `${req.headers.get("origin") || "https://listhq.com.au"}/partner/dashboard`
       : `${req.headers.get("origin") || "https://listhq.com.au"}/partner/join?token=${inviteToken}`;

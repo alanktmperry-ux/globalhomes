@@ -15,7 +15,7 @@ async function sendViaResend(to: string, subject: string, html: string) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: Deno.env.get("EMAIL_FROM") ?? "ListHQ <noreply@listhq.com.au>",
+      from: Deno.env.get("EMAIL_FROM") ?? "ListHQ <hello@listhq.com.au>",
       to: [to],
       subject,
       html,

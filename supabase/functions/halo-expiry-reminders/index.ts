@@ -4,7 +4,7 @@ import { getCorsHeaders } from '../_shared/cors.ts';
 
 const APP_URL = Deno.env.get('APP_URL') ?? 'https://listhq.com.au';
 // NOTE: Falls back to onboarding@resend.dev until listhq.com.au DNS is verified in Resend.
-const FROM = 'ListHQ <noreply@listhq.com.au>';
+const FROM = 'ListHQ <hello@listhq.com.au>';
 
 const TIMEFRAME_LABELS: Record<string, string> = {
   ready_now: 'Ready now',

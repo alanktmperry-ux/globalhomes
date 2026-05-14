@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
          <p>Please resubmit with a clear, legible copy of your current pre-approval letter.</p>`;
 
     const RESEND_KEY = Deno.env.get("RESEND_API_KEY");
-    const EMAIL_FROM = Deno.env.get("EMAIL_FROM") || "ListHQ <noreply@listhq.com.au>";
+    const EMAIL_FROM = Deno.env.get("EMAIL_FROM") || "ListHQ <hello@listhq.com.au>";
 
     if (RESEND_KEY) {
       await fetch("https://api.resend.com/emails", {

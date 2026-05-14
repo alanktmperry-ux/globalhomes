@@ -126,12 +126,11 @@ export default function AgentLandingPage() {
 
       {/* ─── TRUST STATS ─── */}
       <section className="border-y border-[#E5E5E5] py-16 px-6 md:px-8 bg-white">
-        <div className="max-w-[1200px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           {[
-            { target: 0, staticText: 'Active', label: 'Verified buyer network' },
-            { target: 0, staticText: 'Any language', label: 'Auto-translated listings' },
+            { target: 30, suffix: '+', label: 'Languages auto-translated' },
             { target: 24, suffix: '', label: 'Communities served' },
-            { target: 0, staticText: '60 days', label: 'Free trial, then price-locked for 24 months' },
+            { target: 0, staticText: '60 days', label: 'Free trial — price-locked for 24 months' },
           ].map((s) => (
             <div key={s.label}>
               <div

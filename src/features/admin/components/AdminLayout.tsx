@@ -29,6 +29,9 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const { impersonating, impersonatedUser, stopImpersonation, isSupport, isAdmin } = useAuth();
   const [pendingTotal, setPendingTotal] = useState(0);
+  const [listingsPendingCount, setListingsPendingCount] = useState<number | undefined>(undefined);
+  const [agentsStuckCount, setAgentsStuckCount] = useState<number | undefined>(undefined);
+  const [failedPaymentsCount, setFailedPaymentsCount] = useState<number | undefined>(undefined);
   const [mfaRequired, setMfaRequired] = useState(false);
 
   useEffect(() => {

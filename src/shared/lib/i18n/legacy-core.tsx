@@ -1411,6 +1411,18 @@ const CANONICAL_TO_LEGACY: Record<string, Language> = {
 function readStoredLanguage(): Language | null {
   if (typeof window === 'undefined') return null;
   try {
+    // Priority #0: explicit `?lang=` URL param overrides everything and is persisted.
+    try {
+      const urlLang = new URLSearchParams(window.location.search).get('lang');
+      if (urlLang) {
+        const mappedUrl = (CANONICAL_TO_LEGACY[urlLang] ?? urlLang) as string;
+        if (mappedUrl in translations) {
+          localStorage.setItem('listhq_language', mappedUrl);
+          localStorage.setItem('listhq_lang_user_set', '1');
+          return mappedUrl as Language;
+        }
+      }
+    } catch { /* */ }
     // One-time boot migration: consolidate to `listhq_language`.
     const canonical = localStorage.getItem('listhq_language');
     const legacyKey = localStorage.getItem('i18n-language')

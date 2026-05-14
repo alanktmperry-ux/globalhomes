@@ -9,6 +9,7 @@ import AdminSidebar from './AdminSidebar';
 import AdminCommandPalette from './AdminCommandPalette';
 import SetPasswordBanner from './SetPasswordBanner';
 import { AdminErrorBoundary } from './AdminErrorBoundary';
+import { LanguageSwitcher } from '@/shared/components/layout/LanguageSwitcher';
 
 const SECTION_LABELS: Record<string, string> = {
   '': 'Command Centre',
@@ -165,19 +166,21 @@ export default function AdminLayout() {
               <span className="text-muted-foreground/50">/</span>
               <span className="font-semibold text-foreground">{sectionLabel}</span>
             </nav>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 gap-2 text-xs"
-              onClick={() => {
-                // Wired up in Prompt 6
-                window.dispatchEvent(new CustomEvent('admin:open-command-palette'));
-              }}
-            >
-              <Command size={14} />
-              <span>Quick actions</span>
-              <kbd className="ml-1 rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono">⌘K</kbd>
-            </Button>
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-2 text-xs"
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent('admin:open-command-palette'));
+                }}
+              >
+                <Command size={14} />
+                <span>Quick actions</span>
+                <kbd className="ml-1 rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono">⌘K</kbd>
+              </Button>
+            </div>
           </div>
         </header>
 

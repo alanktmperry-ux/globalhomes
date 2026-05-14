@@ -340,7 +340,7 @@ export default function RevenueBilling() {
         </div>
       </div>
 
-      <StripeBanner />
+      <StripeConnectionCard onStatusLoaded={setStripeStatus} />
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

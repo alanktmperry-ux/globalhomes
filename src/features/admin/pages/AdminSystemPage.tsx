@@ -24,7 +24,7 @@ export default function AdminSystemPage() {
           <AdminDatabase />
         </TabsContent>
         <TabsContent value="reports" className="mt-4">
-          <AdminReports />
+          <AdminReports isAdmin />
         </TabsContent>
         <TabsContent value="compliance" className="mt-4">
           <ComplianceMonitor />

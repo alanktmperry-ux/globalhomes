@@ -8,6 +8,7 @@ import { MFAChallenge } from '@/features/auth/components/MFAChallenge';
 import AdminSidebar from './AdminSidebar';
 import AdminCommandPalette from './AdminCommandPalette';
 import SetPasswordBanner from './SetPasswordBanner';
+import { AdminErrorBoundary } from './AdminErrorBoundary';
 
 const SECTION_LABELS: Record<string, string> = {
   '': 'Command Centre',
@@ -169,7 +170,9 @@ export default function AdminLayout() {
 
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-            <Outlet />
+            <AdminErrorBoundary>
+              <Outlet />
+            </AdminErrorBoundary>
           </div>
         </div>
       </main>

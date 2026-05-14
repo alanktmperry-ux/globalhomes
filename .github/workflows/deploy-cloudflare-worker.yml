@@ -27,6 +27,12 @@ jobs:
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Setup Node 22
+        if: steps.check.outputs.skip == 'false'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
       - name: Install Wrangler outside repo
         if: steps.check.outputs.skip == 'false'
         run: |

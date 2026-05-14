@@ -294,16 +294,16 @@ export default function CreateHaloPage() {
         {isFromSearch && (
           <div className="mb-6 rounded-lg border bg-primary/5 p-4 text-sm">
             <p className="font-medium mb-1">
-              {t('halo.prefilled_from_search.heading', {}, "We've pre-filled your Halo from your search")}
+              {t('halo.prefilled_from_search.heading')}
             </p>
             <p className="text-muted-foreground">
               {rawQ && (
                 <>
-                  {t('halo.prefilled_from_search.based_on', {}, 'Based on')}:{' '}
+                  {t('halo.prefilled_from_search.based_on')}:{' '}
                   <span className="italic">"{rawQ}"</span>.{' '}
                 </>
               )}
-              {t('halo.prefilled_from_search.body', {}, 'Review the details and post — usually takes 30 seconds.')}
+              {t('halo.prefilled_from_search.body')}
             </p>
           </div>
         )}

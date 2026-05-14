@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Phone, Mail, MessageCircle, Calendar, CheckCircle2, BadgeCheck,
   Trophy, Zap, MapPin, Star, Loader2, ArrowRight, ArrowLeft, Shield,
-  DollarSign, TrendingUp
+  DollarSign
 } from 'lucide-react';
 import { Property } from '@/shared/lib/types';
 import type { SearchContext } from '@/features/properties/components/PropertyDrawer';
@@ -127,13 +127,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
   const [depositAmount, setDepositAmount] = useState<number | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [leadScore, setLeadScore] = useState(30);
   const { t } = useTranslation();
-
-  // Recalculate score on form changes
-  useEffect(() => {
-    setLeadScore(calcLeadScore(formData, searchContext));
-  }, [formData, searchContext]);
 
   // ── Increment contact_clicks once per modal open ──────────
   const contactTracked = useRef(false);
@@ -401,8 +395,6 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
   );
   const whatsappUrl = `https://wa.me/${agent.phone?.replace(/\D/g, '')}?text=${whatsappMessage}`;
 
-  const scoreColor = leadScore >= 70 ? 'text-emerald-500' : leadScore >= 40 ? 'text-amber-500' : 'text-muted-foreground';
-
   return (
     <AnimatePresence>
       {open && (
@@ -451,10 +443,6 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
                 <div className="flex-1 min-w-0">
                   <p className="font-display font-semibold text-foreground text-sm truncate">{agent.name}</p>
                   <p className="text-xs text-muted-foreground truncate">{property.title} · {property.priceFormatted}</p>
-                </div>
-                <div className="flex flex-col items-center">
-                  <TrendingUp size={14} className={scoreColor} />
-                  <span className={`text-xs font-bold ${scoreColor}`}>{leadScore}</span>
                 </div>
               </div>
 
@@ -590,11 +578,6 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
                       <p className="text-sm text-muted-foreground mt-1">
                         {t('enquiryForm.successMessage', { agentName: agent.name })}
                       </p>
-                    </div>
-
-                    <div className="w-full p-3 rounded-xl bg-secondary text-center">
-                      <p className="text-[11px] text-muted-foreground uppercase tracking-wider">{t('enquiryForm.leadScoreLabel')}</p>
-                      <p className={`text-xl font-bold ${scoreColor}`}>{leadScore}/100</p>
                     </div>
 
                     <button onClick={onClose}

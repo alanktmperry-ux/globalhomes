@@ -8,7 +8,7 @@ declare global {
   }
 }
 
-export function RouteTracker() {
+export function RouteTracker(): null {
   const { pathname, search } = useLocation();
   useEffect(() => {
     const path = pathname + search;

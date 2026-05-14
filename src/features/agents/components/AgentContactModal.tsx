@@ -444,10 +444,6 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
                   <p className="font-display font-semibold text-foreground text-sm truncate">{agent.name}</p>
                   <p className="text-xs text-muted-foreground truncate">{property.title} · {property.priceFormatted}</p>
                 </div>
-                <div className="flex flex-col items-center">
-                  <TrendingUp size={14} className={scoreColor} />
-                  <span className={`text-xs font-bold ${scoreColor}`}>{leadScore}</span>
-                </div>
               </div>
 
               {/* Quick contact (always visible) */}

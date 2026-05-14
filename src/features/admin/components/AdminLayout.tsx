@@ -110,7 +110,13 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-background flex">
-      <AdminSidebar pendingApprovalsTotal={pendingTotal} isSupport={isSupport && !isAdmin} />
+      <AdminSidebar
+        pendingApprovalsTotal={pendingTotal}
+        isSupport={isSupport && !isAdmin}
+        listingsPendingCount={listingsPendingCount}
+        agentsStuckCount={agentsStuckCount}
+        failedPaymentsCount={failedPaymentsCount}
+      />
 
       <main className="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">
         {/* Header strip */}

@@ -19,12 +19,18 @@ function nextStage(currentStage: Stage, daysSinceFailure: number): Stage | null 
   return null;
 }
 
+const CRON_SECRET = Deno.env.get('CRON_SECRET') ?? 'listhq-cron-2026-xK9mP3qR';
+
 async function authorise(req: Request): Promise<{ ok: true } | { ok: false; status: number; error: string }> {
+  // Cron path — shared secret header
+  const cronHeader = req.headers.get('x-cron-secret');
+  if (cronHeader && cronHeader === CRON_SECRET) return { ok: true };
+
   const authHeader = req.headers.get('Authorization');
   if (!authHeader?.startsWith('Bearer ')) return { ok: false, status: 401, error: 'Unauthorized' };
   const token = authHeader.replace('Bearer ', '').trim();
 
-  // Service-role key path (cron)
+  // Service-role key path
   if (token === SERVICE_ROLE) return { ok: true };
 
   // Admin-user path (manual run)

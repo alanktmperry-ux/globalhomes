@@ -257,6 +257,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (isFetching.current) return;
 
     let cancelled = false;
+    let rolesFetched = false;
+    const watchdog = setTimeout(() => {
+      if (cancelled || rolesFetched) return;
+      console.warn('[AuthProvider] Role fetch exceeded 10s safety timeout — treating user as unauthenticated for admin routes');
+      clearRoles();
+      lastFetchedUserId.current = null;
+      isFetching.current = false;
+      setLoading(false);
+    }, 10000);
     const doFetch = async () => {
       if (isFetching.current) return;
       isFetching.current = true;

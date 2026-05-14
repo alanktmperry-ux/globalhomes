@@ -77,6 +77,19 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
       metadata: buildAuditMeta({ reason, admin_email: user?.email }),
     } as any);
     if (auditError) console.error('[AgentApprovalQueue] audit log failed:', auditError);
+
+    // Also append to immutable admin audit log
+    const { error: adminAuditErr } = await supabase.from('admin_audit_log' as any).insert({
+      actor_id: user?.id ?? null,
+      actor_email: user?.email ?? 'unknown',
+      action: action === 'approve' ? 'agent.approved' : 'agent.rejected',
+      target_type: 'agent',
+      target_id: agent.id,
+      target_summary: `${agent.name}${agent.email ? ` (${agent.email})` : ''}`,
+      after_state: { approval_status: action === 'approve' ? 'approved' : 'rejected' },
+      notes: reason,
+    } as any);
+    if (adminAuditErr) console.error('[AgentApprovalQueue] admin_audit_log failed:', adminAuditErr);
   };
 
   const handleApprove = (agent: PendingAgent) => {

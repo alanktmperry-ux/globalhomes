@@ -11,10 +11,12 @@ interface Props {
   requireAdmin?: boolean;
   requirePartner?: boolean;
   requireSupport?: boolean;
+  /** Block seekers (userRole === 'user') from this route. Use on agent-only flows that don't require an existing agent record (e.g. /onboarding/agency). */
+  blockSeekers?: boolean;
 }
 
-export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePartner, requireSupport }: Props) => {
-  const { user, loading, isAgent, isAdmin, isPartner, isSupport } = useAuth();
+export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePartner, requireSupport, blockSeekers }: Props) => {
+  const { user, loading, isAgent, isAdmin, isPartner, isSupport, isPrincipal, userRole } = useAuth();
   const [approvalState, setApprovalState] = useState<'loading' | 'pending' | 'approved' | 'none'>('loading');
 
   useEffect(() => {
@@ -54,7 +56,6 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
   }
 
   if (!user) {
-    // No session — bounce to the appropriate login screen.
     if (requireAdmin || requireSupport) return <Navigate to="/admin/login" replace />;
     if (requirePartner) return <Navigate to="/" replace />;
     return <Navigate to="/login" replace />;
@@ -64,7 +65,15 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
     return <Navigate to="/check-email" replace />;
   }
 
-  // User exists and loading=false ⇒ roles are fetched; trust them.
+  // Role-boundary guard: a seeker must never enter agent-only flows.
+  // Applies to requireAgent routes AND blockSeekers routes (e.g. /onboarding/agency).
+  // Admins, agents, principals, partners, support all bypass this check.
+  const isSeekerOnly =
+    userRole === 'user' && !isAgent && !isAdmin && !isPartner && !isSupport && !isPrincipal;
+  if ((requireAgent || blockSeekers) && isSeekerOnly) {
+    return <Navigate to="/seeker/dashboard" replace />;
+  }
+
   if (requireAdmin && !isAdmin) return <Navigate to="/admin/login" replace />;
   if (requireSupport && !isAdmin && !isSupport) return <Navigate to="/admin/login" replace />;
 
@@ -73,8 +82,6 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
     return <Navigate to="/onboarding/agency" replace />;
   }
 
-  // Auto-approval model: agents are approved on wizard completion. If somehow still pending,
-  // route them back to the wizard to finish their details rather than blocking them.
   if (requireAgent && !isAdmin && approvalState === 'pending') {
     return <Navigate to="/onboarding/agency" replace />;
   }

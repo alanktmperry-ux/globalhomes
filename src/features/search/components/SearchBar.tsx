@@ -16,14 +16,14 @@ interface SearchBarProps {
 
 export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: SearchBarProps) {
   const [query, setQuery] = useState(initialValue);
-  const [isTranslating, setIsTranslating] = useState(false);
-  const [detectedLang, setDetectedLang] = useState<string | null>(null);
+  const [isParsing, setIsParsing] = useState(false);
   const [suggestions, setSuggestions] = useState<{ description: string; place_id: string }[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleVoiceResult = useCallback((text: string) => {
     setQuery(text);

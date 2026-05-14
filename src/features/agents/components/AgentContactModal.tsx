@@ -127,13 +127,7 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
   const [depositAmount, setDepositAmount] = useState<number | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [leadScore, setLeadScore] = useState(30);
   const { t } = useTranslation();
-
-  // Recalculate score on form changes
-  useEffect(() => {
-    setLeadScore(calcLeadScore(formData, searchContext));
-  }, [formData, searchContext]);
 
   // ── Increment contact_clicks once per modal open ──────────
   const contactTracked = useRef(false);

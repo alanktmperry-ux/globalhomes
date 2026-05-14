@@ -209,13 +209,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUserRole(null);
     setAgencyRole(null);
     setAgencyId(null);
-    setRolesFetched(false);
   }, []);
 
   const refreshRoles = useCallback(async () => {
     if (!user) return;
     lastFetchedUserId.current = null;
-    setRolesFetched(false);
     const [rolesResult, agentResult] = await Promise.all([
       supabase.from('user_roles').select('role').eq('user_id', user.id),
       supabase.from('agents').select('id, agency_role, agency_id, approval_status').eq('user_id', user.id).maybeSingle(),
@@ -245,7 +243,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     }
     lastFetchedUserId.current = user.id;
-    setRolesFetched(true);
   }, [user, applyRoles]);
 
   // Fetch roles
@@ -255,7 +252,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     // Same user with roles already fetched — skip to avoid role flicker on navigation
-    if (lastFetchedUserId.current === user.id && rolesFetched) return;
+    if (lastFetchedUserId.current === user.id) return;
 
     if (isFetching.current) return;
 
@@ -341,14 +338,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } finally {
         isFetching.current = false;
         if (!cancelled) {
-          setRolesFetched(true);
+          
           setLoading(false);
         }
       }
     };
     doFetch();
     return () => { cancelled = true; };
-  }, [user, applyRoles, clearRoles, rolesFetched]);
+  }, [user, applyRoles, clearRoles]);
 
   // Auth listener
   useEffect(() => {
@@ -388,7 +385,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const isNewUser = lastFetchedUserId.current !== session.user.id;
           if (isNewUser) {
             lastFetchedUserId.current = null;
-            setRolesFetched(false);
+            
             setLoading(true);
           }
           // Clean up email confirmation hash from URL

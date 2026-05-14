@@ -26,38 +26,65 @@ const PROPERTIES_WITH_AGENTS =
 interface BuyFilters {
   suburbs: string[];
   state?: string;
+  postcode?: string;
   minBeds?: number;
+  maxBeds?: number;
   minBaths?: number;
   minParking?: number;
   minPrice?: number;
   maxPrice?: number;
   propertyType?: string;
+  features: string[];
+  rawQuery?: string;
+  lowConfidence?: boolean;
   sort: 'newest' | 'price_asc' | 'price_desc';
 }
 
-const EMPTY_FILTERS: BuyFilters = { suburbs: [], sort: 'newest' };
+const EMPTY_FILTERS: BuyFilters = { suburbs: [], features: [], sort: 'newest' };
 
 function parseFiltersFromParams(sp: URLSearchParams): BuyFilters {
   const sort = sp.get('sort');
-  const q = sp.get('q');
-  const location = sp.get('location'); // e.g. ?location=St+Kilda from search bar
-  // Support `?q=Toorak,Hawthorn`, repeated `?suburb=`, or `?location=Prahran`
+  // Suburbs: support `?q=A,B`, `?suburb=A` (single, from Smart Search), `?location=A`, repeated `?suburb=`
   let suburbs: string[] = [];
-  if (q) {
+  const smartSuburb = sp.get('suburb');
+  const q = sp.get('q');
+  const location = sp.get('location');
+  if (smartSuburb && !sp.getAll('suburb').slice(1).length) {
+    suburbs = [smartSuburb];
+  } else if (sp.getAll('suburb').length > 0) {
+    suburbs = sp.getAll('suburb').filter(Boolean);
+  } else if (q) {
     suburbs = q.split(',').map(s => s.trim()).filter(Boolean);
   } else if (location) {
     suburbs = location.split(',').map(s => s.trim()).filter(Boolean);
-  } else {
-    suburbs = sp.getAll('suburb').filter(Boolean);
   }
+
+  // Smart Search uses `type` as comma-list of property types — keep first one for the existing single-select UI
+  const typeParam = sp.get('type');
+  const propertyType = typeParam ? typeParam.split(',')[0].trim() || undefined : undefined;
+
+  const features = sp.get('features')?.split(',').map(s => s.trim()).filter(Boolean) ?? [];
+
+  // Read both legacy (`beds`, `priceMin`) and Smart Search (`beds_min`, `min_price`) names
+  const num = (k: string) => {
+    const v = sp.get(k);
+    return v && !Number.isNaN(Number(v)) ? Number(v) : undefined;
+  };
+
   return {
     suburbs,
-    minBeds: sp.get('beds') ? Number(sp.get('beds')) : undefined,
-    minBaths: sp.get('baths') ? Number(sp.get('baths')) : undefined,
-    minParking: sp.get('parking') ? Number(sp.get('parking')) : undefined,
-    minPrice: sp.get('priceMin') ? Number(sp.get('priceMin')) : undefined,
-    maxPrice: sp.get('priceMax') ? Number(sp.get('priceMax')) : undefined,
-    propertyType: sp.get('type') || undefined,
+    state: sp.get('state') || undefined,
+    postcode: sp.get('postcode') || undefined,
+    minBeds: num('beds_min') ?? num('beds'),
+    maxBeds: num('beds_max'),
+    minBaths: num('baths_min') ?? num('baths'),
+    minParking: num('parking_min') ?? num('parking'),
+    minPrice: num('min_price') ?? num('priceMin'),
+    maxPrice: num('max_price') ?? num('priceMax'),
+    propertyType,
+    features,
+    rawQuery: sp.get('raw_q') || undefined,
+    lowConfidence: sp.get('low_confidence') === '1',
     sort: sort === 'price_asc' || sort === 'price_desc' ? sort : 'newest',
   };
 }
@@ -65,12 +92,17 @@ function parseFiltersFromParams(sp: URLSearchParams): BuyFilters {
 function filtersToParams(f: BuyFilters): Record<string, string> {
   const out: Record<string, string> = {};
   if (f.suburbs.length) out.q = f.suburbs.join(',');
+  if (f.state) out.state = f.state;
+  if (f.postcode) out.postcode = f.postcode;
   if (f.minBeds) out.beds = String(f.minBeds);
+  if (f.maxBeds) out.beds_max = String(f.maxBeds);
   if (f.minBaths) out.baths = String(f.minBaths);
   if (f.minParking) out.parking = String(f.minParking);
   if (f.minPrice) out.priceMin = String(f.minPrice);
   if (f.maxPrice) out.priceMax = String(f.maxPrice);
   if (f.propertyType) out.type = f.propertyType;
+  if (f.features.length) out.features = f.features.join(',');
+  if (f.rawQuery) out.raw_q = f.rawQuery;
   if (f.sort && f.sort !== 'newest') out.sort = f.sort;
   return out;
 }
@@ -361,12 +393,15 @@ const BuyPage = () => {
           q = q.or(orExpr);
         }
         if (filters.state) q = q.eq('state', filters.state.toUpperCase());
+        if (filters.postcode) q = q.eq('postcode', filters.postcode);
         if (filters.minBeds) q = q.gte('beds', filters.minBeds);
+        if (filters.maxBeds) q = q.lte('beds', filters.maxBeds);
         if (filters.minBaths) q = q.gte('baths', filters.minBaths);
         if (filters.minParking) q = q.gte('cars', filters.minParking);
         if (filters.minPrice) q = q.gte('price', filters.minPrice);
         if (filters.maxPrice) q = q.lte('price', filters.maxPrice);
         if (filters.propertyType) q = q.ilike('property_type', `%${filters.propertyType}%`);
+        if (filters.features.length) q = q.contains('features', filters.features);
 
         const { data, error } = await q;
         if (cancelled) return;
@@ -407,7 +442,8 @@ const BuyPage = () => {
 
   const activeChipCount = useMemo(
     () => filters.suburbs.length
-      + [filters.minBeds, filters.minBaths, filters.minParking, filters.minPrice, filters.maxPrice, filters.propertyType]
+      + filters.features.length
+      + [filters.minBeds, filters.maxBeds, filters.minBaths, filters.minParking, filters.minPrice, filters.maxPrice, filters.propertyType, filters.state, filters.postcode]
         .filter(v => v !== undefined && v !== '').length,
     [filters],
   );
@@ -543,6 +579,7 @@ const BuyPage = () => {
                   minPrice: parsed.priceMin,
                   maxPrice: parsed.priceMax,
                   propertyType: parsed.propertyType,
+                  features: [],
                   sort: 'newest',
                 }));
               }}
@@ -591,38 +628,95 @@ const BuyPage = () => {
                 )}
               </div>
 
+              {/* Smart Search context (raw query + low-confidence hint) */}
+              {(filters.rawQuery || filters.lowConfidence) && (
+                <div className={`rounded-lg border px-3 py-2 text-xs ${filters.lowConfidence ? 'border-amber-300 bg-amber-50 text-amber-900' : 'border-primary/20 bg-primary/5 text-foreground'}`}>
+                  {filters.rawQuery && (
+                    <span><Sparkles className="inline h-3 w-3 mr-1 text-primary" />{t('Searched')}: <span className="font-medium">{filters.rawQuery}</span></span>
+                  )}
+                  {filters.lowConfidence && (
+                    <span className="ml-2">{t("We weren't fully sure — adjust the chips below if any are off.")}</span>
+                  )}
+                </div>
+              )}
+
               {/* Desktop: Inline sticky filter bar */}
               <div className="hidden md:block sticky top-0 z-30 bg-background/95 backdrop-blur py-3 -mx-4 px-4">
                 <FilterControls filters={filters} onChange={updateFilters} layout="inline" />
                 {hasActiveFilters && (
                   <div className="flex flex-wrap items-center gap-1.5 mt-2">
                     {filters.suburbs.map(s => (
-                      <span key={s} className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full"> {s}</span>
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => updateFilters(f => ({ ...f, suburbs: f.suburbs.filter(x => x !== s) }))}
+                        className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15"
+                      >
+                        {s} <X className="h-3 w-3" />
+                      </button>
                     ))}
+                    {filters.state && (
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, state: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        {filters.state} <X className="h-3 w-3" />
+                      </button>
+                    )}
+                    {filters.postcode && (
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, postcode: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        {filters.postcode} <X className="h-3 w-3" />
+                      </button>
+                    )}
                     {filters.minBeds && (
-                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{filters.minBeds}+ {t('beds')}</span>
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, minBeds: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        {filters.minBeds}+ {t('beds')} <X className="h-3 w-3" />
+                      </button>
+                    )}
+                    {filters.maxBeds && (
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, maxBeds: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        ≤ {filters.maxBeds} {t('beds')} <X className="h-3 w-3" />
+                      </button>
                     )}
                     {filters.minBaths && (
-                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{filters.minBaths}+ {t('baths')}</span>
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, minBaths: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        {filters.minBaths}+ {t('baths')} <X className="h-3 w-3" />
+                      </button>
                     )}
                     {filters.minParking && (
-                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{filters.minParking}+ {t('cars')}</span>
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, minParking: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        {filters.minParking}+ {t('cars')} <X className="h-3 w-3" />
+                      </button>
                     )}
                     {filters.maxPrice && (
-                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{t('Under')} {AUD.format(filters.maxPrice)}</span>
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, maxPrice: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        {t('Under')} {AUD.format(filters.maxPrice)} <X className="h-3 w-3" />
+                      </button>
                     )}
                     {filters.minPrice && (
-                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{t('Over')} {AUD.format(filters.minPrice)}</span>
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, minPrice: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        {t('Over')} {AUD.format(filters.minPrice)} <X className="h-3 w-3" />
+                      </button>
                     )}
                     {filters.propertyType && (
-                      <span className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{t(filters.propertyType)}</span>
+                      <button type="button" onClick={() => updateFilters(f => ({ ...f, propertyType: undefined }))} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15">
+                        {t(filters.propertyType)} <X className="h-3 w-3" />
+                      </button>
                     )}
+                    {filters.features.map(feat => (
+                      <button
+                        key={feat}
+                        type="button"
+                        onClick={() => updateFilters(f => ({ ...f, features: f.features.filter(x => x !== feat) }))}
+                        className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full hover:bg-primary/15"
+                      >
+                        {t(feat)} <X className="h-3 w-3" />
+                      </button>
+                    ))}
                     <Button variant="ghost" size="sm" onClick={clearFilters} className="h-7 text-xs text-muted-foreground ml-1">
                       <X className="h-3 w-3 mr-1" /> {t('Clear all')}
                     </Button>
                   </div>
                 )}
               </div>
+
 
               {/* Results */}
               {isLoading ? (

@@ -12,12 +12,18 @@ import { Filter, X } from 'lucide-react';
 import { AIPropertySearch } from '@/features/properties/components/AIPropertySearch';
 
 function parseRentalFiltersFromParams(sp: URLSearchParams): RentalFilters {
+  const num = (k: string) => {
+    const v = sp.get(k);
+    return v && !Number.isNaN(Number(v)) ? Number(v) : undefined;
+  };
+  const types = sp.get('type')?.split(',').map(s => s.trim()).filter(Boolean);
   return {
-    suburb: sp.get('q') || undefined,
-    minBedrooms: sp.get('beds') ? Number(sp.get('beds')) : undefined,
-    minRent: sp.get('priceMin') ? Number(sp.get('priceMin')) : undefined,
-    maxRent: sp.get('priceMax') ? Number(sp.get('priceMax')) : undefined,
-    propertyTypes: sp.get('type') ? [sp.get('type')!] : undefined,
+    suburb: sp.get('suburb') || sp.get('q') || sp.get('location') || undefined,
+    state: sp.get('state') || undefined,
+    minBedrooms: num('beds_min') ?? num('beds'),
+    minRent: num('min_price') ?? num('priceMin'),
+    maxRent: num('max_price') ?? num('priceMax'),
+    propertyTypes: types && types.length ? types : undefined,
   };
 }
 

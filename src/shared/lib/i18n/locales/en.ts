@@ -3240,6 +3240,22 @@ export const en = {
   'mortgage.referral.validation.nameRequired': "Name is required",
   'mortgage.referral.validation.invalidEmail': "Invalid email",
   'mortgage.referral.validation.phoneRequired': "Phone is required",
+
+  // ──────────────────────────────────────────────────────────────────
+  // Smart Search — zero-result Halo banner & wizard prefill
+  // ──────────────────────────────────────────────────────────────────
+  'search.banner.cta': "Post as a Halo",
+  'search.banner.free_to_post': "Free to post · No account upgrade needed",
+  'search.banner.no_matches': "No matches today for",
+  'search.banner.only': "Only",
+  'search.banner.match_for': "match for",
+  'search.common.bed': "bed",
+  'search.common.car': "car",
+  'search.common.in': "in",
+  'search.common.under': "under",
+  'halo.prefilled_from_search.heading': "We've pre-filled your Halo from your search",
+  'halo.prefilled_from_search.based_on': "Based on",
+  'halo.prefilled_from_search.body': "Review the details and post — usually takes 30 seconds.",
 } as const;
 
 export type TranslationKey = keyof typeof en;

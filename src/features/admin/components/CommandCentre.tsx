@@ -1240,7 +1240,7 @@ export default function CommandCentre() {
         />
         <KPI
           label="MoM growth"
-          value={`${(data.monthlyGrowthRate * 100).toFixed(1)}%`}
+          value={calcMoMGrowth(data.paidAgents, data.paidAgents - (data.paidAgents - data.paidAgentsPrevWeek))}
           sub={data.monthlyGrowthRate > 0 ? 'paid agents vs last month' : data.monthlyGrowthRate < 0 ? 'paid agents vs last month' : 'no change vs last month'}
           color={data.monthlyGrowthRate > 0 ? 'text-emerald-500' : data.monthlyGrowthRate < 0 ? 'text-destructive' : 'text-muted-foreground'}
           trend={data.monthlyGrowthRate > 0 ? 'up' : data.monthlyGrowthRate < 0 ? 'down' : 'flat'}

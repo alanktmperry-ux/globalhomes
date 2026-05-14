@@ -1,13 +1,12 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Search, Mic, MapPin, Loader2 } from 'lucide-react';
-import { capture } from '@/shared/lib/posthog';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from '@/shared/lib/i18n';
 import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
 import { autocomplete } from '@/shared/lib/googleMapsService';
 import { useToast } from '@/shared/hooks/use-toast';
-import { detectLanguage } from '@/features/search/lib/detectLanguage';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;

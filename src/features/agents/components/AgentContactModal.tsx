@@ -580,11 +580,6 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
                       </p>
                     </div>
 
-                    <div className="w-full p-3 rounded-xl bg-secondary text-center">
-                      <p className="text-[11px] text-muted-foreground uppercase tracking-wider">{t('enquiryForm.leadScoreLabel')}</p>
-                      <p className={`text-xl font-bold ${scoreColor}`}>{leadScore}/100</p>
-                    </div>
-
                     <button onClick={onClose}
                       className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors">
                       {t('enquiryForm.doneButton')}

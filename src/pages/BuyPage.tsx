@@ -16,6 +16,7 @@ import { PropertyMap } from '@/features/properties/components/PropertyMap';
 import { Switch } from '@/components/ui/switch';
 import { SearchModeTabs } from '@/features/search/components/SearchModeTabs';
 import { SuburbChipInput } from '@/features/search/components/SuburbChipInput';
+import { SmartSearchBanner } from '@/features/search/SmartSearchBanner';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useSavedSearchesDB } from '@/features/alerts/hooks/useSavedSearchesDB';
 import { toast } from 'sonner';
@@ -775,23 +776,41 @@ const BuyPage = () => {
                   </div>
                 )
               ) : (
-                <div className="flex flex-col items-center text-center py-20">
-                  <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center mb-4">
-                    <Home className="h-6 w-6 text-muted-foreground" />
+                <>
+                  <SmartSearchBanner
+                    parsedFilters={{
+                      intent: 'buy',
+                      suburb: filters.suburbs[0],
+                      bedsMin: filters.minBeds,
+                      bedsMax: filters.maxBeds,
+                      bathsMin: filters.minBaths,
+                      parkingMin: filters.minParking,
+                      minPrice: filters.minPrice,
+                      maxPrice: filters.maxPrice,
+                      propertyTypes: filters.propertyType ? [filters.propertyType] : undefined,
+                      features: filters.features,
+                      rawQuery: filters.rawQuery,
+                    }}
+                    resultCount={0}
+                  />
+                  <div className="flex flex-col items-center text-center py-12">
+                    <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center mb-4">
+                      <Home className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-foreground mb-1">
+                      {t('No properties found')}
+                    </h3>
+                    <p className="text-sm text-muted-foreground max-w-sm mb-6">
+                      {t('Try adjusting your filters — remove a bedroom requirement or widen the price range.')}
+                    </p>
+                    <button
+                      onClick={clearFilters}
+                      className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                    >
+                      {t('Clear all filters')}
+                    </button>
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-1">
-                    {t('No properties found')}
-                  </h3>
-                  <p className="text-sm text-muted-foreground max-w-sm mb-6">
-                    {t('Try adjusting your filters — remove a bedroom requirement or widen the price range.')}
-                  </p>
-                  <button
-                    onClick={clearFilters}
-                    className="h-10 px-6 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
-                  >
-                    {t('Clear all filters')}
-                  </button>
-                </div>
+                </>
               )}
 
               {/* Load more */}

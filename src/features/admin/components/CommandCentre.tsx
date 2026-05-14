@@ -1084,8 +1084,28 @@ export default function CommandCentre() {
         </div>
       )}
 
-      {/* SECTION 2 — Revenue pulse */}
-      {!isSupport && (<>
+      {/* SECTION 2 — Revenue */}
+      {!isSupport && !stripeConnected && (
+        <>
+          <SectionHead title="Revenue" sub="Live revenue from Stripe" />
+          <button
+            onClick={() => navigate('/admin/revenue')}
+            className="w-full text-left rounded-2xl border border-dashed border-border bg-card p-6 hover:bg-accent transition-colors flex items-center gap-4"
+          >
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <DollarSign size={22} className="text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-foreground">Connect Stripe to see revenue</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                MRR, ARR, churn, and forecasts will appear here once Stripe is connected.
+              </p>
+            </div>
+            <ArrowRight size={16} className="text-muted-foreground shrink-0" />
+          </button>
+        </>
+      )}
+      {!isSupport && stripeConnected && (<>
       <SectionHead title="Revenue pulse" sub="Monthly recurring revenue and conversion" />
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
         <KPI

@@ -179,6 +179,8 @@ export function LanguageSwitcher() {
                   onClick={() => selectLang(item)}
                   role="option"
                   aria-selected={isActive}
+                  lang={item.code}
+                  dir={['ar', 'fa', 'ur'].includes(item.code) ? 'rtl' : undefined}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-[13px] transition-colors ${
                     !item.available
                       ? 'text-[#9CA3AF] cursor-not-allowed'

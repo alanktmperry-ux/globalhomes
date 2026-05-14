@@ -106,7 +106,13 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
         className="group cursor-pointer rounded-2xl bg-card shadow-card overflow-hidden border border-border/50 transition-all duration-300 hover:shadow-elevated active:scale-[0.99]"
       >
         {/* Image */}
-        <div className="relative aspect-[4/3] overflow-hidden" onClick={() => { onSelect(property); navigate(`/property/${property.id}`); }}>
+        <div
+          role="button"
+          tabIndex={0}
+          className="relative aspect-[4/3] overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          onClick={() => { onSelect(property); navigate(`/property/${property.id}`); }}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(property); navigate(`/property/${property.id}`); } }}
+        >
           <img
             {...cardImageProps(property.imageUrl, property.title)}
             loading={priority ? 'eager' : 'lazy'}
@@ -161,7 +167,13 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
         </div>
 
         {/* Property info */}
-        <div className="p-4" onClick={() => { onSelect(property); navigate(`/property/${property.id}`); }}>
+        <div
+          role="button"
+          tabIndex={0}
+          className="p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          onClick={() => { onSelect(property); navigate(`/property/${property.id}`); }}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(property); navigate(`/property/${property.id}`); } }}
+        >
           <h3 className="font-display font-semibold text-foreground text-base leading-tight mb-1 line-clamp-1">
             {titleTranslating ? (
               <span className="inline-block h-4 w-3/4 rounded bg-muted animate-pulse align-middle" aria-hidden />

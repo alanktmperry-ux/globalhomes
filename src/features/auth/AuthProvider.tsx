@@ -390,10 +390,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.error('[AuthProvider] role fetch error:', err);
         toast.error('Could not load your account permissions. Please refresh the page or sign out and back in.');
       } finally {
-        if (activeRolesRequestId.current === requestId) {
+        const isCurrent = activeRolesRequestId.current === requestId;
+        const isInvalidated = invalidatedRolesRequestId.current === requestId;
+        if (isCurrent) {
           isFetching.current = false;
         }
-        if (!cancelled && invalidatedRolesRequestId.current !== requestId && activeRolesRequestId.current === requestId) {
+        console.log('[AuthProvider] roles fetch settled', { requestId, cancelled, isCurrent, isInvalidated });
+        if (!cancelled && !isInvalidated && isCurrent) {
           updateLoading(false, 'roles fetch settled');
         }
       }

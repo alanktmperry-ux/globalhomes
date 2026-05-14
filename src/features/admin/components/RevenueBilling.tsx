@@ -10,6 +10,8 @@ import {
 } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import StripeConnectionCard from './StripeConnectionCard';
+import type { StripeStatus } from '@/features/admin/lib/stripeStatus';
 
 const PLAN_LABELS: Record<string, string> = {
   solo: 'Solo',

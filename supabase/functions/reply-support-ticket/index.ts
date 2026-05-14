@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { logAdminAction } from "../_shared/adminAudit.ts";
 
 Deno.serve(async (req) => {
   const cors = getCorsHeaders(req.headers.get('origin'));

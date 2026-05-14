@@ -345,11 +345,15 @@ export default function RevenueBilling() {
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KPI
-          label="Estimated MRR"
+          label={isStripeLive ? 'MRR' : 'Estimated MRR'}
           value={fmt(totalMrr)}
           icon={DollarSign}
           color={totalMrr > 0 ? 'text-emerald-500' : 'text-muted-foreground'}
-          sub={mrrGrowthPct !== null ? `${mrrGrowthPct >= 0 ? '+' : ''}${mrrGrowthPct}% vs last month · pre-Stripe` : 'From plan data · pre-Stripe'}
+          sub={
+            mrrGrowthPct !== null
+              ? `${mrrGrowthPct >= 0 ? '+' : ''}${mrrGrowthPct}% vs last month${isStripeLive ? '' : ' · pre-Stripe'}`
+              : isStripeLive ? 'From Stripe' : 'From plan data · pre-Stripe'
+          }
           trend={mrrGrowthPct !== null ? (mrrGrowthPct >= 0 ? 'up' : 'down') : null}
         />
         <KPI label="Annual Run Rate" value={fmt(totalArr)} icon={TrendingUp} color={totalArr > 0 ? 'text-emerald-500' : 'text-muted-foreground'} sub="Annualised run rate" />

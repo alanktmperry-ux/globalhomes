@@ -57,10 +57,48 @@ export default function AdminLayout() {
 
     async function loadCounts() {
       try {
-        // IMPORTANT: these filters MUST mirror what ApprovalsPage actually displays,
-        // otherwise the sidebar badge and the page list go out of sync.
-        // Listings auto-publish on submission and are not part of this count.
         const [agentsRes, demosRes, partnersRes] = await Promise.all([
+          supabase.from('agents').select('id', { count: 'exact', head: true }).eq('approval_status', 'pending'),
+          (supabase.from('demo_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
+          (supabase.from('partners').select('id', { count: 'exact', head: true }).eq('is_verified', false)) as any,
+        ]);
+        if (cancelled) return;
+        const total = (agentsRes.count ?? 0) + (demosRes.count ?? 0) + (partnersRes.count ?? 0);
+        setPendingTotal(total);
+      } catch {
+        if (!cancelled) setPendingTotal(0);
+      }
+
+      // Sidebar item badges — each guarded so a column-missing failure
+      // gracefully hides the badge instead of showing a fake zero.
+      try {
+        const r = await (supabase.from('properties') as any)
+          .select('id', { count: 'exact', head: true })
+          .eq('moderation_status', 'pending');
+        if (!cancelled) setListingsPendingCount(r.error ? undefined : (r.count ?? 0));
+      } catch {
+        if (!cancelled) setListingsPendingCount(undefined);
+      }
+      try {
+        const r = await (supabase.from('agents') as any)
+          .select('id', { count: 'exact', head: true })
+          .eq('approval_status', 'approved')
+          .eq('onboarding_complete', false);
+        if (!cancelled) setAgentsStuckCount(r.error ? undefined : (r.count ?? 0));
+      } catch {
+        if (!cancelled) setAgentsStuckCount(undefined);
+      }
+      try {
+        const since = new Date(Date.now() - 30 * 86400000).toISOString();
+        const r = await (supabase.from('agents') as any)
+          .select('id', { count: 'exact', head: true })
+          .not('payment_failed_at', 'is', null)
+          .gte('payment_failed_at', since);
+        if (!cancelled) setFailedPaymentsCount(r.error ? undefined : (r.count ?? 0));
+      } catch {
+        if (!cancelled) setFailedPaymentsCount(undefined);
+      }
+    }
           supabase.from('agents').select('id', { count: 'exact', head: true }).eq('approval_status', 'pending'),
           (supabase.from('demo_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
           // Match PartnersTab: unverified partners

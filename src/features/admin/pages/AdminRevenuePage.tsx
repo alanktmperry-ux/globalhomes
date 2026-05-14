@@ -1,14 +1,15 @@
-import { EmptyState } from '@/components/ui/empty-state';
+import RevenueBilling from '@/features/admin/components/RevenueBilling';
 
 export default function AdminRevenuePage() {
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-foreground">Revenue</h1>
-      <EmptyState
-        icon="solar:wallet-2-linear"
-        title="Revenue dashboard is in progress"
-        body="Billing, subscriptions, and growth funnels will live here."
-      />
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Revenue</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          MRR, ARR, plan breakdown, churn, failed payments, and renewal pipeline.
+        </p>
+      </div>
+      <RevenueBilling />
     </div>
   );
 }

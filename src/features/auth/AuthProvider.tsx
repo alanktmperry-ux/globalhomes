@@ -70,6 +70,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [impersonatedUserId, setImpersonatedUserId] = useState<string | null>(null);
   const [impersonationSessionId, setImpersonationSessionId] = useState<string | null>(null);
 
+  const updateLoading = useCallback((next: boolean, reason: string) => {
+    console.log('[AuthProvider] setLoading(' + next + ') — ' + reason);
+    setLoading(next);
+  }, []);
+
   // Load active impersonation session from Supabase (server-side, can't be tampered with via DevTools)
   useEffect(() => {
     if (!user || !isAdmin) {
@@ -247,6 +252,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Fetch roles
   useEffect(() => {
+    let rolesFetched = false;
+    console.log('[AuthProvider] roles effect triggered, user.id:', user?.id, 'rolesFetched:', rolesFetched);
     if (!user) {
       clearRoles();
       return;
@@ -257,14 +264,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (isFetching.current) return;
 
     let cancelled = false;
-    let rolesFetched = false;
     const watchdog = setTimeout(() => {
       if (cancelled || rolesFetched) return;
-      console.warn('[AuthProvider] Role fetch exceeded 10s safety timeout — treating user as unauthenticated for admin routes');
+      console.warn('[AuthProvider] 10s watchdog FIRED — forcing loading=false, treating user as no-roles');
       clearRoles();
       lastFetchedUserId.current = null;
       isFetching.current = false;
-      setLoading(false);
+      updateLoading(false, '10s roles watchdog fired');
     }, 10000);
     const doFetch = async () => {
       if (isFetching.current) return;
@@ -272,6 +278,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       lastFetchedUserId.current = user.id;
 
       try {
+        console.log('[AuthProvider] fetching roles for user:', user.id);
         const [rolesResult, agentResult] = await Promise.all([
           supabase.from('user_roles').select('role').eq('user_id', user.id),
           supabase
@@ -282,8 +289,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         ]);
         if (cancelled) return;
 
-        const { data } = rolesResult;
-        const roles = data?.map((r) => r.role) || [];
+        const { data: rolesData, error: rolesError } = rolesResult;
+        if (rolesError) throw rolesError;
+        console.log('[AuthProvider] roles fetched:', rolesData?.length ?? 0, 'rows');
+        const roles = rolesData?.map((r) => r.role) || [];
 
         // Fallback: if no agent role, check agents table — only honour it when approved
         const { data: agentData } = agentResult;
@@ -342,54 +351,56 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
         }
       } catch (err) {
-        console.error('[Auth] fetchRoles error:', err);
+        console.error('[AuthProvider] role fetch error:', err);
         toast.error('Could not load your account permissions. Please refresh the page or sign out and back in.');
       } finally {
         rolesFetched = true;
         clearTimeout(watchdog);
+        console.log('[AuthProvider] watchdog cleared (fetch completed first)');
         isFetching.current = false;
         if (!cancelled) {
-          setLoading(false);
+          updateLoading(false, 'roles fetch settled');
         }
       }
     };
     doFetch();
     return () => { cancelled = true; clearTimeout(watchdog); };
-  }, [user, applyRoles, clearRoles]);
+  }, [user, applyRoles, clearRoles, updateLoading]);
 
   // Auth listener
   useEffect(() => {
+    console.log('[AuthProvider] mounted, subscribing to auth state changes');
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        
+      (event, session) => {
+        console.log('[AuthProvider] auth event:', event, 'user:', session?.user?.id ?? 'null');
 
         // Explicit sign-out — only clear if there is no active session
         // (guards against spurious SIGNED_OUT from detectSessionInUrl on navigation)
-        if (_event === 'SIGNED_OUT') {
+        if (event === 'SIGNED_OUT') {
           if (session) return; // session still valid, ignore
           setSession(null);
           setUser(null);
           clearRoles();
-          setLoading(false);
+          updateLoading(false, 'SIGNED_OUT with no active session');
           return;
         }
 
         // Silent token refresh or initial session load — update session
         // without resetting roles or triggering loading spinner
-        if (_event === 'TOKEN_REFRESHED' || _event === 'INITIAL_SESSION') {
+        if (event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
           setSession(session);
           setUser(session?.user ?? null);
-          if (!session?.user) setLoading(false);
+          if (!session?.user) updateLoading(false, event + ' without session user');
           return;
         }
 
         // Genuine new sign-in — re-fetch roles only if different user
-        if (_event === 'SIGNED_IN' && session?.user) {
+        if (event === 'SIGNED_IN' && session?.user) {
           const isNewUser = lastFetchedUserId.current !== session.user.id;
           if (isNewUser) {
             lastFetchedUserId.current = null;
-            
-            setLoading(true);
+
+            updateLoading(true, 'SIGNED_IN for new user; awaiting role fetch');
           }
           // Clean up email confirmation hash from URL
           const hash = window.location.hash;
@@ -402,7 +413,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         setSession(session);
         setUser(session?.user ?? null);
-        if (!session?.user) setLoading(false);
+        if (!session?.user) updateLoading(false, 'auth event without session user');
 
         // Request notification permission after login (non-intrusive delay)
         if (session?.user && 'Notification' in window && Notification.permission === 'default') {
@@ -412,19 +423,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      
+
       setSession(session);
       setUser(session?.user ?? null);
-      if (!session?.user) setLoading(false);
+      if (!session?.user) updateLoading(false, 'initial getSession resolved without user');
     }).catch((err) => {
       console.error('[Auth] getSession failed:', err);
-      setLoading(false);
+      updateLoading(false, 'initial getSession failed');
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [clearRoles, updateLoading]);
 
   const signOut = async () => {
     sessionStorage.removeItem('post_login_redirected');

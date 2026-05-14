@@ -99,18 +99,7 @@ export default function AdminLayout() {
         if (!cancelled) setFailedPaymentsCount(undefined);
       }
     }
-          supabase.from('agents').select('id', { count: 'exact', head: true }).eq('approval_status', 'pending'),
-          (supabase.from('demo_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
-          // Match PartnersTab: unverified partners
-          (supabase.from('partners').select('id', { count: 'exact', head: true }).eq('is_verified', false)) as any,
-        ]);
-        if (cancelled) return;
-        const total = (agentsRes.count ?? 0) + (demosRes.count ?? 0) + (partnersRes.count ?? 0);
-        setPendingTotal(total);
-      } catch {
-        if (!cancelled) setPendingTotal(0);
-      }
-    }
+
 
     loadCounts();
     const interval = window.setInterval(loadCounts, 2 * 60 * 1000);

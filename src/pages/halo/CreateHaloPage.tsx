@@ -281,6 +281,30 @@ export default function CreateHaloPage() {
         });
       } catch { /* non-fatal */ }
 
+      // Smart Search funnel: mark search_queries.halo_posted = true
+      try {
+        const fromSearch = searchParams.get('source') === 'search';
+        const rawQuery = searchParams.get('raw_q');
+        if (fromSearch && rawQuery && user?.id) {
+          const { data: rows } = await supabase
+            .from('search_queries' as any)
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('raw_query', rawQuery)
+            .order('created_at', { ascending: false })
+            .limit(1);
+          const rowId = (rows?.[0] as { id?: string } | undefined)?.id;
+          if (rowId) {
+            await supabase
+              .from('search_queries' as any)
+              .update({ halo_posted: true })
+              .eq('id', rowId);
+          }
+        }
+      } catch (telemetryErr) {
+        console.warn('[halo telemetry] halo_posted update failed:', telemetryErr);
+      }
+
       // Halo confirmation email is handled by send-halo-confirmation (fires every Halo).
 
       // Save buyer's preferred language to profile for auto-language on property pages

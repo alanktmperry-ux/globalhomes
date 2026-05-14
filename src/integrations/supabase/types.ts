@@ -11793,6 +11793,7 @@ export type Database = {
           detected_language: string | null
           halo_clicked: boolean | null
           halo_offered: boolean | null
+          halo_posted: boolean
           id: string
           parsed_filters: Json | null
           raw_query: string
@@ -11805,6 +11806,7 @@ export type Database = {
           detected_language?: string | null
           halo_clicked?: boolean | null
           halo_offered?: boolean | null
+          halo_posted?: boolean
           id?: string
           parsed_filters?: Json | null
           raw_query: string
@@ -11817,6 +11819,7 @@ export type Database = {
           detected_language?: string | null
           halo_clicked?: boolean | null
           halo_offered?: boolean | null
+          halo_posted?: boolean
           id?: string
           parsed_filters?: Json | null
           raw_query?: string

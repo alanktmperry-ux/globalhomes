@@ -325,6 +325,12 @@ Deno.serve(async (req) => {
       });
 
       return new Response(
+        JSON.stringify({ success: true }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (action === "verify_partner") {
       const { user_id, verify } = bodyParams;
       const { data: partner, error: findErr } = await supabase
         .from("partners")

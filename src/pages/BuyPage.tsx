@@ -393,12 +393,15 @@ const BuyPage = () => {
           q = q.or(orExpr);
         }
         if (filters.state) q = q.eq('state', filters.state.toUpperCase());
+        if (filters.postcode) q = q.eq('postcode', filters.postcode);
         if (filters.minBeds) q = q.gte('beds', filters.minBeds);
+        if (filters.maxBeds) q = q.lte('beds', filters.maxBeds);
         if (filters.minBaths) q = q.gte('baths', filters.minBaths);
         if (filters.minParking) q = q.gte('cars', filters.minParking);
         if (filters.minPrice) q = q.gte('price', filters.minPrice);
         if (filters.maxPrice) q = q.lte('price', filters.maxPrice);
         if (filters.propertyType) q = q.ilike('property_type', `%${filters.propertyType}%`);
+        if (filters.features.length) q = q.contains('features', filters.features);
 
         const { data, error } = await q;
         if (cancelled) return;

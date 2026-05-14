@@ -17,8 +17,7 @@ const SeekerNotificationBell = lazy(() =>
   import('@/components/halo/SeekerNotificationBell').then(m => ({ default: m.SeekerNotificationBell }))
 );
 import { LanguageSwitcher } from '@/shared/components/layout/LanguageSwitcher';
-import { SUPPORTED_LANGUAGES, LEGACY_CODE_MAP, FROM_LEGACY_CODE_MAP } from '@/shared/lib/i18n/config';
-import { useTranslation, type Language } from '@/shared/lib/i18n';
+import { useTranslation } from '@/shared/lib/i18n';
 import { CurrencySwitcher } from '@/shared/components/layout/CurrencySwitcher';
 // Lazy-loaded — pulls in framer-motion, only needed when the user opens the
 // "Become an agent" modal. Keeping it static added ~50KB gz to every cold load.

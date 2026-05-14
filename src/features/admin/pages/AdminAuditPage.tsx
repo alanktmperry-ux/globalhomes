@@ -78,10 +78,24 @@ export default function AdminAuditPage() {
             Immutable record of admin and support actions. Append-only — entries cannot be edited or deleted.
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          <ExportCSVButton
+            filename={`audit-log-${format(new Date(), 'yyyy-MM-dd')}`}
+            rows={filtered}
+            columns={[
+              { header: 'Timestamp', accessor: (r: typeof filtered[number]) => r.created_at },
+              { header: 'Actor', accessor: (r: typeof filtered[number]) => r.actor_email ?? r.actor_id ?? '' },
+              { header: 'Action', accessor: 'action' as keyof typeof filtered[number] },
+              { header: 'Target type', accessor: (r: typeof filtered[number]) => r.target_type ?? '' },
+              { header: 'Target', accessor: (r: typeof filtered[number]) => r.target_summary ?? r.target_id ?? '' },
+              { header: 'Notes', accessor: (r: typeof filtered[number]) => r.notes ?? '' },
+            ]}
+          />
+          <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2 items-center">

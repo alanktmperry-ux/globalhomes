@@ -10,6 +10,8 @@ import {
 } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import StripeConnectionCard from './StripeConnectionCard';
+import type { StripeStatus } from '@/features/admin/lib/stripeStatus';
 
 const PLAN_LABELS: Record<string, string> = {
   solo: 'Solo',
@@ -120,24 +122,7 @@ function KPI({ label, value, sub, icon: Icon, color = 'text-primary', trend }: {
   );
 }
 
-function StripeBanner() {
-  return (
-    <div className="bg-muted/40 border border-border rounded-xl p-3 flex items-start gap-3 mb-6">
-      <div className="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center flex-shrink-0">
-        <CreditCard size={16} className="text-amber-600" />
-      </div>
-      <div className="flex-1">
-        <p className="text-xs text-muted-foreground">
-          <span className="font-medium text-foreground">Stripe not yet connected</span> — showing estimated MRR from plan data. Connect Stripe to unlock real payment data and accurate MRR history.
-        </p>
-      </div>
-      <Button variant="outline" size="sm" className="gap-1.5 text-xs flex-shrink-0">
-        <Zap size={14} />
-        Connect Stripe
-      </Button>
-    </div>
-  );
-}
+// StripeBanner replaced by <StripeConnectionCard /> — connection-state-aware UI.
 
 function RenewalRow({ agent }: { agent: AgentBillingRow }) {
   const urgent = (agent.daysUntilRenewal ?? 999) <= 7;
@@ -181,6 +166,8 @@ export default function RevenueBilling() {
   const [loading, setLoading] = useState(true);
   const [planFilter, setPlanFilter] = useState('all');
   const [renewalWindow, setRenewalWindow] = useState<7 | 14 | 30>(30);
+  const [stripeStatus, setStripeStatus] = useState<StripeStatus | null>(null);
+  const isStripeLive = stripeStatus?.state === 'live';
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -353,16 +340,20 @@ export default function RevenueBilling() {
         </div>
       </div>
 
-      <StripeBanner />
+      <StripeConnectionCard onStatusLoaded={setStripeStatus} />
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KPI
-          label="Estimated MRR"
+          label={isStripeLive ? 'MRR' : 'Estimated MRR'}
           value={fmt(totalMrr)}
           icon={DollarSign}
           color={totalMrr > 0 ? 'text-emerald-500' : 'text-muted-foreground'}
-          sub={mrrGrowthPct !== null ? `${mrrGrowthPct >= 0 ? '+' : ''}${mrrGrowthPct}% vs last month · pre-Stripe` : 'From plan data · pre-Stripe'}
+          sub={
+            mrrGrowthPct !== null
+              ? `${mrrGrowthPct >= 0 ? '+' : ''}${mrrGrowthPct}% vs last month${isStripeLive ? '' : ' · pre-Stripe'}`
+              : isStripeLive ? 'From Stripe' : 'From plan data · pre-Stripe'
+          }
           trend={mrrGrowthPct !== null ? (mrrGrowthPct >= 0 ? 'up' : 'down') : null}
         />
         <KPI label="Annual Run Rate" value={fmt(totalArr)} icon={TrendingUp} color={totalArr > 0 ? 'text-emerald-500' : 'text-muted-foreground'} sub="Annualised run rate" />

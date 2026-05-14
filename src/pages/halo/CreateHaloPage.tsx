@@ -280,6 +280,9 @@ export default function CreateHaloPage() {
     }
   };
 
+  const isFromSearch = searchParams.get('source') === 'search';
+  const rawQ = searchParams.get('raw_q');
+
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-2xl mx-auto">
@@ -287,6 +290,23 @@ export default function CreateHaloPage() {
         <p className="text-muted-foreground mb-6">
           {t('halo.wizard.create.subtitle')}
         </p>
+
+        {isFromSearch && (
+          <div className="mb-6 rounded-lg border bg-primary/5 p-4 text-sm">
+            <p className="font-medium mb-1">
+              {t('halo.prefilled_from_search.heading', {}, "We've pre-filled your Halo from your search")}
+            </p>
+            <p className="text-muted-foreground">
+              {rawQ && (
+                <>
+                  {t('halo.prefilled_from_search.based_on', {}, 'Based on')}:{' '}
+                  <span className="italic">"{rawQ}"</span>.{' '}
+                </>
+              )}
+              {t('halo.prefilled_from_search.body', {}, 'Review the details and post — usually takes 30 seconds.')}
+            </p>
+          </div>
+        )}
 
         <div className="mb-6">
           <HaloStepIndicator current={step} total={3} labels={STEP_LABELS} />

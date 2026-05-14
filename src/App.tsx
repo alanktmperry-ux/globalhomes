@@ -79,6 +79,9 @@ const AdminUsersPage = React.lazy(() => import("./features/admin/pages/UsersPage
 const AdminSystemPage = React.lazy(() => import("./features/admin/pages/SystemPage"));
 const AdminWebhookDiagnosticPage = React.lazy(() => import("./features/admin/pages/WebhookDiagnosticPage"));
 const AdminCommsStatsPage = React.lazy(() => import("./features/admin/pages/AdminCommsStatsPage"));
+const AdminHaloShell = React.lazy(() => import("./features/admin/pages/HaloShell"));
+const AdminOutreachShell = React.lazy(() => import("./features/admin/pages/OutreachShell"));
+const AdminSystemShell = React.lazy(() => import("./features/admin/pages/SystemShell"));
 const SupportLoginPage = React.lazy(() => import("./features/admin/pages/SupportLoginPage"));
 const SupportDashboardLayout = React.lazy(() => import("./features/admin/pages/SupportDashboardLayout"));
 const SupportTicketsWrapper = React.lazy(() => import("./features/admin/pages/SupportTicketsWrapper"));

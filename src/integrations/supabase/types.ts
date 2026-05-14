@@ -12755,51 +12755,110 @@ export type Database = {
           },
         ]
       }
+      support_messages: {
+        Row: {
+          attachments: Json | null
+          body: string
+          created_at: string
+          id: string
+          sender_id: string | null
+          sender_type: string
+          ticket_id: string
+        }
+        Insert: {
+          attachments?: Json | null
+          body: string
+          created_at?: string
+          id?: string
+          sender_id?: string | null
+          sender_type: string
+          ticket_id: string
+        }
+        Update: {
+          attachments?: Json | null
+          body?: string
+          created_at?: string
+          id?: string
+          sender_id?: string | null
+          sender_type?: string
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_tickets: {
         Row: {
           admin_notes: string | null
           agent_id: string | null
+          assigned_to: string | null
+          body: string
           category: string
+          context: Json | null
           created_at: string
-          description: string
+          description: string | null
+          email: string
+          full_name: string | null
           id: string
+          internal_notes: string | null
           priority: string
           resolved_at: string | null
           status: string
           subject: string
-          submitter_email: string
-          submitter_name: string
+          submitter_email: string | null
+          submitter_name: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           admin_notes?: string | null
           agent_id?: string | null
+          assigned_to?: string | null
+          body: string
           category?: string
+          context?: Json | null
           created_at?: string
-          description: string
+          description?: string | null
+          email: string
+          full_name?: string | null
           id?: string
+          internal_notes?: string | null
           priority?: string
           resolved_at?: string | null
           status?: string
           subject: string
-          submitter_email: string
-          submitter_name: string
+          submitter_email?: string | null
+          submitter_name?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           admin_notes?: string | null
           agent_id?: string | null
+          assigned_to?: string | null
+          body?: string
           category?: string
+          context?: Json | null
           created_at?: string
-          description?: string
+          description?: string | null
+          email?: string
+          full_name?: string | null
           id?: string
+          internal_notes?: string | null
           priority?: string
           resolved_at?: string | null
           status?: string
           subject?: string
-          submitter_email?: string
-          submitter_name?: string
+          submitter_email?: string | null
+          submitter_name?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {

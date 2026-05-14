@@ -32,6 +32,7 @@ export default function AdminLayout() {
   const [listingsPendingCount, setListingsPendingCount] = useState<number | undefined>(undefined);
   const [agentsStuckCount, setAgentsStuckCount] = useState<number | undefined>(undefined);
   const [failedPaymentsCount, setFailedPaymentsCount] = useState<number | undefined>(undefined);
+  const [supportOpenCount, setSupportOpenCount] = useState<number | undefined>(undefined);
   const [mfaRequired, setMfaRequired] = useState(false);
 
   useEffect(() => {
@@ -98,6 +99,14 @@ export default function AdminLayout() {
       } catch {
         if (!cancelled) setFailedPaymentsCount(undefined);
       }
+      try {
+        const r = await (supabase.from('support_tickets') as any)
+          .select('id', { count: 'exact', head: true })
+          .not('status', 'in', '(resolved,closed)');
+        if (!cancelled) setSupportOpenCount(r.error ? undefined : (r.count ?? 0));
+      } catch {
+        if (!cancelled) setSupportOpenCount(undefined);
+      }
     }
 
 
@@ -116,6 +125,7 @@ export default function AdminLayout() {
         listingsPendingCount={listingsPendingCount}
         agentsStuckCount={agentsStuckCount}
         failedPaymentsCount={failedPaymentsCount}
+        supportOpenCount={supportOpenCount}
       />
 
       <main className="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">

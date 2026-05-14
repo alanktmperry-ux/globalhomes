@@ -4,6 +4,7 @@ import { SiteHeader } from "@/shared/components/layout/SiteHeader";
 import { SiteFooter } from "@/shared/components/layout/SiteFooter";
 import { BottomNav } from "@/shared/components/layout/BottomNav";
 import MapsDisclosure from "@/shared/components/MapsDisclosure";
+import SupportWidget from "@/features/support/components/SupportWidget";
 // PaymentStatusBanner only renders for signed-in agents with a payment issue —
 // lazy so the feature-agents chunk stays out of the cold-paint critical path.
 const PaymentStatusBanner = lazy(() =>
@@ -33,6 +34,7 @@ const PublicLayout = () => {
       )}
       {!hasSearch && <SiteFooter />}
       <BottomNav />
+      <SupportWidget />
     </div>
   );
 };

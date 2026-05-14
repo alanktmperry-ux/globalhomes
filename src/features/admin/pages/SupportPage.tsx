@@ -1,436 +1,354 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@/components/ui/dropdown-menu';
-import { Loader2, MoreHorizontal } from 'lucide-react';
-import { getErrorMessage } from '@/shared/lib/errorUtils';
+  Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
+} from '@/components/ui/sheet';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
+import {
+  Loader2, Search, Mail, Clock, Send, RefreshCw, Inbox,
+} from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { cn } from '@/shared/lib/utils';
 
-type TicketStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
-type TicketPriority = 'low' | 'medium' | 'high' | 'critical';
+type Status = 'new' | 'in_progress' | 'waiting_on_user' | 'resolved' | 'closed';
+type Priority = 'low' | 'normal' | 'high' | 'urgent';
 
 interface Ticket {
   id: string;
-  subject: string | null;
-  body: string | null;
-  status: TicketStatus;
-  priority: TicketPriority;
-  created_by_email: string | null;
-  created_by_name: string | null;
-  agent_id: string | null;
   created_at: string;
-  updated_at: string | null;
+  updated_at: string;
+  email: string;
+  full_name: string | null;
+  subject: string;
+  body: string;
+  category: string;
+  status: Status;
+  priority: Priority;
   assigned_to: string | null;
-  resolved_at: string | null;
+  context: any;
+  internal_notes: string | null;
 }
 
-type RequestStatus = 'under_review' | 'planned' | 'in_progress' | 'shipped' | 'declined';
-
-interface FeatureRequest {
+interface Message {
   id: string;
-  title: string | null;
-  description: string | null;
-  status: RequestStatus;
-  votes: number | null;
-  submitted_by_email: string | null;
+  ticket_id: string;
+  sender_type: 'user' | 'admin' | 'system';
+  body: string;
   created_at: string;
-  tags: string[] | null;
 }
 
-const PRIORITY_CLS: Record<TicketPriority, string> = {
-  critical: 'bg-red-100 text-red-700',
+const STATUS_TONE: Record<Status, string> = {
+  new: 'bg-blue-100 text-blue-700 border-blue-200',
+  in_progress: 'bg-amber-100 text-amber-800 border-amber-200',
+  waiting_on_user: 'bg-purple-100 text-purple-700 border-purple-200',
+  resolved: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  closed: 'bg-slate-100 text-slate-600 border-slate-200',
+};
+const PRIORITY_TONE: Record<Priority, string> = {
+  low: 'bg-slate-100 text-slate-600',
+  normal: 'bg-slate-100 text-slate-700',
   high: 'bg-orange-100 text-orange-700',
-  medium: 'bg-amber-100 text-amber-700',
-  low: 'bg-stone-100 text-stone-600',
-};
-const TICKET_STATUS_CLS: Record<TicketStatus, string> = {
-  open: 'bg-blue-100 text-blue-700',
-  in_progress: 'bg-purple-100 text-purple-700',
-  resolved: 'bg-emerald-100 text-emerald-700',
-  closed: 'bg-stone-100 text-stone-500',
-};
-const REQUEST_STATUS_CLS: Record<RequestStatus, string> = {
-  under_review: 'bg-stone-100 text-stone-600',
-  planned: 'bg-blue-100 text-blue-700',
-  in_progress: 'bg-purple-100 text-purple-700',
-  shipped: 'bg-emerald-100 text-emerald-700',
-  declined: 'bg-red-100 text-red-700',
-};
-const REQUEST_STATUS_LABEL: Record<RequestStatus, string> = {
-  under_review: 'Under Review',
-  planned: 'Planned',
-  in_progress: 'In Progress',
-  shipped: 'Shipped',
-  declined: 'Declined',
+  urgent: 'bg-red-100 text-red-700',
 };
 
-function Pill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`px-3 py-1 rounded-full text-[12px] font-medium border transition ${
-        active
-          ? 'bg-stone-900 text-white border-stone-900'
-          : 'bg-white text-stone-600 border-stone-200 hover:border-stone-300'
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
+type Filter = 'all' | 'open' | Status;
 
-function KpiChip({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="rounded-xl border border-stone-200 bg-white px-4 py-3">
-      <div className="text-[11px] uppercase tracking-wide text-stone-500">{label}</div>
-      <div className="text-2xl font-semibold mt-0.5 text-stone-900">{value}</div>
-    </div>
-  );
-}
-
-function CountBadge({ count }: { count: number }) {
-  if (!count) return null;
-  return (
-    <span className="bg-blue-600 text-white text-[11px] rounded-full px-1.5 py-0.5 ml-1.5">
-      {count}
-    </span>
-  );
-}
-
-// ─────────── TICKETS TAB ───────────
-function TicketsTab({ tickets, setTickets }: { tickets: Ticket[]; setTickets: React.Dispatch<React.SetStateAction<Ticket[]>> }) {
-  const [statusFilter, setStatusFilter] = useState<'all' | TicketStatus>('all');
-  const [priorityFilter, setPriorityFilter] = useState<'all' | TicketPriority>('all');
-
-  const filtered = useMemo(() =>
-    tickets.filter((t) =>
-      (statusFilter === 'all' || t.status === statusFilter) &&
-      (priorityFilter === 'all' || t.priority === priorityFilter)
-    ), [tickets, statusFilter, priorityFilter]);
-
-  const kpis = useMemo(() => {
-    const open = tickets.filter((t) => t.status === 'open').length;
-    const critical = tickets.filter((t) => t.priority === 'critical' && t.status !== 'closed').length;
-    const resolved = tickets.filter((t) => t.resolved_at);
-    const totalDays = resolved.reduce((sum, t) => {
-      const d = (new Date(t.resolved_at!).getTime() - new Date(t.created_at).getTime()) / 86400000;
-      return sum + d;
-    }, 0);
-    const avg = resolved.length > 0 ? (totalDays / resolved.length).toFixed(1) : '—';
-    const weekAgo = Date.now() - 7 * 86400000;
-    const resolvedThisWeek = resolved.filter((t) => new Date(t.resolved_at!).getTime() >= weekAgo).length;
-    return { open, critical, avg, resolvedThisWeek };
-  }, [tickets]);
-
-  const updateStatus = async (t: Ticket, status: TicketStatus) => {
-    const patch: Record<string, unknown> = { status };
-    if (status === 'resolved') patch.resolved_at = new Date().toISOString();
-    try {
-      const { error } = await ((supabase as any).from('support_tickets')).update(patch).eq('id', t.id);
-      if (error) throw error;
-      setTickets((rows) => rows.map((r) => (r.id === t.id ? { ...r, ...patch } as Ticket : r)));
-      toast.success(`Ticket marked ${status.replace('_', ' ')}`);
-    } catch (err) {
-      toast.error(getErrorMessage(err));
-    }
-  };
-
-  return (
-    <div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-        <KpiChip label="Open tickets" value={kpis.open} />
-        <KpiChip label="Critical" value={kpis.critical} />
-        <KpiChip label="Avg resolution (days)" value={kpis.avg} />
-        <KpiChip label="Resolved this week" value={kpis.resolvedThisWeek} />
-      </div>
-
-      <div className="flex flex-wrap items-center gap-2 mb-4">
-        <span className="text-[12px] text-stone-500 mr-1">Status:</span>
-        <Pill active={statusFilter === 'all'} onClick={() => setStatusFilter('all')}>All</Pill>
-        <Pill active={statusFilter === 'open'} onClick={() => setStatusFilter('open')}>Open</Pill>
-        <Pill active={statusFilter === 'in_progress'} onClick={() => setStatusFilter('in_progress')}>In Progress</Pill>
-        <Pill active={statusFilter === 'resolved'} onClick={() => setStatusFilter('resolved')}>Resolved</Pill>
-        <Pill active={statusFilter === 'closed'} onClick={() => setStatusFilter('closed')}>Closed</Pill>
-        <span className="text-[12px] text-stone-500 ml-3 mr-1">Priority:</span>
-        <Pill active={priorityFilter === 'all'} onClick={() => setPriorityFilter('all')}>All</Pill>
-        <Pill active={priorityFilter === 'critical'} onClick={() => setPriorityFilter('critical')}>Critical</Pill>
-        <Pill active={priorityFilter === 'high'} onClick={() => setPriorityFilter('high')}>High</Pill>
-        <Pill active={priorityFilter === 'medium'} onClick={() => setPriorityFilter('medium')}>Medium</Pill>
-        <Pill active={priorityFilter === 'low'} onClick={() => setPriorityFilter('low')}>Low</Pill>
-      </div>
-
-      {filtered.length === 0 ? (
-        <div className="text-center py-12 text-stone-400 text-sm">No tickets yet</div>
-      ) : (
-        <div className="overflow-x-auto rounded-xl border border-stone-200">
-          <table className="w-full text-sm">
-            <thead className="bg-stone-50 text-stone-600 text-[12px] uppercase tracking-wide">
-              <tr>
-                <th className="text-left px-4 py-2 font-medium">#ID</th>
-                <th className="text-left px-4 py-2 font-medium">Subject</th>
-                <th className="text-left px-4 py-2 font-medium">From</th>
-                <th className="text-left px-4 py-2 font-medium">Priority</th>
-                <th className="text-left px-4 py-2 font-medium">Status</th>
-                <th className="text-left px-4 py-2 font-medium">Submitted</th>
-                <th className="text-right px-4 py-2 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((t) => (
-                <tr key={t.id} className="border-t border-stone-100">
-                  <td className="px-4 py-3 font-mono text-[12px] text-stone-500">{t.id.slice(0, 8)}</td>
-                  <td className="px-4 py-3 font-medium text-stone-900">{t.subject || '—'}</td>
-                  <td className="px-4 py-3 text-stone-700">
-                    {t.created_by_name || t.created_by_email || '—'}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium capitalize ${PRIORITY_CLS[t.priority]}`}>
-                      {t.priority}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium capitalize ${TICKET_STATUS_CLS[t.status]}`}>
-                      {t.status.replace('_', ' ')}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-stone-500 text-[12px]">
-                    {new Date(t.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => updateStatus(t, 'in_progress')}>
-                          Mark in progress
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => updateStatus(t, 'resolved')}>
-                          Mark resolved
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => updateStatus(t, 'closed')}>
-                          Close
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─────────── FEATURE REQUESTS TAB ───────────
-function RequestsTab({ requests, setRequests }: { requests: FeatureRequest[]; setRequests: React.Dispatch<React.SetStateAction<FeatureRequest[]>> }) {
-  const [sort, setSort] = useState<'votes' | 'newest'>('votes');
-
-  const sorted = useMemo(() => {
-    const arr = [...requests];
-    if (sort === 'votes') arr.sort((a, b) => (b.votes || 0) - (a.votes || 0));
-    else arr.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    return arr;
-  }, [requests, sort]);
-
-  const updateStatus = async (r: FeatureRequest, status: RequestStatus) => {
-    try {
-      const { error } = await ((supabase as any).from('feature_requests')).update({ status }).eq('id', r.id);
-      if (error) throw error;
-      setRequests((rows) => rows.map((row) => (row.id === r.id ? { ...row, status } : row)));
-      toast.success(`Updated to ${REQUEST_STATUS_LABEL[status]}`);
-    } catch (err) {
-      toast.error(getErrorMessage(err));
-    }
-  };
-
-  return (
-    <div>
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-[12px] text-stone-500 mr-1">Sort:</span>
-        <Pill active={sort === 'votes'} onClick={() => setSort('votes')}>Most votes</Pill>
-        <Pill active={sort === 'newest'} onClick={() => setSort('newest')}>Newest</Pill>
-      </div>
-
-      {sorted.length === 0 ? (
-        <div className="text-center py-12 text-stone-400 text-sm">No feature requests yet</div>
-      ) : (
-        <div className="overflow-x-auto rounded-xl border border-stone-200">
-          <table className="w-full text-sm">
-            <thead className="bg-stone-50 text-stone-600 text-[12px] uppercase tracking-wide">
-              <tr>
-                <th className="text-left px-4 py-2 font-medium">Title</th>
-                <th className="text-left px-4 py-2 font-medium">Description</th>
-                <th className="text-left px-4 py-2 font-medium">Votes</th>
-                <th className="text-left px-4 py-2 font-medium">Status</th>
-                <th className="text-left px-4 py-2 font-medium">Tags</th>
-                <th className="text-left px-4 py-2 font-medium">Submitted</th>
-                <th className="text-right px-4 py-2 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sorted.map((r) => (
-                <tr key={r.id} className="border-t border-stone-100">
-                  <td className="px-4 py-3 font-medium text-stone-900">{r.title || '—'}</td>
-                  <td className="px-4 py-3 text-stone-600 max-w-md">
-                    {r.description ? (r.description.length > 100 ? r.description.slice(0, 100) + '…' : r.description) : '—'}
-                  </td>
-                  <td className="px-4 py-3 text-stone-700 font-medium">{r.votes ?? 0}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${REQUEST_STATUS_CLS[r.status]}`}>
-                      {REQUEST_STATUS_LABEL[r.status]}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-stone-600">
-                    <div className="flex flex-wrap gap-1">
-                      {(r.tags || []).map((tag) => (
-                        <span key={tag} className="text-[11px] bg-stone-100 text-stone-600 rounded px-1.5 py-0.5">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-stone-500 text-[12px]">
-                    {new Date(r.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {(['under_review', 'planned', 'in_progress', 'shipped', 'declined'] as RequestStatus[]).map((s) => (
-                          <DropdownMenuItem key={s} onClick={() => updateStatus(r, s)}>
-                            {REQUEST_STATUS_LABEL[s]}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─────────── PAGE ───────────
-export default function SupportPage() {
-  const [activeTab, setActiveTab] = useState<'tickets' | 'requests'>('tickets');
-
+export default function AdminSupportPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [ticketsLoaded, setTicketsLoaded] = useState(false);
-  const [ticketsLoading, setTicketsLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<Filter>('open');
+  const [search, setSearch] = useState('');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [reply, setReply] = useState('');
+  const [sending, setSending] = useState(false);
+  const [internalNotes, setInternalNotes] = useState('');
 
-  const [requests, setRequests] = useState<FeatureRequest[]>([]);
-  const [requestsLoaded, setRequestsLoaded] = useState(false);
-  const [requestsLoading, setRequestsLoading] = useState(false);
-
-  const fetchTickets = async () => {
-    setTicketsLoading(true);
-    try {
-      const { data, error } = await ((supabase as any).from('support_tickets'))
-        .select('id, subject, body, status, priority, created_by_email, created_by_name, agent_id, created_at, updated_at, assigned_to, resolved_at')
-        .order('created_at', { ascending: false })
-        .limit(100);
-      if (error) throw error;
-      setTickets((data || []) as Ticket[]);
-    } catch {
-      setTickets([]);
-    } finally {
-      setTicketsLoading(false);
-      setTicketsLoaded(true);
-    }
-  };
-
-  const fetchRequests = async () => {
-    setRequestsLoading(true);
-    try {
-      const { data, error } = await ((supabase as any).from('feature_requests'))
-        .select('id, title, description, status, votes, submitted_by_email, created_at, tags')
-        .order('votes', { ascending: false })
-        .limit(100);
-      if (error) throw error;
-      setRequests((data || []) as FeatureRequest[]);
-    } catch {
-      setRequests([]);
-    } finally {
-      setRequestsLoading(false);
-      setRequestsLoaded(true);
-    }
-  };
-
-  // initial load: tickets (default tab)
-  useEffect(() => {
-    if (!ticketsLoaded) fetchTickets();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const loadTickets = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('support_tickets')
+      .select('id, created_at, updated_at, email, full_name, subject, body, category, status, priority, assigned_to, context, internal_notes')
+      .order('priority', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(500);
+    if (error) toast.error(error.message);
+    setTickets((data ?? []) as Ticket[]);
+    setLoading(false);
   }, []);
 
-  const handleTabChange = (val: string) => {
-    const tab = val as 'tickets' | 'requests';
-    setActiveTab(tab);
-    if (tab === 'tickets' && !ticketsLoaded) fetchTickets();
-    if (tab === 'requests' && !requestsLoaded) fetchRequests();
+  useEffect(() => { loadTickets(); }, [loadTickets]);
+
+  // Realtime
+  useEffect(() => {
+    const channel = supabase
+      .channel('support_tickets_inbox')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'support_tickets' }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          toast.message('New support ticket', { description: (payload.new as any).subject });
+        }
+        loadTickets();
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_messages' }, (payload) => {
+        const m = payload.new as Message;
+        if (m.ticket_id === selectedId) {
+          setMessages((prev) => [...prev, m]);
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [loadTickets, selectedId]);
+
+  // Load messages for selected
+  useEffect(() => {
+    if (!selectedId) { setMessages([]); return; }
+    (async () => {
+      const { data } = await supabase
+        .from('support_messages')
+        .select('id, ticket_id, sender_type, body, created_at')
+        .eq('ticket_id', selectedId)
+        .order('created_at', { ascending: true });
+      setMessages((data ?? []) as Message[]);
+    })();
+    const t = tickets.find((x) => x.id === selectedId);
+    setInternalNotes(t?.internal_notes ?? '');
+    setReply('');
+  }, [selectedId, tickets]);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return tickets.filter((t) => {
+      if (filter === 'open' && (t.status === 'resolved' || t.status === 'closed')) return false;
+      if (filter !== 'all' && filter !== 'open' && t.status !== filter) return false;
+      if (q && !`${t.subject} ${t.email} ${t.full_name ?? ''} ${t.body}`.toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [tickets, filter, search]);
+
+  const counts = useMemo(() => {
+    return {
+      open: tickets.filter((t) => t.status !== 'resolved' && t.status !== 'closed').length,
+      new: tickets.filter((t) => t.status === 'new').length,
+      in_progress: tickets.filter((t) => t.status === 'in_progress').length,
+      waiting_on_user: tickets.filter((t) => t.status === 'waiting_on_user').length,
+      resolved: tickets.filter((t) => t.status === 'resolved').length,
+    };
+  }, [tickets]);
+
+  const selected = tickets.find((t) => t.id === selectedId) ?? null;
+
+  const updateTicket = async (id: string, patch: Partial<Ticket>) => {
+    const { error } = await supabase.from('support_tickets').update(patch as any).eq('id', id);
+    if (error) { toast.error(error.message); return; }
+    setTickets((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } as Ticket : t)));
+    toast.success('Updated');
   };
 
-  const openCount = tickets.filter((t) => t.status === 'open').length;
-  const reviewCount = requests.filter((r) => r.status === 'under_review').length;
+  const sendReply = async () => {
+    if (!selected || !reply.trim()) return;
+    setSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('reply-support-ticket', {
+        body: { ticket_id: selected.id, body: reply.trim() },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      toast.success('Reply sent');
+      setReply('');
+      // reload messages
+      const { data: msgs } = await supabase
+        .from('support_messages')
+        .select('id, ticket_id, sender_type, body, created_at')
+        .eq('ticket_id', selected.id)
+        .order('created_at', { ascending: true });
+      setMessages((msgs ?? []) as Message[]);
+      loadTickets();
+    } catch (e: any) {
+      toast.error(e?.message || 'Send failed');
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
-    <div className="max-w-screen-xl mx-auto px-6 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Support</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Manage support tickets and track feature requests from agents and buyers.
-        </p>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2"><Inbox className="text-primary" /> Support</h1>
+          <p className="text-sm text-muted-foreground">{counts.open} open · {counts.new} new · {counts.in_progress} in progress · {counts.waiting_on_user} waiting on user</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={loadTickets}><RefreshCw size={14} className="mr-2" /> Refresh</Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={handleTabChange}>
-        <TabsList>
-          <TabsTrigger value="tickets">
-            Tickets<CountBadge count={openCount} />
-          </TabsTrigger>
-          <TabsTrigger value="requests">
-            Feature Requests<CountBadge count={reviewCount} />
-          </TabsTrigger>
-        </TabsList>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search subject, email, message…" className="pl-9" />
+        </div>
+        <Tabs value={filter} onValueChange={(v) => setFilter(v as Filter)}>
+          <TabsList>
+            <TabsTrigger value="open">Open ({counts.open})</TabsTrigger>
+            <TabsTrigger value="new">New ({counts.new})</TabsTrigger>
+            <TabsTrigger value="in_progress">In progress</TabsTrigger>
+            <TabsTrigger value="waiting_on_user">Waiting</TabsTrigger>
+            <TabsTrigger value="resolved">Resolved</TabsTrigger>
+            <TabsTrigger value="all">All</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
 
-        <TabsContent value="tickets" className="mt-4">
-          {ticketsLoading ? (
-            <div className="flex items-center justify-center py-16 text-stone-400">
-              <Loader2 className="h-5 w-5 animate-spin" />
-            </div>
-          ) : (
-            <TicketsTab tickets={tickets} setTickets={setTickets} />
-          )}
-        </TabsContent>
+      <div className="border border-border rounded-lg overflow-hidden bg-card">
+        {loading ? (
+          <div className="p-10 text-center text-muted-foreground"><Loader2 className="animate-spin mx-auto mb-2" /> Loading…</div>
+        ) : filtered.length === 0 ? (
+          <div className="p-10 text-center text-muted-foreground">No tickets match this filter.</div>
+        ) : (
+          <ul className="divide-y divide-border">
+            {filtered.map((t) => (
+              <li
+                key={t.id}
+                onClick={() => setSelectedId(t.id)}
+                className="p-4 hover:bg-accent/40 cursor-pointer flex items-start gap-3"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={cn('text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded border', STATUS_TONE[t.status])}>{t.status.replace('_',' ')}</span>
+                    <span className={cn('text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded', PRIORITY_TONE[t.priority])}>{t.priority}</span>
+                    <Badge variant="outline" className="text-[10px]">{t.category.replace('_',' ')}</Badge>
+                  </div>
+                  <p className="font-semibold mt-1 truncate">{t.subject}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5 truncate">{t.full_name ? `${t.full_name} · ` : ''}{t.email}</p>
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{t.body}</p>
+                </div>
+                <div className="text-[11px] text-muted-foreground whitespace-nowrap flex items-center gap-1">
+                  <Clock size={11} /> {formatDistanceToNow(new Date(t.created_at), { addSuffix: true })}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
-        <TabsContent value="requests" className="mt-4">
-          {requestsLoading ? (
-            <div className="flex items-center justify-center py-16 text-stone-400">
-              <Loader2 className="h-5 w-5 animate-spin" />
-            </div>
-          ) : (
-            <RequestsTab requests={requests} setRequests={setRequests} />
+      <Sheet open={!!selected} onOpenChange={(o) => { if (!o) setSelectedId(null); }}>
+        <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
+          {selected && (
+            <>
+              <SheetHeader>
+                <SheetTitle className="pr-8">{selected.subject}</SheetTitle>
+                <SheetDescription>
+                  <span className="inline-flex items-center gap-1"><Mail size={12} />{selected.email}</span>
+                  {selected.full_name ? ` · ${selected.full_name}` : ''} · {formatDistanceToNow(new Date(selected.created_at), { addSuffix: true })}
+                </SheetDescription>
+              </SheetHeader>
+
+              <div className="grid grid-cols-3 gap-2 mt-4">
+                <div>
+                  <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Status</label>
+                  <Select value={selected.status} onValueChange={(v) => updateTicket(selected.id, { status: v as Status, ...(v === 'resolved' ? {} : {}) })}>
+                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="new">New</SelectItem>
+                      <SelectItem value="in_progress">In progress</SelectItem>
+                      <SelectItem value="waiting_on_user">Waiting on user</SelectItem>
+                      <SelectItem value="resolved">Resolved</SelectItem>
+                      <SelectItem value="closed">Closed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Priority</label>
+                  <Select value={selected.priority} onValueChange={(v) => updateTicket(selected.id, { priority: v as Priority })}>
+                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="normal">Normal</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                      <SelectItem value="urgent">Urgent</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Category</label>
+                  <div className="h-9 flex items-center text-sm capitalize">{selected.category.replace('_',' ')}</div>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-3">
+                <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Conversation</h3>
+                {messages.length === 0 ? (
+                  <div className="text-sm text-muted-foreground border border-dashed border-border rounded p-3">No messages yet — original ticket body below.</div>
+                ) : (
+                  messages.map((m) => (
+                    <div
+                      key={m.id}
+                      className={cn(
+                        'rounded-lg p-3 text-sm whitespace-pre-wrap',
+                        m.sender_type === 'admin' ? 'bg-primary/10 border border-primary/20' :
+                        m.sender_type === 'system' ? 'bg-slate-50 border border-slate-200 text-slate-600 italic' :
+                        'bg-card border border-border',
+                      )}
+                    >
+                      <div className="text-[10px] font-bold uppercase tracking-wider mb-1 text-muted-foreground">
+                        {m.sender_type === 'admin' ? 'You' : m.sender_type === 'system' ? 'System' : (selected.full_name || selected.email)}
+                        <span className="ml-2 font-normal normal-case tracking-normal">{formatDistanceToNow(new Date(m.created_at), { addSuffix: true })}</span>
+                      </div>
+                      {m.body}
+                    </div>
+                  ))
+                )}
+
+                {messages.length === 0 && (
+                  <div className="rounded-lg p-3 text-sm whitespace-pre-wrap bg-card border border-border">
+                    {selected.body}
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-6 space-y-2">
+                <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Reply</h3>
+                <Textarea
+                  rows={5} value={reply} onChange={(e) => setReply(e.target.value)}
+                  placeholder="Reply to the customer. They'll receive this by email."
+                />
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-[11px] text-muted-foreground">Sending will set status to <strong>Waiting on user</strong>.</p>
+                  <Button onClick={sendReply} disabled={sending || !reply.trim()}>
+                    {sending ? <><Loader2 className="animate-spin mr-2" size={14} />Sending</> : <><Send size={14} className="mr-2" />Send reply</>}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-2">
+                <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Internal notes</h3>
+                <Textarea
+                  rows={3} value={internalNotes} onChange={(e) => setInternalNotes(e.target.value)}
+                  placeholder="Private notes for the team. Not shown to the customer."
+                  onBlur={() => {
+                    if (internalNotes !== (selected.internal_notes ?? '')) {
+                      updateTicket(selected.id, { internal_notes: internalNotes });
+                    }
+                  }}
+                />
+              </div>
+
+              {selected.context && (
+                <div className="mt-6">
+                  <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-bold mb-2">Context</h3>
+                  <pre className="text-[11px] bg-muted rounded p-2 overflow-x-auto">{JSON.stringify(selected.context, null, 2)}</pre>
+                </div>
+              )}
+            </>
           )}
-        </TabsContent>
-      </Tabs>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

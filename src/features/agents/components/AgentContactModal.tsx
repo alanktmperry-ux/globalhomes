@@ -395,8 +395,6 @@ export function AgentContactModal({ property, open, onClose, searchContext }: Ag
   );
   const whatsappUrl = `https://wa.me/${agent.phone?.replace(/\D/g, '')}?text=${whatsappMessage}`;
 
-  const scoreColor = leadScore >= 70 ? 'text-emerald-500' : leadScore >= 40 ? 'text-amber-500' : 'text-muted-foreground';
-
   return (
     <AnimatePresence>
       {open && (

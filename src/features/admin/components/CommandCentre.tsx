@@ -872,19 +872,87 @@ export default function CommandCentre() {
     ),
   ].filter(Boolean);
 
+  // === Hero KPI strip values ===
+  const netNewPaid7d = data.paidAgents - data.paidAgentsPrevWeek;
+  const failedPayments = Math.round(data.revenueAtRisk / Math.max(data.arpu, 1));
+  const atRiskTotal =
+    data.onboardingIncomplete + data.trialsExpiringThisWeek + (failedPayments || 0);
+
+  // Ribbon items (compact, includes Stuck in Setup)
+  const ribbonItems: { label: string; to: string; tone: 'amber' | 'red' | 'blue' }[] = [];
+  if (data.trialsExpiringThisWeek > 0)
+    ribbonItems.push({
+      label: `${data.trialsExpiringThisWeek} trial${data.trialsExpiringThisWeek > 1 ? 's' : ''} expiring`,
+      to: '/admin/agents?filter=trials_expiring',
+      tone: 'amber',
+    });
+  if (data.pendingAgentApprovals > 0)
+    ribbonItems.push({
+      label: `${data.pendingAgentApprovals} agent application${data.pendingAgentApprovals > 1 ? 's' : ''}`,
+      to: '/admin/approvals',
+      tone: 'red',
+    });
+  if (data.pendingDemoRequests > 0)
+    ribbonItems.push({
+      label: `${data.pendingDemoRequests} demo request${data.pendingDemoRequests > 1 ? 's' : ''}`,
+      to: '/admin/approvals',
+      tone: 'red',
+    });
+  if (data.onboardingIncomplete > 0)
+    ribbonItems.push({
+      label: `${data.onboardingIncomplete} onboarding incomplete`,
+      to: '/admin/agents?filter=onboarding_incomplete',
+      tone: 'amber',
+    });
+  if (failedPayments > 0)
+    ribbonItems.push({
+      label: `${failedPayments} failed payment${failedPayments > 1 ? 's' : ''}`,
+      to: '/admin/agents?filter=payment_failed',
+      tone: 'red',
+    });
+  if (data.openSupportTickets > 0)
+    ribbonItems.push({
+      label: `${data.openSupportTickets} open ticket${data.openSupportTickets > 1 ? 's' : ''}`,
+      to: '/admin/approvals',
+      tone: 'red',
+    });
+
+  const stripeConnected = data.mrr > 0;
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-bold text-foreground">Command Centre</h2>
-          <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+      {/* === Header (single line) === */}
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div className="min-w-0">
+          <h1 className="text-xl lg:text-2xl font-bold text-foreground whitespace-nowrap">
+            Command Centre
+          </h1>
+          <p className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5">
             <Clock size={12} />
-            Last updated{' '}
+            Live data · auto-refresh every 5 min · last updated{' '}
             {new Date(data.fetchedAt).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' })}
-            <span className="ml-1 opacity-70">· auto-refreshes every 5 min</span>
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Date range selector */}
+          <div className="inline-flex items-center rounded-lg border border-border bg-card p-0.5 text-[11px]">
+            {(['today', '7d', '30d', '90d', 'all'] as DateRange[]).map((r) => (
+              <button
+                key={r}
+                onClick={() => {
+                  setDateRange(r);
+                  try { window.localStorage.setItem('cc_date_range', r); } catch {}
+                }}
+                className={`px-2 py-1 rounded-md font-medium transition-colors ${
+                  dateRange === r
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {r === 'today' ? 'Today' : r === 'all' ? 'All time' : r}
+              </button>
+            ))}
+          </div>
           <button
             onClick={async () => {
               try {
@@ -899,15 +967,15 @@ export default function CommandCentre() {
               }
             }}
             disabled={sendingDigest}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-secondary text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
           >
             <Mail size={14} className={sendingDigest ? 'animate-pulse' : ''} />
-            {sendingDigest ? 'Sending…' : 'Send digest now'}
+            {sendingDigest ? 'Sending…' : 'Digest'}
           </button>
           <button
             onClick={fetchAll}
             disabled={refreshing}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-secondary text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
           >
             <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
             Refresh
@@ -915,159 +983,69 @@ export default function CommandCentre() {
         </div>
       </div>
 
-      {/* SECTION 1 — Needs Attention */}
-      <SectionHead title="Needs Attention" sub="Pending items across the platform" />
-      {attentionCards.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">{attentionCards}</div>
-      ) : (
-        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 flex items-center gap-3">
-          <CheckCircle2 size={20} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-          <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
-            All clear — nothing needs your attention right now.
-          </p>
-        </div>
-      )}
-
-      {/* PLATFORM USERS */}
-      <SectionHead title="Platform Users" sub="Live counts across every account type" />
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-        <button
-          onClick={() => navigate('/admin/users?filter=agents')}
-          className="rounded-2xl border border-border bg-card p-4 text-left hover:bg-accent transition-colors"
-        >
-          <p className="text-xs text-muted-foreground font-medium">Agents</p>
-          <p className="text-2xl font-bold text-foreground mt-1">{data.totalAgents}</p>
-          <p className="text-[11px] text-muted-foreground mt-1">
-            {data.paidAgents} paid · {data.activeTrials} trial
-          </p>
-        </button>
-        <button
-          onClick={() => navigate('/admin/users?filter=seekers')}
-          className="rounded-2xl border border-border bg-card p-4 text-left hover:bg-accent transition-colors"
-        >
-          <p className="text-xs text-muted-foreground font-medium">Seekers</p>
-          <p className="text-2xl font-bold text-foreground mt-1">{data.totalSeekers}</p>
-          <p className="text-[11px] text-muted-foreground mt-1">+{data.newSeekersThisWeek} this week</p>
-        </button>
-        <button
-          onClick={() => navigate('/admin/users?filter=partners')}
-          className="rounded-2xl border border-border bg-card p-4 text-left hover:bg-accent transition-colors"
-        >
-          <p className="text-xs text-muted-foreground font-medium">Mortgage Brokers</p>
-          <p className="text-2xl font-bold text-foreground mt-1">{data.totalMortgageBrokers}</p>
-          <p className="text-[11px] text-muted-foreground mt-1">partners</p>
-        </button>
-        <button
-          onClick={() => navigate('/admin/users?filter=partners')}
-          className="rounded-2xl border border-border bg-card p-4 text-left hover:bg-accent transition-colors"
-        >
-          <p className="text-xs text-muted-foreground font-medium">Trust Accountants</p>
-          <p className="text-2xl font-bold text-foreground mt-1">{data.totalTrustAccountants}</p>
-          {data.pendingPartners > 0 && (
-            <p className="text-[11px] text-amber-500 mt-1">{data.pendingPartners} pending verification</p>
-          )}
-        </button>
-        <button
-          onClick={() => navigate('/admin/users?filter=demo')}
-          className="rounded-2xl border border-border bg-card p-4 text-left hover:bg-accent transition-colors"
-        >
-          <p className="text-xs text-muted-foreground font-medium">Demo / Pending</p>
-          <p className="text-2xl font-bold text-foreground mt-1">{data.totalDemoUsers}</p>
-          <p className="text-[11px] text-muted-foreground mt-1">access requests</p>
-        </button>
+      {/* === Hero KPI strip === */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <HeroKPI
+          label="MRR"
+          value={stripeConnected ? `$${data.mrr.toLocaleString()}` : '$0'}
+          delta={
+            stripeConnected
+              ? `${calcMoMGrowth(data.mrr, data.mrr - data.netNewMrrThisMonth)} vs prev period`
+              : '— No revenue yet · Connect Stripe →'
+          }
+          onClick={!stripeConnected ? () => navigate('/admin/revenue') : undefined}
+        />
+        <HeroKPI
+          label="Active Agents"
+          value={String(data.paidAgents)}
+          delta={`${netNewPaid7d >= 0 ? '+' : ''}${netNewPaid7d} vs prev week`}
+        />
+        <HeroKPI
+          label="Net New (7d)"
+          value={`${netNewPaid7d >= 0 ? '+' : ''}${netNewPaid7d}`}
+          delta="paying agents"
+        />
+        <HeroKPI
+          label="At Risk"
+          value={String(atRiskTotal)}
+          delta="setup + trials + failed"
+          atRisk={atRiskTotal > 0}
+          onClick={() => navigate('/admin/approvals')}
+        />
       </div>
 
-      {data.recentUsers.length > 0 && (
-        <div className="rounded-2xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-foreground">Recently Joined</h3>
-            <button
-              onClick={() => navigate('/admin/users')}
-              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
-            >
-              View all <ArrowRight size={12} />
-            </button>
-          </div>
-          <div className="space-y-2">
-            {data.recentUsers.map(u => {
-              const typeColors: Record<string, string> = {
-                agent: 'bg-blue-500/15 text-blue-600',
-                seeker: 'bg-emerald-500/15 text-emerald-600',
-                partner: 'bg-violet-500/15 text-violet-600',
-                demo: 'bg-amber-500/15 text-amber-600',
-                demo_request: 'bg-amber-500/15 text-amber-600',
-              };
-              const typeLabel: Record<string, string> = {
-                agent: 'Agent',
-                seeker: 'Seeker',
-                partner:
-                  u.partnerType === 'mortgage_broker'
-                    ? 'Broker'
-                    : u.partnerType === 'trust_accountant'
-                    ? 'Accountant'
-                    : 'Partner',
-                demo: 'Demo',
-                demo_request: 'Demo Req',
-              };
-              const isLoading = ccActionLoading === u.id;
-              return (
-                <div
-                  key={u.id}
-                  className="flex items-center gap-3 py-2 border-b border-border last:border-0"
+      {/* === Needs Attention ribbon === */}
+      {ribbonItems.length > 0 ? (
+        <div className="rounded-xl border border-amber-500/40 bg-amber-500/5 px-4 py-3 flex items-center gap-2 flex-wrap min-h-[50px]">
+          <AlertTriangle size={16} className="text-amber-600 shrink-0" />
+          <div className="flex items-center gap-1 flex-wrap text-xs">
+            {ribbonItems.map((it, i) => (
+              <span key={it.label} className="flex items-center gap-1">
+                <button
+                  onClick={() => navigate(it.to)}
+                  className={`font-medium hover:underline ${
+                    it.tone === 'red' ? 'text-destructive' : it.tone === 'amber' ? 'text-amber-700 dark:text-amber-400' : 'text-primary'
+                  }`}
                 >
-                  <div className="w-8 h-8 rounded-full bg-secondary text-foreground flex items-center justify-center text-xs font-bold shrink-0">
-                    {u.displayName?.[0]?.toUpperCase() ?? '?'}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-foreground truncate">{u.email}</p>
-                    <p className="text-[11px] text-muted-foreground truncate">
-                      Joined {new Date(u.created_at).toLocaleDateString('en-AU')}
-                      {u.lastSignIn
-                        ? ` · last seen ${new Date(u.lastSignIn).toLocaleString('en-AU', { dateStyle: 'short', timeStyle: 'short' })}`
-                        : ' · never logged in'}
-                    </p>
-                  </div>
-                  <span
-                    className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ${
-                      typeColors[u.userType] || 'bg-secondary text-muted-foreground'
-                    }`}
-                  >
-                    {typeLabel[u.userType] || u.userType}
-                  </span>
-                  <div className="flex items-center gap-1 shrink-0">
-                    {startImpersonation && (
-                      <button
-                        disabled={isLoading}
-                        onClick={() => handleImpersonate(u.id, u.email, u.displayName)}
-                        title="Impersonate"
-                        className="p-1.5 rounded-lg hover:bg-accent transition-colors text-muted-foreground hover:text-foreground"
-                      >
-                        <UserPlus size={14} />
-                      </button>
-                    )}
-                    <button
-                      disabled={isLoading}
-                      onClick={() => handleCCSuspend(u)}
-                      title={u.isBanned ? 'Unsuspend' : 'Suspend'}
-                      className={`p-1.5 rounded-lg hover:bg-accent transition-colors ${
-                        u.isBanned ? 'text-amber-500' : 'text-muted-foreground hover:text-foreground'
-                      }`}
-                    >
-                      <Ban size={14} />
-                    </button>
-                    <button
-                      disabled={isLoading}
-                      onClick={() => setCCDeleteTarget(u)}
-                      title="Delete user"
-                      className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+                  {it.label}
+                </button>
+                {i < ribbonItems.length - 1 && <span className="text-muted-foreground">·</span>}
+              </span>
+            ))}
           </div>
+          <button
+            onClick={() => navigate('/admin/approvals')}
+            className="ml-auto text-xs font-medium text-primary hover:underline shrink-0 flex items-center gap-1"
+          >
+            Review all <ArrowRight size={12} />
+          </button>
+        </div>
+      ) : (
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 flex items-center gap-2 min-h-[50px]">
+          <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+          <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+            All clear — nothing needs your attention right now.
+          </p>
         </div>
       )}
 
@@ -1076,6 +1054,7 @@ export default function CommandCentre() {
           <div className="bg-card border border-border rounded-2xl p-6 max-w-md w-full space-y-4">
             <h3 className="text-base font-semibold text-foreground">Delete user permanently?</h3>
             <p className="text-sm text-muted-foreground">
+
               This will permanently remove <strong className="text-foreground">{ccDeleteTarget.email}</strong>{' '}
               and all their data, listings, messages, and history. This cannot be undone.
             </p>

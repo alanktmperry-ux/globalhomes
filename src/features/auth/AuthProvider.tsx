@@ -219,28 +219,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setAgencyId(null);
   }, []);
 
-  const clearRolesWatchdog = useCallback((logCleared = false) => {
-    if (rolesWatchdogRef.current !== null) {
-      window.clearTimeout(rolesWatchdogRef.current);
-      rolesWatchdogRef.current = null;
-      if (logCleared) {
-        console.log('[AuthProvider] watchdog cleared (fetch completed first)');
-      }
-    }
-  }, []);
-
-  const startRolesWatchdog = useCallback((currentUserId: string, requestId: number) => {
-    clearRolesWatchdog();
-    rolesWatchdogRef.current = window.setTimeout(() => {
-      if (activeRolesRequestId.current !== requestId) return;
-      invalidatedRolesRequestId.current = requestId;
+  // Standalone 10s safety watchdog — lives OUTSIDE the roles effect so its
+  // cleanup is not triggered by roles-effect re-runs. It only re-arms when
+  // `loading` or `user?.id` actually change.
+  useEffect(() => {
+    if (!loading || !user?.id) return;
+    const userId = user.id;
+    console.log('[AuthProvider] watchdog armed for user:', userId);
+    const timeoutId = window.setTimeout(() => {
       console.warn('[AuthProvider] 10s watchdog FIRED — forcing loading=false, treating user as no-roles');
+      invalidatedRolesRequestId.current = activeRolesRequestId.current;
       clearRoles();
       lastFetchedUserId.current = null;
       isFetching.current = false;
-      updateLoading(false, `10s roles watchdog fired for user ${currentUserId}`);
+      updateLoading(false, `10s watchdog fired for user ${userId}`);
     }, 10000);
-  }, [clearRoles, clearRolesWatchdog, updateLoading]);
+    rolesWatchdogRef.current = timeoutId;
+    return () => {
+      window.clearTimeout(timeoutId);
+      if (rolesWatchdogRef.current === timeoutId) rolesWatchdogRef.current = null;
+      console.log('[AuthProvider] watchdog cleared (loading/user changed)');
+    };
+  }, [loading, user?.id, clearRoles, updateLoading]);
 
   const refreshRoles = useCallback(async () => {
     if (!user) return;

@@ -89,8 +89,8 @@ function SectionHead({ title, sub }: { title: string; sub?: string }) {
 }
 
 // ─── Tab 1: Health ───────────────────────────────────────────
-type HealthService = { name: string; status: string; latency_ms?: number };
-type HealthResult = { status?: string; services?: HealthService[] } | null;
+type HealthService = { service?: string; name?: string; status: string; latency_ms?: number | null };
+type HealthResult = { overall?: string; status?: string; services?: HealthService[] } | null;
 
 function statusBadge(status?: string) {
   const s = (status || '').toLowerCase();

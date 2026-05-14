@@ -17,21 +17,6 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
   const { user, loading, isAgent, isAdmin, isPartner, isSupport } = useAuth();
   const [approvalState, setApprovalState] = useState<'loading' | 'pending' | 'approved' | 'none'>('loading');
 
-  console.log('[ProtectedRoute] render', {
-    loading,
-    userId: user?.id ?? null,
-    isAdmin,
-    isAgent,
-    isPartner,
-    isSupport,
-    requireAgent: !!requireAgent,
-    requireAdmin: !!requireAdmin,
-    requirePartner: !!requirePartner,
-    requireSupport: !!requireSupport,
-    approvalState,
-    pathname: window.location.pathname,
-  });
-
   useEffect(() => {
     if (!user || !requireAgent || isAdmin) {
       setApprovalState('approved');

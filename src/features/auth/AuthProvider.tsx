@@ -73,11 +73,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [impersonatedUserId, setImpersonatedUserId] = useState<string | null>(null);
   const [impersonationSessionId, setImpersonationSessionId] = useState<string | null>(null);
 
-  const updateLoading = useCallback((next: boolean, reason: string) => {
-    console.log('[AuthProvider] setLoading(' + next + ') — ' + reason);
-    setLoading(next);
-  }, []);
-
   // Load active impersonation session from Supabase (server-side, can't be tampered with via DevTools)
   useEffect(() => {
     if (!user || !isAdmin) {

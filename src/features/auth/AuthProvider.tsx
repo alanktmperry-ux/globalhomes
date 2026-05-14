@@ -349,13 +349,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Auth listener
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setLoading((prev) => {
-        
-        return false;
-      });
-    }, 3000);
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         
@@ -419,7 +412,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => {
-      clearTimeout(timeout);
       subscription.unsubscribe();
     };
   }, []);

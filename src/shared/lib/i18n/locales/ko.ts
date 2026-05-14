@@ -2941,4 +2941,18 @@ export const ko: Partial<Record<TranslationKey, string>> = {
   'mortgage.referral.validation.nameRequired': "이름은 필수 항목입니다.",
   'mortgage.referral.validation.invalidEmail': "유효하지 않은 이메일입니다.",
   'mortgage.referral.validation.phoneRequired': "전화번호는 필수 항목입니다.",
+
+  // Smart Search — zero-result Halo banner & wizard prefill
+  'search.banner.cta': "Halo로 등록하기",
+  'search.banner.free_to_post': "무료 등록 · 계정 업그레이드 불필요",
+  'search.banner.no_matches': "오늘은 다음 조건에 맞는 매물이 없습니다:",
+  'search.banner.only': "단",
+  'search.banner.match_for': "건만 일치합니다 —",
+  'search.common.bed': "베드",
+  'search.common.car': "주차",
+  'search.common.in': "지역:",
+  'search.common.under': "최대 예산",
+  'halo.prefilled_from_search.heading': "검색 내용을 기반으로 Halo가 미리 입력되었습니다",
+  'halo.prefilled_from_search.based_on': "기준 검색어:",
+  'halo.prefilled_from_search.body': "내용을 확인하고 등록하세요 — 보통 30초면 됩니다.",
 };

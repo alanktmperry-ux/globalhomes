@@ -2945,4 +2945,18 @@ export const zh: Partial<Record<TranslationKey, string>> = {
   'mortgage.referral.validation.nameRequired': "需要提供姓名",
   'mortgage.referral.validation.invalidEmail': "无效电子邮件",
   'mortgage.referral.validation.phoneRequired': "需要提供电话号码",
+
+  // Smart Search — zero-result Halo banner & wizard prefill
+  'search.banner.cta': "发布为求购需求 (Halo)",
+  'search.banner.free_to_post': "免费发布 · 无需升级账户",
+  'search.banner.no_matches': "今天没有匹配的房源:",
+  'search.banner.only': "仅有",
+  'search.banner.match_for': "套房源匹配",
+  'search.common.bed': "卧室",
+  'search.common.car': "车位",
+  'search.common.in': "位于",
+  'search.common.under': "预算不超过",
+  'halo.prefilled_from_search.heading': "我们已根据您的搜索预填了您的求购需求",
+  'halo.prefilled_from_search.based_on': "基于",
+  'halo.prefilled_from_search.body': "请检查详情后发布 — 通常只需 30 秒。",
 };

@@ -157,6 +157,46 @@ function trendFromDelta(curr: number, prev: number): Trend {
   return 'flat';
 }
 
+// Honest MoM growth — prevents the "300% growth on $0" bug.
+function calcMoMGrowth(current: number, previous: number): string {
+  if (previous === 0 && current === 0) return '—';
+  if (previous === 0) return 'New';
+  const pct = ((current - previous) / previous) * 100;
+  return `${pct > 0 ? '+' : ''}${pct.toFixed(0)}%`;
+}
+
+type DateRange = 'today' | '7d' | '30d' | '90d' | 'all';
+
+function HeroKPI({
+  label,
+  value,
+  delta,
+  atRisk,
+  onClick,
+}: {
+  label: string;
+  value: string;
+  delta?: string;
+  atRisk?: boolean;
+  onClick?: () => void;
+}) {
+  const Wrapper: any = onClick ? 'button' : 'div';
+  return (
+    <Wrapper
+      onClick={onClick}
+      className={`rounded-xl border bg-card p-3 text-left flex flex-col justify-between min-h-[80px] ${
+        atRisk ? 'border-amber-500/60' : 'border-border'
+      } ${onClick ? 'hover:bg-accent transition-colors' : ''}`}
+    >
+      <p className="text-[10px] uppercase tracking-wider font-medium text-muted-foreground">{label}</p>
+      <p className="text-[28px] leading-none font-bold text-foreground mt-1" style={{ fontFamily: 'Plus Jakarta Sans, Inter, sans-serif' }}>
+        {value}
+      </p>
+      {delta && <p className="text-[11px] text-muted-foreground mt-1 truncate">{delta}</p>}
+    </Wrapper>
+  );
+}
+
 function KPI({
   label,
   value,

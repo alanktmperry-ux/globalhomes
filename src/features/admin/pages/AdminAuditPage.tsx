@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Loader2, Search, ShieldCheck, RefreshCw } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, format } from 'date-fns';
+import ExportCSVButton from '@/features/admin/components/ExportCSVButton';
 
 interface AuditRow {
   id: string;

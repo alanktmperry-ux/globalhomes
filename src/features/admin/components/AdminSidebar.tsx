@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Zap, CheckCircle, Users, Building2, DollarSign, Megaphone, Settings,
   Shield, ArrowLeft, LineChart, Wallet, Landmark, Sparkles, Share2, Briefcase,
-  Command, LifeBuoy,
+  Command, LifeBuoy, ShieldCheck,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -122,6 +122,7 @@ export default function AdminSidebar({
   ];
   const system: NavItem[] = [
     { to: '/admin/system', label: 'System', icon: Settings },
+    { to: '/admin/audit', label: 'Audit Log', icon: ShieldCheck },
   ];
 
   void search;

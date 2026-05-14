@@ -49,6 +49,7 @@ const CheckEmailPage = React.lazy(() => import("./pages/CheckEmailPage"));
 const AuthLandingPage = React.lazy(() => import("./pages/AuthLandingPage"));
 const AdminDashboard = React.lazy(() => import("./pages/AdminDashboard"));
 const AdminLayout = React.lazy(() => import("./features/admin/components/AdminLayout"));
+import { AdminErrorBoundary } from "./features/admin/components/AdminErrorBoundary";
 const CommandCentre = React.lazy(() => import("./features/admin/components/CommandCentre"));
 const AdminApprovalsPage = React.lazy(() => import("./features/admin/pages/ApprovalsPage"));
 const AdminAgentsPage = React.lazy(() => import("./features/admin/pages/AgentsPage"));
@@ -554,7 +555,7 @@ const App = () => (
 
                 {/* Admin */}
                 <Route path="/admin/login" element={<AdminLoginPage />} />
-                <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>
+                <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminErrorBoundary><AdminLayout /></AdminErrorBoundary></ProtectedRoute>}>
                   <Route index element={<CommandCentre />} />
                   <Route path="overview" element={<AdminOverviewPage />} />
                   <Route path="approvals" element={<AdminApprovalsPage />} />

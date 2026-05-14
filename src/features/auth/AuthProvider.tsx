@@ -23,7 +23,7 @@ interface AuthContextType {
   impersonatedUserId: string | null;
   startImpersonation: (userId: string, userEmail: string) => Promise<void>;
   stopImpersonation: () => Promise<void>;
-  rolesFetched: boolean;
+  
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -45,7 +45,7 @@ const AuthContext = createContext<AuthContextType>({
   impersonatedUserId: null,
   startImpersonation: async () => {},
   stopImpersonation: async () => {},
-  rolesFetched: false,
+  
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userRole, setUserRole] = useState<'user' | 'agent' | 'admin' | 'partner' | 'support' | null>(null);
   const [agencyRole, setAgencyRole] = useState<string | null>(null);
   const [agencyId, setAgencyId] = useState<string | null>(null);
-  const [rolesFetched, setRolesFetched] = useState(false);
+  
   const lastFetchedUserId = useRef<string | null>(null);
   const isFetching = useRef(false);
   const [impersonating, setImpersonating] = useState(false);
@@ -209,13 +209,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUserRole(null);
     setAgencyRole(null);
     setAgencyId(null);
-    setRolesFetched(false);
   }, []);
 
   const refreshRoles = useCallback(async () => {
     if (!user) return;
     lastFetchedUserId.current = null;
-    setRolesFetched(false);
     const [rolesResult, agentResult] = await Promise.all([
       supabase.from('user_roles').select('role').eq('user_id', user.id),
       supabase.from('agents').select('id, agency_role, agency_id, approval_status').eq('user_id', user.id).maybeSingle(),
@@ -245,7 +243,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     }
     lastFetchedUserId.current = user.id;
-    setRolesFetched(true);
   }, [user, applyRoles]);
 
   // Fetch roles
@@ -255,7 +252,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     // Same user with roles already fetched — skip to avoid role flicker on navigation
-    if (lastFetchedUserId.current === user.id && rolesFetched) return;
+    if (lastFetchedUserId.current === user.id) return;
 
     if (isFetching.current) return;
 
@@ -341,14 +338,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } finally {
         isFetching.current = false;
         if (!cancelled) {
-          setRolesFetched(true);
+          
           setLoading(false);
         }
       }
     };
     doFetch();
     return () => { cancelled = true; };
-  }, [user, applyRoles, clearRoles, rolesFetched]);
+  }, [user, applyRoles, clearRoles]);
 
   // Auth listener
   useEffect(() => {
@@ -388,7 +385,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const isNewUser = lastFetchedUserId.current !== session.user.id;
           if (isNewUser) {
             lastFetchedUserId.current = null;
-            setRolesFetched(false);
+            
             setLoading(true);
           }
           // Clean up email confirmation hash from URL
@@ -464,7 +461,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       user, session, loading, isAgent, isAdmin, isPartner, isSupport, isPrincipal, userRole,
       agencyRole, agencyId, signOut, refreshRoles,
       impersonating, impersonatedUser, impersonatedUserId, startImpersonation, stopImpersonation,
-      rolesFetched,
+
     }}>
       {children}
     </AuthContext.Provider>

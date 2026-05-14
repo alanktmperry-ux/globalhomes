@@ -23,6 +23,7 @@ interface AuthContextType {
   impersonatedUserId: string | null;
   startImpersonation: (userId: string, userEmail: string) => Promise<void>;
   stopImpersonation: () => Promise<void>;
+  rolesFetched: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({

@@ -93,7 +93,7 @@ export default function CreateHaloPage() {
     }
   }, [user?.id]);
 
-  // Apply query-param prefill (Listing CTA, CRM invite, voice lead, rent roll)
+  // Apply query-param prefill (Listing CTA, CRM invite, voice lead, rent roll, smart search)
   useEffect(() => {
     const intent = searchParams.get('intent');
     const suburb = searchParams.get('suburb');
@@ -103,12 +103,38 @@ export default function CreateHaloPage() {
     const sAid = searchParams.get('source_agent_id') ?? undefined;
     const sType = searchParams.get('source_type') ?? undefined;
 
+    // Smart Search prefill params (source=search)
+    const isFromSearch = searchParams.get('source') === 'search';
+    const bedsMin = searchParams.get('beds_min');
+    const bedsMax = searchParams.get('beds_max');
+    const bathsMin = searchParams.get('baths_min');
+    const parkingMin = searchParams.get('parking_min');
+    const minPrice = searchParams.get('min_price');
+    const maxPrice = searchParams.get('max_price');
+    const typesCsv = searchParams.get('type');
+    const featuresCsv = searchParams.get('features');
+    const rawQuery = searchParams.get('raw_q');
+
     let touched = false;
     const patch: Partial<HaloFormData> = {};
     if (intent === 'buy' || intent === 'rent') { patch.intent = intent; touched = true; }
     if (suburb) { patch.suburbs = [suburb]; touched = true; }
     if (budgetMax && !Number.isNaN(Number(budgetMax))) { patch.budget_max = Number(budgetMax); touched = true; }
     if (propertyType) { patch.property_types = [propertyType]; touched = true; }
+
+    if (isFromSearch) {
+      const parsedTypes = typesCsv?.split(',').map((s) => s.trim()).filter(Boolean) ?? [];
+      if (parsedTypes.length) { patch.property_types = parsedTypes; touched = true; }
+      if (bedsMin && !Number.isNaN(Number(bedsMin))) { patch.bedrooms_min = Number(bedsMin); touched = true; }
+      if (bedsMax && !Number.isNaN(Number(bedsMax))) { patch.bedrooms_max = Number(bedsMax); touched = true; }
+      if (bathsMin && !Number.isNaN(Number(bathsMin))) { patch.bathrooms_min = Number(bathsMin); touched = true; }
+      if (parkingMin && !Number.isNaN(Number(parkingMin))) { patch.car_spaces_min = Number(parkingMin); touched = true; }
+      if (minPrice && !Number.isNaN(Number(minPrice))) { patch.budget_min = Number(minPrice); touched = true; }
+      if (maxPrice && !Number.isNaN(Number(maxPrice))) { patch.budget_max = Number(maxPrice); touched = true; }
+      const parsedFeatures = featuresCsv?.split(',').map((s) => s.trim()).filter(Boolean) ?? [];
+      if (parsedFeatures.length) { patch.must_haves = parsedFeatures; touched = true; }
+      if (rawQuery) { patch.description = rawQuery.slice(0, 500); touched = true; }
+    }
 
     if (touched) {
       setData((d) => ({ ...d, ...patch }));

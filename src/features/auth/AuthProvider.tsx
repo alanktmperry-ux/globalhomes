@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   
   const lastFetchedUserId = useRef<string | null>(null);
   const isFetching = useRef(false);
-  const rolesWatchdogRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+  const rolesWatchdogRef = useRef<number | null>(null);
   const activeRolesRequestId = useRef(0);
   const invalidatedRolesRequestId = useRef<number | null>(null);
   const [impersonating, setImpersonating] = useState(false);

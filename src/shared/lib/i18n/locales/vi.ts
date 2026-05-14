@@ -2941,4 +2941,18 @@ export const vi: Partial<Record<TranslationKey, string>> = {
   'mortgage.referral.validation.nameRequired': "Tên là bắt buộc",
   'mortgage.referral.validation.invalidEmail': "Email không hợp lệ",
   'mortgage.referral.validation.phoneRequired': "Điện thoại là bắt buộc",
+
+  // Smart Search — zero-result Halo banner & wizard prefill
+  'search.banner.cta': "Đăng yêu cầu tìm nhà (Halo)",
+  'search.banner.free_to_post': "Đăng miễn phí · Không cần nâng cấp tài khoản",
+  'search.banner.no_matches': "Hôm nay không có kết quả phù hợp cho",
+  'search.banner.only': "Chỉ có",
+  'search.banner.match_for': "kết quả phù hợp với",
+  'search.common.bed': "phòng ngủ",
+  'search.common.car': "chỗ đỗ xe",
+  'search.common.in': "tại",
+  'search.common.under': "dưới",
+  'halo.prefilled_from_search.heading': "Chúng tôi đã điền sẵn yêu cầu Halo từ tìm kiếm của bạn",
+  'halo.prefilled_from_search.based_on': "Dựa trên",
+  'halo.prefilled_from_search.body': "Xem lại chi tiết và đăng — thường chỉ mất 30 giây.",
 };

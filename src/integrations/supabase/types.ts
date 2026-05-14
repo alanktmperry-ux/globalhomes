@@ -9591,6 +9591,51 @@ export type Database = {
           },
         ]
       }
+      privacy_requests: {
+        Row: {
+          created_at: string
+          email: string
+          export_url: string | null
+          fulfilled_at: string | null
+          fulfilled_by: string | null
+          id: string
+          notes: string | null
+          request_type: string
+          status: string
+          user_id: string | null
+          verification_token: string
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          export_url?: string | null
+          fulfilled_at?: string | null
+          fulfilled_by?: string | null
+          id?: string
+          notes?: string | null
+          request_type: string
+          status?: string
+          user_id?: string | null
+          verification_token: string
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          export_url?: string | null
+          fulfilled_at?: string | null
+          fulfilled_by?: string | null
+          id?: string
+          notes?: string | null
+          request_type?: string
+          status?: string
+          user_id?: string | null
+          verification_token?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -11864,6 +11909,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      service_health_log: {
+        Row: {
+          checked_at: string
+          error_message: string | null
+          id: string
+          latency_ms: number | null
+          service: string
+          status: string
+        }
+        Insert: {
+          checked_at?: string
+          error_message?: string | null
+          id?: string
+          latency_ms?: number | null
+          service: string
+          status: string
+        }
+        Update: {
+          checked_at?: string
+          error_message?: string | null
+          id?: string
+          latency_ms?: number | null
+          service?: string
+          status?: string
+        }
+        Relationships: []
       }
       signature_request_parties: {
         Row: {

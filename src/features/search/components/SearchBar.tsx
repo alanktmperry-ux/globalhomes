@@ -80,47 +80,52 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
     const trimmed = query.trim();
     if (!trimmed) return;
 
-    const detectedLang = detectLanguage(trimmed);
-    const shouldTranslate = detectedLang !== 'en' && detectedLang !== 'unknown';
-
-    if (!shouldTranslate) {
-      onSearch(trimmed);
-      return;
-    }
-
-    setIsTranslating(true);
+    setIsParsing(true);
     try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 3000);
-
-      const { data: translationResult, error: fnError } = await supabase.functions.invoke('generate-translations', {
-        body: { type: 'translate_search', search_query: trimmed },
-      });
-      clearTimeout(timeout);
-
-      if (!fnError && translationResult) {
-        const lang = translationResult.detected_language;
-        const englishQuery = translationResult.english_query || trimmed;
-
-        capture('search_translated', {
-          original_query: trimmed,
-          english_query: englishQuery,
-          detected_language: lang,
-        });
-
-        if (lang && lang !== 'en' && lang !== 'English') {
-          setDetectedLang(lang);
-          setTimeout(() => setDetectedLang(null), 3000);
-        }
-
-        onSearch(englishQuery);
-      } else {
-        onSearch(trimmed);
+      // Fast path: single short word — likely a suburb, skip the LLM
+      const isSingleWord = !/\s/.test(trimmed) && trimmed.length < 30;
+      if (isSingleWord) {
+        navigate(`/buy?q=${encodeURIComponent(trimmed)}`);
+        return;
       }
-    } catch {
-      onSearch(trimmed);
+
+      const { data, error } = await supabase.functions.invoke('parse-search-query', {
+        body: { query: trimmed, locale: language ?? 'en' },
+      });
+
+      if (error || !data?.parsed) {
+        navigate(`/buy?q=${encodeURIComponent(trimmed)}`);
+        return;
+      }
+
+      const p = data.parsed;
+      const intent = p.intent === 'rent' ? 'rent' : 'buy';
+
+      const params = new URLSearchParams();
+      if (p.suburb_or_locality) params.set('suburb', p.suburb_or_locality);
+      if (p.postcode) params.set('postcode', p.postcode);
+      if (p.state) params.set('state', p.state);
+      if (p.property_types?.length) params.set('type', p.property_types.join(','));
+      if (p.beds_min != null) params.set('beds_min', String(p.beds_min));
+      if (p.beds_max != null) params.set('beds_max', String(p.beds_max));
+      if (p.baths_min != null) params.set('baths_min', String(p.baths_min));
+      if (p.parking_min != null) params.set('parking_min', String(p.parking_min));
+      if (p.min_price_aud != null) params.set('min_price', String(p.min_price_aud));
+      if (p.max_price_aud != null) params.set('max_price', String(p.max_price_aud));
+      if (p.features?.length) params.set('features', p.features.join(','));
+      params.set('raw_q', trimmed);
+
+      if ((p.confidence ?? 0) < 0.5) {
+        params.set('q', trimmed);
+        params.set('low_confidence', '1');
+      }
+
+      navigate(`/${intent}?${params.toString()}`);
+    } catch (err) {
+      console.error('[SearchBar] parse failed, falling back to literal:', err);
+      navigate(`/buy?q=${encodeURIComponent(trimmed)}`);
     } finally {
-      setIsTranslating(false);
+      setIsParsing(false);
     }
   };
 

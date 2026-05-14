@@ -484,6 +484,15 @@ Deno.serve(async (req) => {
         console.error("audit log:", auditError);
       }
 
+      await logAdminAction({
+        actor_id: caller.id, actor_email: caller.email ?? 'unknown',
+        action: 'user.deleted',
+        target_type: 'user', target_id: user_id,
+        target_summary: `User ${user_id}`,
+        notes: warnings.length ? `Warnings: ${warnings.join('; ')}` : null,
+        request: req,
+      });
+
       return new Response(JSON.stringify({ success: true, warnings }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

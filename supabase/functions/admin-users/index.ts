@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { logAdminAction } from "../_shared/adminAudit.ts";
 
 // --- Ad-hoc in-memory rate limiting (resets on cold start) ---
 const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
@@ -254,6 +255,14 @@ Deno.serve(async (req) => {
         });
       } catch (e) { console.error("audit log:", e); }
 
+      await logAdminAction({
+        actor_id: caller.id, actor_email: caller.email ?? 'unknown',
+        action: ban ? 'user.banned' : 'user.unbanned',
+        target_type: 'user', target_id: user_id,
+        target_summary: `User ${user_id}`,
+        request: req,
+      });
+
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -305,6 +314,15 @@ Deno.serve(async (req) => {
           metadata: { plan_type, performed_by: caller.email },
         });
       } catch (e) { console.error("audit log:", e); }
+
+      await logAdminAction({
+        actor_id: caller.id, actor_email: caller.email ?? 'unknown',
+        action: 'subscription.changed',
+        target_type: 'user', target_id: user_id,
+        target_summary: `User ${user_id} → ${plan_type}`,
+        after_state: { plan_type, listing_limit, seat_limit, founding_member },
+        request: req,
+      });
 
       return new Response(
         JSON.stringify({ success: true }),
@@ -465,6 +483,15 @@ Deno.serve(async (req) => {
       } catch (auditError) {
         console.error("audit log:", auditError);
       }
+
+      await logAdminAction({
+        actor_id: caller.id, actor_email: caller.email ?? 'unknown',
+        action: 'user.deleted',
+        target_type: 'user', target_id: user_id,
+        target_summary: `User ${user_id}`,
+        notes: warnings.length ? `Warnings: ${warnings.join('; ')}` : null,
+        request: req,
+      });
 
       return new Response(JSON.stringify({ success: true, warnings }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -758,6 +785,15 @@ Deno.serve(async (req) => {
           },
         });
       } catch (e) { console.error("audit log:", e); }
+
+      await logAdminAction({
+        actor_id: caller.id, actor_email: caller.email ?? 'unknown',
+        action: opName === 'grant_role' ? 'role.granted' : 'role.revoked',
+        target_type: 'user_role', target_id: userId,
+        target_summary: `User ${userId} role=${role}`,
+        after_state: { role, granted: opName === 'grant_role' },
+        request: req,
+      });
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

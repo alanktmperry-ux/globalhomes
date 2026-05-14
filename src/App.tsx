@@ -82,6 +82,7 @@ const AdminCommsStatsPage = React.lazy(() => import("./features/admin/pages/Admi
 const AdminHaloShell = React.lazy(() => import("./features/admin/pages/HaloShell"));
 const AdminOutreachShell = React.lazy(() => import("./features/admin/pages/OutreachShell"));
 const AdminSystemShell = React.lazy(() => import("./features/admin/pages/SystemShell"));
+const AdminAuditPage = React.lazy(() => import("./features/admin/pages/AdminAuditPage"));
 const SupportLoginPage = React.lazy(() => import("./features/admin/pages/SupportLoginPage"));
 const SupportDashboardLayout = React.lazy(() => import("./features/admin/pages/SupportDashboardLayout"));
 const SupportTicketsWrapper = React.lazy(() => import("./features/admin/pages/SupportTicketsWrapper"));
@@ -568,6 +569,7 @@ const App = () => (
                   <Route path="outreach" element={<AdminOutreachShell />} />
                   <Route path="halo" element={<AdminHaloShell />} />
                   <Route path="system" element={<AdminSystemShell />} />
+                  <Route path="audit" element={<AdminAuditPage />} />
                   <Route path="partners" element={<AdminPartnersPage />} />
                   <Route path="referral-partners" element={<AdminReferralPartnersPage />} />
                   <Route path="brokers" element={<AdminBrokers />} />

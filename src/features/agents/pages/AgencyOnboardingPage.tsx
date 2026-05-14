@@ -1353,12 +1353,13 @@ export default function AgencyOnboardingPage() {
                 </Button>
                 {step === 2 && (
                   <Button
-                    variant="ghost"
-                    className="w-full mt-1 text-muted-foreground text-xs"
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-1"
                     onClick={handleSkipTrustAccount}
                     disabled={loading}
                   >
-                    {t('agentOnboarding.nav.skipTrust')}
+                    Set up trust account later
                   </Button>
                 )}
               </div>

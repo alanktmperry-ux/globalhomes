@@ -138,6 +138,14 @@ const AuthConfirmPage = () => {
             {message}
           </p>
         </div>
+        {status === 'success' && (
+          <Link
+            to="/dashboard"
+            className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
+          >
+            Continue to dashboard →
+          </Link>
+        )}
         {status === 'error' && (
           <Link
             to="/login"

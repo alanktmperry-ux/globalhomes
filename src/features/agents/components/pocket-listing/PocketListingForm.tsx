@@ -778,7 +778,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
   }
 
   return (
-    <div className="bg-card border border-border rounded-2xl flex flex-col max-h-[calc(100vh-12rem)] min-h-0">
+    <div className="bg-card border border-border rounded-2xl flex flex-col md:max-h-[calc(100vh-12rem)] md:min-h-0">
       {/* Progress */}
       <div className="px-4 pt-4 pb-2">
         {/* Step breadcrumb */}

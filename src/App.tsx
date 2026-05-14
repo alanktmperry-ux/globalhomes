@@ -571,6 +571,7 @@ const App = () => (
                   <Route path="halo" element={<AdminHaloShell />} />
                   <Route path="system" element={<AdminSystemShell />} />
                   <Route path="audit" element={<AdminAuditPage />} />
+                  <Route path="team" element={<AdminTeamPage />} />
                   <Route path="partners" element={<AdminPartnersPage />} />
                   <Route path="referral-partners" element={<AdminReferralPartnersPage />} />
                   <Route path="brokers" element={<AdminBrokers />} />

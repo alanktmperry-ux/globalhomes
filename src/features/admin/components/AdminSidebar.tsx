@@ -122,6 +122,7 @@ export default function AdminSidebar({
   ];
   const system: NavItem[] = [
     { to: '/admin/system', label: 'System', icon: Settings },
+    { to: '/admin/team', label: 'Team', icon: Users },
     { to: '/admin/audit', label: 'Audit Log', icon: ShieldCheck },
   ];
 

@@ -47,6 +47,26 @@ export default function HeroSearchPreview() {
   const { isListening, isTranscribing, startListening, stopListening, isSupported: isMicSupported } = useVoiceSearch(
     (transcript) => {
       setQ(transcript);
+
+      // Fast path: if regex parser extracts both intent and location, skip Gemini
+      const quick = parsePropertyQuery(transcript);
+      const hasIntent = quick.intent === 'rent' || quick.intent === 'sale';
+      const hasLocation = !!quick.location;
+
+      if (hasIntent && hasLocation) {
+        const params = new URLSearchParams();
+        params.set('raw_q', transcript);
+        if (quick.location) params.set('suburb', quick.location);
+        if (quick.beds) params.set('beds_min', String(quick.beds));
+        if (quick.priceMin) params.set('min_price_aud', String(quick.priceMin));
+        if (quick.priceMax) params.set('max_price_aud', String(quick.priceMax));
+        if (quick.propertyType) params.set('property_types', quick.propertyType);
+        const route = quick.intent === 'rent' ? '/rent' : '/buy';
+        navigate(`${route}?${params.toString()}`);
+        return;
+      }
+
+      // Slow path: unclear intent or no suburb — use Gemini
       submitQuery(transcript);
     },
     (errorMsg) => {

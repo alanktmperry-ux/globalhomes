@@ -39,14 +39,20 @@ INTENT DETECTION:
 - "sold", "售出", "đã bán" → "sold"
 - Default "buy" if unclear
 
-RENT PRICE PERIOD (Australian rent is quoted PER WEEK):
-- If intent="rent", interpret bare prices as PER WEEK and set price_period="per_week".
-  Examples: "rent under $700" → max_price_aud=700, price_period="per_week".
-  "$500-700 a week", "500-700 pw", "500到700周" → min_price_aud=500, max_price_aud=700, price_period="per_week".
-- If the user explicitly says "per month" / "monthly" / "/mo" → convert to weekly (monthly * 12 / 52) and set price_period="per_week".
-- If the user explicitly says "per annum" / "yearly" / "p.a." → convert to weekly (annual / 52) and set price_period="per_week".
-- For intent="buy" / "sold", price_period="total".
-- If intent unknown and price is small (< $50,000), assume rent + per_week.
+PRICE PERIOD DETECTION (CRITICAL — Australian rent is ALWAYS per-week):
+- If intent="rent": ALWAYS set price_period="per_week".
+- If intent="buy" or "sold": set price_period="total".
+- Mentions of "per week", "/week", "p/w", "pw", "weekly", "a week", "每周", "周", "tuần", "주" → price_period="per_week" AND auto-correct intent to "rent" if not already.
+- Mentions of "per month", "/month", "/mo", "monthly" for residential rent → CONVERT to per-week by dividing by 4.33 (round to nearest dollar) and return price_period="per_week".
+- Mentions of "per annum", "yearly", "p.a." for rent → divide by 52 and return price_period="per_week".
+- If intent unknown and the price is small (< $50,000), assume intent="rent" + price_period="per_week".
+
+PRICE PERIOD EXAMPLES:
+- "3 bed apartment Cabramatta under $700 week" → intent=rent, max_price_aud=700, price_period=per_week
+- "house in Box Hill under $1.2m" → intent=buy, max_price_aud=1200000, price_period=total
+- "rental Eastwood $600 p/w" → intent=rent, max_price_aud=600, price_period=per_week
+- "apartment Sydney $800 weekly" → intent=rent, max_price_aud=800, price_period=per_week
+- "rent Springvale $2600 per month" → intent=rent, max_price_aud=600, price_period=per_week (2600/4.33≈600)
 
 PROPERTY TYPE:
 - "house", "独立屋", "단독주택", "nhà phố", "villa" → "house"

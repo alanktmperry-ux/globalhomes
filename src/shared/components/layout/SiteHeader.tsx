@@ -63,6 +63,17 @@ export function SiteHeader() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showAgentModal, setShowAgentModal] = useState(false);
+  const [showSignInMenu, setShowSignInMenu] = useState(false);
+  const signInMenuRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (signInMenuRef.current && !signInMenuRef.current.contains(e.target as Node)) {
+        setShowSignInMenu(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   const navTo = (path: string) => {
     setMobileOpen(false);

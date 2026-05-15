@@ -52,9 +52,8 @@ const SPEECH_LANG_MAP: Record<string, string> = {
   zh_traditional: 'zh-TW',
   vi: 'vi-VN',
 };
-function pickSpeechLang(locale: string | null | undefined): string {
-  return SPEECH_LANG_MAP[locale ?? 'en'] ?? 'en-AU';
-}
+
+
 
 // ─── Language sequence ────────────────────────────────────────
 type SeqItem = {

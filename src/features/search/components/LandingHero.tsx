@@ -1,18 +1,31 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Mic, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Search, Mic, ArrowRight, Sparkles } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from '@/shared/lib/i18n';
 
-const AVATAR_COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
-const AVATAR_INITIALS = ['A', 'M', 'S', 'J', 'R'];
-
 function usePlatformStats() {
-  const [stats, setStats] = useState<{ properties: number | null; buyerCount: number | null; searching: number }>({
-    properties: null, buyerCount: null, searching: 12,
+  const [stats, setStats] = useState<{ properties: number | null; buyerCount: number | null }>({
+    properties: null, buyerCount: null,
   });
+
+  useEffect(() => {
+    async function load() {
+      const { count: propCount } = await supabase
+        .from('properties').select('id', { count: 'exact', head: true }).eq('is_active', true);
+      setStats(s => ({
+        ...s,
+        properties: propCount ?? 0,
+        buyerCount: null,
+      }));
+    }
+    load();
+  }, []);
+
+  return stats;
+}
 
   useEffect(() => {
     async function load() {

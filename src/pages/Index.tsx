@@ -404,13 +404,7 @@ const Index = () => {
     const recognition = new SpeechRecognition();
     // Set language to the user's UI locale (NOT the marketing carousel) so
     // the speech recognizer matches what the user is actually speaking.
-    const localeToBcp47: Record<string, string> = {
-      en: 'en-AU',
-      zh_simplified: 'zh-CN',
-      zh_traditional: 'zh-TW',
-      vi: 'vi-VN',
-    };
-    recognition.lang = localeToBcp47[language ?? 'en'] ?? 'en-AU';
+    recognition.lang = pickSpeechLang(language);
     recognition.continuous = false;
     recognition.interimResults = false;
     recognitionRef.current = recognition;

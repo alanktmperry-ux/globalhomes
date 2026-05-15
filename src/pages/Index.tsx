@@ -45,6 +45,17 @@ const T = {
   blueTint: '#F5F8FF',
 };
 
+// Map UI locale → BCP-47 tag for the Web Speech API recognizer.
+const SPEECH_LANG_MAP: Record<string, string> = {
+  en: 'en-AU',
+  zh_simplified: 'zh-CN',
+  zh_traditional: 'zh-TW',
+  vi: 'vi-VN',
+};
+function pickSpeechLang(locale: string | null | undefined): string {
+  return SPEECH_LANG_MAP[locale ?? 'en'] ?? 'en-AU';
+}
+
 // ─── Language sequence ────────────────────────────────────────
 type SeqItem = {
   lang: string; flag: string; flagLabel: string;
@@ -393,13 +404,7 @@ const Index = () => {
     const recognition = new SpeechRecognition();
     // Set language to the user's UI locale (NOT the marketing carousel) so
     // the speech recognizer matches what the user is actually speaking.
-    const localeToBcp47: Record<string, string> = {
-      en: 'en-AU',
-      zh_simplified: 'zh-CN',
-      zh_traditional: 'zh-TW',
-      vi: 'vi-VN',
-    };
-    recognition.lang = localeToBcp47[language ?? 'en'] ?? 'en-AU';
+    recognition.lang = pickSpeechLang(language);
     recognition.continuous = false;
     recognition.interimResults = false;
     recognitionRef.current = recognition;
@@ -412,7 +417,7 @@ const Index = () => {
         setSearchQuery(text);
         try { inputRef.current?.blur(); } catch { /* noop */ }
         // Route through the Smart Search parser, same as text submit.
-        window.setTimeout(() => { void runSmartSearch(text); }, 200);
+        window.setTimeout(() => { void submitSearchQuery(text); }, 200);
       }
     };
 
@@ -449,10 +454,9 @@ const Index = () => {
 
   const [isParsing, setIsParsing] = useState(false);
 
-  const runSmartSearch = async (rawText: string) => {
+  const submitSearchQuery = useCallback(async (rawText: string) => {
     const trimmed = rawText.trim();
     if (!trimmed) return;
-
 
     setIsParsing(true);
 
@@ -508,11 +512,11 @@ const Index = () => {
     } finally {
       setIsParsing(false);
     }
-  };
+  }, [language, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await runSmartSearch(searchQuery);
+    await submitSearchQuery(searchQuery);
   };
 
   // Initial card content (static — JS handles all subsequent updates via refs).

@@ -127,6 +127,12 @@ export function SiteHeader() {
           </span>
         </Link>
 
+        <nav className="hidden md:flex items-center gap-1 ps-4 ms-2 border-l border-slate-200/70">
+          <Link to="/properties" className="text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors px-3 py-1.5 rounded-full hover:bg-slate-50">Browse</Link>
+          <Link to="/properties?mode=sale" className="text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors px-3 py-1.5 rounded-full hover:bg-slate-50">Buy</Link>
+          <Link to="/properties?mode=rent" className="text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors px-3 py-1.5 rounded-full hover:bg-slate-50">Rent</Link>
+        </nav>
+
         {/* Right cluster */}
         <div className="flex items-center" style={{ gap: 18 }}>
           <LanguageSwitcher />
@@ -263,9 +269,6 @@ export function SiteHeader() {
                       </button>
                       <button onClick={() => { navigate('/saved'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
                         <Bookmark size={14} className="text-muted-foreground" /> {t('nav.savedProperties')}
-                      </button>
-                      <button onClick={() => { navigate('/settings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
-                        <Settings size={14} className="text-muted-foreground" /> {t('nav.accountSettings')}
                       </button>
                       <button onClick={() => { navigate('/account/settings'); setShowUserMenu(false); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors">
                         <Settings size={14} className="text-muted-foreground" /> {t('nav.profilePassword')}
@@ -424,6 +427,9 @@ export function SiteHeader() {
                   </button>
                 ) : (
                   <>
+                    <button onClick={() => navTo('/properties')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-[#2563EB] hover:bg-[#EFF6FF] transition-colors">
+                      <Search size={16} className="text-[#2563EB]" /> Browse Properties
+                    </button>
                     <button onClick={() => navTo('/login')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                       <LogIn size={16} />
                       {t('common.signin')}

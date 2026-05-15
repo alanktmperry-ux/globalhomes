@@ -192,7 +192,7 @@ export default function HeroSearchPreview() {
       const text = (e.results?.[0]?.[0]?.transcript || '').trim();
       if (text) {
         setQ(text);
-        setTimeout(() => navigate(`/search?q=${encodeURIComponent(text)}`), 200);
+        setTimeout(() => submitQuery(text), 200);
       }
     };
 

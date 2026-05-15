@@ -1088,20 +1088,6 @@ const Index = () => {
           <style>{`@media (max-width:860px){.how-grid{grid-template-columns:1fr !important}}`}</style>
         </section>
 
-        {/* ═══ SECTION 7 — Testimonials ═══ */}
-        <section style={{ background:'#fff', padding:'88px 24px' }}>
-          <div style={{ maxWidth:1200, margin:'0 auto' }}>
-            <div style={{ fontSize:11, fontWeight:700, color:T.blue, textTransform:'uppercase', letterSpacing:'.12em', marginBottom:14 }}>{t('home.testimonials.eyebrow')}</div>
-            <h2 style={{ fontSize:'clamp(32px, 3.5vw, 48px)', fontWeight:800, letterSpacing:'-1.5px', lineHeight:1.1, margin:'0 0 16px' }}>
-              {t('home.testimonials.heading')}
-            </h2>
-            <p className="text-xs text-center text-muted-foreground mb-6 max-w-xl mx-auto">
-              Feedback from our beta program. Names anonymised.
-            </p>
-            <p className="text-center text-muted-foreground py-8 text-sm">Agent testimonials coming soon — we're onboarding our first founding agents now.</p>
-          </div>
-        </section>
-
         {/* ═══ SECTION 8 — Agent Band ═══ */}
         <AgentBand />
 

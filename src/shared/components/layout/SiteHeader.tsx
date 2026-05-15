@@ -231,7 +231,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-border/50">
-      <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
+      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
         {/* Logo — always show globe + ListHQ wordmark on every breakpoint */}
         <div className="flex items-center gap-3 shrink-0 min-w-0">
           <Link to="/" className="flex items-center gap-2 shrink-0" aria-label="ListHQ home">

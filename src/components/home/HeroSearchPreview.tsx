@@ -46,6 +46,41 @@ export default function HeroSearchPreview() {
   const intervalRef = useRef<number | null>(null);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [aiSummary, setAiSummary] = useState('');
+
+  async function submitQuery(term: string) {
+    if (!term.trim()) return;
+    setIsSearching(true);
+    setAiSummary('');
+    try {
+      const { data, error } = await supabase.functions.invoke('parse-search-query', {
+        body: { query: term, locale: viewerLocale },
+      });
+      if (error || !data) throw error ?? new Error('No response');
+      const p = data.parsed ?? data;
+      const params = new URLSearchParams();
+      params.set('raw_q', term);
+      if (p.suburb_or_locality) params.set('suburb', p.suburb_or_locality);
+      if (p.postcode) params.set('postcode', p.postcode);
+      if (p.state) params.set('state', p.state);
+      if (p.beds_min != null) params.set('beds_min', String(p.beds_min));
+      if (p.beds_max != null) params.set('beds_max', String(p.beds_max));
+      if (p.baths_min != null) params.set('baths_min', String(p.baths_min));
+      if (p.parking_min != null) params.set('parking_min', String(p.parking_min));
+      if (p.min_price_aud != null) params.set('min_price_aud', String(p.min_price_aud));
+      if (p.max_price_aud != null) params.set('max_price_aud', String(p.max_price_aud));
+      if (p.price_period) params.set('price_period', p.price_period);
+      if (p.property_types?.length) params.set('property_types', p.property_types.join(','));
+      if (p.intent_summary) setAiSummary(p.intent_summary);
+      const route = p.intent === 'rent' ? '/rent' : '/buy';
+      navigate(`${route}?${params.toString()}`);
+    } catch {
+      navigate(`/buy?raw_q=${encodeURIComponent(term)}`);
+    } finally {
+      setIsSearching(false);
+    }
+  }
 
   // Auto-cycling runs only when viewer is on English AND has no explicit saved locale.
   const shouldAutoCycle = viewerLocale === 'en' && !hasExplicitLocale;

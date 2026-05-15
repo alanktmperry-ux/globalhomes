@@ -45,6 +45,17 @@ const T = {
   blueTint: '#F5F8FF',
 };
 
+// Map UI locale → BCP-47 tag for the Web Speech API recognizer.
+const SPEECH_LANG_MAP: Record<string, string> = {
+  en: 'en-AU',
+  zh_simplified: 'zh-CN',
+  zh_traditional: 'zh-TW',
+  vi: 'vi-VN',
+};
+function pickSpeechLang(locale: string | null | undefined): string {
+  return SPEECH_LANG_MAP[locale ?? 'en'] ?? 'en-AU';
+}
+
 // ─── Language sequence ────────────────────────────────────────
 type SeqItem = {
   lang: string; flag: string; flagLabel: string;

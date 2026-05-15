@@ -188,7 +188,7 @@ export async function resolveRecipientLocale(opts: {
     const { data } = await supabase
       .from('profiles')
       .select('locale')
-      .eq('id', opts.userId)
+      .eq('user_id', opts.userId)
       .maybeSingle();
     if (data?.locale) return data.locale;
   }

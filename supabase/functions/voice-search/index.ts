@@ -9,6 +9,15 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Warmup early-return — keeps function hot without doing real work
+  const bodyText = await req.text();
+  const warmupBody = bodyText ? (() => { try { return JSON.parse(bodyText); } catch { return {}; } })() : {};
+  if (warmupBody.warmup) {
+    return new Response(JSON.stringify({ warmup: true }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   const rlBlocked = await enforceRateLimit(req, {
     endpoint: "voice-search",
     userMaxPerWindow: 30,

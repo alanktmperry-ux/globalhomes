@@ -44,6 +44,8 @@ export default function HeroSearchPreview() {
   const inputRef = useRef<HTMLInputElement>(null);
   const paused = useRef(false);
   const intervalRef = useRef<number | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   // Auto-cycling runs only when viewer is on English AND has no explicit saved locale.
   const shouldAutoCycle = viewerLocale === 'en' && !hasExplicitLocale;

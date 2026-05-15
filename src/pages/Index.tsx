@@ -689,7 +689,7 @@ const Index = () => {
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-4 px-4 text-[13px] text-muted-foreground">
           <span className="flex items-center gap-1.5">
             <span className="text-base">🏠</span>
-            <span><strong className="text-foreground font-semibold">{propertyCount ? propertyCount.toLocaleString() : '10,000'}+</strong> properties</span>
+            <span><strong className="text-foreground font-semibold">{propertyCount && propertyCount >= 1000 ? propertyCount.toLocaleString() : '10,000'}+</strong> properties</span>
           </span>
           <span className="hidden sm:inline text-border">·</span>
           <span className="flex items-center gap-1.5">

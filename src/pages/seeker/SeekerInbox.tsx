@@ -80,7 +80,7 @@ export default function SeekerInbox() {
 
     const [{ data: agents }, { data: properties }, { data: unreadMsgs }] = await Promise.all([
       agentIds.length
-        ? supabase.from('agents').select('user_id, full_name, agency_name, avatar_url').in('user_id', agentIds)
+        ? supabase.from('agents').select('user_id, name, agency, avatar_url, phone, email').in('user_id', agentIds)
         : Promise.resolve({ data: [] as any[] }),
       allPropertyIds.length
         ? supabase.from('properties').select('id, title, address, suburb, price').in('id', allPropertyIds)
@@ -263,14 +263,14 @@ export default function SeekerInbox() {
                     >
                       <div className="flex items-start justify-between gap-2 mb-1">
                         <span className="font-medium text-sm text-[#1E293B] truncate">
-                          {r.agent?.full_name || t('seeker.inbox.agentFallback')}
+                          {r.agent?.name || t('seeker.inbox.agentFallback')}
                         </span>
                         {unread && (
                           <span className="h-2 w-2 rounded-full bg-[#2563EB] mt-1.5 flex-shrink-0" />
                         )}
                       </div>
                       <p className="text-xs text-[#64748B] truncate">
-                        {r.agent?.agency_name || ''}
+                        {r.agent?.agency || ''}
                       </p>
                       <div className="flex items-center gap-1 mt-1 text-xs text-[#64748B]">
                         <MapPin className="h-3 w-3" />
@@ -302,15 +302,35 @@ export default function SeekerInbox() {
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div>
                         <h2 className="text-lg font-semibold text-[#1E293B]">
-                          {selected.agent?.full_name || t('seeker.inbox.agentFallback')}
+                          {selected.agent?.name || t('seeker.inbox.agentFallback')}
                         </h2>
-                        {selected.agent?.agency_name && (
-                          <p className="text-sm text-[#64748B]">{selected.agent.agency_name}</p>
+                        {selected.agent?.agency && (
+                          <p className="text-sm text-[#64748B]">{selected.agent.agency}</p>
                         )}
                         <div className="flex items-center gap-1 mt-1 text-xs text-[#64748B]">
                           <MapPin className="h-3 w-3" />
                           {(selected.halo?.suburbs || []).join(', ')}
                         </div>
+                        {selected.accepted && (selected.agent?.phone || selected.agent?.email) && (
+                          <div className="mt-2 space-y-1 text-sm text-[#1E293B]">
+                            {selected.agent?.phone && (
+                              <p>
+                                <span className="text-[#64748B]">{t('seeker.inbox.detail.phone') || 'Phone'}: </span>
+                                <a href={`tel:${selected.agent.phone}`} className="text-[#2563EB] hover:underline">
+                                  {selected.agent.phone}
+                                </a>
+                              </p>
+                            )}
+                            {selected.agent?.email && (
+                              <p>
+                                <span className="text-[#64748B]">{t('seeker.inbox.detail.email') || 'Email'}: </span>
+                                <a href={`mailto:${selected.agent.email}`} className="text-[#2563EB] hover:underline break-all">
+                                  {selected.agent.email}
+                                </a>
+                              </p>
+                            )}
+                          </div>
+                        )}
                       </div>
                       <div className="flex flex-col sm:flex-row gap-2">
                         {!selected.accepted && !selected.dismissed_by_seeker && (

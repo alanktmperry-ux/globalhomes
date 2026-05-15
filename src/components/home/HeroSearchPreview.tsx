@@ -250,6 +250,7 @@ export default function HeroSearchPreview() {
               {t('hero.h1').replace(/[.。।]$/, '')}<span style={{ color: '#2563EB' }}>{t('hero.h1').slice(-1)}</span>
             </span>
             <span
+              key={idx}
               id="h2Cycle"
               role="button"
               tabIndex={0}
@@ -265,6 +266,8 @@ export default function HeroSearchPreview() {
                 backgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 color: 'transparent',
+                paddingBottom: '0.12em',
+                animation: 'hspSlideIn 0.45s ease-out both',
               }}
               aria-label="Change language"
             >

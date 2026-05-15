@@ -454,6 +454,10 @@ const Index = () => {
     const trimmed = searchQuery.trim();
     if (!trimmed) return;
 
+  const runSmartSearch = async (rawText: string) => {
+    const trimmed = rawText.trim();
+    if (!trimmed) return;
+
     setIsParsing(true);
 
     // Fast path: single bare word that looks like a suburb → skip LLM
@@ -508,6 +512,11 @@ const Index = () => {
     } finally {
       setIsParsing(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await runSmartSearch(searchQuery);
   };
 
   // Initial card content (static — JS handles all subsequent updates via refs).

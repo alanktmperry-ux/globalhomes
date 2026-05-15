@@ -836,7 +836,7 @@ const Index = () => {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-14">
                 {[
                   { value: '500+', label: 'Licensed agents' },
-                  { value: propertyCount ? `${propertyCount.toLocaleString()}+` : '10,000+', label: 'Properties listed' },
+                  { value: propertyCount && propertyCount >= 1000 ? `${propertyCount.toLocaleString()}+` : '10,000+', label: 'Properties listed' },
                   { value: '20', label: 'Languages supported' },
                   { value: 'Australia-wide', label: 'Coverage' },
                 ].map(({ value, label }) => (

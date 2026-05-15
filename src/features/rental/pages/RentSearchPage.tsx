@@ -17,8 +17,14 @@ function parseRentalFiltersFromParams(sp: URLSearchParams): RentalFilters {
     return v && !Number.isNaN(Number(v)) ? Number(v) : undefined;
   };
   const types = sp.get('type')?.split(',').map(s => s.trim()).filter(Boolean);
+  // price_period defaults to per_week for /rent. If a non-weekly period sneaks
+  // in via URL, we still treat the numeric values as weekly here — the parser
+  // edge function is responsible for converting monthly/annual → weekly before
+  // navigating. Reading the param keeps the URL contract explicit.
+  const pricePeriod = sp.get('price_period') ?? 'per_week';
+  void pricePeriod;
   return {
-    suburb: sp.get('suburb') || sp.get('q') || sp.get('location') || undefined,
+    suburb: sp.get('suburb') || sp.get('raw_q') || sp.get('q') || sp.get('location') || undefined,
     state: sp.get('state') || undefined,
     minBedrooms: num('beds_min') ?? num('beds'),
     minRent: num('min_price') ?? num('priceMin'),

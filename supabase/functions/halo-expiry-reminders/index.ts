@@ -1,5 +1,6 @@
 import "../_shared/email-footer.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { translateEmailPayload, resolveRecipientLocale } from '../_shared/translateEmailPayload.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 
 const APP_URL = Deno.env.get('APP_URL') ?? 'https://listhq.com.au';
@@ -13,11 +14,38 @@ const TIMEFRAME_LABELS: Record<string, string> = {
   exploring: 'Just exploring',
 };
 
-async function sendEmail(resendKey: string, to: string, subject: string, html: string) {
+async function sendEmail(
+  resendKey: string,
+  to: string,
+  subject: string,
+  html: string,
+  opts: { userId?: string; source: string },
+) {
+  const recipientLocale = await resolveRecipientLocale({ userId: opts.userId, email: to });
+  let translated;
+  try {
+    translated = await translateEmailPayload(
+      { subject, body: html, isHtml: true, sourceLang: 'en' },
+      recipientLocale,
+    );
+  } catch (err) {
+    console.error(`[${opts.source}] translation failed, sending original`, err, { to, recipientLocale });
+    translated = { subject, body: html, wasTranslated: false, sourceLang: 'en', targetLang: recipientLocale, cached: false };
+  }
+  console.log(`[${opts.source}] sending`, { to, recipientLocale, wasTranslated: translated.wasTranslated });
   const resp = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: FROM, to: [to], subject, html }),
+    body: JSON.stringify({
+      from: FROM,
+      to: [to],
+      subject: translated.subject,
+      html: translated.body,
+      headers: {
+        'X-ListHQ-Locale': translated.targetLang,
+        'X-ListHQ-Translated': translated.wasTranslated ? 'true' : 'false',
+      },
+    }),
   });
   if (!resp.ok) console.error('Resend error', await resp.text());
 }
@@ -64,7 +92,8 @@ Deno.serve(async (req) => {
         const date = new Date(h.expires_at).toLocaleDateString('en-AU');
         await sendEmail(resendKey, email,
           'Your Halo expires in 14 days — renew to stay visible',
-          emailShell(`<h1 style="font-size:22px;margin:0 0 12px;">Your Halo expires soon</h1><p style="font-size:15px;line-height:1.5;">Your Halo on ListHQ expires on <strong>${date}</strong>. Renew it from your dashboard to stay visible to agents.</p>${btn(`${APP_URL}/dashboard/my-halos`, 'Manage my Halo →')}`));
+          emailShell(`<h1 style="font-size:22px;margin:0 0 12px;">Your Halo expires soon</h1><p style="font-size:15px;line-height:1.5;">Your Halo on ListHQ expires on <strong>${date}</strong>. Renew it from your dashboard to stay visible to agents.</p>${btn(`${APP_URL}/dashboard/my-halos`, 'Manage my Halo →')}`),
+          { userId: h.seeker_id, source: 'halo-expiry-reminders:14day' });
       }
       await admin.from('halos').update({ expiry_reminder_sent: true }).eq('id', h.id);
       results.reminded++;
@@ -86,7 +115,8 @@ Deno.serve(async (req) => {
         const date = new Date(h.expires_at).toLocaleDateString('en-AU');
         await sendEmail(resendKey, email,
           'Your Halo has expired',
-          emailShell(`<h1 style="font-size:22px;margin:0 0 12px;">Your Halo has expired</h1><p style="font-size:15px;line-height:1.5;">Your Halo expired on <strong>${date}</strong>. Repost from your dashboard to get back in front of agents.</p>${btn(`${APP_URL}/dashboard/my-halos`, 'Repost my Halo →')}`));
+          emailShell(`<h1 style="font-size:22px;margin:0 0 12px;">Your Halo has expired</h1><p style="font-size:15px;line-height:1.5;">Your Halo expired on <strong>${date}</strong>. Repost from your dashboard to get back in front of agents.</p>${btn(`${APP_URL}/dashboard/my-halos`, 'Repost my Halo →')}`),
+          { userId: h.seeker_id, source: 'halo-expiry-reminders:expired' });
       }
       results.expired++;
     }
@@ -113,7 +143,8 @@ Deno.serve(async (req) => {
       if (email && resendKey) {
         await sendEmail(resendKey, email,
           "Your Halo hasn't had any agent responses yet",
-          emailShell(`<h1 style="font-size:22px;margin:0 0 12px;">Let's get more agents seeing your Halo</h1><p style="font-size:15px;line-height:1.5;">Your Halo has been live for 7 days with no agent responses yet.</p><p style="font-size:15px;line-height:1.5;"><strong>Here are some tips to attract more agents:</strong></p><ul style="font-size:14px;line-height:1.6;color:#334155;"><li>Add more suburbs — wider search area = more visibility</li><li>Widen your budget range if possible</li><li>Add a description — agents respond more to detailed Halos</li><li>Make sure your finance status is up to date</li></ul>${btn(`${APP_URL}/dashboard/my-halos`, 'Update my Halo →')}`));
+          emailShell(`<h1 style="font-size:22px;margin:0 0 12px;">Let's get more agents seeing your Halo</h1><p style="font-size:15px;line-height:1.5;">Your Halo has been live for 7 days with no agent responses yet.</p><p style="font-size:15px;line-height:1.5;"><strong>Here are some tips to attract more agents:</strong></p><ul style="font-size:14px;line-height:1.6;color:#334155;"><li>Add more suburbs — wider search area = more visibility</li><li>Widen your budget range if possible</li><li>Add a description — agents respond more to detailed Halos</li><li>Make sure your finance status is up to date</li></ul>${btn(`${APP_URL}/dashboard/my-halos`, 'Update my Halo →')}`),
+          { userId: h.seeker_id, source: 'halo-expiry-reminders:no-response' });
       }
       await admin.from('halos').update({ no_response_alert_sent: true }).eq('id', h.id);
       results.no_response_alerts++;
@@ -153,7 +184,8 @@ Deno.serve(async (req) => {
             `<p style="font-size:15px;line-height:1.5;">Whether you're looking to rent again or ready to buy, post a free Halo on ListHQ and let agents come to you with options.</p>` +
             `<p style="font-size:14px;line-height:1.6;color:#334155;">It takes 2 minutes and it's completely free.</p>` +
             btn(`${APP_URL}/halo/new?source_type=rent_roll`, 'Post my Halo →')
-          )
+          ),
+          { source: 'halo-expiry-reminders:rent-roll-invite' }
         );
       }
       await admin.from('tenancies').update({ halo_invite_sent: true }).eq('id', t.id);
@@ -227,7 +259,8 @@ Deno.serve(async (req) => {
             `<ul style="font-size:14px;line-height:1.6;color:#334155;padding-left:18px;">${items}</ul>` +
             `<p style="font-size:14px;line-height:1.6;color:#334155;">Each Halo costs 1 credit to unlock.</p>` +
             btn(`${APP_URL}/dashboard/halo-board`, 'View Halo Board →')
-          )
+          ),
+          { userId: agentId, source: 'halo-expiry-reminders:suburb-digest' }
         );
 
         await admin.from('halo_suburb_digests').insert({

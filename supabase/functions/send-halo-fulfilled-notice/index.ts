@@ -1,16 +1,44 @@
 import "../_shared/email-footer.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { translateEmailPayload, resolveRecipientLocale } from '../_shared/translateEmailPayload.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 
 const APP_URL = Deno.env.get('APP_URL') ?? 'https://listhq.com.au';
 // NOTE: Falls back to onboarding@resend.dev until listhq.com.au DNS is verified in Resend.
 const FROM = 'ListHQ <noreply@listhq.com.au>';
 
-async function sendEmail(resendKey: string, to: string, subject: string, html: string) {
+async function sendEmail(
+  resendKey: string,
+  to: string,
+  subject: string,
+  html: string,
+  opts: { userId?: string; source: string },
+) {
+  const recipientLocale = await resolveRecipientLocale({ userId: opts.userId, email: to });
+  let translated;
+  try {
+    translated = await translateEmailPayload(
+      { subject, body: html, isHtml: true, sourceLang: 'en' },
+      recipientLocale,
+    );
+  } catch (err) {
+    console.error(`[${opts.source}] translation failed, sending original`, err, { to, recipientLocale });
+    translated = { subject, body: html, wasTranslated: false, sourceLang: 'en', targetLang: recipientLocale, cached: false };
+  }
+  console.log(`[${opts.source}] sending`, { to, recipientLocale, wasTranslated: translated.wasTranslated });
   const resp = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: FROM, to: [to], subject, html }),
+    body: JSON.stringify({
+      from: FROM,
+      to: [to],
+      subject: translated.subject,
+      html: translated.body,
+      headers: {
+        'X-ListHQ-Locale': translated.targetLang,
+        'X-ListHQ-Translated': translated.wasTranslated ? 'true' : 'false',
+      },
+    }),
   });
   if (!resp.ok) console.error('Resend error', await resp.text());
 }
@@ -71,7 +99,8 @@ Deno.serve(async (req) => {
     if (seekerEmail && resendKey) {
       await sendEmail(resendKey, seekerEmail,
         'Congratulations — your Halo is marked as fulfilled',
-        `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a;"><h1 style="font-size:22px;margin:0 0 12px;">Congratulations!</h1><p style="font-size:15px;line-height:1.5;">Great news! We've notified the agents who responded. We hope you love your new property.</p><p style="margin:24px 0;"><a href="${APP_URL}" style="display:inline-block;background:#3b82f6;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Visit ListHQ →</a></p></div>`);
+        `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a;"><h1 style="font-size:22px;margin:0 0 12px;">Congratulations!</h1><p style="font-size:15px;line-height:1.5;">Great news! We've notified the agents who responded. We hope you love your new property.</p><p style="margin:24px 0;"><a href="${APP_URL}" style="display:inline-block;background:#3b82f6;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Visit ListHQ →</a></p></div>`,
+        { userId: halo.seeker_id, source: 'send-halo-fulfilled-notice:seeker' });
     }
 
     // Notify each agent who unlocked
@@ -84,7 +113,8 @@ Deno.serve(async (req) => {
       if (!email || !resendKey) continue;
       await sendEmail(resendKey, email,
         'A Halo you responded to has been fulfilled',
-        `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a;"><h1 style="font-size:22px;margin:0 0 12px;">A Halo has been fulfilled</h1><p style="font-size:15px;line-height:1.5;">The seeker whose Halo you unlocked on ListHQ has found their property.</p><div style="background:#f1f5f9;border-radius:8px;padding:16px;margin:20px 0;"><p style="margin:0;"><strong>Halo summary:</strong></p><p style="margin:8px 0 0;">${summary}</p></div><p style="font-size:14px;color:#64748b;">This Halo is now closed. Thank you for using ListHQ.</p></div>`);
+        `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a;"><h1 style="font-size:22px;margin:0 0 12px;">A Halo has been fulfilled</h1><p style="font-size:15px;line-height:1.5;">The seeker whose Halo you unlocked on ListHQ has found their property.</p><div style="background:#f1f5f9;border-radius:8px;padding:16px;margin:20px 0;"><p style="margin:0;"><strong>Halo summary:</strong></p><p style="margin:8px 0 0;">${summary}</p></div><p style="font-size:14px;color:#64748b;">This Halo is now closed. Thank you for using ListHQ.</p></div>`,
+        { userId: agentId, source: 'send-halo-fulfilled-notice:agent' });
       notified++;
     }
 

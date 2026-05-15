@@ -1145,7 +1145,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                   <div className="flex flex-wrap gap-1.5">
                     {[
                       { key: 'zh_simplified', flag: '🇨🇳', label: '普通话' },
-                      { key: 'zh_traditional', flag: '🇭🇰', label: '廣東話' },
+                      { key: 'zh_traditional', flag: '🇹🇼', label: '繁體中文' },
                       { key: 'vi', flag: '🇻🇳', label: 'Tiếng Việt' },
                       { key: 'ko', flag: '🇰🇷', label: '한국어' },
                       { key: 'ar', flag: '🇸🇦', label: 'العربية' },

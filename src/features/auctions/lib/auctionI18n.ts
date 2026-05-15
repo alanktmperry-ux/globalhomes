@@ -49,6 +49,6 @@ export function setPreferredLang(lang: AuctionLang) {
 export const LANG_OPTIONS: { value: AuctionLang; flag: string; label: string }[] = [
   { value: 'en', flag: '🇦🇺', label: 'EN' },
   { value: 'zh_simplified', flag: '🇨🇳', label: '普通话' },
-  { value: 'zh_traditional', flag: '🇭🇰', label: '廣東話' },
+  { value: 'zh_traditional', flag: '🇹🇼', label: '繁體中文' },
   { value: 'vi', flag: '🇻🇳', label: 'Tiếng Việt' },
 ];

@@ -126,9 +126,52 @@ export default function HeroSearchPreview() {
   }
 
   function startVoice() {
-    const el = document.querySelector<HTMLElement>('[data-voice-search-trigger]');
-    if (el) { el.click(); return; }
-    inputRef.current?.focus();
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      inputRef.current?.focus();
+      return;
+    }
+
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = viewerLocale === 'zh' ? 'zh-CN'
+      : viewerLocale === 'vi' ? 'vi-VN'
+      : viewerLocale === 'ar' ? 'ar-SA'
+      : viewerLocale === 'hi' ? 'hi-IN'
+      : viewerLocale === 'ko' ? 'ko-KR'
+      : viewerLocale === 'ja' ? 'ja-JP'
+      : 'en-AU';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognitionRef.current = recognition;
+
+    recognition.onstart = () => setIsListening(true);
+
+    recognition.onresult = (e: any) => {
+      const text = (e.results?.[0]?.[0]?.transcript || '').trim();
+      if (text) {
+        setQ(text);
+        setTimeout(() => navigate(`/search?q=${encodeURIComponent(text)}`), 200);
+      }
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+      recognitionRef.current = null;
+    };
+
+    recognition.onerror = () => {
+      setIsListening(false);
+      recognitionRef.current = null;
+    };
+
+    recognition.start();
   }
 
   // Computed display values for static-mode (non-cycling) hero

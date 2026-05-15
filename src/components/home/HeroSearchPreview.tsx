@@ -269,13 +269,19 @@ export default function HeroSearchPreview() {
           >
             <button
               type="button"
-              onClick={startVoice}
-              aria-label="Voice search"
+              onClick={() => isListening ? stopListening() : startListening()}
+              aria-label={isListening ? 'Stop voice search' : 'Start voice search'}
+              disabled={!isMicSupported || isTranscribing}
               style={{
-                width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: 'transparent', border: 0, cursor: 'pointer',
-                color: isListening ? '#ef4444' : '#6a6a6a', marginRight: 12, flexShrink: 0,
+                width: 28, height: 28,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'transparent', border: 0,
+                cursor: isMicSupported && !isTranscribing ? 'pointer' : 'not-allowed',
+                color: isListening ? '#EF4444' : isTranscribing ? '#F59E0B' : '#6a6a6a',
+                marginRight: 12, flexShrink: 0,
                 animation: isListening ? 'hspPulse 1s ease-in-out infinite' : 'none',
+                opacity: (!isMicSupported || isTranscribing) && !isListening ? 0.5 : 1,
+                transition: 'color 0.2s ease',
               }}
             >
               <Mic size={20} strokeWidth={1.6} />

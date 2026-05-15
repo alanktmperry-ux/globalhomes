@@ -12,7 +12,7 @@ export function SiteFooter() {
     {
       titleKey: 'layout.footer.sections.platform',
       links: [
-        { labelKey: 'layout.footer.links.search', to: '/' },
+        { labelKey: 'layout.footer.links.search', to: '/properties' },
         { labelKey: 'layout.footer.links.translate', to: '/tools/translate' },
         { labelKey: 'layout.footer.links.findAgent', to: '/agents' },
         { labelKey: 'layout.footer.links.pricing', to: '/for-agents/pricing' },

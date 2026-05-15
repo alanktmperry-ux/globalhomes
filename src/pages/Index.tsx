@@ -411,7 +411,8 @@ const Index = () => {
       if (text) {
         setSearchQuery(text);
         try { inputRef.current?.blur(); } catch { /* noop */ }
-        window.setTimeout(() => navigate(`/buy?q=${encodeURIComponent(text)}`), 200);
+        // Route through the Smart Search parser, same as text submit.
+        window.setTimeout(() => { void runSmartSearch(text); }, 200);
       }
     };
 

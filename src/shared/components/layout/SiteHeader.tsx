@@ -117,18 +117,14 @@ export function SiteHeader() {
   // Public (signed-out) header — Bose × Blue simplified design.
   // Authenticated users (seekers / agents / admins) keep the full role-aware header below.
   if (!user && !loading) {
+    const publicLinks = [
+      { label: 'Buy', to: '/buy' },
+      { label: 'Rent', to: '/rent' },
+      { label: 'New Homes', to: '/new-homes' },
+      { label: 'Find an Agent', to: '/agents' },
+    ];
     return (
-      <header
-        className="fixed top-0 left-0 right-0 z-10 flex items-center justify-between px-6 md:px-10"
-        style={{
-          height: 72,
-          background: 'rgba(255,255,255,0.85)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(229,231,235,0.6)',
-        }}
-      >
-        {/* Logo — globe icon in rounded square + ListHQ wordmark */}
+      <header className="fixed top-0 left-0 right-0 z-10 h-16 flex items-center justify-between px-6 md:px-10 bg-white/85 backdrop-blur-xl border-b border-border/60">
         <Link to="/" className="flex items-center gap-2 shrink-0" aria-label="ListHQ home">
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-cyan-accent flex items-center justify-center shrink-0">
             <Globe size={20} className="text-primary-foreground" />
@@ -138,37 +134,97 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-1 ps-4 ms-2 border-l border-slate-200/70">
-          <Link to="/properties" className="text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors px-3 py-1.5 rounded-full hover:bg-slate-50">Browse</Link>
-          <Link to="/properties?mode=sale" className="text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors px-3 py-1.5 rounded-full hover:bg-slate-50">Buy</Link>
-          <Link to="/properties?mode=rent" className="text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors px-3 py-1.5 rounded-full hover:bg-slate-50">Rent</Link>
+        <nav className="hidden md:flex items-center gap-6">
+          {publicLinks.map(link => {
+            const active = isActiveRoute(location.pathname, link.to);
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`text-[13px] font-medium transition-colors ${
+                  active
+                    ? 'text-primary border-b-2 border-primary pb-0.5'
+                    : 'text-foreground hover:text-primary'
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
-        {/* Right cluster */}
-        <div className="flex items-center" style={{ gap: 18 }}>
+        <div className="flex items-center gap-3">
           <LanguageSwitcher />
-          <Link
-            to="/login"
-            onMouseEnter={prefetchLogin}
-            onFocus={prefetchLogin}
-            onTouchStart={prefetchLogin}
-            className="text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors"
+
+          <div ref={signInMenuRef} className="relative hidden md:block">
+            <button
+              onClick={() => setShowSignInMenu(o => !o)}
+              onMouseEnter={prefetchLogin}
+              onFocus={prefetchLogin}
+              className="inline-flex items-center gap-1 text-[13px] font-semibold text-foreground hover:text-primary transition-colors"
+              aria-haspopup="menu"
+              aria-expanded={showSignInMenu}
+            >
+              Sign in <ChevronDown size={14} />
+            </button>
+            {showSignInMenu && (
+              <div className="absolute right-0 top-full mt-1 w-56 bg-popover border border-border rounded-xl shadow-elevated overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                <button
+                  onClick={() => { setShowSignInMenu(false); prefetchLogin(); navigate('/login'); }}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
+                >
+                  <Home size={14} className="text-muted-foreground" /> I'm a buyer or renter
+                </button>
+                <button
+                  onClick={() => { setShowSignInMenu(false); navigate('/agents/login'); }}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
+                >
+                  <Building2 size={14} className="text-muted-foreground" /> I'm a real estate agent
+                </button>
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={() => setShowAgentModal(true)}
+            className="hidden md:inline-flex rounded-full bg-primary text-primary-foreground px-4 py-1.5 text-[13px] font-semibold hover:bg-primary/90 transition-colors"
           >
-            Sign in
-          </Link>
-          <Link
-            to="/agents/login"
-            className="hidden md:inline text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors"
-          >
-            Agent login
-          </Link>
-          <Link
-            to="/for-agents"
-            className="hidden md:inline rounded-full bg-[#2563EB] text-white px-3 py-1.5 text-[12px] font-semibold hover:bg-[#1d4ed8] transition-colors"
-          >
-            List with us
-          </Link>
+            Become an Agent
+          </button>
+
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+            <SheetTrigger asChild>
+              <button
+                className="md:hidden w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                aria-label="Open menu"
+              >
+                <Menu size={20} />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-72 p-0">
+              <nav className="flex flex-col pt-10 pb-4">
+                <p className="text-[11px] font-semibold text-muted-foreground tracking-wider uppercase px-4 pt-4 pb-1">Browse</p>
+                <button onClick={() => navTo('/buy')} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-accent rounded-lg transition-colors">Buy</button>
+                <button onClick={() => navTo('/rent')} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-accent rounded-lg transition-colors">Rent</button>
+                <button onClick={() => navTo('/new-homes')} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-accent rounded-lg transition-colors">New Homes</button>
+                <button onClick={() => navTo('/agents')} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-accent rounded-lg transition-colors">Find an Agent</button>
+
+                <p className="text-[11px] font-semibold text-muted-foreground tracking-wider uppercase px-4 pt-4 pb-1">For Agents</p>
+                <button onClick={() => { setMobileOpen(false); setShowAgentModal(true); }} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-accent rounded-lg transition-colors">Become an Agent</button>
+                <button onClick={() => navTo('/agents/login')} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-accent rounded-lg transition-colors">Agent Login</button>
+
+                <p className="text-[11px] font-semibold text-muted-foreground tracking-wider uppercase px-4 pt-4 pb-1">Sign In</p>
+                <button onClick={() => navTo('/login')} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-accent rounded-lg transition-colors">Sign in as buyer / renter</button>
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
+
+        {showAgentModal && (
+          <Suspense fallback={null}>
+            <AgentRegistrationModal open={showAgentModal} onOpenChange={setShowAgentModal} />
+          </Suspense>
+        )}
       </header>
     );
   }

@@ -391,8 +391,15 @@ const Index = () => {
     setVoiceError(null);
 
     const recognition = new SpeechRecognition();
-    // Set language to currently active hero cycle language — every click
-    recognition.lang = langCodeRef.current || 'en-AU';
+    // Set language to the user's UI locale (NOT the marketing carousel) so
+    // the speech recognizer matches what the user is actually speaking.
+    const localeToBcp47: Record<string, string> = {
+      en: 'en-AU',
+      zh_simplified: 'zh-CN',
+      zh_traditional: 'zh-TW',
+      vi: 'vi-VN',
+    };
+    recognition.lang = localeToBcp47[language ?? 'en'] ?? 'en-AU';
     recognition.continuous = false;
     recognition.interimResults = false;
     recognitionRef.current = recognition;
@@ -404,7 +411,8 @@ const Index = () => {
       if (text) {
         setSearchQuery(text);
         try { inputRef.current?.blur(); } catch { /* noop */ }
-        window.setTimeout(() => navigate(`/buy?q=${encodeURIComponent(text)}`), 200);
+        // Route through the Smart Search parser, same as text submit.
+        window.setTimeout(() => { void runSmartSearch(text); }, 200);
       }
     };
 
@@ -441,10 +449,10 @@ const Index = () => {
 
   const [isParsing, setIsParsing] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmed = searchQuery.trim();
+  const runSmartSearch = async (rawText: string) => {
+    const trimmed = rawText.trim();
     if (!trimmed) return;
+
 
     setIsParsing(true);
 
@@ -500,6 +508,11 @@ const Index = () => {
     } finally {
       setIsParsing(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await runSmartSearch(searchQuery);
   };
 
   // Initial card content (static — JS handles all subsequent updates via refs).

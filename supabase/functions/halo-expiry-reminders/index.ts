@@ -184,7 +184,8 @@ Deno.serve(async (req) => {
             `<p style="font-size:15px;line-height:1.5;">Whether you're looking to rent again or ready to buy, post a free Halo on ListHQ and let agents come to you with options.</p>` +
             `<p style="font-size:14px;line-height:1.6;color:#334155;">It takes 2 minutes and it's completely free.</p>` +
             btn(`${APP_URL}/halo/new?source_type=rent_roll`, 'Post my Halo →')
-          )
+          ),
+          { source: 'halo-expiry-reminders:rent-roll-invite' }
         );
       }
       await admin.from('tenancies').update({ halo_invite_sent: true }).eq('id', t.id);

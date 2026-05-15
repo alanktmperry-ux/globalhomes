@@ -175,6 +175,12 @@ export default function HeroSearchPreview() {
     return () => { cancelled = true; };
   }, []);
 
+  // Pre-warm edge functions — eliminates cold start for first voice/search user
+  useEffect(() => {
+    supabase.functions.invoke('voice-search', { body: { warmup: true } }).catch(() => {});
+    supabase.functions.invoke('parse-search-query', { body: { query: '__warmup__', locale: 'en' } }).catch(() => {});
+  }, []);
+
   async function submit(e?: React.FormEvent) {
     e?.preventDefault();
     const term = q.trim();

@@ -133,8 +133,9 @@ export function SearchBar({ onSearch, onLocationSelect, initialValue = '' }: Sea
         params.set('low_confidence', '1');
       }
 
-      // Always navigate to /buy for now — rent routing is a separate prompt
-      navigate(`/buy?${params.toString()}`);
+      // Route to /rent if the parser detected rental intent, otherwise /buy.
+      const dest = p.intent === 'rent' ? '/rent' : '/buy';
+      navigate(`${dest}?${params.toString()}`);
     } catch (err) {
       console.error('[SearchBar] parse threw, falling back:', err);
       navigate(`/buy?q=${encodeURIComponent(trimmed)}`);

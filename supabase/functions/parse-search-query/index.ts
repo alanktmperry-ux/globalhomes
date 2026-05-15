@@ -34,10 +34,19 @@ SUBURB MATCHING (Australian context — Melbourne, Sydney, Brisbane, Perth, Adel
 - DO NOT invent suburbs — if unclear, leave blank and add to unmatched_terms
 
 INTENT DETECTION:
-- "rent", "lease", "let", "租", "出租", "thuê", "임대", "إيجار" → "rent"
+- "rent", "lease", "let", "to let", "weekly", "per week", "/week", "pw", "p/w", "$X a week", "租", "出租", "thuê", "임대", "إيجار" → "rent"
 - "buy", "purchase", "for sale", "买", "购买", "mua", "구매", "شراء" → "buy"
 - "sold", "售出", "đã bán" → "sold"
 - Default "buy" if unclear
+
+RENT PRICE PERIOD (Australian rent is quoted PER WEEK):
+- If intent="rent", interpret bare prices as PER WEEK and set price_period="per_week".
+  Examples: "rent under $700" → max_price_aud=700, price_period="per_week".
+  "$500-700 a week", "500-700 pw", "500到700周" → min_price_aud=500, max_price_aud=700, price_period="per_week".
+- If the user explicitly says "per month" / "monthly" / "/mo" → convert to weekly (monthly * 12 / 52) and set price_period="per_week".
+- If the user explicitly says "per annum" / "yearly" / "p.a." → convert to weekly (annual / 52) and set price_period="per_week".
+- For intent="buy" / "sold", price_period="total".
+- If intent unknown and price is small (< $50,000), assume rent + per_week.
 
 PROPERTY TYPE:
 - "house", "独立屋", "단독주택", "nhà phố", "villa" → "house"
@@ -82,6 +91,7 @@ SCHEMA:
   "parking_min": number | null,
   "min_price_aud": number | null,
   "max_price_aud": number | null,
+  "price_period": "per_week" | "total" | null,
   "features": string[] | null,
   "deal_breakers": string[] | null,
   "raw_language": string,

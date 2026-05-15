@@ -505,7 +505,8 @@ const Index = () => {
         params.set('low_confidence', '1');
       }
 
-      navigate(`/buy?${params.toString()}`);
+      const dest = p.intent === 'rent' ? '/rent' : '/buy';
+      navigate(`${dest}?${params.toString()}`);
     } catch (err) {
       console.error('[Index hero] parse threw, falling back:', err);
       navigate(`/buy?q=${encodeURIComponent(trimmed)}`);

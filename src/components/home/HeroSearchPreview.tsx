@@ -46,6 +46,41 @@ export default function HeroSearchPreview() {
   const intervalRef = useRef<number | null>(null);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [aiSummary, setAiSummary] = useState('');
+
+  async function submitQuery(term: string) {
+    if (!term.trim()) return;
+    setIsSearching(true);
+    setAiSummary('');
+    try {
+      const { data, error } = await supabase.functions.invoke('parse-search-query', {
+        body: { query: term, locale: viewerLocale },
+      });
+      if (error || !data) throw error ?? new Error('No response');
+      const p = data.parsed ?? data;
+      const params = new URLSearchParams();
+      params.set('raw_q', term);
+      if (p.suburb_or_locality) params.set('suburb', p.suburb_or_locality);
+      if (p.postcode) params.set('postcode', p.postcode);
+      if (p.state) params.set('state', p.state);
+      if (p.beds_min != null) params.set('beds_min', String(p.beds_min));
+      if (p.beds_max != null) params.set('beds_max', String(p.beds_max));
+      if (p.baths_min != null) params.set('baths_min', String(p.baths_min));
+      if (p.parking_min != null) params.set('parking_min', String(p.parking_min));
+      if (p.min_price_aud != null) params.set('min_price_aud', String(p.min_price_aud));
+      if (p.max_price_aud != null) params.set('max_price_aud', String(p.max_price_aud));
+      if (p.price_period) params.set('price_period', p.price_period);
+      if (p.property_types?.length) params.set('property_types', p.property_types.join(','));
+      if (p.intent_summary) setAiSummary(p.intent_summary);
+      const route = p.intent === 'rent' ? '/rent' : '/buy';
+      navigate(`${route}?${params.toString()}`);
+    } catch {
+      navigate(`/buy?raw_q=${encodeURIComponent(term)}`);
+    } finally {
+      setIsSearching(false);
+    }
+  }
 
   // Auto-cycling runs only when viewer is on English AND has no explicit saved locale.
   const shouldAutoCycle = viewerLocale === 'en' && !hasExplicitLocale;
@@ -111,11 +146,11 @@ export default function HeroSearchPreview() {
     return () => { cancelled = true; };
   }, []);
 
-  function submit(e?: React.FormEvent) {
+  async function submit(e?: React.FormEvent) {
     e?.preventDefault();
     const term = q.trim();
     if (!term) { inputRef.current?.focus(); return; }
-    navigate(`/search?q=${encodeURIComponent(term)}`);
+    await submitQuery(term);
   }
 
   function openLangDropdown() {
@@ -157,7 +192,7 @@ export default function HeroSearchPreview() {
       const text = (e.results?.[0]?.[0]?.transcript || '').trim();
       if (text) {
         setQ(text);
-        setTimeout(() => navigate(`/search?q=${encodeURIComponent(text)}`), 200);
+        setTimeout(() => submitQuery(text), 200);
       }
     };
 
@@ -303,18 +338,55 @@ export default function HeroSearchPreview() {
 
             <button
               type="submit"
+              disabled={isSearching}
               style={{
                 padding: '14px 22px', color: '#fff', fontSize: 14, fontWeight: 700,
                 borderRadius: 12, display: 'inline-flex', alignItems: 'center', gap: 8,
-                border: 0, cursor: 'pointer',
+                border: 0, cursor: isSearching ? 'wait' : 'pointer',
                 background: 'linear-gradient(135deg, #2563EB, #4F88FF)',
                 boxShadow: '0 6px 20px rgba(37,99,235,0.30)',
                 flexShrink: 0, whiteSpace: 'nowrap',
+                opacity: isSearching ? 0.85 : 1,
               }}
             >
-              {t('hero.searchButton')} <ArrowRight size={14} />
+              {isSearching ? (
+                <span
+                  style={{
+                    width: 14, height: 14, borderRadius: '50%',
+                    border: '2px solid rgba(255,255,255,0.4)',
+                    borderTopColor: '#fff',
+                    display: 'inline-block',
+                    animation: 'hspSpin 0.7s linear infinite',
+                  }}
+                />
+              ) : (
+                <>{t('hero.searchButton')} <ArrowRight size={14} /></>
+              )}
             </button>
           </form>
+
+          {/* AI summary / loading */}
+          {(isSearching || aiSummary) && (
+            <div style={{
+              marginTop: 12, display: 'flex', alignItems: 'center', gap: 8,
+              fontSize: 13, color: '#1E40AF', maxWidth: 600,
+            }}>
+              {isSearching ? (
+                <>
+                  <span style={{
+                    width: 12, height: 12, borderRadius: '50%',
+                    border: '2px solid rgba(37,99,235,0.3)',
+                    borderTopColor: '#2563EB',
+                    display: 'inline-block',
+                    animation: 'hspSpin 0.7s linear infinite',
+                  }} />
+                  {t('hero.aiThinking') || 'Understanding your search…'}
+                </>
+              ) : (
+                <>✨ {aiSummary}</>
+              )}
+            </div>
+          )}
 
           {/* Filter chips */}
           <div style={{
@@ -325,7 +397,7 @@ export default function HeroSearchPreview() {
               <button
                 key={c.key}
                 type="button"
-                onClick={() => navigate(`/search?q=${encodeURIComponent(c.key)}`)}
+                onClick={() => { setQ(c.key); navigate(`/buy?raw_q=${encodeURIComponent(c.key)}`); }}
                 style={{
                   background: '#F9FAFB', border: '1px solid #E5E7EB',
                   borderRadius: 100, padding: '7px 14px',
@@ -489,6 +561,9 @@ export default function HeroSearchPreview() {
         @keyframes hspPulse {
           0%, 100% { opacity: 1;   transform: scale(1); }
           50%      { opacity: 0.45; transform: scale(0.85); }
+        }
+        @keyframes hspSpin {
+          to { transform: rotate(360deg); }
         }
         .hsp-search:focus-within {
           border-color: #2563EB !important;

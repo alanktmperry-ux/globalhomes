@@ -800,7 +800,9 @@ const Index = () => {
           <FeaturedListings />
 
           {/* ═══ Replace five tools with one — Bose-signature visual ═══ */}
-          <ReplaceFiveTools />
+          <div id="how-it-works">
+            <ReplaceFiveTools />
+          </div>
 
           {/* ═══ Voice Listing showcase — blue gradient stage ═══ */}
           <VoiceListingShowcase />

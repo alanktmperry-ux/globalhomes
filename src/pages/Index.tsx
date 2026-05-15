@@ -417,7 +417,7 @@ const Index = () => {
         setSearchQuery(text);
         try { inputRef.current?.blur(); } catch { /* noop */ }
         // Route through the Smart Search parser, same as text submit.
-        window.setTimeout(() => { void runSmartSearch(text); }, 200);
+        window.setTimeout(() => { void submitSearchQuery(text); }, 200);
       }
     };
 
@@ -516,7 +516,7 @@ const Index = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await runSmartSearch(searchQuery);
+    await submitSearchQuery(searchQuery);
   };
 
   // Initial card content (static — JS handles all subsequent updates via refs).

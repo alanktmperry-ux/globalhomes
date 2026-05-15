@@ -61,7 +61,7 @@ export function useListingTranslation(property: any | null | undefined): Transla
         const { data, error } = await supabase
           .from('profiles')
           .select('language_preference')
-          .eq('id', user.id)
+          .eq('user_id', user.id)
           .maybeSingle();
         if (error || cancelled) return;
         const pref = (data as { language_preference?: string } | null)?.language_preference;

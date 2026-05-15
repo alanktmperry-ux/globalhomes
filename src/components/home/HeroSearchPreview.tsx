@@ -58,9 +58,9 @@ export default function HeroSearchPreview() {
         params.set('raw_q', transcript);
         if (quick.location) params.set('suburb', quick.location);
         if (quick.beds) params.set('beds_min', String(quick.beds));
-        if (quick.priceMin) params.set('min_price_aud', String(quick.priceMin));
-        if (quick.priceMax) params.set('max_price_aud', String(quick.priceMax));
-        if (quick.propertyType) params.set('property_types', quick.propertyType);
+        if (quick.priceMin) params.set('min_price', String(quick.priceMin));
+        if (quick.priceMax) params.set('max_price', String(quick.priceMax));
+        if (quick.propertyType) params.set('type', quick.propertyType);
         const route = quick.intent === 'rent' ? '/rent' : '/buy';
         navigate(`${route}?${params.toString()}`);
         return;
@@ -97,10 +97,10 @@ export default function HeroSearchPreview() {
       if (p.beds_max != null) params.set('beds_max', String(p.beds_max));
       if (p.baths_min != null) params.set('baths_min', String(p.baths_min));
       if (p.parking_min != null) params.set('parking_min', String(p.parking_min));
-      if (p.min_price_aud != null) params.set('min_price_aud', String(p.min_price_aud));
-      if (p.max_price_aud != null) params.set('max_price_aud', String(p.max_price_aud));
+      if (p.min_price_aud != null) params.set('min_price', String(p.min_price_aud));
+      if (p.max_price_aud != null) params.set('max_price', String(p.max_price_aud));
       if (p.price_period) params.set('price_period', p.price_period);
-      if (p.property_types?.length) params.set('property_types', p.property_types.join(','));
+      if (p.property_types?.length) params.set('type', p.property_types[0]);
       if (p.intent_summary) setAiSummary(p.intent_summary);
       const route = p.intent === 'rent' ? '/rent' : '/buy';
       navigate(`${route}?${params.toString()}`);

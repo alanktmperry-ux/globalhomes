@@ -43,10 +43,17 @@ export default function HeroSearchPreview() {
     return localStorage.getItem('listhq.locale') !== null || localStorage.getItem('gh-lang') !== null;
   });
   const inputRef = useRef<HTMLInputElement>(null);
+  const { isListening, isTranscribing, startListening, stopListening, isSupported: isMicSupported } = useVoiceSearch(
+    (transcript) => {
+      setQ(transcript);
+      submitQuery(transcript);
+    },
+    (errorMsg) => {
+      console.warn('[VoiceSearch]', errorMsg);
+    }
+  );
   const paused = useRef(false);
   const intervalRef = useRef<number | null>(null);
-  const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<any>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [aiSummary, setAiSummary] = useState('');
 

@@ -22,7 +22,7 @@ interface HaloResponse {
   created_at: string;
   unlocked_at: string;
   halo?: { suburbs: string[] | null; intent: string | null } | null;
-  agent?: { full_name: string | null; agency_name: string | null; avatar_url: string | null } | null;
+  agent?: { name: string | null; agency: string | null; avatar_url: string | null; phone: string | null; email: string | null } | null;
   properties?: Array<{ id: string; title: string | null; address: string | null; suburb: string | null; price: number | null }>;
   unread_count?: number;
 }

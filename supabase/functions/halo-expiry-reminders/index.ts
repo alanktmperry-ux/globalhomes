@@ -143,7 +143,8 @@ Deno.serve(async (req) => {
       if (email && resendKey) {
         await sendEmail(resendKey, email,
           "Your Halo hasn't had any agent responses yet",
-          emailShell(`<h1 style="font-size:22px;margin:0 0 12px;">Let's get more agents seeing your Halo</h1><p style="font-size:15px;line-height:1.5;">Your Halo has been live for 7 days with no agent responses yet.</p><p style="font-size:15px;line-height:1.5;"><strong>Here are some tips to attract more agents:</strong></p><ul style="font-size:14px;line-height:1.6;color:#334155;"><li>Add more suburbs — wider search area = more visibility</li><li>Widen your budget range if possible</li><li>Add a description — agents respond more to detailed Halos</li><li>Make sure your finance status is up to date</li></ul>${btn(`${APP_URL}/dashboard/my-halos`, 'Update my Halo →')}`));
+          emailShell(`<h1 style="font-size:22px;margin:0 0 12px;">Let's get more agents seeing your Halo</h1><p style="font-size:15px;line-height:1.5;">Your Halo has been live for 7 days with no agent responses yet.</p><p style="font-size:15px;line-height:1.5;"><strong>Here are some tips to attract more agents:</strong></p><ul style="font-size:14px;line-height:1.6;color:#334155;"><li>Add more suburbs — wider search area = more visibility</li><li>Widen your budget range if possible</li><li>Add a description — agents respond more to detailed Halos</li><li>Make sure your finance status is up to date</li></ul>${btn(`${APP_URL}/dashboard/my-halos`, 'Update my Halo →')}`),
+          { userId: h.seeker_id, source: 'halo-expiry-reminders:no-response' });
       }
       await admin.from('halos').update({ no_response_alert_sent: true }).eq('id', h.id);
       results.no_response_alerts++;

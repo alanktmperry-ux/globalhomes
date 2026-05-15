@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
   if (rlBlocked) return rlBlocked;
 
   try {
-    const body = await req.json();
+    const body = warmupBody;
     const { audio, mimeType, transcript: rawTranscript, detectedLanguage, userLocation, sessionId, audioDuration, language_hint } = body;
 
     // ── Input validation ──

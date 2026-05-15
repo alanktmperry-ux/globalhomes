@@ -127,6 +127,12 @@ export function SiteHeader() {
           </span>
         </Link>
 
+        <nav className="hidden md:flex items-center gap-1 ps-4 ms-2 border-l border-slate-200/70">
+          <Link to="/properties" className="text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors px-3 py-1.5 rounded-full hover:bg-slate-50">Browse</Link>
+          <Link to="/properties?mode=sale" className="text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors px-3 py-1.5 rounded-full hover:bg-slate-50">Buy</Link>
+          <Link to="/properties?mode=rent" className="text-[13px] font-semibold text-[#0a0f1e] hover:text-[#2563EB] transition-colors px-3 py-1.5 rounded-full hover:bg-slate-50">Rent</Link>
+        </nav>
+
         {/* Right cluster */}
         <div className="flex items-center" style={{ gap: 18 }}>
           <LanguageSwitcher />

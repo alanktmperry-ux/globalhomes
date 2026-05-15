@@ -10,6 +10,7 @@ import { RecoveryEmail } from '../_shared/email-templates/recovery.tsx'
 import { EmailChangeEmail } from '../_shared/email-templates/email-change.tsx'
 import { ReauthenticationEmail } from '../_shared/email-templates/reauthentication.tsx'
 import { getCorsHeaders } from '../_shared/cors.ts';
+import { translateEmailPayload, resolveRecipientLocale } from '../_shared/translateEmailPayload.ts';
 
 const EMAIL_SUBJECTS: Record<string, string> = {
   signup: 'Welcome to ListHQ — confirm your email',
@@ -228,6 +229,8 @@ async function handleWebhook(req: Request): Promise<Response> {
     plainText: true,
   })
 
+  const baseSubject = EMAIL_SUBJECTS[emailType] || 'Notification'
+
   // Send directly via the user's verified Resend account.
   // Lovable's managed Resend only has notify.listhq.com.au verified; the user's
   // own Resend has the bare domain (listhq.com.au) verified — same account used
@@ -256,12 +259,36 @@ async function handleWebhook(req: Request): Promise<Response> {
     })
   }
 
+  // Resolve recipient locale + translate (no-op for English)
+  let finalSubject = baseSubject
+  let finalHtml = html
+  let finalText = text
+  let recipientLocale = 'en'
+  try {
+    recipientLocale = await resolveRecipientLocale({ email: payload.data.email })
+    if (recipientLocale && recipientLocale !== 'en') {
+      const translatedHtml = await translateEmailPayload(
+        { subject: baseSubject, body: html, isHtml: true, sourceLang: 'en' },
+        recipientLocale,
+      )
+      const translatedText = await translateEmailPayload(
+        { subject: baseSubject, body: text, isHtml: false, sourceLang: 'en' },
+        recipientLocale,
+      )
+      finalSubject = translatedHtml.subject
+      finalHtml = translatedHtml.body
+      finalText = translatedText.body
+    }
+  } catch (err) {
+    console.error('[auth-email-hook] translation failed, sending original', err, { email: payload.data.email, recipientLocale })
+  }
+
   await supabase.from('email_send_log').insert({
     message_id: messageId,
     template_name: emailType,
     recipient_email: payload.data.email,
     status: 'pending',
-    metadata: { from: FROM_ADDRESS, sender_domain: SENDER_DOMAIN, run_id, email_type: emailType, source: 'auth-email-hook' },
+    metadata: { from: FROM_ADDRESS, sender_domain: SENDER_DOMAIN, run_id, email_type: emailType, source: 'auth-email-hook', locale: recipientLocale },
   })
 
   const resendRes = await fetch('https://api.resend.com/emails', {
@@ -274,9 +301,9 @@ async function handleWebhook(req: Request): Promise<Response> {
     body: JSON.stringify({
       from: FROM_ADDRESS,
       to: [payload.data.email],
-      subject: EMAIL_SUBJECTS[emailType] || 'Notification',
-      html,
-      text,
+      subject: finalSubject,
+      html: finalHtml,
+      text: finalText,
     }),
   })
 

@@ -99,7 +99,8 @@ Deno.serve(async (req) => {
     if (seekerEmail && resendKey) {
       await sendEmail(resendKey, seekerEmail,
         'Congratulations — your Halo is marked as fulfilled',
-        `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a;"><h1 style="font-size:22px;margin:0 0 12px;">Congratulations!</h1><p style="font-size:15px;line-height:1.5;">Great news! We've notified the agents who responded. We hope you love your new property.</p><p style="margin:24px 0;"><a href="${APP_URL}" style="display:inline-block;background:#3b82f6;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Visit ListHQ →</a></p></div>`);
+        `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a;"><h1 style="font-size:22px;margin:0 0 12px;">Congratulations!</h1><p style="font-size:15px;line-height:1.5;">Great news! We've notified the agents who responded. We hope you love your new property.</p><p style="margin:24px 0;"><a href="${APP_URL}" style="display:inline-block;background:#3b82f6;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Visit ListHQ →</a></p></div>`,
+        { userId: halo.seeker_id, source: 'send-halo-fulfilled-notice:seeker' });
     }
 
     // Notify each agent who unlocked

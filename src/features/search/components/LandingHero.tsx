@@ -73,14 +73,14 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
     location.pathname === '/rent' ? 'rent' : listingMode
   );
   const [featuredListings, setFeaturedListings] = useState<Array<{
-    id: string; price: number; address_suburb: string; address_state: string;
-    bedrooms: number | null; bathrooms: number | null; parking_spaces: number | null; listing_type: string;
+    id: string; price: number | null; suburb: string | null; state: string | null;
+    beds: number | null; baths: number | null; parking: number | null; listing_type: string;
   }>>([]);
 
   useEffect(() => {
     supabase
       .from('properties')
-      .select('id, price, address_suburb, address_state, bedrooms, bathrooms, parking_spaces, listing_type')
+      .select('id, price, suburb, state, beds, baths, parking, listing_type')
       .eq('is_active', true)
       .order('created_at', { ascending: false })
       .limit(3)

@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { useViewerLocale } from '@/features/auth/hooks/useViewerLocale';
 import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
+import { parsePropertyQuery } from '@/features/search/lib/parsePropertyQuery';
 
 type Seq = {
   flag: string; code: string; line: string; ph: string;

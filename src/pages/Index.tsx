@@ -454,10 +454,9 @@ const Index = () => {
 
   const [isParsing, setIsParsing] = useState(false);
 
-  const runSmartSearch = async (rawText: string) => {
+  const submitSearchQuery = useCallback(async (rawText: string) => {
     const trimmed = rawText.trim();
     if (!trimmed) return;
-
 
     setIsParsing(true);
 
@@ -513,7 +512,7 @@ const Index = () => {
     } finally {
       setIsParsing(false);
     }
-  };
+  }, [language, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

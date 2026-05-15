@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, useCallback, lazy, Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
-import { Mic, Search, Play, X, ArrowRight, Unlock } from 'lucide-react';
+import { Search, Play, X, ArrowRight, Unlock } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
@@ -52,9 +52,8 @@ const SPEECH_LANG_MAP: Record<string, string> = {
   zh_traditional: 'zh-TW',
   vi: 'vi-VN',
 };
-function pickSpeechLang(locale: string | null | undefined): string {
-  return SPEECH_LANG_MAP[locale ?? 'en'] ?? 'en-AU';
-}
+
+
 
 // ─── Language sequence ────────────────────────────────────────
 type SeqItem = {
@@ -367,97 +366,7 @@ const Index = () => {
     };
   }, [modalOpen, closeModal]);
 
-  // ── Voice search (Web Speech API) ──────────────────────────
-  const [voiceState, setVoiceState] = useState<'idle' | 'listening' | 'processing'>('idle');
-  const [voiceError, setVoiceError] = useState<string | null>(null);
-  const [voiceUnsupportedTip, setVoiceUnsupportedTip] = useState(false);
-  const recognitionRef = useRef<any>(null);
-  const langCodeRef = useRef<string>(SEQUENCE[0].code);
-  const errorTimerRef = useRef<number | null>(null);
-  const tipTimerRef = useRef<number | null>(null);
 
-  // Keep active language code in sync (read from ref inside callbacks)
-  useEffect(() => {
-    langCodeRef.current = SEQUENCE[seqIdx].code;
-  }, [seqIdx]);
-
-  useEffect(() => {
-    return () => {
-      if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
-      try { recognitionRef.current?.stop?.(); } catch { /* noop */ }
-      recognitionRef.current = null;
-    };
-  }, []);
-
-  const startVoice = useCallback(() => {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      setVoiceUnsupportedTip(true);
-      if (tipTimerRef.current) window.clearTimeout(tipTimerRef.current);
-      tipTimerRef.current = window.setTimeout(() => setVoiceUnsupportedTip(false), 4000);
-      return;
-    }
-
-    // If already listening, stop
-    if (voiceState === 'listening' && recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch { /* noop */ }
-      return;
-    }
-
-    setVoiceError(null);
-
-    const recognition = new SpeechRecognition();
-    // Set language to the user's UI locale (NOT the marketing carousel) so
-    // the speech recognizer matches what the user is actually speaking.
-    recognition.lang = pickSpeechLang(language);
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognitionRef.current = recognition;
-
-    recognition.onstart = () => setVoiceState('listening');
-
-    recognition.onresult = (e: any) => {
-      const text = (e.results?.[0]?.[0]?.transcript || '').trim();
-      if (text) {
-        setSearchQuery(text);
-        try { inputRef.current?.blur(); } catch { /* noop */ }
-        // Route through the Smart Search parser, same as text submit.
-        window.setTimeout(() => { void submitSearchQuery(text); }, 200);
-      }
-    };
-
-    recognition.onend = () => {
-      setVoiceState('idle');
-      recognitionRef.current = null;
-    };
-
-    recognition.onerror = (e: any) => {
-      setVoiceState('idle');
-      recognitionRef.current = null;
-      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-        setVoiceError('Microphone access denied. Please allow access in your browser settings.');
-      } else if (e.error !== 'aborted' && e.error !== 'no-speech') {
-        setVoiceError('Nothing heard. Please try again.');
-      }
-      if (e.error && e.error !== 'aborted') {
-        if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
-        errorTimerRef.current = window.setTimeout(() => setVoiceError(null), 3000);
-      }
-    };
-
-    // Must be called synchronously in the click handler (Safari requirement)
-    try {
-      recognition.start();
-    } catch (err) {
-      setVoiceState('idle');
-      recognitionRef.current = null;
-      setVoiceError('Could not start voice search. Please try again.');
-      if (errorTimerRef.current) window.clearTimeout(errorTimerRef.current);
-      errorTimerRef.current = window.setTimeout(() => setVoiceError(null), 3000);
-    }
-  }, [voiceState, openSearch]);
 
   const [isParsing, setIsParsing] = useState(false);
 

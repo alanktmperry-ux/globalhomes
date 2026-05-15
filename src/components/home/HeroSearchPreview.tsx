@@ -4,6 +4,7 @@ import { Mic, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { useViewerLocale } from '@/features/auth/hooks/useViewerLocale';
+import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
 
 type Seq = {
   flag: string; code: string; line: string; ph: string;
@@ -42,10 +43,17 @@ export default function HeroSearchPreview() {
     return localStorage.getItem('listhq.locale') !== null || localStorage.getItem('gh-lang') !== null;
   });
   const inputRef = useRef<HTMLInputElement>(null);
+  const { isListening, isTranscribing, startListening, stopListening, isSupported: isMicSupported } = useVoiceSearch(
+    (transcript) => {
+      setQ(transcript);
+      submitQuery(transcript);
+    },
+    (errorMsg) => {
+      console.warn('[VoiceSearch]', errorMsg);
+    }
+  );
   const paused = useRef(false);
   const intervalRef = useRef<number | null>(null);
-  const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<any>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [aiSummary, setAiSummary] = useState('');
 
@@ -160,54 +168,7 @@ export default function HeroSearchPreview() {
     el?.click();
   }
 
-  function startVoice() {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
-    if (!SpeechRecognition) {
-      inputRef.current?.focus();
-      return;
-    }
-
-    if (isListening && recognitionRef.current) {
-      recognitionRef.current.stop();
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = viewerLocale === 'zh' ? 'zh-CN'
-      : viewerLocale === 'vi' ? 'vi-VN'
-      : viewerLocale === 'ar' ? 'ar-SA'
-      : viewerLocale === 'hi' ? 'hi-IN'
-      : viewerLocale === 'ko' ? 'ko-KR'
-      : viewerLocale === 'ja' ? 'ja-JP'
-      : 'en-AU';
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognitionRef.current = recognition;
-
-    recognition.onstart = () => setIsListening(true);
-
-    recognition.onresult = (e: any) => {
-      const text = (e.results?.[0]?.[0]?.transcript || '').trim();
-      if (text) {
-        setQ(text);
-        setTimeout(() => submitQuery(text), 200);
-      }
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-      recognitionRef.current = null;
-    };
-
-    recognition.onerror = () => {
-      setIsListening(false);
-      recognitionRef.current = null;
-    };
-
-    recognition.start();
-  }
 
   // Computed display values for static-mode (non-cycling) hero
   const cyclingLine = shouldAutoCycle ? cur.line : t('hero.cyclingLine');
@@ -308,13 +269,19 @@ export default function HeroSearchPreview() {
           >
             <button
               type="button"
-              onClick={startVoice}
-              aria-label="Voice search"
+              onClick={() => isListening ? stopListening() : startListening()}
+              aria-label={isListening ? 'Stop voice search' : 'Start voice search'}
+              disabled={!isMicSupported || isTranscribing}
               style={{
-                width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: 'transparent', border: 0, cursor: 'pointer',
-                color: isListening ? '#ef4444' : '#6a6a6a', marginRight: 12, flexShrink: 0,
+                width: 28, height: 28,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'transparent', border: 0,
+                cursor: isMicSupported && !isTranscribing ? 'pointer' : 'not-allowed',
+                color: isListening ? '#EF4444' : isTranscribing ? '#F59E0B' : '#6a6a6a',
+                marginRight: 12, flexShrink: 0,
                 animation: isListening ? 'hspPulse 1s ease-in-out infinite' : 'none',
+                opacity: (!isMicSupported || isTranscribing) && !isListening ? 0.5 : 1,
+                transition: 'color 0.2s ease',
               }}
             >
               <Mic size={20} strokeWidth={1.6} />

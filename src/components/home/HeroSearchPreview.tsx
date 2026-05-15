@@ -58,9 +58,9 @@ export default function HeroSearchPreview() {
         params.set('raw_q', transcript);
         if (quick.location) params.set('suburb', quick.location);
         if (quick.beds) params.set('beds_min', String(quick.beds));
-        if (quick.priceMin) params.set('min_price_aud', String(quick.priceMin));
-        if (quick.priceMax) params.set('max_price_aud', String(quick.priceMax));
-        if (quick.propertyType) params.set('property_types', quick.propertyType);
+        if (quick.priceMin) params.set('min_price', String(quick.priceMin));
+        if (quick.priceMax) params.set('max_price', String(quick.priceMax));
+        if (quick.propertyType) params.set('type', quick.propertyType);
         const route = quick.intent === 'rent' ? '/rent' : '/buy';
         navigate(`${route}?${params.toString()}`);
         return;

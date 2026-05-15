@@ -146,11 +146,11 @@ export default function HeroSearchPreview() {
     return () => { cancelled = true; };
   }, []);
 
-  function submit(e?: React.FormEvent) {
+  async function submit(e?: React.FormEvent) {
     e?.preventDefault();
     const term = q.trim();
     if (!term) { inputRef.current?.focus(); return; }
-    navigate(`/search?q=${encodeURIComponent(term)}`);
+    await submitQuery(term);
   }
 
   function openLangDropdown() {

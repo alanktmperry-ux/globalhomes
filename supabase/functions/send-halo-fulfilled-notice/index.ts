@@ -113,7 +113,8 @@ Deno.serve(async (req) => {
       if (!email || !resendKey) continue;
       await sendEmail(resendKey, email,
         'A Halo you responded to has been fulfilled',
-        `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a;"><h1 style="font-size:22px;margin:0 0 12px;">A Halo has been fulfilled</h1><p style="font-size:15px;line-height:1.5;">The seeker whose Halo you unlocked on ListHQ has found their property.</p><div style="background:#f1f5f9;border-radius:8px;padding:16px;margin:20px 0;"><p style="margin:0;"><strong>Halo summary:</strong></p><p style="margin:8px 0 0;">${summary}</p></div><p style="font-size:14px;color:#64748b;">This Halo is now closed. Thank you for using ListHQ.</p></div>`);
+        `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a;"><h1 style="font-size:22px;margin:0 0 12px;">A Halo has been fulfilled</h1><p style="font-size:15px;line-height:1.5;">The seeker whose Halo you unlocked on ListHQ has found their property.</p><div style="background:#f1f5f9;border-radius:8px;padding:16px;margin:20px 0;"><p style="margin:0;"><strong>Halo summary:</strong></p><p style="margin:8px 0 0;">${summary}</p></div><p style="font-size:14px;color:#64748b;">This Halo is now closed. Thank you for using ListHQ.</p></div>`,
+        { userId: agentId, source: 'send-halo-fulfilled-notice:agent' });
       notified++;
     }
 

@@ -278,7 +278,8 @@ export default function HeroSearchPreview() {
               style={{
                 width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
                 background: 'transparent', border: 0, cursor: 'pointer',
-                color: '#6a6a6a', marginRight: 12, flexShrink: 0,
+                color: isListening ? '#ef4444' : '#6a6a6a', marginRight: 12, flexShrink: 0,
+                animation: isListening ? 'hspPulse 1s ease-in-out infinite' : 'none',
               }}
             >
               <Mic size={20} strokeWidth={1.6} />

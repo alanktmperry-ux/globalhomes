@@ -1,16 +1,44 @@
 import "../_shared/email-footer.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { translateEmailPayload, resolveRecipientLocale } from '../_shared/translateEmailPayload.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 
 const APP_URL = Deno.env.get('APP_URL') ?? 'https://listhq.com.au';
 // NOTE: Falls back to onboarding@resend.dev until listhq.com.au DNS is verified in Resend.
 const FROM = 'ListHQ <noreply@listhq.com.au>';
 
-async function sendEmail(resendKey: string, to: string, subject: string, html: string) {
+async function sendEmail(
+  resendKey: string,
+  to: string,
+  subject: string,
+  html: string,
+  opts: { userId?: string; source: string },
+) {
+  const recipientLocale = await resolveRecipientLocale({ userId: opts.userId, email: to });
+  let translated;
+  try {
+    translated = await translateEmailPayload(
+      { subject, body: html, isHtml: true, sourceLang: 'en' },
+      recipientLocale,
+    );
+  } catch (err) {
+    console.error(`[${opts.source}] translation failed, sending original`, err, { to, recipientLocale });
+    translated = { subject, body: html, wasTranslated: false, sourceLang: 'en', targetLang: recipientLocale, cached: false };
+  }
+  console.log(`[${opts.source}] sending`, { to, recipientLocale, wasTranslated: translated.wasTranslated });
   const resp = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: FROM, to: [to], subject, html }),
+    body: JSON.stringify({
+      from: FROM,
+      to: [to],
+      subject: translated.subject,
+      html: translated.body,
+      headers: {
+        'X-ListHQ-Locale': translated.targetLang,
+        'X-ListHQ-Translated': translated.wasTranslated ? 'true' : 'false',
+      },
+    }),
   });
   if (!resp.ok) console.error('Resend error', await resp.text());
 }

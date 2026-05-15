@@ -164,6 +164,13 @@ const Index = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalQuery, setModalQuery] = useState('');
   const [propertyCount, setPropertyCount] = useState<number | null>(null);
+  const [betaBannerDismissed, setBetaBannerDismissed] = useState(() => {
+    try { return localStorage.getItem('gh_beta_banner') === '1'; } catch { return false; }
+  });
+  const dismissBetaBanner = () => {
+    try { localStorage.setItem('gh_beta_banner', '1'); } catch { /* */ }
+    setBetaBannerDismissed(true);
+  };
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Front card crossfade refs

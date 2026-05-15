@@ -61,6 +61,7 @@ interface Props {
 
 export function LandingHero({ onSearch, onListingModeChange }: Props) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { listingMode, setListingMode } = useCurrency();
   const { t } = useTranslation();
   const platformStats = usePlatformStats();
@@ -68,7 +69,23 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
   const [wordIndex, setWordIndex] = useState(0);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [localMode, setLocalMode] = useState<'sale' | 'rent' | 'commercial' | 'land'>(listingMode);
+  const [localMode, setLocalMode] = useState<'sale' | 'rent' | 'commercial' | 'land'>(
+    location.pathname === '/rent' ? 'rent' : listingMode
+  );
+  const [featuredListings, setFeaturedListings] = useState<Array<{
+    id: string; price: number; address_suburb: string; address_state: string;
+    bedrooms: number | null; bathrooms: number | null; parking_spaces: number | null; listing_type: string;
+  }>>([]);
+
+  useEffect(() => {
+    supabase
+      .from('properties')
+      .select('id, price, address_suburb, address_state, bedrooms, bathrooms, parking_spaces, listing_type')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+      .limit(3)
+      .then(({ data }) => { if (data && data.length > 0) setFeaturedListings(data as typeof featuredListings); });
+  }, []);
 
   // Rotate headline word
   useEffect(() => {

@@ -11,7 +11,7 @@ interface Lang {
 const LANGS: Lang[] = [
   { code: 'en',    label: 'English',    flag: '🇦🇺', key: 'en' },
   { code: 'zh-CN', label: '普通话',     flag: '🇨🇳', key: 'zh_simplified' },
-  { code: 'zh-TW', label: '廣東話',     flag: '🇭🇰', key: 'zh_traditional' },
+  { code: 'zh-TW', label: '繁體中文',   flag: '🇹🇼', key: 'zh_traditional' },
   { code: 'vi',    label: 'Tiếng Việt', flag: '🇻🇳', key: 'vi' },
   { code: 'ko',    label: '한국어',     flag: '🇰🇷', key: 'ko' },
   { code: 'ar',    label: 'العربية',    flag: '🇸🇦', key: 'ar' },

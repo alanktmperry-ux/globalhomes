@@ -568,7 +568,7 @@ const Index = () => {
         }
       `}</style>
 
-      <div className="wave17">
+      <div className="wave17 pt-16">
         <a href="#main-content"
            style={{ position:'absolute', left:'-9999px', top:'auto', width:1, height:1, overflow:'hidden' }}
            onFocus={(e) => { e.currentTarget.style.left = '16px'; e.currentTarget.style.width = 'auto'; e.currentTarget.style.height = 'auto'; }}

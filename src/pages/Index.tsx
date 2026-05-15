@@ -666,6 +666,17 @@ const Index = () => {
            onBlur={(e) => { e.currentTarget.style.left = '-9999px'; e.currentTarget.style.width = '1px'; e.currentTarget.style.height = '1px'; }}>
           Skip to main content
         </a>
+
+        {/* ═══ Dismissible Beta Urgency Banner ═══ */}
+        {!betaBannerDismissed && (
+          <div className="relative w-full bg-primary text-primary-foreground flex items-center justify-center gap-3 px-4 text-[13px] font-medium" style={{ height: 40 }}>
+            <span>🚀</span>
+            <span>Beta launch — first 500 agents get <strong>3 months free</strong></span>
+            <a href="/agents/login" className="underline underline-offset-2 font-semibold hover:opacity-80 transition-opacity">Claim your spot →</a>
+            <button onClick={dismissBetaBanner} aria-label="Dismiss" className="absolute right-4 text-primary-foreground/70 hover:text-primary-foreground transition-colors text-lg leading-none">×</button>
+          </div>
+        )}
+
         {/* ═══ Agent sliver bar (rotating) ═══ */}
         <SliverBar />
         
@@ -673,6 +684,38 @@ const Index = () => {
 
         {/* ═══ SECTION 2 — Hero (HeroSearchPreview) ═══ */}
         <HeroSearchPreview />
+
+        {/* ═══ Trust Strip below search ═══ */}
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-4 px-4 text-[13px] text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <span className="text-base">🏠</span>
+            <span><strong className="text-foreground font-semibold">{propertyCount ? propertyCount.toLocaleString() : '10,000'}+</strong> properties</span>
+          </span>
+          <span className="hidden sm:inline text-border">·</span>
+          <span className="flex items-center gap-1.5">
+            <span className="text-base">🌏</span>
+            <span>Search in <strong className="text-foreground font-semibold">20 languages</strong></span>
+          </span>
+          <span className="hidden sm:inline text-border">·</span>
+          <span className="flex items-center gap-1 text-base tracking-wide" aria-label="Supported languages">
+            🇦🇺 🇨🇳 🇻🇳 🇸🇦 🇮🇳 🇰🇷 🇧🇩
+          </span>
+        </div>
+
+        {/* ═══ Secondary CTA — scroll to how it works ═══ */}
+        <div className="flex justify-center mt-6">
+          <a
+            href="#how-it-works"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="text-[13px] text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 group"
+          >
+            See how it works
+            <span className="group-hover:translate-y-0.5 transition-transform inline-block">↓</span>
+          </a>
+        </div>
 
         {/* ═══ Live Activity Ticker ═══ */}
         <LiveActivityTicker />

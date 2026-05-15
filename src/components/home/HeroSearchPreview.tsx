@@ -562,6 +562,9 @@ export default function HeroSearchPreview() {
           0%, 100% { opacity: 1;   transform: scale(1); }
           50%      { opacity: 0.45; transform: scale(0.85); }
         }
+        @keyframes hspSpin {
+          to { transform: rotate(360deg); }
+        }
         .hsp-search:focus-within {
           border-color: #2563EB !important;
           box-shadow: 0 0 0 4px rgba(37,99,235,0.15), 0 8px 24px rgba(37,99,235,0.12);

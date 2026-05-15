@@ -91,6 +91,7 @@ SCHEMA:
   "parking_min": number | null,
   "min_price_aud": number | null,
   "max_price_aud": number | null,
+  "price_period": "per_week" | "total" | null,
   "features": string[] | null,
   "deal_breakers": string[] | null,
   "raw_language": string,

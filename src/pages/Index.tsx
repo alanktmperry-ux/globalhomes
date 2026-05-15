@@ -449,14 +449,10 @@ const Index = () => {
 
   const [isParsing, setIsParsing] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmed = searchQuery.trim();
-    if (!trimmed) return;
-
   const runSmartSearch = async (rawText: string) => {
     const trimmed = rawText.trim();
     if (!trimmed) return;
+
 
     setIsParsing(true);
 

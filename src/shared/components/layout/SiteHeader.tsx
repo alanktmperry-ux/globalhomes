@@ -427,6 +427,9 @@ export function SiteHeader() {
                   </button>
                 ) : (
                   <>
+                    <button onClick={() => navTo('/properties')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-[#2563EB] hover:bg-[#EFF6FF] transition-colors">
+                      <Search size={16} className="text-[#2563EB]" /> Browse Properties
+                    </button>
                     <button onClick={() => navTo('/login')} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                       <LogIn size={16} />
                       {t('common.signin')}

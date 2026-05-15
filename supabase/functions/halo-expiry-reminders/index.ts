@@ -259,7 +259,8 @@ Deno.serve(async (req) => {
             `<ul style="font-size:14px;line-height:1.6;color:#334155;padding-left:18px;">${items}</ul>` +
             `<p style="font-size:14px;line-height:1.6;color:#334155;">Each Halo costs 1 credit to unlock.</p>` +
             btn(`${APP_URL}/dashboard/halo-board`, 'View Halo Board →')
-          )
+          ),
+          { userId: agentId, source: 'halo-expiry-reminders:suburb-digest' }
         );
 
         await admin.from('halo_suburb_digests').insert({

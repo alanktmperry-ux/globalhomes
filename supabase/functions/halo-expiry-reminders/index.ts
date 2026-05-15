@@ -92,7 +92,8 @@ Deno.serve(async (req) => {
         const date = new Date(h.expires_at).toLocaleDateString('en-AU');
         await sendEmail(resendKey, email,
           'Your Halo expires in 14 days — renew to stay visible',
-          emailShell(`<h1 style="font-size:22px;margin:0 0 12px;">Your Halo expires soon</h1><p style="font-size:15px;line-height:1.5;">Your Halo on ListHQ expires on <strong>${date}</strong>. Renew it from your dashboard to stay visible to agents.</p>${btn(`${APP_URL}/dashboard/my-halos`, 'Manage my Halo →')}`));
+          emailShell(`<h1 style="font-size:22px;margin:0 0 12px;">Your Halo expires soon</h1><p style="font-size:15px;line-height:1.5;">Your Halo on ListHQ expires on <strong>${date}</strong>. Renew it from your dashboard to stay visible to agents.</p>${btn(`${APP_URL}/dashboard/my-halos`, 'Manage my Halo →')}`),
+          { userId: h.seeker_id, source: 'halo-expiry-reminders:14day' });
       }
       await admin.from('halos').update({ expiry_reminder_sent: true }).eq('id', h.id);
       results.reminded++;

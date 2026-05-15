@@ -27,22 +27,6 @@ function usePlatformStats() {
   return stats;
 }
 
-  useEffect(() => {
-    async function load() {
-      const { count: propCount } = await supabase
-        .from('properties').select('id', { count: 'exact', head: true }).eq('is_active', true);
-      setStats(s => ({
-        ...s,
-        properties: propCount ?? 0,
-        buyerCount: null,
-      }));
-    }
-    load();
-  }, []);
-
-  return stats;
-}
-
 const ROTATING_WORDS = [
   { text: 'next home.', color: 'text-foreground' },
   { text: 'investment.', color: 'text-blue-500' },

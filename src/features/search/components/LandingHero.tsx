@@ -227,7 +227,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shrink-0"
               >
                 <Search size={14} />
-                {t('hero.search')}
+                {localMode === 'rent' ? 'Find My Rental' : 'Find My Home'}
               </button>
             </div>
             <p className="text-xs text-slate-400 mt-3 text-center">
@@ -235,19 +235,13 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
             </p>
           </form>
 
-          {/* Dual CTA pills */}
-          <div className="flex flex-wrap justify-center gap-4 mt-5">
-            <a
-              href="#featured"
-              className="text-sm text-slate-500 underline underline-offset-2 hover:text-slate-800 transition-colors"
-            >
-              🔍 Searching for a property? Start here
+          {/* Audience CTA pills */}
+          <div className="flex flex-wrap justify-center gap-3 mt-5">
+            <a href="/properties" className="inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-semibold text-sm px-5 py-2.5 rounded-full transition-colors">
+              <Search size={14} /> Browse Properties
             </a>
-            <a
-              href="/signup?role=agent"
-              className="text-sm text-slate-500 underline underline-offset-2 hover:text-slate-800 transition-colors"
-            >
-               Are you an agent? List for free →
+            <a href="/agents/login" className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm px-5 py-2.5 rounded-full transition-colors">
+              Agent? List free →
             </a>
           </div>
 

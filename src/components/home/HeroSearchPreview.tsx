@@ -209,7 +209,7 @@ export default function HeroSearchPreview() {
     <section
       id="main-content"
       dir={isRTL ? 'rtl' : 'ltr'}
-      className="bg-white min-h-screen pt-32 pb-20"
+      className="bg-white min-h-screen pt-6 pb-20"
       style={{ overflowX: 'hidden' }}
     >
       <div className={`grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 max-w-[1400px] mx-auto px-8 lg:px-12 items-center ${isRTL ? 'lg:[direction:rtl]' : ''}`}>

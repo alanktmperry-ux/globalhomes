@@ -77,6 +77,23 @@ Deno.serve(async (req) => {
     }
     const recipientEmail = userData.user.email;
 
+    // Idempotency: skip if a halo confirmation for this halo was already sent/queued
+    const { data: prevSend } = await admin
+      .from('email_send_log')
+      .select('id,status')
+      .eq('recipient_email', recipientEmail)
+      .eq('template_name', 'halo_confirmation')
+      .filter('metadata->>halo_id', 'eq', id)
+      .in('status', ['pending', 'sent'])
+      .limit(1)
+      .maybeSingle();
+    if (prevSend) {
+      console.log('[send-halo-confirmation] skipped — already sent', { halo_id: id, seeker_id });
+      return new Response(JSON.stringify({ ok: true, skipped: 'already_sent' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     if (!resendKey) {
       console.warn('RESEND_API_KEY not set — skipping email send');
       return new Response(JSON.stringify({ ok: true, skipped: true }), {
@@ -146,14 +163,58 @@ Deno.serve(async (req) => {
       }),
     });
 
+    const messageId = crypto.randomUUID();
+    await admin.from('email_send_log').insert({
+      message_id: messageId,
+      template_name: 'halo_confirmation',
+      recipient_email: recipientEmail,
+      status: 'pending',
+      metadata: { halo_id: id, seeker_id, locale: recipientLocale, source: 'send-halo-confirmation' },
+    });
+
+    const resp = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${resendKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: Deno.env.get('EMAIL_FROM') ?? 'ListHQ <hello@listhq.com.au>',
+        to: [recipientEmail],
+        subject: translated.subject,
+        html: translated.body,
+        headers: {
+          'X-ListHQ-Locale': translated.targetLang,
+          'X-ListHQ-Translated': translated.wasTranslated ? 'true' : 'false',
+        },
+      }),
+    });
+
     if (!resp.ok) {
       const text = await resp.text();
       console.error('Resend error:', text);
+      await admin.from('email_send_log').insert({
+        message_id: messageId,
+        template_name: 'halo_confirmation',
+        recipient_email: recipientEmail,
+        status: 'failed',
+        error_message: `Resend ${resp.status}: ${text.slice(0, 500)}`,
+        metadata: { halo_id: id, seeker_id, locale: recipientLocale, source: 'send-halo-confirmation' },
+      });
       return new Response(JSON.stringify({ error: 'Email send failed' }), {
         status: 502,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    const resendData = await resp.json().catch(() => ({}));
+    await admin.from('email_send_log').insert({
+      message_id: messageId,
+      template_name: 'halo_confirmation',
+      recipient_email: recipientEmail,
+      status: 'sent',
+      metadata: { halo_id: id, seeker_id, locale: recipientLocale, source: 'send-halo-confirmation', resend_id: (resendData as any)?.id },
+    });
 
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

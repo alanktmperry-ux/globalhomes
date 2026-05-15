@@ -1,5 +1,6 @@
 import "../_shared/email-footer.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { translateEmailPayload, resolveRecipientLocale } from '../_shared/translateEmailPayload.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 
 const fmtAUD = (n: number | null | undefined) =>

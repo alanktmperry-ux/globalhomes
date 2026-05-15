@@ -1,17 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Mic, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Search, Mic, ArrowRight, Sparkles } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useCurrency } from '@/shared/lib/CurrencyContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from '@/shared/lib/i18n';
 
-const AVATAR_COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
-const AVATAR_INITIALS = ['A', 'M', 'S', 'J', 'R'];
-
 function usePlatformStats() {
-  const [stats, setStats] = useState<{ properties: number | null; buyerCount: number | null; searching: number }>({
-    properties: null, buyerCount: null, searching: 12,
+  const [stats, setStats] = useState<{ properties: number | null; buyerCount: number | null }>({
+    properties: null, buyerCount: null,
   });
 
   useEffect(() => {
@@ -64,6 +61,7 @@ interface Props {
 
 export function LandingHero({ onSearch, onListingModeChange }: Props) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { listingMode, setListingMode } = useCurrency();
   const { t } = useTranslation();
   const platformStats = usePlatformStats();
@@ -71,7 +69,23 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
   const [wordIndex, setWordIndex] = useState(0);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [localMode, setLocalMode] = useState<'sale' | 'rent' | 'commercial' | 'land'>(listingMode);
+  const [localMode, setLocalMode] = useState<'sale' | 'rent' | 'commercial' | 'land'>(
+    location.pathname === '/rent' ? 'rent' : listingMode
+  );
+  const [featuredListings, setFeaturedListings] = useState<Array<{
+    id: string; price: number | null; suburb: string | null; state: string | null;
+    beds: number | null; baths: number | null; parking: number | null; listing_type: string;
+  }>>([]);
+
+  useEffect(() => {
+    supabase
+      .from('properties')
+      .select('id, price, suburb, state, beds, baths, parking, listing_type')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+      .limit(3)
+      .then(({ data }) => { if (data && data.length > 0) setFeaturedListings(data as typeof featuredListings); });
+  }, []);
 
   // Rotate headline word
   useEffect(() => {
@@ -213,7 +227,7 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shrink-0"
               >
                 <Search size={14} />
-                {t('hero.search')}
+                {localMode === 'rent' ? 'Find My Rental' : 'Find My Home'}
               </button>
             </div>
             <p className="text-xs text-slate-400 mt-3 text-center">
@@ -221,19 +235,13 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
             </p>
           </form>
 
-          {/* Dual CTA pills */}
-          <div className="flex flex-wrap justify-center gap-4 mt-5">
-            <a
-              href="#featured"
-              className="text-sm text-slate-500 underline underline-offset-2 hover:text-slate-800 transition-colors"
-            >
-              🔍 Searching for a property? Start here
+          {/* Audience CTA pills */}
+          <div className="flex flex-wrap justify-center gap-3 mt-5">
+            <a href="/properties" className="inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-semibold text-sm px-5 py-2.5 rounded-full transition-colors">
+              <Search size={14} /> Browse Properties
             </a>
-            <a
-              href="/signup?role=agent"
-              className="text-sm text-slate-500 underline underline-offset-2 hover:text-slate-800 transition-colors"
-            >
-               Are you an agent? List for free →
+            <a href="/agents/login" className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm px-5 py-2.5 rounded-full transition-colors">
+              Agent? List free →
             </a>
           </div>
 
@@ -296,24 +304,6 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
               </>
             )}
 
-            {/* Searching now — avatar stack */}
-            <div className="flex items-center gap-3">
-              <div className="flex">
-                {AVATAR_INITIALS.map((init, i) => (
-                  <div
-                    key={init}
-                    className="w-7 h-7 rounded-full border-2 border-white flex items-center justify-center text-[11px] font-bold text-white"
-                    style={{ background: AVATAR_COLORS[i], marginLeft: i === 0 ? 0 : -8 }}
-                  >
-                    {init}
-                  </div>
-                ))}
-              </div>
-              <span className="text-sm text-slate-500 font-medium">
-                <span className="font-bold text-slate-900">{platformStats.searching}</span> {t('hero.searchingNow')}
-              </span>
-            </div>
-
           </div>
         </motion.div>
 
@@ -330,23 +320,71 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
             <a href="/search" className="text-sm text-blue-600 hover:text-blue-700 font-medium">{t('hero.viewAll')} →</a>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {featuredListings.length === 0
+              ? [0, 1, 2].map(i => (
+                  <div key={i} className="h-40 bg-slate-100 animate-pulse rounded-xl" />
+                ))
+              : featuredListings.map((p) => {
+                  const isRent = p.listing_type === 'rent';
+                  const priceLabel = p.price != null
+                    ? new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 }).format(p.price)
+                    : '—';
+                  return (
+                    <a
+                      key={p.id}
+                      href={`/property/${p.id}`}
+                      className="rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer block"
+                    >
+                      <div className="h-40 bg-blue-50 flex items-center justify-center relative">
+                        <span className={`absolute top-3 left-3 text-xs px-2 py-0.5 rounded-full font-medium border ${
+                          isRent ? 'bg-cyan-50 text-cyan-700 border-cyan-200' : 'bg-blue-50 text-blue-700 border-blue-200'
+                        }`}>
+                          {isRent ? 'Rent' : 'Sale'}
+                        </span>
+                      </div>
+                      <div className="p-4">
+                        <div className="text-base font-semibold text-slate-900">{priceLabel}</div>
+                        <div className="text-xs text-slate-500 mt-0.5 mb-2">
+                          {[p.suburb, p.state].filter(Boolean).join(', ')}
+                        </div>
+                        <div className="flex gap-3 text-xs text-slate-400">
+                          <span>{p.beds ?? 0} {t('card.beds')}</span>
+                          <span>{p.baths ?? 0} {t('card.bath')}</span>
+                          <span>{p.parking ?? 0} {t('card.car')}</span>
+                        </div>
+                      </div>
+                    </a>
+                  );
+                })}
+          </div>
+        </div>
+      </section>
+
+      {/* Halo — exclusive to ListHQ */}
+      <section className="py-12 px-6 bg-gradient-to-br from-violet-950 via-purple-900 to-violet-900">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 mb-5 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-violet-200 text-xs font-semibold tracking-wide">
+            <Sparkles size={12} /> Halo — Only on ListHQ
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-tight mb-4">
+            Don't chase listings.<br />
+            <span className="text-violet-300">Let agents come to you.</span>
+          </h2>
+          <p className="text-violet-200/80 text-base leading-relaxed mb-8 max-w-lg mx-auto">
+            Post what you're looking for — suburb, budget, bedrooms. Agents with matching properties contact you directly. No spam. No cold calls. You choose who to talk to.
+          </p>
+          <a href="/halo/new" className="inline-flex items-center gap-2 bg-white text-violet-900 hover:bg-violet-50 font-bold text-sm px-8 py-3.5 rounded-full transition-all hover:scale-105 shadow-lg shadow-violet-900/40">
+            Post a Halo brief — it's free <ArrowRight size={15} />
+          </a>
+          <div className="grid grid-cols-3 gap-4 mt-10 max-w-sm mx-auto">
             {[
-              { price: '$1,250,000', addr: '32 Harbour St, Sydney NSW', beds: 3, baths: 2, cars: 1, badge: 'AI Translated', color: 'blue' },
-              { price: '$850,000', addr: '14 Chapel St, Melbourne VIC', beds: 2, baths: 1, cars: 1, badge: 'New', color: 'blue' },
-              { price: '$720,000', addr: '8 Bridge Rd, Richmond VIC', beds: 2, baths: 2, cars: 0, badge: 'Hot', color: 'blue' },
-            ].map((p, i) => (
-              <div key={i} className="rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
-                <div className="h-40 bg-blue-50 flex items-center justify-center relative">
-                  <span className="absolute top-3 left-3 text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full font-medium">{p.badge}</span>
-                  <span className="text-slate-300 text-sm">Photo</span>
-                </div>
-                <div className="p-4">
-                  <div className="text-base font-semibold text-slate-900">{p.price}</div>
-                  <div className="text-xs text-slate-500 mt-0.5 mb-2">{p.addr}</div>
-                  <div className="flex gap-3 text-xs text-slate-400">
-                    <span>{p.beds} {t('card.beds')}</span><span>{p.baths} {t('card.bath')}</span><span>{p.cars} {t('card.car')}</span>
-                  </div>
-                </div>
+              { num: '1', text: 'Describe your ideal property' },
+              { num: '2', text: 'Agents with matches respond' },
+              { num: '3', text: 'You choose who to speak with' },
+            ].map((step) => (
+              <div key={step.num} className="bg-white/8 border border-white/10 rounded-xl p-4 text-center">
+                <div className="text-2xl font-extrabold text-white/25 mb-2">{step.num}</div>
+                <div className="text-xs text-violet-200/80 leading-snug">{step.text}</div>
               </div>
             ))}
           </div>
@@ -370,18 +408,6 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
                 <p className="text-xs text-slate-500 leading-relaxed">{step.desc}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Agent CTA */}
-      <section className="bg-slate-900 py-16 px-6 text-center">
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-2xl font-semibold text-white mb-3">{t('hero.agentCTA')}</h2>
-          <p className="text-sm text-slate-400 mb-8">{t('hero.agentCTASub')}</p>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <a href="/agents/login" className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-full px-6 py-3 transition-colors">{t('hero.startTrial')}</a>
-            <a href="/agents/login" className="border border-slate-600 text-slate-300 hover:text-white text-sm font-medium rounded-full px-6 py-3 transition-colors">{t('hero.seeHow')}</a>
           </div>
         </div>
       </section>

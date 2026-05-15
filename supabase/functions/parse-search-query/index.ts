@@ -169,6 +169,14 @@ serve(async (req) => {
     }
 
     const { query, locale = "en" } = await req.json();
+
+    if (query === '__warmup__') {
+      return new Response(JSON.stringify({ warmup: true }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (!query || typeof query !== "string" || query.length > 500) {
       return new Response(JSON.stringify({ error: "Invalid query" }), {
         status: 400,

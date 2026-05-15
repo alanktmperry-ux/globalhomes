@@ -9,6 +9,15 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Warmup early-return — keeps function hot without doing real work
+  const bodyText = await req.text();
+  const warmupBody = bodyText ? (() => { try { return JSON.parse(bodyText); } catch { return {}; } })() : {};
+  if (warmupBody.warmup) {
+    return new Response(JSON.stringify({ warmup: true }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   const rlBlocked = await enforceRateLimit(req, {
     endpoint: "voice-search",
     userMaxPerWindow: 30,
@@ -19,7 +28,7 @@ Deno.serve(async (req) => {
   if (rlBlocked) return rlBlocked;
 
   try {
-    const body = await req.json();
+    const body = warmupBody;
     const { audio, mimeType, transcript: rawTranscript, detectedLanguage, userLocation, sessionId, audioDuration, language_hint } = body;
 
     // ── Input validation ──

@@ -717,6 +717,37 @@ const Index = () => {
           </a>
         </div>
 
+        {/* ── Category Browse Row ── */}
+        <section className="w-full max-w-5xl mx-auto px-4 py-8">
+          <h2 className="text-[13px] font-semibold text-muted-foreground uppercase tracking-wider mb-4 text-center">
+            Browse by type
+          </h2>
+          <div
+            className="flex gap-3 overflow-x-auto pb-2 sm:grid sm:grid-cols-6 sm:overflow-visible sm:pb-0"
+            style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
+          >
+            {[
+              { emoji: '🏡', label: 'Buy',        href: '/buy' },
+              { emoji: '🔑', label: 'Rent',       href: '/rent' },
+              { emoji: '🏗️', label: 'New Homes', href: '/new-homes' },
+              { emoji: '🏢', label: 'Commercial', href: '/properties?type=commercial' },
+              { emoji: '🌿', label: 'Land',       href: '/properties?type=land' },
+              { emoji: '📈', label: 'Investment', href: '/properties?type=investment' },
+            ].map(({ emoji, label, href }) => (
+              <a
+                key={label}
+                href={href}
+                className="flex-shrink-0 flex flex-col items-center gap-2 p-4 rounded-2xl border border-border bg-card hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group min-w-[90px] sm:min-w-0"
+              >
+                <span className="text-3xl leading-none">{emoji}</span>
+                <span className="text-[13px] font-semibold text-foreground group-hover:text-primary transition-colors text-center leading-tight">
+                  {label}
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
+
         {/* ═══ Live Activity Ticker ═══ */}
         <LiveActivityTicker />
 

@@ -304,24 +304,6 @@ export function LandingHero({ onSearch, onListingModeChange }: Props) {
               </>
             )}
 
-            {/* Searching now — avatar stack */}
-            <div className="flex items-center gap-3">
-              <div className="flex">
-                {AVATAR_INITIALS.map((init, i) => (
-                  <div
-                    key={init}
-                    className="w-7 h-7 rounded-full border-2 border-white flex items-center justify-center text-[11px] font-bold text-white"
-                    style={{ background: AVATAR_COLORS[i], marginLeft: i === 0 ? 0 : -8 }}
-                  >
-                    {init}
-                  </div>
-                ))}
-              </div>
-              <span className="text-sm text-slate-500 font-medium">
-                <span className="font-bold text-slate-900">{platformStats.searching}</span> {t('hero.searchingNow')}
-              </span>
-            </div>
-
           </div>
         </motion.div>
 

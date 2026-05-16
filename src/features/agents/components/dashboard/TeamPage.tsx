@@ -1016,6 +1016,24 @@ const TeamPage = () => {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Remove Member Dialog */}
+      <AlertDialog open={!!removeTarget} onOpenChange={() => setRemoveTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove {removeTarget?.agents?.name || 'this member'} from the agency?</AlertDialogTitle>
+            <AlertDialogDescription>
+              They will immediately lose access to the agency workspace. Their contact and listing data is preserved but will need to be reassigned. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleRemoveMember} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Remove Member
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Reassign Dialog */}
       <Dialog open={!!reassignTarget} onOpenChange={() => { setReassignTarget(null); setReassignTo(''); }}>
         <DialogContent className="sm:max-w-md">

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { User, Mail, Phone, Shield, Bell, Globe, Camera, Loader2, Package, GitBranch, Languages, ShieldCheck } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,11 +27,13 @@ interface AgentProfile {
   agency: string;
   avatar_url: string | null;
   user_id: string;
+  service_areas: string[] | null;
 }
 
 const SettingsPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = searchParams.get('tab') || 'profile';
@@ -83,6 +85,7 @@ const SettingsPage = () => {
       });
     } catch (err) {
       console.error('Error loading agent data:', err);
+      toast.error('Failed to load settings. Please refresh the page.');
     } finally {
       setLoading(false);
     }
@@ -319,16 +322,21 @@ const SettingsPage = () => {
               {t('agent.settings.profile.territoryHint')}
             </p>
             <div className="flex flex-wrap gap-1.5 mb-4">
-              {['Berwick', 'Narre Warren', 'Officer', 'Clyde North', 'Pakenham'].map((s) => (
-                <span
-                  key={s}
-                  className="px-3 py-1 bg-[#EFF6FF] text-[#1E40AF] text-xs font-semibold rounded-full"
-                >
-                  {s}
-                </span>
-              ))}
+              {(agentData.service_areas && agentData.service_areas.length > 0) ? (
+                agentData.service_areas.map((s) => (
+                  <span
+                    key={s}
+                    className="px-3 py-1 bg-[#EFF6FF] text-[#1E40AF] text-xs font-semibold rounded-full"
+                  >
+                    {s}
+                  </span>
+                ))
+              ) : (
+                <p className="text-xs text-[#6B7280]">No service areas set yet. Add them in Profile Settings.</p>
+              )}
             </div>
             <button
+              onClick={() => navigate('/dashboard/profile')}
               className="bg-white border border-[#E5E7EB] text-[#374151] hover:bg-[#F9FAFB] font-semibold rounded-[10px] px-4 py-2 text-sm transition-all"
             >
               {t('agent.settings.profile.editSuburbs')}

@@ -287,7 +287,8 @@ const NetworkPage = () => {
     if (!agentId) return;
     if (listing.is_shared) {
       if (listing.share_id) {
-        await supabase.from('off_market_shares').delete().eq('id', listing.share_id);
+        const { error } = await supabase.from('off_market_shares').delete().eq('id', listing.share_id);
+        if (error) { toast.error('Failed to remove from network'); await fetchMyListings(); return; }
       }
       toast.success('Removed from network');
     } else {
@@ -765,12 +766,12 @@ const NetworkPage = () => {
       </div>
 
       {/* ── Contact Modal ── */}
-      <Dialog open={showContact} onOpenChange={setShowContact}>
+      <Dialog open={showContact} onOpenChange={(open) => { setShowContact(open); if (!open) { setContactTarget(null); setContactMessage(''); } }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Contact {contactTarget?.sharing_agent_name}</DialogTitle>
             <DialogDescription>
-              This will send a referral request and auto-create a trust entry for the referral deposit.
+              Send a co-broke enquiry to this agent. No trust entries are created at this stage — add them manually once a co-broke agreement is confirmed.
             </DialogDescription>
           </DialogHeader>
           {contactTarget && (
@@ -801,17 +802,13 @@ const NetworkPage = () => {
                 <Label className="text-xs">Message to Agent</Label>
                 <Textarea value={contactMessage} onChange={e => setContactMessage(e.target.value)} rows={4} className="text-sm" />
               </div>
-              <div className="bg-primary/5 border border-primary/20 rounded-lg p-2.5 text-[11px] text-muted-foreground flex items-start gap-2">
-                <Landmark size={14} className="text-primary shrink-0 mt-0.5" />
-                <span>A <strong className="text-foreground">pending trust entry</strong> for the estimated referral fee will be automatically created in your trust account.</span>
-              </div>
             </div>
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowContact(false)}>Discard</Button>
             <Button onClick={handleContact} disabled={contactSending} className="gap-1.5">
               {contactSending && <Loader2 size={13} className="animate-spin" />}
-              Send & Create Trust Entry
+              Send Enquiry
             </Button>
           </DialogFooter>
         </DialogContent>

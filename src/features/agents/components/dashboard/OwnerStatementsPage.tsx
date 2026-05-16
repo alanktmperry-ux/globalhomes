@@ -189,7 +189,7 @@ export default function OwnerStatementsPage() {
     }
   };
 
-  const save = async (alsoEmail: boolean) => {
+  const proceedSave = async (alsoEmail: boolean) => {
     if (!form.property_id) { toast.error('Select a property'); return; }
     if (!agentId) return;
     setSaving(true);

@@ -226,7 +226,7 @@ export default function MarketingLandingPage() {
                 <Button
                   variant={plan.highlight ? 'default' : 'outline'}
                   className="w-full rounded-xl font-semibold"
-                  onClick={() => navigate('/agents/login')}
+                  onClick={() => navigate('/agents/login?mode=signup')}
                 >
                   {plan.cta}
                 </Button>

@@ -1,5 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { LucideIcon } from 'lucide-react';
+import {
+  Flame, Star, Wallet, MapPin, Calendar, Bath, Car,
+  CheckCircle, Mail, MessageCircle, Loader2, ExternalLink,
+  CheckCircle2, Lock,
+} from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Halo } from '@/types/halo';
 import { TIMEFRAME_LABELS, FINANCE_LABELS } from '@/types/halo';
@@ -51,9 +57,8 @@ const LANG_META: Record<string, { flag: string; label: string }> = {
   ar: { flag: '🇸🇦', label: 'Arabic' },
 };
 
-const Ico = ({ icon, size = 16, color }: { icon: string; size?: number; color?: string }) =>
-  // @ts-expect-error iconify web component
-  <iconify-icon icon={icon} width={size} height={size} style={{ color, display: 'inline-block' }} />;
+
+
 
 export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Props) {
   const navigate = useNavigate();
@@ -101,17 +106,26 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
       onMouseEnter={(e) => (e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.06)')}
       onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'none')}
       onClick={() => unlocked && navigate(`/dashboard/halo-board/${halo.id}`)}
+      tabIndex={0}
+      role="article"
+      aria-label={`Halo brief for ${(halo.suburbs || []).join(', ') || 'unspecified suburbs'}`}
+      onKeyDown={(e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && unlocked) {
+          e.preventDefault();
+          navigate(`/dashboard/halo-board/${halo.id}`);
+        }
+      }}
     >
       {/* Hot pill */}
       {isHot && (
         <div className="absolute top-4 left-4 bg-[#FEF2F2] text-[#DC2626] rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.10em] inline-flex items-center gap-1">
-          <Ico icon="solar:flame-bold" size={12} color="#DC2626" />
+          <Flame size={12} color="#DC2626" />
           Pre-approved
         </div>
       )}
       {pocketMatch && !isHot && (
         <div className="absolute top-4 left-4 bg-[#FEF3C7] text-[#92400E] rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.10em] inline-flex items-center gap-1">
-          <Ico icon="solar:star-bold" size={12} color="#92400E" />
+          <Star size={12} color="#92400E" />
           Pocket match
         </div>
       )}
@@ -139,16 +153,16 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
 
       {/* Details */}
       <div className="mt-5 space-y-3">
-        <DetailRow icon="solar:wallet-2-linear" label="Budget" value={`AUD ${formatBudget(halo.budget_min, halo.budget_max)}`} />
-        <DetailRow icon="solar:map-point-linear" label="Suburbs" value={suburbsLabel} />
-        <DetailRow icon="solar:calendar-linear" label="Timeframe" value={TIMEFRAME_LABELS[halo.timeframe] || '—'} />
+        <DetailRow icon={Wallet} label="Budget" value={`AUD ${formatBudget(halo.budget_min, halo.budget_max)}`} />
+        <DetailRow icon={MapPin} label="Suburbs" value={suburbsLabel} />
+        <DetailRow icon={Calendar} label="Timeframe" value={TIMEFRAME_LABELS[halo.timeframe] || '—'} />
         {halo.bathrooms_min != null && halo.bathrooms_min > 0 && (
-          <DetailRow icon="solar:bath-linear" label="Bathrooms" value={`${halo.bathrooms_min}+`} />
+          <DetailRow icon={Bath} label="Bathrooms" value={`${halo.bathrooms_min}+`} />
         )}
         {halo.car_spaces_min != null && halo.car_spaces_min > 0 && (
-          <DetailRow icon="solar:car-linear" label="Parking" value={`${halo.car_spaces_min} car${halo.car_spaces_min === 1 ? '' : 's'}`} />
+          <DetailRow icon={Car} label="Parking" value={`${halo.car_spaces_min} car${halo.car_spaces_min === 1 ? '' : 's'}`} />
         )}
-        <DetailRow icon="solar:check-circle-linear" label="Finance" value={FINANCE_LABELS[halo.finance_status] || '—'} />
+        <DetailRow icon={CheckCircle} label="Finance" value={FINANCE_LABELS[halo.finance_status] || '—'} />
       </div>
 
       {/* Footer */}
@@ -164,7 +178,7 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
                 aria-label="Email seeker"
                 className="w-9 h-9 rounded-full bg-[#EFF6FF] text-[#2563EB] hover:bg-[#2563EB] hover:text-white flex items-center justify-center transition"
               >
-                <Ico icon="solar:letter-bold" size={16} />
+                <Mail size={16} />
               </a>
             ) : (
               <button
@@ -174,7 +188,7 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
                 aria-label="Reveal contact"
                 className="w-9 h-9 rounded-full bg-[#EFF6FF] text-[#2563EB] hover:bg-[#2563EB] hover:text-white flex items-center justify-center transition"
               >
-                <Ico icon={revealing ? 'solar:refresh-bold' : 'solar:chat-line-bold'} size={16} />
+                {revealing ? <Loader2 size={16} className="animate-spin" /> : <MessageCircle size={16} />}
               </button>
             )}
             <button
@@ -183,10 +197,10 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
               aria-label="Open"
               className="w-9 h-9 rounded-full bg-[#EFF6FF] text-[#2563EB] hover:bg-[#2563EB] hover:text-white flex items-center justify-center transition"
             >
-              <Ico icon="solar:phone-bold" size={16} />
+              <ExternalLink size={16} />
             </button>
             <span className="bg-[#ECFDF5] text-[#065F46] rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.10em] inline-flex items-center gap-1">
-              <Ico icon="solar:check-circle-bold" size={12} color="#065F46" />
+              <CheckCircle2 size={12} color="#065F46" />
               Unlocked
             </span>
           </div>
@@ -201,7 +215,7 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
               }}
               className="bg-[#0a0f1e] text-white rounded-full px-5 py-2.5 text-[13px] font-bold inline-flex items-center gap-2 hover:bg-[#2563EB] transition"
             >
-              <Ico icon="solar:lock-keyhole-bold" size={14} />
+              <Lock size={14} />
               Unlock · 1 credit
             </button>
           </div>
@@ -211,11 +225,11 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
   );
 }
 
-function DetailRow({ icon, label, value }: { icon: string; label: string; value: string }) {
+function DetailRow({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
   return (
     <div className="flex items-center gap-3 text-[13px]">
       <span className="text-[#6a6a6a] shrink-0">
-        <Ico icon={icon} size={16} color="#6a6a6a" />
+        <Icon size={16} color="#6a6a6a" />
       </span>
       <span className="font-medium text-[#6a6a6a] w-[90px] shrink-0 hidden sm:block">{label}</span>
       <span className="font-bold text-[#0a0f1e] flex-1 truncate">{value}</span>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Card, CardContent } from '@/components/ui/card';
@@ -49,6 +49,7 @@ const SellerScoringPage = () => {
   const [loading, setLoading] = useState(true);
   const [agentInfo, setAgentInfo] = useState<AgentInfo | null>(null);
   const [outreachProperty, setOutreachProperty] = useState<ScoredProperty | null>(null);
+  const [editableMessage, setEditableMessage] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -176,7 +177,13 @@ const SellerScoringPage = () => {
                           size="sm"
                           variant="outline"
                           className="text-xs h-7 gap-1.5"
-                          onClick={() => setOutreachProperty(p)}
+                          onClick={() => {
+                            setOutreachProperty(p);
+                            const msg = agentInfo
+                              ? `Hi, I'm ${agentInfo.name} from ${agentInfo.agency || 'our agency'}. I noticed your property at ${p.address} and wanted to reach out — we currently have buyers actively searching in ${p.suburb}. If you've ever considered selling, I'd love to have a confidential conversation. No obligation. Call me on ${agentInfo.phone || '[your number]'}.`
+                              : '';
+                            setEditableMessage(msg);
+                          }}
                         >
                           <Mail size={12} /> Draft Outreach
                         </Button>
@@ -200,8 +207,8 @@ const SellerScoringPage = () => {
             Personalised message for <span className="font-semibold text-foreground">{outreachProperty?.address}</span>
           </p>
           <Textarea
-            value={outreachMessage}
-            readOnly
+            value={editableMessage}
+            onChange={(e) => setEditableMessage(e.target.value)}
             className="min-h-[120px] text-sm"
             rows={5}
           />
@@ -210,7 +217,7 @@ const SellerScoringPage = () => {
               variant="outline"
               className="gap-1.5"
               onClick={() => {
-                navigator.clipboard.writeText(outreachMessage);
+                navigator.clipboard.writeText(editableMessage);
                 toast.success('Message copied to clipboard');
               }}
             >
@@ -220,7 +227,7 @@ const SellerScoringPage = () => {
               className="gap-1.5"
               onClick={() => {
                 const subject = encodeURIComponent(`Regarding your property at ${outreachProperty?.address || ''}`);
-                const body = encodeURIComponent(outreachMessage);
+                const body = encodeURIComponent(editableMessage);
                 window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
               }}
             >

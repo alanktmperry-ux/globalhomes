@@ -52,7 +52,7 @@ interface Job {
 
 interface Supplier { id: string; business_name: string; trade_category: string; email: string | null; }
 
-const STATUSES = ['all', 'new', 'acknowledged', 'assigned', 'in_progress', 'completed', 'cancelled'];
+const STATUSES = ['all', 'new', 'acknowledged', 'assigned', 'quoted', 'approved', 'in_progress', 'completed', 'cancelled'] as const;
 
 import { APlusBadge, type APlusBadgeTone } from '@/components/ui/data-table-aplus';
 

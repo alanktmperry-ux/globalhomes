@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTeamAgents, TeamAgent } from '@/features/agents/hooks/useTeamAgents';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Loader2, ShieldCheck, Clock, AlertTriangle, Users, CheckCircle2, UserPlus, Calendar } from 'lucide-react';
+import { Loader2, ShieldCheck, Clock, AlertTriangle, Users, CheckCircle2, UserPlus, Calendar, Download, Search, CreditCard, Bell, UserCheck, Info } from 'lucide-react';
 
 type Urgency = 'compliant' | 'due_soon' | 'overdue' | 'missing';
 

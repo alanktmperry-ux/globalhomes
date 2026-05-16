@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
-import { BarChart2, MapPin, TrendingUp, Target, Zap, Wallet, Tag, Clock, Hammer, Users, Home, X, FilePlus } from 'lucide-react';
+import { BarChart2, MapPin, TrendingUp, Target, Zap, Wallet, Tag, Clock, Hammer, Users, Home, X, FilePlus, Folder, FolderOpen } from 'lucide-react';
 
 type TabKey = 'tools' | 'suburb' | 'saved' | 'seller';
 

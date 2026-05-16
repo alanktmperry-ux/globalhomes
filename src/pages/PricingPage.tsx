@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRight, CheckCircle2, X, Tag } from 'lucide-react';
+import { ArrowRight, CheckCircle2, X, Tag, ChevronDown } from 'lucide-react';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import FinalCTA from '@/features/marketing/FinalCTA';
 

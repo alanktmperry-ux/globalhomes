@@ -1,6 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
+import { useTranslation } from '@/shared/lib/i18n';
 
 interface Props {
   name: string;
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function CreditPackageCard({ name, credits, priceAud, onBuy, loading }: Props) {
+  const { t } = useTranslation();
   const perCredit = priceAud / credits;
   return (
     <Card className="flex flex-col">
@@ -28,10 +30,10 @@ export function CreditPackageCard({ name, credits, priceAud, onBuy, loading }: P
         <Button
           onClick={onBuy}
           disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700 text-white mt-auto"
+          className="mt-auto"
         >
           {loading && <Loader2 size={16} className="animate-spin" />}
-          Buy now
+          {t('agent.halo.credits.buy')}
         </Button>
       </CardContent>
     </Card>

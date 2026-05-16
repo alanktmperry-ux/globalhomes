@@ -268,19 +268,18 @@ export default function HaloBoardPage() {
 
         <div className="flex items-center gap-3 flex-wrap">
           <div className="bg-white border border-[#E5E5E5] rounded-full px-4 py-2 inline-flex items-center gap-2.5">
-            <Ico icon="solar:bolt-bold" size={18} color="#2563EB" />
+            <Zap size={18} color="#2563EB" />
             <span className="text-[16px] font-extrabold text-[#0a0f1e] tabular-nums">{balance}</span>
             <span className="text-[12px] text-[#6a6a6a] font-medium">{t('agent.halo.credits.label')}</span>
           </div>
-          <button
-            type="button"
-            onClick={() => navigate('/dashboard/buy-credits')}
+          <Link
+            to="/dashboard/buy-credits"
             className="text-white rounded-full px-5 py-2.5 text-[13px] font-extrabold inline-flex items-center gap-2 transition hover:opacity-95"
             style={{ background: 'linear-gradient(135deg,#2563EB,#1D4ED8)' }}
           >
-            <Ico icon="solar:add-square-bold" size={16} />
+            <PlusCircle size={16} />
             <span>{t('agent.halo.credits.buy')}</span>
-          </button>
+          </Link>
         </div>
       </div>
 

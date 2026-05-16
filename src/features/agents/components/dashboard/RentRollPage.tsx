@@ -1322,7 +1322,6 @@ const RentRollPage = () => {
                       setForm(f => ({
                         ...f,
                         rent_amount: val,
-                        rent_frequency: 'weekly',
                         bond_amount: !f.bond_manual && val ? (parseFloat(val) * 4).toFixed(2) : f.bond_amount,
                       }));
                     }}

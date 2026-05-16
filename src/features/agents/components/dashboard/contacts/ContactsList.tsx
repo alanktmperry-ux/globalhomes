@@ -27,7 +27,7 @@ function ContactsSkeleton() {
     </div>
   );
 }
-import { Flame, Thermometer, Snowflake, Search, Trash2, Phone, Mail, ArrowUp, ArrowDown, AlarmClock, AlertTriangle, X, Users, Plus } from 'lucide-react';
+import { Flame, Thermometer, Snowflake, Search, Trash2, Phone, Mail, ArrowUp, ArrowDown, AlarmClock, AlertTriangle, X, Users, Plus, ArrowRightLeft } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

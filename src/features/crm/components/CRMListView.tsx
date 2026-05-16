@@ -8,10 +8,7 @@ import {
   URGENCY_CONFIG, URGENCY_TIERS, type UrgencyTier,
 } from '../lib/urgency';
 
-const Ico = ({ icon, size = 16, color, className }: { icon: string; size?: number; color?: string; className?: string }) => (
-  // @ts-expect-error iconify-icon is a web component
-  <iconify-icon icon={icon} class={className} style={{ fontSize: `${size}px`, color, display: 'inline-flex', lineHeight: 1 }} />
-);
+import { Search, ChevronDown, Users, UserPlus, MessageCircle, Phone, Mail, ChevronRight } from 'lucide-react';
 
 const fmtLabel = (s: string) =>
   s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
@@ -173,7 +170,7 @@ export function CRMListView({ urgencyFilter, onUrgencyFilterChange }: Props) {
 
         <div className="flex-1 relative min-w-[220px] max-w-[420px]">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9CA3AF] pointer-events-none">
-            <Ico icon="solar:magnifer-linear" size={16} />
+            <Search size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
           </span>
           <input
             type="text"
@@ -204,7 +201,7 @@ export function CRMListView({ urgencyFilter, onUrgencyFilterChange }: Props) {
             className="bg-white border border-[#E5E5E5] rounded-full px-4 py-2.5 text-[13px] font-bold text-[#374151] inline-flex items-center gap-2 hover:border-[#2563EB] hover:text-[#2563EB] transition-all"
           >
             {SORT_LABELS[sortBy]}
-            <Ico icon="solar:alt-arrow-down-linear" size={12} />
+            <ChevronDown size={12} style={{ display: 'inline-flex', flexShrink: 0 }} />
           </button>
           {sortOpen && (
             <>
@@ -236,7 +233,7 @@ export function CRMListView({ urgencyFilter, onUrgencyFilterChange }: Props) {
       ) : sorted.length === 0 ? (
         leads.length === 0 && !search && urgency.length === 0 && stageFilter === 'all' ? (
           <div className="bg-white rounded-3xl border border-[#E5E5E5] py-20 px-8 text-center">
-            <div className="flex justify-center"><Ico icon="solar:users-group-rounded-linear" size={56} color="#E5E7EB" /></div>
+            <div className="flex justify-center"><Users size={56} color="#E5E7EB" style={{ display: 'inline-flex', flexShrink: 0 }} /></div>
             <h2 className="text-[22px] font-bold text-[#0a0f1e] mt-6">Your pipeline is empty — for now</h2>
             <p className="text-[14px] text-[#6a6a6a] max-w-[460px] mx-auto leading-[1.55] mt-3">
               Once buyers start enquiring on your listings or matching via Halo, they'll appear here automatically with readiness scores.
@@ -247,7 +244,7 @@ export function CRMListView({ urgencyFilter, onUrgencyFilterChange }: Props) {
               className="mt-8 rounded-full px-5 py-2.5 text-[14px] font-bold text-white inline-flex items-center gap-2 transition-all hover:shadow-[0_8px_24px_rgba(37,99,235,0.3)]"
               style={{ background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)' }}
             >
-              <Ico icon="solar:user-plus-bold" size={16} color="#fff" /> Add your first buyer
+              <UserPlus size={16} color="#fff" style={{ display: 'inline-flex', flexShrink: 0 }} /> Add your first buyer
             </button>
             <div className="mt-4">
               <a href="/dashboard/crm/import" className="text-[13px] font-bold text-[#2563EB] hover:underline">
@@ -257,7 +254,7 @@ export function CRMListView({ urgencyFilter, onUrgencyFilterChange }: Props) {
           </div>
         ) : (
           <div className="bg-white rounded-3xl border border-[#E5E5E5] py-12 px-8 text-center">
-            <div className="flex justify-center"><Ico icon="solar:magnifer-square-linear" size={56} color="#E5E7EB" /></div>
+            <div className="flex justify-center"><Search size={56} color="#E5E7EB" style={{ display: 'inline-flex', flexShrink: 0 }} /></div>
             <h2 className="text-[22px] font-bold text-[#0a0f1e] mt-6">No buyers match</h2>
             <p className="text-[14px] text-[#6a6a6a] max-w-[420px] mx-auto leading-[1.55] mt-3">
               Try clearing some filters.
@@ -344,7 +341,7 @@ export function CRMListView({ urgencyFilter, onUrgencyFilterChange }: Props) {
                     title="Message"
                     className="w-9 h-9 rounded-full bg-[#F9FAFB] hover:bg-[#0a0f1e] text-[#374151] hover:text-white flex items-center justify-center transition-all"
                   >
-                    <Ico icon="solar:chat-line-bold" size={16} />
+                    <MessageCircle size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
                   </button>
                   {lead.phone ? (
                     <a
@@ -353,7 +350,7 @@ export function CRMListView({ urgencyFilter, onUrgencyFilterChange }: Props) {
                       title="Call"
                       className="w-9 h-9 rounded-full bg-[#F9FAFB] hover:bg-[#0a0f1e] text-[#374151] hover:text-white flex items-center justify-center transition-all"
                     >
-                      <Ico icon="solar:phone-linear" size={16} />
+                      <Phone size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
                     </a>
                   ) : (
                     <button
@@ -362,7 +359,7 @@ export function CRMListView({ urgencyFilter, onUrgencyFilterChange }: Props) {
                       aria-label="No phone"
                       className="w-9 h-9 rounded-full bg-[#F9FAFB] text-[#D1D5DB] flex items-center justify-center cursor-not-allowed"
                     >
-                      <Ico icon="solar:phone-linear" size={16} />
+                      <Phone size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
                     </button>
                   )}
                   {lead.email ? (
@@ -372,7 +369,7 @@ export function CRMListView({ urgencyFilter, onUrgencyFilterChange }: Props) {
                       title="Email"
                       className="w-9 h-9 rounded-full bg-[#F9FAFB] hover:bg-[#0a0f1e] text-[#374151] hover:text-white flex items-center justify-center transition-all"
                     >
-                      <Ico icon="solar:letter-linear" size={16} />
+                      <Mail size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
                     </a>
                   ) : (
                     <button
@@ -381,11 +378,11 @@ export function CRMListView({ urgencyFilter, onUrgencyFilterChange }: Props) {
                       aria-label="No email"
                       className="w-9 h-9 rounded-full bg-[#F9FAFB] text-[#D1D5DB] flex items-center justify-center cursor-not-allowed"
                     >
-                      <Ico icon="solar:letter-linear" size={16} />
+                      <Mail size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
                     </button>
                   )}
                   <span className="text-[#6a6a6a] pl-1">
-                    <Ico icon="solar:alt-arrow-right-linear" size={18} />
+                    <ChevronRight size={18} style={{ display: 'inline-flex', flexShrink: 0 }} />
                   </span>
                 </div>
               </div>

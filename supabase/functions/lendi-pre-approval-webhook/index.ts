@@ -58,6 +58,16 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Verify user_id resolves to a real user — prevents IDOR via arbitrary user_id
+    const { data: { user: targetUser }, error: userLookupError } =
+      await supabase.auth.admin.getUserById(user_id);
+    if (userLookupError || !targetUser) {
+      return new Response(JSON.stringify({ error: 'Invalid user_id' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     let approvalId: string | null = null;
 
     if (status === 'approved') {

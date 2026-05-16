@@ -496,6 +496,12 @@ ${agencyName || ''}`.trim();
                   </div>
                 </div>
               )}
+
+              {scheduleFor.lease_end && effectiveDate && new Date(effectiveDate) <= new Date(scheduleFor.lease_end) && (
+                <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-700">
+                  <span className="font-semibold">Fixed-term warning:</span> The effective date falls within this tenancy&apos;s fixed term (ends {fmtDate(scheduleFor.lease_end)}). Most state residential tenancy acts prohibit rent increases during a fixed-term lease unless the agreement specifically provides for it. Verify with {scheduleFor.actName} before proceeding.
+                </div>
+              )}
             </div>
           )}
           <DialogFooter>

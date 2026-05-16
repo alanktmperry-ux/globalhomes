@@ -114,6 +114,9 @@ const SmokeAlarmPanel = ({ propertyId, propertyState, agentId }: Props) => {
       toast.error('QLD requires a compliance certificate number');
       return;
     }
+    if (isQLD && form.alarm_type !== 'photoelectric' && form.compliance_status === 'compliant') {
+      toast.warning('QLD requires interconnected photoelectric smoke alarms. Consider marking this as Non-Compliant or Requires Attention if the alarms are not yet photoelectric.');
+    }
     setSaving(true);
     const { error } = await supabase.from('smoke_alarm_records').insert({
       property_id: propertyId,

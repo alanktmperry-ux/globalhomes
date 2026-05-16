@@ -10,14 +10,9 @@ import LeadContactForm from '@/shared/components/LeadContactForm';
 import { useAgentId } from '../hooks/useAgentId';
 import { useCRMLeads } from '../hooks/useCRMLeads';
 import { Link } from 'react-router-dom';
+import { List, LayoutGrid, Upload, UserPlus } from 'lucide-react';
 import type { UrgencyTier } from '../lib/urgency';
 import type { CRMLead } from '../types';
-
-// iconify-icon web component (loaded in index.html)
-const Ico = ({ icon, size = 16, color, className }: { icon: string; size?: number; color?: string; className?: string }) => (
-  // @ts-expect-error iconify-icon is a web component
-  <iconify-icon icon={icon} class={className} style={{ fontSize: `${size}px`, color, display: 'inline-flex', lineHeight: 1 }} />
-);
 
 export default function CRMPage() {
   const [view, setView] = useState<'board' | 'list'>('list');

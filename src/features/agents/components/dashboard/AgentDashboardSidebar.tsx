@@ -6,9 +6,6 @@ import {
   Handshake, Sparkles, Target, ShoppingBag, ChevronDown, ChevronRight, Mail, Wrench, Activity, AlertCircle, RefreshCw,
   HandCoins, Briefcase, LineChart, BookOpen, ArrowLeft,
 } from 'lucide-react';
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/shared/hooks/use-mobile';
@@ -173,6 +170,7 @@ const AgentDashboardSidebar = () => {
   const [inboxCount, setInboxCount] = useState(0);
   const [buyerMatchesCount, setBuyerMatchesCount] = useState(0);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
+  const [newListingOpen, setNewListingOpen] = useState(false);
   const [agentLogo, setAgentLogo] = useState<string | null>(null);
   const [agentName, setAgentName] = useState<string | null>(null);
   const [agencyName, setAgencyName] = useState<string | null>(null);
@@ -738,11 +736,11 @@ const AgentDashboardSidebar = () => {
         <nav aria-label="Main navigation">
         {/* Quick actions */}
         <div className="px-3 mb-2 flex gap-1.5">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          <Collapsible open={newListingOpen} onOpenChange={setNewListingOpen} className="w-full">
+            <CollapsibleTrigger asChild>
               <Button
                 size="sm"
-                className={`flex-1 gap-1.5 text-xs font-bold relative ${collapsed ? 'px-0 justify-center' : ''}`}
+                className={`w-full gap-1.5 text-xs font-bold relative ${collapsed ? 'px-0 justify-center' : ''}`}
                 aria-label="Create new listing"
               >
                 <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-success rounded-full animate-pulse" />
@@ -750,42 +748,51 @@ const AgentDashboardSidebar = () => {
                 {!collapsed && (
                   <>
                     New Listing
-                    <ChevronDown size={12} className="ml-auto" />
+                    <ChevronDown
+                      size={12}
+                      className={`ml-auto transition-transform ${newListingOpen ? 'rotate-180' : ''}`}
+                    />
                   </>
                 )}
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              <DropdownMenuItem
-                onSelect={(event) => {
-                  event.preventDefault();
-                  localStorage.removeItem('pocket-listing-draft');
-                  const ts = Date.now();
-                  window.setTimeout(() => {
-                    navigate('/dashboard/listings/new', { state: { type: 'sale', _ts: ts } });
-                    if (isMobile) setOpenMobile(false);
-                  }, 10);
-                }}
-              >
-                <Home size={14} className="mr-2 text-primary" />
-                Sale Listing
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onSelect={(event) => {
-                  event.preventDefault();
-                  localStorage.removeItem('pocket-listing-draft');
-                  const ts = Date.now();
-                  window.setTimeout(() => {
-                    navigate('/dashboard/listings/new', { state: { type: 'rental', _ts: ts } });
-                    if (isMobile) setOpenMobile(false);
-                  }, 10);
-                }}
-              >
-                <Building2 size={14} className="mr-2 text-primary" />
-                Rental Listing
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="mt-1 pl-2 flex flex-col gap-0.5">
+                <button
+                  type="button"
+                  className="flex items-center gap-2 w-full px-3 py-2 rounded-[10px] text-[13px] text-white/55 hover:text-white hover:bg-white/10 transition-all text-left"
+                  onClick={() => {
+                    localStorage.removeItem('pocket-listing-draft');
+                    const ts = Date.now();
+                    window.setTimeout(() => {
+                      navigate('/dashboard/listings/new', { state: { type: 'sale', _ts: ts } });
+                      if (isMobile) setOpenMobile(false);
+                    }, 10);
+                    setNewListingOpen(false);
+                  }}
+                >
+                  <Home size={14} className="shrink-0 text-primary" />
+                  <span>Sale Listing</span>
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center gap-2 w-full px-3 py-2 rounded-[10px] text-[13px] text-white/55 hover:text-white hover:bg-white/10 transition-all text-left"
+                  onClick={() => {
+                    localStorage.removeItem('pocket-listing-draft');
+                    const ts = Date.now();
+                    window.setTimeout(() => {
+                      navigate('/dashboard/listings/new', { state: { type: 'rental', _ts: ts } });
+                      if (isMobile) setOpenMobile(false);
+                    }, 10);
+                    setNewListingOpen(false);
+                  }}
+                >
+                  <Building2 size={14} className="shrink-0 text-primary" />
+                  <span>Rental Listing</span>
+                </button>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </div>
 
         {/* Top-level sections — each is clickable and expands to show sub-items */}

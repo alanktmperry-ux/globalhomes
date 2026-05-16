@@ -1,5 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { LucideIcon } from 'lucide-react';
+import {
+  Flame, Star, Wallet, MapPin, Calendar, Bath, Car,
+  CheckCircle, Mail, MessageCircle, Loader2, ExternalLink,
+  CheckCircle2, Lock,
+} from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Halo } from '@/types/halo';
 import { TIMEFRAME_LABELS, FINANCE_LABELS } from '@/types/halo';

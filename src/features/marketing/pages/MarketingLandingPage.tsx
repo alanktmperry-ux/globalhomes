@@ -267,7 +267,9 @@ export default function MarketingLandingPage() {
         <div className="relative container mx-auto px-6 text-center max-w-2xl">
           <Sparkles size={32} className="text-primary-foreground/60 mx-auto mb-4" />
           <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-primary-foreground mb-4">
-            Join {spotsRemaining > 0 ? `${spotsRemaining}` : '100'} Founding Agents
+            {spotsRemaining > 0
+              ? `${spotsRemaining} Founding Agent Spots Remaining`
+              : 'Join Australia\'s AI Property Platform'}
           </h2>
           <p className="text-primary-foreground/70 text-lg mb-8">
             60-day free trial for founding agents. No credit card required to get started.

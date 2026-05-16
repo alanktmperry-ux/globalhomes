@@ -884,7 +884,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { setShowLiveEditConfirm(false); handlePublish(); }}>
+            <AlertDialogAction onClick={() => handlePublish()}>
               Yes, save changes
             </AlertDialogAction>
           </AlertDialogFooter>

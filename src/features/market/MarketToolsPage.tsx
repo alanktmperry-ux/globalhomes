@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
 import { BarChart2, MapPin, TrendingUp, Target, Zap, Wallet, Tag, Clock, Hammer, Users, Home, X, FilePlus, Folder, FolderOpen } from 'lucide-react';
@@ -18,11 +18,11 @@ const TOOLS: {
   {
     key: 'cma',
     name: 'CMA Tool',
-    description: 'Generate a professional Comparative Market Analysis with comparable sales, days on market, and price-per-sqm. PDF-ready for vendor appraisals.',
+    description: 'Access your performance reports and financial dashboards. Full CMA generation with comparable sales and PDF export is coming soon.',
     icon: BarChart2,
     iconBg: '#EFF6FF',
     iconColor: '#2563EB',
-    pill: '30s',
+    pill: 'Reports',
     to: '/dashboard/reports',
   },
   {
@@ -82,7 +82,20 @@ export default function MarketToolsPage() {
   const [tab, setTab] = useState<TabKey>('tools');
   const [suburbSearch, setSuburbSearch] = useState('');
   const [selectedSuburb, setSelectedSuburb] = useState<string | null>(null);
-  const [recentSuburbs, setRecentSuburbs] = useState<string[]>(['Bondi NSW', 'Carlton VIC', 'Toowong QLD']);
+  const [recentSuburbs, setRecentSuburbs] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem('market-tools-recent-suburbs');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('market-tools-recent-suburbs', JSON.stringify(recentSuburbs));
+    } catch { /* ignore quota errors */ }
+  }, [recentSuburbs]);
 
   const statCards = useMemo(() => ([
     {

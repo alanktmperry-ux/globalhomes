@@ -232,7 +232,8 @@
     <script>
       (function () {
         try {
-          var KEY = 'listhq_beta_access';
+          var KEY = 'listhq_beta_access_v2';
+          var LEGACY_KEYS = ['listhq_beta_access'];
           var VAL = 'granted';
           var PWD = 'listhq2026beta100%';
           var path = location.pathname;
@@ -249,7 +250,10 @@
             hash.indexOf('type=recovery') !== -1 ||
             hash.indexOf('type=email') !== -1;
           var granted = false;
-          try { granted = localStorage.getItem(KEY) === VAL; } catch (e) {}
+          try {
+            LEGACY_KEYS.forEach(function (legacyKey) { localStorage.removeItem(legacyKey); });
+            granted = localStorage.getItem(KEY) === VAL;
+          } catch (e) {}
           if (isAuthCb || granted) return;
 
           // Stop the module script from loading the app behind the gate.
@@ -299,7 +303,10 @@
             f.addEventListener('submit', function (ev) {
               ev.preventDefault();
               if (i.value.trim() === PWD) {
-                try { localStorage.setItem(KEY, VAL); } catch (err) {}
+                try {
+                  LEGACY_KEYS.forEach(function (legacyKey) { localStorage.removeItem(legacyKey); });
+                  localStorage.setItem(KEY, VAL);
+                } catch (err) {}
                 location.reload();
               } else {
                 if (e) e.textContent = 'Invalid code. Try again.';

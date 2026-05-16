@@ -175,6 +175,72 @@ export default function MaintenancePage() {
   const [entryDate, setEntryDate] = useState('');
   const [entrySaving, setEntrySaving] = useState(false);
 
+  // new job dialog
+  const [newJobOpen, setNewJobOpen] = useState(false);
+  const [newJobSaving, setNewJobSaving] = useState(false);
+  const [newJobProperties, setNewJobProperties] = useState<Array<{ id: string; address: string; suburb: string | null; agency_id: string | null }>>([]);
+  const [newJobTenancies, setNewJobTenancies] = useState<Array<{ id: string; tenant_name: string | null }>>([]);
+  const [newJobPropertyId, setNewJobPropertyId] = useState('');
+  const [newJobTenancyId, setNewJobTenancyId] = useState('');
+  const [newJobDescription, setNewJobDescription] = useState('');
+  const [newJobPriority, setNewJobPriority] = useState('standard');
+  const [newJobReportedBy, setNewJobReportedBy] = useState('');
+
+  const openNewJob = async () => {
+    setNewJobOpen(true);
+    setNewJobPropertyId('');
+    setNewJobTenancyId('');
+    setNewJobDescription('');
+    setNewJobPriority('standard');
+    setNewJobReportedBy('');
+    setNewJobTenancies([]);
+    if (!agentId) return;
+    const { data } = await supabase
+      .from('properties')
+      .select('id, address, suburb, agency_id')
+      .eq('agent_id', agentId)
+      .order('address', { ascending: true });
+    setNewJobProperties((data as any) || []);
+  };
+
+  useEffect(() => {
+    if (!newJobPropertyId) { setNewJobTenancies([]); setNewJobTenancyId(''); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('tenancies')
+        .select('id, tenant_name, status')
+        .eq('property_id', newJobPropertyId)
+        .eq('status', 'active');
+      if (cancelled) return;
+      setNewJobTenancies(((data as any) || []).map((t: any) => ({ id: t.id, tenant_name: t.tenant_name })));
+    })();
+    return () => { cancelled = true; };
+  }, [newJobPropertyId]);
+
+  const submitNewJob = async () => {
+    if (!agentId || !newJobPropertyId || !newJobDescription.trim()) return;
+    const prop = newJobProperties.find(p => p.id === newJobPropertyId);
+    const title = newJobDescription.trim().slice(0, 80);
+    setNewJobSaving(true);
+    const { error } = await supabase.from('maintenance_jobs').insert({
+      property_id: newJobPropertyId,
+      tenancy_id: newJobTenancyId || null,
+      agent_id: agentId,
+      agency_id: prop?.agency_id || null,
+      title,
+      description: newJobDescription.trim(),
+      priority: newJobPriority,
+      status: 'new',
+      reported_by: newJobReportedBy.trim() || null,
+    } as any);
+    setNewJobSaving(false);
+    if (error) { toast.error(error.message || 'Failed to create job'); return; }
+    toast.success('Job created');
+    setNewJobOpen(false);
+    load();
+  };
+
   const load = async () => {
     if (!agentId) return;
     setLoading(true);

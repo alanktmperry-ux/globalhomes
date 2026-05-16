@@ -151,6 +151,29 @@ const ReportsPage = () => {
     })();
   }, [agent?.id]);
 
+  // Load persisted bank balances from localStorage when agent ID becomes available
+  useEffect(() => {
+    if (!agent?.id) return;
+    const months = eachMonthOfInterval({ start: subMonths(new Date(), 11), end: new Date() });
+    const stored: Record<string, string> = {};
+    months.forEach(m => {
+      const key = format(m, 'yyyy-MM');
+      const val = localStorage.getItem(`recon-bank-${agent.id}-${key}`);
+      if (val !== null) stored[key] = val;
+    });
+    if (Object.keys(stored).length > 0) setBankBalances(stored);
+  }, [agent?.id]);
+
+  // Persist bank balances to localStorage on every change
+  useEffect(() => {
+    if (!agent?.id) return;
+    Object.entries(bankBalances).forEach(([key, val]) => {
+      if (val !== '') {
+        localStorage.setItem(`recon-bank-${agent.id}-${key}`, val);
+      }
+    });
+  }, [bankBalances, agent?.id]);
+
   const range = useMemo(() => getDateRange(period, customFrom, customTo), [period, customFrom, customTo]);
 
   // ─── Rent Roll Summary KPIs ───

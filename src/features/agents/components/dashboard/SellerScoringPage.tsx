@@ -79,11 +79,6 @@ const SellerScoringPage = () => {
     fetchData();
   }, [user]);
 
-  const outreachMessage = useMemo(() => {
-    if (!outreachProperty || !agentInfo) return '';
-    return `Hi, I'm ${agentInfo.name} from ${agentInfo.agency || 'our agency'}. I noticed your property at ${outreachProperty.address} and wanted to reach out — we currently have buyers actively searching in ${outreachProperty.suburb}. If you've ever considered selling, I'd love to have a confidential conversation. No obligation. Call me on ${agentInfo.phone || '[your number]'}.`;
-  }, [outreachProperty, agentInfo]);
-
   if (loading) {
     return (
       <div>

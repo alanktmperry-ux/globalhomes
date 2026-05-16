@@ -174,9 +174,8 @@ export default function VacanciesPage() {
     if (!noticeFor) return;
     if (vacateDate) {
       const days = Math.ceil((new Date(vacateDate).getTime() - new Date().setHours(0,0,0,0)) / 86400000);
-      if (days < 60) {
-        toast.error('Vacate date must be at least 60 days from today — required under Australian tenancy law (NSW/VIC/QLD). Check your state legislation for the exact requirement.');
-        return;
+      if (days < 14) {
+        toast.warning('Vacate date is less than 14 days away — confirm this is correct before saving.');
       }
     }
     await setVacancyStatus(noticeFor, 'notice_given', { vacate_date: vacateDate || null });
@@ -609,7 +608,7 @@ export default function VacanciesPage() {
               <Label className="text-xs">Vacate date</Label>
               <Input type="date" value={vacateDate} onChange={e => setVacateDate(e.target.value)} />
               <p className="mt-2 text-xs rounded-md border border-amber-200 bg-amber-50 text-amber-900 px-2.5 py-2 leading-relaxed">
-                Minimum 60 days notice required. NSW: 90 days end-of-term · VIC: 60 days · QLD: 60 days. Always confirm with your state legislation.
+                Tenant notice periods: NSW: 21 days (periodic) / 14 days (end of fixed term) · VIC: 28 days · QLD: 14 days (end of fixed term) / 2 weeks (periodic). Always confirm with your state legislation.
               </p>
             </div>
             <p className="text-xs text-muted-foreground flex items-start gap-1.5"><AlertTriangle size={12} className="mt-0.5 text-amber-600"/>This sets vacancy status to <strong>notice given</strong>.</p>

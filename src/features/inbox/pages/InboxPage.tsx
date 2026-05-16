@@ -90,6 +90,12 @@ export default function InboxPage() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length, activeId]);
 
+  // Reset compose state when active thread changes
+  useEffect(() => {
+    setComposeChannel('email');
+    setDraft('');
+  }, [activeId]);
+
   const handleSend = async () => {
     if (!draft.trim() || !activeThread || !agentId) return;
     setSending(true);
@@ -114,19 +120,31 @@ export default function InboxPage() {
   const handleSnooze = async (hours: number) => {
     if (!activeThread) return;
     const until = new Date(Date.now() + hours * 3600_000).toISOString();
-    await setThreadStatus(activeThread.id, 'snoozed', until);
-    toast.success(`Snoozed for ${hours}h`);
+    try {
+      await setThreadStatus(activeThread.id, 'snoozed', until);
+      toast.success(`Snoozed for ${hours}h`);
+    } catch {
+      toast.error('Failed to snooze');
+    }
   };
   const handleClose = async () => {
     if (!activeThread) return;
-    await setThreadStatus(activeThread.id, 'closed', null);
-    toast.success('Marked as closed');
-    setActiveId(null);
+    try {
+      await setThreadStatus(activeThread.id, 'closed', null);
+      toast.success('Marked as closed');
+      setActiveId(null);
+    } catch {
+      toast.error('Failed to close thread');
+    }
   };
   const handleReopen = async () => {
     if (!activeThread) return;
-    await setThreadStatus(activeThread.id, 'open', null);
-    toast.success('Reopened');
+    try {
+      await setThreadStatus(activeThread.id, 'open', null);
+      toast.success('Reopened');
+    } catch {
+      toast.error('Failed to reopen thread');
+    }
   };
 
   const pickerContact: TemplatePickerContact | null = activeThread?.contact

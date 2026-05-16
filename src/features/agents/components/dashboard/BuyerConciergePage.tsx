@@ -149,6 +149,7 @@ const BuyerConciergePage = () => {
   const [contactMatch, setContactMatch] = useState<EnrichedMatch | null>(null);
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<'match' | 'readiness' | 'recent'>('match');
+  const [contactDraft, setContactDraft] = useState('');
 
   const navigate = useNavigate();
   const { canAccessBuyerConcierge, conciergeMatchesPerMonth, conciergeIntrosPerMonth, loading: subLoading } = useSubscription();

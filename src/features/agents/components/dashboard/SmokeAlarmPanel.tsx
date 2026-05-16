@@ -48,7 +48,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const STATE_INFO: Record<string, string> = {
-  QLD: 'Queensland law requires interconnected photoelectric smoke alarms and a compliance certificate for each new tenancy since January 2022.',
+  QLD: 'Queensland law requires interconnected photoelectric smoke alarms and a compliance certificate for each new tenancy and renewal since January 2022. Testing required within 30 days before each new tenancy or renewal.',
   VIC: 'Landlords must ensure smoke alarms are in working order. Annual testing is recommended.',
   NSW: 'Landlords must test and clean smoke alarms or have them tested annually.',
 };
@@ -113,6 +113,9 @@ const SmokeAlarmPanel = ({ propertyId, propertyState, agentId }: Props) => {
     if (isQLD && !form.certificate_number.trim()) {
       toast.error('QLD requires a compliance certificate number');
       return;
+    }
+    if (isQLD && form.alarm_type !== 'photoelectric' && form.compliance_status === 'compliant') {
+      toast.warning('QLD requires interconnected photoelectric smoke alarms. Consider marking this as Non-Compliant or Requires Attention if the alarms are not yet photoelectric.');
     }
     setSaving(true);
     const { error } = await supabase.from('smoke_alarm_records').insert({

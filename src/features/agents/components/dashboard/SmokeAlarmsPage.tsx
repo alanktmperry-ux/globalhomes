@@ -103,11 +103,6 @@ const SmokeAlarmsPage = () => {
     [rows]
   );
   const noRecordCount = useMemo(() => rows.filter(r => !r.latest).length, [rows]);
-
-  if (loading) {
-    return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" size={28} /></div>;
-  }
-
   const dueSoonCount = useMemo(
     () => rows.filter(r => {
       if (!r.latest) return false;
@@ -116,6 +111,10 @@ const SmokeAlarmsPage = () => {
     }).length,
     [rows]
   );
+
+  if (loading) {
+    return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" size={28} /></div>;
+  }
 
   return (
     <div className="p-4 sm:p-6 pb-20">

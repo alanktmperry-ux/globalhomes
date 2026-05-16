@@ -555,6 +555,22 @@ const BondClaimsPage = () => {
           </CardContent>
         </Card>
 
+        {/* Delete item confirmation */}
+        <AlertDialog open={!!deleteItemId} onOpenChange={(o) => { if (!o) setDeleteItemId(null); }}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete this deduction item?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will permanently remove the item from this bond claim. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => { if (deleteItemId) { deleteItem(deleteItemId); } setDeleteItemId(null); }}>Delete</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         {/* Summary dialog */}
         <Dialog open={showSummary} onOpenChange={setShowSummary}>
           <DialogContent className="max-w-2xl">

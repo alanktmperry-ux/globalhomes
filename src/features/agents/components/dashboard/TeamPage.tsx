@@ -816,7 +816,16 @@ const TeamPage = () => {
                       <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-destructive hover:text-destructive" onClick={() => setDeactivateTarget(m)} title="Deactivate agent">
                         <UserMinus size={14} />
                       </Button>
-                      <button onClick={() => handleRemoveMember(m.id, m.user_id)} className="w-8 h-8 rounded-lg hover:bg-destructive/10 flex items-center justify-center transition-colors">
+                      <button
+                        onClick={() => {
+                          if (m.user_id === user?.id) {
+                            toast.error("You can't remove yourself");
+                            return;
+                          }
+                          setRemoveTarget(m);
+                        }}
+                        className="w-8 h-8 rounded-lg hover:bg-destructive/10 flex items-center justify-center transition-colors"
+                      >
                         <Trash2 size={14} className="text-destructive" />
                       </button>
                     </div>

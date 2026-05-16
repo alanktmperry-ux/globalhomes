@@ -482,6 +482,18 @@ const ContactsList = ({
                       )}
                       {showCol('actions') && (
                         <td className="p-3 text-right">
+                          {onReassign && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 px-2 mr-1"
+                              aria-label="Reassign contact"
+                              title="Reassign contact"
+                              onClick={(e) => { e.stopPropagation(); onReassign(c); }}
+                            >
+                              <ArrowRightLeft size={14} />
+                            </Button>
+                          )}
                           <Button
                             size="sm"
                             variant="ghost"

@@ -485,7 +485,7 @@ const ContactsList = ({
                             size="sm"
                             variant="ghost"
                             className="h-7 px-2 text-destructive hover:text-destructive"
-                            onClick={(e) => { e.stopPropagation(); onDelete(c.id); }}
+                            onClick={(e) => { e.stopPropagation(); setDeleteTargetId(c.id); }}
                           >
                             <Trash2 size={14} />
                           </Button>

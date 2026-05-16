@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, Fragment } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Home, Loader2, AlertTriangle, CheckCircle2, Clock, ClipboardCheck, ChevronDown, ChevronUp, Calendar, RefreshCw } from 'lucide-react';
+import { Plus, Home, Loader2, AlertTriangle, CheckCircle2, Clock, ClipboardCheck, ChevronDown, ChevronUp, Calendar, RefreshCw, Wallet } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { capture } from '@/shared/lib/posthog';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -722,10 +722,6 @@ const RentRollPage = () => {
     { label: 'Monthly Mgmt Fees', value: `$${monthlyMgmtFees.toFixed(0)}`, icon: Clock },
   ];
 
-  const Ico = ({ icon, size = 16, color }: { icon: string; size?: number; color?: string }) =>
-    // @ts-expect-error iconify web component
-    <iconify-icon icon={icon} width={size} height={size} style={{ color, display: 'inline-block' }} />;
-
   // KPI card colour map per metric tone
   const kpiCards = [
     { key: 'managed', label: 'TOTAL MANAGED', value: String(activeTenancies.length), sub: `${properties.length} rental ${properties.length === 1 ? 'property' : 'properties'}`, icon: Home, iconColor: '#065F46', iconBg: '#ECFDF5' },
@@ -838,7 +834,7 @@ const RentRollPage = () => {
                     className="w-10 h-10 rounded-2xl flex items-center justify-center"
                     style={{ background: c.iconBg }}
                   >
-                    <Ico icon={c.icon} size={20} color={c.iconColor} />
+                    <c.icon size={20} color={c.iconColor} />
                   </div>
                 </div>
                 <div className="text-[11px] uppercase tracking-[0.12em] text-[#6a6a6a] font-bold mt-4">

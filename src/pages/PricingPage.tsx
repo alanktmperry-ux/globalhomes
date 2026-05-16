@@ -1,19 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, CheckCircle2, X, Tag } from 'lucide-react';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import FinalCTA from '@/features/marketing/FinalCTA';
 
 type BillingCycle = 'monthly' | 'annual';
 
 const GRAD = 'linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%)';
-
-// iconify-icon is a globally loaded web component
-const Icon = ({ icon, size = 18, color }: { icon: string; size?: number; color?: string }) => (
-  // @ts-expect-error — iconify-icon is a web component
-  <iconify-icon icon={icon} style={{ fontSize: `${size}px`, color, display: 'inline-flex', lineHeight: 1 }} />
-);
 
 const gradientText: React.CSSProperties = {
   background: GRAD,

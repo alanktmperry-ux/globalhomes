@@ -3,11 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTeamAgents, TeamAgent } from '@/features/agents/hooks/useTeamAgents';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
-
-const Ico = ({ icon, size = 16, color }: { icon: string; size?: number; color?: string }) =>
-  // @ts-expect-error iconify web component
-  <iconify-icon icon={icon} width={size} height={size} style={{ color, display: 'inline-block' }} />;
+import { Loader2, ShieldCheck, Clock, AlertTriangle, Users, CheckCircle2, UserPlus, Calendar } from 'lucide-react';
 
 type Urgency = 'compliant' | 'due_soon' | 'overdue' | 'missing';
 
@@ -205,7 +201,7 @@ export default function ComplianceTab() {
         {statCards.map(c => (
           <div key={c.key} className="bg-white rounded-3xl border border-[#E5E5E5] p-5">
             <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: c.iconBg }}>
-              <Ico icon={c.icon} size={20} color={c.iconColor} />
+              <c.icon size={20} color={c.iconColor} />
             </div>
             <div className="text-[11px] uppercase tracking-[0.12em] text-[#6a6a6a] font-bold mt-4">{c.label}</div>
             <div className="font-extrabold tabular-nums mt-2" style={{ fontSize: 36, color: c.highlight ? (c as any).highlightColor : '#0a0f1e' }}>{c.value}</div>

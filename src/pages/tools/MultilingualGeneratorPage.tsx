@@ -1,12 +1,7 @@
 import { useState } from 'react';
 import { usePageTitle } from '@/lib/usePageTitle';
 import { cn } from '@/lib/utils';
-
-// iconify-icon is a globally loaded web component
-const Icon = ({ icon, width = 20, color, className }: { icon: string; width?: number; color?: string; className?: string }) => (
-  // @ts-expect-error — iconify-icon is a web component
-  <iconify-icon icon={icon} class={className} style={{ fontSize: `${width}px`, color, display: 'inline-flex', lineHeight: 1 }} />
-);
+import { Gift, RefreshCw, Languages, Copy, Share2, ArrowRight } from 'lucide-react';
 
 type TranslationMap = Record<string, { title?: string; description?: string }>;
 

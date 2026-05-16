@@ -124,7 +124,6 @@ const AgentAuthPage = () => {
     if (!trimmed) { setEmailError('Email address is required'); return; }
     if (!emailRe.test(trimmed)) { setEmailError('Enter a valid email (e.g. name@agency.com.au)'); return; }
     if (password.length < 10) { setFormError('Password must be at least 10 characters.'); return; }
-    if (!dataLocationConsent) { setFormError('Please acknowledge where your data is stored to continue.'); return; }
     if (!policyConsent) { setFormError('Please agree to the Privacy Policy and Terms of Service to continue.'); return; }
     const cleaned = trimmed.toLowerCase();
     if (isDisposableEmail(cleaned)) {

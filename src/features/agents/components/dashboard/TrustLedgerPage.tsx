@@ -393,7 +393,7 @@ const TrustLedgerPage = () => {
     a.href = url; a.download = `trust_ledger_${viewYear}_${String(viewMonth + 1).padStart(2, '0')}_7yr_compliant.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success('5yr compliant ledger exported');
+    toast.success('7-year compliant ledger exported');
   };
 
   // Generate individual receipt PDF on demand
@@ -624,7 +624,7 @@ const TrustLedgerPage = () => {
     </div>
 
     <div class="footer">
-      Generated ${generatedDate} — Retain for minimum 5 years per AFAA 2014 s.84 — This document is auditor-ready
+      Generated ${generatedDate} — Retain for minimum 7 years per AFA 2014 and ATO record-keeping requirements — This document is auditor-ready
     </div>
     </body></html>`;
 

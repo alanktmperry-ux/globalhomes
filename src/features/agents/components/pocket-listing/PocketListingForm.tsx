@@ -428,6 +428,11 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
   };
 
   const handlePublish = async () => {
+    if (editPropertyId && isPublishedListing && !showLiveEditConfirm) {
+      setShowLiveEditConfirm(true);
+      return;
+    }
+    setShowLiveEditConfirm(false);
     if (publishing) return;
     setPublishing(true);
 

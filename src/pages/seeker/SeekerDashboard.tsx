@@ -75,6 +75,7 @@ export default function SeekerDashboard() {
       .order('created_at', { ascending: false });
     if (error) {
       console.error('[SeekerDashboard] halos:', error);
+      toast.error('Failed to load your Halos. Please refresh.');
       setHalos([]);
       return;
     }

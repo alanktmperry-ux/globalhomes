@@ -9,6 +9,10 @@ import { ArrowLeft, Check, X, Send, Inbox as InboxIcon, Home, MapPin } from 'luc
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { useTranslation } from '@/shared/lib/i18n';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface HaloResponse {
   id: string;
@@ -52,6 +56,7 @@ export default function SeekerInbox() {
   const [messages, setMessages] = useState<HaloMessage[]>([]);
   const [reply, setReply] = useState('');
   const [sending, setSending] = useState(false);
+  const [dismissTarget, setDismissTarget] = useState<string | null>(null);
 
   const loadResponses = useCallback(async () => {
     if (!user) return;
@@ -66,11 +71,17 @@ export default function SeekerInbox() {
       setLoading(false);
       return;
     }
-    const { data: resps } = await supabase
+    const { data: resps, error: respsError } = await supabase
       .from('halo_responses')
       .select('id, halo_id, agent_id, body, suggested_property_ids, accepted, dismissed_by_seeker, viewed_by_seeker, created_at, unlocked_at')
       .in('halo_id', haloIds)
       .order('created_at', { ascending: false });
+
+    if (respsError) {
+      toast.error('Failed to load your inbox. Please refresh.');
+      setLoading(false);
+      return;
+    }
 
     const list = (resps || []) as HaloResponse[];
     const agentIds = Array.from(new Set(list.map((r) => r.agent_id)));
@@ -201,7 +212,7 @@ export default function SeekerInbox() {
     loadResponses();
   };
 
-  const handleDismiss = async () => {
+  const executeDismiss = async () => {
     if (!selected) return;
     const { error } = await supabase
       .from('halo_responses')
@@ -343,7 +354,7 @@ export default function SeekerInbox() {
                               <Check className="h-4 w-4 me-1" /> {t('seeker.inbox.action.accept')}
                             </Button>
                             <Button
-                              onClick={handleDismiss}
+                              onClick={() => setDismissTarget(selected.id)}
                               variant="outline"
                               className="border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] min-h-[44px]"
                               size="sm"
@@ -452,6 +463,26 @@ export default function SeekerInbox() {
           </div>
         )}
       </div>
+
+      <AlertDialog open={!!dismissTarget} onOpenChange={(open) => { if (!open) setDismissTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Dismiss this agent's response?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently hide the response from your inbox. If you change your mind, you'll need to contact support to recover it. If you're just not ready, you can leave it unread instead.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDismissTarget(null)}>Keep it</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { setDismissTarget(null); executeDismiss(); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Yes, dismiss
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

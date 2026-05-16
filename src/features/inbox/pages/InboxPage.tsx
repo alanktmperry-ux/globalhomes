@@ -254,7 +254,7 @@ export default function InboxPage() {
                   </p>
                 </div>
                 <Button asChild>
-                  <a href="/dashboard/listings">View your listings →</a>
+                  <Link to="/dashboard/listings">View your listings →</Link>
                 </Button>
               </div>
             ) : (

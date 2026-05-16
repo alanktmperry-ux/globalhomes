@@ -397,7 +397,26 @@ const PropertyDocumentsPage = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete document?</AlertDialogTitle>
             <AlertDialogDescription>
-              Delete &ldquo;{toDelete?.title}&rdquo;? This cannot be undone.
+              {(() => {
+                const retentionCategories = [
+                  'Lease Agreement',
+                  'Entry Condition Report',
+                  'Exit Condition Report',
+                  'Bond Lodgement Receipt',
+                  'Breach Notice',
+                ];
+                const isRetentionDoc = toDelete && retentionCategories.includes(toDelete.category);
+                return (
+                  <>
+                    Delete &ldquo;{toDelete?.title}&rdquo;? This cannot be undone.
+                    {isRetentionDoc && (
+                      <span className="block mt-2 text-amber-700 font-medium">
+                        ⚠️ This document type must be retained for 7 years under Australian law. Only delete if this was uploaded in error.
+                      </span>
+                    )}
+                  </>
+                );
+              })()}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

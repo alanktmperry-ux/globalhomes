@@ -109,6 +109,9 @@ export default function OwnerStatementsPage() {
   const [otherDeductions, setOtherDeductions] = useState<OtherDeduction[]>([]);
   const [feeSource, setFeeSource] = useState<{ percent: number; fromTenancy: boolean } | null>(null);
   const [pdfLoading, setPdfLoading] = useState<Record<string, boolean>>({});
+  const [showEmailConfirm, setShowEmailConfirm] = useState(false);
+  const [showDuplicateWarn, setShowDuplicateWarn] = useState(false);
+  const [pendingAlsoEmail, setPendingAlsoEmail] = useState(false);
 
   // Filter statements by URL ?property_id
   const visibleStatements = useMemo(

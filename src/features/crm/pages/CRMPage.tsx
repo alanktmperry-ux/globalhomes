@@ -67,7 +67,7 @@ export default function CRMPage() {
                     : 'w-9 h-9 rounded-full flex items-center justify-center text-[#6a6a6a]'
                 }
               >
-                <Ico icon="solar:list-linear" size={16} />
+                <List size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
               </button>
               <button
                 type="button"
@@ -79,7 +79,7 @@ export default function CRMPage() {
                     : 'w-9 h-9 rounded-full flex items-center justify-center text-[#6a6a6a]'
                 }
               >
-                <Ico icon="solar:widget-5-linear" size={16} />
+                <LayoutGrid size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
               </button>
             </div>
 
@@ -87,7 +87,7 @@ export default function CRMPage() {
               to="/dashboard/crm/import"
               className="text-[#374151] border border-[#E5E5E5] bg-white rounded-full px-4 py-2 text-[13px] font-bold hover:border-[#2563EB] hover:text-[#2563EB] transition-all inline-flex items-center gap-2"
             >
-              <Ico icon="solar:upload-linear" size={14} /> Import contacts
+              <Upload size={14} style={{ display: 'inline-flex', flexShrink: 0 }} /> Import contacts
             </Link>
 
             <button
@@ -96,7 +96,7 @@ export default function CRMPage() {
               className="rounded-full px-5 py-2.5 text-[14px] font-bold text-white inline-flex items-center gap-2 transition-all hover:shadow-[0_8px_24px_rgba(37,99,235,0.3)]"
               style={{ background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)' }}
             >
-              <Ico icon="solar:user-plus-bold" size={16} color="#fff" /> Add buyer
+              <UserPlus size={16} color="#fff" style={{ display: 'inline-flex', flexShrink: 0 }} /> Add buyer
             </button>
           </div>
         </div>

@@ -8,11 +8,7 @@ import { BottomNav } from '@/shared/components/layout/BottomNav';
 import { cn } from '@/lib/utils';
 import type { AgentFilters } from '@/features/agents/types';
 
-// iconify-icon is a globally loaded web component
-const Icon = ({ icon, width = 20, color, className }: { icon: string; width?: number; color?: string; className?: string }) => (
-  // @ts-expect-error — iconify-icon is a web component
-  <iconify-icon icon={icon} class={className} style={{ fontSize: `${width}px`, color, display: 'inline-flex', lineHeight: 1 }} />
-);
+import { Users, Mic, ArrowRight } from 'lucide-react';
 
 const SPECIALTY_CHIPS = [
   { key: 'all', label: 'All agents' },
@@ -65,7 +61,7 @@ export default function FindAgentPage() {
         {/* Hero */}
         <section className="pt-[140px] pb-12 px-8 bg-white text-center">
           <div className="inline-flex items-center gap-2 bg-[#EFF6FF] text-[#2563EB] rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em]">
-            <Icon icon="solar:users-group-rounded-linear" width={14} />
+            <Users size={14} style={{ display: 'inline-flex', flexShrink: 0 }} />
             Find an agent
           </div>
           <h1 className="text-[clamp(48px,7vw,100px)] font-extrabold leading-[0.95] tracking-[-0.05em] text-black mt-6">
@@ -80,7 +76,7 @@ export default function FindAgentPage() {
           {/* Search bar */}
           <div className="max-w-[640px] mx-auto px-8 mt-10">
             <div className="flex items-center gap-2 bg-white border-2 border-black rounded-[18px] pl-4 pr-1.5 py-1.5">
-              <Icon icon="solar:microphone-linear" width={18} color="#6a6a6a" />
+              <Mic size={18} color="#6a6a6a" style={{ display: 'inline-flex', flexShrink: 0 }} />
               <input
                 type="text"
                 value={query}
@@ -95,7 +91,7 @@ export default function FindAgentPage() {
                 className="bg-gradient-to-r from-[#2563EB] to-[#60A5FA] text-white rounded-full px-6 py-2.5 text-[14px] font-bold inline-flex items-center gap-1.5"
               >
                 Search
-                <Icon icon="solar:arrow-right-linear" width={14} />
+                <ArrowRight size={14} style={{ display: 'inline-flex', flexShrink: 0 }} />
               </button>
             </div>
           </div>
@@ -149,7 +145,7 @@ export default function FindAgentPage() {
             </div>
           ) : results.length === 0 ? (
             <div className="text-center py-24">
-              <Icon icon="solar:users-group-rounded-linear" width={56} color="#E5E7EB" />
+              <Users size={56} color="#E5E7EB" style={{ display: 'inline-flex', flexShrink: 0 }} />
               <p className="text-[18px] font-bold text-[#0a0f1e] mt-4">No agents found</p>
               <p className="text-[14px] text-[#6a6a6a] mt-2">Try widening your search filters.</p>
             </div>
@@ -197,7 +193,7 @@ export default function FindAgentPage() {
                 className="inline-flex items-center gap-2 bg-[#0a0f1e] text-white rounded-full px-7 py-3.5 text-[14px] font-bold mt-6 hover:bg-[#2563EB] transition-colors"
               >
                 Tell agents what you want
-                <Icon icon="solar:arrow-right-linear" width={14} />
+                <ArrowRight size={14} style={{ display: 'inline-flex', flexShrink: 0 }} />
               </Link>
             </div>
           )}

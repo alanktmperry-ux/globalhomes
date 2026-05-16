@@ -342,13 +342,14 @@ export default function InboxPage() {
                     </Button>
                   )}
                   {composeChannel === 'email' && !activeThread.contact?.email && (
-                    <span className="text-[11px] text-warning ml-auto">No email on file</span>
+                    <span className="text-[11px] text-amber-500 ml-auto">No email on file</span>
                   )}
                 </div>
                 <Textarea
                   value={draft}
                   onChange={e => setDraft(e.target.value)}
                   placeholder={composeChannel === 'email' ? 'Write your email…' : 'Write a message…'}
+                  aria-label={composeChannel === 'email' ? 'Write your email' : 'Write a message'}
                   className="min-h-20 text-sm"
                   onKeyDown={e => {
                     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); handleSend(); }

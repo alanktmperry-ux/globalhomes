@@ -6,6 +6,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import CreditPackageCard from '@/components/halo/CreditPackageCard';
 import { useTranslation } from '@/shared/lib/i18n';
+import { useHaloCreditsBalance } from '@/features/halo/hooks/useHaloCreditsBalance';
 
 interface CreditPackage {
   id: string;
@@ -18,13 +19,21 @@ interface CreditPackage {
 
 export default function BuyCreditsPage() {
   const { t } = useTranslation();
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const success = params.get('success') === 'true';
   const cancelled = params.get('cancelled') === 'true';
+  const { balance } = useHaloCreditsBalance();
 
   const [packages, setPackages] = useState<CreditPackage[]>([]);
   const [loading, setLoading] = useState(true);
   const [buyingId, setBuyingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (success || cancelled) {
+      setParams({}, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -74,6 +83,9 @@ export default function BuyCreditsPage() {
         <p className="text-sm text-muted-foreground mt-1">
           {t('halo.credits.subtitle')}
         </p>
+        <p className="text-sm font-medium mt-2">
+          Current balance: {balance} {balance === 1 ? 'credit' : 'credits'}
+        </p>
       </div>
 
       {success && (
@@ -94,6 +106,10 @@ export default function BuyCreditsPage() {
       {loading ? (
         <div className="flex justify-center py-16">
           <Loader2 className="animate-spin text-primary" size={28} />
+        </div>
+      ) : packages.length === 0 ? (
+        <div className="border rounded-lg p-8 text-center text-muted-foreground">
+          {t('halo.credits.noPackages') || 'No credit packages available right now.'}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">

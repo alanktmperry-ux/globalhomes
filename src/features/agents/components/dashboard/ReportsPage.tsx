@@ -151,6 +151,29 @@ const ReportsPage = () => {
     })();
   }, [agent?.id]);
 
+  // Load persisted bank balances from localStorage when agent ID becomes available
+  useEffect(() => {
+    if (!agent?.id) return;
+    const months = eachMonthOfInterval({ start: subMonths(new Date(), 11), end: new Date() });
+    const stored: Record<string, string> = {};
+    months.forEach(m => {
+      const key = format(m, 'yyyy-MM');
+      const val = localStorage.getItem(`recon-bank-${agent.id}-${key}`);
+      if (val !== null) stored[key] = val;
+    });
+    if (Object.keys(stored).length > 0) setBankBalances(stored);
+  }, [agent?.id]);
+
+  // Persist bank balances to localStorage on every change
+  useEffect(() => {
+    if (!agent?.id) return;
+    Object.entries(bankBalances).forEach(([key, val]) => {
+      if (val !== '') {
+        localStorage.setItem(`recon-bank-${agent.id}-${key}`, val);
+      }
+    });
+  }, [bankBalances, agent?.id]);
+
   const range = useMemo(() => getDateRange(period, customFrom, customTo), [period, customFrom, customTo]);
 
   // ─── Rent Roll Summary KPIs ───
@@ -452,7 +475,7 @@ const ReportsPage = () => {
       <p class="cert">I certify this trust account reconciliation is correct as at ${today}.</p>
       <div class="sig">Signature & Licensee Name</div>
       <p style="margin-top:32px;font-size:9px;color:#64748b;">
-        Monthly trust reconciliation is required under the Agents Financial Administration Act 2014.
+        Monthly trust reconciliation is required under the Agents Financial Administration Act 2014. Retain for minimum 7 years per AFA 2014 and ATO record-keeping requirements.
       </p>
       <script>window.onload=()=>window.print();</script>
       </body></html>`;

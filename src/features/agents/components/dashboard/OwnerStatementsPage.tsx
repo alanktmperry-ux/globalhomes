@@ -465,16 +465,58 @@ export default function OwnerStatementsPage() {
             )}
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => save(false)} disabled={saving}>
+            <Button variant="outline" onClick={() => handleSave(false)} disabled={saving}>
               {saving ? <Loader2 size={14} className="animate-spin mr-1" /> : null} Save
             </Button>
-            <Button onClick={() => save(true)} disabled={saving}>
+            <Button onClick={handleEmailSave} disabled={saving}>
               {saving ? <Loader2 size={14} className="animate-spin mr-1" /> : <Mail size={14} className="mr-1" />}
               Save & email owner
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Email confirmation dialog */}
+      <AlertDialog open={showEmailConfirm} onOpenChange={setShowEmailConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Email statement to owner?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will send the financial statement for {form.period_start ? format(parseISO(form.period_start), 'MMM yyyy') : 'selected period'} to{' '}
+              <strong>{properties.find(p => p.id === form.property_id)?.owner_email || 'the owner'}</strong>.
+              Once sent this cannot be recalled.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowEmailConfirm(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setShowEmailConfirm(false); proceedSave(true); }}>
+              Send statement
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Duplicate statement warning */}
+      <AlertDialog open={showDuplicateWarn} onOpenChange={setShowDuplicateWarn}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Duplicate statement detected</AlertDialogTitle>
+            <AlertDialogDescription>
+              A statement for this property covering {form.period_start ? format(parseISO(form.period_start), 'MMM yyyy') : 'this period'} already exists.
+              Creating another will result in duplicate statements for the owner. Are you sure you want to proceed?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowDuplicateWarn(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => { setShowDuplicateWarn(false); proceedSave(pendingAlsoEmail); }}
+            >
+              Create duplicate anyway
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -828,7 +828,7 @@ const BankReconciliationPage = () => {
             )}
             <Button size="sm" className="gap-1.5 text-xs"
               disabled={reconcileAllRunning || (matchedCount + manualCount === 0)}
-              onClick={handleReconcileAll}>
+              onClick={unmatchedCount > 0 ? () => setShowReconcileConfirm(true) : handleReconcileAll}>
               <CheckCircle2 size={12} />
               {reconcileAllRunning ? 'Reconciling…' : 'Reconcile All'}
             </Button>

@@ -12,7 +12,7 @@ import DashboardHeader from '@/features/agents/components/dashboard/DashboardHea
 export default function AgentOpenHomeManager() {
   const { user } = useAuth();
   const [agentId, setAgentId] = useState<string | null>(null);
-  const { sessions, loading } = useAgentOpenHomes(agentId ?? undefined);
+  const { sessions, loading, refetch } = useAgentOpenHomes(agentId ?? undefined);
   const [showCreate, setShowCreate] = useState(false);
   const [selectedSession, setSelected] = useState<OpenHomeWithCounts | null>(null);
   const [properties, setProperties] = useState<Record<string, string>>({});
@@ -134,7 +134,7 @@ export default function AgentOpenHomeManager() {
         <CreateOpenHomeModal
           agentId={agentId}
           onClose={() => setShowCreate(false)}
-          onCreated={() => { setShowCreate(false); window.location.reload(); }}
+          onCreated={() => { setShowCreate(false); refetch(); }}
         />
       )}
 

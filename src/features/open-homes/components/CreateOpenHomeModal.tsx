@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,17 +39,22 @@ export function CreateOpenHomeModal({ agentId, onClose, onCreated, defaultProper
     const startsAt = new Date(`${date}T${startTime}:00`).toISOString();
     const endsAt = new Date(`${date}T${endTime}:00`).toISOString();
 
-    await supabase.from('open_homes').insert({
-      property_id: propertyId,
-      agent_id: agentId,
-      starts_at: startsAt,
-      ends_at: endsAt,
-      max_attendees: parseInt(maxAttendees, 10) || 0,
-      notes: notes || null,
-    } as any);
-
-    setSaving(false);
-    onCreated();
+    try {
+      const { error } = await supabase.from('open_homes').insert({
+        property_id: propertyId,
+        agent_id: agentId,
+        starts_at: startsAt,
+        ends_at: endsAt,
+        max_attendees: parseInt(maxAttendees, 10) || 0,
+        notes: notes || null,
+      } as any);
+      if (error) throw error;
+      onCreated();
+    } catch (err) {
+      toast.error('Failed to schedule open home — please try again');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

@@ -679,6 +679,76 @@ export default function MaintenancePage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* New job dialog */}
+      <Dialog open={newJobOpen} onOpenChange={o => !newJobSaving && setNewJobOpen(o)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>New maintenance job</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label className="text-xs">Property</Label>
+              <Select value={newJobPropertyId} onValueChange={setNewJobPropertyId}>
+                <SelectTrigger><SelectValue placeholder="Select property"/></SelectTrigger>
+                <SelectContent>
+                  {newJobProperties.length === 0 ? (
+                    <div className="p-3 text-xs text-muted-foreground">No properties found.</div>
+                  ) : newJobProperties.map(p => (
+                    <SelectItem key={p.id} value={p.id}>{p.address}{p.suburb ? `, ${p.suburb}` : ''}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Tenancy (optional)</Label>
+              <Select value={newJobTenancyId || 'none'} onValueChange={v => setNewJobTenancyId(v === 'none' ? '' : v)} disabled={!newJobPropertyId}>
+                <SelectTrigger><SelectValue placeholder="No tenancy"/></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No tenancy</SelectItem>
+                  {newJobTenancies.map(t => (
+                    <SelectItem key={t.id} value={t.id}>{t.tenant_name || 'Unnamed tenant'}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Description</Label>
+              <Textarea
+                value={newJobDescription}
+                onChange={e => setNewJobDescription(e.target.value)}
+                placeholder="What needs to be fixed?"
+                rows={3}
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Priority</Label>
+              <Select value={newJobPriority} onValueChange={setNewJobPriority}>
+                <SelectTrigger><SelectValue/></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="urgent">Urgent</SelectItem>
+                  <SelectItem value="standard">Standard</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="cosmetic">Cosmetic</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Reported by (optional)</Label>
+              <Input
+                value={newJobReportedBy}
+                onChange={e => setNewJobReportedBy(e.target.value)}
+                placeholder="e.g. tenant phone-in, walk-in"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setNewJobOpen(false)} disabled={newJobSaving}>Cancel</Button>
+            <Button onClick={submitNewJob} disabled={newJobSaving || !newJobPropertyId || !newJobDescription.trim()}>
+              {newJobSaving ? <Loader2 size={14} className="animate-spin mr-2"/> : null}
+              Create job
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

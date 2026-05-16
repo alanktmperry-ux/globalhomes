@@ -135,6 +135,8 @@ const PreMarketPage = () => {
       setItems(mapped);
     } catch (err) {
       console.warn('[PreMarket] Fetch failed:', err);
+      setFetchError(true);
+      toast.error('Failed to load pre-market opportunities. Please refresh.');
     } finally {
       setLoading(false);
     }

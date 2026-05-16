@@ -399,7 +399,7 @@ export default function HaloBoardPage() {
           {!hasFilters && cleanHalos.length === 0 && (
             <div className="mt-8 bg-[#EFF6FF] border border-[#2563EB]/15 rounded-3xl p-6 flex items-center gap-5">
               <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shrink-0">
-                <Ico icon="solar:lightbulb-bolt-bold" size={24} color="#2563EB" />
+                <Lightbulb size={24} color="#2563EB" />
               </div>
               <div>
                 <div className="text-[16px] font-extrabold text-[#1E40AF]">{t('agent.halo.how.title')}</div>

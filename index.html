@@ -224,6 +224,102 @@
   </head>
 
   <body>
+    <!--
+      Inline beta gate. Runs BEFORE any bundle / prerender shell is shown so the
+      lock is bulletproof against stale caches, broken bundles, or missing env.
+      Mirrors src/features/beta-gate/useBetaAccess.ts + BetaGate.tsx.
+    -->
+    <script>
+      (function () {
+        try {
+          var KEY = 'listhq_beta_access';
+          var VAL = 'granted';
+          var PWD = 'listhq2026beta100%';
+          var path = location.pathname;
+          var search = location.search;
+          var hash = location.hash;
+          var isAuthCb =
+            path.indexOf('/auth/') === 0 ||
+            path.indexOf('/reset-password') === 0 ||
+            search.indexOf('token_hash=') !== -1 ||
+            search.indexOf('access_token=') !== -1 ||
+            search.indexOf('code=') !== -1 ||
+            hash.indexOf('access_token=') !== -1 ||
+            hash.indexOf('type=signup') !== -1 ||
+            hash.indexOf('type=recovery') !== -1 ||
+            hash.indexOf('type=email') !== -1;
+          var granted = false;
+          try { granted = localStorage.getItem(KEY) === VAL; } catch (e) {}
+          if (isAuthCb || granted) return;
+
+          // Stop the module script from loading the app behind the gate.
+          document.addEventListener('DOMContentLoaded', function () {
+            var m = document.querySelector('script[src="/src/main.tsx"]');
+            if (m && m.parentNode) m.parentNode.removeChild(m);
+          });
+
+          document.documentElement.style.background = '#ffffff';
+          document.write(
+            '<div id="listhq-inline-gate" style="position:fixed;inset:0;z-index:2147483647;background:#ffffff;display:flex;align-items:center;justify-content:center;padding:16px;font-family:Plus Jakarta Sans,Inter,system-ui,sans-serif;color:#0f172a">' +
+              '<div style="width:100%;max-width:28rem">' +
+                '<div style="display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:32px">' +
+                  '<div style="display:flex;align-items:center;gap:8px">' +
+                    '<div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#2563EB,#22D3EE);display:flex;align-items:center;justify-content:center;color:white;font-size:20px">\uD83C\uDF10</div>' +
+                    '<span style="font-size:20px;font-weight:700">ListHQ</span>' +
+                  '</div>' +
+                '</div>' +
+                '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:24px;padding:32px;box-shadow:0 20px 50px rgba(15,23,42,0.08)">' +
+                  '<h1 style="font-size:24px;line-height:1.2;font-weight:700;text-align:center;margin:0 0 8px">ListHQ \u2014 Closed Beta</h1>' +
+                  '<p style="font-size:14px;line-height:1.5;color:#64748b;text-align:center;margin:0 0 24px">Enter your access code to continue.</p>' +
+                  '<form id="lhq-gate-form" style="display:flex;flex-direction:column;gap:16px">' +
+                    '<input id="lhq-gate-input" type="password" placeholder="Access code" autocomplete="off" autofocus style="width:100%;box-sizing:border-box;border:1px solid #e5e7eb;border-radius:14px;padding:14px 16px;font-size:16px;text-align:center;outline:none" />' +
+                    '<p id="lhq-gate-error" style="min-height:20px;font-size:14px;line-height:1.4;color:#dc2626;text-align:center;margin:0"></p>' +
+                    '<button id="lhq-gate-submit" type="submit" disabled style="width:100%;border:none;border-radius:14px;padding:14px 16px;background:#2563EB;color:white;font-size:15px;font-weight:700;cursor:not-allowed;opacity:.6">Submit</button>' +
+                  '</form>' +
+                  '<p style="font-size:12px;line-height:1.5;color:#64748b;text-align:center;margin:24px 0 0">Don\u2019t have a code? <a href="mailto:alan@listhq.com.au" style="color:#2563EB;font-weight:600">alan@listhq.com.au</a></p>' +
+                '</div>' +
+              '</div>' +
+            '</div>'
+          );
+
+          var wire = function () {
+            var f = document.getElementById('lhq-gate-form');
+            var i = document.getElementById('lhq-gate-input');
+            var e = document.getElementById('lhq-gate-error');
+            var b = document.getElementById('lhq-gate-submit');
+            if (!f || !i || !b) { setTimeout(wire, 30); return; }
+            i.focus();
+            i.addEventListener('input', function () {
+              if (e) e.textContent = '';
+              var has = !!i.value.trim();
+              b.disabled = !has;
+              b.style.cursor = has ? 'pointer' : 'not-allowed';
+              b.style.opacity = has ? '1' : '.6';
+            });
+            f.addEventListener('submit', function (ev) {
+              ev.preventDefault();
+              if (i.value.trim() === PWD) {
+                try { localStorage.setItem(KEY, VAL); } catch (err) {}
+                location.reload();
+              } else {
+                if (e) e.textContent = 'Invalid code. Try again.';
+                i.animate(
+                  [{transform:'translateX(0)'},{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],
+                  {duration:300, easing:'ease-in-out'}
+                );
+              }
+            });
+          };
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', wire);
+          } else {
+            wire();
+          }
+        } catch (err) {
+          // If anything throws, fall through to the app so we never hard-brick the site.
+        }
+      })();
+    </script>
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded">Skip to main content</a>
     <!--
       Prerendered hero shell. Paints before any JS executes — crushes FCP from

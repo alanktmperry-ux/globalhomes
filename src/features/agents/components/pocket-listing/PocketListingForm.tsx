@@ -254,7 +254,7 @@ const formatPriceForDB = (draft: ListingDraft): string => {
   }
 };
 
-const PocketListingForm = ({ onPublish, onCancel, initialListingType, editPropertyId, duplicatePropertyId }: Props) => {
+const PocketListingForm = ({ onPublish, onCancel, initialListingType, editPropertyId, duplicatePropertyId, isPublishedListing }: Props) => {
   const loadPropertyId = editPropertyId || duplicatePropertyId;
   const [step, setStep] = useState(0);
   const [draft, setDraft] = useState<ListingDraft>(() => ({

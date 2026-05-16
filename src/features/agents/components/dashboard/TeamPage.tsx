@@ -127,6 +127,7 @@ const TeamPage = () => {
   const [reassignTarget, setReassignTarget] = useState<{ member: AgencyMember; type: 'contacts' | 'listings' } | null>(null);
   const [reassignTo, setReassignTo] = useState<string>('');
   const [reassigning, setReassigning] = useState(false);
+  const [removeTarget, setRemoveTarget] = useState<AgencyMember | null>(null);
 
   const isPrincipalOrOwner = myRole === 'principal' || myRole === 'owner';
   const isOwnerOrAdmin = isPrincipalOrOwner || myRole === 'admin';
@@ -220,6 +221,7 @@ const TeamPage = () => {
       }
     } catch (err) {
       console.error(err);
+      toast.error('Failed to load team data. Please refresh.');
     } finally {
       setLoading(false);
     }
@@ -299,18 +301,26 @@ const TeamPage = () => {
   };
 
   const handleDeactivateCode = async (id: string) => {
-    await supabase.from('agency_invite_codes').update({ is_active: false }).eq('id', id);
-    loadData();
+    try {
+      const { error } = await supabase.from('agency_invite_codes').update({ is_active: false }).eq('id', id);
+      if (error) throw error;
+      loadData();
+    } catch (err: unknown) {
+      toast.error('Error — ' + getErrorMessage(err));
+    }
   };
 
-  const handleRemoveMember = async (memberId: string, memberUserId: string) => {
-    if (memberUserId === user?.id) {
-      toast.error("You can't remove yourself");
-      return;
+  const handleRemoveMember = async () => {
+    if (!removeTarget) return;
+    try {
+      const { error } = await supabase.from('agency_members').delete().eq('id', removeTarget.id);
+      if (error) throw error;
+      toast.success('Member removed');
+      setRemoveTarget(null);
+      loadData();
+    } catch (err: unknown) {
+      toast.error('Error — ' + getErrorMessage(err));
     }
-    await supabase.from('agency_members').delete().eq('id', memberId);
-    toast.success('Member removed');
-    loadData();
   };
 
   const handleChangeRole = async (memberId: string, newRole: string) => {
@@ -806,7 +816,16 @@ const TeamPage = () => {
                       <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-destructive hover:text-destructive" onClick={() => setDeactivateTarget(m)} title="Deactivate agent">
                         <UserMinus size={14} />
                       </Button>
-                      <button onClick={() => handleRemoveMember(m.id, m.user_id)} className="w-8 h-8 rounded-lg hover:bg-destructive/10 flex items-center justify-center transition-colors">
+                      <button
+                        onClick={() => {
+                          if (m.user_id === user?.id) {
+                            toast.error("You can't remove yourself");
+                            return;
+                          }
+                          setRemoveTarget(m);
+                        }}
+                        className="w-8 h-8 rounded-lg hover:bg-destructive/10 flex items-center justify-center transition-colors"
+                      >
                         <Trash2 size={14} className="text-destructive" />
                       </button>
                     </div>
@@ -992,6 +1011,24 @@ const TeamPage = () => {
             <AlertDialogCancel>Discard</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeactivateAgent} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Deactivate
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Remove Member Dialog */}
+      <AlertDialog open={!!removeTarget} onOpenChange={() => setRemoveTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove {removeTarget?.agents?.name || 'this member'} from the agency?</AlertDialogTitle>
+            <AlertDialogDescription>
+              They will immediately lose access to the agency workspace. Their contact and listing data is preserved but will need to be reassigned. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleRemoveMember} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Remove Member
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

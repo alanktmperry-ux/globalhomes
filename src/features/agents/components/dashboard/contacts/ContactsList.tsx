@@ -506,7 +506,6 @@ const ContactsList = ({
           )}
         </div>
       )}
-      )}
       <AlertDialog open={deleteTargetId !== null} onOpenChange={(open) => { if (!open) setDeleteTargetId(null); }}>
         <AlertDialogContent>
           <AlertDialogHeader>

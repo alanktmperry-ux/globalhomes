@@ -475,7 +475,7 @@ const ReportsPage = () => {
       <p class="cert">I certify this trust account reconciliation is correct as at ${today}.</p>
       <div class="sig">Signature & Licensee Name</div>
       <p style="margin-top:32px;font-size:9px;color:#64748b;">
-        Monthly trust reconciliation is required under the Agents Financial Administration Act 2014.
+        Monthly trust reconciliation is required under the Agents Financial Administration Act 2014. Retain for minimum 7 years per AFA 2014 and ATO record-keeping requirements.
       </p>
       <script>window.onload=()=>window.print();</script>
       </body></html>`;

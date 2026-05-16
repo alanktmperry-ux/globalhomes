@@ -48,7 +48,7 @@ export function useCRMActivities(leadId: string) {
       completed: type !== 'task',
       event_data: outcome ? { outcome } : null,
     } as any);
-    if (['call', 'email', 'meeting'].includes(type)) {
+    if (['call', 'email', 'meeting', 'sms'].includes(type)) {
       await supabase.from('crm_leads')
         .update({ last_contacted: new Date().toISOString() } as any)
         .eq('id', leadId);

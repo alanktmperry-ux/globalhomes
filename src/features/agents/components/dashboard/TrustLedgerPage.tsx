@@ -378,7 +378,7 @@ const TrustLedgerPage = () => {
     const csv = [
       `Trust Ledger - ${monthNames[viewMonth]} ${viewYear}`,
       `Generated: ${new Date().toISOString()}`,
-      `Retention: 5 years per Agents Financial Administration Act 2014`,
+      `Retention: 7 years per Agents Financial Administration Act 2014 and ATO record-keeping requirements`,
       '',
       headers.join(','),
       ...rows.map(r => r.map(c => `"${c}"`).join(',')),
@@ -390,10 +390,10 @@ const TrustLedgerPage = () => {
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `trust_ledger_${viewYear}_${String(viewMonth + 1).padStart(2, '0')}_5yr_compliant.csv`;
+    a.href = url; a.download = `trust_ledger_${viewYear}_${String(viewMonth + 1).padStart(2, '0')}_7yr_compliant.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success('5yr compliant ledger exported');
+    toast.success('7-year compliant ledger exported');
   };
 
   // Generate individual receipt PDF on demand
@@ -624,7 +624,7 @@ const TrustLedgerPage = () => {
     </div>
 
     <div class="footer">
-      Generated ${generatedDate} — Retain for minimum 5 years per AFAA 2014 s.84 — This document is auditor-ready
+      Generated ${generatedDate} — Retain for minimum 7 years per AFA 2014 and ATO record-keeping requirements — This document is auditor-ready
     </div>
     </body></html>`;
 

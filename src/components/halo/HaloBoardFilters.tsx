@@ -93,7 +93,7 @@ export function HaloBoardFilters({ value, onChange }: Props) {
       {/* Suburb search */}
       <div className="relative">
         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]">
-          <Ico icon="solar:map-point-linear" size={16} />
+          <MapPin size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
         </span>
         <input
           value={value.suburb}

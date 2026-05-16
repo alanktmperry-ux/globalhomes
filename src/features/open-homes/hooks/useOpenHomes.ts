@@ -88,48 +88,49 @@ export function useAgentOpenHomes(agentId: string | undefined) {
   const [sessions, setSessions] = useState<OpenHomeWithCounts[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchSessions = useCallback(async () => {
     if (!agentId) { setLoading(false); return; }
-    (async () => {
-      const { data: openHomes } = await supabase
-        .from('open_homes')
-        .select('*')
-        .eq('agent_id', agentId)
-        .order('starts_at', { ascending: true });
+    setLoading(true);
+    const { data: openHomes } = await supabase
+      .from('open_homes')
+      .select('*')
+      .eq('agent_id', agentId)
+      .order('starts_at', { ascending: true });
 
-      if (!openHomes || openHomes.length === 0) {
-        setSessions([]);
-        setLoading(false);
-        return;
-      }
-
-      const ids = openHomes.map(oh => oh.id);
-      const { data: regs } = await supabase
-        .from('open_home_registrations')
-        .select('open_home_id, on_waitlist, attended')
-        .in('open_home_id', ids);
-
-      const countMap: Record<string, { registered: number; waitlist: number; attended: number }> = {};
-      (regs ?? []).forEach(r => {
-        if (!countMap[r.open_home_id]) countMap[r.open_home_id] = { registered: 0, waitlist: 0, attended: 0 };
-        if (r.on_waitlist) countMap[r.open_home_id].waitlist++;
-        else countMap[r.open_home_id].registered++;
-        if (r.attended) countMap[r.open_home_id].attended++;
-      });
-
-      setSessions(openHomes.map(oh => {
-        const c = countMap[oh.id] ?? { registered: 0, waitlist: 0, attended: 0 };
-        return {
-          ...oh,
-          registered_count: c.registered,
-          waitlist_count: c.waitlist,
-          attended_count: c.attended,
-          is_full: oh.max_attendees > 0 && c.registered >= oh.max_attendees,
-        } as OpenHomeWithCounts;
-      }));
+    if (!openHomes || openHomes.length === 0) {
+      setSessions([]);
       setLoading(false);
-    })();
+      return;
+    }
+
+    const ids = openHomes.map(oh => oh.id);
+    const { data: regs } = await supabase
+      .from('open_home_registrations')
+      .select('open_home_id, on_waitlist, attended')
+      .in('open_home_id', ids);
+
+    const countMap: Record<string, { registered: number; waitlist: number; attended: number }> = {};
+    (regs ?? []).forEach(r => {
+      if (!countMap[r.open_home_id]) countMap[r.open_home_id] = { registered: 0, waitlist: 0, attended: 0 };
+      if (r.on_waitlist) countMap[r.open_home_id].waitlist++;
+      else countMap[r.open_home_id].registered++;
+      if (r.attended) countMap[r.open_home_id].attended++;
+    });
+
+    setSessions(openHomes.map(oh => {
+      const c = countMap[oh.id] ?? { registered: 0, waitlist: 0, attended: 0 };
+      return {
+        ...oh,
+        registered_count: c.registered,
+        waitlist_count: c.waitlist,
+        attended_count: c.attended,
+        is_full: oh.max_attendees > 0 && c.registered >= oh.max_attendees,
+      } as OpenHomeWithCounts;
+    }));
+    setLoading(false);
   }, [agentId]);
 
-  return { sessions, loading };
+  useEffect(() => { fetchSessions(); }, [fetchSessions]);
+
+  return { sessions, loading, refetch: fetchSessions };
 }

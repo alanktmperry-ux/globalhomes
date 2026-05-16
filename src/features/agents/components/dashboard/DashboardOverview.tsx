@@ -1,5 +1,23 @@
-import { useEffect, useMemo, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import {
+  Building2,
+  Flame,
+  Users,
+  Zap,
+  Bell,
+  Heart,
+  Eye,
+  MessageCircle,
+  Tag,
+  ArrowUp,
+  ArrowDown,
+  Minus,
+  ArrowRight,
+  PlusSquare,
+  Map,
+  type LucideIcon,
+} from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useAgentListings } from '@/features/agents/hooks/useAgentListings';
@@ -9,11 +27,29 @@ import { AgentOnboardingProgress } from '@/features/agents/components/onboarding
 import { differenceInDays, formatDistanceToNow } from 'date-fns';
 import { useI18n } from '@/shared/lib/i18n/legacy-core';
 
-// iconify-icon is a globally loaded web component (see index.html)
-const Ico = ({ icon, size = 18, color, className }: { icon: string; size?: number; color?: string; className?: string }) => (
-  // @ts-expect-error — iconify-icon is a web component
-  <iconify-icon icon={icon} class={className} style={{ fontSize: `${size}px`, color, display: 'inline-flex', lineHeight: 1 }} />
-);
+const ICON_MAP: Record<string, LucideIcon> = {
+  'solar:buildings-linear': Building2,
+  'solar:flame-bold': Flame,
+  'solar:users-group-rounded-linear': Users,
+  'solar:users-group-rounded-bold': Users,
+  'solar:bolt-bold': Zap,
+  'solar:bell-linear': Bell,
+  'solar:heart-linear': Heart,
+  'solar:eye-linear': Eye,
+  'solar:chat-round-line-linear': MessageCircle,
+  'solar:tag-price-linear': Tag,
+  'solar:arrow-up-linear': ArrowUp,
+  'solar:arrow-down-linear': ArrowDown,
+  'solar:minus-linear': Minus,
+  'solar:arrow-right-linear': ArrowRight,
+  'solar:add-square-bold': PlusSquare,
+  'solar:streets-bold': Map,
+};
+
+const Ico = ({ icon, size = 18, color, className }: { icon: string; size?: number; color?: string; className?: string }) => {
+  const Cmp = ICON_MAP[icon] ?? Bell;
+  return <Cmp size={size} color={color} className={className} strokeWidth={2} />;
+};
 
 interface RecentActivity {
   id: string;
@@ -84,9 +120,10 @@ interface StatCardProps {
   value: string | number;
   trendDir?: 'up' | 'down' | 'flat';
   trendValue?: string;
+  cta?: ReactNode;
 }
 
-const StatCard = ({ icon, iconColor = '#2563EB', label, value, trendDir, trendValue }: StatCardProps) => {
+const StatCard = ({ icon, iconColor = '#2563EB', label, value, trendDir, trendValue, cta }: StatCardProps) => {
   const trendStyles =
     trendDir === 'up'
       ? { bg: 'bg-[#ECFDF5]', text: 'text-[#065F46]', arrow: 'solar:arrow-up-linear' }
@@ -101,6 +138,7 @@ const StatCard = ({ icon, iconColor = '#2563EB', label, value, trendDir, trendVa
         <span className="text-[11px] uppercase tracking-[0.12em] text-[#6a6a6a] font-bold">{label}</span>
       </div>
       <div className="text-[44px] font-extrabold text-[#0a0f1e] tabular-nums leading-none mt-3">{value}</div>
+      {cta && <div className="mt-3">{cta}</div>}
       {trendDir && (
         <div className="mt-4 flex items-center gap-2">
           <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-bold ${trendStyles.bg} ${trendStyles.text}`}>
@@ -148,6 +186,7 @@ const DashboardOverview = () => {
   const [buyerMatchesPrev, setBuyerMatchesPrev] = useState(0);
   const [haloCredits, setHaloCredits] = useState(0);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [activitiesLoading, setActivitiesLoading] = useState(true);
 
   const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
   const [boostedListings, setBoostedListings] = useState<BoostedListing[]>([]);
@@ -220,9 +259,10 @@ const DashboardOverview = () => {
       setRecentActivities((activitiesRes.data as any) || []);
       setBoostedListings((boostedRes.data as any) || []);
       setStatsLoading(false);
+      setActivitiesLoading(false);
     };
 
-    load().catch(() => { if (!cancelled) setStatsLoading(false); });
+    load().catch(() => { if (!cancelled) { setStatsLoading(false); setActivitiesLoading(false); } });
     return () => { cancelled = true; };
   }, [user]);
 
@@ -299,6 +339,17 @@ const DashboardOverview = () => {
               icon="solar:bolt-bold"
               label="Halo Credits"
               value={haloCredits}
+              cta={
+                haloCredits === 0 ? (
+                  <Link
+                    to="/dashboard/buy-credits"
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-[13px] text-[#2563EB] font-bold hover:underline"
+                  >
+                    Buy credits →
+                  </Link>
+                ) : undefined
+              }
             />
           </div>
         )}
@@ -313,7 +364,20 @@ const DashboardOverview = () => {
                 View all
               </Link>
             </div>
-            {recentActivities.length === 0 ? (
+            {activitiesLoading ? (
+              <div>
+                {[0,1,2,3].map((i) => (
+                  <div key={i} className="flex items-center gap-3 py-4 border-b border-[#F3F4F6] last:border-0 animate-pulse">
+                    <div className="w-9 h-9 rounded-full bg-[#F3F4F6] shrink-0" />
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <div className="h-4 w-2/3 bg-[#F3F4F6] rounded-full" />
+                      <div className="h-3 w-1/4 bg-[#F3F4F6] rounded-full" />
+                    </div>
+                    <div className="h-3 w-12 bg-[#F3F4F6] rounded-full shrink-0" />
+                  </div>
+                ))}
+              </div>
+            ) : recentActivities.length === 0 ? (
               <div className="py-10 text-center">
                 <div className="flex justify-center mb-3">
                   <Ico icon="solar:bell-linear" size={40} color='#E5E7EB' />
@@ -350,9 +414,9 @@ const DashboardOverview = () => {
           {/* Quick actions */}
           <div className="flex flex-col gap-3">
             {QUICK_ACTIONS.map((a) => (
-              <button
+              <Link
                 key={a.title}
-                onClick={() => navigate(a.to)}
+                to={a.to}
                 className="group bg-white rounded-3xl border border-[#E5E5E5] p-5 text-left transition-all hover:border-[#2563EB] hover:shadow-[0_8px_24px_rgba(37,99,235,0.06)] flex items-center gap-4"
               >
                 <div
@@ -368,7 +432,7 @@ const DashboardOverview = () => {
                 <span className="text-[#6a6a6a] transition-transform group-hover:translate-x-1 shrink-0">
                   <Ico icon="solar:arrow-right-linear" size={20} />
                 </span>
-              </button>
+              </Link>
             ))}
           </div>
         </div>

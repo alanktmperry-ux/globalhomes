@@ -170,6 +170,7 @@ const AgentDashboardSidebar = () => {
   const [inboxCount, setInboxCount] = useState(0);
   const [buyerMatchesCount, setBuyerMatchesCount] = useState(0);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
+  const [newListingOpen, setNewListingOpen] = useState(false);
   const [agentLogo, setAgentLogo] = useState<string | null>(null);
   const [agentName, setAgentName] = useState<string | null>(null);
   const [agencyName, setAgencyName] = useState<string | null>(null);

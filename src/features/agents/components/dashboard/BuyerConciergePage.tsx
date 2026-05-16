@@ -301,6 +301,10 @@ const BuyerConciergePage = () => {
     ? `Hi ${contactMatch.profile?.display_name?.split(' ')[0] || contactMatch.profile?.full_name?.split(' ')[0] || 'there'}, I noticed you've been searching in ${buyerSuburb(contactMatch)} — I have a listing that might suit you perfectly: ${contactMatch.listing?.address || ''}. Would you like me to send through more details or arrange an inspection?\n\nBest regards`
     : '';
 
+  useEffect(() => {
+    setContactDraft(contactMessage);
+  }, [contactMessage]);
+
   if (!subLoading && !canAccessBuyerConcierge) {
     return (
       <div className="max-w-2xl mx-auto p-6 text-center space-y-4">

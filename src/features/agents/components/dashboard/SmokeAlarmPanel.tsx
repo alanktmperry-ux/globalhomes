@@ -48,7 +48,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const STATE_INFO: Record<string, string> = {
-  QLD: 'Queensland law requires interconnected photoelectric smoke alarms and a compliance certificate for each new tenancy since January 2022.',
+  QLD: 'Queensland law requires interconnected photoelectric smoke alarms and a compliance certificate for each new tenancy and renewal since January 2022. Testing required within 30 days before each new tenancy or renewal.',
   VIC: 'Landlords must ensure smoke alarms are in working order. Annual testing is recommended.',
   NSW: 'Landlords must test and clean smoke alarms or have them tested annually.',
 };

@@ -122,6 +122,7 @@ const BondClaimsPage = () => {
 
   // Inline new item
   const [itemForm, setItemForm] = useState<{ room: string; category: string; description: string; amount: number } | null>(null);
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
 
   const fetchAll = useCallback(async () => {
     if (!user) return;

@@ -81,6 +81,9 @@ const BankReconciliationPage = () => {
 
   // CSV import modal
   const [showImport, setShowImport] = useState(false);
+  const [showReconcileConfirm, setShowReconcileConfirm] = useState(false);
+  const [manualTarget, setManualTarget] = useState<Reconciliation | null>(null);
+  const [manualReason, setManualReason] = useState('');
   const [csvText, setCsvText] = useState('');
   const [importSaving, setImportSaving] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -453,14 +456,24 @@ const BankReconciliationPage = () => {
     }
   };
 
-  const handleManualReconcile = async (item: Reconciliation) => {
+  const handleManualReconcile = (item: Reconciliation) => {
+    setManualTarget(item);
+    setManualReason('');
+  };
+
+  const confirmManualReconcile = async () => {
+    if (!manualTarget) return;
     try {
       const { error } = await supabase
         .from('trust_reconciliations')
-        .update({ status: 'manual' } as any)
-        .eq('id', item.id);
+        .update({ status: 'manual', description: manualTarget.description
+          ? `${manualTarget.description} [Manual: ${manualReason}]`
+          : `Manual reconciliation: ${manualReason}` } as any)
+        .eq('id', manualTarget.id);
       if (error) throw error;
-      toast.success('Marked as manually reconciled');
+      toast.success('Marked as manually reconciled — reason recorded in audit trail');
+      setManualTarget(null);
+      setManualReason('');
       await fetchData();
     } catch (e: unknown) {
       toast.error(getErrorMessage(e));
@@ -815,7 +828,7 @@ const BankReconciliationPage = () => {
             )}
             <Button size="sm" className="gap-1.5 text-xs"
               disabled={reconcileAllRunning || (matchedCount + manualCount === 0)}
-              onClick={handleReconcileAll}>
+              onClick={unmatchedCount > 0 ? () => setShowReconcileConfirm(true) : handleReconcileAll}>
               <CheckCircle2 size={12} />
               {reconcileAllRunning ? 'Reconciling…' : 'Reconcile All'}
             </Button>
@@ -992,6 +1005,51 @@ const BankReconciliationPage = () => {
             <Button onClick={handleCsvImport} disabled={!csvText.trim() || importSaving} className="gap-1.5">
               <Upload size={13} />
               {importSaving ? 'Importing…' : 'Import'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Reconcile All Confirm (unmatched warning) ── */}
+      <Dialog open={showReconcileConfirm} onOpenChange={setShowReconcileConfirm}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-base">Reconcile with unmatched items?</DialogTitle>
+            <DialogDescription>
+              {unmatchedCount} bank statement {unmatchedCount === 1 ? 'entry' : 'entries'} {unmatchedCount === 1 ? 'is' : 'are'} still unmatched. Finalising now means your closing balance cannot be verified against all transactions. Under AFA 2014, a valid reconciliation must account for every bank statement entry.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowReconcileConfirm(false)}>Go back and match</Button>
+            <Button variant="destructive" onClick={() => { setShowReconcileConfirm(false); handleReconcileAll(); }}>
+              Reconcile anyway
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Manual Reconcile Dialog ── */}
+      <Dialog open={!!manualTarget} onOpenChange={(o) => !o && setManualTarget(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-base">Manual Reconciliation</DialogTitle>
+            <DialogDescription>
+              This entry could not be auto-matched. Provide a reason for manual reconciliation — this will be recorded in your audit trail and visible to your annual auditor.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label className="text-xs">Reason <span className="text-destructive">*</span></Label>
+            <Textarea
+              value={manualReason}
+              onChange={(e) => setManualReason(e.target.value)}
+              placeholder="e.g. Bank fee charged directly — no matching trust transaction required"
+              rows={3}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setManualTarget(null)}>Cancel</Button>
+            <Button onClick={confirmManualReconcile} disabled={!manualReason.trim()}>
+              Confirm Manual
             </Button>
           </DialogFooter>
         </DialogContent>

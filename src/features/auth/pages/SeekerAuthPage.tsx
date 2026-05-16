@@ -31,7 +31,7 @@ const SeekerAuthPage = () => {
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [dataLocationConsent, setDataLocationConsent] = useState(false);
+  
   const [policyConsent, setPolicyConsent] = useState(false);
   const [showOAuthConsentModal, setShowOAuthConsentModal] = useState(false);
   const [pendingOAuthProvider, setPendingOAuthProvider] = useState<'google' | 'apple' | null>(null);
@@ -104,7 +104,7 @@ const SeekerAuthPage = () => {
     setError(null);
     if (!email.trim()) { setError(t('auth.error.emailRequired')); return; }
     if (password.length < 10) { setError(t('auth.error.passwordTooShort')); return; }
-    if (!dataLocationConsent) { setError(t('auth.error.consentDataLocation')); return; }
+    
     if (!policyConsent) { setError(t('auth.error.consentPolicy')); return; }
     const cleanEmail = email.trim().toLowerCase();
     if (isDisposableEmail(cleanEmail)) {
@@ -164,7 +164,7 @@ const SeekerAuthPage = () => {
   };
 
   const handleOAuth = async (provider: 'google' | 'apple') => {
-    if (mode === 'signup' && (!dataLocationConsent || !policyConsent)) {
+    if (mode === 'signup' && !policyConsent) {
       setPendingOAuthProvider(provider);
       setShowOAuthConsentModal(true);
       return;
@@ -329,31 +329,15 @@ const SeekerAuthPage = () => {
             </div>
           </div>
 
-          <label className="flex items-start gap-2.5 mb-3 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={dataLocationConsent}
-              onChange={(e) => setDataLocationConsent(e.target.checked)}
-              className="mt-0.5 h-4 w-4 rounded shrink-0 cursor-pointer accent-white"
-            />
-            <span className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.70)' }}>
-              {t('auth.consent.dataLocation')}{' '}
-              <a href="/privacy" className="text-white underline underline-offset-2">{t('auth.privacyLink')}</a>.
-            </span>
-          </label>
-
           <label className="flex items-start gap-2.5 mb-5 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={policyConsent}
               onChange={(e) => setPolicyConsent(e.target.checked)}
-              className="mt-0.5 h-4 w-4 rounded shrink-0 cursor-pointer accent-white"
+              className="mt-0.5 h-4 w-4 rounded shrink-0 cursor-pointer"
             />
-            <span className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.70)' }}>
-              {t('auth.consent.agreement')}{' '}
-              <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-white underline underline-offset-2">{t('auth.privacyLink')}</a>
-              {' '}{t('auth.and')}{' '}
-              <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-white underline underline-offset-2">{t('auth.termsLink')}</a>.
+            <span className="text-xs leading-relaxed">
+              I agree to the <Link to="/privacy" className="underline hover:opacity-80">Privacy Policy</Link> and <Link to="/terms" className="underline hover:opacity-80">Terms of Service</Link>. My data is stored securely in Australia under the Privacy Act 1988.
             </span>
           </label>
 
@@ -368,7 +352,7 @@ const SeekerAuthPage = () => {
 
           <button
             type="submit"
-            disabled={loading || !email.trim() || !password || !dataLocationConsent || !policyConsent}
+            disabled={loading || !email.trim() || !password || !policyConsent}
             className={s.primaryBtn}
           >
             {loading

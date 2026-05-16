@@ -13,6 +13,10 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
 import { useAgentId } from '@/features/crm/hooks/useAgentId';
@@ -180,9 +184,16 @@ export default function SuppliersPage() {
     setOpenJobs([]);
   };
 
-  const removeSupplier = async (s: Supplier) => {
-    if (!confirm(`Remove ${s.business_name} from your supplier list? This won't affect jobs already assigned.`)) return;
-    const { error } = await supabase.from('suppliers' as any).update({ status: 'inactive' } as any).eq('id', s.id);
+  const [toRemove, setToRemove] = useState<Supplier | null>(null);
+
+  const removeSupplier = (s: Supplier) => {
+    setToRemove(s);
+  };
+
+  const confirmRemove = async () => {
+    if (!toRemove) return;
+    const { error } = await supabase.from('suppliers' as any).update({ status: 'inactive' } as any).eq('id', toRemove.id);
+    setToRemove(null);
     if (error) { toast.error('Could not remove'); return; }
     toast.success('Supplier removed');
     load();
@@ -402,6 +413,41 @@ export default function SuppliersPage() {
           <DialogHeader>
             <DialogTitle>Assign job to {assignFor?.business_name}</DialogTitle>
           </DialogHeader>
+          {assignFor && (() => {
+            const exp = assignFor.insurance_expiry;
+            if (!exp) {
+              return (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 flex items-start gap-2">
+                  <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                  <p className="text-sm text-amber-900 dark:text-amber-200">
+                    No insurance certificate on file for this supplier. Consider requesting one before assigning work.
+                  </p>
+                </div>
+              );
+            }
+            const days = Math.floor((new Date(exp).getTime() - Date.now()) / 86400000);
+            if (days < 0) {
+              return (
+                <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 flex items-start gap-2">
+                  <AlertTriangle size={16} className="text-destructive shrink-0 mt-0.5" />
+                  <p className="text-sm text-destructive">
+                    Insurance expired {Math.abs(days)} day{Math.abs(days) === 1 ? '' : 's'} ago. Do not assign until renewed.
+                  </p>
+                </div>
+              );
+            }
+            if (days < 30) {
+              return (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 flex items-start gap-2">
+                  <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                  <p className="text-sm text-amber-900 dark:text-amber-200">
+                    Insurance expires in {days} day{days === 1 ? '' : 's'} — request a renewed certificate soon.
+                  </p>
+                </div>
+              );
+            }
+            return null;
+          })()}
           {loadingJobs ? (
             <div className="flex justify-center py-6"><Loader2 className="animate-spin text-primary"/></div>
           ) : openJobs.length === 0 ? (
@@ -432,6 +478,21 @@ export default function SuppliersPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!toRemove} onOpenChange={o => !o && setToRemove(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove {toRemove?.business_name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This sets the supplier to inactive. Jobs already assigned to them won't be affected.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRemove}>Remove</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

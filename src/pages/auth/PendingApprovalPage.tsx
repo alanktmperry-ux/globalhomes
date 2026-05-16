@@ -84,7 +84,18 @@ export default function PendingApprovalPage() {
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 size={16} className="text-primary mt-0.5 shrink-0" />
-                    <span>Watch the 90-second product tour at listhq.com.au/agents/demo</span>
+                    <span>
+                      Watch the{' '}
+                      <a
+                        href="https://listhq.com.au/agents/demo"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary underline hover:text-primary/80 transition-colors"
+                      >
+                        90-second product tour
+                      </a>
+                      {' '}while you wait.
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 size={16} className="text-primary mt-0.5 shrink-0" />
@@ -96,6 +107,16 @@ export default function PendingApprovalPage() {
                   </li>
                 </ul>
               </div>
+              <p className="text-sm text-muted-foreground mb-6">
+                Haven't heard back in 2 business days?{' '}
+                <a
+                  href="mailto:hello@listhq.com.au?subject=Agent approval enquiry"
+                  className="underline hover:text-foreground transition-colors"
+                >
+                  Email us
+                </a>
+                .
+              </p>
             </>
           )}
 

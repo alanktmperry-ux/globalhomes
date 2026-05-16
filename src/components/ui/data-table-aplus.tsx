@@ -1,4 +1,5 @@
 import { ReactNode, ThHTMLAttributes, TdHTMLAttributes, HTMLAttributes } from 'react';
+import { type LucideIcon, MoreHorizontal, AlertTriangle, Clock, Lock } from 'lucide-react';
 
 /**
  * Version A+ data table & dashboard primitives.
@@ -134,7 +135,7 @@ export function APlusBadge({
 }: {
   tone: APlusBadgeTone;
   label: ReactNode;
-  icon?: string;
+  icon?: LucideIcon;
   showDot?: boolean;
 }) {
   const t = TONE_MAP[tone];
@@ -143,10 +144,7 @@ export function APlusBadge({
       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase"
       style={{ background: t.bg, color: t.color, letterSpacing: '0.08em' }}
     >
-      {icon ? (
-        // @ts-expect-error iconify web component
-        <iconify-icon icon={icon} style={{ fontSize: '10px' }}></iconify-icon>
-      ) : showDot ? (
+      {icon ? (() => { const I = icon; return <I size={10} style={{ display: 'inline-flex', flexShrink: 0 }} />; })() : showDot ? (
         <span className="w-1.5 h-1.5 rounded-full" style={{ background: t.dot }} />
       ) : null}
       {label}
@@ -161,8 +159,7 @@ export function APlusActionTrigger(props: HTMLAttributes<HTMLButtonElement>) {
       {...props}
       className={`w-8 h-8 rounded-[8px] text-[#6B7280] hover:text-[#0a0f1e] hover:bg-[#F3F4F6] flex items-center justify-center transition-all ${props.className || ''}`}
     >
-      {/* @ts-expect-error iconify */}
-      <iconify-icon icon="solar:menu-dots-linear" style={{ fontSize: '18px' }}></iconify-icon>
+      <MoreHorizontal size={18} />
     </button>
   );
 }
@@ -175,7 +172,7 @@ export function APlusStatCard({
   value: ReactNode;
   valueClassName?: string;
   trailing?: ReactNode;
-  icon?: string;
+  icon?: LucideIcon;
   urgent?: boolean;
 }) {
   return (
@@ -187,10 +184,7 @@ export function APlusStatCard({
         >
           {label}
         </span>
-        {icon && (
-          // @ts-expect-error iconify
-          <iconify-icon icon={icon} style={{ fontSize: '14px', color: urgent ? '#F87171' : '#9CA3AF' }}></iconify-icon>
-        )}
+        {icon && (() => { const I = icon; return <I size={14} color={urgent ? '#F87171' : '#9CA3AF'} style={{ display: 'inline-flex', flexShrink: 0 }} />; })()}
       </div>
       <div className={`text-3xl font-bold tabular-nums mt-2 ${urgent ? 'text-[#991B1B]' : 'text-[#0a0f1e]'} ${valueClassName}`}>
         {value}
@@ -209,8 +203,7 @@ export function APlusArrearsBanner({
       className="bg-[#FEF2F2] rounded-[12px] p-4 flex items-center gap-3 mb-6"
       style={{ border: '1px solid rgba(248,113,113,0.30)' }}
     >
-      {/* @ts-expect-error iconify */}
-      <iconify-icon icon="solar:danger-triangle-linear" style={{ fontSize: '24px', color: '#DC2626' }}></iconify-icon>
+      <AlertTriangle size={24} color="#DC2626" />
       <div className="flex-1 min-w-0">
         <div className="text-sm font-bold text-[#991B1B]">{title}</div>
         {body && <div className="text-xs text-[#991B1B]/80 mt-0.5">{body}</div>}
@@ -228,8 +221,7 @@ export function APlusDueSoonBanner({
       className="bg-[#FFFBEB] rounded-[12px] p-4 flex items-center gap-3 mb-6"
       style={{ border: '1px solid rgba(251,191,36,0.30)' }}
     >
-      {/* @ts-expect-error iconify */}
-      <iconify-icon icon="solar:clock-circle-linear" style={{ fontSize: '24px', color: '#D97706' }}></iconify-icon>
+      <Clock size={24} color="#D97706" />
       <div className="flex-1 min-w-0">
         <div className="text-sm font-bold text-[#92400E]">{title}</div>
         {body && <div className="text-xs text-[#92400E]/80 mt-0.5">{body}</div>}
@@ -242,8 +234,7 @@ export function APlusDueSoonBanner({
 export function APlusReconciledBanner({ children }: { children?: ReactNode }) {
   return (
     <div className="bg-[#F3F4F6] rounded-[10px] p-4 flex items-center gap-3 mb-4">
-      {/* @ts-expect-error iconify */}
-      <iconify-icon icon="solar:lock-keyhole-minimalistic-linear" style={{ fontSize: '20px', color: '#6B7280' }}></iconify-icon>
+      <Lock size={20} color="#6B7280" />
       <div className="text-sm text-[#374151]">
         {children || 'This period is reconciled and locked. Transactions cannot be edited.'}
       </div>

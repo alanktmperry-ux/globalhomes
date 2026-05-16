@@ -5,6 +5,7 @@ import {
   AlertDialogContent,
   AlertDialogFooter,
 } from '@/components/ui/alert-dialog';
+import { Lock } from 'lucide-react';
 
 interface Props {
   open: boolean;
@@ -13,10 +14,6 @@ interface Props {
   busy: boolean;
   onConfirm: () => void;
 }
-
-const Ico = ({ icon, size = 16, color }: { icon: string; size?: number; color?: string }) =>
-  // @ts-expect-error iconify web component
-  <iconify-icon icon={icon} width={size} height={size} style={{ color, display: 'inline-block' }} />;
 
 export function HaloUnlockDialog({ open, onOpenChange, balance, busy, onConfirm }: Props) {
   return (
@@ -27,7 +24,7 @@ export function HaloUnlockDialog({ open, onOpenChange, balance, busy, onConfirm 
       >
         <div className="flex flex-col items-center">
           <div className="w-16 h-16 rounded-full bg-[#EFF6FF] flex items-center justify-center">
-            <Ico icon="solar:lock-keyhole-bold" size={32} color="#2563EB" />
+            <Lock size={32} color="#2563EB" style={{ display: 'inline-flex', flexShrink: 0 }} />
           </div>
           <h2 className="text-[22px] font-extrabold text-[#0a0f1e] text-center mt-5 tracking-[-0.02em]">
             Unlock this Halo?

@@ -81,6 +81,9 @@ const BankReconciliationPage = () => {
 
   // CSV import modal
   const [showImport, setShowImport] = useState(false);
+  const [showReconcileConfirm, setShowReconcileConfirm] = useState(false);
+  const [manualTarget, setManualTarget] = useState<Reconciliation | null>(null);
+  const [manualReason, setManualReason] = useState('');
   const [csvText, setCsvText] = useState('');
   const [importSaving, setImportSaving] = useState(false);
   const [dragging, setDragging] = useState(false);

@@ -205,6 +205,7 @@ export default function InboxPage() {
                 <button
                   key={t.id}
                   onClick={() => setActiveId(t.id)}
+                  aria-current={activeId === t.id ? 'true' : undefined}
                   className={`w-full text-left p-3 border-b border-border hover:bg-muted/50 transition-colors ${activeId === t.id ? 'bg-muted' : ''}`}
                 >
                   <div className="flex items-start gap-2.5">

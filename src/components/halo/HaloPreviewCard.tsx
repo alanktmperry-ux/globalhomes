@@ -57,9 +57,8 @@ const LANG_META: Record<string, { flag: string; label: string }> = {
   ar: { flag: '🇸🇦', label: 'Arabic' },
 };
 
-const Ico = ({ icon, size = 16, color }: { icon: string; size?: number; color?: string }) =>
-  // @ts-expect-error iconify web component
-  <iconify-icon icon={icon} width={size} height={size} style={{ color, display: 'inline-block' }} />;
+
+
 
 export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Props) {
   const navigate = useNavigate();

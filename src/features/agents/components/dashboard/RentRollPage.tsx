@@ -195,7 +195,7 @@ const RentRollPage = () => {
     bond_amount: '',
     bond_manual: false,
     bond_authority: '',
-    bond_lodgement_number: '',
+    bond_lodgment_number: '',
     management_fee_percent: '8.80',
     owner_name: '',
     owner_email: '',
@@ -206,7 +206,7 @@ const RentRollPage = () => {
   const initialForm = {
     property_id: '', tenant_name: '', tenant_email: '', tenant_phone: '',
     lease_start: '', lease_end: '', rent_amount: '', rent_frequency: 'weekly',
-    bond_amount: '', bond_manual: false, bond_authority: '', bond_lodgement_number: '',
+    bond_amount: '', bond_manual: false, bond_authority: '', bond_lodgment_number: '',
     management_fee_percent: '8.80', owner_name: '', owner_email: '',
     owner_bsb: '', owner_account_number: '',
   };
@@ -684,7 +684,7 @@ const RentRollPage = () => {
       rent_frequency: form.rent_frequency,
       bond_amount: parseFloat(form.bond_amount),
       bond_authority: form.bond_authority || null,
-      bond_lodgement_number: form.bond_lodgement_number || null,
+      bond_lodgment_number: form.bond_lodgment_number || null,
       management_fee_percent: parseFloat(form.management_fee_percent),
       owner_name: form.owner_name || null,
       owner_email: form.owner_email || null,
@@ -1322,7 +1322,6 @@ const RentRollPage = () => {
                       setForm(f => ({
                         ...f,
                         rent_amount: val,
-                        rent_frequency: 'weekly',
                         bond_amount: !f.bond_manual && val ? (parseFloat(val) * 4).toFixed(2) : f.bond_amount,
                       }));
                     }}
@@ -1369,8 +1368,8 @@ const RentRollPage = () => {
                 <div>
                   <Label>Bond Lodgement Ref</Label>
                   <Input
-                    value={form.bond_lodgement_number}
-                    onChange={e => setForm(f => ({ ...f, bond_lodgement_number: e.target.value }))}
+                    value={form.bond_lodgment_number}
+                    onChange={e => setForm(f => ({ ...f, bond_lodgment_number: e.target.value }))}
                     placeholder="e.g. BL-2024-123456"
                   />
                   <p className="text-[10px] text-muted-foreground mt-0.5">Enter the reference number from the bond authority receipt</p>
@@ -1452,7 +1451,7 @@ const RentRollPage = () => {
                   <div className="flex justify-between"><span className="text-muted-foreground">Weekly Rent</span><span className="font-medium">${weeklyRent.toFixed(2)}</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Bond</span><span>${bond.toFixed(2)} ({(bond / (weeklyRent || 1)).toFixed(1)} weeks)</span></div>
                   {form.bond_authority && <div className="flex justify-between"><span className="text-muted-foreground">Bond Authority</span><span>{form.bond_authority}</span></div>}
-                  {form.bond_lodgement_number && <div className="flex justify-between"><span className="text-muted-foreground">Bond Ref</span><span>{form.bond_lodgement_number}</span></div>}
+                  {form.bond_lodgment_number && <div className="flex justify-between"><span className="text-muted-foreground">Bond Ref</span><span>{form.bond_lodgment_number}</span></div>}
                   <div className="flex justify-between"><span className="text-muted-foreground">Lease</span><span>{form.lease_start} → {form.lease_end}</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Management %</span><span>{mgmt}%</span></div>
                   {form.owner_name && <div className="flex justify-between"><span className="text-muted-foreground">Owner</span><span>{form.owner_name}</span></div>}

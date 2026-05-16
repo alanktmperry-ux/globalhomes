@@ -6,9 +6,6 @@ import {
   Handshake, Sparkles, Target, ShoppingBag, ChevronDown, ChevronRight, Mail, Wrench, Activity, AlertCircle, RefreshCw,
   HandCoins, Briefcase, LineChart, BookOpen, ArrowLeft,
 } from 'lucide-react';
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/shared/hooks/use-mobile';

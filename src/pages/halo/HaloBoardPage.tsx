@@ -230,10 +230,6 @@ export default function HaloBoardPage() {
     }
   };
 
-  const Ico = ({ icon, size = 16, color }: { icon: string; size?: number; color?: string }) =>
-    // @ts-expect-error iconify web component
-    <iconify-icon icon={icon} width={size} height={size} style={{ color, display: 'inline-block' }} />;
-
   const activeCount = cleanHalos.length;
   const hasFilters =
     filters.intent !== 'all' ||

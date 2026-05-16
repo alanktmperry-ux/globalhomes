@@ -194,12 +194,20 @@ const PipelinePage = () => {
     const target = outcome === 'accepted' ? settled : outcome === 'rejected' ? listed : offer;
     if (!target) return;
 
-    setCards(prev => prev.map(c =>
-      c.id === cardId
-        ? { ...c, stageId: target.id, movedAt: new Date().toISOString(), sentOfferId: undefined }
-        : c
-    ));
-    await persistStageMove(cardId, target);
+    const previousCards = [...cards];
+
+    try {
+      await persistStageMove(cardId, target);
+      setCards(prev => prev.map(c =>
+        c.id === cardId
+          ? { ...c, stageId: target.id, movedAt: new Date().toISOString(), sentOfferId: undefined }
+          : c
+      ));
+    } catch (err) {
+      console.error('[Pipeline] persistStageMove failed:', err);
+      setCards(previousCards);
+      toast.error('Failed to update offer outcome — please try again');
+    }
   };
 
   const totalValue = cards.reduce((sum, c) => sum + c.estimatedValue, 0);

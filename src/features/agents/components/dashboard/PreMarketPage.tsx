@@ -101,9 +101,11 @@ const PreMarketPage = () => {
     open: false, content: '', loading: false, property: null,
   });
   const [copied, setCopied] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
+    setFetchError(false);
     try {
       const { data } = await supabase
         .from('seller_likelihood_scores')
@@ -133,12 +135,22 @@ const PreMarketPage = () => {
       setItems(mapped);
     } catch (err) {
       console.warn('[PreMarket] Fetch failed:', err);
+      setFetchError(true);
+      toast.error('Failed to load pre-market opportunities. Please refresh.');
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  if (subLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 size={24} className="animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   const filtered = items.filter(item => {
     if (filter === 'hot') return item.score >= 80;
@@ -260,7 +272,14 @@ const PreMarketPage = () => {
         ))}
       </div>
 
-      {loading ? (
+      {fetchError ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center px-4">
+          <Target size={32} className="text-muted-foreground/30 mb-3" />
+          <p className="text-sm font-medium text-muted-foreground">Failed to load opportunities</p>
+          <p className="text-xs text-muted-foreground/70 mt-1 max-w-[280px]">Check your connection and try again.</p>
+          <Button size="sm" variant="outline" className="mt-4" onClick={fetchData}>Retry</Button>
+        </div>
+      ) : loading ? (
         <div className="flex items-center justify-center py-20">
           <Loader2 size={24} className="animate-spin text-muted-foreground" />
         </div>

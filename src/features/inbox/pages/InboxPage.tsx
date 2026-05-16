@@ -316,7 +316,7 @@ export default function InboxPage() {
                           <span>{formatDistanceToNow(new Date(m.sent_at), { addSuffix: true })}</span>
                         </div>
                         {m.body_html ? (
-                          <div className="text-sm prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(m.body_html, { ALLOWED_TAGS: ['p','br','strong','em','ul','ol','li','a'], ALLOWED_ATTR: ['href','target','rel'] }) }} />
+                          <div className="text-sm [&_a]:underline [&_a]:text-primary-foreground [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4 [&_p]:mb-1 last:[&_p]:mb-0" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(m.body_html, { ALLOWED_TAGS: ['p','br','strong','em','ul','ol','li','a'], ALLOWED_ATTR: ['href','target','rel'] }) }} />
                         ) : (
                           <div className="text-sm whitespace-pre-wrap break-words">{m.body}</div>
                         )}

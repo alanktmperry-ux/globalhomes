@@ -421,6 +421,14 @@ const BondClaimsPage = () => {
                       </td>
                     </tr>
                   )}
+                  {itemForm && (itemForm.category === 'damage' || itemForm.category === 'cleaning') && (
+                    <tr>
+                      <td colSpan={5} className="pb-2 px-2">
+                        <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800">
+                          <span>⚠️</span>
+                          <span><strong>Fair wear and tear cannot be claimed.</strong> Normal deterioration from everyday use (faded paint, carpet flattening, minor scuffs) must not be included. Only claim for damage beyond fair wear and tear — backed by the exit condition report comparison.</span>
+                        </div>
+                      </td>
                   {openClaim.bond_claim_items.length === 0 && !itemForm && (
                     <tr><td colSpan={5} className="py-6 text-center text-muted-foreground">No deduction items yet.</td></tr>
                   )}

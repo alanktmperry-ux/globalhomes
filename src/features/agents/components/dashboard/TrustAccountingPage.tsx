@@ -54,6 +54,7 @@ const STATUS_MAP: Record<string, { variant: 'default' | 'secondary' | 'outline' 
 
 const TrustAccountingPage = () => {
   const { t } = useTranslation();
+  usePageTitle('Trust Accounting');
   const { user } = useAuth();
   const { canAccessTrust, loading: subLoading } = useSubscription();
   const {
@@ -569,7 +570,6 @@ const TrustAccountingPage = () => {
 
   // ── Transaction Form Fields (shared between new & edit) ──
   function renderTxFormFields() {
-  usePageTitle('Trust Accounting');
     return (
       <div className="space-y-3">
         {!showEditTx && (
@@ -951,12 +951,17 @@ const TrustAccountingPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowCloseConfirm(true)}
-                  disabled={!agent?.id}
+                  disabled={!agent?.id || overdrawnLedgers.length > 0}
                   className="bg-white border border-[#E5E5E5] text-[#0a0f1e] rounded-full px-4 py-2 text-[12px] font-bold inline-flex items-center gap-2 hover:bg-[#F9FAFB] disabled:opacity-50 disabled:cursor-not-allowed transition"
                 >
                   <Lock size={14} style={{ display: 'inline-flex', flexShrink: 0 }} />
                   Close {periodLabel}
                 </button>
+                {overdrawnLedgers.length > 0 && (
+                  <p className="text-[11px] text-destructive font-semibold">
+                    Cannot close period — {overdrawnLedgers.length} client ledger{overdrawnLedgers.length > 1 ? 's are' : ' is'} overdrawn. Remedy the shortfall first.
+                  </p>
+                )}
               </div>
             )}
           </div>
@@ -969,6 +974,11 @@ const TrustAccountingPage = () => {
               <DialogDescription>
                 This will lock all {periodLabel} transactions. You will not be able to edit or add transactions for this period after closing. The {nextMonthLabel} opening balance will be set to <strong>{AUD.format(periodBalance)}</strong>. Proceed?
               </DialogDescription>
+              {unmatchedCount > 0 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-3 text-sm text-amber-900">
+                  <strong>{unmatchedCount} unmatched reconciliation item{unmatchedCount > 1 ? 's' : ''} outstanding.</strong> Closing the period before reconciling means your closing balance cannot be verified against the bank statement. Complete reconciliation first or proceed with caution.
+                </div>
+              )}
             </DialogHeader>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowCloseConfirm(false)} disabled={closingPeriod}>Discard</Button>

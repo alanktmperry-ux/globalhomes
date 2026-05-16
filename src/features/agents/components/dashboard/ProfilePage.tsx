@@ -12,6 +12,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -74,6 +84,7 @@ const ProfilePage = () => {
   const [newArea, setNewArea] = useState('');
   const [newLang, setNewLang] = useState('');
   const [docType, setDocType] = useState('license');
+  const [confirmDeleteCredId, setConfirmDeleteCredId] = useState<string | null>(null);
   const [addressSuggestions, setAddressSuggestions] = useState<{ description: string; place_id: string }[]>([]);
   const [showAddressSuggestions, setShowAddressSuggestions] = useState(false);
   const [addressSearching, setAddressSearching] = useState(false);
@@ -214,11 +225,12 @@ const ProfilePage = () => {
   const removeLogo = async () => {
     if (!agent) return;
     try {
-      await supabase.from('agents').update({ company_logo_url: null } as any).eq('id', agent.id);
+      const { error } = await supabase.from('agents').update({ company_logo_url: null } as any).eq('id', agent.id);
+      if (error) throw error;
       setAgent(prev => prev ? { ...prev, company_logo_url: null } : null);
       toast.success('Logo removed');
     } catch (err: unknown) {
-      toast.error(`Error — ${(getErrorMessage(err))}`);
+      toast.error(`Failed to remove logo — ${getErrorMessage(err)}`);
     }
   };
 
@@ -256,7 +268,11 @@ const ProfilePage = () => {
   };
 
   const deleteCredential = async (id: string) => {
-    await supabase.from('agent_credentials').delete().eq('id', id);
+    const { error } = await supabase.from('agent_credentials').delete().eq('id', id);
+    if (error) {
+      toast.error('Failed to remove document. Please try again.');
+      return;
+    }
     setCredentials(prev => prev.filter(c => c.id !== id));
     toast.success('Document removed');
   };
@@ -738,7 +754,7 @@ const ProfilePage = () => {
                           {c.verified_status === 'pending' && <Clock size={10} className="mr-1" />}
                           {c.verified_status}
                         </Badge>
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => deleteCredential(c.id)}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setConfirmDeleteCredId(c.id)}>
                           <Trash2 size={14} className="text-destructive" />
                         </Button>
                       </div>
@@ -792,6 +808,30 @@ const ProfilePage = () => {
             </div>
           </TabsContent>
         </Tabs>
+
+      <AlertDialog open={!!confirmDeleteCredId} onOpenChange={(open) => { if (!open) setConfirmDeleteCredId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this document?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This credential document will be permanently deleted and cannot be recovered. If it is under review, deletion will cancel the verification request.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                const id = confirmDeleteCredId;
+                setConfirmDeleteCredId(null);
+                if (id) deleteCredential(id);
+              }}
+            >
+              Delete Document
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

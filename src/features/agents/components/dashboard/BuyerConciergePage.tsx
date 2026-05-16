@@ -647,10 +647,10 @@ const BuyerConciergePage = () => {
                     await recordConciergeAction(agent.id, 'intro_sent', contactMatch.id);
                     refreshUsage();
                   }
-                  toast.success('Marked as contacted', { description: 'Outbound messaging launches soon.' });
+                  toast.success('Marked as contacted', { description: 'Buyer marked as contacted — direct messaging coming soon.' });
                   setContactMatch(null);
                 }}>
-                  <Mail size={14} /> Send & mark contacted
+                  <Mail size={14} /> Mark as contacted
                 </Button>
               </DialogFooter>
             </div>

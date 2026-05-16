@@ -7,10 +7,6 @@ import { supabase } from '@/integrations/supabase/client';
 // The unrestricted server key lives only in the google-maps-proxy edge function.
 const BROWSER_MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_BROWSER_KEY as string | undefined;
 
-if (!BROWSER_MAPS_KEY && import.meta.env.PROD) {
-  throw new Error('VITE_GOOGLE_MAPS_BROWSER_KEY is not set. Configure it in Lovable project settings before deploying.');
-}
-
 export async function getGoogleMapsApiKey(): Promise<string> {
   if (!BROWSER_MAPS_KEY) {
     throw new Error('Google Maps browser key is not configured (VITE_GOOGLE_MAPS_BROWSER_KEY).');

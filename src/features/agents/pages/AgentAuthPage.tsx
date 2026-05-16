@@ -187,7 +187,7 @@ const AgentAuthPage = () => {
   };
 
   const handleOAuth = async (provider: 'google' | 'apple') => {
-    if (step === 'register' && !(dataLocationConsent && policyConsent)) {
+    if (step === 'register' && !policyConsent) {
       setPendingOAuthProvider(provider);
       setShowOAuthConsentModal(true);
       return;

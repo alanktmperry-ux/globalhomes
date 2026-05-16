@@ -14,6 +14,16 @@ const StepVoice     = lazy(() => import('./StepVoice'));
 const StepTranslate = lazy(() => import('./StepTranslate'));
 const StepSettings  = lazy(() => import('./StepSettings'));
 const StepPreview   = lazy(() => import('./StepPreview'));
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 function parseSuburbFallback(address: string): string {
   const segments = address.split(',').map(s => s.trim());

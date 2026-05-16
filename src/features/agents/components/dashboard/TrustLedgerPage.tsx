@@ -390,7 +390,7 @@ const TrustLedgerPage = () => {
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `trust_ledger_${viewYear}_${String(viewMonth + 1).padStart(2, '0')}_5yr_compliant.csv`;
+    a.href = url; a.download = `trust_ledger_${viewYear}_${String(viewMonth + 1).padStart(2, '0')}_7yr_compliant.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success('5yr compliant ledger exported');

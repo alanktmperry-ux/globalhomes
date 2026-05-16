@@ -1,9 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-
-const Ico = ({ icon, size = 16, color }: { icon: string; size?: number; color?: string }) =>
-  // @ts-expect-error iconify web component
-  <iconify-icon icon={icon} width={size} height={size} style={{ color, display: 'inline-block' }} />;
+import type { LucideIcon } from 'lucide-react';
+import { BarChart2, MapPin, TrendingUp, Target, Zap, Wallet, Tag, Clock, Hammer, Users, Home, X, FilePlus, Folder, FolderOpen } from 'lucide-react';
 
 type TabKey = 'tools' | 'suburb' | 'saved' | 'seller';
 
@@ -11,7 +9,7 @@ const TOOLS: {
   key: string;
   name: string;
   description: string;
-  icon: string;
+  icon: LucideIcon;
   iconBg: string;
   iconColor: string;
   pill: string;
@@ -173,7 +171,7 @@ export default function MarketToolsPage() {
         {statCards.map(c => (
           <div key={c.key} className="bg-white rounded-3xl border border-[#E5E5E5] p-5">
             <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: c.iconBg }}>
-              <Ico icon={c.icon} size={20} color={c.iconColor} />
+              <c.icon size={20} color={c.iconColor} />
             </div>
             <div className="text-[11px] uppercase tracking-[0.12em] text-[#6a6a6a] font-bold mt-4">{c.label}</div>
             <div className="font-extrabold tabular-nums mt-2 text-[#0a0f1e]" style={{ fontSize: 36 }}>{c.value}</div>
@@ -222,7 +220,7 @@ export default function MarketToolsPage() {
                   className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5"
                   style={{ background: t.iconBg }}
                 >
-                  <Ico icon={t.icon} size={26} color={t.iconColor} />
+                  <t.icon size={26} color={t.iconColor} />
                 </div>
                 <div className="text-[18px] font-extrabold text-[#0a0f1e] tracking-[-0.02em]">{t.name}</div>
                 <div className="text-[13px] text-[#6a6a6a] mt-2 leading-[1.55] flex-1">{t.description}</div>
@@ -304,7 +302,7 @@ export default function MarketToolsPage() {
                 ].map(card => (
                   <div key={card.title} className="bg-[#F9FAFB] rounded-2xl p-5">
                     <div className="flex items-center gap-2">
-                      <Ico icon={card.icon} size={16} color="#6a6a6a" />
+                      <card.icon size={16} color="#6a6a6a" />
                       <div className="text-[12px] uppercase tracking-[0.12em] text-[#6a6a6a] font-bold">{card.title}</div>
                     </div>
                     <div className="mt-3 divide-y divide-[#E5E7EB]">

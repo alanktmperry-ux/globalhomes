@@ -2,10 +2,10 @@ import { motion } from 'framer-motion';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, MapPin, Mic, Globe, DollarSign, ShieldCheck, Briefcase, Wand2, Lock, Clock, BarChart2, Wallet, Home, ArrowRight, type LucideIcon } from 'lucide-react';
 import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 
-type Feature = { icon: string; title: string; desc: string };
+type Feature = { icon: LucideIcon; title: string; desc: string };
 
 const buyerFeatures: Feature[] = [
   { icon: MapPin, title: 'Post a Halo', desc: 'Tell agents what you want — they come to you' },
@@ -26,12 +26,6 @@ const agentFeatures: Feature[] = [
   { icon: BarChart2, title: 'Lead pipeline CRM', desc: 'Enquiries auto-sync into Kanban' },
   { icon: Wallet, title: 'Built-in trust accounting', desc: 'Migrate from PropertyMe in one step' },
 ];
-
-// iconify-icon is a globally loaded web component
-const IconifyIcon = ({ icon, size = 18, color }: { icon: string; size?: number; color?: string }) => (
-  // @ts-expect-error — iconify-icon is a web component
-  <iconify-icon icon={icon} style={{ fontSize: `${size}px`, color, display: 'inline-flex', lineHeight: 1 }} />
-);
 
 const AuthLandingPage = () => {
   const navigate = useNavigate();
@@ -111,7 +105,7 @@ const AuthLandingPage = () => {
                 className="bg-[#EFF6FF] border border-[#2563EB]/15 rounded-2xl p-5 transition-all hover:border-[#2563EB] hover:-translate-y-0.5"
               >
                 <div className="w-9 h-9 rounded-[10px] bg-white flex items-center justify-center text-[#2563EB] mb-3">
-                  <IconifyIcon icon={f.icon} size={18} color="#2563EB" />
+                  <f.icon size={18} color="#2563EB" />
                 </div>
                 <div className="text-[15px] font-bold text-[#0a0f1e] leading-tight">{f.title}</div>
                 <div className="text-[12px] text-[#4a4a4a] mt-1 leading-[1.45]">{f.desc}</div>
@@ -185,7 +179,7 @@ const AuthLandingPage = () => {
                   className="bg-white/[0.04] border border-white/10 rounded-2xl p-5 transition-all hover:border-[#2563EB]/40 hover:-translate-y-0.5 cursor-pointer"
                 >
                   <div className="w-9 h-9 rounded-[10px] bg-[#2563EB]/15 flex items-center justify-center text-[#93C5FD] mb-3">
-                    <IconifyIcon icon={f.icon} size={18} color="#93C5FD" />
+                    <f.icon size={18} color="#93C5FD" />
                   </div>
                   <div className="text-[15px] font-bold text-white leading-tight">{f.title}</div>
                   <div className="text-[12px] text-white/65 mt-1 leading-[1.45]">{f.desc}</div>

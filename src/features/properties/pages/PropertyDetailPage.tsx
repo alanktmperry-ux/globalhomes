@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { PropertySEOHead } from '@/features/seo/components/PropertySEOHead';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X, PawPrint, Sofa, Clock, FileText, Users, Phone, MessageCircle, Globe, Loader2, ScrollText, HardHat, ImageIcon } from 'lucide-react';
+import { ArrowLeft, Bed, Bath, Car, Ruler, Share2, Heart, MapPin, ChevronLeft, ChevronRight, Calendar, Eye, Home, BadgeCheck, Star, X, PawPrint, Sofa, Clock, FileText, Users, Phone, MessageCircle, Globe, Loader2, ScrollText, HardHat, ImageIcon, GraduationCap, BedDouble, ParkingCircle, CheckCircle2, ArrowRight } from 'lucide-react';
 import { LISTING_PLACEHOLDER_CLASS } from '@/shared/lib/listingImage';
 import MultilingualListingDetail from '@/features/properties/components/MultilingualListingDetail';
 import { ListingLanguageSwitcher } from '@/features/properties/components/ListingLanguageSwitcher';
@@ -1181,7 +1181,7 @@ export default function PropertyDetailPage() {
 
             {/* Property features */}
             {(() => {
-              const rows: { icon: string; label: string; value: string }[] = [];
+              const rows: { icon: any; label: string; value: string }[] = [];
               if (property.beds) rows.push({ icon: BedDouble, label: 'BEDROOMS', value: String(property.beds) });
               if (property.baths) rows.push({ icon: Bath, label: 'BATHROOMS', value: String(property.baths) });
               if (property.parking) rows.push({ icon: ParkingCircle, label: 'PARKING', value: `${property.parking} ${property.parking === 1 ? 'space' : 'spaces'}` });
@@ -1196,8 +1196,7 @@ export default function PropertyDetailPage() {
                     {rows.map((r) => (
                       <div key={r.label} className="flex items-start gap-3.5">
                         <div className="w-10 h-10 rounded-xl bg-[#EFF6FF] flex items-center justify-center flex-shrink-0">
-                          {/* @ts-expect-error iconify-icon is a web component */}
-                          <iconify-icon icon={r.icon} style={{ fontSize: '20px', color: '#2563EB' }} />
+                          <r.icon size={20} color="#2563EB" />
                         </div>
                         <div className="flex flex-col">
                           <p className="text-[11px] font-bold uppercase tracking-[0.10em] text-[#6a6a6a]">{r.label}</p>

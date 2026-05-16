@@ -15,7 +15,7 @@ import {
   TrendingUp, TrendingDown, FileDown, Trash2, Pencil, Clock,
   AlertTriangle, CalendarIcon, Home, Users, Receipt, Upload,
   CreditCard, CheckSquare, ShieldCheck, FileText, BarChart3,
-  ExternalLink, Lock,
+  ExternalLink, Lock, Wallet, PlusSquare, Filter, ArrowUp,
 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
@@ -699,10 +699,6 @@ const TrustAccountingPage = () => {
     );
   }
 
-
-  const Ico = ({ icon, size = 16, color }: { icon: string; size?: number; color?: string }) =>
-    // @ts-expect-error iconify web component
-    <iconify-icon icon={icon} width={size} height={size} style={{ color, display: 'inline-block' }} />;
 
   return (
     <div className="max-w-[1480px] mx-auto px-6 md:px-10 py-10">

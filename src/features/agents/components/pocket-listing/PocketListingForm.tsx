@@ -757,12 +757,12 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
               Listing published
             </p>
             <p className="flex items-center gap-2 text-muted-foreground">
-              <Loader2 size={14} className="animate-spin text-primary" />
-              Matching buyers to your listing…
+              <span className="w-5 h-5 rounded-full bg-emerald-500/80 flex items-center justify-center text-white text-xs">✓</span>
+              Matching buyers in background…
             </p>
             <p className="flex items-center gap-2 text-muted-foreground">
-              <Loader2 size={14} className="animate-spin text-primary" />
-              Generating multilingual versions…
+              <span className="w-5 h-5 rounded-full bg-emerald-500/80 flex items-center justify-center text-white text-xs">✓</span>
+              Generating multilingual versions in background…
             </p>
           </div>
 

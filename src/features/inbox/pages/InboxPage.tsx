@@ -19,6 +19,7 @@ import {
 import TemplatePicker, { type TemplatePickerContact } from '@/features/messaging/components/TemplatePicker';
 import { usePageTitle } from '@/lib/usePageTitle';
 import { Skeleton } from '@/components/ui/skeleton';
+import { supabase } from '@/integrations/supabase/client';
 
 function InboxSkeleton() {
   return (
@@ -108,6 +109,40 @@ export default function InboxPage() {
         recipientEmail: activeThread.contact?.email ?? null,
         subject: activeThread.subject || `Re: ${contactName(activeThread)}`,
       });
+      // Log inbox reply to CRM lead timeline (fire-and-forget — never block send)
+      if (activeThread?.contact?.id && agentId) {
+        (async () => {
+          try {
+            const { data: lead } = await supabase
+              .from('crm_leads' as any)
+              .select('id')
+              .eq('contact_id', activeThread.contact!.id)
+              .eq('agent_id', agentId)
+              .not('stage', 'in', '("settled","lost")')
+              .order('updated_at', { ascending: false })
+              .limit(1)
+              .maybeSingle();
+            if (lead) {
+              const activityType = composeChannel === 'email' ? 'email' : 'note';
+              const preview = draft.trim().slice(0, 200);
+              await Promise.all([
+                supabase.from('crm_activities' as any).insert({
+                  lead_id: (lead as any).id,
+                  agent_id: agentId,
+                  type: activityType,
+                  body: `Inbox reply: ${preview}${draft.trim().length > 200 ? '…' : ''}`,
+                  completed: true,
+                }),
+                supabase.from('crm_leads' as any)
+                  .update({ last_contacted: new Date().toISOString() } as any)
+                  .eq('id', (lead as any).id),
+              ]);
+            }
+          } catch {
+            // Intentionally silent — CRM sync failure must not affect inbox UX
+          }
+        })();
+      }
       setDraft('');
       toast.success(composeChannel === 'email' ? 'Email sent' : 'Message sent');
     } catch (e: any) {

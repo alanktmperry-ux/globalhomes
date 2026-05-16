@@ -127,6 +127,7 @@ const TeamPage = () => {
   const [reassignTarget, setReassignTarget] = useState<{ member: AgencyMember; type: 'contacts' | 'listings' } | null>(null);
   const [reassignTo, setReassignTo] = useState<string>('');
   const [reassigning, setReassigning] = useState(false);
+  const [removeTarget, setRemoveTarget] = useState<AgencyMember | null>(null);
 
   const isPrincipalOrOwner = myRole === 'principal' || myRole === 'owner';
   const isOwnerOrAdmin = isPrincipalOrOwner || myRole === 'admin';

@@ -1279,7 +1279,15 @@ ${agencyName || ''}`.trim();
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              Entry Notice — {noticeFor?.tenancies?.properties?.address || 'Property'}
+              {(() => {
+                const t = (noticeFor as any)?.type;
+                const label = t === 'entry' || t === 'ingoing' ? 'Entry Notice'
+                  : t === 'routine' ? 'Routine Inspection Notice'
+                  : t === 'exit' || t === 'outgoing' ? 'Exit Notice'
+                  : t === 're_let' ? 'Re-let Inspection Notice'
+                  : 'Inspection Notice';
+                return `${label} — ${noticeFor?.tenancies?.properties?.address || 'Property'}`;
+              })()}
             </DialogTitle>
           </DialogHeader>
           {noticeFor && (

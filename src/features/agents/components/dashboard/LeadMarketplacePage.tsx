@@ -4,13 +4,23 @@ import { ShoppingBag, Lock, Sparkles, Loader2, MapPin, Home, DollarSign, BedDoub
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import DashboardHeader from './DashboardHeader';
 import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { formatDistanceToNow } from 'date-fns';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface ConsumerLead {
@@ -64,6 +74,7 @@ const LeadMarketplacePage = () => {
   const [agentId, setAgentId] = useState<string | null>(null);
   const [purchasing, setPurchasing] = useState<string | null>(null);
   const [successModal, setSuccessModal] = useState<PurchasedBuyer | null>(null);
+  const [confirmLead, setConfirmLead] = useState<ConsumerLead | null>(null);
 
   const isPremium = plan === 'agency' || plan === 'agency_pro' || plan === 'enterprise' || plan === 'demo';
 
@@ -99,10 +110,10 @@ const LeadMarketplacePage = () => {
       if (data?.buyer) {
         setSuccessModal(data.buyer);
         setLeads(prev => prev.filter(l => l.id !== lead.id));
-        toast({ title: 'Lead purchased!', description: `You now have access to ${data.buyer.name}'s contact details.` });
+        toast.success(`Lead purchased — you now have access to ${data.buyer.name}'s contact details.`);
       }
     } catch (err: unknown) {
-      toast({ title: 'Purchase failed', description: getErrorMessage(err) || 'Please try again', variant: 'destructive' });
+      toast.error(getErrorMessage(err) || 'Purchase failed. Please try again.');
     } finally {
       setPurchasing(null);
     }
@@ -203,7 +214,7 @@ const LeadMarketplacePage = () => {
                 </div>
 
                 <Button
-                  onClick={() => handlePurchase(lead)}
+                  onClick={() => setConfirmLead(lead)}
                   disabled={purchasing === lead.id}
                   className="w-full"
                 >
@@ -261,6 +272,29 @@ const LeadMarketplacePage = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!confirmLead} onOpenChange={(open) => { if (!open) setConfirmLead(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Purchase this lead for $29?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This charge is non-refundable. You will receive the buyer's name, email address, and full contact details immediately after purchase.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setConfirmLead(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                const lead = confirmLead;
+                setConfirmLead(null);
+                if (lead) handlePurchase(lead);
+              }}
+            >
+              Confirm Purchase — $29
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -64,6 +64,7 @@ const STATUS_TONE: Record<string, APlusBadgeTone> = {
   completed: 'green',
   cancelled: 'grey',
   quoted: 'cyan',
+  approved: 'green',
 };
 const statusBadge = (s: string) => (
   <APlusBadge tone={STATUS_TONE[s] || 'grey'} label={s.replace('_', ' ')} />

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 const STORAGE_KEY = 'listhq_beta_access';
 const GRANTED_VALUE = 'granted';
 
-export const BETA_PASSWORD = 'listhq2026beta';
+export const BETA_PASSWORD = 'listhq2026beta100%';
 
 export function useBetaAccess() {
   const [granted, setGranted] = useState<boolean>(() => {

@@ -149,6 +149,7 @@ const BuyerConciergePage = () => {
   const [contactMatch, setContactMatch] = useState<EnrichedMatch | null>(null);
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<'match' | 'readiness' | 'recent'>('match');
+  const [contactDraft, setContactDraft] = useState('');
 
   const navigate = useNavigate();
   const { canAccessBuyerConcierge, conciergeMatchesPerMonth, conciergeIntrosPerMonth, loading: subLoading } = useSubscription();
@@ -238,9 +239,18 @@ const BuyerConciergePage = () => {
   };
 
   const archive = async (id: string) => {
+    const previous = matches.find(m => m.id === id);
     await setStatus(id, 'archived');
     setMatches(prev => prev.filter(m => m.id !== id));
-    toast.success('Buyer archived');
+    toast.success('Buyer archived', {
+      action: {
+        label: 'Undo',
+        onClick: async () => {
+          await setStatus(id, previous?.status || 'new');
+          setMatches(prev => previous ? [previous, ...prev] : prev);
+        },
+      },
+    });
   };
 
   const openContact = async (m: EnrichedMatch) => {
@@ -291,6 +301,10 @@ const BuyerConciergePage = () => {
     ? `Hi ${contactMatch.profile?.display_name?.split(' ')[0] || contactMatch.profile?.full_name?.split(' ')[0] || 'there'}, I noticed you've been searching in ${buyerSuburb(contactMatch)} — I have a listing that might suit you perfectly: ${contactMatch.listing?.address || ''}. Would you like me to send through more details or arrange an inspection?\n\nBest regards`
     : '';
 
+  useEffect(() => {
+    setContactDraft(contactMessage);
+  }, [contactMessage]);
+
   if (!subLoading && !canAccessBuyerConcierge) {
     return (
       <div className="max-w-2xl mx-auto p-6 text-center space-y-4">
@@ -315,8 +329,6 @@ const BuyerConciergePage = () => {
     return <div className="p-6"><Card><CardContent className="p-6 text-sm text-destructive">{error}</CardContent></Card></div>;
   }
 
-  const visibleMatches = matchLimit !== null ? matches.slice(0, matchLimit) : matches;
-  const hiddenMatches = matches.length - visibleMatches.length;
 
   return (
     <div className="space-y-8 max-w-7xl">
@@ -619,7 +631,7 @@ const BuyerConciergePage = () => {
                   <p className="text-muted-foreground italic mt-2">"{contactMatch.match_reasoning}"</p>
                 )}
               </div>
-              <Textarea defaultValue={contactMessage} rows={6} className="text-sm" />
+              <Textarea value={contactDraft} onChange={(e) => setContactDraft(e.target.value)} rows={6} className="text-sm" />
               <DialogFooter>
                 <Button variant="outline" onClick={() => setContactMatch(null)}>Discard</Button>
                 <Button onClick={async () => {
@@ -635,10 +647,10 @@ const BuyerConciergePage = () => {
                     await recordConciergeAction(agent.id, 'intro_sent', contactMatch.id);
                     refreshUsage();
                   }
-                  toast.success('Marked as contacted', { description: 'Outbound messaging launches soon.' });
+                  toast.success('Marked as contacted', { description: 'Buyer marked as contacted — direct messaging coming soon.' });
                   setContactMatch(null);
                 }}>
-                  <Mail size={14} /> Send & mark contacted
+                  <Mail size={14} /> Mark as contacted
                 </Button>
               </DialogFooter>
             </div>

@@ -4,13 +4,23 @@ import { ShoppingBag, Lock, Sparkles, Loader2, MapPin, Home, DollarSign, BedDoub
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import DashboardHeader from './DashboardHeader';
 import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { formatDistanceToNow } from 'date-fns';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface ConsumerLead {

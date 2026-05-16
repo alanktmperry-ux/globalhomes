@@ -221,6 +221,7 @@ const TeamPage = () => {
       }
     } catch (err) {
       console.error(err);
+      toast.error('Failed to load team data. Please refresh.');
     } finally {
       setLoading(false);
     }

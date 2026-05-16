@@ -74,6 +74,7 @@ const LeadMarketplacePage = () => {
   const [agentId, setAgentId] = useState<string | null>(null);
   const [purchasing, setPurchasing] = useState<string | null>(null);
   const [successModal, setSuccessModal] = useState<PurchasedBuyer | null>(null);
+  const [confirmLead, setConfirmLead] = useState<ConsumerLead | null>(null);
 
   const isPremium = plan === 'agency' || plan === 'agency_pro' || plan === 'enterprise' || plan === 'demo';
 

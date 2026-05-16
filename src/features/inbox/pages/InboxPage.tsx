@@ -218,7 +218,7 @@ export default function InboxPage() {
                         <span className={`text-sm truncate ${t.is_unread ? 'font-semibold text-foreground' : 'font-medium text-foreground/90'}`}>
                           {contactName(t)}
                         </span>
-                        {t.is_unread && <span className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />}
+                        {t.is_unread && <span aria-label="Unread" className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />}
                         <span className="ml-auto text-[10px] text-muted-foreground flex-shrink-0">
                           {formatDistanceToNow(new Date(t.last_message_at), { addSuffix: false })}
                         </span>

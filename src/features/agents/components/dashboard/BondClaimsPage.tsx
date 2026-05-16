@@ -470,6 +470,23 @@ const BondClaimsPage = () => {
         <Card className="mx-4 sm:mx-6">
           <CardContent className="p-4 space-y-3">
             <h2 className="text-sm font-semibold">Authority Details</h2>
+            {(() => {
+              const state = openClaim.tenancies?.properties?.state?.toUpperCase();
+              const deadlines: Record<string, string> = {
+                QLD: 'QLD: Bond claims must be filed with the RTA within 3 business days of the vacancy date.',
+                NSW: 'NSW: Bond claims must be lodged with NSW Fair Trading within 14 days of the end of tenancy.',
+                VIC: 'VIC: Bond claims must be lodged with the RTBA within 10 business days of the end of tenancy.',
+                WA: 'WA: Bond claims must be lodged within 7 days of the end of tenancy.',
+              };
+              const msg = state ? deadlines[state] : null;
+              if (!msg) return null;
+              return (
+                <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-xs text-blue-800 mb-3">
+                  <span>ℹ️</span>
+                  <span>{msg}</span>
+                </div>
+              );
+            })()}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs">Authority</Label>

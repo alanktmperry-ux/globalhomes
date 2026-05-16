@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -121,6 +122,7 @@ const BondClaimsPage = () => {
 
   // Inline new item
   const [itemForm, setItemForm] = useState<{ room: string; category: string; description: string; amount: number } | null>(null);
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
 
   const fetchAll = useCallback(async () => {
     if (!user) return;
@@ -386,7 +388,7 @@ const BondClaimsPage = () => {
                       <td className="py-2 px-2">{item.description}</td>
                       <td className="py-2 px-2 text-right font-medium">{fmt$(Number(item.amount))}</td>
                       <td className="py-2 px-2">
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => deleteItem(item.id)}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setDeleteItemId(item.id)}>
                           <Trash2 size={12} />
                         </Button>
                       </td>
@@ -415,6 +417,16 @@ const BondClaimsPage = () => {
                         <div className="flex gap-1">
                           <Button size="sm" className="h-7 px-2 text-xs" onClick={addItem}>Save</Button>
                           <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={() => setItemForm(null)}>Discard</Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                  {itemForm && (itemForm.category === 'damage' || itemForm.category === 'cleaning') && (
+                    <tr>
+                      <td colSpan={5} className="pb-2 px-2">
+                        <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800">
+                          <span>⚠️</span>
+                          <span><strong>Fair wear and tear cannot be claimed.</strong> Normal deterioration from everyday use (faded paint, carpet flattening, minor scuffs) must not be included. Only claim for damage beyond fair wear and tear — backed by the exit condition report comparison.</span>
                         </div>
                       </td>
                     </tr>
@@ -458,6 +470,23 @@ const BondClaimsPage = () => {
         <Card className="mx-4 sm:mx-6">
           <CardContent className="p-4 space-y-3">
             <h2 className="text-sm font-semibold">Authority Details</h2>
+            {(() => {
+              const state = openClaim.tenancies?.properties?.state?.toUpperCase();
+              const deadlines: Record<string, string> = {
+                QLD: 'QLD: Bond claims must be filed with the RTA within 3 business days of the vacancy date.',
+                NSW: 'NSW: Bond claims must be lodged with NSW Fair Trading within 14 days of the end of tenancy.',
+                VIC: 'VIC: Bond claims must be lodged with the RTBA within 10 business days of the end of tenancy.',
+                WA: 'WA: Bond claims must be lodged within 7 days of the end of tenancy.',
+              };
+              const msg = state ? deadlines[state] : null;
+              if (!msg) return null;
+              return (
+                <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-xs text-blue-800 mb-3">
+                  <span>ℹ️</span>
+                  <span>{msg}</span>
+                </div>
+              );
+            })()}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs">Authority</Label>
@@ -525,6 +554,22 @@ const BondClaimsPage = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Delete item confirmation */}
+        <AlertDialog open={!!deleteItemId} onOpenChange={(o) => { if (!o) setDeleteItemId(null); }}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete this deduction item?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will permanently remove the item from this bond claim. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => { if (deleteItemId) { deleteItem(deleteItemId); } setDeleteItemId(null); }}>Delete</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* Summary dialog */}
         <Dialog open={showSummary} onOpenChange={setShowSummary}>

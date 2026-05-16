@@ -239,9 +239,18 @@ const BuyerConciergePage = () => {
   };
 
   const archive = async (id: string) => {
+    const previous = matches.find(m => m.id === id);
     await setStatus(id, 'archived');
     setMatches(prev => prev.filter(m => m.id !== id));
-    toast.success('Buyer archived');
+    toast.success('Buyer archived', {
+      action: {
+        label: 'Undo',
+        onClick: async () => {
+          await setStatus(id, previous?.status || 'new');
+          setMatches(prev => previous ? [previous, ...prev] : prev);
+        },
+      },
+    });
   };
 
   const openContact = async (m: EnrichedMatch) => {

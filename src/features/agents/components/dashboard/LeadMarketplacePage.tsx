@@ -214,7 +214,7 @@ const LeadMarketplacePage = () => {
                 </div>
 
                 <Button
-                  onClick={() => handlePurchase(lead)}
+                  onClick={() => setConfirmLead(lead)}
                   disabled={purchasing === lead.id}
                   className="w-full"
                 >

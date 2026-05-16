@@ -378,7 +378,7 @@ const TrustLedgerPage = () => {
     const csv = [
       `Trust Ledger - ${monthNames[viewMonth]} ${viewYear}`,
       `Generated: ${new Date().toISOString()}`,
-      `Retention: 5 years per Agents Financial Administration Act 2014`,
+      `Retention: 7 years per Agents Financial Administration Act 2014 and ATO record-keeping requirements`,
       '',
       headers.join(','),
       ...rows.map(r => r.map(c => `"${c}"`).join(',')),

@@ -1009,6 +1009,51 @@ const BankReconciliationPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* ── Reconcile All Confirm (unmatched warning) ── */}
+      <Dialog open={showReconcileConfirm} onOpenChange={setShowReconcileConfirm}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-base">Reconcile with unmatched items?</DialogTitle>
+            <DialogDescription>
+              {unmatchedCount} bank statement {unmatchedCount === 1 ? 'entry' : 'entries'} {unmatchedCount === 1 ? 'is' : 'are'} still unmatched. Finalising now means your closing balance cannot be verified against all transactions. Under AFA 2014, a valid reconciliation must account for every bank statement entry.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowReconcileConfirm(false)}>Go back and match</Button>
+            <Button variant="destructive" onClick={() => { setShowReconcileConfirm(false); handleReconcileAll(); }}>
+              Reconcile anyway
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Manual Reconcile Dialog ── */}
+      <Dialog open={!!manualTarget} onOpenChange={(o) => !o && setManualTarget(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-base">Manual Reconciliation</DialogTitle>
+            <DialogDescription>
+              This entry could not be auto-matched. Provide a reason for manual reconciliation — this will be recorded in your audit trail and visible to your annual auditor.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label className="text-xs">Reason <span className="text-destructive">*</span></Label>
+            <Textarea
+              value={manualReason}
+              onChange={(e) => setManualReason(e.target.value)}
+              placeholder="e.g. Bank fee charged directly — no matching trust transaction required"
+              rows={3}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setManualTarget(null)}>Cancel</Button>
+            <Button onClick={confirmManualReconcile} disabled={!manualReason.trim()}>
+              Confirm Manual
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

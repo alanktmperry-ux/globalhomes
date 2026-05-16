@@ -184,9 +184,16 @@ export default function SuppliersPage() {
     setOpenJobs([]);
   };
 
-  const removeSupplier = async (s: Supplier) => {
-    if (!confirm(`Remove ${s.business_name} from your supplier list? This won't affect jobs already assigned.`)) return;
-    const { error } = await supabase.from('suppliers' as any).update({ status: 'inactive' } as any).eq('id', s.id);
+  const [toRemove, setToRemove] = useState<Supplier | null>(null);
+
+  const removeSupplier = (s: Supplier) => {
+    setToRemove(s);
+  };
+
+  const confirmRemove = async () => {
+    if (!toRemove) return;
+    const { error } = await supabase.from('suppliers' as any).update({ status: 'inactive' } as any).eq('id', toRemove.id);
+    setToRemove(null);
     if (error) { toast.error('Could not remove'); return; }
     toast.success('Supplier removed');
     load();

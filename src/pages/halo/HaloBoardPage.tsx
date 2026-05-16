@@ -365,7 +365,7 @@ export default function HaloBoardPage() {
           {filtered.length === 0 ? (
             <div className="bg-white rounded-3xl border border-[#E5E5E5] py-20 px-8 text-center">
               <div className="flex justify-center">
-                <Ico icon="solar:streets-linear" size={56} color="#E5E7EB" />
+                <MapPin size={56} color="#E5E7EB" />
               </div>
               <h3 className="text-[22px] font-bold text-[#0a0f1e] mt-6">{t('agent.halo.empty.title')}</h3>
               <p className="text-[14px] text-[#6a6a6a] max-w-[480px] mx-auto leading-[1.55] mt-3">

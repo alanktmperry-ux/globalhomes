@@ -456,14 +456,24 @@ const BankReconciliationPage = () => {
     }
   };
 
-  const handleManualReconcile = async (item: Reconciliation) => {
+  const handleManualReconcile = (item: Reconciliation) => {
+    setManualTarget(item);
+    setManualReason('');
+  };
+
+  const confirmManualReconcile = async () => {
+    if (!manualTarget) return;
     try {
       const { error } = await supabase
         .from('trust_reconciliations')
-        .update({ status: 'manual' } as any)
-        .eq('id', item.id);
+        .update({ status: 'manual', description: manualTarget.description
+          ? `${manualTarget.description} [Manual: ${manualReason}]`
+          : `Manual reconciliation: ${manualReason}` } as any)
+        .eq('id', manualTarget.id);
       if (error) throw error;
-      toast.success('Marked as manually reconciled');
+      toast.success('Marked as manually reconciled — reason recorded in audit trail');
+      setManualTarget(null);
+      setManualReason('');
       await fetchData();
     } catch (e: unknown) {
       toast.error(getErrorMessage(e));

@@ -237,6 +237,8 @@ interface Props {
   editPropertyId?: string | null;
   /** When provided, the form loads this property's data but creates a new listing */
   duplicatePropertyId?: string | null;
+  /** When true, the listing is currently live — show confirm dialog before saving */
+  isPublishedListing?: boolean;
 }
 
 const formatPriceForDB = (draft: ListingDraft): string => {

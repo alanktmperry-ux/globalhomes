@@ -329,8 +329,6 @@ const BuyerConciergePage = () => {
     return <div className="p-6"><Card><CardContent className="p-6 text-sm text-destructive">{error}</CardContent></Card></div>;
   }
 
-  const visibleMatches = matchLimit !== null ? matches.slice(0, matchLimit) : matches;
-  const hiddenMatches = matches.length - visibleMatches.length;
 
   return (
     <div className="space-y-8 max-w-7xl">

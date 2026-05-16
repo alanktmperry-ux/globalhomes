@@ -334,6 +334,11 @@ const AgentDashboardSidebar = () => {
     if (path === '/dashboard/rent-roll') {
       return location.pathname === '/dashboard/rent-roll' && !new URLSearchParams(location.search).get('filter');
     }
+    // /dashboard/listings should only be active on the exact list page,
+    // not on /new or /:id sub-routes
+    if (path === '/dashboard/listings') {
+      return location.pathname === '/dashboard/listings';
+    }
     return location.pathname.startsWith(path);
   };
 

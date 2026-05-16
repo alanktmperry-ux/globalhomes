@@ -109,6 +109,16 @@ export default function MarketingLandingPage() {
             <motion.p variants={fadeUp} custom={2} className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
               4 AI builds that replace hours of manual work. Find sellers, match buyers, generate offers, and purchase qualified leads — all in one platform.
             </motion.p>
+            {agentCount !== null && agentCount > 0 && (
+              <motion.div variants={fadeUp} custom={2.5} className="flex items-center justify-center gap-2 mb-6">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 border border-success/20">
+                  <CheckCircle2 size={14} className="text-success" />
+                  <span className="text-sm font-medium text-success">
+                    Trusted by {agentCount} licensed Australian agent{agentCount !== 1 ? 's' : ''}
+                  </span>
+                </div>
+              </motion.div>
+            )}
             <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" onClick={() => navigate('/agents/demo')} className="text-base px-10 py-6 rounded-xl font-bold shadow-lg hover:scale-[1.02] transition-transform">
                 Start Free Demo <ArrowRight size={18} className="ml-1" />

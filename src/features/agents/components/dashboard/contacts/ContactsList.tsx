@@ -89,6 +89,7 @@ interface Props {
   onSortChange: (s: ContactSort) => void;
   onSelect: (c: Contact) => void;
   onDelete: (id: string) => void;
+  onReassign?: (contact: Contact) => void;
   hasMore?: boolean;
   onLoadMore?: () => void;
   onAdd?: () => void;
@@ -96,7 +97,7 @@ interface Props {
 
 const ContactsList = ({
   contacts, loading, filters, sort, columns,
-  onFiltersChange, onSortChange, onSelect, onDelete,
+  onFiltersChange, onSortChange, onSelect, onDelete, onReassign,
   hasMore, onLoadMore, onAdd,
 }: Props) => {
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);

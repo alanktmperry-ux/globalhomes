@@ -210,6 +210,10 @@ const RentIncreasePage = () => {
 
   const submitSchedule = async () => {
     if (!scheduleFor || !effectiveDate || !newRent) return;
+    if (Number(newRent) <= Number(scheduleFor.rent_amount || 0)) {
+      toast.error('New rent must be higher than the current rent');
+      return;
+    }
     setSaving(true);
     const { error } = await supabase.from('rent_increases' as any).insert({
       tenancy_id: scheduleFor.id,

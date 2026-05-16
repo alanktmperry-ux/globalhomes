@@ -293,7 +293,7 @@ export default function InboxPage() {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              <div className="flex-1 overflow-y-auto p-4 space-y-3" role="log" aria-live="polite" aria-label="Conversation messages">
                 {hasMore && (
                   <div className="flex justify-center">
                     <Button variant="ghost" size="sm" onClick={loadMore} disabled={messagesLoading}>

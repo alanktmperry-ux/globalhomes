@@ -37,7 +37,16 @@ export function PipelineKPIBar({ onUrgencyClick }: Props) {
   const counts: Record<UrgencyTier, number> = { hot: 0, warm: 0, cool: 0, cold: 0 };
   for (const l of active) counts[(l as any).urgency as UrgencyTier]++;
 
+  const pipelineValue = active.reduce((sum, l) => sum + ((l as any).budget_max ?? 0), 0);
+  const leadsWithValue = active.filter(l => ((l as any).budget_max ?? 0) > 0).length;
+  const formatValue = (v: number) => {
+    if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`;
+    if (v >= 1_000) return `$${Math.round(v / 1_000)}k`;
+    return `$${v}`;
+  };
+
   return (
+    <>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {URGENCY_TIERS.map(tier => {
         const cfg = TILE_CONFIG[tier];
@@ -70,5 +79,15 @@ export function PipelineKPIBar({ onUrgencyClick }: Props) {
         );
       })}
     </div>
+    {pipelineValue > 0 && (
+      <div className="mt-3 px-5 py-3 bg-white border border-[#E5E5E5] rounded-2xl flex items-center justify-between">
+        <span className="text-[12px] text-[#6a6a6a] uppercase font-semibold tracking-widest">Pipeline Value</span>
+        <div>
+          <span className="text-[20px] font-extrabold text-[#0a0f1e] tabular-nums">{formatValue(pipelineValue)}</span>
+          <span className="text-[11px] text-[#6a6a6a] ml-2">across {leadsWithValue} lead{leadsWithValue !== 1 ? 's' : ''} with budget</span>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

@@ -107,6 +107,16 @@ export default function PendingApprovalPage() {
                   </li>
                 </ul>
               </div>
+              <p className="text-sm text-muted-foreground mb-6">
+                Haven't heard back in 2 business days?{' '}
+                <a
+                  href="mailto:hello@listhq.com.au?subject=Agent approval enquiry"
+                  className="underline hover:text-foreground transition-colors"
+                >
+                  Email us
+                </a>
+                .
+              </p>
             </>
           )}
 

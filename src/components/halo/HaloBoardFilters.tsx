@@ -1,3 +1,4 @@
+import { MapPin } from 'lucide-react';
 import { PROPERTY_TYPE_OPTIONS } from '@/types/halo';
 
 export type IntentFilter = 'all' | 'buy' | 'rent';
@@ -34,9 +35,7 @@ interface Props {
   resultCount: number;
 }
 
-const Ico = ({ icon, size = 16, color }: { icon: string; size?: number; color?: string }) =>
-  // @ts-expect-error iconify web component
-  <iconify-icon icon={icon} width={size} height={size} style={{ color, display: 'inline-block' }} />;
+
 
 export function HaloBoardFilters({ value, onChange }: Props) {
   const intents: { v: IntentFilter; label: string }[] = [
@@ -94,7 +93,7 @@ export function HaloBoardFilters({ value, onChange }: Props) {
       {/* Suburb search */}
       <div className="relative">
         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]">
-          <Ico icon="solar:map-point-linear" size={16} />
+          <MapPin size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
         </span>
         <input
           value={value.suburb}

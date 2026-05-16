@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, ChevronDown, ChevronUp, X, Flame, Snowflake, Clock, Mail, CalendarClock, Loader2, PartyPopper, Send } from 'lucide-react';
+import { Sparkles, ChevronDown, ChevronUp, X, Flame, Snowflake, Clock, Mail, CalendarClock, Loader2, PartyPopper, Send, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -119,7 +119,7 @@ export default function TodayPrioritiesPanel() {
           ) : items.length === 0 ? (
             <EmptyState
               variant="compact"
-              icon="solar:bell-linear"
+              icon={Bell}
               title="You're all caught up"
               body="We'll let you know when something needs your attention."
             />

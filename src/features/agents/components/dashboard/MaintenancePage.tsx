@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Wrench, Loader2, Copy, ChevronDown, ChevronUp, CheckCircle2, Upload, Receipt, ExternalLink } from 'lucide-react';
+import { Wrench, Loader2, Copy, ChevronDown, ChevronUp, CheckCircle2, Upload, Receipt, ExternalLink, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, parseISO, differenceInDays } from 'date-fns';
 import DashboardHeader from './DashboardHeader';
@@ -76,7 +76,7 @@ const PRIORITY_TONE: Record<string, APlusBadgeTone> = {
   cosmetic: 'grey',
 };
 const priorityBadge = (p: string) => (
-  <APlusBadge tone={PRIORITY_TONE[p] || 'amber'} label={p} icon={p === 'urgent' ? 'solar:danger-triangle-linear' : undefined} />
+  <APlusBadge tone={PRIORITY_TONE[p] || 'amber'} label={p} icon={p === 'urgent' ? AlertTriangle : undefined} />
 );
 
 export default function MaintenancePage() {

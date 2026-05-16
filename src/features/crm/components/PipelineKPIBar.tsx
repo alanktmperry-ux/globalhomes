@@ -1,27 +1,23 @@
 import { useCRMLeads } from '../hooks/useCRMLeads';
 import { URGENCY_TIERS, type UrgencyTier } from '../lib/urgency';
+import { type LucideIcon, Flame, Snowflake } from 'lucide-react';
 
 interface Props {
   /** Called when a heat tile is clicked (switches to filtered list view). */
   onUrgencyClick?: (tier: UrgencyTier) => void;
 }
 
-const Ico = ({ icon, size = 18, color }: { icon: string; size?: number; color?: string }) => (
-  // @ts-expect-error iconify-icon is a web component
-  <iconify-icon icon={icon} style={{ fontSize: `${size}px`, color, display: 'inline-flex', lineHeight: 1 }} />
-);
-
 const TILE_CONFIG: Record<UrgencyTier, {
   label: string;
-  icon: string;
+  icon: LucideIcon;
   iconColor: string;
   labelColor: string;
   sub: string;
 }> = {
-  hot:  { label: 'HOT',  icon: 'solar:flame-bold',                iconColor: '#DC2626', labelColor: '#DC2626', sub: 'ready to act' },
-  warm: { label: 'WARM', icon: 'solar:fire-minimalistic-bold',    iconColor: '#F59E0B', labelColor: '#D97706', sub: 'warming up' },
-  cool: { label: 'COOL', icon: 'solar:snowflake-linear',          iconColor: '#0EA5E9', labelColor: '#0EA5E9', sub: 'in early discovery' },
-  cold: { label: 'COLD', icon: 'solar:snowflake-linear',          iconColor: '#6B7280', labelColor: '#374151', sub: 'gone quiet' },
+  hot:  { label: 'HOT',  icon: Flame,     iconColor: '#DC2626', labelColor: '#DC2626', sub: 'ready to act' },
+  warm: { label: 'WARM', icon: Flame,     iconColor: '#F59E0B', labelColor: '#D97706', sub: 'warming up' },
+  cool: { label: 'COOL', icon: Snowflake, iconColor: '#0EA5E9', labelColor: '#0EA5E9', sub: 'in early discovery' },
+  cold: { label: 'COLD', icon: Snowflake, iconColor: '#6B7280', labelColor: '#374151', sub: 'gone quiet' },
 };
 
 export function PipelineKPIBar({ onUrgencyClick }: Props) {
@@ -47,6 +43,7 @@ export function PipelineKPIBar({ onUrgencyClick }: Props) {
         const cfg = TILE_CONFIG[tier];
         const count = counts[tier];
         const interactive = !!onUrgencyClick;
+        const I = cfg.icon;
         return (
           <button
             key={tier}
@@ -59,7 +56,7 @@ export function PipelineKPIBar({ onUrgencyClick }: Props) {
             }
           >
             <div className="flex items-center gap-2">
-              <Ico icon={cfg.icon} size={18} color={cfg.iconColor} />
+              <I size={18} color={cfg.iconColor} style={{ display: 'inline-flex', flexShrink: 0 }} />
               <span
                 className="text-[11px] uppercase font-bold"
                 style={{ letterSpacing: '0.12em', color: cfg.labelColor }}

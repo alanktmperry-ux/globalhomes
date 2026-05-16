@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, ReactNode } from 'react';
-import { X, ChevronLeft, ChevronRight, ImageOff } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, ImageOff, Images } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -127,8 +127,7 @@ export function ListingImageGallery({ images, address, overlay }: Props) {
             onClick={() => openLightbox(0)}
             className="hidden md:inline-flex absolute bottom-5 right-5 bg-white text-[#0a0f1e] px-4 py-2.5 rounded-full text-[13px] font-bold shadow-md items-center gap-2 hover:scale-[1.02] transition-transform"
           >
-            {/* @ts-expect-error iconify-icon is a web component */}
-            <iconify-icon icon="solar:gallery-linear" style={{ fontSize: '16px' }} />
+            <Images size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
             View all {totalCount} photos
           </button>
         )}

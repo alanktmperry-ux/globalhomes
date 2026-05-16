@@ -142,10 +142,10 @@ export default function ComplianceTab() {
   const dueSoonCount = counts.due_soon + counts.missing;
 
   const statCards = [
-    { key: 'compliant', label: 'COMPLIANT', value: counts.compliant, sub: `of ${enriched.length} agents`, icon: 'solar:shield-check-bold', iconColor: '#065F46', iconBg: '#ECFDF5', highlight: false },
-    { key: 'due_soon', label: 'DUE SOON', value: dueSoonCount, sub: 'expiring in next 60 days', icon: 'solar:clock-circle-bold', iconColor: '#D97706', iconBg: '#FFFBEB', highlight: dueSoonCount > 0, highlightColor: '#D97706' },
-    { key: 'overdue', label: 'OVERDUE', value: overdueCount, sub: 'past renewal — action required', icon: 'solar:danger-triangle-bold', iconColor: '#DC2626', iconBg: '#FEF2F2', highlight: overdueCount > 0, highlightColor: '#DC2626' },
-    { key: 'agents', label: 'ACTIVE AGENTS', value: enriched.length, sub: 'tracked across the agency', icon: 'solar:users-group-rounded-bold', iconColor: '#2563EB', iconBg: '#EFF6FF', highlight: false },
+    { key: 'compliant', label: 'COMPLIANT', value: counts.compliant, sub: `of ${enriched.length} agents`, icon: ShieldCheck, iconColor: '#065F46', iconBg: '#ECFDF5', highlight: false },
+    { key: 'due_soon', label: 'DUE SOON', value: dueSoonCount, sub: 'expiring in next 60 days', icon: Clock, iconColor: '#D97706', iconBg: '#FFFBEB', highlight: dueSoonCount > 0, highlightColor: '#D97706' },
+    { key: 'overdue', label: 'OVERDUE', value: overdueCount, sub: 'past renewal — action required', icon: AlertTriangle, iconColor: '#DC2626', iconBg: '#FEF2F2', highlight: overdueCount > 0, highlightColor: '#DC2626' },
+    { key: 'agents', label: 'ACTIVE AGENTS', value: enriched.length, sub: 'tracked across the agency', icon: Users, iconColor: '#2563EB', iconBg: '#EFF6FF', highlight: false },
   ] as const;
 
   const filterChips: { key: 'all' | Urgency; label: string }[] = [
@@ -159,12 +159,12 @@ export default function ComplianceTab() {
   const urgencyPill = (u: Urgency, issues: string[]) => {
     if (u === 'compliant') return (
       <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.10em] bg-[#ECFDF5] text-[#065F46]">
-        <Ico icon="solar:check-circle-bold" size={11} color="#065F46" /> Compliant
+        <CheckCircle2 size={11} style={{ display: 'inline-flex', flexShrink: 0 }} /> Compliant
       </span>
     );
     if (u === 'overdue') return (
       <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.10em] bg-[#FEF2F2] text-[#991B1B]">
-        <Ico icon="solar:danger-triangle-bold" size={11} color="#991B1B" /> Overdue
+        <AlertTriangle size={11} style={{ display: 'inline-flex', flexShrink: 0 }} /> Overdue
       </span>
     );
     if (u === 'missing') return (
@@ -189,13 +189,13 @@ export default function ComplianceTab() {
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <button onClick={exportCsv} className="inline-flex items-center gap-2 bg-white border border-[#E5E5E5] rounded-full px-4 py-2.5 text-[13px] font-bold text-[#0a0f1e] hover:border-[#0a0f1e] transition">
-            <Ico icon="solar:download-linear" size={16} color="#0a0f1e" /> Export report
+            <Download size={16} style={{ display: 'inline-flex', flexShrink: 0 }} /> Export report
           </button>
           <button className="inline-flex items-center gap-2 bg-white border border-[#E5E5E5] rounded-full px-4 py-2.5 text-[13px] font-bold text-[#0a0f1e] hover:border-[#0a0f1e] transition" onClick={() => agents[0] && openEdit(agents[0])}>
-            <Ico icon="solar:user-plus-linear" size={16} color="#0a0f1e" /> Add credentials
+            <UserPlus size={16} style={{ display: 'inline-flex', flexShrink: 0 }} /> Add credentials
           </button>
           <button onClick={() => agents.find(a => agentUrgency(a).urgency === 'overdue' || agentUrgency(a).urgency === 'due_soon') && openEdit(agents.find(a => agentUrgency(a).urgency === 'overdue' || agentUrgency(a).urgency === 'due_soon')!)} className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-bold text-white shadow-[0_6px_20px_rgba(37,99,235,0.35)] hover:shadow-[0_8px_28px_rgba(37,99,235,0.45)] transition" style={{ background: 'linear-gradient(135deg,#2563EB 0%,#1D4ED8 100%)' }}>
-            <Ico icon="solar:shield-check-bold" size={16} color="#ffffff" /> Schedule review
+            <ShieldCheck size={16} style={{ display: 'inline-flex', flexShrink: 0 }} /> Schedule review
           </button>
         </div>
       </div>
@@ -218,7 +218,7 @@ export default function ComplianceTab() {
       {overdueCount > 0 && (
         <div className="mb-8 bg-[#FEF2F2] border border-[#DC2626]/25 rounded-3xl p-5 flex items-center gap-5 flex-wrap">
           <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shrink-0">
-            <Ico icon="solar:danger-triangle-bold" size={24} color="#DC2626" />
+            <AlertTriangle size={24} style={{ display: 'inline-flex', flexShrink: 0 }} />
           </div>
           <div className="flex-1 min-w-[200px]">
             <div className="text-[15px] font-extrabold text-[#991B1B]">{overdueCount} compliance {overdueCount === 1 ? 'item is' : 'items are'} overdue</div>
@@ -230,7 +230,7 @@ export default function ComplianceTab() {
       {overdueCount === 0 && dueSoonCount > 0 && (
         <div className="mb-8 bg-[#FFFBEB] border border-[#F59E0B]/25 rounded-3xl p-5 flex items-center gap-5 flex-wrap">
           <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shrink-0">
-            <Ico icon="solar:clock-circle-bold" size={24} color="#D97706" />
+            <Clock size={24} style={{ display: 'inline-flex', flexShrink: 0 }} />
           </div>
           <div className="flex-1 min-w-[200px]">
             <div className="text-[15px] font-extrabold text-[#92400E]">{dueSoonCount} {dueSoonCount === 1 ? 'item' : 'items'} due in the next 60 days</div>
@@ -254,7 +254,7 @@ export default function ComplianceTab() {
         </div>
         <div className="flex-1" />
         <div className="relative flex-1 max-w-[280px] min-w-[180px]">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2"><Ico icon="solar:magnifer-linear" size={16} color="#6a6a6a" /></span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2"><Search size={16} style={{ display: 'inline-flex', flexShrink: 0 }} /></span>
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -267,7 +267,7 @@ export default function ComplianceTab() {
       {/* Items grid */}
       {filtered.length === 0 ? (
         <div className="bg-white rounded-3xl border border-[#E5E5E5] py-20 px-8 text-center">
-          <div className="flex justify-center"><Ico icon="solar:shield-check-linear" size={56} color="#E5E7EB" /></div>
+          <div className="flex justify-center"><ShieldCheck size={56} style={{ display: 'inline-flex', flexShrink: 0 }} /></div>
           <h3 className="text-[22px] font-bold text-[#0a0f1e] mt-6">No compliance records to show</h3>
           <p className="text-[14px] text-[#6a6a6a] max-w-[460px] mx-auto leading-[1.55] mt-3">
             {enriched.length === 0
@@ -282,7 +282,7 @@ export default function ComplianceTab() {
               {/* Top row */}
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <Ico icon="solar:user-id-bold" size={16} color="#6a6a6a" />
+                  <CreditCard size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
                   <span className="text-[11px] uppercase tracking-[0.12em] text-[#6a6a6a] font-bold">Agent licence</span>
                 </div>
                 {urgencyPill(urgency, issues)}
@@ -297,19 +297,19 @@ export default function ComplianceTab() {
               {/* Detail rows */}
               <div className="mt-5 space-y-3 text-[13px]">
                 <div className="flex items-center gap-3">
-                  <Ico icon="solar:calendar-linear" size={16} color="#6a6a6a" />
+                  <Calendar size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
                   <span className="text-[#6a6a6a] flex-1">Licence expiry</span>
                   <span className="font-bold" style={{ color: urgencyDateColor(agent.licence_expiry_date) }}>{fmtDate(agent.licence_expiry_date)}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Ico icon="solar:bell-bold" size={16} color="#6a6a6a" />
+                  <Bell size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
                   <span className="text-[#6a6a6a] flex-1">CPD hours</span>
                   <span className="font-bold" style={{ color: agent.cpd_hours_completed >= agent.cpd_hours_required ? '#065F46' : '#D97706' }}>
                     {agent.cpd_hours_completed}/{agent.cpd_hours_required}h
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Ico icon="solar:shield-user-bold" size={16} color="#6a6a6a" />
+                  <UserCheck size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
                   <span className="text-[#6a6a6a] flex-1">PI insurance</span>
                   <span className="font-bold" style={{ color: urgencyDateColor(agent.professional_indemnity_expiry) }}>{fmtDate(agent.professional_indemnity_expiry)}</span>
                 </div>
@@ -318,7 +318,7 @@ export default function ComplianceTab() {
               {/* Issues pill */}
               {issues.length > 0 && (
                 <div className="mt-4 flex items-center gap-2 px-3 py-2 rounded-2xl bg-[#F9FAFB] border border-[#E5E5E5]">
-                  <Ico icon="solar:info-circle-bold" size={16} color="#6a6a6a" />
+                  <Info size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
                   <span className="text-[12px] font-medium text-[#374151] flex-1 truncate">{issues.join(' · ')}</span>
                 </div>
               )}
@@ -344,7 +344,7 @@ export default function ComplianceTab() {
         <DialogContent className="sm:max-w-[520px] bg-white rounded-3xl border-0 p-7 shadow-[0_30px_90px_rgba(0,0,0,0.15)]">
           <div className="flex flex-col items-center text-center">
             <div className="w-12 h-12 rounded-2xl bg-[#EFF6FF] flex items-center justify-center">
-              <Ico icon="solar:shield-check-bold" size={22} color="#2563EB" />
+              <ShieldCheck size={22} style={{ display: 'inline-flex', flexShrink: 0 }} />
             </div>
             <h3 className="text-[20px] font-extrabold text-[#0a0f1e] mt-4 tracking-[-0.02em]">Edit compliance</h3>
             <p className="text-[13px] text-[#6a6a6a] mt-1">{editAgent?.name}</p>
@@ -378,7 +378,7 @@ export default function ComplianceTab() {
           <div className="flex items-center justify-end gap-2 mt-7">
             <button onClick={() => setEditAgent(null)} className="rounded-full border border-[#E5E5E5] px-5 py-2.5 text-[13px] font-bold text-[#0a0f1e] hover:border-[#0a0f1e] transition">Cancel</button>
             <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-bold text-white shadow-[0_6px_20px_rgba(37,99,235,0.35)] hover:shadow-[0_8px_28px_rgba(37,99,235,0.45)] transition disabled:opacity-60" style={{ background: 'linear-gradient(135deg,#2563EB 0%,#1D4ED8 100%)' }}>
-              {saving ? <Loader2 size={14} className="animate-spin" /> : <Ico icon="solar:check-circle-bold" size={14} color="#ffffff" />}
+              {saving ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} style={{ display: 'inline-flex', flexShrink: 0 }} />}
               Save changes
             </button>
           </div>

@@ -8,23 +8,23 @@ import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 type Feature = { icon: string; title: string; desc: string };
 
 const buyerFeatures: Feature[] = [
-  { icon: 'solar:streets-linear', title: 'Post a Halo', desc: 'Tell agents what you want — they come to you' },
-  { icon: 'solar:microphone-3-linear', title: 'Voice search', desc: 'Speak in any language' },
-  { icon: 'solar:earth-linear', title: 'Listings in your language', desc: 'Every property auto-translated' },
-  { icon: 'solar:dollar-linear', title: 'Prices in your currency', desc: 'Live conversion, 20+ currencies' },
-  { icon: 'solar:shield-check-linear', title: 'Rental bond guarantee', desc: 'No 4-week bond upfront — from $8/week' },
-  { icon: 'solar:case-round-linear', title: 'Multilingual brokers', desc: 'Finance help in your language, free' },
+  { icon: MapPin, title: 'Post a Halo', desc: 'Tell agents what you want — they come to you' },
+  { icon: Mic, title: 'Voice search', desc: 'Speak in any language' },
+  { icon: Globe, title: 'Listings in your language', desc: 'Every property auto-translated' },
+  { icon: DollarSign, title: 'Prices in your currency', desc: 'Live conversion, 20+ currencies' },
+  { icon: ShieldCheck, title: 'Rental bond guarantee', desc: 'No 4-week bond upfront — from $8/week' },
+  { icon: Briefcase, title: 'Multilingual brokers', desc: 'Finance help in your language, free' },
 ];
 
 const agentFeatures: Feature[] = [
-  { icon: 'solar:streets-linear', title: 'Halo Board', desc: 'See buyers before they look at a listing' },
-  { icon: 'solar:magic-stick-3-linear', title: 'AI Buyer Concierge', desc: 'Matched leads arrive automatically' },
-  { icon: 'solar:earth-linear', title: 'multilingual translation', desc: 'Reach 1.2M buyers no other portal reaches' },
-  { icon: 'solar:lock-keyhole-linear', title: 'Pocket listings', desc: 'No public days-on-market counter' },
-  { icon: 'solar:microphone-3-linear', title: 'Voice-qualified leads', desc: 'Transcript with every enquiry' },
-  { icon: 'solar:clock-circle-linear', title: '14-day exclusive window', desc: 'Your listing, before any other portal' },
-  { icon: 'solar:chart-square-linear', title: 'Lead pipeline CRM', desc: 'Enquiries auto-sync into Kanban' },
-  { icon: 'solar:wallet-2-linear', title: 'Built-in trust accounting', desc: 'Migrate from PropertyMe in one step' },
+  { icon: MapPin, title: 'Halo Board', desc: 'See buyers before they look at a listing' },
+  { icon: Wand2, title: 'AI Buyer Concierge', desc: 'Matched leads arrive automatically' },
+  { icon: Globe, title: 'multilingual translation', desc: 'Reach 1.2M buyers no other portal reaches' },
+  { icon: Lock, title: 'Pocket listings', desc: 'No public days-on-market counter' },
+  { icon: Mic, title: 'Voice-qualified leads', desc: 'Transcript with every enquiry' },
+  { icon: Clock, title: '14-day exclusive window', desc: 'Your listing, before any other portal' },
+  { icon: BarChart2, title: 'Lead pipeline CRM', desc: 'Enquiries auto-sync into Kanban' },
+  { icon: Wallet, title: 'Built-in trust accounting', desc: 'Migrate from PropertyMe in one step' },
 ];
 
 // iconify-icon is a globally loaded web component
@@ -93,7 +93,7 @@ const AuthLandingPage = () => {
           className="flex-1 min-h-screen bg-white flex flex-col justify-center px-[7vw] py-24"
         >
           <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-[#EFF6FF] border border-[#2563EB]/20 rounded-full text-[11px] font-bold tracking-[0.06em] uppercase text-[#1E40AF] self-start">
-            <IconifyIcon icon="solar:home-2-linear" size={13} />
+            <Home size={13} style={{ display: 'inline-flex', flexShrink: 0 }} />
             FIND YOUR NEXT HOME
           </div>
 
@@ -124,14 +124,14 @@ const AuthLandingPage = () => {
             className="w-full bg-[#0a0f1e] text-white rounded-full py-4 text-[15px] font-bold cursor-pointer transition-all hover:bg-white hover:text-[#0a0f1e] border border-[#0a0f1e] inline-flex items-center justify-center gap-2.5 max-w-[540px] mt-10"
           >
             Sign in or create account
-            <IconifyIcon icon="solar:arrow-right-linear" size={16} />
+            <ArrowRight size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
           </button>
           <button
             onClick={() => navigate('/')}
             className="w-full bg-white text-[#4a4a4a] rounded-full py-4 text-[15px] font-semibold cursor-pointer transition-all hover:text-[#0a0f1e] max-w-[540px] mt-3 inline-flex items-center justify-center gap-2"
           >
             Browse without signing in
-            <IconifyIcon icon="solar:arrow-right-linear" size={14} />
+            <ArrowRight size={14} style={{ display: 'inline-flex', flexShrink: 0 }} />
           </button>
         </motion.div>
 
@@ -197,16 +197,16 @@ const AuthLandingPage = () => {
               onClick={() => { dismissError(); navigate('/agents/login'); }}
               className="w-full bg-white text-[#0a0f1e] rounded-full py-4 text-[15px] font-bold cursor-pointer transition-all hover:bg-white/95 inline-flex items-center justify-center gap-2.5 max-w-[600px] mt-10"
             >
-              <IconifyIcon icon="solar:lock-keyhole-linear" size={16} color="#0a0f1e" />
+              <Lock size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
               Agent sign in
-              <IconifyIcon icon="solar:arrow-right-linear" size={16} color="#0a0f1e" />
+              <ArrowRight size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
             </button>
             <button
               onClick={() => navigate('/')}
               className="w-full text-center text-[14px] font-semibold text-[#93C5FD] hover:text-white transition-colors cursor-pointer max-w-[600px] mt-4 inline-flex items-center justify-center gap-2 bg-transparent border-0"
             >
               See everything on ListHQ
-              <IconifyIcon icon="solar:arrow-right-linear" size={14} />
+              <ArrowRight size={14} style={{ display: 'inline-flex', flexShrink: 0 }} />
             </button>
           </div>
         </motion.div>

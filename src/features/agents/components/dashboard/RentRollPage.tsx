@@ -728,10 +728,10 @@ const RentRollPage = () => {
 
   // KPI card colour map per metric tone
   const kpiCards = [
-    { key: 'managed', label: 'TOTAL MANAGED', value: String(activeTenancies.length), sub: `${properties.length} rental ${properties.length === 1 ? 'property' : 'properties'}`, icon: 'solar:home-2-bold', iconColor: '#065F46', iconBg: '#ECFDF5' },
-    { key: 'rent', label: 'WEEKLY RENT', value: `$${totalWeeklyRent.toLocaleString('en-AU', { maximumFractionDigits: 0 })}`, sub: 'across active tenancies', icon: 'solar:wallet-2-bold', iconColor: '#2563EB', iconBg: '#EFF6FF' },
-    { key: 'arrears', label: 'IN ARREARS', value: String(overdueCount), sub: arrearsSummary.totalOwed > 0 ? `$${arrearsSummary.totalOwed.toLocaleString('en-AU', { maximumFractionDigits: 0 })} outstanding` : 'no overdue tenants', icon: 'solar:danger-triangle-bold', iconColor: '#DC2626', iconBg: '#FEF2F2', emphasise: overdueCount > 0 },
-    { key: 'mgmt', label: 'MONTHLY MGMT FEES', value: `$${monthlyMgmtFees.toLocaleString('en-AU', { maximumFractionDigits: 0 })}`, sub: 'this month', icon: 'solar:clock-circle-bold', iconColor: '#D97706', iconBg: '#FFFBEB' },
+    { key: 'managed', label: 'TOTAL MANAGED', value: String(activeTenancies.length), sub: `${properties.length} rental ${properties.length === 1 ? 'property' : 'properties'}`, icon: Home, iconColor: '#065F46', iconBg: '#ECFDF5' },
+    { key: 'rent', label: 'WEEKLY RENT', value: `$${totalWeeklyRent.toLocaleString('en-AU', { maximumFractionDigits: 0 })}`, sub: 'across active tenancies', icon: Wallet, iconColor: '#2563EB', iconBg: '#EFF6FF' },
+    { key: 'arrears', label: 'IN ARREARS', value: String(overdueCount), sub: arrearsSummary.totalOwed > 0 ? `$${arrearsSummary.totalOwed.toLocaleString('en-AU', { maximumFractionDigits: 0 })} outstanding` : 'no overdue tenants', icon: AlertTriangle, iconColor: '#DC2626', iconBg: '#FEF2F2', emphasise: overdueCount > 0 },
+    { key: 'mgmt', label: 'MONTHLY MGMT FEES', value: `$${monthlyMgmtFees.toLocaleString('en-AU', { maximumFractionDigits: 0 })}`, sub: 'this month', icon: Clock, iconColor: '#D97706', iconBg: '#FFFBEB' },
   ];
 
   return (
@@ -762,7 +762,7 @@ const RentRollPage = () => {
             onClick={() => navigate('/dashboard/pm-inspections')}
             className="bg-white border border-[#E5E5E5] text-[#0a0f1e] rounded-full px-4 py-2.5 text-[13px] font-semibold inline-flex items-center gap-2 hover:bg-[#F9FAFB] transition"
           >
-            <Ico icon="solar:calendar-add-linear" size={16} color="#0a0f1e" />
+            <CalendarPlus size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
             <span className="hidden sm:inline">Add inspection</span>
           </button>
           <button
@@ -771,7 +771,7 @@ const RentRollPage = () => {
             className="text-white rounded-full px-5 py-2.5 text-[13px] font-extrabold inline-flex items-center gap-2 transition hover:opacity-95"
             style={{ background: 'linear-gradient(135deg,#2563EB,#1D4ED8)' }}
           >
-            <Ico icon="solar:home-add-bold" size={16} color="#fff" />
+            <Home size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
             Add tenancy
           </button>
         </div>
@@ -781,7 +781,7 @@ const RentRollPage = () => {
       {!loading && !noAgent && arrearsSummary.count > 0 && (
         <div className="bg-[#FEF2F2] border border-[#DC2626]/20 rounded-3xl p-5 mb-8 flex items-center gap-5 flex-wrap">
           <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shrink-0">
-            <Ico icon="solar:danger-triangle-bold" size={24} color="#DC2626" />
+            <AlertTriangle size={24} style={{ display: 'inline-flex', flexShrink: 0 }} />
           </div>
           <div className="flex-1 min-w-[200px]">
             <div className="text-[15px] font-extrabold text-[#991B1B]">
@@ -814,7 +814,7 @@ const RentRollPage = () => {
       ) : noAgent ? (
         <div className="bg-white rounded-3xl border border-[#E5E5E5] py-20 px-8 text-center">
           <div className="flex justify-center">
-            <Ico icon="solar:home-bold" size={48} color="#E5E7EB" />
+            <Home size={48} style={{ display: 'inline-flex', flexShrink: 0 }} />
           </div>
           <h3 className="text-[20px] font-bold text-[#0a0f1e] mt-6">Agent profile required</h3>
           <p className="text-[14px] text-[#6a6a6a] max-w-[480px] mx-auto mt-3">Set up your agent profile to manage tenancies and rental income.</p>

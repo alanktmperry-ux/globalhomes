@@ -221,10 +221,11 @@ export async function markThreadRead(threadId: string) {
 }
 
 export async function setThreadStatus(threadId: string, status: InboxStatus, snoozedUntil?: string | null) {
-  await supabase
+  const { error } = await supabase
     .from('inbox_threads' as any)
     .update({ status, snoozed_until: snoozedUntil ?? null })
     .eq('id', threadId);
+  if (error) throw error;
 }
 
 export async function assignThread(threadId: string, agentId: string | null) {

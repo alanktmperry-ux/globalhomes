@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import { Helmet } from 'react-helmet-async';
 import { Loader2, Mail, MessageSquare, Search, Send, Clock, X, CheckCircle2, Inbox as InboxIcon, MailOpen } from 'lucide-react';
@@ -89,6 +90,12 @@ export default function InboxPage() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length, activeId]);
 
+  // Reset compose state when active thread changes
+  useEffect(() => {
+    setComposeChannel('email');
+    setDraft('');
+  }, [activeId]);
+
   const handleSend = async () => {
     if (!draft.trim() || !activeThread || !agentId) return;
     setSending(true);
@@ -113,19 +120,31 @@ export default function InboxPage() {
   const handleSnooze = async (hours: number) => {
     if (!activeThread) return;
     const until = new Date(Date.now() + hours * 3600_000).toISOString();
-    await setThreadStatus(activeThread.id, 'snoozed', until);
-    toast.success(`Snoozed for ${hours}h`);
+    try {
+      await setThreadStatus(activeThread.id, 'snoozed', until);
+      toast.success(`Snoozed for ${hours}h`);
+    } catch {
+      toast.error('Failed to snooze');
+    }
   };
   const handleClose = async () => {
     if (!activeThread) return;
-    await setThreadStatus(activeThread.id, 'closed', null);
-    toast.success('Marked as closed');
-    setActiveId(null);
+    try {
+      await setThreadStatus(activeThread.id, 'closed', null);
+      toast.success('Marked as closed');
+      setActiveId(null);
+    } catch {
+      toast.error('Failed to close thread');
+    }
   };
   const handleReopen = async () => {
     if (!activeThread) return;
-    await setThreadStatus(activeThread.id, 'open', null);
-    toast.success('Reopened');
+    try {
+      await setThreadStatus(activeThread.id, 'open', null);
+      toast.success('Reopened');
+    } catch {
+      toast.error('Failed to reopen thread');
+    }
   };
 
   const pickerContact: TemplatePickerContact | null = activeThread?.contact
@@ -186,6 +205,7 @@ export default function InboxPage() {
                 <button
                   key={t.id}
                   onClick={() => setActiveId(t.id)}
+                  aria-current={activeId === t.id ? 'true' : undefined}
                   className={`w-full text-left p-3 border-b border-border hover:bg-muted/50 transition-colors ${activeId === t.id ? 'bg-muted' : ''}`}
                 >
                   <div className="flex items-start gap-2.5">
@@ -198,7 +218,7 @@ export default function InboxPage() {
                         <span className={`text-sm truncate ${t.is_unread ? 'font-semibold text-foreground' : 'font-medium text-foreground/90'}`}>
                           {contactName(t)}
                         </span>
-                        {t.is_unread && <span className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />}
+                        {t.is_unread && <span aria-label="Unread" className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />}
                         <span className="ml-auto text-[10px] text-muted-foreground flex-shrink-0">
                           {formatDistanceToNow(new Date(t.last_message_at), { addSuffix: false })}
                         </span>
@@ -234,7 +254,7 @@ export default function InboxPage() {
                   </p>
                 </div>
                 <Button asChild>
-                  <a href="/dashboard/listings">View your listings →</a>
+                  <Link to="/dashboard/listings">View your listings →</Link>
                 </Button>
               </div>
             ) : (
@@ -273,7 +293,7 @@ export default function InboxPage() {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              <div className="flex-1 overflow-y-auto p-4 space-y-3" role="log" aria-live="polite" aria-label="Conversation messages">
                 {hasMore && (
                   <div className="flex justify-center">
                     <Button variant="ghost" size="sm" onClick={loadMore} disabled={messagesLoading}>
@@ -296,7 +316,7 @@ export default function InboxPage() {
                           <span>{formatDistanceToNow(new Date(m.sent_at), { addSuffix: true })}</span>
                         </div>
                         {m.body_html ? (
-                          <div className="text-sm prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(m.body_html, { ALLOWED_TAGS: ['p','br','strong','em','ul','ol','li','a'], ALLOWED_ATTR: ['href','target','rel'] }) }} />
+                          <div className="text-sm [&_a]:underline [&_a]:text-primary-foreground [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4 [&_p]:mb-1 last:[&_p]:mb-0" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(m.body_html, { ALLOWED_TAGS: ['p','br','strong','em','ul','ol','li','a'], ALLOWED_ATTR: ['href','target','rel'] }) }} />
                         ) : (
                           <div className="text-sm whitespace-pre-wrap break-words">{m.body}</div>
                         )}
@@ -322,13 +342,14 @@ export default function InboxPage() {
                     </Button>
                   )}
                   {composeChannel === 'email' && !activeThread.contact?.email && (
-                    <span className="text-[11px] text-warning ml-auto">No email on file</span>
+                    <span className="text-[11px] text-amber-500 ml-auto">No email on file</span>
                   )}
                 </div>
                 <Textarea
                   value={draft}
                   onChange={e => setDraft(e.target.value)}
                   placeholder={composeChannel === 'email' ? 'Write your email…' : 'Write a message…'}
+                  aria-label={composeChannel === 'email' ? 'Write your email' : 'Write a message'}
                   className="min-h-20 text-sm"
                   onKeyDown={e => {
                     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); handleSend(); }

@@ -79,5 +79,15 @@ export function PipelineKPIBar({ onUrgencyClick }: Props) {
         );
       })}
     </div>
+    {pipelineValue > 0 && (
+      <div className="mt-3 px-5 py-3 bg-white border border-[#E5E5E5] rounded-2xl flex items-center justify-between">
+        <span className="text-[12px] text-[#6a6a6a] uppercase font-semibold tracking-widest">Pipeline Value</span>
+        <div>
+          <span className="text-[20px] font-extrabold text-[#0a0f1e] tabular-nums">{formatValue(pipelineValue)}</span>
+          <span className="text-[11px] text-[#6a6a6a] ml-2">across {leadsWithValue} lead{leadsWithValue !== 1 ? 's' : ''} with budget</span>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

@@ -262,6 +262,34 @@ export default function OwnerStatementsPage() {
     toast.success(alsoEmail ? 'Statement saved & emailed to owner' : 'Statement saved');
   };
 
+  const handleSave = async (alsoEmail: boolean) => {
+    if (!form.property_id) { toast.error('Select a property'); return; }
+    if (!agentId) return;
+    const { data: existing } = await supabase
+      .from('owner_statements' as any)
+      .select('id')
+      .eq('property_id', form.property_id)
+      .eq('period_start', form.period_start)
+      .eq('period_end', form.period_end)
+      .limit(1);
+    if (existing && (existing as any[]).length > 0) {
+      setPendingAlsoEmail(alsoEmail);
+      setShowDuplicateWarn(true);
+      return;
+    }
+    proceedSave(alsoEmail);
+  };
+
+  const handleEmailSave = () => {
+    const prop = properties.find(p => p.id === form.property_id);
+    if (!prop?.owner_email) {
+      toast.warning('No owner email on file — statement will be saved only');
+      handleSave(false);
+      return;
+    }
+    setShowEmailConfirm(true);
+  };
+
   return (
     <div className="space-y-4">
       <nav className="text-sm text-muted-foreground mb-2">

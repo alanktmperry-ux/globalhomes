@@ -9,9 +9,10 @@ interface Props {
   priceAud: number;
   onBuy: () => void;
   loading?: boolean;
+  disabled?: boolean;
 }
 
-export function CreditPackageCard({ name, credits, priceAud, onBuy, loading }: Props) {
+export function CreditPackageCard({ name, credits, priceAud, onBuy, loading, disabled }: Props) {
   const { t } = useTranslation();
   const perCredit = priceAud / credits;
   return (
@@ -29,10 +30,12 @@ export function CreditPackageCard({ name, credits, priceAud, onBuy, loading }: P
         </div>
         <Button
           onClick={onBuy}
-          disabled={loading}
+          disabled={disabled || loading}
+          aria-busy={loading}
+          variant="default"
           className="mt-auto"
         >
-          {loading && <Loader2 size={16} className="animate-spin" />}
+          {loading && <Loader2 size={16} className="animate-spin" aria-hidden="true" />}
           {t('agent.halo.credits.buy')}
         </Button>
       </CardContent>

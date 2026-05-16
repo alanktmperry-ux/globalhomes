@@ -22,7 +22,7 @@ export default function BuyCreditsPage() {
   const [params, setParams] = useSearchParams();
   const success = params.get('success') === 'true';
   const cancelled = params.get('cancelled') === 'true';
-  const { balance } = useHaloCreditsBalance();
+  const { balance, loading: balanceLoading } = useHaloCreditsBalance();
 
   const [packages, setPackages] = useState<CreditPackage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +30,7 @@ export default function BuyCreditsPage() {
 
   useEffect(() => {
     if (success || cancelled) {
-      setParams({}, { replace: true });
+      window.history.replaceState({}, '', window.location.pathname);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -84,19 +84,19 @@ export default function BuyCreditsPage() {
           {t('halo.credits.subtitle')}
         </p>
         <p className="text-sm font-medium mt-2">
-          Current balance: {balance} {balance === 1 ? 'credit' : 'credits'}
+          {t('halo.credits.currentBalance') || 'Current balance'}: {balanceLoading ? '…' : balance}
         </p>
       </div>
 
       {success && (
-        <Alert className="border-green-500 bg-green-50">
+        <Alert role="alert" className="border-green-500 bg-green-50">
           <AlertDescription className="text-green-800">
             {t('halo.credits.success')}
           </AlertDescription>
         </Alert>
       )}
       {cancelled && (
-        <Alert className="border-amber-500 bg-amber-50">
+        <Alert role="alert" className="border-amber-500 bg-amber-50">
           <AlertDescription className="text-amber-800">
             {t('halo.credits.cancelled')}
           </AlertDescription>
@@ -120,6 +120,7 @@ export default function BuyCreditsPage() {
               credits={p.credits}
               priceAud={p.price_aud}
               loading={buyingId === p.id}
+              disabled={buyingId !== null && buyingId !== p.id}
               onBuy={() => handleBuy(p)}
             />
           ))}

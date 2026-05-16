@@ -54,6 +54,7 @@ const STATUS_MAP: Record<string, { variant: 'default' | 'secondary' | 'outline' 
 
 const TrustAccountingPage = () => {
   const { t } = useTranslation();
+  usePageTitle('Trust Accounting');
   const { user } = useAuth();
   const { canAccessTrust, loading: subLoading } = useSubscription();
   const {

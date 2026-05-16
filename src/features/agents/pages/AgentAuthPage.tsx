@@ -414,17 +414,6 @@ const AgentAuthPage = () => {
               })()}
             </div>
 
-            <label className="flex items-start gap-2.5 mb-3 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={dataLocationConsent}
-                onChange={(e) => setDataLocationConsent(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded shrink-0 cursor-pointer accent-white"
-              />
-              <span className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.70)' }}>
-                I understand that my data is stored on secure servers compliant with the Australian Privacy Act 1988.
-              </span>
-            </label>
             <label className="flex items-start gap-2.5 mb-5 cursor-pointer select-none">
               <input
                 type="checkbox"
@@ -437,6 +426,7 @@ const AgentAuthPage = () => {
                 <Link to="/privacy" target="_blank" rel="noopener noreferrer" className="text-white underline underline-offset-2">Privacy Policy</Link>
                 {' '}and{' '}
                 <Link to="/terms" target="_blank" rel="noopener noreferrer" className="text-white underline underline-offset-2">Terms of Service</Link>.
+                {' '}My data is stored securely in Australia under the Privacy Act 1988.
               </span>
             </label>
 
@@ -444,7 +434,7 @@ const AgentAuthPage = () => {
 
             <button
               type="submit"
-              disabled={emailSubmitting || !(dataLocationConsent && policyConsent)}
+              disabled={emailSubmitting || !policyConsent}
               className={s.primaryBtn}
             >
               {emailSubmitting

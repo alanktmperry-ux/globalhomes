@@ -974,6 +974,11 @@ const TrustAccountingPage = () => {
               <DialogDescription>
                 This will lock all {periodLabel} transactions. You will not be able to edit or add transactions for this period after closing. The {nextMonthLabel} opening balance will be set to <strong>{AUD.format(periodBalance)}</strong>. Proceed?
               </DialogDescription>
+              {unmatchedCount > 0 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-3 text-sm text-amber-900">
+                  <strong>{unmatchedCount} unmatched reconciliation item{unmatchedCount > 1 ? 's' : ''} outstanding.</strong> Closing the period before reconciling means your closing balance cannot be verified against the bank statement. Complete reconciliation first or proceed with caution.
+                </div>
+              )}
             </DialogHeader>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowCloseConfirm(false)} disabled={closingPeriod}>Discard</Button>

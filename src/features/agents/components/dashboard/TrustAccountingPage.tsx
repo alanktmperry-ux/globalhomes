@@ -570,7 +570,6 @@ const TrustAccountingPage = () => {
 
   // ── Transaction Form Fields (shared between new & edit) ──
   function renderTxFormFields() {
-  usePageTitle('Trust Accounting');
     return (
       <div className="space-y-3">
         {!showEditTx && (

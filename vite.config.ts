@@ -7,12 +7,14 @@ import { visualizer } from "rollup-plugin-visualizer";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = { ...process.env, ...loadEnv(mode, process.cwd(), "") };
-  const SUPABASE_URL = env.VITE_SUPABASE_URL;
-  const SUPABASE_PUBLISHABLE_KEY = env.VITE_SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_ANON_KEY;
+  const FALLBACK_SUPABASE_URL = "https://ngrkbohpmkzjonaofgbb.supabase.co";
+  const FALLBACK_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_BPW9omcmNwRZnH6blNp9Sw_lk7f4F_D";
+  const SUPABASE_URL = env.VITE_SUPABASE_URL ?? FALLBACK_SUPABASE_URL;
+  const SUPABASE_PUBLISHABLE_KEY = env.VITE_SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_ANON_KEY ?? FALLBACK_SUPABASE_PUBLISHABLE_KEY;
   const SUPABASE_PROJECT_ID = env.VITE_SUPABASE_PROJECT_ID;
 
-  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-    console.warn('[Config] Supabase env vars missing at build time — the app will rely on runtime-injected values.');
+  if (!env.VITE_SUPABASE_URL || !(env.VITE_SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_ANON_KEY)) {
+    console.warn('[Config] Supabase env vars missing at build time — using the Lovable Cloud fallback values.');
   }
   return ({
   define: {

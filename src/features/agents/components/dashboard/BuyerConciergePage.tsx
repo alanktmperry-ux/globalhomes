@@ -631,7 +631,7 @@ const BuyerConciergePage = () => {
                   <p className="text-muted-foreground italic mt-2">"{contactMatch.match_reasoning}"</p>
                 )}
               </div>
-              <Textarea defaultValue={contactMessage} rows={6} className="text-sm" />
+              <Textarea value={contactDraft} onChange={(e) => setContactDraft(e.target.value)} rows={6} className="text-sm" />
               <DialogFooter>
                 <Button variant="outline" onClick={() => setContactMatch(null)}>Discard</Button>
                 <Button onClick={async () => {

@@ -272,6 +272,29 @@ const LeadMarketplacePage = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!confirmLead} onOpenChange={(open) => { if (!open) setConfirmLead(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Purchase this lead for $29?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This charge is non-refundable. You will receive the buyer's name, email address, and full contact details immediately after purchase.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setConfirmLead(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                const lead = confirmLead;
+                setConfirmLead(null);
+                if (lead) handlePurchase(lead);
+              }}
+            >
+              Confirm Purchase — $29
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

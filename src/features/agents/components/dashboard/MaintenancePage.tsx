@@ -227,7 +227,6 @@ export default function MaintenancePage() {
       property_id: newJobPropertyId,
       tenancy_id: newJobTenancyId || null,
       agent_id: agentId,
-      agency_id: prop?.agency_id || null,
       title,
       description: newJobDescription.trim(),
       priority: newJobPriority,

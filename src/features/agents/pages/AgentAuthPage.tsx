@@ -37,7 +37,6 @@ const AgentAuthPage = () => {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [pendingSignIn, setPendingSignIn] = useState(false);
   const [pendingSignup, setPendingSignup] = useState(false);
-  const [dataLocationConsent, setDataLocationConsent] = useState(false);
   const [policyConsent, setPolicyConsent] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
@@ -125,7 +124,6 @@ const AgentAuthPage = () => {
     if (!trimmed) { setEmailError('Email address is required'); return; }
     if (!emailRe.test(trimmed)) { setEmailError('Enter a valid email (e.g. name@agency.com.au)'); return; }
     if (password.length < 10) { setFormError('Password must be at least 10 characters.'); return; }
-    if (!dataLocationConsent) { setFormError('Please acknowledge where your data is stored to continue.'); return; }
     if (!policyConsent) { setFormError('Please agree to the Privacy Policy and Terms of Service to continue.'); return; }
     const cleaned = trimmed.toLowerCase();
     if (isDisposableEmail(cleaned)) {
@@ -189,7 +187,7 @@ const AgentAuthPage = () => {
   };
 
   const handleOAuth = async (provider: 'google' | 'apple') => {
-    if (step === 'register' && !(dataLocationConsent && policyConsent)) {
+    if (step === 'register' && !policyConsent) {
       setPendingOAuthProvider(provider);
       setShowOAuthConsentModal(true);
       return;
@@ -217,7 +215,7 @@ const AgentAuthPage = () => {
     return (
       <AuthShell
         heading="Check your email"
-        subheading={<>We sent a confirmation link to <span className="text-white font-medium">{regEmail}</span>. Click the link to activate your account.</>}
+        subheading={<>We sent a verification link to <span className="text-white font-medium">{regEmail}</span>. Click the link in the email to activate your account — check your spam folder if you don't see it.</>}
       >
         <div className="flex justify-center mb-4">
           <div
@@ -416,17 +414,6 @@ const AgentAuthPage = () => {
               })()}
             </div>
 
-            <label className="flex items-start gap-2.5 mb-3 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={dataLocationConsent}
-                onChange={(e) => setDataLocationConsent(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded shrink-0 cursor-pointer accent-white"
-              />
-              <span className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.70)' }}>
-                I understand that my data is stored on secure servers compliant with the Australian Privacy Act 1988.
-              </span>
-            </label>
             <label className="flex items-start gap-2.5 mb-5 cursor-pointer select-none">
               <input
                 type="checkbox"
@@ -439,6 +426,7 @@ const AgentAuthPage = () => {
                 <Link to="/privacy" target="_blank" rel="noopener noreferrer" className="text-white underline underline-offset-2">Privacy Policy</Link>
                 {' '}and{' '}
                 <Link to="/terms" target="_blank" rel="noopener noreferrer" className="text-white underline underline-offset-2">Terms of Service</Link>.
+                {' '}My data is stored securely in Australia under the Privacy Act 1988.
               </span>
             </label>
 
@@ -446,7 +434,7 @@ const AgentAuthPage = () => {
 
             <button
               type="submit"
-              disabled={emailSubmitting || !(dataLocationConsent && policyConsent)}
+              disabled={emailSubmitting || !policyConsent}
               className={s.primaryBtn}
             >
               {emailSubmitting

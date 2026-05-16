@@ -429,6 +429,8 @@ const BondClaimsPage = () => {
                           <span><strong>Fair wear and tear cannot be claimed.</strong> Normal deterioration from everyday use (faded paint, carpet flattening, minor scuffs) must not be included. Only claim for damage beyond fair wear and tear — backed by the exit condition report comparison.</span>
                         </div>
                       </td>
+                    </tr>
+                  )}
                   {openClaim.bond_claim_items.length === 0 && !itemForm && (
                     <tr><td colSpan={5} className="py-6 text-center text-muted-foreground">No deduction items yet.</td></tr>
                   )}

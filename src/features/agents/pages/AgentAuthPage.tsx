@@ -37,7 +37,6 @@ const AgentAuthPage = () => {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [pendingSignIn, setPendingSignIn] = useState(false);
   const [pendingSignup, setPendingSignup] = useState(false);
-  const [dataLocationConsent, setDataLocationConsent] = useState(false);
   const [policyConsent, setPolicyConsent] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);

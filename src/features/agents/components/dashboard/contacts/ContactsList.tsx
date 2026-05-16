@@ -1,5 +1,15 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 function ContactsSkeleton() {
   return (
@@ -89,6 +99,7 @@ const ContactsList = ({
   onFiltersChange, onSortChange, onSelect, onDelete,
   hasMore, onLoadMore, onAdd,
 }: Props) => {
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const showCol = (k: ContactColumnKey) => columns.includes(k);
 
   // Derive available tags + sources from current contacts
@@ -474,7 +485,7 @@ const ContactsList = ({
                             size="sm"
                             variant="ghost"
                             className="h-7 px-2 text-destructive hover:text-destructive"
-                            onClick={(e) => { e.stopPropagation(); onDelete(c.id); }}
+                            onClick={(e) => { e.stopPropagation(); setDeleteTargetId(c.id); }}
                           >
                             <Trash2 size={14} />
                           </Button>
@@ -495,6 +506,25 @@ const ContactsList = ({
           )}
         </div>
       )}
+      <AlertDialog open={deleteTargetId !== null} onOpenChange={(open) => { if (!open) setDeleteTargetId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete contact?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the contact and all their activity history. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteTargetId(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => { if (deleteTargetId) onDelete(deleteTargetId); setDeleteTargetId(null); }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -220,7 +220,6 @@ export default function MaintenancePage() {
 
   const submitNewJob = async () => {
     if (!agentId || !newJobPropertyId || !newJobDescription.trim()) return;
-    const prop = newJobProperties.find(p => p.id === newJobPropertyId);
     const title = newJobDescription.trim().slice(0, 80);
     setNewJobSaving(true);
     const { error } = await supabase.from('maintenance_jobs').insert({

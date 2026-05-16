@@ -144,6 +144,14 @@ const PreMarketPage = () => {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  if (subLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 size={24} className="animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   const filtered = items.filter(item => {
     if (filter === 'hot') return item.score >= 80;
     if (filter === 'warm') return item.score >= 65 && item.score < 80;

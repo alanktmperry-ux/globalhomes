@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Inbox, Users } from 'lucide-react';
 
 interface Props {
   agentId: string | null;
@@ -173,7 +174,7 @@ export default function DashboardHomeStats({ agentId }: Props) {
           ) : recentEnquiries.length === 0 ? (
             <EmptyState
               variant="compact"
-              icon="solar:inbox-linear"
+              icon={Inbox}
               title="No enquiries yet"
               body="When buyers reach out about your listings, they'll appear here."
             />
@@ -218,7 +219,7 @@ export default function DashboardHomeStats({ agentId }: Props) {
           ) : recentMatches.length === 0 ? (
             <EmptyState
               variant="compact"
-              icon="solar:users-group-rounded-linear"
+              icon={Users}
               title="No buyer matches yet"
               body="Our AI will surface buyers actively searching for your listings."
             />

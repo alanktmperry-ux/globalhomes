@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { X } from 'lucide-react';
+import { X, AlertTriangle } from 'lucide-react';
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 
 interface AgentPaymentState {
@@ -88,8 +88,7 @@ export function PaymentStatusBanner({ onVisibleChange }: { onVisibleChange?: (vi
       <div className="sticky top-0 z-40 w-full bg-red-600 text-white px-4 py-3 text-sm">
         <div className="max-w-5xl mx-auto flex items-center justify-center gap-2 text-center">
           <span>
-            {/* @ts-expect-error — iconify-icon is a web component loaded globally */}
-            <iconify-icon icon="solar:danger-triangle-bold" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '8px' }} />
+            <AlertTriangle size={18} style={{ display: 'inline-flex', verticalAlign: 'middle', marginRight: '8px', flexShrink: 0 }} />
             Action required: Payment overdue. Your listings will be hidden in{' '}
             <strong>{daysRemaining} day{daysRemaining !== 1 ? 's' : ''}</strong> unless payment is resolved.{' '}
             <Link to="/dashboard/billing" className="underline font-semibold hover:text-white/90">
@@ -144,8 +143,7 @@ function TrialBanner({ daysLeft }: { daysLeft: number }) {
       <div className="sticky top-0 z-40 w-full bg-red-600 text-white px-4 py-3 text-sm">
         <div className="max-w-5xl mx-auto flex items-center justify-center gap-2 text-center">
           <span>
-            {/* @ts-expect-error — iconify-icon is a web component loaded globally */}
-            <iconify-icon icon="solar:danger-triangle-bold" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '8px' }} />
+            <AlertTriangle size={18} style={{ display: 'inline-flex', verticalAlign: 'middle', marginRight: '8px', flexShrink: 0 }} />
             Your trial ends in <strong>{daysLeft} day{daysLeft !== 1 ? 's' : ''}</strong>. Upgrade immediately to keep listings live.{' '}
             <Link to="/dashboard/billing" className="underline font-semibold hover:text-white/90">
               Upgrade now →

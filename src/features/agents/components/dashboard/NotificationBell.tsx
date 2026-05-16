@@ -189,7 +189,7 @@ export function NotificationBell() {
                 {notifications.length === 0 ? (
                   <EmptyState
                     variant="compact"
-                    icon="solar:bell-linear"
+                    icon={Bell}
                     title="You're all caught up"
                     body="We'll let you know when something needs your attention."
                   />

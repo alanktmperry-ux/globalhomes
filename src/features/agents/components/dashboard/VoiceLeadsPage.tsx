@@ -188,7 +188,7 @@ const VoiceLeadsPage = () => {
             {leads.length === 0 && (
               <EmptyState
                 variant="compact"
-                icon="solar:microphone-linear"
+                icon={Mic}
                 title={t('agent.voiceListing.empty.title')}
                 body={t('agent.voiceListing.empty.body')}
               />

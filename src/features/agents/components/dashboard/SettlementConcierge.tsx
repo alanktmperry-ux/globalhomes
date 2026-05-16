@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { PartyPopper, MapPin, Clock, ChevronDown, ChevronUp, Star, ExternalLink, Gift, Loader2, Home } from 'lucide-react';
+import { PartyPopper, MapPin, Clock, ChevronDown, ChevronUp, Star, ExternalLink, Gift, Loader2, Home, CalendarDays } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -218,7 +218,7 @@ const SettlementConcierge = () => {
       {upcoming.length === 0 ? (
         <div className="mb-8">
           <EmptyState
-            icon="solar:calendar-mark-linear"
+            icon={CalendarDays}
             title="No upcoming settlements"
             body="Settlements scheduled in the next 90 days will appear here."
           />

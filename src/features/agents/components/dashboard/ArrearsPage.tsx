@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { FileText, ExternalLink, Copy } from 'lucide-react';
+import { FileText, ExternalLink, Copy, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   APlusPageHeader, APlusStatCard, APlusTable, APlusTHead, APlusTh, APlusTBody, APlusTr, APlusTd,
@@ -275,7 +275,7 @@ ${agencyName || ''}`.trim();
           label="Critical (14+ days)"
           value={summary.critical}
           urgent={summary.critical > 0}
-          icon="solar:danger-triangle-linear"
+          icon={AlertTriangle}
         />
       </div>
 
@@ -289,7 +289,7 @@ ${agencyName || ''}`.trim();
       ) : items.length === 0 ? (
         <div className="bg-white rounded-[12px] p-10" style={{ border: '1px solid #E5E7EB' }}>
           <EmptyState
-            icon="solar:shield-check-linear"
+            icon={ShieldCheck}
             title="No tenants currently in arrears"
             body="When a tenant falls behind on rent, they will appear here with the days overdue and recommended action."
             variant="compact"

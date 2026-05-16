@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { cn } from '@/lib/utils';
 import SmokeAlarmPanel from './SmokeAlarmPanel';
 import { format, parseISO, differenceInDays } from 'date-fns';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertTriangle, ShieldCheck } from 'lucide-react';
 import {
   APlusPageHeader, APlusStatCard, APlusTable, APlusTHead, APlusTh, APlusTBody, APlusTr, APlusTd,
   APlusBadge, APlusDueSoonBanner, type APlusBadgeTone,
@@ -134,14 +134,14 @@ const SmokeAlarmsPage = () => {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         <APlusStatCard label="Compliant" value={rows.length - overdueCount - noRecordCount} />
         <APlusStatCard label="Due Soon" value={dueSoonCount} />
-        <APlusStatCard label="Overdue" value={overdueCount} urgent={overdueCount > 0} icon="solar:danger-triangle-linear" />
+        <APlusStatCard label="Overdue" value={overdueCount} urgent={overdueCount > 0} icon={AlertTriangle} />
         <APlusStatCard label="No Record" value={noRecordCount} />
       </div>
 
       {rows.length === 0 ? (
         <div className="bg-white rounded-[12px] p-10" style={{ border: '1px solid #E5E7EB' }}>
           <EmptyState
-            icon="solar:shield-check-linear"
+            icon={ShieldCheck}
             title="No properties found"
             body="Add properties to your portfolio to track smoke alarm compliance."
             variant="compact"
@@ -189,7 +189,7 @@ const SmokeAlarmsPage = () => {
                       <APlusBadge
                         tone={STATUS_TONE[p.latest.compliance_status] || 'grey'}
                         label={STATUS_LABEL[p.latest.compliance_status] || p.latest.compliance_status}
-                        icon={p.latest.compliance_status === 'non_compliant' ? 'solar:danger-triangle-linear' : undefined}
+                        icon={p.latest.compliance_status === 'non_compliant' ? AlertTriangle : undefined}
                       />
                     ) : (
                       <APlusBadge tone="amber" label="No Record" />

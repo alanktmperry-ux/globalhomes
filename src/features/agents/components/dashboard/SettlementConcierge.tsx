@@ -98,11 +98,27 @@ const SettlementConcierge = () => {
 
       // Build settlements from trust transactions (for deals tracked via trust)
       const contactIds = new Set(fromContacts.map(s => s.contactId));
+
+      // Fetch property addresses for trust-sourced settlements
+      const trustPropertyIds = (trustTx || [])
+        .map((tx: any) => tx.property_id)
+        .filter(Boolean)
+        .filter((id: string) => !contactIds.has(id));
+
+      const { data: trustProperties } = trustPropertyIds.length > 0
+        ? await (supabase as any)
+            .from('properties')
+            .select('id, address')
+            .in('id', trustPropertyIds)
+        : { data: [] };
+
+      const propAddressMap = new Map((trustProperties || []).map((p: any) => [p.id, p.address]));
+
       const fromTrust: Settlement[] = (trustTx || [])
-        .filter((tx: any) => tx.property_id && !contactIds.has(tx.property_id))
+        .filter((tx: any) => tx.property_id && !contactIds.has(tx.property_id) && propAddressMap.has(tx.property_id))
         .map((tx: any) => ({
           id: `trust-${tx.property_id}-${tx.created_at}`,
-          address: tx.property_id,
+          address: (propAddressMap.get(tx.property_id) as string) || 'Unknown address',
           buyerName: tx.client_name || 'Unknown buyer',
           settlementDate: parseISO(tx.created_at),
           propertyId: tx.property_id,

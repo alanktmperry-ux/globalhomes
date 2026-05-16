@@ -215,7 +215,7 @@ const AgentAuthPage = () => {
     return (
       <AuthShell
         heading="Check your email"
-        subheading={<>We sent a confirmation link to <span className="text-white font-medium">{regEmail}</span>. Click the link to activate your account.</>}
+        subheading={<>We sent a verification link to <span className="text-white font-medium">{regEmail}</span>. Click the link in the email to activate your account — check your spam folder if you don't see it.</>}
       >
         <div className="flex justify-center mb-4">
           <div

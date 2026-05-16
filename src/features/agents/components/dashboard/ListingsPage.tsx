@@ -279,11 +279,6 @@ interface ListingCardProps {
   stats: ListingStatsMaps;
 }
 
-// iconify-icon helper (script loaded in index.html)
-const Ico = ({ icon, size = 16, color, className }: { icon: string; size?: number; color?: string; className?: string }) => (
-  // @ts-expect-error — iconify-icon is a web component
-  <iconify-icon icon={icon} class={className} style={{ fontSize: `${size}px`, color, display: 'inline-flex', lineHeight: 1 }} />
-);
 
 const STATUS_OVERLAY: Record<string, { label: string; className: string }> = {
   public: { label: 'For Sale', className: 'bg-[#0a0f1e]/85 backdrop-blur text-white' },

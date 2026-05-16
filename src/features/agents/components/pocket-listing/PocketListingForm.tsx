@@ -873,6 +873,23 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
           </Button>
         )}
       </div>
+
+      <AlertDialog open={showLiveEditConfirm} onOpenChange={setShowLiveEditConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Save changes to live listing?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This listing is currently visible to buyers. Changes will go live immediately after saving.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setShowLiveEditConfirm(false); handlePublish(); }}>
+              Yes, save changes
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

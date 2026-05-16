@@ -388,7 +388,7 @@ const BondClaimsPage = () => {
                       <td className="py-2 px-2">{item.description}</td>
                       <td className="py-2 px-2 text-right font-medium">{fmt$(Number(item.amount))}</td>
                       <td className="py-2 px-2">
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => deleteItem(item.id)}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setDeleteItemId(item.id)}>
                           <Trash2 size={12} />
                         </Button>
                       </td>

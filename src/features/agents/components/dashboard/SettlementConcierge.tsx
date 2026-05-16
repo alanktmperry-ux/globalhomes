@@ -156,7 +156,9 @@ const SettlementConcierge = () => {
   };
 
   const handleCongrats = (s: Settlement) => {
-    toast.success(` Email sent — Congratulations email sent to ${s.buyerName}`);
+    const msg = `Congratulations ${s.buyerName}! It was an absolute pleasure helping you settle on ${s.address}. Wishing you many wonderful memories in your new home. 🏡`;
+    navigator.clipboard.writeText(msg);
+    toast.success('Copied — Congratulations message copied to clipboard');
   };
 
   const handleReviewRequest = (s: Settlement) => {
@@ -288,7 +290,7 @@ const SettlementConcierge = () => {
                 <p className="text-xs text-muted-foreground mb-3">Buyer: {s.buyerName} · Settled {format(s.settlementDate, 'dd MMM')}</p>
                 <div className="flex flex-wrap gap-2">
                   <Button size="sm" variant="outline" onClick={() => handleCongrats(s)} className="gap-1.5 text-xs">
-                    <PartyPopper size={14} /> Send Congratulations
+                    <PartyPopper size={14} /> Copy Congratulations Message
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => handleReviewRequest(s)} className="gap-1.5 text-xs">
                     <Star size={14} /> Request Google Review

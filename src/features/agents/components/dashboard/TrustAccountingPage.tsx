@@ -731,13 +731,13 @@ const TrustAccountingPage = () => {
             </h1>
             {lastReconciledDate && (
               <span className="bg-[#ECFDF5] border border-[#34D399]/20 text-[#065F46] rounded-full px-3 py-1 text-[12px] font-bold inline-flex items-center gap-1.5">
-                <Ico icon="solar:check-circle-bold" size={12} color="#065F46" />
+                <CheckCircle2 size={12} style={{ display: 'inline-flex', flexShrink: 0 }} />
                 Reconciled to {new Intl.DateTimeFormat('en-AU', { day: '2-digit', month: 'short' }).format(new Date(lastReconciledDate))}
               </span>
             )}
             {periodClosed && (
               <span className="bg-[#F3F4F6] border border-[#E5E5E5] text-[#374151] rounded-full px-3 py-1 text-[12px] font-bold inline-flex items-center gap-1.5">
-                <Ico icon="solar:lock-keyhole-minimalistic-bold" size={12} color="#374151" />
+                <Lock size={12} style={{ display: 'inline-flex', flexShrink: 0 }} />
                 {periodLabel} closed
               </span>
             )}
@@ -752,7 +752,7 @@ const TrustAccountingPage = () => {
             onClick={() => navigate('/dashboard/reconciliation')}
             className="bg-white border border-[#E5E5E5] text-[#0a0f1e] rounded-full px-4 py-2.5 text-[13px] font-semibold inline-flex items-center gap-2 hover:bg-[#F9FAFB] transition"
           >
-            <Ico icon="solar:document-linear" size={16} color="#0a0f1e" />
+            <FileText size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
             <span className="hidden sm:inline">Reconciliation</span>
           </button>
           <button
@@ -760,7 +760,7 @@ const TrustAccountingPage = () => {
             onClick={() => setShowNewAccount(true)}
             className="bg-white border border-[#E5E5E5] text-[#0a0f1e] rounded-full px-4 py-2.5 text-[13px] font-semibold inline-flex items-center gap-2 hover:bg-[#F9FAFB] transition"
           >
-            <Ico icon="solar:wallet-2-linear" size={16} color="#0a0f1e" />
+            <Wallet size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
             <span className="hidden sm:inline">New account</span>
           </button>
           <button
@@ -769,7 +769,7 @@ const TrustAccountingPage = () => {
             className="text-white rounded-full px-5 py-2.5 text-[13px] font-extrabold inline-flex items-center gap-2 transition hover:opacity-95"
             style={{ background: 'linear-gradient(135deg,#2563EB,#1D4ED8)' }}
           >
-            <Ico icon="solar:add-square-bold" size={16} color="#fff" />
+            <PlusSquare size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
             New transaction
           </button>
         </div>
@@ -781,7 +781,7 @@ const TrustAccountingPage = () => {
 
       {urlPropertyId && filteredPropertyAddress && (
         <div className="bg-[#EFF6FF] border border-[#2563EB]/15 text-[#1E40AF] rounded-2xl px-4 py-2.5 mb-6 flex items-center gap-2 text-[13px] font-semibold">
-          <Ico icon="solar:filter-bold" size={14} color="#1E40AF" />
+          <Filter size={14} style={{ display: 'inline-flex', flexShrink: 0 }} />
           <span>Filtered by property: <strong>{filteredPropertyAddress}</strong></span>
           <button
             onClick={() => {
@@ -800,7 +800,7 @@ const TrustAccountingPage = () => {
       {overdrawnLedgers.length > 0 && (
         <div className="bg-[#FEF2F2] border border-[#DC2626]/20 rounded-3xl p-5 mb-8 flex items-start gap-4">
           <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shrink-0">
-            <Ico icon="solar:danger-triangle-bold" size={24} color="#DC2626" />
+            <AlertTriangle size={24} style={{ display: 'inline-flex', flexShrink: 0 }} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[15px] font-extrabold text-[#991B1B]">
@@ -834,7 +834,7 @@ const TrustAccountingPage = () => {
           <div className="bg-white rounded-3xl border border-[#E5E5E5] p-6">
             <div className="flex items-start justify-between">
               <div className="w-10 h-10 rounded-2xl bg-[#ECFDF5] flex items-center justify-center">
-                <Ico icon="solar:wallet-bold" size={20} color="#065F46" />
+                <Wallet size={20} style={{ display: 'inline-flex', flexShrink: 0 }} />
               </div>
               {newReceiptsCount > 0 && (
                 <span className="bg-[#EFF6FF] text-[#1E40AF] rounded-full px-2.5 py-0.5 text-[10px] font-bold">
@@ -863,7 +863,7 @@ const TrustAccountingPage = () => {
           <div className="bg-white rounded-3xl border border-[#E5E5E5] p-6">
             <div className="flex items-start justify-between">
               <div className="w-10 h-10 rounded-2xl bg-[#FFFBEB] flex items-center justify-center">
-                <Ico icon="solar:arrow-up-bold" size={20} color="#D97706" />
+                <ArrowUp size={20} style={{ display: 'inline-flex', flexShrink: 0 }} />
               </div>
               {pendingPayments.length > 0 && (
                 <span className="bg-[#FFFBEB] text-[#92400E] rounded-full px-2.5 py-0.5 text-[10px] font-bold">
@@ -896,7 +896,7 @@ const TrustAccountingPage = () => {
           <div className="bg-white rounded-3xl border border-[#E5E5E5] p-6">
             <div className="flex items-start justify-between">
               <div className="w-10 h-10 rounded-2xl bg-[#EFF6FF] flex items-center justify-center">
-                <Ico icon="solar:graph-bold" size={20} color="#2563EB" />
+                <TrendingUp size={20} style={{ display: 'inline-flex', flexShrink: 0 }} />
               </div>
               {unmatchedCount > 0 && (
                 <span className="bg-[#FEF2F2] text-[#DC2626] rounded-full px-2.5 py-0.5 text-[10px] font-bold">
@@ -930,7 +930,7 @@ const TrustAccountingPage = () => {
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-[#FFFBEB] flex items-center justify-center">
-                <Ico icon="solar:lock-keyhole-minimalistic-bold" size={18} color="#D97706" />
+                <Lock size={18} style={{ display: 'inline-flex', flexShrink: 0 }} />
               </div>
               <div>
                 <div className="text-[14px] font-extrabold text-[#0a0f1e]">Month-End Close</div>
@@ -940,7 +940,7 @@ const TrustAccountingPage = () => {
             {periodClosed ? (
               <div className="flex items-center gap-3 flex-wrap">
                 <span className="bg-[#ECFDF5] text-[#065F46] rounded-full px-3 py-1 text-[12px] font-bold inline-flex items-center gap-1.5">
-                  <Ico icon="solar:check-circle-bold" size={12} color="#065F46" />
+                  <CheckCircle2 size={12} style={{ display: 'inline-flex', flexShrink: 0 }} />
                   {periodLabel} closed
                 </span>
                 <span className="text-[12px] text-[#6a6a6a]">
@@ -958,7 +958,7 @@ const TrustAccountingPage = () => {
                   disabled={!agent?.id}
                   className="bg-white border border-[#E5E5E5] text-[#0a0f1e] rounded-full px-4 py-2 text-[12px] font-bold inline-flex items-center gap-2 hover:bg-[#F9FAFB] disabled:opacity-50 disabled:cursor-not-allowed transition"
                 >
-                  <Ico icon="solar:lock-keyhole-minimalistic-bold" size={14} color="#0a0f1e" />
+                  <Lock size={14} style={{ display: 'inline-flex', flexShrink: 0 }} />
                   Close {periodLabel}
                 </button>
               </div>

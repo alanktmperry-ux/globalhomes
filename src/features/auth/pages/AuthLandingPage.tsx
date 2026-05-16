@@ -93,7 +93,7 @@ const AuthLandingPage = () => {
           className="flex-1 min-h-screen bg-white flex flex-col justify-center px-[7vw] py-24"
         >
           <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-[#EFF6FF] border border-[#2563EB]/20 rounded-full text-[11px] font-bold tracking-[0.06em] uppercase text-[#1E40AF] self-start">
-            <IconifyIcon icon="solar:home-2-linear" size={13} />
+            <Home size={13} style={{ display: 'inline-flex', flexShrink: 0 }} />
             FIND YOUR NEXT HOME
           </div>
 
@@ -124,14 +124,14 @@ const AuthLandingPage = () => {
             className="w-full bg-[#0a0f1e] text-white rounded-full py-4 text-[15px] font-bold cursor-pointer transition-all hover:bg-white hover:text-[#0a0f1e] border border-[#0a0f1e] inline-flex items-center justify-center gap-2.5 max-w-[540px] mt-10"
           >
             Sign in or create account
-            <IconifyIcon icon="solar:arrow-right-linear" size={16} />
+            <ArrowRight size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
           </button>
           <button
             onClick={() => navigate('/')}
             className="w-full bg-white text-[#4a4a4a] rounded-full py-4 text-[15px] font-semibold cursor-pointer transition-all hover:text-[#0a0f1e] max-w-[540px] mt-3 inline-flex items-center justify-center gap-2"
           >
             Browse without signing in
-            <IconifyIcon icon="solar:arrow-right-linear" size={14} />
+            <ArrowRight size={14} style={{ display: 'inline-flex', flexShrink: 0 }} />
           </button>
         </motion.div>
 
@@ -197,16 +197,16 @@ const AuthLandingPage = () => {
               onClick={() => { dismissError(); navigate('/agents/login'); }}
               className="w-full bg-white text-[#0a0f1e] rounded-full py-4 text-[15px] font-bold cursor-pointer transition-all hover:bg-white/95 inline-flex items-center justify-center gap-2.5 max-w-[600px] mt-10"
             >
-              <IconifyIcon icon="solar:lock-keyhole-linear" size={16} color="#0a0f1e" />
+              <Lock size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
               Agent sign in
-              <IconifyIcon icon="solar:arrow-right-linear" size={16} color="#0a0f1e" />
+              <ArrowRight size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
             </button>
             <button
               onClick={() => navigate('/')}
               className="w-full text-center text-[14px] font-semibold text-[#93C5FD] hover:text-white transition-colors cursor-pointer max-w-[600px] mt-4 inline-flex items-center justify-center gap-2 bg-transparent border-0"
             >
               See everything on ListHQ
-              <IconifyIcon icon="solar:arrow-right-linear" size={14} />
+              <ArrowRight size={14} style={{ display: 'inline-flex', flexShrink: 0 }} />
             </button>
           </div>
         </motion.div>

@@ -87,7 +87,7 @@ export default function MultilingualGeneratorPage() {
       <section className="pt-[140px] pb-12 px-8 bg-white text-center">
         <div className="max-w-[920px] mx-auto">
           <div className="inline-flex items-center gap-2 bg-[#EFF6FF] text-[#2563EB] rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em]">
-            <Icon icon="solar:gift-linear" width={14} />
+            <Gift size={14} style={{ display: 'inline-flex', flexShrink: 0 }} />
             Free tool · No login
           </div>
           <h1 className="text-[clamp(48px,7vw,100px)] font-extrabold leading-[0.95] tracking-[-0.05em] text-black mt-6">
@@ -152,12 +152,12 @@ export default function MultilingualGeneratorPage() {
               >
                 {loading ? (
                   <>
-                    <Icon icon="solar:refresh-linear" width={16} className="animate-spin" />
+                    <RefreshCw size={16} className="animate-spin" style={{ display: 'inline-flex', flexShrink: 0 }} />
                     Translating...
                   </>
                 ) : (
                   <>
-                    <Icon icon="solar:translation-linear" width={16} />
+                    <Languages size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
                     Translate
                   </>
                 )}
@@ -203,7 +203,7 @@ export default function MultilingualGeneratorPage() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-16 text-center min-h-[280px] bg-[#F9FAFB] rounded-2xl">
-                <Icon icon="solar:translation-linear" width={48} color="#E5E7EB" />
+                <Languages size={48} style={{ display: 'inline-flex', flexShrink: 0 }} />
                 <p className="text-[14px] text-[#6a6a6a] mt-4 max-w-[280px]">
                   Paste a description and click Translate to see the output here
                 </p>
@@ -216,7 +216,7 @@ export default function MultilingualGeneratorPage() {
                 disabled={!activeContent}
                 className="text-[13px] font-semibold text-[#374151] inline-flex items-center gap-1.5 hover:text-[#2563EB] disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                <Icon icon="solar:copy-linear" width={16} />
+                <Copy size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
                 {copied ? 'Copied!' : 'Copy translation'}
               </button>
               <button
@@ -224,7 +224,7 @@ export default function MultilingualGeneratorPage() {
                 disabled={!activeContent}
                 className="text-[13px] font-semibold text-[#374151] inline-flex items-center gap-1.5 hover:text-[#2563EB] disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                <Icon icon="solar:share-linear" width={16} />
+                <Share2 size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
                 Share with team
               </button>
             </div>
@@ -252,7 +252,7 @@ export default function MultilingualGeneratorPage() {
               className="bg-white text-[#2563EB] rounded-full px-8 py-4 font-bold text-[15px] inline-flex items-center gap-2 hover:bg-[#EFF6FF] transition-colors"
             >
               Start free trial
-              <Icon icon="solar:arrow-right-linear" width={16} />
+              <ArrowRight size={16} style={{ display: 'inline-flex', flexShrink: 0 }} />
             </a>
             <a
               href="/for-agents"

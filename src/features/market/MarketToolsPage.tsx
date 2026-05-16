@@ -156,14 +156,14 @@ export default function MarketToolsPage() {
             onClick={() => setTab('saved')}
             className="inline-flex items-center gap-2 bg-white border border-[#E5E5E5] rounded-full px-4 py-2.5 text-[13px] font-bold text-[#0a0f1e] hover:border-[#0a0f1e] transition"
           >
-            <Ico icon="solar:folder-bold" size={16} color="#0a0f1e" /> Saved reports
+            <Folder size={16} style={{ display: 'inline-flex', flexShrink: 0 }} /> Saved reports
           </button>
           <button
             onClick={() => navigate('/dashboard/reports')}
             className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-bold text-white shadow-[0_6px_20px_rgba(37,99,235,0.35)] hover:shadow-[0_8px_28px_rgba(37,99,235,0.45)] transition"
             style={{ background: 'linear-gradient(135deg,#2563EB 0%,#1D4ED8 100%)' }}
           >
-            <Ico icon="solar:chart-square-bold" size={16} color="#ffffff" /> Generate CMA
+            <BarChart2 size={16} style={{ display: 'inline-flex', flexShrink: 0 }} /> Generate CMA
           </button>
         </div>
       </div>
@@ -248,7 +248,7 @@ export default function MarketToolsPage() {
 
           <form onSubmit={handleSuburbSubmit} className="relative max-w-[640px] mx-auto block mt-8">
             <span className="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none">
-              <Ico icon="solar:map-point-bold" size={20} color="#6a6a6a" />
+              <MapPin size={20} style={{ display: 'inline-flex', flexShrink: 0 }} />
             </span>
             <input
               value={suburbSearch}
@@ -272,7 +272,7 @@ export default function MarketToolsPage() {
                     className="text-[#9ca3af] hover:text-[#0a0f1e]"
                     aria-label={`Remove ${s}`}
                   >
-                    <Ico icon="solar:close-circle-linear" size={14} color="currentColor" />
+                    <X size={14} style={{ display: 'inline-flex', flexShrink: 0 }} />
                   </button>
                 </span>
               ))}
@@ -291,7 +291,7 @@ export default function MarketToolsPage() {
                   style={{ background: 'linear-gradient(135deg,#2563EB 0%,#1D4ED8 100%)' }}
                   onClick={() => navigate('/dashboard/reports')}
                 >
-                  <Ico icon="solar:document-add-bold" size={16} color="#ffffff" /> Save report
+                  <FilePlus size={16} style={{ display: 'inline-flex', flexShrink: 0 }} /> Save report
                 </button>
               </div>
 
@@ -325,7 +325,7 @@ export default function MarketToolsPage() {
             </div>
           ) : (
             <div className="bg-white rounded-3xl border border-[#E5E5E5] py-20 px-8 text-center mt-8">
-              <div className="flex justify-center"><Ico icon="solar:map-point-linear" size={56} color="#E5E7EB" /></div>
+              <div className="flex justify-center"><MapPin size={56} style={{ display: 'inline-flex', flexShrink: 0 }} /></div>
               <h3 className="text-[22px] font-bold text-[#0a0f1e] mt-6">Search a suburb to begin</h3>
               <p className="text-[14px] text-[#6a6a6a] max-w-[460px] mx-auto leading-[1.55] mt-3">
                 Type any Australian suburb above and we'll pull medians, days on market, demographics, and auction clearance.
@@ -338,7 +338,7 @@ export default function MarketToolsPage() {
       {/* SAVED REPORTS */}
       {tab === 'saved' && (
         <div className="bg-white rounded-3xl border border-[#E5E5E5] py-20 px-8 text-center">
-          <div className="flex justify-center"><Ico icon="solar:folder-with-files-linear" size={56} color="#E5E7EB" /></div>
+          <div className="flex justify-center"><FolderOpen size={56} style={{ display: 'inline-flex', flexShrink: 0 }} /></div>
           <h3 className="text-[22px] font-bold text-[#0a0f1e] mt-6">No saved reports yet</h3>
           <p className="text-[14px] text-[#6a6a6a] max-w-[460px] mx-auto leading-[1.55] mt-3">
             Generate your first report — CMAs, suburb snapshots, and vendor dashboards are saved here for re-use.
@@ -349,7 +349,7 @@ export default function MarketToolsPage() {
               className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-bold text-white shadow-[0_6px_20px_rgba(37,99,235,0.35)] hover:shadow-[0_8px_28px_rgba(37,99,235,0.45)] transition"
               style={{ background: 'linear-gradient(135deg,#2563EB 0%,#1D4ED8 100%)' }}
             >
-              <Ico icon="solar:chart-square-bold" size={16} color="#ffffff" /> Generate a report
+              <BarChart2 size={16} style={{ display: 'inline-flex', flexShrink: 0 }} /> Generate a report
             </button>
           </div>
         </div>
@@ -368,7 +368,7 @@ export default function MarketToolsPage() {
           </div>
 
           <div className="px-6 py-14 text-center">
-            <div className="flex justify-center"><Ico icon="solar:target-linear" size={48} color="#E5E7EB" /></div>
+            <div className="flex justify-center"><Target size={48} style={{ display: 'inline-flex', flexShrink: 0 }} /></div>
             <h3 className="text-[18px] font-bold text-[#0a0f1e] mt-5">No scored properties yet</h3>
             <p className="text-[14px] text-[#6a6a6a] max-w-[460px] mx-auto leading-[1.55] mt-2">
               Open the full Seller Likelihood workspace to surface motivated vendors and draft outreach in seconds.
@@ -379,7 +379,7 @@ export default function MarketToolsPage() {
                 className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-bold text-white shadow-[0_6px_20px_rgba(37,99,235,0.35)] hover:shadow-[0_8px_28px_rgba(37,99,235,0.45)] transition"
                 style={{ background: 'linear-gradient(135deg,#2563EB 0%,#1D4ED8 100%)' }}
               >
-                <Ico icon="solar:target-bold" size={16} color="#ffffff" /> Open Seller Likelihood
+                <Target size={16} style={{ display: 'inline-flex', flexShrink: 0 }} /> Open Seller Likelihood
               </Link>
             </div>
           </div>

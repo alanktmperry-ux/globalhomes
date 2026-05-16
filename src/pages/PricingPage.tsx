@@ -244,7 +244,7 @@ function PlanCard({ plan, billing, index }: { plan: Plan; billing: BillingCycle;
         {plan.features.map((f) => (
           <div key={f} className="flex items-start gap-2.5 text-[14px] text-[#4a4a4a]">
             <span className="mt-0.5 flex-shrink-0">
-              <Icon icon="solar:check-circle-bold" size={18} color="#2563EB" />
+              <CheckCircle2 size={18} style={{ display: 'inline-flex', flexShrink: 0 }} />
             </span>
             <span>{f}</span>
           </div>
@@ -255,8 +255,8 @@ function PlanCard({ plan, billing, index }: { plan: Plan; billing: BillingCycle;
 }
 
 function CompareCell({ value }: { value: boolean | string }) {
-  if (value === true) return <Icon icon="solar:check-circle-bold" size={18} color="#2563EB" />;
-  if (value === false) return <Icon icon="solar:close-circle-linear" size={18} color="#9CA3AF" />;
+  if (value === true) return <CheckCircle2 size={18} style={{ display: 'inline-flex', flexShrink: 0 }} />;
+  if (value === false) return <X size={18} style={{ display: 'inline-flex', flexShrink: 0 }} />;
   return <span className="text-[14px] font-semibold text-[#0a0f1e]">{value}</span>;
 }
 
@@ -301,7 +301,7 @@ export default function PricingPage() {
         <section className="pt-[120px] md:pt-[140px] pb-16 px-6 md:px-8 bg-white text-center">
           <div className="max-w-[960px] mx-auto">
             <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-[#EFF6FF] border border-[#2563EB]/20 rounded-full text-[11px] font-bold tracking-[0.06em] uppercase text-[#1E40AF]">
-              <Icon icon="solar:tag-linear" size={13} />
+              <Tag size={13} style={{ display: 'inline-flex', flexShrink: 0 }} />
               PRICING
             </div>
             <h1 className="text-[clamp(40px,7vw,96px)] font-extrabold leading-[0.98] tracking-[-0.04em] text-black mt-6">
@@ -448,7 +448,7 @@ export default function PricingPage() {
                           display: 'inline-flex',
                         }}
                       >
-                        <Icon icon="solar:alt-arrow-down-linear" size={20} color="#6a6a6a" />
+                        <ChevronDown size={20} style={{ display: 'inline-flex', flexShrink: 0 }} />
                       </span>
                     </button>
                     {open && (

@@ -110,6 +110,7 @@ const ListingEditPage = () => {
 
       <PocketListingForm
         editPropertyId={listing.id}
+        isPublishedListing={isPublished}
         onPublish={() => navigate('/dashboard/listings')}
         onCancel={() => navigate('/dashboard/listings')}
       />

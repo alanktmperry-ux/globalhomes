@@ -5,7 +5,8 @@ import { InvestorModeProvider } from "./context/InvestorModeContext";
 import "./index.css";
 import { getConsent, initPostHog } from "./shared/lib/analyticsConsent";
 
-const BETA_STORAGE_KEY = 'listhq_beta_access';
+const BETA_STORAGE_KEY = 'listhq_beta_access_v2';
+const LEGACY_BETA_STORAGE_KEYS = ['listhq_beta_access'];
 const BETA_GRANTED_VALUE = 'granted';
 const BETA_PASSWORD = 'listhq2026beta100%';
 const AUTH_BYPASS_PATHS = [
@@ -18,6 +19,7 @@ const AUTH_BYPASS_PATHS = [
 
 function hasBootstrapBetaAccess() {
   try {
+    LEGACY_BETA_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
     return localStorage.getItem(BETA_STORAGE_KEY) === BETA_GRANTED_VALUE;
   } catch {
     return false;
@@ -87,6 +89,7 @@ function renderBootstrapGate(rootEl: HTMLElement) {
 
     if (value === BETA_PASSWORD) {
       try {
+        LEGACY_BETA_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
         localStorage.setItem(BETA_STORAGE_KEY, BETA_GRANTED_VALUE);
       } catch {
         /* ignore */

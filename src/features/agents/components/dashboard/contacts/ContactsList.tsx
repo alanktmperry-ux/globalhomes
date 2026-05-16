@@ -99,6 +99,7 @@ const ContactsList = ({
   onFiltersChange, onSortChange, onSelect, onDelete,
   hasMore, onLoadMore, onAdd,
 }: Props) => {
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const showCol = (k: ContactColumnKey) => columns.includes(k);
 
   // Derive available tags + sources from current contacts

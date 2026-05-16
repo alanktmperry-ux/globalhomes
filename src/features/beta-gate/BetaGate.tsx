@@ -27,15 +27,18 @@ export function BetaGate({ children }: Props) {
     '/auth/v1/verify',
     '/reset-password',
   ];
+  const isAuthPath = AUTH_BYPASS_PATHS.some((p) => path.startsWith(p)) || path.startsWith('/auth/');
   const isAuthCallback =
-    AUTH_BYPASS_PATHS.some((p) => path.startsWith(p)) ||
-    search.includes('token_hash=') ||
-    search.includes('access_token=') ||
-    search.includes('code=') ||
-    hash.includes('access_token=') ||
-    hash.includes('type=signup') ||
-    hash.includes('type=recovery') ||
-    hash.includes('type=email');
+    isAuthPath && (
+      AUTH_BYPASS_PATHS.some((p) => path.startsWith(p)) ||
+      search.includes('token_hash=') ||
+      search.includes('access_token=') ||
+      search.includes('code=') ||
+      hash.includes('access_token=') ||
+      hash.includes('type=signup') ||
+      hash.includes('type=recovery') ||
+      hash.includes('type=email')
+    );
   if (isAuthCallback) return <>{children}</>;
 
   if (granted) return <>{children}</>;

@@ -312,7 +312,7 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
           <img src={thumb} alt={l.address} className="w-full h-full object-cover" loading="lazy" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-[#D1D5DB]">
-            <Ico icon="solar:buildings-linear" size={40} />
+            <Building2 size={40} />
           </div>
         )}
         {/* Status pill top-left */}
@@ -326,12 +326,12 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
             style={{ background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)' }}
             title="Boosted listing"
           >
-            <Ico icon="solar:bolt-bold" size={16} color="#fff" />
+            <Zap size={16} />
           </div>
         )}
         {/* Language pill bottom-left */}
         <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 bg-white/95 backdrop-blur rounded-full px-2.5 py-1 text-[11px] font-bold text-[#0a0f1e]">
-          <Ico icon="solar:earth-bold" size={12} color="#2563EB" />
+          <Globe size={12} color="#2563EB" />
           Any language
         </span>
       </div>
@@ -385,10 +385,10 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
 
         {/* Meta row */}
         <div className="flex items-center gap-4 mt-3 text-[12px] text-[#6a6a6a] font-medium">
-          <span className="inline-flex items-center gap-1"><Ico icon="solar:bed-linear" size={14} />{l.beds ?? 0}</span>
-          <span className="inline-flex items-center gap-1"><Ico icon="solar:bath-linear" size={14} />{l.baths ?? 0}</span>
-          <span className="inline-flex items-center gap-1"><Ico icon="solar:car-linear" size={14} />{l.parking ?? 0}</span>
-          <span className="inline-flex items-center gap-1 ml-auto"><Ico icon="solar:eye-linear" size={14} />{views}</span>
+          <span className="inline-flex items-center gap-1"><BedDouble size={14} />{l.beds ?? 0}</span>
+          <span className="inline-flex items-center gap-1"><Bath size={14} />{l.baths ?? 0}</span>
+          <span className="inline-flex items-center gap-1"><Car size={14} />{l.parking ?? 0}</span>
+          <span className="inline-flex items-center gap-1 ml-auto"><Eye size={14} />{views}</span>
         </div>
 
         {/* Inline status menu (preserves existing status-change + delete mutation) */}
@@ -741,7 +741,7 @@ const ListingsPage = () => {
           className="rounded-full px-5 py-2.5 text-[14px] font-bold text-white flex items-center gap-2 transition-all hover:shadow-[0_8px_24px_rgba(37,99,235,0.3)]"
           style={{ background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)' }}
         >
-          <Ico icon="solar:add-square-bold" size={16} color="#fff" /> {t('agent.listings.addNewListing')}
+          <PlusCircle size={16} /> {t('agent.listings.addNewListing')}
         </button>
       </div>
     </div>
@@ -854,7 +854,7 @@ const ListingsPage = () => {
 
           <div className="flex-1 relative min-w-[220px] max-w-[420px]">
             <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9CA3AF] pointer-events-none">
-              <Ico icon="solar:magnifer-linear" size={16} />
+              <Search size={16} />
             </span>
             <input
               type="text"
@@ -872,7 +872,7 @@ const ListingsPage = () => {
                 className="bg-white border border-[#E5E5E5] rounded-full px-4 py-2.5 text-[13px] font-bold text-[#374151] inline-flex items-center gap-2 hover:border-[#2563EB] hover:text-[#2563EB] transition-all"
               >
                 {SORT_LABELS[sortBy]}
-                <Ico icon="solar:alt-arrow-down-linear" size={12} />
+                <ChevronDown size={12} />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
@@ -894,7 +894,7 @@ const ListingsPage = () => {
                 gridView === 'grid' ? 'bg-white shadow-[0_2px_6px_rgba(0,0,0,0.08)] text-[#0a0f1e]' : 'text-[#6a6a6a]',
               )}
             >
-              <Ico icon="solar:widget-2-linear" size={16} />
+              <LayoutGrid size={16} />
             </button>
             <button
               type="button"
@@ -905,7 +905,7 @@ const ListingsPage = () => {
                 gridView === 'list' ? 'bg-white shadow-[0_2px_6px_rgba(0,0,0,0.08)] text-[#0a0f1e]' : 'text-[#6a6a6a]',
               )}
             >
-              <Ico icon="solar:list-linear" size={16} />
+              <ListIcon size={16} />
             </button>
           </div>
         </div>
@@ -915,7 +915,7 @@ const ListingsPage = () => {
         ) : searchedFiltered.length === 0 ? (
           withStatus.length === 0 ? (
             <div className="bg-white rounded-3xl border border-[#E5E5E5] py-20 px-8 text-center">
-              <div className="flex justify-center"><Ico icon="solar:buildings-linear" size={56} color="#E5E7EB" /></div>
+              <div className="flex justify-center"><Building2 size={56} color="#E5E7EB" /></div>
               <h2 className="text-[22px] font-bold text-[#0a0f1e] mt-6">You haven't listed any properties yet</h2>
               <p className="text-[14px] text-[#6a6a6a] max-w-[420px] mx-auto leading-[1.55] mt-3">
                 Add your first listing in 90 seconds. It auto-translates into any language the moment it's live.
@@ -926,12 +926,12 @@ const ListingsPage = () => {
                 className="mt-8 rounded-full px-5 py-2.5 text-[14px] font-bold text-white inline-flex items-center gap-2 transition-all hover:shadow-[0_8px_24px_rgba(37,99,235,0.3)]"
                 style={{ background: 'linear-gradient(135deg, #2563EB, #4F88FF, #93C5FD)' }}
               >
-                <Ico icon="solar:add-square-bold" size={16} color="#fff" /> Add your first listing
+                <PlusCircle size={16} /> Add your first listing
               </button>
             </div>
           ) : (
             <div className="bg-white rounded-3xl border border-[#E5E5E5] py-12 px-8 text-center">
-              <div className="flex justify-center"><Ico icon="solar:magnifer-square-linear" size={56} color="#E5E7EB" /></div>
+              <div className="flex justify-center"><Search size={56} color="#E5E7EB" /></div>
               <h2 className="text-[22px] font-bold text-[#0a0f1e] mt-6">Nothing matches that filter</h2>
               <p className="text-[14px] text-[#6a6a6a] max-w-[420px] mx-auto leading-[1.55] mt-3">
                 Try clearing some filters or change your search term.
@@ -980,17 +980,17 @@ const ListingsPage = () => {
                     <img src={thumb} alt="" className="w-32 h-24 rounded-xl object-cover shrink-0" loading="lazy" />
                   ) : (
                     <div className="w-32 h-24 rounded-xl bg-[#F3F4F6] flex items-center justify-center text-[#D1D5DB] shrink-0">
-                      <Ico icon="solar:buildings-linear" size={28} />
+                      <Building2 size={28} />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
                     <h3 className="text-[15px] font-bold text-[#0a0f1e] truncate">{l.address}</h3>
                     <p className="text-[12px] text-[#6a6a6a] truncate">{l.suburb}{l.state ? `, ${l.state}` : ''}</p>
                     <div className="flex items-center gap-4 mt-2 text-[12px] text-[#6a6a6a]">
-                      <span className="inline-flex items-center gap-1"><Ico icon="solar:bed-linear" size={12} />{l.beds ?? 0}</span>
-                      <span className="inline-flex items-center gap-1"><Ico icon="solar:bath-linear" size={12} />{l.baths ?? 0}</span>
-                      <span className="inline-flex items-center gap-1"><Ico icon="solar:car-linear" size={12} />{l.parking ?? 0}</span>
-                      <span className="inline-flex items-center gap-1"><Ico icon="solar:eye-linear" size={12} />{stats.views[l.id] ?? l.views ?? 0}</span>
+                      <span className="inline-flex items-center gap-1"><BedDouble size={12} />{l.beds ?? 0}</span>
+                      <span className="inline-flex items-center gap-1"><Bath size={12} />{l.baths ?? 0}</span>
+                      <span className="inline-flex items-center gap-1"><Car size={12} />{l.parking ?? 0}</span>
+                      <span className="inline-flex items-center gap-1"><Eye size={12} />{stats.views[l.id] ?? l.views ?? 0}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">

@@ -14,6 +14,16 @@ const StepVoice     = lazy(() => import('./StepVoice'));
 const StepTranslate = lazy(() => import('./StepTranslate'));
 const StepSettings  = lazy(() => import('./StepSettings'));
 const StepPreview   = lazy(() => import('./StepPreview'));
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 function parseSuburbFallback(address: string): string {
   const segments = address.split(',').map(s => s.trim());
@@ -237,6 +247,8 @@ interface Props {
   editPropertyId?: string | null;
   /** When provided, the form loads this property's data but creates a new listing */
   duplicatePropertyId?: string | null;
+  /** When true, the listing is currently live — show confirm dialog before saving */
+  isPublishedListing?: boolean;
 }
 
 const formatPriceForDB = (draft: ListingDraft): string => {
@@ -252,7 +264,7 @@ const formatPriceForDB = (draft: ListingDraft): string => {
   }
 };
 
-const PocketListingForm = ({ onPublish, onCancel, initialListingType, editPropertyId, duplicatePropertyId }: Props) => {
+const PocketListingForm = ({ onPublish, onCancel, initialListingType, editPropertyId, duplicatePropertyId, isPublishedListing }: Props) => {
   const loadPropertyId = editPropertyId || duplicatePropertyId;
   const [step, setStep] = useState(0);
   const [draft, setDraft] = useState<ListingDraft>(() => ({
@@ -262,6 +274,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
   const [publishing, setPublishing] = useState(false);
   const [loadingEdit, setLoadingEdit] = useState(!!loadPropertyId);
   const [publishedListing, setPublishedListing] = useState<{ id: string; address: string; title: string } | null>(null);
+  const [showLiveEditConfirm, setShowLiveEditConfirm] = useState(false);
   const autoSaveRef = useRef<ReturnType<typeof setInterval>>();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -425,6 +438,11 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
   };
 
   const handlePublish = async () => {
+    if (editPropertyId && isPublishedListing && !showLiveEditConfirm) {
+      setShowLiveEditConfirm(true);
+      return;
+    }
+    setShowLiveEditConfirm(false);
     if (publishing) return;
     setPublishing(true);
 
@@ -739,12 +757,12 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
               Listing published
             </p>
             <p className="flex items-center gap-2 text-muted-foreground">
-              <Loader2 size={14} className="animate-spin text-primary" />
-              Matching buyers to your listing…
+              <span className="w-5 h-5 rounded-full bg-emerald-500/80 flex items-center justify-center text-white text-xs">✓</span>
+              Matching buyers in background…
             </p>
             <p className="flex items-center gap-2 text-muted-foreground">
-              <Loader2 size={14} className="animate-spin text-primary" />
-              Generating multilingual versions…
+              <span className="w-5 h-5 rounded-full bg-emerald-500/80 flex items-center justify-center text-white text-xs">✓</span>
+              Generating multilingual versions in background…
             </p>
           </div>
 
@@ -855,6 +873,23 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
           </Button>
         )}
       </div>
+
+      <AlertDialog open={showLiveEditConfirm} onOpenChange={setShowLiveEditConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Save changes to live listing?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This listing is currently visible to buyers. Changes will go live immediately after saving.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => handlePublish()}>
+              Yes, save changes
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

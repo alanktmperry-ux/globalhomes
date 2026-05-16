@@ -456,6 +456,11 @@ const StepBasics = ({ draft, update }: Props) => {
                   Reset to 4 weeks (${(draft.rentalWeekly * 4).toLocaleString('en-AU')})
                 </button>
               )}
+              {draft.bondAmount > 0 && draft.rentalWeekly > 0 && draft.bondAmount > draft.rentalWeekly * 4 && (
+                <p className="text-[11px] font-medium text-destructive mt-1">
+                  Bond exceeds 4 weeks rent (${(draft.rentalWeekly * 4).toLocaleString('en-AU')}). All Australian state residential tenancy acts cap bonds at 4 weeks rent. Reduce this amount before listing.
+                </p>
+              )}
             </div>
           </div>
         </div>

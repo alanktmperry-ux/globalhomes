@@ -301,18 +301,26 @@ const TeamPage = () => {
   };
 
   const handleDeactivateCode = async (id: string) => {
-    await supabase.from('agency_invite_codes').update({ is_active: false }).eq('id', id);
-    loadData();
+    try {
+      const { error } = await supabase.from('agency_invite_codes').update({ is_active: false }).eq('id', id);
+      if (error) throw error;
+      loadData();
+    } catch (err: unknown) {
+      toast.error('Error — ' + getErrorMessage(err));
+    }
   };
 
-  const handleRemoveMember = async (memberId: string, memberUserId: string) => {
-    if (memberUserId === user?.id) {
-      toast.error("You can't remove yourself");
-      return;
+  const handleRemoveMember = async () => {
+    if (!removeTarget) return;
+    try {
+      const { error } = await supabase.from('agency_members').delete().eq('id', removeTarget.id);
+      if (error) throw error;
+      toast.success('Member removed');
+      setRemoveTarget(null);
+      loadData();
+    } catch (err: unknown) {
+      toast.error('Error — ' + getErrorMessage(err));
     }
-    await supabase.from('agency_members').delete().eq('id', memberId);
-    toast.success('Member removed');
-    loadData();
   };
 
   const handleChangeRole = async (memberId: string, newRole: string) => {

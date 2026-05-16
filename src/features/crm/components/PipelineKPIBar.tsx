@@ -37,7 +37,16 @@ export function PipelineKPIBar({ onUrgencyClick }: Props) {
   const counts: Record<UrgencyTier, number> = { hot: 0, warm: 0, cool: 0, cold: 0 };
   for (const l of active) counts[(l as any).urgency as UrgencyTier]++;
 
+  const pipelineValue = active.reduce((sum, l) => sum + ((l as any).budget_max ?? 0), 0);
+  const leadsWithValue = active.filter(l => ((l as any).budget_max ?? 0) > 0).length;
+  const formatValue = (v: number) => {
+    if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`;
+    if (v >= 1_000) return `$${Math.round(v / 1_000)}k`;
+    return `$${v}`;
+  };
+
   return (
+    <>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {URGENCY_TIERS.map(tier => {
         const cfg = TILE_CONFIG[tier];

@@ -951,12 +951,17 @@ const TrustAccountingPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowCloseConfirm(true)}
-                  disabled={!agent?.id}
+                  disabled={!agent?.id || overdrawnLedgers.length > 0}
                   className="bg-white border border-[#E5E5E5] text-[#0a0f1e] rounded-full px-4 py-2 text-[12px] font-bold inline-flex items-center gap-2 hover:bg-[#F9FAFB] disabled:opacity-50 disabled:cursor-not-allowed transition"
                 >
                   <Lock size={14} style={{ display: 'inline-flex', flexShrink: 0 }} />
                   Close {periodLabel}
                 </button>
+                {overdrawnLedgers.length > 0 && (
+                  <p className="text-[11px] text-destructive font-semibold">
+                    Cannot close period — {overdrawnLedgers.length} client ledger{overdrawnLedgers.length > 1 ? 's are' : ' is'} overdrawn. Remedy the shortfall first.
+                  </p>
+                )}
               </div>
             )}
           </div>

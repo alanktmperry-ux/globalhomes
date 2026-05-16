@@ -413,6 +413,41 @@ export default function SuppliersPage() {
           <DialogHeader>
             <DialogTitle>Assign job to {assignFor?.business_name}</DialogTitle>
           </DialogHeader>
+          {assignFor && (() => {
+            const exp = assignFor.insurance_expiry;
+            if (!exp) {
+              return (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 flex items-start gap-2">
+                  <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                  <p className="text-sm text-amber-900 dark:text-amber-200">
+                    No insurance certificate on file for this supplier. Consider requesting one before assigning work.
+                  </p>
+                </div>
+              );
+            }
+            const days = Math.floor((new Date(exp).getTime() - Date.now()) / 86400000);
+            if (days < 0) {
+              return (
+                <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 flex items-start gap-2">
+                  <AlertTriangle size={16} className="text-destructive shrink-0 mt-0.5" />
+                  <p className="text-sm text-destructive">
+                    Insurance expired {Math.abs(days)} day{Math.abs(days) === 1 ? '' : 's'} ago. Do not assign until renewed.
+                  </p>
+                </div>
+              );
+            }
+            if (days < 30) {
+              return (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 flex items-start gap-2">
+                  <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                  <p className="text-sm text-amber-900 dark:text-amber-200">
+                    Insurance expires in {days} day{days === 1 ? '' : 's'} — request a renewed certificate soon.
+                  </p>
+                </div>
+              );
+            }
+            return null;
+          })()}
           {loadingJobs ? (
             <div className="flex justify-center py-6"><Loader2 className="animate-spin text-primary"/></div>
           ) : openJobs.length === 0 ? (

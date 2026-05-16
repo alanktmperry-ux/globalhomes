@@ -52,7 +52,7 @@ interface Job {
 
 interface Supplier { id: string; business_name: string; trade_category: string; email: string | null; }
 
-const STATUSES = ['all', 'new', 'acknowledged', 'assigned', 'in_progress', 'completed', 'cancelled'];
+const STATUSES = ['all', 'new', 'acknowledged', 'assigned', 'quoted', 'approved', 'in_progress', 'completed', 'cancelled'] as const;
 
 import { APlusBadge, type APlusBadgeTone } from '@/components/ui/data-table-aplus';
 
@@ -64,6 +64,7 @@ const STATUS_TONE: Record<string, APlusBadgeTone> = {
   completed: 'green',
   cancelled: 'grey',
   quoted: 'cyan',
+  approved: 'green',
 };
 const statusBadge = (s: string) => (
   <APlusBadge tone={STATUS_TONE[s] || 'grey'} label={s.replace('_', ' ')} />
@@ -173,6 +174,70 @@ export default function MaintenancePage() {
   const [entryFor, setEntryFor] = useState<Job | null>(null);
   const [entryDate, setEntryDate] = useState('');
   const [entrySaving, setEntrySaving] = useState(false);
+
+  // new job dialog
+  const [newJobOpen, setNewJobOpen] = useState(false);
+  const [newJobSaving, setNewJobSaving] = useState(false);
+  const [newJobProperties, setNewJobProperties] = useState<Array<{ id: string; address: string; suburb: string | null; agency_id: string | null }>>([]);
+  const [newJobTenancies, setNewJobTenancies] = useState<Array<{ id: string; tenant_name: string | null }>>([]);
+  const [newJobPropertyId, setNewJobPropertyId] = useState('');
+  const [newJobTenancyId, setNewJobTenancyId] = useState('');
+  const [newJobDescription, setNewJobDescription] = useState('');
+  const [newJobPriority, setNewJobPriority] = useState('standard');
+  const [newJobReportedBy, setNewJobReportedBy] = useState('');
+
+  const openNewJob = async () => {
+    setNewJobOpen(true);
+    setNewJobPropertyId('');
+    setNewJobTenancyId('');
+    setNewJobDescription('');
+    setNewJobPriority('standard');
+    setNewJobReportedBy('');
+    setNewJobTenancies([]);
+    if (!agentId) return;
+    const { data } = await supabase
+      .from('properties')
+      .select('id, address, suburb, agency_id')
+      .eq('agent_id', agentId)
+      .order('address', { ascending: true });
+    setNewJobProperties((data as any) || []);
+  };
+
+  useEffect(() => {
+    if (!newJobPropertyId) { setNewJobTenancies([]); setNewJobTenancyId(''); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('tenancies')
+        .select('id, tenant_name, status')
+        .eq('property_id', newJobPropertyId)
+        .eq('status', 'active');
+      if (cancelled) return;
+      setNewJobTenancies(((data as any) || []).map((t: any) => ({ id: t.id, tenant_name: t.tenant_name })));
+    })();
+    return () => { cancelled = true; };
+  }, [newJobPropertyId]);
+
+  const submitNewJob = async () => {
+    if (!agentId || !newJobPropertyId || !newJobDescription.trim()) return;
+    const title = newJobDescription.trim().slice(0, 80);
+    setNewJobSaving(true);
+    const { error } = await supabase.from('maintenance_jobs').insert({
+      property_id: newJobPropertyId,
+      tenancy_id: newJobTenancyId || null,
+      agent_id: agentId,
+      title,
+      description: newJobDescription.trim(),
+      priority: newJobPriority,
+      status: 'new',
+      reported_by: newJobReportedBy.trim() || null,
+    } as any);
+    setNewJobSaving(false);
+    if (error) { toast.error(error.message || 'Failed to create job'); return; }
+    toast.success('Job created');
+    setNewJobOpen(false);
+    load();
+  };
 
   const load = async () => {
     if (!agentId) return;
@@ -339,6 +404,9 @@ export default function MaintenancePage() {
             className="h-9"
           >
             {savingThreshold ? <Loader2 size={14} className="animate-spin" /> : 'Save'}
+          </Button>
+          <Button size="sm" onClick={openNewJob} className="h-9">
+            New Job
           </Button>
         </div>
       </div>
@@ -606,6 +674,76 @@ export default function MaintenancePage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setQuoteFor(null)}>Discard</Button>
             <Button onClick={submitQuote} disabled={!quoteAmount}>Save quote</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* New job dialog */}
+      <Dialog open={newJobOpen} onOpenChange={o => !newJobSaving && setNewJobOpen(o)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>New maintenance job</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label className="text-xs">Property</Label>
+              <Select value={newJobPropertyId} onValueChange={setNewJobPropertyId}>
+                <SelectTrigger><SelectValue placeholder="Select property"/></SelectTrigger>
+                <SelectContent>
+                  {newJobProperties.length === 0 ? (
+                    <div className="p-3 text-xs text-muted-foreground">No properties found.</div>
+                  ) : newJobProperties.map(p => (
+                    <SelectItem key={p.id} value={p.id}>{p.address}{p.suburb ? `, ${p.suburb}` : ''}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Tenancy (optional)</Label>
+              <Select value={newJobTenancyId || 'none'} onValueChange={v => setNewJobTenancyId(v === 'none' ? '' : v)} disabled={!newJobPropertyId}>
+                <SelectTrigger><SelectValue placeholder="No tenancy"/></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No tenancy</SelectItem>
+                  {newJobTenancies.map(t => (
+                    <SelectItem key={t.id} value={t.id}>{t.tenant_name || 'Unnamed tenant'}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Description</Label>
+              <Textarea
+                value={newJobDescription}
+                onChange={e => setNewJobDescription(e.target.value)}
+                placeholder="What needs to be fixed?"
+                rows={3}
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Priority</Label>
+              <Select value={newJobPriority} onValueChange={setNewJobPriority}>
+                <SelectTrigger><SelectValue/></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="urgent">Urgent</SelectItem>
+                  <SelectItem value="standard">Standard</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="cosmetic">Cosmetic</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Reported by (optional)</Label>
+              <Input
+                value={newJobReportedBy}
+                onChange={e => setNewJobReportedBy(e.target.value)}
+                placeholder="e.g. tenant phone-in, walk-in"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setNewJobOpen(false)} disabled={newJobSaving}>Cancel</Button>
+            <Button onClick={submitNewJob} disabled={newJobSaving || !newJobPropertyId || !newJobDescription.trim()}>
+              {newJobSaving ? <Loader2 size={14} className="animate-spin mr-2"/> : null}
+              Create job
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

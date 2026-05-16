@@ -9,7 +9,7 @@ export type LeadSource =
   | 'manual' | 'enquiry_form' | 'open_home'
   | 'eoi' | 'pre_approval' | 'referral' | 'portal';
 
-export type ActivityType = 'note' | 'call' | 'email' | 'meeting' | 'task';
+export type ActivityType = 'note' | 'call' | 'email' | 'meeting' | 'task' | 'sms';
 
 /**
  * A CRMLead now references a Contact (the source of truth for the person)

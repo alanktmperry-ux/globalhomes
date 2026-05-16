@@ -138,7 +138,7 @@ export function LeadDetailModal({ lead, onClose, onUpdate }: Props) {
     if (!smsBody.trim()) return;
     const encodedBody = encodeURIComponent(smsBody);
     window.open(`sms:${lead.phone}?body=${encodedBody}`, '_self');
-    await addActivity('sms' as ActivityType, smsBody);
+    await addActivity('sms', smsBody);
     setSmsBody('');
     setSmsSent(true);
     setTimeout(() => { setShowSMSComposer(false); setSmsSent(false); }, 1500);

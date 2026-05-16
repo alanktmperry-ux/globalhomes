@@ -701,8 +701,7 @@ export default function PropertyDetailPage() {
                 </Link>
               )}
               <div className="mt-4 bg-[#EFF6FF] border border-[#2563EB]/15 rounded-2xl p-4 flex items-center gap-3 flex-wrap">
-                {/* @ts-expect-error — iconify-icon is a web component */}
-                <iconify-icon icon="solar:earth-linear" style={{ fontSize: '20px', color: '#2563EB', display: 'inline-flex', lineHeight: 1 }} />
+                <Globe size={20} color="#2563EB" style={{ display: 'inline-flex', flexShrink: 0 }} />
                 <span className="text-[13px] font-semibold text-[#1E40AF]">
                   {tp('property.translatedIn') || 'Currently showing in your language'}
                 </span>
@@ -790,8 +789,7 @@ export default function PropertyDetailPage() {
             {/* School zone feature row */}
             {property.schoolZoneTop && (
               <div className="flex items-center gap-3 border border-slate-200 rounded-2xl px-4 py-3 bg-white">
-                {/* @ts-expect-error iconify-icon is a web component */}
-                <iconify-icon icon="solar:square-academic-cap-linear" style={{ fontSize: '20px', color: '#2563EB' }} aria-hidden="true" />
+                <GraduationCap size={20} color="#2563EB" style={{ display: 'inline-flex', flexShrink: 0 }} />
                 <div className="flex-1 min-w-0">
                   <p className="text-[11px] uppercase tracking-wide text-slate-400 font-medium">{tp('property.schoolZone.label')}</p>
                   <p className="text-sm font-semibold text-slate-900 truncate">
@@ -1184,12 +1182,12 @@ export default function PropertyDetailPage() {
             {/* Property features */}
             {(() => {
               const rows: { icon: string; label: string; value: string }[] = [];
-              if (property.beds) rows.push({ icon: 'solar:bed-linear', label: 'BEDROOMS', value: String(property.beds) });
-              if (property.baths) rows.push({ icon: 'solar:bath-linear', label: 'BATHROOMS', value: String(property.baths) });
-              if (property.parking) rows.push({ icon: 'solar:card-linear', label: 'PARKING', value: `${property.parking} ${property.parking === 1 ? 'space' : 'spaces'}` });
-              if (property.sqm) rows.push({ icon: 'solar:ruler-linear', label: 'LAND SIZE', value: `${property.sqm} m²` });
-              if (property.propertyType) rows.push({ icon: 'solar:home-linear', label: 'PROPERTY TYPE', value: property.propertyType });
-              if ((property as any).yearBuilt) rows.push({ icon: 'solar:calendar-linear', label: 'YEAR BUILT', value: String((property as any).yearBuilt) });
+              if (property.beds) rows.push({ icon: BedDouble, label: 'BEDROOMS', value: String(property.beds) });
+              if (property.baths) rows.push({ icon: Bath, label: 'BATHROOMS', value: String(property.baths) });
+              if (property.parking) rows.push({ icon: ParkingCircle, label: 'PARKING', value: `${property.parking} ${property.parking === 1 ? 'space' : 'spaces'}` });
+              if (property.sqm) rows.push({ icon: Ruler, label: 'LAND SIZE', value: `${property.sqm} m²` });
+              if (property.propertyType) rows.push({ icon: Home, label: 'PROPERTY TYPE', value: property.propertyType });
+              if ((property as any).yearBuilt) rows.push({ icon: Calendar, label: 'YEAR BUILT', value: String((property as any).yearBuilt) });
               if (rows.length === 0) return null;
               return (
                 <div className="bg-white border border-[#E5E5E5] rounded-2xl p-7 mt-2">
@@ -1219,8 +1217,7 @@ export default function PropertyDetailPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
                   {property.features.map((f) => (
                     <div key={f} className="flex items-center gap-3 text-[14px] text-[#374151]">
-                      {/* @ts-expect-error iconify-icon is a web component */}
-                      <iconify-icon icon="solar:check-circle-linear" style={{ fontSize: '18px', color: '#34D399', flexShrink: 0 }} />
+                      <CheckCircle2 size={18} color="#34D399" style={{ display: 'inline-flex', flexShrink: 0 }} />
                       <span>{f}</span>
                     </div>
                   ))}
@@ -1559,8 +1556,7 @@ function SimilarPropertiesSection({ suburb, state, excludeId }: { suburb: string
             className="text-[13px] font-bold text-[#2563EB] hover:underline inline-flex items-center gap-1.5"
           >
             See all {suburb} listings
-            {/* @ts-expect-error iconify-icon web component */}
-            <iconify-icon icon="solar:arrow-right-linear" style={{ fontSize: '14px' }} />
+            <ArrowRight size={14} style={{ display: 'inline-flex', flexShrink: 0 }} />
           </Link>
         )}
       </div>

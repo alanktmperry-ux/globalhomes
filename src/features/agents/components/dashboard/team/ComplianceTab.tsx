@@ -142,10 +142,10 @@ export default function ComplianceTab() {
   const dueSoonCount = counts.due_soon + counts.missing;
 
   const statCards = [
-    { key: 'compliant', label: 'COMPLIANT', value: counts.compliant, sub: `of ${enriched.length} agents`, icon: 'solar:shield-check-bold', iconColor: '#065F46', iconBg: '#ECFDF5', highlight: false },
-    { key: 'due_soon', label: 'DUE SOON', value: dueSoonCount, sub: 'expiring in next 60 days', icon: 'solar:clock-circle-bold', iconColor: '#D97706', iconBg: '#FFFBEB', highlight: dueSoonCount > 0, highlightColor: '#D97706' },
-    { key: 'overdue', label: 'OVERDUE', value: overdueCount, sub: 'past renewal — action required', icon: 'solar:danger-triangle-bold', iconColor: '#DC2626', iconBg: '#FEF2F2', highlight: overdueCount > 0, highlightColor: '#DC2626' },
-    { key: 'agents', label: 'ACTIVE AGENTS', value: enriched.length, sub: 'tracked across the agency', icon: 'solar:users-group-rounded-bold', iconColor: '#2563EB', iconBg: '#EFF6FF', highlight: false },
+    { key: 'compliant', label: 'COMPLIANT', value: counts.compliant, sub: `of ${enriched.length} agents`, icon: ShieldCheck, iconColor: '#065F46', iconBg: '#ECFDF5', highlight: false },
+    { key: 'due_soon', label: 'DUE SOON', value: dueSoonCount, sub: 'expiring in next 60 days', icon: Clock, iconColor: '#D97706', iconBg: '#FFFBEB', highlight: dueSoonCount > 0, highlightColor: '#D97706' },
+    { key: 'overdue', label: 'OVERDUE', value: overdueCount, sub: 'past renewal — action required', icon: AlertTriangle, iconColor: '#DC2626', iconBg: '#FEF2F2', highlight: overdueCount > 0, highlightColor: '#DC2626' },
+    { key: 'agents', label: 'ACTIVE AGENTS', value: enriched.length, sub: 'tracked across the agency', icon: Users, iconColor: '#2563EB', iconBg: '#EFF6FF', highlight: false },
   ] as const;
 
   const filterChips: { key: 'all' | Urgency; label: string }[] = [

@@ -728,10 +728,10 @@ const RentRollPage = () => {
 
   // KPI card colour map per metric tone
   const kpiCards = [
-    { key: 'managed', label: 'TOTAL MANAGED', value: String(activeTenancies.length), sub: `${properties.length} rental ${properties.length === 1 ? 'property' : 'properties'}`, icon: 'solar:home-2-bold', iconColor: '#065F46', iconBg: '#ECFDF5' },
-    { key: 'rent', label: 'WEEKLY RENT', value: `$${totalWeeklyRent.toLocaleString('en-AU', { maximumFractionDigits: 0 })}`, sub: 'across active tenancies', icon: 'solar:wallet-2-bold', iconColor: '#2563EB', iconBg: '#EFF6FF' },
-    { key: 'arrears', label: 'IN ARREARS', value: String(overdueCount), sub: arrearsSummary.totalOwed > 0 ? `$${arrearsSummary.totalOwed.toLocaleString('en-AU', { maximumFractionDigits: 0 })} outstanding` : 'no overdue tenants', icon: 'solar:danger-triangle-bold', iconColor: '#DC2626', iconBg: '#FEF2F2', emphasise: overdueCount > 0 },
-    { key: 'mgmt', label: 'MONTHLY MGMT FEES', value: `$${monthlyMgmtFees.toLocaleString('en-AU', { maximumFractionDigits: 0 })}`, sub: 'this month', icon: 'solar:clock-circle-bold', iconColor: '#D97706', iconBg: '#FFFBEB' },
+    { key: 'managed', label: 'TOTAL MANAGED', value: String(activeTenancies.length), sub: `${properties.length} rental ${properties.length === 1 ? 'property' : 'properties'}`, icon: Home, iconColor: '#065F46', iconBg: '#ECFDF5' },
+    { key: 'rent', label: 'WEEKLY RENT', value: `$${totalWeeklyRent.toLocaleString('en-AU', { maximumFractionDigits: 0 })}`, sub: 'across active tenancies', icon: Wallet, iconColor: '#2563EB', iconBg: '#EFF6FF' },
+    { key: 'arrears', label: 'IN ARREARS', value: String(overdueCount), sub: arrearsSummary.totalOwed > 0 ? `$${arrearsSummary.totalOwed.toLocaleString('en-AU', { maximumFractionDigits: 0 })} outstanding` : 'no overdue tenants', icon: AlertTriangle, iconColor: '#DC2626', iconBg: '#FEF2F2', emphasise: overdueCount > 0 },
+    { key: 'mgmt', label: 'MONTHLY MGMT FEES', value: `$${monthlyMgmtFees.toLocaleString('en-AU', { maximumFractionDigits: 0 })}`, sub: 'this month', icon: Clock, iconColor: '#D97706', iconBg: '#FFFBEB' },
   ];
 
   return (

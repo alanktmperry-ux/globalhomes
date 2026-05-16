@@ -407,6 +407,9 @@ export default function MaintenancePage() {
           >
             {savingThreshold ? <Loader2 size={14} className="animate-spin" /> : 'Save'}
           </Button>
+          <Button size="sm" onClick={openNewJob} className="h-9">
+            New Job
+          </Button>
         </div>
       </div>
 

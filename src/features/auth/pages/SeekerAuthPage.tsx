@@ -70,7 +70,7 @@ const SeekerAuthPage = () => {
         return;
       }
     }
-    navigate('/', { replace: true });
+    navigate('/seeker/dashboard', { replace: true });
   };
 
   const handleSignIn = async (e: React.FormEvent) => {

@@ -101,9 +101,11 @@ const PreMarketPage = () => {
     open: false, content: '', loading: false, property: null,
   });
   const [copied, setCopied] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
+    setFetchError(false);
     try {
       const { data } = await supabase
         .from('seller_likelihood_scores')

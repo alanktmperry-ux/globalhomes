@@ -478,6 +478,21 @@ export default function SuppliersPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!toRemove} onOpenChange={o => !o && setToRemove(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove {toRemove?.business_name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This sets the supplier to inactive. Jobs already assigned to them won't be affected.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRemove}>Remove</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

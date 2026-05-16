@@ -19,7 +19,7 @@ interface CreditPackage {
 
 export default function BuyCreditsPage() {
   const { t } = useTranslation();
-  const [params, setParams] = useSearchParams();
+  const [params] = useSearchParams();
   const success = params.get('success') === 'true';
   const cancelled = params.get('cancelled') === 'true';
   const { balance, loading: balanceLoading } = useHaloCreditsBalance();

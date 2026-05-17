@@ -465,7 +465,7 @@ const BankReconciliationPage = () => {
         .from('trust_reconciliations')
         .update({ status: 'manual', description: manualTarget.description
           ? `${manualTarget.description} [Manual: ${manualReason}]`
-          : `Manual reconciliation: ${manualReason}` } as any)
+          : `Manual reconciliation: ${manualReason}` })
         .eq('id', manualTarget.id);
       if (error) throw error;
       toast.success('Marked as manually reconciled — reason recorded in audit trail');

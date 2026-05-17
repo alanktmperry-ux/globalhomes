@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { PropertyRow } from '@/features/agents/types/listing';
 import MarketingSupplierToggle from '../MarketingSupplierToggle';
 import ListingPhotoGallery from './ListingPhotoGallery';
+import { SuburbPoolDepth } from '@/features/boost/components/SuburbPoolDepth';
 import { supabase } from '@/integrations/supabase/client';
 import { dispatchNotification } from '@/shared/lib/notify';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -83,7 +84,27 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
     featured_until: listing.featured_until || null,
   });
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
-  
+  const [boostStats, setBoostStats] = useState<{ impressions: number; clicks: number } | null>(null);
+
+  useEffect(() => {
+    if (!boostState.is_featured || !boostState.featured_until) return;
+    const expiresAt = new Date(boostState.featured_until);
+    const startedAt = new Date(expiresAt.getTime() - 30 * 24 * 60 * 60 * 1000);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
+      .from('listing_events')
+      .select('event_type')
+      .eq('listing_id', listing.id)
+      .gte('created_at', startedAt.toISOString())
+      .then(({ data }: { data: { event_type: string }[] | null }) => {
+        const rows = data ?? [];
+        setBoostStats({
+          impressions: rows.filter(r => r.event_type === 'impression').length,
+          clicks: rows.filter(r => r.event_type === 'click').length,
+        });
+      });
+  }, [listing.id, boostState.is_featured, boostState.featured_until]);
+
 
   const [vendorName, setVendorName] = useState(listing.vendor_name || '');
   const [vendorEmail, setVendorEmail] = useState(listing.vendor_email || '');
@@ -470,6 +491,43 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               ))}
             </ul>
 
+            {boostStats !== null && (
+              <div className="rounded-xl border border-border bg-secondary/40 p-4 space-y-3">
+                <p className="text-xs font-semibold text-foreground">Boost performance · this period</p>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <p className="text-lg font-bold text-foreground">{boostStats.impressions.toLocaleString()}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">impressions</p>
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-foreground">{boostStats.clicks.toLocaleString()}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">clicks</p>
+                  </div>
+                  {boostStats.impressions > 0 && (
+                    <div>
+                      <p className="text-lg font-bold text-foreground">
+                        {((boostStats.clicks / boostStats.impressions) * 100).toFixed(1)}%
+                      </p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wide">CTR</p>
+                    </div>
+                  )}
+                </div>
+                {boostState.featured_until && (() => {
+                  const daysLeft = Math.ceil(
+                    (new Date(boostState.featured_until!).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+                  );
+                  if (daysLeft > 3) return null;
+                  return (
+                    <p className="text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-lg p-2.5">
+                      ⚡ Your boost expires in {daysLeft} day{daysLeft !== 1 ? 's' : ''} — it delivered{' '}
+                      {boostStats.impressions.toLocaleString()} impressions and {boostStats.clicks} clicks.
+                      Renew to keep your listing at the top.
+                    </p>
+                  );
+                })()}
+              </div>
+            )}
+
             <p className="text-xs text-muted-foreground">
               Boost expires{' '}
               <span className="font-medium text-foreground">
@@ -674,6 +732,10 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                 </div>
               );
             })()}
+
+            {!showPaymentStep && listing.suburb && (
+              <SuburbPoolDepth suburb={listing.suburb} currentListingId={listing.id} />
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Featured card */}

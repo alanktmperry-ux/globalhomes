@@ -37,6 +37,7 @@ interface Reconciliation {
   matched_payment_id: string | null;
   status: string;
   created_at: string;
+  bank_reference?: string | null;
 }
 
 interface MatchCandidate {

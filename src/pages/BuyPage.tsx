@@ -443,6 +443,10 @@ const BuyPage = () => {
     setSearchParams({});
   };
 
+  const discoverySuburb = filters.suburbs[0] ?? null;
+  const { suburb: detectedSuburb, featuredSlots } = useListingDiscovery(discoverySuburb, 'sale');
+
+
   const activeChipCount = useMemo(
     () => filters.suburbs.length
       + filters.features.length

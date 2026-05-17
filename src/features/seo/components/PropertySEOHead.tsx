@@ -29,51 +29,53 @@ export function PropertySEOHead({ property, agent }: PropertySEOHeadProps) {
     return 'SingleFamilyResidence';
   })();
 
-  const schema = {
+  const breadcrumbs = [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: APP_URL + '/' },
+    isRent
+      ? { '@type': 'ListItem', position: 2, name: 'Rentals', item: APP_URL + '/rent' }
+      : { '@type': 'ListItem', position: 2, name: 'Properties for Sale', item: APP_URL + '/buy' },
+    { '@type': 'ListItem', position: 3, name: property.address ?? property.suburb ?? 'Listing' },
+  ];
+
+  const graph = {
     '@context': 'https://schema.org',
-    '@type': schemaType,
-    name: property.title ?? title,
-    description,
-    url,
-    image: img ? [img] : undefined,
-    offers: {
-      '@type': 'Offer',
-      price: property.price,
-      priceCurrency: property.currency_code || 'AUD',
-      availability: 'https://schema.org/InStock',
-    },
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: property.address,
-      addressLocality: property.suburb,
-      addressRegion: property.state,
-      postalCode: property.postcode,
-      addressCountry: property.country || 'AU',
-    },
-    numberOfRooms: property.beds,
-    numberOfBathroomsTotal: property.baths || undefined,
-    parkingSpaces: property.parking || undefined,
-    amenityFeature: property.features && Array.isArray(property.features) && property.features.length > 0
-      ? property.features.map((f: string) => ({
-          '@type': 'LocationFeatureSpecification',
-          name: f,
-          value: true,
-        }))
-      : undefined,
-    datePosted: property.listed_date || undefined,
-    floorSize: property.land_size ? { '@type': 'QuantitativeValue', value: property.land_size, unitCode: 'MTK' } : undefined,
-    ...(property.virtual_tour_url ? { virtualTourUrl: property.virtual_tour_url } : {}),
-    ...(agent ? {
-      agent: {
-        '@type': 'RealEstateAgent',
-        name: agent.name || agent.full_name,
-        image: agent.avatar_url || agent.avatarUrl,
-      }
-    } : {}),
-    speakable: {
-      '@type': 'SpeakableSpecification',
-      cssSelector: ['h1', '[data-speakable]'],
-    },
+    '@graph': [
+      {
+        '@type': schemaType,
+        name: property.title ?? title,
+        description,
+        url,
+        image: img ? [img] : undefined,
+        offers: {
+          '@type': 'Offer',
+          price: property.price,
+          priceCurrency: property.currency_code || 'AUD',
+          availability: 'https://schema.org/InStock',
+        },
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: property.address,
+          addressLocality: property.suburb,
+          addressRegion: property.state,
+          postalCode: property.postcode,
+          addressCountry: property.country || 'AU',
+        },
+        numberOfRooms: property.beds,
+        numberOfBathroomsTotal: property.baths || undefined,
+        parkingSpaces: property.parking || undefined,
+        amenityFeature: property.features && Array.isArray(property.features) && property.features.length > 0
+          ? property.features.map((f: string) => ({ '@type': 'LocationFeatureSpecification', name: f, value: true }))
+          : undefined,
+        datePosted: property.listed_date || undefined,
+        floorSize: property.land_size ? { '@type': 'QuantitativeValue', value: property.land_size, unitCode: 'MTK' } : undefined,
+        ...(property.virtual_tour_url ? { virtualTourUrl: property.virtual_tour_url } : {}),
+        ...(agent ? { agent: { '@type': 'RealEstateAgent', name: agent.name, url: agent.profile_url } } : {}),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: breadcrumbs,
+      },
+    ],
   };
 
   return (

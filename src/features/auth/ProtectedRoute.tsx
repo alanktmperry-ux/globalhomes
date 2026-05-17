@@ -59,7 +59,8 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
   if (!user) {
     if (requireAdmin || requireSupport) return <Navigate to="/admin/login" replace />;
     if (requirePartner) return <Navigate to="/" replace />;
-    return <Navigate to="/login" replace />;
+    const redirectParam = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={`/login?redirect=${redirectParam}`} replace />;
   }
 
   if (user && !user.email_confirmed_at && !isAdmin) {

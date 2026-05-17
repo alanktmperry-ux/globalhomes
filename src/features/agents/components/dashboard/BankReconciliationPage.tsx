@@ -506,7 +506,7 @@ const BankReconciliationPage = () => {
 
       if (entries.length === 0) { toast.error('No valid entries found'); return; }
 
-      const { error } = await supabase.from('trust_reconciliations').insert(entries as any);
+      const { error } = await supabase.from('trust_reconciliations').insert(entries);
       if (error) throw error;
 
       toast.success(`${entries.length} bank statement entries imported`);

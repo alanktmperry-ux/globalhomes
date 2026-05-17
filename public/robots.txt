@@ -94,5 +94,11 @@ Disallow: /partner/
 User-agent: Bytespider
 Disallow: /
 
+User-agent: CCBot
+Allow: /
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /partner/
+
 # llms.txt
 LLMs: https://listhq.com.au/llms.txt

@@ -686,7 +686,7 @@ export default function PropertyDetailPage() {
                   ? formatAddress(`${property.suburb ?? ''}, ${property.state ?? ''}`)
                   : formatAddress(`${property.address ?? ''}${property.country && property.country !== 'Australia' ? `, ${property.country}` : ''}`)}
               </p>
-              {property.status === 'under_offer' && (
+              {(property.status as string) === 'under_offer' && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 mt-2 rounded-full bg-amber-100 text-amber-800 text-sm font-medium">
                   <span className="w-2 h-2 rounded-full bg-amber-500" />
                   {tp('property.underOfferBadge')}

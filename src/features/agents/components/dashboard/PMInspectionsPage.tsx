@@ -623,13 +623,13 @@ ${agencyName || ''}`.trim();
         await supabase.from('maintenance_jobs').insert({
           tenancy_id: completeFor.tenancy_id,
           property_id: t.property_id,
-          agent_id: agentId,
+          agent_id: agentId!,
           reported_by: 'agent',
           title: `Follow-up from ${TYPE_LABEL[completeFor.inspection_type].toLowerCase()} inspection at ${addr}`,
           description: completeForm.notes.trim() || null,
           priority: 'routine',
           status: 'open',
-        } as any);
+        });
       }
     }
     setSavingComplete(false);

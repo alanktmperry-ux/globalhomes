@@ -17,6 +17,10 @@ const BOT_PATTERNS = [
   'yandexbot', 'baiduspider', 'semrushbot', 'ahrefsbot',
   'msnbot', 'ia_archiver', 'embedly', 'quora link preview',
   'outbrain', 'pinterest', 'developers.google.com/+/web/snippet',
+  // AI search crawlers
+  'gptbot', 'oai-searchbot', 'chatgpt-user',
+  'perplexitybot', 'claudebot',
+  'amazonbot', 'facebookbot', 'applebot-extended',
 ];
 
 // --- Ad-hoc per-IP rate limit for bot traffic (resets on worker recycle) ---

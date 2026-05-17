@@ -443,12 +443,12 @@ function ReportsTab() {
       description: 'Plan, trial, and active state per agent.',
       icon: CreditCard,
       run: async () => {
-        const { data } = await (supabase as any)
+        const { data } = await supabase
           .from('agent_subscriptions')
           .select('agent_id, plan_type, is_active, trial_ends_at, created_at')
           .limit(1000);
         const rows = [['Agent ID', 'Plan', 'Active', 'Trial Ends', 'Created']];
-        for (const r of (data ?? []) as any[]) {
+        for (const r of data ?? []) {
           rows.push([
             fmt(r.agent_id),
             fmt(r.plan_type),

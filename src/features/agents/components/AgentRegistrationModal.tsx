@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { useTranslation } from '@/shared/lib/i18n';
+import { capture } from '@/shared/lib/posthog';
 
 interface Props {
   open: boolean;

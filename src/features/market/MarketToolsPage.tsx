@@ -265,6 +265,7 @@ export default function MarketToolsPage() {
               value={suburbSearch}
               onChange={e => setSuburbSearch(e.target.value)}
               placeholder="Search any Australian suburb..."
+              aria-label="Search Australian suburbs"
               className="w-full bg-white border border-[#E5E5E5] rounded-full pl-14 pr-6 py-4 text-[16px] text-[#0a0f1e] placeholder:text-[#9ca3af] outline-none focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB]/40 transition"
             />
           </form>

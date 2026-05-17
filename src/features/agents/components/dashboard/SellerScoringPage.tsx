@@ -206,6 +206,7 @@ const SellerScoringPage = () => {
             onChange={(e) => setEditableMessage(e.target.value)}
             className="min-h-[120px] text-sm"
             rows={5}
+            aria-label="Seller outreach message"
           />
           <DialogFooter className="gap-2 sm:gap-0">
             <Button

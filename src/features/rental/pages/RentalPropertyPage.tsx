@@ -52,6 +52,22 @@ export default function RentalPropertyPage() {
 
   return (
     <>
+      <PropertySEOHead property={{
+        id: property.id,
+        address: property.address,
+        suburb: property.suburb,
+        state: property.state,
+        postcode: property.postcode,
+        beds: property.beds,
+        baths: property.baths,
+        parking: property.parking,
+        property_type: property.property_type,
+        price: property.rental_weekly,
+        listing_type: 'rent',
+        images: property.images,
+        image_url: property.image_url,
+        description: property.description,
+      }} />
       <Helmet>
         <title>{title}</title>
         <meta name="description" content={desc} />

@@ -140,7 +140,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     // Persist impersonation session server-side (1 hour TTL set by table default)
-    const { data: sessionRow, error: insertError } = await (supabase as any)
+    const { data: sessionRow, error: insertError } = await supabase
       .from('admin_impersonation_sessions')
       .insert({
         admin_id: user.id,

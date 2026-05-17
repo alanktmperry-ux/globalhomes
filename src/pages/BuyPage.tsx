@@ -16,6 +16,8 @@ import { PropertyMap } from '@/features/properties/components/PropertyMap';
 import { Switch } from '@/components/ui/switch';
 import { SearchModeTabs } from '@/features/search/components/SearchModeTabs';
 import { SuburbChipInput } from '@/features/search/components/SuburbChipInput';
+import { useListingDiscovery } from '@/features/boost/hooks/useListingDiscovery';
+import { FeaturedZone } from '@/features/boost/components/FeaturedZone';
 import { SmartSearchBanner } from '@/features/search/SmartSearchBanner';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useSavedSearchesDB } from '@/features/alerts/hooks/useSavedSearchesDB';
@@ -441,6 +443,10 @@ const BuyPage = () => {
     setSearchParams({});
   };
 
+  const discoverySuburb = filters.suburbs[0] ?? null;
+  const { suburb: detectedSuburb, featuredSlots } = useListingDiscovery(discoverySuburb, 'sale');
+
+
   const activeChipCount = useMemo(
     () => filters.suburbs.length
       + filters.features.length
@@ -718,6 +724,11 @@ const BuyPage = () => {
                 )}
               </div>
 
+
+              {/* Featured zone */}
+              {!isLoading && detectedSuburb && featuredSlots.length > 0 && (
+                <FeaturedZone slots={featuredSlots} suburb={detectedSuburb} />
+              )}
 
               {/* Results */}
               {isLoading ? (

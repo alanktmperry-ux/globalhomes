@@ -187,7 +187,7 @@ const BankReconciliationPage = () => {
         if (candidate) {
           const { error: matchError } = await supabase
             .from('trust_reconciliations')
-            .update({ status: 'matched', matched_receipt_id: candidate.id } as any)
+            .update({ status: 'matched', matched_receipt_id: candidate.id })
             .eq('id', item.id);
           if (matchError) {
             console.error('[BankReconciliation] match failed:', matchError);

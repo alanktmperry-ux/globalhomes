@@ -221,12 +221,12 @@ function ComplianceTab() {
     (async () => {
       const d7 = new Date(Date.now() - 7 * 86400000).toISOString();
       const [weekly, latest] = await Promise.all([
-        (supabase as any)
+        supabase
           .from('audit_log')
           .select('action_type, created_at, user_id')
           .gte('created_at', d7)
           .limit(500),
-        (supabase as any)
+        supabase
           .from('audit_log')
           .select('action_type, description, created_at, user_id, entity_type, entity_id')
           .order('created_at', { ascending: false })

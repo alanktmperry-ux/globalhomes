@@ -605,7 +605,7 @@ export default function MaintenancePage() {
                         </TableCell>
                       </TableRow>
                     )}
-                  </>
+                  </React.Fragment>
                   );
                 })}
               </TableBody>

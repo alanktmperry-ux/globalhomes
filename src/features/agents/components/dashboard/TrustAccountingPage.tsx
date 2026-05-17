@@ -199,10 +199,17 @@ const TrustAccountingPage = () => {
 
   const fetchPendingPayments = useCallback(async () => {
     if (!user) return;
+    const { data: agentData } = await supabase
+      .from('agents')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    if (!agentData) return;
     const { data } = await supabase
       .from('trust_payments')
       .select('id, client_name, property_address, amount, bsb, account_number, reference, payment_number')
       .eq('status', 'pending')
+      .eq('agent_id', agentData.id)
       .order('created_at', { ascending: false });
     if (data) setPendingPayments(data as PendingPayment[]);
   }, [user]);
@@ -1235,7 +1242,7 @@ const TrustAccountingPage = () => {
                           <TableCell>
                             <div className="flex items-center gap-0.5 justify-end">
                               <Button size="sm" variant="ghost" className="h-7 px-1.5 text-destructive"
-                                onClick={() => { setDeletingTx(tx); setShowDeleteConfirm(true); }} title="Void">
+                                onClick={() => { setDeletingTx(tx); setShowDeleteConfirm(true); }} title="Void" aria-label="Void transaction">
                                 <Trash2 size={12} />
                               </Button>
                             </div>

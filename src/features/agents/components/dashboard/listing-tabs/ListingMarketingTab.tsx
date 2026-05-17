@@ -733,6 +733,10 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               );
             })()}
 
+            {!showPaymentStep && listing.suburb && (
+              <SuburbPoolDepth suburb={listing.suburb} currentListingId={listing.id} />
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Featured card */}
               <div className="border border-border rounded-xl p-4 space-y-3">

@@ -73,6 +73,10 @@ const SeekerAuthPage = () => {
         return;
       }
     }
+    if (redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')) {
+      navigate(redirectTo, { replace: true });
+      return;
+    }
     navigate('/seeker/dashboard', { replace: true });
   };
 

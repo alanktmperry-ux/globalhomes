@@ -631,17 +631,17 @@ const ReportsPage = () => {
                     {listings.length === 0 ? (
                       <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">No listings</TableCell></TableRow>
                     ) : listings.slice(0, 20).map(l => {
-                      const price = (l as any).price || 0;
-                      const rate = (l as any).commission_rate || 2;
-                      const status = '_mock_status' in l ? l._mock_status : (l as any).status;
+                      const price = l.price || 0;
+                      const rate = l.commission_rate ?? 2;
+                      const status = '_mock_status' in l ? l._mock_status : l.status;
                       return (
-                        <TableRow key={(l as any).id}>
-                          <TableCell className="text-xs font-medium">{(l as any).title}</TableCell>
+                        <TableRow key={l.id}>
+                          <TableCell className="text-xs font-medium">{l.title}</TableCell>
                           <TableCell className="text-xs">{AUD.format(price)}</TableCell>
                           <TableCell className="text-xs">{rate}%</TableCell>
                           <TableCell className="text-xs font-semibold">{AUD.format(price * rate / 100)}</TableCell>
-                          <TableCell className="text-xs">{(l as any).views || 0}</TableCell>
-                          <TableCell className="text-xs">{(l as any).contact_clicks || 0}</TableCell>
+                          <TableCell className="text-xs">{l.views || 0}</TableCell>
+                          <TableCell className="text-xs">{l.contact_clicks || 0}</TableCell>
                           <TableCell>
                             <Badge variant={status === 'sold' ? 'secondary' : 'default'} className="text-[10px] capitalize">{status}</Badge>
                           </TableCell>

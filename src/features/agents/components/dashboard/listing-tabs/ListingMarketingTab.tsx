@@ -352,6 +352,8 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
       setBoostLoading(null);
     }
   };
+
+  const handleSendReport = async () => {
     if (!vendorName.trim() || !vendorEmail.trim()) {
       toast.error('Please enter both vendor name and email');
       return;

@@ -108,6 +108,7 @@ export default function AdminSidebar({
   const operations: NavItem[] = [
     { to: '/admin/approvals', label: 'Approvals', icon: CheckCircle, badge: pendingApprovalsTotal, badgeTone: 'destructive' },
     { to: '/admin/listings', label: 'Listings', icon: Building2, badge: listingsPendingCount },
+    { to: '/admin/boosts', label: 'Boosts', icon: Star, badge: boostsPendingCount, badgeTone: 'destructive' },
     { to: '/admin/agents', label: 'Agents', icon: Users, badge: agentsStuckCount },
     { to: '/admin/support', label: 'Support', icon: LifeBuoy, badge: supportOpenCount, badgeTone: 'destructive' },
     { to: '/admin/careers', label: 'Careers', icon: Briefcase },

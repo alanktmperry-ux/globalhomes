@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let cancelled = false;
     (async () => {
       const nowIso = new Date().toISOString();
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('admin_impersonation_sessions')
         .select('id, impersonated_user_id, impersonated_email, expires_at')
         .eq('admin_id', user.id)

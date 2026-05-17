@@ -409,6 +409,7 @@ const ProfilePage = () => {
                   <button
                     onClick={() => avatarInputRef.current?.click()}
                     disabled={uploadingAvatar}
+                    aria-label="Change profile photo"
                     className="absolute inset-0 rounded-full bg-foreground/0 group-hover:bg-foreground/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
                   >
                     {uploadingAvatar ? <Loader2 size={18} className="text-background animate-spin" /> : <Camera size={18} className="text-background" />}
@@ -427,26 +428,27 @@ const ProfilePage = () => {
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-xs">Full Name</Label>
-                  <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+                  <Label htmlFor="profile-name" className="text-xs">Full Name</Label>
+                  <Input id="profile-name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
                 </div>
                 <div>
-                  <Label className="text-xs">Title / Position</Label>
-                  <Input value={form.title_position} onChange={e => setForm(f => ({ ...f, title_position: e.target.value }))} placeholder="Senior Agent, Owner, etc." />
+                  <Label htmlFor="profile-title" className="text-xs">Title / Position</Label>
+                  <Input id="profile-title" value={form.title_position} onChange={e => setForm(f => ({ ...f, title_position: e.target.value }))} placeholder="Senior Agent, Owner, etc." />
                 </div>
                 <div>
-                  <Label className="text-xs">Email</Label>
-                  <Input value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} type="email" />
+                  <Label htmlFor="profile-email" className="text-xs">Email</Label>
+                  <Input id="profile-email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} type="email" />
                 </div>
                 <div>
-                  <Label className="text-xs">Phone</Label>
-                  <Input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
+                  <Label htmlFor="profile-phone" className="text-xs">Phone</Label>
+                  <Input id="profile-phone" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
                 </div>
               </div>
 
               <div>
-                <Label className="text-xs">Bio / Description</Label>
+                <Label htmlFor="profile-bio" className="text-xs">Bio / Description</Label>
                 <Textarea
+                  id="profile-bio"
                   value={form.bio}
                   onChange={e => setForm(f => ({ ...f, bio: e.target.value }))}
                   placeholder="Tell potential clients about yourself..."
@@ -480,6 +482,7 @@ const ProfilePage = () => {
                     <button
                       onClick={() => logoInputRef.current?.click()}
                       disabled={uploadingLogo}
+                      aria-label="Change company logo"
                       className="absolute inset-0 rounded-xl bg-foreground/0 group-hover:bg-foreground/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
                     >
                       {uploadingLogo ? <Loader2 size={18} className="text-background animate-spin" /> : <Camera size={18} className="text-background" />}
@@ -504,18 +507,19 @@ const ProfilePage = () => {
               <Separator />
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-xs">Agency Name</Label>
-                  <Input value={form.agency} onChange={e => setForm(f => ({ ...f, agency: e.target.value }))} />
+                  <Label htmlFor="profile-agency" className="text-xs">Agency Name</Label>
+                  <Input id="profile-agency" value={form.agency} onChange={e => setForm(f => ({ ...f, agency: e.target.value }))} />
                 </div>
                 <div>
-                  <Label className="text-xs">License Number</Label>
-                  <Input value={form.license_number} onChange={e => setForm(f => ({ ...f, license_number: e.target.value }))} />
+                  <Label htmlFor="profile-license" className="text-xs">License Number</Label>
+                  <Input id="profile-license" value={form.license_number} onChange={e => setForm(f => ({ ...f, license_number: e.target.value }))} />
                 </div>
                 <div className="relative">
-                  <Label className="text-xs">Office Address</Label>
+                  <Label htmlFor="profile-address" className="text-xs">Office Address</Label>
                   <div className="relative">
                     <MapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <Input
+                      id="profile-address"
                       value={form.office_address}
                       onChange={e => handleOfficeAddressChange(e.target.value)}
                       onFocus={() => addressSuggestions.length > 0 && setShowAddressSuggestions(true)}
@@ -544,12 +548,13 @@ const ProfilePage = () => {
                   )}
                 </div>
                 <div>
-                  <Label className="text-xs">Years of Experience</Label>
-                  <Input type="number" min={0} max={50} value={form.years_experience} onChange={e => setForm(f => ({ ...f, years_experience: parseInt(e.target.value) || 0 }))} />
+                  <Label htmlFor="profile-experience" className="text-xs">Years of Experience</Label>
+                  <Input id="profile-experience" type="number" min={0} max={50} value={form.years_experience} onChange={e => setForm(f => ({ ...f, years_experience: parseInt(e.target.value) || 0 }))} />
                 </div>
                 <div>
-                  <Label className="text-xs">Specialization</Label>
+                  <Label htmlFor="profile-specialization" className="text-xs">Specialization</Label>
                   <select
+                    id="profile-specialization"
                     value={form.specialization}
                     onChange={e => setForm(f => ({ ...f, specialization: e.target.value }))}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -604,8 +609,8 @@ const ProfilePage = () => {
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs">Website URL</Label>
-                  <Input value={form.website_url} onChange={e => setForm(f => ({ ...f, website_url: e.target.value }))} placeholder="https://" />
+                  <Label htmlFor="profile-website" className="text-xs">Website URL</Label>
+                  <Input id="profile-website" value={form.website_url} onChange={e => setForm(f => ({ ...f, website_url: e.target.value }))} placeholder="https://" />
                 </div>
               </div>
             </div>
@@ -619,12 +624,12 @@ const ProfilePage = () => {
                 {languages.map(l => (
                   <Badge key={l} variant="secondary" className="gap-1">
                     {l}
-                    <button onClick={() => setLanguages(prev => prev.filter(x => x !== l))} className="ml-0.5 hover:text-destructive">×</button>
+                    <button onClick={() => setLanguages(prev => prev.filter(x => x !== l))} className="ml-0.5 hover:text-destructive" aria-label={`Remove ${l}`}>×</button>
                   </Badge>
                 ))}
               </div>
               <div className="flex gap-2">
-                <Input value={newLang} onChange={e => setNewLang(e.target.value)} placeholder="Add language" className="max-w-xs"
+                <Input value={newLang} onChange={e => setNewLang(e.target.value)} placeholder="Add language" className="max-w-xs" aria-label="Add language"
                   onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addLanguage())} />
                 <Button variant="outline" size="sm" onClick={addLanguage}><Plus size={14} /></Button>
               </div>
@@ -651,19 +656,19 @@ const ProfilePage = () => {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="flex items-center gap-2">
                   <Instagram size={16} className="text-muted-foreground shrink-0" />
-                  <Input value={form.social_instagram} onChange={e => setForm(f => ({ ...f, social_instagram: e.target.value }))} placeholder="Instagram URL" />
+                  <Input value={form.social_instagram} onChange={e => setForm(f => ({ ...f, social_instagram: e.target.value }))} placeholder="Instagram URL" aria-label="Instagram URL" />
                 </div>
                 <div className="flex items-center gap-2">
                   <Linkedin size={16} className="text-muted-foreground shrink-0" />
-                  <Input value={form.social_linkedin} onChange={e => setForm(f => ({ ...f, social_linkedin: e.target.value }))} placeholder="LinkedIn URL" />
+                  <Input value={form.social_linkedin} onChange={e => setForm(f => ({ ...f, social_linkedin: e.target.value }))} placeholder="LinkedIn URL" aria-label="LinkedIn URL" />
                 </div>
                 <div className="flex items-center gap-2">
                   <Facebook size={16} className="text-muted-foreground shrink-0" />
-                  <Input value={form.social_facebook} onChange={e => setForm(f => ({ ...f, social_facebook: e.target.value }))} placeholder="Facebook URL" />
+                  <Input value={form.social_facebook} onChange={e => setForm(f => ({ ...f, social_facebook: e.target.value }))} placeholder="Facebook URL" aria-label="Facebook URL" />
                 </div>
                 <div className="flex items-center gap-2">
                   <Twitter size={16} className="text-muted-foreground shrink-0" />
-                  <Input value={form.social_twitter} onChange={e => setForm(f => ({ ...f, social_twitter: e.target.value }))} placeholder="X / Twitter URL" />
+                  <Input value={form.social_twitter} onChange={e => setForm(f => ({ ...f, social_twitter: e.target.value }))} placeholder="X / Twitter URL" aria-label="X / Twitter URL" />
                 </div>
               </div>
             </div>
@@ -716,6 +721,7 @@ const ProfilePage = () => {
                 <select
                   value={docType}
                   onChange={e => setDocType(e.target.value)}
+                  aria-label="Document type"
                   className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
                 >
                   <option value="license">License</option>
@@ -754,7 +760,7 @@ const ProfilePage = () => {
                           {c.verified_status === 'pending' && <Clock size={10} className="mr-1" />}
                           {c.verified_status}
                         </Badge>
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setConfirmDeleteCredId(c.id)}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Delete document" onClick={() => setConfirmDeleteCredId(c.id)}>
                           <Trash2 size={14} className="text-destructive" />
                         </Button>
                       </div>

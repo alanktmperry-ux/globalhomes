@@ -395,11 +395,11 @@ const ReportsPage = () => {
   const exportSalesReport = () => {
     const headers = ['Property', 'Address', 'Price', 'Commission Rate', 'GCI', 'Status', 'Listed Date'];
     const rows = salesData.soldListings.map(l => [
-      (l as any).title, (l as any).address, String((l as any).price || 0),
-      String((l as any).commission_rate || 2) + '%',
-      AUD.format(((l as any).price || 0) * ((l as any).commission_rate || 2) / 100),
-      '_mock_status' in l ? l._mock_status : (l as any).status,
-      (l as any).listed_date || '',
+      l.title, l.address, String(l.price || 0),
+      String(l.commission_rate ?? 2) + '%',
+      AUD.format((l.price || 0) * (l.commission_rate ?? 2) / 100),
+      '_mock_status' in l ? l._mock_status : l.status,
+      l.listed_date || '',
     ]);
     exportCsv(headers, rows, 'sales_report');
   };

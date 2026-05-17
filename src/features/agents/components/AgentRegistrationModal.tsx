@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
@@ -49,6 +49,15 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
   const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const captchaRef = useRef<HCaptcha | null>(null);
+  const [pendingEmailSubmit, setPendingEmailSubmit] = useState(false);
+
+  useEffect(() => {
+    if (pendingEmailSubmit && captchaToken) {
+      setPendingEmailSubmit(false);
+      handleEmailSubmit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingEmailSubmit, captchaToken]);
 
   // Password step state
   const [newPassword, setNewPassword] = useState('');
@@ -167,7 +176,8 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
     if (e) e.preventDefault();
     if (!emailInput.trim()) return;
     if (!captchaToken) {
-      toast.error(t('agent.registration.email.completeCaptcha'));
+      setPendingEmailSubmit(true);
+      captchaRef.current?.execute();
       return;
     }
     setEmailSubmitting(true);
@@ -287,26 +297,23 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                 </div>
 
 
-                <div className="flex justify-center">
-                  <HCaptcha
-                    ref={captchaRef}
-                    sitekey={hcaptchaSiteKey}
-                    onVerify={(token) => setCaptchaToken(token)}
-                    onExpire={() => setCaptchaToken(null)}
-                    onError={() => setCaptchaToken(null)}
-                  />
-                </div>
+                <HCaptcha
+                  ref={captchaRef}
+                  sitekey={hcaptchaSiteKey}
+                  size="invisible"
+                  onVerify={(token) => setCaptchaToken(token)}
+                  onExpire={() => setCaptchaToken(null)}
+                  onError={() => setCaptchaToken(null)}
+                />
 
                 <Button
                   type="submit"
-                  disabled={emailSubmitting || !captchaToken}
+                  disabled={emailSubmitting}
                   className="w-full py-5 rounded-xl text-base font-bold"
                 >
                   {emailSubmitting
                     ? t('agent.registration.email.sending')
-                    : !captchaToken
-                      ? t('agent.registration.email.completeCaptcha')
-                      : t('agent.registration.email.continue')}
+                    : t('agent.registration.email.continue')}
                 </Button>
 
                 <p className="text-center text-xs text-muted-foreground">

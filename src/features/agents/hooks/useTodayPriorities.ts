@@ -171,20 +171,20 @@ export function useTodayPriorities(limit = 5) {
         .limit(20);
 
       for (const th of unrespThreads || []) {
-        const c = (th as any).contact;
+        const c = th.contact as { id: string; first_name: string | null; last_name: string | null; email: string | null } | null;
         const name = c
           ? (`${c.first_name ?? ''} ${c.last_name ?? ''}`.trim() || c.email || 'Contact')
-          : ((th as any).subject || 'Lead enquiry');
-        const ageMs = nowMs - new Date((th as any).last_message_at).getTime();
+          : (th.subject || 'Lead enquiry');
+        const ageMs = nowMs - new Date(th.last_message_at).getTime();
         candidates.push({
-          id: `unresponded:${(th as any).id}`,
+          id: `unresponded:${th.id}`,
           sourceKey: 'unresponded',
-          sourceId: (th as any).id,
+          sourceId: th.id,
           weight: 60,
           ageMs,
           title: `Reply to ${name}`,
-          context: `${(th as any).subject || 'Inbox thread'} · ${formatAgo(ageMs)} ago`,
-          actionHref: `/dashboard/inbox?thread=${(th as any).id}`,
+          context: `${th.subject || 'Inbox thread'} · ${formatAgo(ageMs)} ago`,
+          actionHref: `/dashboard/inbox?thread=${th.id}`,
           actionLabel: 'Open',
         });
       }

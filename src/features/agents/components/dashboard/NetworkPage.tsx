@@ -472,7 +472,8 @@ const NetworkPage = () => {
               <div className="relative flex-1">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="Search your off-market listings…" className="pl-9 h-9 text-sm" />
+                  placeholder="Search your off-market listings…" className="pl-9 h-9 text-sm"
+                  aria-label="Search your off-market listings" />
               </div>
             </div>
 
@@ -512,7 +513,7 @@ const NetworkPage = () => {
                           <TableCell className="text-xs text-right font-semibold">{AUD.format(l.price)}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              <Switch checked={l.is_shared} onCheckedChange={() => toggleNetworkShare(l)} />
+                              <Switch checked={l.is_shared} onCheckedChange={() => toggleNetworkShare(l)} aria-label={`Share ${l.address} with network`} />
                               <span className="text-[10px] text-muted-foreground">{l.is_shared ? 'Shared' : 'Private'}</span>
                             </div>
                           </TableCell>
@@ -605,7 +606,8 @@ const NetworkPage = () => {
               <div className="relative flex-1">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input value={networkSearch} onChange={e => setNetworkSearch(e.target.value)}
-                  placeholder="Search network listings…" className="pl-9 h-9 text-sm" />
+                  placeholder="Search network listings…" className="pl-9 h-9 text-sm"
+                  aria-label="Search network listings" />
               </div>
             </div>
 
@@ -799,8 +801,8 @@ const NetworkPage = () => {
                 </div>
               </div>
               <div>
-                <Label className="text-xs">Message to Agent</Label>
-                <Textarea value={contactMessage} onChange={e => setContactMessage(e.target.value)} rows={4} className="text-sm" />
+                <Label className="text-xs" htmlFor="contact-message">Message to Agent</Label>
+                <Textarea id="contact-message" value={contactMessage} onChange={e => setContactMessage(e.target.value)} rows={4} className="text-sm" />
               </div>
             </div>
           )}
@@ -865,9 +867,9 @@ const NetworkPage = () => {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label className="text-xs">Property Type</Label>
+              <Label className="text-xs" htmlFor="brief-property-type">Property Type</Label>
               <Select value={briefForm.property_type} onValueChange={v => setBriefForm(f => ({ ...f, property_type: v }))}>
-                <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                <SelectTrigger id="brief-property-type" className="h-9 text-sm"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {PROPERTY_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
                 </SelectContent>
@@ -875,31 +877,31 @@ const NetworkPage = () => {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs">Min Bedrooms</Label>
-                <Input type="number" min={0} max={20} value={briefForm.min_beds} onChange={e => setBriefForm(f => ({ ...f, min_beds: Number(e.target.value) }))} className="h-9 text-sm" />
+                <Label className="text-xs" htmlFor="brief-min-beds">Min Bedrooms</Label>
+                <Input id="brief-min-beds" type="number" min={0} max={20} value={briefForm.min_beds} onChange={e => setBriefForm(f => ({ ...f, min_beds: Number(e.target.value) }))} className="h-9 text-sm" />
               </div>
               <div>
-                <Label className="text-xs">Max Bedrooms</Label>
-                <Input type="number" min={0} max={20} value={briefForm.max_beds} onChange={e => setBriefForm(f => ({ ...f, max_beds: Number(e.target.value) }))} className="h-9 text-sm" />
+                <Label className="text-xs" htmlFor="brief-max-beds">Max Bedrooms</Label>
+                <Input id="brief-max-beds" type="number" min={0} max={20} value={briefForm.max_beds} onChange={e => setBriefForm(f => ({ ...f, max_beds: Number(e.target.value) }))} className="h-9 text-sm" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs">Min Price (AUD)</Label>
-                <Input type="number" min={0} step={50000} value={briefForm.min_price} onChange={e => setBriefForm(f => ({ ...f, min_price: Number(e.target.value) }))} className="h-9 text-sm" />
+                <Label className="text-xs" htmlFor="brief-min-price">Min Price (AUD)</Label>
+                <Input id="brief-min-price" type="number" min={0} step={50000} value={briefForm.min_price} onChange={e => setBriefForm(f => ({ ...f, min_price: Number(e.target.value) }))} className="h-9 text-sm" />
               </div>
               <div>
-                <Label className="text-xs">Max Price (AUD)</Label>
-                <Input type="number" min={0} step={50000} value={briefForm.max_price} onChange={e => setBriefForm(f => ({ ...f, max_price: Number(e.target.value) }))} className="h-9 text-sm" />
+                <Label className="text-xs" htmlFor="brief-max-price">Max Price (AUD)</Label>
+                <Input id="brief-max-price" type="number" min={0} step={50000} value={briefForm.max_price} onChange={e => setBriefForm(f => ({ ...f, max_price: Number(e.target.value) }))} className="h-9 text-sm" />
               </div>
             </div>
             <div>
-              <Label className="text-xs">Preferred Suburbs (comma-separated)</Label>
-              <Input value={briefForm.suburbs} onChange={e => setBriefForm(f => ({ ...f, suburbs: e.target.value }))} placeholder="e.g. Berwick, Narre Warren, Officer" className="h-9 text-sm" />
+              <Label className="text-xs" htmlFor="brief-suburbs">Preferred Suburbs (comma-separated)</Label>
+              <Input id="brief-suburbs" value={briefForm.suburbs} onChange={e => setBriefForm(f => ({ ...f, suburbs: e.target.value }))} placeholder="e.g. Berwick, Narre Warren, Officer" className="h-9 text-sm" />
             </div>
             <div>
-              <Label className="text-xs">Notes</Label>
-              <Textarea value={briefForm.notes} onChange={e => setBriefForm(f => ({ ...f, notes: e.target.value }))} placeholder="Any specific requirements…" rows={3} className="text-sm" />
+              <Label className="text-xs" htmlFor="brief-notes">Notes</Label>
+              <Textarea id="brief-notes" value={briefForm.notes} onChange={e => setBriefForm(f => ({ ...f, notes: e.target.value }))} placeholder="Any specific requirements…" rows={3} className="text-sm" />
             </div>
             <div>
               <Label className="text-xs">Urgency</Label>

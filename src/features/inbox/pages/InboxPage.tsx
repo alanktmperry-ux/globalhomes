@@ -61,8 +61,13 @@ export default function InboxPage() {
   usePageTitle('Inbox');
   const [filter, setFilter] = useState<InboxFilter>('all');
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(t);
+  }, [search]);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const { threads, loading, agentId, counts } = useInboxThreads(filter, search);
+  const { threads, loading, agentId, counts } = useInboxThreads(filter, debouncedSearch);
   const { messages, loading: messagesLoading, hasMore, loadMore } = useInboxMessages(activeId);
   const activeThread = useMemo(() => threads.find(t => t.id === activeId) || null, [threads, activeId]);
 

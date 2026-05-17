@@ -874,6 +874,7 @@ const ReportsPage = () => {
                             value={bankBalances[r.key] ?? ''}
                             onChange={e => setBankBalances(prev => ({ ...prev, [r.key]: e.target.value }))}
                             className="h-7 w-28 text-xs ml-auto"
+                            aria-label={`Bank balance for ${r.monthLabel}`}
                           />
                         </TableCell>
                         <TableCell className={`text-xs text-right font-semibold ${r.variance == null ? '' : Math.abs(r.variance) < 0.01 ? 'text-green-600' : 'text-destructive'}`}>

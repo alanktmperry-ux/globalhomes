@@ -55,8 +55,8 @@ const ScoreRing = ({ score, size = 48 }: { score: number; size?: number }) => {
   const r = (size - 8) / 2;
   const circ = 2 * Math.PI * r;
   return (
-    <div className="relative shrink-0" style={{ width: size, height: size }}>
-      <svg className="-rotate-90" width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+    <div className="relative shrink-0" style={{ width: size, height: size }} role="img" aria-label={`Seller likelihood score: ${score}`}>
+      <svg className="-rotate-90" width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="hsl(var(--border))" strokeWidth="4" />
         <circle
           cx={size / 2} cy={size / 2} r={r} fill="none"

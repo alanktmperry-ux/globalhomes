@@ -634,17 +634,17 @@ const TeamPage = () => {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label className="text-xs font-medium">Email</Label>
-                  <Input type="email" placeholder="office@agency.com" value={newAgencyEmail} onChange={(e) => setNewAgencyEmail(e.target.value)} className="mt-1.5" />
+                  <Label htmlFor="new-agency-email" className="text-xs font-medium">Email</Label>
+                  <Input id="new-agency-email" type="email" placeholder="office@agency.com" value={newAgencyEmail} onChange={(e) => setNewAgencyEmail(e.target.value)} className="mt-1.5" />
                 </div>
                 <div>
-                  <Label className="text-xs font-medium">Phone</Label>
-                  <Input placeholder="+61 4xx xxx xxx" value={newAgencyPhone} onChange={(e) => setNewAgencyPhone(e.target.value)} className="mt-1.5" />
+                  <Label htmlFor="new-agency-phone" className="text-xs font-medium">Phone</Label>
+                  <Input id="new-agency-phone" placeholder="+61 4xx xxx xxx" value={newAgencyPhone} onChange={(e) => setNewAgencyPhone(e.target.value)} className="mt-1.5" />
                 </div>
               </div>
               <div>
-                <Label className="text-xs font-medium">Description</Label>
-                <Textarea placeholder="Tell clients about your agency..." value={newAgencyDescription} onChange={(e) => setNewAgencyDescription(e.target.value)} className="mt-1.5 resize-none" rows={3} />
+                <Label htmlFor="new-agency-description" className="text-xs font-medium">Description</Label>
+                <Textarea id="new-agency-description" placeholder="Tell clients about your agency..." value={newAgencyDescription} onChange={(e) => setNewAgencyDescription(e.target.value)} className="mt-1.5 resize-none" rows={3} />
               </div>
               <Button onClick={handleCreateAgency} disabled={creatingAgency || !newAgencyName.trim()} className="w-full">
                 {creatingAgency ? <><Loader2 size={14} className="animate-spin mr-2" /> Creating...</> : <><Building2 size={14} className="mr-2" /> Create Agency</>}

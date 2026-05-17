@@ -295,7 +295,7 @@ const BankReconciliationPage = () => {
 
     if (entries.length === 0) { toast.error('No valid entries found'); return; }
 
-    const { error, data: inserted } = await supabase.from('trust_reconciliations').insert(entries as any).select();
+    const { error, data: inserted } = await supabase.from('trust_reconciliations').insert(entries).select();
     if (error) { toast.error(error.message); return; }
 
     toast.success(`${entries.length} entries imported. Running auto-match…`);

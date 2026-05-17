@@ -433,6 +433,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if (type === 'signup' || type === 'email') {
             window.history.replaceState({}, '', window.location.pathname);
           }
+          identify(session.user.id, { email: session.user.email ?? undefined });
         }
 
         setSession(session);

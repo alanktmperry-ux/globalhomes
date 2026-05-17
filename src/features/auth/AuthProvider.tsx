@@ -468,7 +468,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Clear any active impersonation rows for this admin
     if (user) {
       try {
-        await (supabase as any)
+        await supabase
           .from('admin_impersonation_sessions')
           .delete()
           .eq('admin_id', user.id);

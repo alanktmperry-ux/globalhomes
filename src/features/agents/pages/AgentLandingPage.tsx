@@ -273,7 +273,10 @@ export default function AgentLandingPage() {
           </p>
           <button
             type="button"
-            onClick={() => setShowModal(true)}
+            onClick={() => {
+              capture('agent_cta_clicked', { source: 'founding_callout', label: 'reserve_spot' });
+              setShowModal(true);
+            }}
             className="mt-6 inline-flex items-center gap-2 px-7 py-3.5 bg-black text-white rounded-full text-[14px] font-bold hover:-translate-y-0.5 transition-all"
           >
             Reserve your founding spot

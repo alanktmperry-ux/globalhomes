@@ -321,7 +321,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (cancelled || invalidatedRolesRequestId.current === requestId || activeRolesRequestId.current !== requestId) return;
 
         const isAdminUser = roles.includes('admin');
-        const isApprovedAgent = !!agentData && ((agentData as any).approval_status === 'approved' || isAdminUser);
+        const isApprovedAgent = !!agentData && (agentData.approval_status === 'approved' || isAdminUser);
         const filteredRoles = roles.filter((r) => {
           if (r !== 'agent') return true;
           return isApprovedAgent;
@@ -329,21 +329,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         if (isApprovedAgent && !filteredRoles.includes('agent')) {
           filteredRoles.push('agent');
-          supabase.from('user_roles').insert({ user_id: userId, role: 'agent' as any })
+          supabase.from('user_roles').insert({ user_id: userId, role: 'agent' as const })
             .then(({ error }) => { if (error && !String(error.message).includes('duplicate') && import.meta.env.DEV) console.warn('[Auth] backfill user_roles:', error.message); });
         }
 
         applyRoles(filteredRoles, userEmail);
 
         if (agentData) {
-          setAgencyRole((agentData as any).agency_role || null);
+          setAgencyRole(agentData.agency_role || null);
           setAgencyId(agentData.agency_id || null);
-          if (isApprovedAgent && ((agentData as any).agency_role === 'principal' || (agentData as any).agency_role === 'admin')) {
+          if (isApprovedAgent && (agentData.agency_role === 'principal' || agentData.agency_role === 'admin')) {
             setIsPrincipal(true);
           }
           if (isApprovedAgent && !roles.includes('agent') && !roles.includes('admin')) {
             await supabase.from('user_roles').upsert(
-              { user_id: userId, role: 'agent' as any },
+              { user_id: userId, role: 'agent' as const },
               { onConflict: 'user_id,role' }
             );
           }

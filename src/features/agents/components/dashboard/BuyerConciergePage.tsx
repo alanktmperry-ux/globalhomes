@@ -441,7 +441,7 @@ const BuyerConciergePage = () => {
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] text-muted-foreground">{lastActive(m.intent)}</span>
                       <div className="flex gap-1.5">
-                        <Button size="sm" variant="outline" className="h-7 px-2 text-xs" onClick={() => archive(m.id)}>
+                        <Button size="sm" variant="outline" className="h-7 px-2 text-xs" aria-label="Archive buyer" onClick={() => archive(m.id)}>
                           <Archive size={12} />
                         </Button>
                         <Button size="sm" className="h-7 px-2.5 text-xs gap-1" onClick={() => openContact(m)}>

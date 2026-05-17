@@ -133,8 +133,8 @@ export function useTodayPriorities(limit = 5) {
 
     for (const c of overdue || []) {
       const name = `${c.first_name ?? ''} ${c.last_name ?? ''}`.trim() || 'Contact';
-      const ageMs = nowMs - new Date((c as any).next_action_due_at).getTime();
-      const note = (c as any).next_action_note || 'Follow up';
+      const ageMs = nowMs - new Date(c.next_action_due_at!).getTime();
+      const note = c.next_action_note || 'Follow up';
       candidates.push({
         id: `overdue_action:${c.id}`,
         sourceKey: 'overdue_action',

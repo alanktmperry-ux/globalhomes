@@ -621,7 +621,7 @@ const ListingsPage = () => {
       .select('id')
       .eq('property_id', l.id)
       .eq('status', 'active')
-      .limit(1) as any;
+      .limit(1);
 
     if (activeTenancies && activeTenancies.length > 0) {
       toast.error('This property has an active tenancy. End the tenancy before marking as sold.');

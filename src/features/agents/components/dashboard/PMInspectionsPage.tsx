@@ -223,14 +223,14 @@ export default function PMInspectionsPage() {
       .eq('user_id', user.id)
       .maybeSingle();
     if (!agent) { setLoading(false); return; }
-    const aid = (agent as any).id as string;
+    const aid = agent.id;
     setAgentId(aid);
-    setAgentName((agent as any).name || '');
-    if ((agent as any).agency_id) {
+    setAgentName(agent.name || '');
+    if (agent.agency_id) {
       const { data: agencyRow } = await supabase
         .from('agencies')
         .select('name')
-        .eq('id', (agent as any).agency_id)
+        .eq('id', agent.agency_id)
         .maybeSingle();
       if (agencyRow?.name) setAgencyName(agencyRow.name);
     }
@@ -256,8 +256,8 @@ export default function PMInspectionsPage() {
     ]);
 
     if (insRes.error) toast.error('Could not load inspections');
-    setInspections(((insRes.data as any) || []) as InspectionRow[]);
-    setActiveTenancies(((tensRes.data as any) || []) as ActiveTenancy[]);
+    setInspections((insRes.data || []) as InspectionRow[]);
+    setActiveTenancies((tensRes.data || []) as ActiveTenancy[]);
     setLoading(false);
   }, [user]);
 
@@ -398,7 +398,7 @@ export default function PMInspectionsPage() {
       .update({
         dispute_resolved_at: new Date().toISOString(),
         dispute_resolution_notes: resolveNotes.trim() || null,
-      } as any)
+      })
       .eq('id', resolveFor.id);
     setSavingResolve(false);
     if (error) { toast.error('Could not mark resolved'); return; }
@@ -481,13 +481,13 @@ export default function PMInspectionsPage() {
       status: 'scheduled',
       inspector_name: scheduleForm.inspector_name.trim() || null,
       overall_notes: scheduleForm.notes.trim() || null,
-    } as any).select('id').maybeSingle();
+    }).select('id').maybeSingle();
     setSavingSchedule(false);
     if (error || !inserted) { toast.error('Could not schedule inspection'); return; }
     toast.success('Inspection scheduled');
     setScheduleForm(null);
     if (opts.startReport) {
-      navigate(`/dashboard/inspection/${(inserted as any).id}`);
+      navigate(`/dashboard/inspection/${inserted.id}`);
       return;
     }
     loadData();
@@ -505,9 +505,9 @@ export default function PMInspectionsPage() {
       inspection_type: 'routine',
       scheduled_date: format(ruleMinDate(r), 'yyyy-MM-dd'),
       status: 'scheduled',
-    } as any).select('id').maybeSingle();
+    }).select('id').maybeSingle();
     if (error || !inserted) { toast.error('Could not schedule inspection'); return; }
-    navigate(`/dashboard/inspection/${(inserted as any).id}`);
+    navigate(`/dashboard/inspection/${inserted.id}`);
   };
 
   const scheduleExitInspection = async (tenancyId: string, leaseEnd: string) => {
@@ -526,9 +526,9 @@ export default function PMInspectionsPage() {
       inspection_type: 'exit',
       scheduled_date: format(scheduled, 'yyyy-MM-dd'),
       status: 'scheduled',
-    } as any).select('id').maybeSingle();
+    }).select('id').maybeSingle();
     if (error || !inserted) { toast.error('Could not schedule exit inspection'); return; }
-    navigate(`/dashboard/inspection/${(inserted as any).id}`);
+    navigate(`/dashboard/inspection/${inserted.id}`);
   };
 
   // Notice
@@ -577,7 +577,7 @@ ${agencyName || ''}`.trim();
     setSavingNotice(true);
     const { error } = await supabase
       .from('property_inspections')
-      .update({ notice_sent_at: new Date().toISOString() } as any)
+      .update({ notice_sent_at: new Date().toISOString() })
       .eq('id', noticeFor.id);
     setSavingNotice(false);
     if (error) { toast.error('Could not record notice'); return; }
@@ -604,7 +604,7 @@ ${agencyName || ''}`.trim();
         status: 'completed',
         conducted_date: format(completeForm.conducted_date, 'yyyy-MM-dd'),
         overall_notes: noteParts.join('\n\n'),
-      } as any)
+      })
       .eq('id', completeFor.id);
     if (insErr) {
       setSavingComplete(false);
@@ -623,13 +623,13 @@ ${agencyName || ''}`.trim();
         await supabase.from('maintenance_jobs').insert({
           tenancy_id: completeFor.tenancy_id,
           property_id: t.property_id,
-          agent_id: agentId,
+          agent_id: agentId!,
           reported_by: 'agent',
           title: `Follow-up from ${TYPE_LABEL[completeFor.inspection_type].toLowerCase()} inspection at ${addr}`,
           description: completeForm.notes.trim() || null,
           priority: 'routine',
           status: 'open',
-        } as any);
+        });
       }
     }
     setSavingComplete(false);
@@ -643,7 +643,7 @@ ${agencyName || ''}`.trim();
     if (!cancelTarget) return;
     const { error } = await supabase
       .from('property_inspections')
-      .update({ status: 'cancelled' } as any)
+      .update({ status: 'cancelled' })
       .eq('id', cancelTarget.id);
     if (error) { toast.error('Could not cancel'); return; }
     toast.success('Inspection cancelled');
@@ -719,7 +719,7 @@ ${agencyName || ''}`.trim();
       const t = activeTenancies.find(x => x.id === p.tenancyId);
       return p.dates.map(date => ({
         tenancy_id: p.tenancyId,
-        property_id: t?.property_id,
+        property_id: t?.property_id ?? null,
         agent_id: agentId,
         inspection_type: 'routine',
         scheduled_date: date,
@@ -727,7 +727,7 @@ ${agencyName || ''}`.trim();
       }));
     });
 
-    const { error } = await supabase.from('property_inspections').insert(inserts as any);
+    const { error } = await supabase.from('property_inspections').insert(inserts);
     setAutoScheduling(false);
     if (error) { toast.error('Could not schedule inspections'); return; }
     toast.success(`${inserts.length} routine inspection${inserts.length === 1 ? '' : 's'} scheduled`);

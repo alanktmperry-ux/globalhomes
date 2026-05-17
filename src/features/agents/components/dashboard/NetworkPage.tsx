@@ -801,8 +801,8 @@ const NetworkPage = () => {
                 </div>
               </div>
               <div>
-                <Label className="text-xs">Message to Agent</Label>
-                <Textarea value={contactMessage} onChange={e => setContactMessage(e.target.value)} rows={4} className="text-sm" />
+                <Label className="text-xs" htmlFor="contact-message">Message to Agent</Label>
+                <Textarea id="contact-message" value={contactMessage} onChange={e => setContactMessage(e.target.value)} rows={4} className="text-sm" />
               </div>
             </div>
           )}

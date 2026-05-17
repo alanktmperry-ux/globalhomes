@@ -443,6 +443,7 @@ ${agencyName || ''}`.trim();
                   value={newRent}
                   onChange={(e) => setNewRent(e.target.value)}
                   placeholder="e.g. 650"
+                  aria-label="New rent amount"
                 />
                 <div className="text-xs text-muted-foreground mt-1">
                   Current: {fmtMoney(Number(scheduleFor.rent_amount || 0))} per {scheduleFor.rent_frequency || 'week'}
@@ -476,7 +477,7 @@ ${agencyName || ''}`.trim();
 
               <div>
                 <label className="text-sm font-medium">Notes (optional)</label>
-                <Textarea value={scheduleNotes} onChange={(e) => setScheduleNotes(e.target.value)} rows={2} />
+                <Textarea value={scheduleNotes} onChange={(e) => setScheduleNotes(e.target.value)} rows={2} aria-label="Notes" />
               </div>
 
               {scheduleComputed && (

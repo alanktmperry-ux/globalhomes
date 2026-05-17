@@ -293,7 +293,10 @@ const RentRollPage = () => {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   // Derive stats
-  const activeTenancies = tenancies.filter(t => t.status === 'active');
+  const activeTenancies = useMemo(
+    () => tenancies.filter(t => t.status === 'active'),
+    [tenancies],
+  );
   const today = new Date();
 
   const totalWeeklyRent = activeTenancies.reduce(
@@ -305,12 +308,13 @@ const RentRollPage = () => {
   );
 
   // Latest payment per tenancy
-  const latestPaymentMap = new Map<string, RentPayment>();
-  for (const p of payments) {
-    if (!latestPaymentMap.has(p.tenancy_id)) {
-      latestPaymentMap.set(p.tenancy_id, p);
+  const latestPaymentMap = useMemo(() => {
+    const map = new Map<string, RentPayment>();
+    for (const p of payments) {
+      if (!map.has(p.tenancy_id)) map.set(p.tenancy_id, p);
     }
-  }
+    return map;
+  }, [payments]);
 
   const getArrearsInfo = (t: Tenancy) => {
     const latest = latestPaymentMap.get(t.id);
@@ -1148,6 +1152,7 @@ const RentRollPage = () => {
           <Card>
             <button
               type="button"
+              aria-expanded={bondRegisterOpen}
               onClick={() => setBondRegisterOpen(o => !o)}
               className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-muted/40 transition-colors"
             >
@@ -1609,11 +1614,15 @@ const RentRollPage = () => {
                 <div className="space-y-2">
                   {suggestedInspections.map((s, i) => (
                     <div key={i} className="flex items-center gap-3 rounded-lg border p-2">
-                      <input
-                        type="checkbox"
+                      <Checkbox
+                        id={`insp-${i}`}
                         checked={s.selected}
-                        onChange={(e) => setSuggestedInspections(prev => prev.map((x, xi) => xi === i ? { ...x, selected: (e.target as HTMLInputElement).checked } : x))}
-                        className="h-4 w-4 rounded"
+                        onCheckedChange={(checked) =>
+                          setSuggestedInspections(prev =>
+                            prev.map((x, xi) => xi === i ? { ...x, selected: !!checked } : x)
+                          )
+                        }
+                        aria-label={s.label}
                       />
                       <div className="flex-1 flex items-center gap-2">
                         <span className="text-sm font-medium min-w-[140px]">{s.label}</span>

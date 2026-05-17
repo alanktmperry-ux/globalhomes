@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Lock, Sparkles, Loader2, MapPin, Home, DollarSign, BedDouble, Phone, Mail, ExternalLink } from 'lucide-react';
+import { capture } from '@/shared/lib/posthog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';

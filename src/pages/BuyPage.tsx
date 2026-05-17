@@ -725,6 +725,11 @@ const BuyPage = () => {
               </div>
 
 
+              {/* Featured zone */}
+              {!isLoading && detectedSuburb && featuredSlots.length > 0 && (
+                <FeaturedZone slots={featuredSlots} suburb={detectedSuburb} />
+              )}
+
               {/* Results */}
               {isLoading ? (
                 <div className="flex items-center justify-center py-20">

@@ -690,7 +690,7 @@ const TeamPage = () => {
             </div>
           )}
           {isOwnerOrAdmin && (
-            <button onClick={() => fileInputRef.current?.click()} disabled={uploadingLogo} className="absolute inset-0 rounded-2xl bg-foreground/0 group-hover:bg-foreground/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+            <button onClick={() => fileInputRef.current?.click()} disabled={uploadingLogo} aria-label="Change agency logo" className="absolute inset-0 rounded-2xl bg-foreground/0 group-hover:bg-foreground/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
               {uploadingLogo ? <Loader2 size={18} className="text-background animate-spin" /> : <Camera size={18} className="text-background" />}
             </button>
           )}

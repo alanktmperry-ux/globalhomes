@@ -151,10 +151,10 @@ function StatusMenu({
   async function changeStatus(newStatus: string) {
     setSaving(true);
     setOpen(false);
-    const update: Record<string, unknown> = { status: newStatus };
+    const update: { status: string; is_active?: boolean } = { status: newStatus };
     if (newStatus === 'sold' || newStatus === 'leased' || newStatus === 'draft') update.is_active = false;
     if (newStatus === 'public') update.is_active = true;
-    const { error } = await supabase.from('properties').update(update as any).eq('id', listing.id);
+    const { error } = await supabase.from('properties').update(update).eq('id', listing.id);
     if (error) {
       toast.error('Failed to update status');
     } else {

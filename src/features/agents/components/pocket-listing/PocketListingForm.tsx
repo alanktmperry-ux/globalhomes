@@ -566,7 +566,8 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         is_exclusive: draft.isExclusive || false,
         exclusive_start_date: draft.isExclusive && !editPropertyId ? new Date().toISOString() : undefined,
         exclusive_end_date: draft.isExclusive && !editPropertyId ? new Date(Date.now() + 14 * 86_400_000).toISOString() : undefined,
-      } as any;
+        translations: null as Json | null,
+      };
 
       // Seed translations JSONB from any manually-entered wizard translations.
       // generate-translations will merge AI output on top but will not overwrite these.

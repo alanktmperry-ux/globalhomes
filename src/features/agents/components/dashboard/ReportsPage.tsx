@@ -189,7 +189,7 @@ const ReportsPage = () => {
         : amt;
       return sum + weekly;
     }, 0);
-    const tenantedPropertyIds = new Set(active.map(t => (t.properties as any)?.address ? t.id : t.id));
+    const tenantedPropertyIds = new Set(active.map(t => t.id));
     const totalProps = propertiesCount;
     const occupied = active.length;
     const vacancyRate = totalProps > 0 ? Math.max(0, ((totalProps - occupied) / totalProps) * 100) : 0;
@@ -211,7 +211,7 @@ const ReportsPage = () => {
           : freq === 'yearly' ? amt / 52
           : amt;
         const owing = Math.round((daysOverdue / 7) * weekly * 100) / 100;
-        const prop = (t.properties as any) || {};
+        const prop = t.properties || {};
         const addr = [prop.address, prop.suburb, prop.state].filter(Boolean).join(', ');
         return {
           id: t.id,
@@ -272,25 +272,25 @@ const ReportsPage = () => {
   // ─── SALES DATA ───
   const salesData = useMemo(() => {
     const soldListings = listings.filter(l => {
-      const status = '_mock_status' in l ? l._mock_status : (l as any).status;
+      const status = '_mock_status' in l ? l._mock_status : l.status;
       if (status !== 'sold') return false;
-      const date = new Date((l as any).updated_at || (l as any).created_at);
+      const date = new Date(l.updated_at || l.created_at || '');
       return isWithinInterval(date, { start: range.from, end: range.to });
     });
 
     const totalGci = soldListings.reduce((sum, l) => {
-      const price = (l as any).price || 0;
-      const rate = (l as any).commission_rate || 2;
+      const price = l.price || 0;
+      const rate = l.commission_rate ?? 2;
       return sum + (price * rate / 100);
     }, 0);
 
-    const totalVolume = soldListings.reduce((sum, l) => sum + ((l as any).price || 0), 0);
+    const totalVolume = soldListings.reduce((sum, l) => sum + (l.price || 0), 0);
 
-    const datedSold = soldListings.filter(l => (l as any).listed_date);
+    const datedSold = soldListings.filter(l => l.listed_date);
     const avgDom = datedSold.length > 0
       ? Math.round(datedSold.reduce((sum, l) => {
-          const listed = new Date((l as any).listed_date);
-          const sold = new Date((l as any).updated_at || (l as any).created_at);
+          const listed = new Date(l.listed_date!);
+          const sold = new Date(l.updated_at || l.created_at || '');
           return sum + Math.max(1, Math.round((sold.getTime() - listed.getTime()) / 86400000));
         }, 0) / datedSold.length)
       : 0;
@@ -301,25 +301,25 @@ const ReportsPage = () => {
       const start = startOfMonth(m);
       const end = endOfMonth(m);
       const monthSold = soldListings.filter(l => {
-        const d = new Date((l as any).updated_at || (l as any).created_at);
+        const d = new Date(l.updated_at || l.created_at || '');
         return isWithinInterval(d, { start, end });
       });
       return {
         month: format(m, 'MMM yy'),
         sales: monthSold.length,
-        gci: monthSold.reduce((s, l) => s + ((l as any).price || 0) * ((l as any).commission_rate || 2) / 100, 0),
+        gci: monthSold.reduce((s, l) => s + (l.price || 0) * (l.commission_rate ?? 2) / 100, 0),
       };
     });
 
     // Property type breakdown
     const typeMap: Record<string, number> = {};
     soldListings.forEach(l => {
-      const t = (l as any).property_type || 'Unknown';
+      const t = l.property_type || 'Unknown';
       typeMap[t] = (typeMap[t] || 0) + 1;
     });
     const typeData = Object.entries(typeMap).map(([name, value]) => ({ name, value }));
 
-    return { soldListings, totalGci, totalVolume, avgDom, monthlyData, typeData, activeListings: listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : (l as any).status !== 'sold')).length };
+    return { soldListings, totalGci, totalVolume, avgDom, monthlyData, typeData, activeListings: listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : l.status !== 'sold')).length };
   }, [listings, range]);
 
   // ─── FINANCIAL DATA ───
@@ -365,8 +365,8 @@ const ReportsPage = () => {
     const totalContacts = contacts.length;
     const hotLeads = contacts.filter(c => c.ranking === 'hot').length;
     const warmLeads = contacts.filter(c => c.ranking === 'warm').length;
-    const totalViews = listings.reduce((s, l) => s + ((l as any).views || 0), 0);
-    const totalClicks = listings.reduce((s, l) => s + ((l as any).contact_clicks || 0), 0);
+    const totalViews = listings.reduce((s, l) => s + (l.views || 0), 0);
+    const totalClicks = listings.reduce((s, l) => s + (l.contact_clicks || 0), 0);
     const conversionRate = totalViews > 0 ? Math.min(100, (totalClicks / totalViews) * 100).toFixed(1) : '0';
 
     // Source breakdown
@@ -395,11 +395,11 @@ const ReportsPage = () => {
   const exportSalesReport = () => {
     const headers = ['Property', 'Address', 'Price', 'Commission Rate', 'GCI', 'Status', 'Listed Date'];
     const rows = salesData.soldListings.map(l => [
-      (l as any).title, (l as any).address, String((l as any).price || 0),
-      String((l as any).commission_rate || 2) + '%',
-      AUD.format(((l as any).price || 0) * ((l as any).commission_rate || 2) / 100),
-      '_mock_status' in l ? l._mock_status : (l as any).status,
-      (l as any).listed_date || '',
+      l.title, l.address, String(l.price || 0),
+      String(l.commission_rate ?? 2) + '%',
+      AUD.format((l.price || 0) * (l.commission_rate ?? 2) / 100),
+      String('_mock_status' in l ? l._mock_status : l.status ?? ''),
+      l.listed_date || '',
     ]);
     exportCsv(headers, rows, 'sales_report');
   };
@@ -416,7 +416,7 @@ const ReportsPage = () => {
   const exportActivityReport = () => {
     const headers = ['Name', 'Type', 'Ranking', 'Email', 'Phone', 'Source', 'Pipeline Stage', 'Suburb'];
     const periodContacts = contacts.filter(c => {
-      const created = (c as any).created_at ? new Date((c as any).created_at) : null;
+      const created = c.created_at ? new Date(c.created_at) : null;
       return created ? created >= range.from && created <= range.to : true;
     });
     const rows = periodContacts.map(c => [
@@ -438,7 +438,7 @@ const ReportsPage = () => {
 
   const downloadReconciliationPdf = () => {
     if (!agent) { toast.error('Agent details not loaded'); return; }
-    const agencyName = (agent as any).agency_name || (agent as any).agency || agent.name || 'Agency';
+    const agencyName = agent?.agency_name || agent?.agency || agent?.name || 'Agency';
     const today = format(new Date(), 'd MMM yyyy');
     const html = `<!doctype html><html><head><meta charset="utf-8"><title>Trust Reconciliation</title>
       <style>
@@ -631,19 +631,19 @@ const ReportsPage = () => {
                     {listings.length === 0 ? (
                       <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">No listings</TableCell></TableRow>
                     ) : listings.slice(0, 20).map(l => {
-                      const price = (l as any).price || 0;
-                      const rate = (l as any).commission_rate || 2;
-                      const status = '_mock_status' in l ? l._mock_status : (l as any).status;
+                      const price = l.price || 0;
+                      const rate = l.commission_rate ?? 2;
+                      const status = '_mock_status' in l ? l._mock_status : l.status;
                       return (
-                        <TableRow key={(l as any).id}>
-                          <TableCell className="text-xs font-medium">{(l as any).title}</TableCell>
+                        <TableRow key={l.id}>
+                          <TableCell className="text-xs font-medium">{l.title}</TableCell>
                           <TableCell className="text-xs">{AUD.format(price)}</TableCell>
                           <TableCell className="text-xs">{rate}%</TableCell>
                           <TableCell className="text-xs font-semibold">{AUD.format(price * rate / 100)}</TableCell>
-                          <TableCell className="text-xs">{(l as any).views || 0}</TableCell>
-                          <TableCell className="text-xs">{(l as any).contact_clicks || 0}</TableCell>
+                          <TableCell className="text-xs">{l.views || 0}</TableCell>
+                          <TableCell className="text-xs">{l.contact_clicks || 0}</TableCell>
                           <TableCell>
-                            <Badge variant={status === 'sold' ? 'secondary' : 'default'} className="text-[10px] capitalize">{status}</Badge>
+                            <Badge variant={status === 'sold' ? 'secondary' : 'default'} className="text-[10px] capitalize">{String(status ?? '')}</Badge>
                           </TableCell>
                         </TableRow>
                       );

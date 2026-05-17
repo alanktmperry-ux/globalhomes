@@ -76,6 +76,11 @@ export interface Property {
   rent_per_week?: number | null;
   weekly_rent?: number | null;
   __lang?: string | null;
+  commission_rate?: number | null;
+  contact_clicks?: number | null;
+  listed_date?: string | null;
+  updated_at?: string | null;
+  created_at?: string | null;
 }
 
 export interface InspectionSlot {

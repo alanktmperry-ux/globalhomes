@@ -179,7 +179,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Remove only the current impersonation session row
     if (user && impersonationSessionId) {
-      await (supabase as any)
+      await supabase
         .from('admin_impersonation_sessions')
         .delete()
         .eq('id', impersonationSessionId);

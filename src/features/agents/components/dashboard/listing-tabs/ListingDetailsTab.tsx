@@ -50,7 +50,7 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
 
   const [schoolZoneTop, setSchoolZoneTop] = useState<boolean>(Boolean((listing as any).school_zone_top));
   const [schoolZoneName, setSchoolZoneName] = useState<string>((listing as any).school_zone_name || '');
-  const [savingSchoolZone, setSavingSchoolZone] = useState(false);
+  
 
   // Inspection times management
   const inspectionTimes: InspectionSlot[] = (listing.inspection_times as unknown as InspectionSlot[]) || [];

@@ -165,8 +165,8 @@ const BankReconciliationPage = () => {
           metadata: buildAuditMeta({
             matched_amount: amount,
             bank_reference: bankRef,
-          }),
-        } as any);
+          }) as unknown as Json,
+        });
       } catch (e) {
         console.error('[BankReconciliation] audit log failed:', e);
       }

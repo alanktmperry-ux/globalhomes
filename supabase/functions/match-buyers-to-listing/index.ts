@@ -114,6 +114,7 @@ Deno.serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    const APP_URL = Deno.env.get('APP_URL') ?? 'https://listhq.com.au';
 
     // Verify caller
     const userClient = createClient(supabaseUrl, anonKey, {

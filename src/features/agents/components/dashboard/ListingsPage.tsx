@@ -564,7 +564,7 @@ const ListingsPage = () => {
         { p_property_id: l.id, p_agent_id: agent.id } as any,
       );
       if (!rpcError && rpcData) {
-        token = typeof rpcData === 'string' ? rpcData : (rpcData as any)?.token ?? null;
+        token = typeof rpcData === 'string' ? rpcData : (rpcData as unknown as { token?: string })?.token ?? null;
       }
 
       // Fallback: insert directly

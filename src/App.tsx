@@ -560,6 +560,7 @@ const App = () => (
                   <Route index element={<CommandCentre />} />
                   <Route path="overview" element={<AdminOverviewPage />} />
                   <Route path="approvals" element={<AdminApprovalsPage />} />
+                  <Route path="boosts" element={<AdminBoostsPage />} />
                   <Route path="users" element={<AdminUsersPage />} />
                   <Route path="agents" element={<AdminAgentsPage />} />
                   <Route path="listings" element={<AdminListingsPage />} />

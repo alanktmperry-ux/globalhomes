@@ -765,7 +765,7 @@ const ListingsPage = () => {
   const searchedFiltered = (() => {
     const q = searchQuery.trim().toLowerCase();
     let arr = !q ? filtered : filtered.filter((l) =>
-      [l.address, l.suburb, l.title, (l as any).reference_code]
+      [l.address, l.suburb, l.title]
         .filter(Boolean).some((s: string) => s.toLowerCase().includes(q))
     );
     arr = [...arr].sort((a, b) => {

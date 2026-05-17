@@ -846,7 +846,7 @@ const TeamPage = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <code className="font-mono text-sm font-bold tracking-widest text-foreground">{code.code}</code>
-                        <button onClick={() => copyCode(code.code)} className="text-muted-foreground hover:text-foreground transition-colors"><Copy size={12} /></button>
+                        <button onClick={() => copyCode(code.code)} aria-label={`Copy invite code ${code.code}`} className="text-muted-foreground hover:text-foreground transition-colors"><Copy size={12} /></button>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         Role: {code.role} · Used {code.uses}/{code.max_uses ?? '∞'} times

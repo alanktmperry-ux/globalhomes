@@ -300,10 +300,10 @@ const PropertyDocumentsPage = () => {
                 <div className="flex items-start justify-between gap-2">
                   <Badge variant="outline" className={CATEGORY_COLORS[cat]}>{d.category}</Badge>
                   <div className="flex items-center gap-1">
-                    <Button size="icon" variant="ghost" onClick={() => downloadDoc(d)} title="Download">
+                    <Button size="icon" variant="ghost" onClick={() => downloadDoc(d)} aria-label="Download document">
                       <Download size={14} />
                     </Button>
-                    <Button size="icon" variant="ghost" onClick={() => setToDelete(d)} title="Delete">
+                    <Button size="icon" variant="ghost" onClick={() => setToDelete(d)} aria-label="Delete document">
                       <Trash2 size={14} className="text-red-600" />
                     </Button>
                   </div>

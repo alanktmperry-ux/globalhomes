@@ -904,8 +904,8 @@ const TeamPage = () => {
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Max uses</label>
-              <Input type="number" min="1" value={newInviteMaxUses} onChange={(e) => setNewInviteMaxUses(e.target.value)} placeholder="10" />
+              <label htmlFor="max-uses" className="text-sm font-medium text-foreground mb-1.5 block">Max uses</label>
+              <Input id="max-uses" type="number" min="1" value={newInviteMaxUses} onChange={(e) => setNewInviteMaxUses(e.target.value)} placeholder="10" />
               <p className="text-xs text-muted-foreground mt-1">How many people can use this code</p>
             </div>
             <Button onClick={handleCreateInvite} disabled={creating} className="w-full">

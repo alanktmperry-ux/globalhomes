@@ -70,8 +70,9 @@ export function useTodayPriorities(limit = 5) {
       .limit(20);
 
     for (const l of hotLeads || []) {
-      const name = ((l as any).contacts ? `${(l as any).contacts.first_name ?? ''} ${(l as any).contacts.last_name ?? ''}`.trim() : '') || 'New lead';
-      const propAddr = (l as any).properties?.address;
+      const contacts = l.contacts as { first_name: string | null; last_name: string | null } | null;
+      const name = (contacts ? `${contacts.first_name ?? ''} ${contacts.last_name ?? ''}`.trim() : '') || 'New lead';
+      const propAddr = (l.properties as { address: string } | null)?.address;
       const ageMs = nowMs - new Date(l.created_at).getTime();
       candidates.push({
         id: `hot_lead:${l.id}`,

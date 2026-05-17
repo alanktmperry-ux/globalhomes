@@ -624,12 +624,12 @@ const ProfilePage = () => {
                 {languages.map(l => (
                   <Badge key={l} variant="secondary" className="gap-1">
                     {l}
-                    <button onClick={() => setLanguages(prev => prev.filter(x => x !== l))} className="ml-0.5 hover:text-destructive">×</button>
+                    <button onClick={() => setLanguages(prev => prev.filter(x => x !== l))} className="ml-0.5 hover:text-destructive" aria-label={`Remove ${l}`}>×</button>
                   </Badge>
                 ))}
               </div>
               <div className="flex gap-2">
-                <Input value={newLang} onChange={e => setNewLang(e.target.value)} placeholder="Add language" className="max-w-xs"
+                <Input value={newLang} onChange={e => setNewLang(e.target.value)} placeholder="Add language" className="max-w-xs" aria-label="Add language"
                   onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addLanguage())} />
                 <Button variant="outline" size="sm" onClick={addLanguage}><Plus size={14} /></Button>
               </div>

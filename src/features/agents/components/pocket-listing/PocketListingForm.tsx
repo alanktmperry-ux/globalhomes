@@ -344,7 +344,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         bondAmount: prop.bond_amount || ((prop.listing_type === 'rent' ? (prop.rental_weekly || 0) : 0) * 4),
         availableFrom: prop.available_from || '',
         leaseTerm: prop.lease_term || '12 months',
-        furnished: prop.furnished || 'unfurnished',
+        furnished: (prop.furnished as 'unfurnished' | 'partially_furnished' | 'furnished') || 'unfurnished',
         petsAllowed: prop.pets_allowed || false,
         screeningLevel: prop.screening_level || 'Basic',
         commissionRate: prop.commission_rate || 0,

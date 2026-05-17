@@ -8,6 +8,7 @@ import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import HomeCountUp from '@/components/HomeCountUp';
 // PricingSection moved to dedicated /for-agents/pricing route
 import FinalCTA from '@/features/marketing/FinalCTA';
+import { capture } from '@/shared/lib/posthog';
 
 const GRAD = 'linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%)';
 
@@ -103,7 +104,10 @@ export default function AgentLandingPage() {
           <div className="flex flex-col items-center gap-5 mt-10">
             <button
               type="button"
-              onClick={() => setShowModal(true)}
+              onClick={() => {
+                capture('agent_cta_clicked', { source: 'hero', label: 'start_free_trial' });
+                setShowModal(true);
+              }}
               className="px-8 md:px-9 py-4 bg-black text-white border-[1.5px] border-black rounded-full text-[15px] font-bold inline-flex items-center gap-2.5 hover:bg-white hover:text-black transition-all"
             >
               Start free trial — 60 days free
@@ -269,7 +273,10 @@ export default function AgentLandingPage() {
           </p>
           <button
             type="button"
-            onClick={() => setShowModal(true)}
+            onClick={() => {
+              capture('agent_cta_clicked', { source: 'founding_callout', label: 'reserve_spot' });
+              setShowModal(true);
+            }}
             className="mt-6 inline-flex items-center gap-2 px-7 py-3.5 bg-black text-white rounded-full text-[14px] font-bold hover:-translate-y-0.5 transition-all"
           >
             Reserve your founding spot

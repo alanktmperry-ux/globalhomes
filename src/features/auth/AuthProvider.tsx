@@ -3,6 +3,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { buildAuditMeta } from '@/shared/lib/auditLog';
+import { identify } from '@/shared/lib/posthog';
 
 interface AuthContextType {
   user: User | null;
@@ -432,6 +433,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if (type === 'signup' || type === 'email') {
             window.history.replaceState({}, '', window.location.pathname);
           }
+          identify(session.user.id, { email: session.user.email ?? undefined });
         }
 
         setSession(session);

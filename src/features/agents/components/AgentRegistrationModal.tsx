@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { useTranslation } from '@/shared/lib/i18n';
+import { capture } from '@/shared/lib/posthog';
 
 interface Props {
   open: boolean;
@@ -181,6 +182,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
       return;
     }
     setEmailSubmitting(true);
+    capture('agent_registration_started', { email: emailInput.trim().toLowerCase() });
     try {
       const email = emailInput.trim().toLowerCase();
       const { data, error } = await supabase.auth.signUp({

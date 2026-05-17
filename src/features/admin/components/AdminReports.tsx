@@ -364,7 +364,9 @@ const AdminReports = ({ isAdmin, currentAgentId }: Props) => {
           const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
           const j = await callAdminFunction('list_users');
           (j?.users || []).forEach((u: any) => signInMap.set(u.id, u.last_sign_in_at || null));
-        } catch {}
+        } catch (err) {
+          console.warn('[AdminReports] could not fetch last_sign_in data:', err);
+        }
       }
 
       // Get listing counts & views per agent

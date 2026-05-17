@@ -77,8 +77,8 @@ export default function ListingModerationQueue({ onPendingCountChange }: Props) 
         title: 'Your listing has been approved',
         message: `Your listing at ${listing.address} is now live in search results.`,
       });
-    } catch {
-      // notification failed silently — moderation action still succeeded
+    } catch (err) {
+      console.error('[ListingModerationQueue] notification dispatch failed:', err);
     }
 
     toast.success('Listing approved');
@@ -110,8 +110,8 @@ export default function ListingModerationQueue({ onPendingCountChange }: Props) 
         title: 'Listing not approved',
         message: rejectReason.trim(),
       });
-    } catch {
-      // notification failed silently — moderation action still succeeded
+    } catch (err) {
+      console.error('[ListingModerationQueue] notification dispatch failed:', err);
     }
 
     toast.success('Listing rejected');

@@ -656,7 +656,7 @@ const TrustLedgerPage = () => {
               <FileText size={13} /> Download Audit PDF
             </Button>
             <Button size="sm" variant="outline" onClick={exportCsv} className="gap-1.5 text-xs">
-              <FileDown size={13} /> Export CSV 5yr
+              <FileDown size={13} /> Export CSV
             </Button>
             <Button size="sm" variant="outline" onClick={() => setShowJournal(true)} className="gap-1.5 text-xs">
               <BookOpen size={13} /> Journal Adjustment
@@ -695,13 +695,13 @@ const TrustLedgerPage = () => {
         {/* Month Navigator + Summary */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Button size="icon" variant="outline" className="h-8 w-8" onClick={prevMonth}>
+            <Button size="icon" variant="outline" className="h-8 w-8" onClick={prevMonth} aria-label="Previous month">
               <ChevronLeft size={14} />
             </Button>
             <h2 className="text-lg font-bold min-w-[180px] text-center">
               {monthNames[viewMonth]} {viewYear}
             </h2>
-            <Button size="icon" variant="outline" className="h-8 w-8" onClick={nextMonth}>
+            <Button size="icon" variant="outline" className="h-8 w-8" onClick={nextMonth} aria-label="Next month">
               <ChevronRight size={14} />
             </Button>
           </div>
@@ -731,10 +731,10 @@ const TrustLedgerPage = () => {
               <div className="relative">
                 <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                  placeholder={t('agent.trust.ledger.search.placeholder')} className="h-8 pl-8 w-[200px] text-xs" />
+                  placeholder={t('agent.trust.ledger.search.placeholder')} className="h-8 pl-8 w-[200px] text-xs" aria-label="Search ledger entries" />
               </div>
               <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-[120px] h-8 text-xs">
+                <SelectTrigger className="w-[120px] h-8 text-xs" aria-label="Filter by status">
                   <Filter size={12} className="me-1" /><SelectValue placeholder={t('agent.trust.ledger.status')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -816,7 +816,7 @@ const TrustLedgerPage = () => {
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <Button size="icon" variant="ghost" className="h-7 w-7"
-                                      onClick={() => generateReceiptPdf(entry)}>
+                                      onClick={() => generateReceiptPdf(entry)} aria-label="Download receipt PDF">
                                       <Download size={12} />
                                     </Button>
                                   </TooltipTrigger>

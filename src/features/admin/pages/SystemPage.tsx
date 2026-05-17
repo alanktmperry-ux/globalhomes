@@ -420,13 +420,13 @@ function ReportsTab() {
       description: 'Buyer enquiries from the last 90 days.',
       icon: Mail,
       run: async () => {
-        const { data } = await (supabase as any)
+        const { data } = await supabase
           .from('leads')
           .select('buyer_name, buyer_email, buyer_phone, created_at')
           .gte('created_at', d90)
           .limit(2000);
         const rows = [['Name', 'Email', 'Phone', 'Submitted']];
-        for (const r of (data ?? []) as any[]) {
+        for (const r of data ?? []) {
           rows.push([
             fmt(r.buyer_name),
             fmt(r.buyer_email),

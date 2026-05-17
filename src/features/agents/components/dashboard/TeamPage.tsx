@@ -810,13 +810,14 @@ const TeamPage = () => {
                   {/* Action buttons for principals */}
                   {isOwnerOrAdmin && m.user_id !== user?.id && m.role !== 'principal' && m.role !== 'owner' && (
                     <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => setReassignTarget({ member: m, type: 'contacts' })} title="Reassign contacts">
+                      <Button variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => setReassignTarget({ member: m, type: 'contacts' })} aria-label={`Reassign ${m.agents?.name ?? 'member'}'s contacts`}>
                         <ArrowRightLeft size={14} />
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-destructive hover:text-destructive" onClick={() => setDeactivateTarget(m)} title="Deactivate agent">
+                      <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-destructive hover:text-destructive" onClick={() => setDeactivateTarget(m)} aria-label={`Deactivate ${m.agents?.name ?? 'agent'}`}>
                         <UserMinus size={14} />
                       </Button>
                       <button
+                        aria-label={`Remove ${m.agents?.name ?? 'member'} from agency`}
                         onClick={() => {
                           if (m.user_id === user?.id) {
                             toast.error("You can't remove yourself");

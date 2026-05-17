@@ -526,9 +526,9 @@ const ListingsPage = () => {
           return acc;
         }, {});
       setStats({
-        enquiries: buildMap(enqRes.data as any[], 'property_id'),
-        views: buildMap(viewRes.data as any[], 'property_id'),
-        matches: buildMap(matchRes.data as any[], 'listing_id'),
+        enquiries: buildMap(enqRes.data, 'property_id'),
+        views: buildMap(viewRes.data, 'property_id'),
+        matches: buildMap(matchRes.data, 'listing_id'),
       });
     })();
     return () => { cancelled = true; };

@@ -721,6 +721,7 @@ const ProfilePage = () => {
                 <select
                   value={docType}
                   onChange={e => setDocType(e.target.value)}
+                  aria-label="Document type"
                   className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
                 >
                   <option value="license">License</option>

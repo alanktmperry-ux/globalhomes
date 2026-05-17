@@ -299,7 +299,7 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
   
   const overlayKey = isRental && l._status === 'public' ? 'rent' : l._status;
   const overlay = STATUS_OVERLAY[overlayKey] || STATUS_OVERLAY.public;
-  const isBoosted = (l as any).is_featured === true || (l as any).boost_ends_at;
+  const isBoosted = l.is_featured === true;
 
   return (
     <div

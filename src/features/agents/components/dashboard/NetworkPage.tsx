@@ -472,7 +472,8 @@ const NetworkPage = () => {
               <div className="relative flex-1">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="Search your off-market listings…" className="pl-9 h-9 text-sm" />
+                  placeholder="Search your off-market listings…" className="pl-9 h-9 text-sm"
+                  aria-label="Search your off-market listings" />
               </div>
             </div>
 

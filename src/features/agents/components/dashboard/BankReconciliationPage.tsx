@@ -400,7 +400,7 @@ const BankReconciliationPage = () => {
         amount: finalAmount,
         bank_balance: parseFloat(addBalance) || 0,
         status: 'unmatched',
-      } as any);
+      });
       if (error) throw error;
 
       toast.success('Bank statement entry added');

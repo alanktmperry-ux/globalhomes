@@ -25,6 +25,8 @@ const SeekerAuthPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialMode: Mode = searchParams.get('mode') === 'signup' ? 'signup' : 'signin';
+  const redirectTo = searchParams.get('redirect');
+  const isHaloIntent = !!redirectTo?.startsWith('/halo');
   const [mode, setMode] = useState<Mode>(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

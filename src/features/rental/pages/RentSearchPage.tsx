@@ -10,6 +10,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter
 import { Button } from '@/components/ui/button';
 import { Filter, X } from 'lucide-react';
 import { AIPropertySearch } from '@/features/properties/components/AIPropertySearch';
+import { useListingDiscovery } from '@/features/boost/hooks/useListingDiscovery';
+import { FeaturedZone } from '@/features/boost/components/FeaturedZone';
 
 function parseRentalFiltersFromParams(sp: URLSearchParams): RentalFilters {
   const num = (k: string) => {

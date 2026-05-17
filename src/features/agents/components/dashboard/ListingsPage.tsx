@@ -578,11 +578,11 @@ const ListingsPage = () => {
             agent_id: agent.id,
             token: newToken,
             expires_at: expiresAt,
-          } as any)
+          })
           .select('token')
           .maybeSingle();
         if (insertError) throw insertError;
-        token = (insertData as any)?.token ?? newToken;
+        token = insertData?.token ?? newToken;
       }
 
       const url = `${window.location.origin}/vendor-report/${token}`;

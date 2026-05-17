@@ -491,12 +491,12 @@ function ReportsTab() {
       description: 'Registered buyers and budget bands.',
       icon: UserSquare,
       run: async () => {
-        const { data } = await (supabase as any)
+        const { data } = await supabase
           .from('buyer_profiles')
           .select('user_id, budget_min, budget_max, created_at')
           .limit(1000);
         const rows = [['User ID', 'Budget Min', 'Budget Max', 'Joined']];
-        for (const r of (data ?? []) as any[]) {
+        for (const r of data ?? []) {
           rows.push([
             fmt(r.user_id),
             fmt(r.budget_min),

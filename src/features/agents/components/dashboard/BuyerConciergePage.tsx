@@ -525,6 +525,7 @@ const BuyerConciergePage = () => {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="pl-8 h-9 w-64 text-sm"
+                    aria-label="Search matched buyers"
                   />
                 </div>
                 <Button

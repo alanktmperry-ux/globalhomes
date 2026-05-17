@@ -656,19 +656,19 @@ const ProfilePage = () => {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="flex items-center gap-2">
                   <Instagram size={16} className="text-muted-foreground shrink-0" />
-                  <Input value={form.social_instagram} onChange={e => setForm(f => ({ ...f, social_instagram: e.target.value }))} placeholder="Instagram URL" />
+                  <Input value={form.social_instagram} onChange={e => setForm(f => ({ ...f, social_instagram: e.target.value }))} placeholder="Instagram URL" aria-label="Instagram URL" />
                 </div>
                 <div className="flex items-center gap-2">
                   <Linkedin size={16} className="text-muted-foreground shrink-0" />
-                  <Input value={form.social_linkedin} onChange={e => setForm(f => ({ ...f, social_linkedin: e.target.value }))} placeholder="LinkedIn URL" />
+                  <Input value={form.social_linkedin} onChange={e => setForm(f => ({ ...f, social_linkedin: e.target.value }))} placeholder="LinkedIn URL" aria-label="LinkedIn URL" />
                 </div>
                 <div className="flex items-center gap-2">
                   <Facebook size={16} className="text-muted-foreground shrink-0" />
-                  <Input value={form.social_facebook} onChange={e => setForm(f => ({ ...f, social_facebook: e.target.value }))} placeholder="Facebook URL" />
+                  <Input value={form.social_facebook} onChange={e => setForm(f => ({ ...f, social_facebook: e.target.value }))} placeholder="Facebook URL" aria-label="Facebook URL" />
                 </div>
                 <div className="flex items-center gap-2">
                   <Twitter size={16} className="text-muted-foreground shrink-0" />
-                  <Input value={form.social_twitter} onChange={e => setForm(f => ({ ...f, social_twitter: e.target.value }))} placeholder="X / Twitter URL" />
+                  <Input value={form.social_twitter} onChange={e => setForm(f => ({ ...f, social_twitter: e.target.value }))} placeholder="X / Twitter URL" aria-label="X / Twitter URL" />
                 </div>
               </div>
             </div>

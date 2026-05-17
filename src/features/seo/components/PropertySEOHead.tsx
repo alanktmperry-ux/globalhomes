@@ -18,7 +18,7 @@ export function PropertySEOHead({ property, agent }: PropertySEOHeadProps) {
   const description = property.description
     ? property.description.slice(0, 160)
     : `${price} · ${[property.beds && property.beds + ' bed', property.baths && property.baths + ' bath', property.suburb, property.state].filter(Boolean).join(' · ')}. View on ListHQ.`;
-  const url = `${APP_URL}/property/${property.slug ?? property.id}`;
+  const url = `${APP_URL}/properties/${property.slug ?? property.id}`;
 
   const schemaType = (() => {
     if (isRent) return 'Accommodation';

@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { PropertyRow } from '@/features/agents/types/listing';
 import MarketingSupplierToggle from '../MarketingSupplierToggle';
 import ListingPhotoGallery from './ListingPhotoGallery';
@@ -61,6 +61,7 @@ interface Props {
 const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [leads, setLeads] = useState<any[]>([]);
   const [weeklyViews, setWeeklyViews] = useState<
@@ -104,6 +105,29 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
         });
       });
   }, [listing.id, boostState.is_featured, boostState.featured_until]);
+
+  useEffect(() => {
+    if (searchParams.get('boost') !== 'success') return;
+    const activatedTier = searchParams.get('tier') as 'featured' | 'premier' | null;
+    toast.success(
+      `${activatedTier === 'premier' ? 'Premier' : 'Featured'} boost is live — your listing is now featured!`
+    );
+    const featuredUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    setBoostState(prev => ({
+      ...prev,
+      is_featured: true,
+      boost_tier: activatedTier,
+      featured_until: featuredUntil,
+      boost_requested_at: null,
+      boost_requested_tier: null,
+    }));
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      next.delete('boost');
+      next.delete('tier');
+      return next;
+    }, { replace: true });
+  }, [searchParams]);
 
 
   const [vendorName, setVendorName] = useState(listing.vendor_name || '');
@@ -314,6 +338,20 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
     }
   };
 
+  const handleBoostCheckout = async (tier: 'featured' | 'premier') => {
+    setBoostLoading(tier);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-boost-checkout', {
+        body: { listingId: listing.id, tier, suburb: listing.suburb ?? '' },
+      });
+      if (error || !data?.url) throw error ?? new Error('No checkout URL returned');
+      window.location.href = data.url;
+    } catch (e) {
+      toast.error('Could not start checkout — please try again');
+      console.error(e);
+      setBoostLoading(null);
+    }
+  };
 
   const handleSendReport = async () => {
     if (!vendorName.trim() || !vendorEmail.trim()) {
@@ -697,30 +735,20 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                     </div>
                   </div>
                   <div className="space-y-2 mb-4">
-                    <div className="flex items-start gap-2 text-xs text-muted-foreground bg-amber-50 border border-amber-200 rounded-lg p-3 dark:bg-amber-500/10 dark:border-amber-500/20">
-                      <AlertCircle size={14} className="text-amber-600 flex-shrink-0 mt-px" />
-                      <div>
-                        <p className="font-medium text-amber-800 dark:text-amber-400 mb-0.5">How payment works right now</p>
-                        <p>
-                          Stripe instant payment is coming very soon. For now, payment is
-                          confirmed on activation and your listing goes live on the featured
-                          grid immediately.
-                        </p>
-                      </div>
+                    <div className="flex items-start gap-2 text-xs text-muted-foreground bg-muted/50 border border-border rounded-lg p-3">
+                      <Zap size={14} className="text-primary flex-shrink-0 mt-px" />
+                      <p>Secure payment via Stripe. Your listing goes live in the featured grid immediately after payment.</p>
                     </div>
                   </div>
                   <div className="flex gap-2">
                     <Button
                       className="flex-1"
-                      onClick={async () => {
-                        setShowPaymentStep(null);
-                        await handleRequestBoost(tier);
-                      }}
+                      onClick={() => handleBoostCheckout(tier)}
                       disabled={!!boostLoading}>
                       {boostLoading === tier
                         ? <Loader2 size={13} className="animate-spin mr-2" />
                         : <Zap size={13} className="mr-2" />}
-                      Confirm — request {tierData.label}
+                      Pay now — {tierData.label} {tierData.priceLabel}
                     </Button>
                     <Button variant="outline" onClick={() => setShowPaymentStep(null)}>
                       Back

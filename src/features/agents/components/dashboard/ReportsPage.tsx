@@ -365,8 +365,8 @@ const ReportsPage = () => {
     const totalContacts = contacts.length;
     const hotLeads = contacts.filter(c => c.ranking === 'hot').length;
     const warmLeads = contacts.filter(c => c.ranking === 'warm').length;
-    const totalViews = listings.reduce((s, l) => s + ((l as any).views || 0), 0);
-    const totalClicks = listings.reduce((s, l) => s + ((l as any).contact_clicks || 0), 0);
+    const totalViews = listings.reduce((s, l) => s + (l.views || 0), 0);
+    const totalClicks = listings.reduce((s, l) => s + (l.contact_clicks || 0), 0);
     const conversionRate = totalViews > 0 ? Math.min(100, (totalClicks / totalViews) * 100).toFixed(1) : '0';
 
     // Source breakdown

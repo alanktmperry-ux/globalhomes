@@ -246,7 +246,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const roles = rolesResult.data?.map((r) => r.role) || [];
     const agentData = agentResult.data;
     const isAdminUser = roles.includes('admin');
-    const isApprovedAgent = !!agentData && ((agentData as any).approval_status === 'approved' || isAdminUser);
+    const isApprovedAgent = !!agentData && (agentData.approval_status === 'approved' || isAdminUser);
     // Only grant agent role if the agents row is approved (admins always pass)
     const filteredRoles = roles.filter((r) => {
       if (r !== 'agent') return true;
@@ -255,14 +255,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (isApprovedAgent && !filteredRoles.includes('agent')) filteredRoles.push('agent');
     applyRoles(filteredRoles, user.email);
     if (agentData) {
-      setAgencyRole((agentData as any).agency_role || null);
+      setAgencyRole(agentData.agency_role || null);
       setAgencyId(agentData.agency_id || null);
-      if (isApprovedAgent && ((agentData as any).agency_role === 'principal' || (agentData as any).agency_role === 'admin')) {
+      if (isApprovedAgent && (agentData.agency_role === 'principal' || agentData.agency_role === 'admin')) {
         setIsPrincipal(true);
       }
       if (isApprovedAgent && !roles.includes('agent') && !roles.includes('admin')) {
         await supabase.from('user_roles').upsert(
-          { user_id: user.id, role: 'agent' as any },
+          { user_id: user.id, role: 'agent' as const },
           { onConflict: 'user_id,role' }
         );
       }

@@ -223,14 +223,14 @@ export default function PMInspectionsPage() {
       .eq('user_id', user.id)
       .maybeSingle();
     if (!agent) { setLoading(false); return; }
-    const aid = (agent as any).id as string;
+    const aid = agent.id;
     setAgentId(aid);
-    setAgentName((agent as any).name || '');
-    if ((agent as any).agency_id) {
+    setAgentName(agent.name || '');
+    if (agent.agency_id) {
       const { data: agencyRow } = await supabase
         .from('agencies')
         .select('name')
-        .eq('id', (agent as any).agency_id)
+        .eq('id', agent.agency_id)
         .maybeSingle();
       if (agencyRow?.name) setAgencyName(agencyRow.name);
     }

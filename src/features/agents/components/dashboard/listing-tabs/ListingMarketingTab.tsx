@@ -61,6 +61,7 @@ interface Props {
 const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [leads, setLeads] = useState<any[]>([]);
   const [weeklyViews, setWeeklyViews] = useState<

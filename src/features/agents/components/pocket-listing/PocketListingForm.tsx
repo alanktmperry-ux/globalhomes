@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, Save, Loader2, FileText, Trash2, Share2 } from '
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
 import StepAddress from './StepAddress';

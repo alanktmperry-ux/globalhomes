@@ -17,6 +17,7 @@ interface Props {
 
 export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePartner, requireSupport, blockSeekers }: Props) => {
   const { user, loading, isAgent, isAdmin, isPartner, isSupport, isPrincipal, userRole } = useAuth();
+  const location = useLocation();
   const [approvalState, setApprovalState] = useState<'loading' | 'pending' | 'approved' | 'none'>('loading');
 
   useEffect(() => {

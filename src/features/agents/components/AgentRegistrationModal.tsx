@@ -49,6 +49,15 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
   const hcaptchaSiteKey = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001';
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const captchaRef = useRef<HCaptcha | null>(null);
+  const [pendingEmailSubmit, setPendingEmailSubmit] = useState(false);
+
+  useEffect(() => {
+    if (pendingEmailSubmit && captchaToken) {
+      setPendingEmailSubmit(false);
+      handleEmailSubmit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingEmailSubmit, captchaToken]);
 
   // Password step state
   const [newPassword, setNewPassword] = useState('');

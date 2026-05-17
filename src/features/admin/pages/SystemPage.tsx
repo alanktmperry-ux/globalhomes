@@ -367,12 +367,12 @@ function ReportsTab() {
       description: 'Full agent roster with plan and subscription state.',
       icon: Users,
       run: async () => {
-        const { data } = await (supabase as any)
+        const { data } = await supabase
           .from('agents')
           .select('name, email, agency, is_subscribed, created_at, state, agent_subscriptions(plan_type)')
           .limit(1000);
         const rows = [['Name', 'Agency', 'Email', 'Plan', 'Subscribed', 'State', 'Joined']];
-        for (const r of (data ?? []) as any[]) {
+        for (const r of data ?? []) {
           const plan = Array.isArray(r.agent_subscriptions)
             ? r.agent_subscriptions[0]?.plan_type
             : r.agent_subscriptions?.plan_type;

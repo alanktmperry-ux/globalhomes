@@ -1242,7 +1242,7 @@ const TrustAccountingPage = () => {
                           <TableCell>
                             <div className="flex items-center gap-0.5 justify-end">
                               <Button size="sm" variant="ghost" className="h-7 px-1.5 text-destructive"
-                                onClick={() => { setDeletingTx(tx); setShowDeleteConfirm(true); }} title="Void">
+                                onClick={() => { setDeletingTx(tx); setShowDeleteConfirm(true); }} title="Void" aria-label="Void transaction">
                                 <Trash2 size={12} />
                               </Button>
                             </div>

@@ -526,9 +526,9 @@ export default function PMInspectionsPage() {
       inspection_type: 'exit',
       scheduled_date: format(scheduled, 'yyyy-MM-dd'),
       status: 'scheduled',
-    } as any).select('id').maybeSingle();
+    }).select('id').maybeSingle();
     if (error || !inserted) { toast.error('Could not schedule exit inspection'); return; }
-    navigate(`/dashboard/inspection/${(inserted as any).id}`);
+    navigate(`/dashboard/inspection/${inserted.id}`);
   };
 
   // Notice

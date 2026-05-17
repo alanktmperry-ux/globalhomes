@@ -443,7 +443,7 @@ const BankReconciliationPage = () => {
     try {
       const { error } = await supabase
         .from('trust_reconciliations')
-        .update({ status: 'unmatched', matched_receipt_id: null, matched_payment_id: null } as any)
+        .update({ status: 'unmatched', matched_receipt_id: null, matched_payment_id: null })
         .eq('id', item.id);
       if (error) throw error;
       toast.success('Unmatched successfully');

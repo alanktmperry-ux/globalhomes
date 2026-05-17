@@ -60,7 +60,7 @@ async function logAudit(action_type: string, metadata: Record<string, unknown>) 
       action_type,
       entity_type: 'system',
       user_id: userRes.user?.id,
-      metadata: metadata as any,
+      metadata: metadata as unknown as Json,
     });
   } catch {
     /* noop */

@@ -90,6 +90,7 @@ export default function AdminSidebar({
   agentsStuckCount,
   failedPaymentsCount,
   supportOpenCount,
+  boostsPendingCount,
 }: AdminSidebarProps) {
   const { pathname, search } = useLocation();
   const navigate = useNavigate();

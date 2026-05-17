@@ -54,7 +54,7 @@ export function useTodayPriorities(limit = 5) {
       .eq('agent_id', agent.id)
       .gt('dismissed_until', new Date().toISOString());
     const dismissed = new Set(
-      ((dismissalsRaw as any[]) || []).map(d => `${d.source_key}:${d.source_id}`),
+      (dismissalsRaw || []).map(d => `${d.source_key}:${d.source_id}`),
     );
 
     const candidates: PriorityItem[] = [];

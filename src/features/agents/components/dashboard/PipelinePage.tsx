@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, DragEvent } from 'react';
+import { useEffect, useState, useCallback, useMemo, DragEvent } from 'react';
 import { motion } from 'framer-motion';
 import { GripVertical, FileText, Plus, Banknote, Settings as SettingsIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -212,6 +212,16 @@ const PipelinePage = () => {
 
   const totalValue = cards.reduce((sum, c) => sum + c.estimatedValue, 0);
 
+  const cardsByStage = useMemo(() => {
+    const map = new Map<string, PipelineCard[]>();
+    for (const card of cards) {
+      const existing = map.get(card.stageId) ?? [];
+      existing.push(card);
+      map.set(card.stageId, existing);
+    }
+    return map;
+  }, [cards]);
+
   return (
     <div>
       <DashboardHeader
@@ -239,7 +249,7 @@ const PipelinePage = () => {
       <div className="p-4 sm:p-6 max-w-[1600px]">
         <div className="flex gap-3 overflow-x-auto pb-4">
           {effectiveStages.map((stage) => {
-            const stageCards = cards.filter(c => c.stageId === stage.id);
+            const stageCards = cardsByStage.get(stage.id) ?? [];
             const stageValue = stageCards.reduce((s, c) => s + c.estimatedValue, 0);
             const isOver = dragOverStageId === stage.id;
 
@@ -298,6 +308,7 @@ const PipelinePage = () => {
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setOfferCard(card); }}
                                   className="p-1 rounded hover:bg-primary/10 transition-colors shrink-0"
+                                  aria-label="AI Offer Assistant"
                                   title="AI Offer Assistant"
                                 >
                                   <FileText size={12} className="text-primary" />
@@ -307,6 +318,7 @@ const PipelinePage = () => {
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setBrokerCard(card); }}
                                   className="p-1 rounded hover:bg-primary/10 transition-colors shrink-0"
+                                  aria-label="Refer buyer to mortgage broker"
                                   title="Refer buyer to mortgage broker"
                                 >
                                   <Banknote size={12} className="text-primary" />

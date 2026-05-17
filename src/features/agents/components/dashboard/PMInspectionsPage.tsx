@@ -643,7 +643,7 @@ ${agencyName || ''}`.trim();
     if (!cancelTarget) return;
     const { error } = await supabase
       .from('property_inspections')
-      .update({ status: 'cancelled' } as any)
+      .update({ status: 'cancelled' })
       .eq('id', cancelTarget.id);
     if (error) { toast.error('Could not cancel'); return; }
     toast.success('Inspection cancelled');

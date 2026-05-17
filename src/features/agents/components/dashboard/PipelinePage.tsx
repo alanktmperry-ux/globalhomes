@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, DragEvent } from 'react';
+import { useEffect, useState, useCallback, useMemo, DragEvent } from 'react';
 import { motion } from 'framer-motion';
 import { GripVertical, FileText, Plus, Banknote, Settings as SettingsIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';

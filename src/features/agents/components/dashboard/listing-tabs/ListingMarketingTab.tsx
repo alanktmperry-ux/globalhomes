@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { PropertyRow } from '@/features/agents/types/listing';
 import MarketingSupplierToggle from '../MarketingSupplierToggle';
 import ListingPhotoGallery from './ListingPhotoGallery';
+import { SuburbPoolDepth } from '@/features/boost/components/SuburbPoolDepth';
 import { supabase } from '@/integrations/supabase/client';
 import { dispatchNotification } from '@/shared/lib/notify';
 import { useAuth } from '@/features/auth/AuthProvider';

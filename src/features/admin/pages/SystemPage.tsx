@@ -445,14 +445,14 @@ function ReportsTab() {
       run: async () => {
         const { data } = await supabase
           .from('agent_subscriptions')
-          .select('agent_id, plan_type, is_active, trial_ends_at, created_at')
+          .select('agent_id, plan_type, auto_renew, trial_ends_at, created_at')
           .limit(1000);
-        const rows = [['Agent ID', 'Plan', 'Active', 'Trial Ends', 'Created']];
+        const rows = [['Agent ID', 'Plan', 'Auto-Renew', 'Trial Ends', 'Created']];
         for (const r of data ?? []) {
           rows.push([
             fmt(r.agent_id),
             fmt(r.plan_type),
-            r.is_active ? 'Yes' : 'No',
+            r.auto_renew ? 'Yes' : 'No',
             r.trial_ends_at ? new Date(r.trial_ends_at).toISOString().slice(0, 10) : '',
             r.created_at ? new Date(r.created_at).toISOString().slice(0, 10) : '',
           ]);

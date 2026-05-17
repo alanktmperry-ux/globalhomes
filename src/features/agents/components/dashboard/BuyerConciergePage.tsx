@@ -577,7 +577,7 @@ const BuyerConciergePage = () => {
                         <TableCell><StatusBadge status={m.status} /></TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => archive(m.id)}>
+                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0" aria-label="Archive buyer" onClick={() => archive(m.id)}>
                               <Archive size={12} />
                             </Button>
                             <Button size="sm" variant="outline" className="h-7 text-xs px-2" onClick={() => openContact(m)}>

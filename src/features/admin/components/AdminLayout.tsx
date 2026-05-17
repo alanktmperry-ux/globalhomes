@@ -17,6 +17,7 @@ const SECTION_LABELS: Record<string, string> = {
   approvals: 'Approvals',
   agents: 'Agents',
   listings: 'Listings',
+  boosts: 'Boosts',
   revenue: 'Revenue',
   outreach: 'Outreach',
   system: 'System',
@@ -48,6 +49,7 @@ export default function AdminLayout() {
   const [agentsStuckCount, setAgentsStuckCount] = useState<number | undefined>(undefined);
   const [failedPaymentsCount, setFailedPaymentsCount] = useState<number | undefined>(undefined);
   const [supportOpenCount, setSupportOpenCount] = useState<number | undefined>(undefined);
+  const [boostsPendingCount, setBoostsPendingCount] = useState<number | undefined>(undefined);
   const [mfaRequired, setMfaRequired] = useState(false);
 
   useEffect(() => {
@@ -122,6 +124,15 @@ export default function AdminLayout() {
       } catch {
         if (!cancelled) setSupportOpenCount(undefined);
       }
+      try {
+        const r = await (supabase.from('properties') as any)
+          .select('id', { count: 'exact', head: true })
+          .not('boost_requested_at', 'is', null)
+          .eq('is_featured', false);
+        if (!cancelled) setBoostsPendingCount(r.error ? undefined : (r.count ?? 0));
+      } catch {
+        if (!cancelled) setBoostsPendingCount(undefined);
+      }
     }
 
 
@@ -141,6 +152,7 @@ export default function AdminLayout() {
         agentsStuckCount={agentsStuckCount}
         failedPaymentsCount={failedPaymentsCount}
         supportOpenCount={supportOpenCount}
+        boostsPendingCount={boostsPendingCount}
       />
 
       <main className="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">

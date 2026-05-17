@@ -265,7 +265,7 @@ export default function AgentLandingPage() {
             Lock in 30% lower pricing for 24 months.
           </h3>
           <p className="text-[15px] md:text-[16px] text-[#4a4a4a] mt-3 leading-[1.55] max-w-[640px]">
-            First 100 paying agents get founding rates. Once they're gone, public pricing applies.
+            First 100 agents get 60 days free, then founding rates permanently locked — 30% below public pricing for as long as you stay. Once they're gone, public pricing applies.
           </p>
           <button
             type="button"

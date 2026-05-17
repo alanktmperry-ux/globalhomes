@@ -55,8 +55,8 @@ const ScoreRing = ({ score, size = 48 }: { score: number; size?: number }) => {
   const r = (size - 8) / 2;
   const circ = 2 * Math.PI * r;
   return (
-    <div className="relative shrink-0" style={{ width: size, height: size }}>
-      <svg className="-rotate-90" width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+    <div className="relative shrink-0" style={{ width: size, height: size }} role="img" aria-label={`Seller likelihood score: ${score}`}>
+      <svg className="-rotate-90" width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="hsl(var(--border))" strokeWidth="4" />
         <circle
           cx={size / 2} cy={size / 2} r={r} fill="none"
@@ -363,7 +363,7 @@ const PreMarketPage = () => {
           <DialogHeader>
             <DialogTitle className="text-base">Outreach Letter{letterModal.property ? ` — ${letterModal.property.address}` : ''}</DialogTitle>
           </DialogHeader>
-          <div className="bg-secondary rounded-xl p-4 text-sm leading-relaxed whitespace-pre-wrap min-h-[120px]">
+          <div className="bg-secondary rounded-xl p-4 text-sm leading-relaxed whitespace-pre-wrap min-h-[120px]" aria-live="polite">
             {letterModal.loading && !letterModal.content && (
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Loader2 size={14} className="animate-spin" /> Generating letter…

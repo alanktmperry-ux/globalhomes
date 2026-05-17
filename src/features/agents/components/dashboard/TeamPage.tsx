@@ -619,8 +619,8 @@ const TeamPage = () => {
                 </div>
               </div>
               <div>
-                <Label className="text-xs font-medium">Agency Name *</Label>
-                <Input placeholder="e.g. Elite Property Group" value={newAgencyName} onChange={(e) => setNewAgencyName(e.target.value)} className="mt-1.5" />
+                <Label htmlFor="new-agency-name" className="text-xs font-medium">Agency Name *</Label>
+                <Input id="new-agency-name" placeholder="e.g. Elite Property Group" value={newAgencyName} onChange={(e) => setNewAgencyName(e.target.value)} className="mt-1.5" />
               </div>
               <div>
                 <Label className="text-xs font-medium">Office Address</Label>
@@ -634,17 +634,17 @@ const TeamPage = () => {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label className="text-xs font-medium">Email</Label>
-                  <Input type="email" placeholder="office@agency.com" value={newAgencyEmail} onChange={(e) => setNewAgencyEmail(e.target.value)} className="mt-1.5" />
+                  <Label htmlFor="new-agency-email" className="text-xs font-medium">Email</Label>
+                  <Input id="new-agency-email" type="email" placeholder="office@agency.com" value={newAgencyEmail} onChange={(e) => setNewAgencyEmail(e.target.value)} className="mt-1.5" />
                 </div>
                 <div>
-                  <Label className="text-xs font-medium">Phone</Label>
-                  <Input placeholder="+61 4xx xxx xxx" value={newAgencyPhone} onChange={(e) => setNewAgencyPhone(e.target.value)} className="mt-1.5" />
+                  <Label htmlFor="new-agency-phone" className="text-xs font-medium">Phone</Label>
+                  <Input id="new-agency-phone" placeholder="+61 4xx xxx xxx" value={newAgencyPhone} onChange={(e) => setNewAgencyPhone(e.target.value)} className="mt-1.5" />
                 </div>
               </div>
               <div>
-                <Label className="text-xs font-medium">Description</Label>
-                <Textarea placeholder="Tell clients about your agency..." value={newAgencyDescription} onChange={(e) => setNewAgencyDescription(e.target.value)} className="mt-1.5 resize-none" rows={3} />
+                <Label htmlFor="new-agency-description" className="text-xs font-medium">Description</Label>
+                <Textarea id="new-agency-description" placeholder="Tell clients about your agency..." value={newAgencyDescription} onChange={(e) => setNewAgencyDescription(e.target.value)} className="mt-1.5 resize-none" rows={3} />
               </div>
               <Button onClick={handleCreateAgency} disabled={creatingAgency || !newAgencyName.trim()} className="w-full">
                 {creatingAgency ? <><Loader2 size={14} className="animate-spin mr-2" /> Creating...</> : <><Building2 size={14} className="mr-2" /> Create Agency</>}
@@ -656,8 +656,8 @@ const TeamPage = () => {
           <TabsContent value="join">
             <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
               <div>
-                <Label className="text-xs font-medium">Invite Code</Label>
-                <Input placeholder="e.g. ABCD1234" value={joinCode} onChange={(e) => setJoinCode(e.target.value.toUpperCase())} className="mt-1.5 font-mono tracking-widest text-center text-lg" maxLength={8} />
+                <Label htmlFor="join-code" className="text-xs font-medium">Invite Code</Label>
+                <Input id="join-code" placeholder="e.g. ABCD1234" value={joinCode} onChange={(e) => setJoinCode(e.target.value.toUpperCase())} className="mt-1.5 font-mono tracking-widest text-center text-lg" maxLength={8} />
                 <p className="text-[11px] text-muted-foreground mt-1.5">Ask your agency principal or admin for an invite code.</p>
               </div>
               <Button onClick={handleJoinAgency} disabled={joiningAgency || joinCode.trim().length < 4} className="w-full">
@@ -690,7 +690,7 @@ const TeamPage = () => {
             </div>
           )}
           {isOwnerOrAdmin && (
-            <button onClick={() => fileInputRef.current?.click()} disabled={uploadingLogo} className="absolute inset-0 rounded-2xl bg-foreground/0 group-hover:bg-foreground/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+            <button onClick={() => fileInputRef.current?.click()} disabled={uploadingLogo} aria-label="Change agency logo" className="absolute inset-0 rounded-2xl bg-foreground/0 group-hover:bg-foreground/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
               {uploadingLogo ? <Loader2 size={18} className="text-background animate-spin" /> : <Camera size={18} className="text-background" />}
             </button>
           )}
@@ -810,13 +810,14 @@ const TeamPage = () => {
                   {/* Action buttons for principals */}
                   {isOwnerOrAdmin && m.user_id !== user?.id && m.role !== 'principal' && m.role !== 'owner' && (
                     <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => setReassignTarget({ member: m, type: 'contacts' })} title="Reassign contacts">
+                      <Button variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => setReassignTarget({ member: m, type: 'contacts' })} aria-label={`Reassign ${m.agents?.name ?? 'member'}'s contacts`}>
                         <ArrowRightLeft size={14} />
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-destructive hover:text-destructive" onClick={() => setDeactivateTarget(m)} title="Deactivate agent">
+                      <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-destructive hover:text-destructive" onClick={() => setDeactivateTarget(m)} aria-label={`Deactivate ${m.agents?.name ?? 'agent'}`}>
                         <UserMinus size={14} />
                       </Button>
                       <button
+                        aria-label={`Remove ${m.agents?.name ?? 'member'} from agency`}
                         onClick={() => {
                           if (m.user_id === user?.id) {
                             toast.error("You can't remove yourself");
@@ -845,7 +846,7 @@ const TeamPage = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <code className="font-mono text-sm font-bold tracking-widest text-foreground">{code.code}</code>
-                        <button onClick={() => copyCode(code.code)} className="text-muted-foreground hover:text-foreground transition-colors"><Copy size={12} /></button>
+                        <button onClick={() => copyCode(code.code)} aria-label={`Copy invite code ${code.code}`} className="text-muted-foreground hover:text-foreground transition-colors"><Copy size={12} /></button>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         Role: {code.role} · Used {code.uses}/{code.max_uses ?? '∞'} times
@@ -903,8 +904,8 @@ const TeamPage = () => {
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Max uses</label>
-              <Input type="number" min="1" value={newInviteMaxUses} onChange={(e) => setNewInviteMaxUses(e.target.value)} placeholder="10" />
+              <label htmlFor="max-uses" className="text-sm font-medium text-foreground mb-1.5 block">Max uses</label>
+              <Input id="max-uses" type="number" min="1" value={newInviteMaxUses} onChange={(e) => setNewInviteMaxUses(e.target.value)} placeholder="10" />
               <p className="text-xs text-muted-foreground mt-1">How many people can use this code</p>
             </div>
             <Button onClick={handleCreateInvite} disabled={creating} className="w-full">
@@ -923,8 +924,8 @@ const TeamPage = () => {
           </DialogHeader>
           <div className="space-y-4 mt-2">
             <div>
-              <Label className="text-sm font-medium mb-1.5 block">Email Address *</Label>
-              <Input type="email" placeholder="agent@example.com" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} />
+              <Label htmlFor="invite-email" className="text-sm font-medium mb-1.5 block">Email Address *</Label>
+              <Input id="invite-email" type="email" placeholder="agent@example.com" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} />
             </div>
             <div>
               <Label className="text-sm font-medium mb-1.5 block">Role</Label>
@@ -945,7 +946,7 @@ const TeamPage = () => {
                     {inviteAccessLevel === 'full' ? 'Can create, edit, and delete listings, leads, and settings' : 'Can view listings, leads, and analytics only'}
                   </p>
                 </div>
-                <Switch checked={inviteAccessLevel === 'full'} onCheckedChange={(checked) => setInviteAccessLevel(checked ? 'full' : 'read')} />
+                <Switch checked={inviteAccessLevel === 'full'} onCheckedChange={(checked) => setInviteAccessLevel(checked ? 'full' : 'read')} aria-label="Toggle full access" />
               </div>
             </div>
             <Button onClick={handleSendEmailInvite} disabled={sendingInvite || !inviteEmail.trim()} className="w-full">
@@ -964,8 +965,8 @@ const TeamPage = () => {
           </DialogHeader>
           <div className="space-y-4 mt-2">
             <div>
-              <Label className="text-xs font-medium">Agency Name</Label>
-              <Input value={agencyName} onChange={(e) => setAgencyName(e.target.value)} className="mt-1.5" />
+              <Label htmlFor="edit-agency-name" className="text-xs font-medium">Agency Name</Label>
+              <Input id="edit-agency-name" value={agencyName} onChange={(e) => setAgencyName(e.target.value)} className="mt-1.5" />
             </div>
             <div>
               <Label className="text-xs font-medium">Office Address</Label>
@@ -979,17 +980,17 @@ const TeamPage = () => {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs font-medium">Email</Label>
-                <Input type="email" value={agencyEmail} onChange={(e) => setAgencyEmail(e.target.value)} className="mt-1.5" />
+                <Label htmlFor="edit-agency-email" className="text-xs font-medium">Email</Label>
+                <Input id="edit-agency-email" type="email" value={agencyEmail} onChange={(e) => setAgencyEmail(e.target.value)} className="mt-1.5" />
               </div>
               <div>
-                <Label className="text-xs font-medium">Phone</Label>
-                <Input value={agencyPhone} onChange={(e) => setAgencyPhone(e.target.value)} className="mt-1.5" />
+                <Label htmlFor="edit-agency-phone" className="text-xs font-medium">Phone</Label>
+                <Input id="edit-agency-phone" value={agencyPhone} onChange={(e) => setAgencyPhone(e.target.value)} className="mt-1.5" />
               </div>
             </div>
             <div>
-              <Label className="text-xs font-medium">Description</Label>
-              <Textarea value={agencyDescription} onChange={(e) => setAgencyDescription(e.target.value)} className="mt-1.5 resize-none" rows={3} />
+              <Label htmlFor="edit-agency-description" className="text-xs font-medium">Description</Label>
+              <Textarea id="edit-agency-description" value={agencyDescription} onChange={(e) => setAgencyDescription(e.target.value)} className="mt-1.5 resize-none" rows={3} />
             </div>
             <Button onClick={handleSaveBranding} disabled={savingBranding} className="w-full">
               {savingBranding ? <><Loader2 size={14} className="animate-spin mr-2" /> Saving...</> : 'Save Changes'}

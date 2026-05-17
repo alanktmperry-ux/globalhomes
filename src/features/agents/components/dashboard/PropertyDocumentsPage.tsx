@@ -253,6 +253,7 @@ const PropertyDocumentsPage = () => {
         <div className="relative flex-1">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
+            aria-label="Search documents"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by title or tenant…"

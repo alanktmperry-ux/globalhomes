@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Zap, CheckCircle, Users, Building2, DollarSign, Megaphone, Settings,
   Shield, ArrowLeft, LineChart, Wallet, Landmark, Sparkles, Share2, Briefcase,
-  Command, LifeBuoy, ShieldCheck,
+  Command, LifeBuoy, ShieldCheck, Star,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';

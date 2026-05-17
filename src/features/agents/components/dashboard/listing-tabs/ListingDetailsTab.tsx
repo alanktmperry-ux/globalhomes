@@ -107,7 +107,7 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
 
       {/* Hero image */}
       {listing.image_url && (
-        <img src={listing.image_url} alt="" className="w-full h-48 object-cover rounded-xl" />
+        <img src={listing.image_url} alt={listing.address ?? 'Listing photo'} className="w-full h-48 object-cover rounded-xl" />
       )}
 
       <div className="flex items-center justify-between">

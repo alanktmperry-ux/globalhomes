@@ -618,7 +618,7 @@ const handler = {
           const maxAge = parseInt(cc.match(/max-age=(\d+)/)?.[1] || '60', 10);
           const isStale = ageSec > maxAge;
           if (isStale) {
-            const originRequest = new Request(request.url, { method: 'GET', headers: request.headers });
+            const originRequest = new Request(APP_ORIGIN + url.pathname + url.search, { method: 'GET', headers: request.headers });
             ctx.waitUntil(refreshCacheInBackground(originRequest, cacheKey, cache, env));
           }
           console.log(JSON.stringify({ type: 'cache', status: isStale ? 'STALE' : 'HIT', path: url.pathname, age: ageSec }));
@@ -626,7 +626,7 @@ const handler = {
         }
 
         // MISS — fetch origin, store, compress, return
-        const originRes = await fetch(request);
+        const originRes = await fetch(new Request(APP_ORIGIN + url.pathname + url.search, request));
         const ct = originRes.headers.get('content-type') || '';
         const isHtml = ct.includes('text/html');
 
@@ -653,7 +653,7 @@ const handler = {
       }
 
       // Bypass path (auth/dashboard/admin/api) — pass through, never cache
-      const passRes = await fetch(request);
+      const passRes = await fetch(new Request(APP_ORIGIN + url.pathname + url.search, request));
       const secured = withSecurityHeaders(passRes, env);
       const headers = new Headers(secured.headers);
       headers.set('X-Cache-Status', 'BYPASS');

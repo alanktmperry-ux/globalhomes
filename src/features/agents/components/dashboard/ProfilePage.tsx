@@ -482,6 +482,7 @@ const ProfilePage = () => {
                     <button
                       onClick={() => logoInputRef.current?.click()}
                       disabled={uploadingLogo}
+                      aria-label="Change company logo"
                       className="absolute inset-0 rounded-xl bg-foreground/0 group-hover:bg-foreground/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
                     >
                       {uploadingLogo ? <Loader2 size={18} className="text-background animate-spin" /> : <Camera size={18} className="text-background" />}

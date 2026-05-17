@@ -609,8 +609,8 @@ const ProfilePage = () => {
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs">Website URL</Label>
-                  <Input value={form.website_url} onChange={e => setForm(f => ({ ...f, website_url: e.target.value }))} placeholder="https://" />
+                  <Label htmlFor="profile-website" className="text-xs">Website URL</Label>
+                  <Input id="profile-website" value={form.website_url} onChange={e => setForm(f => ({ ...f, website_url: e.target.value }))} placeholder="https://" />
                 </div>
               </div>
             </div>

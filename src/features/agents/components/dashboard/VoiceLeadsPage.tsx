@@ -249,8 +249,12 @@ const VoiceLeadsPage = () => {
                 const scoreVal = hasScore ? (selected.score as number) : 0;
                 return (
                   <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center gap-4">
-                    <div className="relative w-14 h-14 shrink-0">
-                      <svg className="w-14 h-14 -rotate-90" viewBox="0 0 56 56">
+                    <div
+                      role="img"
+                      aria-label={hasScore ? `AI Lead Score: ${scoreVal}%` : 'AI Lead Score: unscored'}
+                      className="relative w-14 h-14 shrink-0"
+                    >
+                      <svg aria-hidden="true" className="w-14 h-14 -rotate-90" viewBox="0 0 56 56">
                         <circle cx="28" cy="28" r="24" fill="none" stroke="hsl(var(--border))" strokeWidth="4" />
                         {hasScore && (
                           <circle

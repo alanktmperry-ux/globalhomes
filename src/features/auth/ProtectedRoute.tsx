@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
@@ -17,6 +17,7 @@ interface Props {
 
 export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePartner, requireSupport, blockSeekers }: Props) => {
   const { user, loading, isAgent, isAdmin, isPartner, isSupport, isPrincipal, userRole } = useAuth();
+  const location = useLocation();
   const [approvalState, setApprovalState] = useState<'loading' | 'pending' | 'approved' | 'none'>('loading');
 
   useEffect(() => {
@@ -58,7 +59,8 @@ export const ProtectedRoute = ({ children, requireAgent, requireAdmin, requirePa
   if (!user) {
     if (requireAdmin || requireSupport) return <Navigate to="/admin/login" replace />;
     if (requirePartner) return <Navigate to="/" replace />;
-    return <Navigate to="/login" replace />;
+    const redirectParam = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={`/login?redirect=${redirectParam}`} replace />;
   }
 
   if (user && !user.email_confirmed_at && !isAdmin) {

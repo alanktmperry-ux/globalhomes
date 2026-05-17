@@ -946,7 +946,7 @@ const TeamPage = () => {
                     {inviteAccessLevel === 'full' ? 'Can create, edit, and delete listings, leads, and settings' : 'Can view listings, leads, and analytics only'}
                   </p>
                 </div>
-                <Switch checked={inviteAccessLevel === 'full'} onCheckedChange={(checked) => setInviteAccessLevel(checked ? 'full' : 'read')} />
+                <Switch checked={inviteAccessLevel === 'full'} onCheckedChange={(checked) => setInviteAccessLevel(checked ? 'full' : 'read')} aria-label="Toggle full access" />
               </div>
             </div>
             <Button onClick={handleSendEmailInvite} disabled={sendingInvite || !inviteEmail.trim()} className="w-full">

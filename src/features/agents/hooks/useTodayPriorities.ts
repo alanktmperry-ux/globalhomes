@@ -54,7 +54,7 @@ export function useTodayPriorities(limit = 5) {
       .eq('agent_id', agent.id)
       .gt('dismissed_until', new Date().toISOString());
     const dismissed = new Set(
-      ((dismissalsRaw as any[]) || []).map(d => `${d.source_key}:${d.source_id}`),
+      (dismissalsRaw || []).map(d => `${d.source_key}:${d.source_id}`),
     );
 
     const candidates: PriorityItem[] = [];
@@ -70,8 +70,9 @@ export function useTodayPriorities(limit = 5) {
       .limit(20);
 
     for (const l of hotLeads || []) {
-      const name = ((l as any).contacts ? `${(l as any).contacts.first_name ?? ''} ${(l as any).contacts.last_name ?? ''}`.trim() : '') || 'New lead';
-      const propAddr = (l as any).properties?.address;
+      const contacts = l.contacts as { first_name: string | null; last_name: string | null } | null;
+      const name = (contacts ? `${contacts.first_name ?? ''} ${contacts.last_name ?? ''}`.trim() : '') || 'New lead';
+      const propAddr = (l.properties as { address: string } | null)?.address;
       const ageMs = nowMs - new Date(l.created_at).getTime();
       candidates.push({
         id: `hot_lead:${l.id}`,
@@ -104,8 +105,9 @@ export function useTodayPriorities(limit = 5) {
       .limit(20);
 
     for (const l of coldSoon || []) {
-      const name = ((l as any).contacts ? `${(l as any).contacts.first_name ?? ''} ${(l as any).contacts.last_name ?? ''}`.trim() : '') || 'Lead';
-      const ageMs = nowMs - new Date((l as any).last_contacted).getTime();
+      const contacts = l.contacts as { first_name: string | null; last_name: string | null } | null;
+      const name = (contacts ? `${contacts.first_name ?? ''} ${contacts.last_name ?? ''}`.trim() : '') || 'Lead';
+      const ageMs = nowMs - new Date(l.last_contacted!).getTime();
       candidates.push({
         id: `going_cold:${l.id}`,
         sourceKey: 'going_cold',
@@ -131,8 +133,8 @@ export function useTodayPriorities(limit = 5) {
 
     for (const c of overdue || []) {
       const name = `${c.first_name ?? ''} ${c.last_name ?? ''}`.trim() || 'Contact';
-      const ageMs = nowMs - new Date((c as any).next_action_due_at).getTime();
-      const note = (c as any).next_action_note || 'Follow up';
+      const ageMs = nowMs - new Date(c.next_action_due_at!).getTime();
+      const note = c.next_action_note || 'Follow up';
       candidates.push({
         id: `overdue_action:${c.id}`,
         sourceKey: 'overdue_action',
@@ -153,7 +155,7 @@ export function useTodayPriorities(limit = 5) {
       .select('agency_id')
       .eq('id', agent.id)
       .maybeSingle();
-    const agencyId = (agentRow as any)?.agency_id;
+    const agencyId = agentRow?.agency_id;
 
     if (agencyId) {
       const cutoffIso = new Date(nowMs - 86_400_000).toISOString();
@@ -169,20 +171,20 @@ export function useTodayPriorities(limit = 5) {
         .limit(20);
 
       for (const th of unrespThreads || []) {
-        const c = (th as any).contact;
+        const c = th.contact as { id: string; first_name: string | null; last_name: string | null; email: string | null } | null;
         const name = c
           ? (`${c.first_name ?? ''} ${c.last_name ?? ''}`.trim() || c.email || 'Contact')
-          : ((th as any).subject || 'Lead enquiry');
-        const ageMs = nowMs - new Date((th as any).last_message_at).getTime();
+          : (th.subject || 'Lead enquiry');
+        const ageMs = nowMs - new Date(th.last_message_at).getTime();
         candidates.push({
-          id: `unresponded:${(th as any).id}`,
+          id: `unresponded:${th.id}`,
           sourceKey: 'unresponded',
-          sourceId: (th as any).id,
+          sourceId: th.id,
           weight: 60,
           ageMs,
           title: `Reply to ${name}`,
-          context: `${(th as any).subject || 'Inbox thread'} · ${formatAgo(ageMs)} ago`,
-          actionHref: `/dashboard/inbox?thread=${(th as any).id}`,
+          context: `${th.subject || 'Inbox thread'} · ${formatAgo(ageMs)} ago`,
+          actionHref: `/dashboard/inbox?thread=${th.id}`,
           actionLabel: 'Open',
         });
       }
@@ -201,8 +203,8 @@ export function useTodayPriorities(limit = 5) {
 
     for (const c of dueSoon || []) {
       const name = `${c.first_name ?? ''} ${c.last_name ?? ''}`.trim() || 'Contact';
-      const dueIn = new Date((c as any).next_action_due_at).getTime() - nowMs;
-      const note = (c as any).next_action_note || 'Follow up';
+      const dueIn = new Date(c.next_action_due_at!).getTime() - nowMs;
+      const note = c.next_action_note || 'Follow up';
       candidates.push({
         id: `due_soon:${c.id}`,
         sourceKey: 'due_soon',

@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, Save, Loader2, FileText, Trash2, Share2 } from '
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { toast } from 'sonner';
 import StepAddress from './StepAddress';
@@ -328,32 +329,32 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         generatedTitle: duplicatePropertyId ? '' : prop.title,
         generatedBullets: bulletLines,
         features: prop.features || [],
-        visibility: ((prop as any).status === 'whisper' || (prop as any).status === 'coming-soon') ? (prop as any).status : (prop as any).status === 'sold' ? 'whisper' : 'public',
+        visibility: (prop.status === 'whisper' || prop.status === 'coming-soon') ? prop.status : prop.status === 'sold' ? 'whisper' : 'public',
         exclusiveDays: 14,
         buyerRequirements: 'none',
         showContact: true,
         allowCoBroke: true,
         autoDeclineBelow: 0,
         sqm: prop.sqm || 0,
-        landSize: (prop as any).land_size || 0,
+        landSize: prop.land_size || 0,
         scheduledAt: null,
         estimatedRentalWeekly: prop.rental_weekly || 0,
         rentalWeekly: prop.listing_type === 'rent' ? (prop.rental_weekly || 0) : 0,
         rentalBondWeeks: 4,
-        bondAmount: (prop as any).bond_amount || ((prop.listing_type === 'rent' ? (prop.rental_weekly || 0) : 0) * 4),
-        availableFrom: (prop as any).available_from || '',
-        leaseTerm: (prop as any).lease_term || '12 months',
-        furnished: (prop as any).furnished || 'unfurnished',
-        petsAllowed: (prop as any).pets_allowed || false,
-        screeningLevel: (prop as any).screening_level || 'Basic',
+        bondAmount: prop.bond_amount || ((prop.listing_type === 'rent' ? (prop.rental_weekly || 0) : 0) * 4),
+        availableFrom: prop.available_from || '',
+        leaseTerm: prop.lease_term || '12 months',
+        furnished: (prop.furnished as 'unfurnished' | 'partially_furnished' | 'furnished') || 'unfurnished',
+        petsAllowed: prop.pets_allowed || false,
+        screeningLevel: prop.screening_level || 'Basic',
         commissionRate: prop.commission_rate || 0,
-        lettingFeeWeeks: (prop as any).letting_fee_weeks || 0,
+        lettingFeeWeeks: prop.letting_fee_weeks || 0,
 
-        vendorName: (prop as any).vendor_name || '',
-        vendorEmail: (prop as any).vendor_email || '',
-        vendorPhone: (prop as any).vendor_phone || '',
-        virtual_tour_url: (prop as any).virtual_tour_url || '',
-        video_url: (prop as any).video_url || '',
+        vendorName: prop.vendor_name || '',
+        vendorEmail: prop.vendor_email || '',
+        vendorPhone: prop.vendor_phone || '',
+        virtual_tour_url: prop.virtual_tour_url || '',
+        video_url: prop.video_url || '',
       });
       setLoadingEdit(false);
     };
@@ -565,7 +566,8 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
         is_exclusive: draft.isExclusive || false,
         exclusive_start_date: draft.isExclusive && !editPropertyId ? new Date().toISOString() : undefined,
         exclusive_end_date: draft.isExclusive && !editPropertyId ? new Date(Date.now() + 14 * 86_400_000).toISOString() : undefined,
-      } as any;
+        translations: null as Json | null,
+      };
 
       // Seed translations JSONB from any manually-entered wizard translations.
       // generate-translations will merge AI output on top but will not overwrite these.
@@ -579,7 +581,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
       if (draft.title_ko || draft.description_ko)
         manualTranslations['ko'] = { title: draft.title_ko || null, description: draft.description_ko || null };
       if (Object.keys(manualTranslations).length > 0) {
-        (payload as any).translations = manualTranslations;
+        payload.translations = manualTranslations as unknown as Json;
       }
 
       // Add 'Pets considered' to features if applicable

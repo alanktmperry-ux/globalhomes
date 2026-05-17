@@ -211,7 +211,7 @@ const ReportsPage = () => {
           : freq === 'yearly' ? amt / 52
           : amt;
         const owing = Math.round((daysOverdue / 7) * weekly * 100) / 100;
-        const prop = (t.properties as any) || {};
+        const prop = t.properties || {};
         const addr = [prop.address, prop.suburb, prop.state].filter(Boolean).join(', ');
         return {
           id: t.id,

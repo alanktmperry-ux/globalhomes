@@ -62,6 +62,7 @@ const PartnerReferralPage = React.lazy(() => import("./features/public/PartnerRe
 const ReferralPartnerDashboard = React.lazy(() => import("./features/referral/pages/ReferralPartnerDashboard"));
 const AdminListingsPage = React.lazy(() => import("./features/admin/pages/AdminListingsPage"));
 const AdminCareersPage = React.lazy(() => import("./features/admin/pages/AdminCareersPage"));
+const AdminBoostsPage = React.lazy(() => import("./features/admin/pages/AdminBoostsPage"));
 const AdminInsightsPage = React.lazy(() => import("./features/admin/pages/InsightsPage"));
 const AdminOverviewPage = React.lazy(() => import("./features/admin/pages/AdminOverviewPage"));
 const AdminCostsPage = React.lazy(() => import("./features/admin/pages/CostsPage"));

@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { RentalKeyFacts } from '../components/RentalKeyFacts';
 import { RentalApplicationForm } from '../components/RentalApplicationForm';
 import { ChevronDown, ChevronUp, ArrowLeft, MapPin, Bed, Bath, Car } from 'lucide-react';
+import { PropertySEOHead } from '@/features/seo/components/PropertySEOHead';
 
 interface RentalProperty {
   id: string;

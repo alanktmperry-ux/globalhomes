@@ -644,7 +644,7 @@ const ListingsPage = () => {
       }
     }
 
-    const { error } = await supabase.from('properties').update({ status: 'sold', is_active: false } as any).eq('id', l.id);
+    const { error } = await supabase.from('properties').update({ status: 'sold', is_active: false }).eq('id', l.id);
     if (error) { toast.error('Failed to update'); }
     else { toast.success('Marked as sold! — Listing has been marked as sold.'); refetch(); }
     setActionLoading(null);

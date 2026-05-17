@@ -259,7 +259,7 @@ export default function CreateHaloPage() {
 
       const { data: inserted, error } = await supabase
         .from('halos')
-        .insert(insertPayload)
+        .insert(insertPayload as any)
         .select('id')
         .single();
       if (error) throw error;

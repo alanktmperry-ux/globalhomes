@@ -25,10 +25,10 @@ export default function HelpContactPage() {
     }
     setLoading(true);
     const { error } = await supabase.from('support_tickets').insert({
-      name: form.name.trim(),
+      full_name: form.name.trim(),
       email: form.email.trim(),
       subject: form.subject,
-      message: form.message.trim(),
+      body: form.message.trim(),
     });
     setLoading(false);
     if (error) {

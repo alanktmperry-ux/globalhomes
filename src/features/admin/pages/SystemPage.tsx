@@ -581,7 +581,7 @@ function DatabaseTab() {
     const results = await Promise.all(
       COUNTED_TABLES.map(async (t) => {
         try {
-          const { count } = await supabase.from(t).select('*', { count: 'exact', head: true });
+          const { count } = await supabase.from(t as any).select('*', { count: 'exact', head: true });
           return [t, typeof count === 'number' ? count : null] as const;
         } catch {
           return [t, null] as const;

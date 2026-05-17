@@ -297,26 +297,23 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
                 </div>
 
 
-                <div className="flex justify-center">
-                  <HCaptcha
-                    ref={captchaRef}
-                    sitekey={hcaptchaSiteKey}
-                    onVerify={(token) => setCaptchaToken(token)}
-                    onExpire={() => setCaptchaToken(null)}
-                    onError={() => setCaptchaToken(null)}
-                  />
-                </div>
+                <HCaptcha
+                  ref={captchaRef}
+                  sitekey={hcaptchaSiteKey}
+                  size="invisible"
+                  onVerify={(token) => setCaptchaToken(token)}
+                  onExpire={() => setCaptchaToken(null)}
+                  onError={() => setCaptchaToken(null)}
+                />
 
                 <Button
                   type="submit"
-                  disabled={emailSubmitting || !captchaToken}
+                  disabled={emailSubmitting}
                   className="w-full py-5 rounded-xl text-base font-bold"
                 >
                   {emailSubmitting
                     ? t('agent.registration.email.sending')
-                    : !captchaToken
-                      ? t('agent.registration.email.completeCaptcha')
-                      : t('agent.registration.email.continue')}
+                    : t('agent.registration.email.continue')}
                 </Button>
 
                 <p className="text-center text-xs text-muted-foreground">

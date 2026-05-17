@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useState } from 'react';
 import { Calendar, Clock, Plus, Trash2, GraduationCap } from 'lucide-react';
 import ListingCompleteness from './ListingCompleteness';
+import { toast } from 'sonner';
 
 const FEATURE_OPTIONS = [
   'Air Conditioning', 'Heating', 'Pool', 'Spa', 'Garage', 'Built-in Wardrobes',

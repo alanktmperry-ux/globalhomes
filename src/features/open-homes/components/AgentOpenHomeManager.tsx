@@ -9,6 +9,44 @@ import type { OpenHomeWithCounts } from '../hooks/useOpenHomes';
 import { Button } from '@/components/ui/button';
 import DashboardHeader from '@/features/agents/components/dashboard/DashboardHeader';
 
+interface SessionRowProps {
+  session: OpenHomeWithCounts;
+  propertyAddress: string;
+  onSelectSession: (session: OpenHomeWithCounts) => void;
+}
+
+function SessionRow({ session, propertyAddress, onSelectSession }: SessionRowProps) {
+  return (
+    <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/50 border border-border/50">
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-foreground truncate">
+          {propertyAddress || 'Loading…'}
+        </p>
+        <p className="text-xs text-muted-foreground">{new Date(session.starts_at).toLocaleString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</p>
+      </div>
+      <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
+        <Users size={12} />
+        {session.attended_count > 0
+          ? `${session.attended_count}/${session.registered_count} attended`
+          : `${session.registered_count} registered`}
+        {session.waitlist_count > 0 && (
+          <span className="text-amber-600 ml-1">+{session.waitlist_count} waitlist</span>
+        )}
+      </div>
+      <div className="flex items-center gap-1.5 ml-3 shrink-0">
+        <Button variant="outline" size="sm" onClick={() => onSelectSession(session)} className="text-xs gap-1">
+          <Users size={12} /> Attendees
+        </Button>
+        <Button variant="outline" size="sm" className="text-xs gap-1" asChild>
+          <a href={`/open-home/signin/${session.qr_token}`} target="_blank" rel="noopener noreferrer">
+            <QrCode size={12} /> Sign-in
+          </a>
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function AgentOpenHomeManager() {
   const { user } = useAuth();
   const [agentId, setAgentId] = useState<string | null>(null);
@@ -36,48 +74,6 @@ export default function AgentOpenHomeManager() {
   const upcoming = sessions.filter(s => s.status === 'scheduled');
   const live = sessions.filter(s => s.status === 'in_progress');
   const past = sessions.filter(s => s.status === 'completed').slice(0, 5);
-
-  const formatDateTime = (iso: string) =>
-    new Date(iso).toLocaleString('en-AU', {
-      weekday: 'short', day: 'numeric', month: 'short',
-      hour: '2-digit', minute: '2-digit', hour12: true,
-    });
-
-  const SessionRow = ({ session }: { session: OpenHomeWithCounts }) => (
-    <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/50 border border-border/50">
-      <div className="min-w-0">
-        <p className="text-sm font-medium text-foreground truncate">
-          {properties[session.property_id] ?? 'Loading…'}
-        </p>
-        <p className="text-xs text-muted-foreground">{formatDateTime(session.starts_at)}</p>
-      </div>
-
-      <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
-        <Users size={12} />
-        {session.attended_count > 0
-          ? `${session.attended_count}/${session.registered_count} attended`
-          : `${session.registered_count} registered`}
-        {session.waitlist_count > 0 && (
-          <span className="text-amber-600 ml-1">+{session.waitlist_count} waitlist</span>
-        )}
-      </div>
-
-      <div className="flex items-center gap-1.5 ml-3 shrink-0">
-        <Button variant="outline" size="sm" onClick={() => setSelected(session)} className="text-xs gap-1">
-          <Users size={12} /> Attendees
-        </Button>
-        <a
-          href={`/open-home/signin/${session.qr_token}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Button variant="outline" size="sm" className="text-xs gap-1">
-            <QrCode size={12} /> Sign-in
-          </Button>
-        </a>
-      </div>
-    </div>
-  );
 
   return (
     <div>

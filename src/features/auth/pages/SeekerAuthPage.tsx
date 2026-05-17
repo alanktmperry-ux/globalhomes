@@ -287,6 +287,16 @@ const SeekerAuthPage = () => {
         </form>
       ) : (
         <form onSubmit={handleSignUp} noValidate>
+          {mode === 'signup' && isHaloIntent && (
+            <div
+              className="mb-5 p-3 rounded-[10px] flex items-start gap-2"
+              style={{ background: 'rgba(52,211,153,0.15)', border: '1px solid rgba(52,211,153,0.30)' }}
+            >
+              <span className="text-sm" style={{ color: '#A7F3D0' }}>
+                Create a free account to post your Halo property brief. Matched agents will reach out to you directly.
+              </span>
+            </div>
+          )}
           <div className={s.field}>
             <label className={s.label} style={s.labelStyle}>{t('auth.emailLabel')}</label>
             <input

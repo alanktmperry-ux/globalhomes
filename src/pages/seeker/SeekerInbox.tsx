@@ -13,6 +13,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { capture } from '@/shared/lib/posthog';
 
 interface HaloResponse {
   id: string;
@@ -209,6 +210,7 @@ export default function SeekerInbox() {
       .eq('id', selected.id);
     if (error) return toast.error(t('seeker.inbox.toast.acceptError'));
     toast.success(t('seeker.inbox.toast.accepted'));
+    capture('halo_response_accepted', { halo_id: selected.halo_id, agent_id: selected.agent_id });
     loadResponses();
   };
 
@@ -220,6 +222,7 @@ export default function SeekerInbox() {
       .eq('id', selected.id);
     if (error) return toast.error(t('seeker.inbox.toast.dismissError'));
     toast.success(t('seeker.inbox.toast.dismissed'));
+    capture('halo_response_dismissed', { halo_id: selected.halo_id, agent_id: selected.agent_id });
     setSelectedId(null);
     loadResponses();
   };

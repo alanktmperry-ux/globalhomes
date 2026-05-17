@@ -111,6 +111,7 @@ const LeadMarketplacePage = () => {
         setSuccessModal(data.buyer);
         setLeads(prev => prev.filter(l => l.id !== lead.id));
         toast.success(`Lead purchased — you now have access to ${data.buyer.name}'s contact details.`);
+        capture('lead_purchased', { consumer_profile_id: lead.id, agent_id: agentId, price_aud: 29 });
       }
     } catch (err: unknown) {
       toast.error(getErrorMessage(err) || 'Purchase failed. Please try again.');

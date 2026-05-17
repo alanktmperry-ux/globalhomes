@@ -13,6 +13,7 @@ import { HaloStep3, validateStep3 } from '@/components/halo/HaloStep3';
 import type { HaloFormData } from '@/types/halo';
 import { usePageTitle } from '@/lib/usePageTitle';
 import { useTranslation } from '@/shared/lib/i18n';
+import { capture } from '@/shared/lib/posthog';
 
 const DRAFT_KEY = 'halo_draft';
 
@@ -262,6 +263,15 @@ export default function CreateHaloPage() {
         .select('id')
         .single();
       if (error) throw error;
+
+      capture('halo_created', {
+        halo_id: (inserted as any).id,
+        intent: data.intent,
+        suburb: data.suburbs?.[0] ?? null,
+        budget_max: data.budget_max,
+        preferred_language: data.preferred_language,
+        is_from_search: isFromSearch,
+      });
 
       try {
         await supabase.functions.invoke('send-halo-confirmation', {

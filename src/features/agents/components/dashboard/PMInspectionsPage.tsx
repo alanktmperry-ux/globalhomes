@@ -256,8 +256,8 @@ export default function PMInspectionsPage() {
     ]);
 
     if (insRes.error) toast.error('Could not load inspections');
-    setInspections(((insRes.data as any) || []) as InspectionRow[]);
-    setActiveTenancies(((tensRes.data as any) || []) as ActiveTenancy[]);
+    setInspections((insRes.data || []) as InspectionRow[]);
+    setActiveTenancies((tensRes.data || []) as ActiveTenancy[]);
     setLoading(false);
   }, [user]);
 

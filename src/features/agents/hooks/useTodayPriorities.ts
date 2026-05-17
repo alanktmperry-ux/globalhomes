@@ -105,8 +105,9 @@ export function useTodayPriorities(limit = 5) {
       .limit(20);
 
     for (const l of coldSoon || []) {
-      const name = ((l as any).contacts ? `${(l as any).contacts.first_name ?? ''} ${(l as any).contacts.last_name ?? ''}`.trim() : '') || 'Lead';
-      const ageMs = nowMs - new Date((l as any).last_contacted).getTime();
+      const contacts = l.contacts as { first_name: string | null; last_name: string | null } | null;
+      const name = (contacts ? `${contacts.first_name ?? ''} ${contacts.last_name ?? ''}`.trim() : '') || 'Lead';
+      const ageMs = nowMs - new Date(l.last_contacted!).getTime();
       candidates.push({
         id: `going_cold:${l.id}`,
         sourceKey: 'going_cold',

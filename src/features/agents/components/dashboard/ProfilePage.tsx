@@ -428,26 +428,27 @@ const ProfilePage = () => {
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-xs">Full Name</Label>
-                  <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+                  <Label htmlFor="profile-name" className="text-xs">Full Name</Label>
+                  <Input id="profile-name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
                 </div>
                 <div>
-                  <Label className="text-xs">Title / Position</Label>
-                  <Input value={form.title_position} onChange={e => setForm(f => ({ ...f, title_position: e.target.value }))} placeholder="Senior Agent, Owner, etc." />
+                  <Label htmlFor="profile-title" className="text-xs">Title / Position</Label>
+                  <Input id="profile-title" value={form.title_position} onChange={e => setForm(f => ({ ...f, title_position: e.target.value }))} placeholder="Senior Agent, Owner, etc." />
                 </div>
                 <div>
-                  <Label className="text-xs">Email</Label>
-                  <Input value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} type="email" />
+                  <Label htmlFor="profile-email" className="text-xs">Email</Label>
+                  <Input id="profile-email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} type="email" />
                 </div>
                 <div>
-                  <Label className="text-xs">Phone</Label>
-                  <Input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
+                  <Label htmlFor="profile-phone" className="text-xs">Phone</Label>
+                  <Input id="profile-phone" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
                 </div>
               </div>
 
               <div>
-                <Label className="text-xs">Bio / Description</Label>
+                <Label htmlFor="profile-bio" className="text-xs">Bio / Description</Label>
                 <Textarea
+                  id="profile-bio"
                   value={form.bio}
                   onChange={e => setForm(f => ({ ...f, bio: e.target.value }))}
                   placeholder="Tell potential clients about yourself..."

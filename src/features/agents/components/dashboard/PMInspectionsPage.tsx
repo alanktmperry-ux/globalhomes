@@ -505,9 +505,9 @@ export default function PMInspectionsPage() {
       inspection_type: 'routine',
       scheduled_date: format(ruleMinDate(r), 'yyyy-MM-dd'),
       status: 'scheduled',
-    } as any).select('id').maybeSingle();
+    }).select('id').maybeSingle();
     if (error || !inserted) { toast.error('Could not schedule inspection'); return; }
-    navigate(`/dashboard/inspection/${(inserted as any).id}`);
+    navigate(`/dashboard/inspection/${inserted.id}`);
   };
 
   const scheduleExitInspection = async (tenancyId: string, leaseEnd: string) => {

@@ -212,6 +212,16 @@ const PipelinePage = () => {
 
   const totalValue = cards.reduce((sum, c) => sum + c.estimatedValue, 0);
 
+  const cardsByStage = useMemo(() => {
+    const map = new Map<string, PipelineCard[]>();
+    for (const card of cards) {
+      const existing = map.get(card.stageId) ?? [];
+      existing.push(card);
+      map.set(card.stageId, existing);
+    }
+    return map;
+  }, [cards]);
+
   return (
     <div>
       <DashboardHeader

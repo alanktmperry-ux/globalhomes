@@ -606,7 +606,8 @@ const NetworkPage = () => {
               <div className="relative flex-1">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input value={networkSearch} onChange={e => setNetworkSearch(e.target.value)}
-                  placeholder="Search network listings…" className="pl-9 h-9 text-sm" />
+                  placeholder="Search network listings…" className="pl-9 h-9 text-sm"
+                  aria-label="Search network listings" />
               </div>
             </div>
 

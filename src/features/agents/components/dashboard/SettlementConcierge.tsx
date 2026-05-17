@@ -73,6 +73,7 @@ const SettlementConcierge = () => {
       const { data: trustTx } = await supabase
         .from('trust_receipts')
         .select('property_id, client_name, created_at, status, purpose')
+        .eq('agent_id', agent.id)
         .in('purpose', ['settlement', 'holding_deposit', 'deposit'])
         .order('created_at', { ascending: false })
         .limit(20);

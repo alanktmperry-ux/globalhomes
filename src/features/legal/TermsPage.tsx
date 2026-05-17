@@ -74,7 +74,8 @@ const TermsPage = () => {
 
             <section id="billing">
               <h2>4. Subscriptions, Billing & Refunds</h2>
-              <p>All paid plans include a 60-day free trial. Your nominated payment method will be charged on day 61 unless you cancel before that date. Subscriptions renew monthly unless cancelled. You may cancel at any time via your billing dashboard. Refunds are not provided for partial billing periods. For billing disputes, contact <a href="mailto:support@listhq.com.au" className="text-primary hover:underline">support@listhq.com.au</a> within 30 days of the charge.</p>
+              <p>All paid plans include a 60-day free trial. Your nominated payment method will be charged on day 61 unless you cancel before that date. Subscriptions renew monthly unless cancelled. You may cancel at any time via your billing dashboard. Refunds are not provided for partial billing periods. For billing disputes, contact <a href="mailto:support@listhq.com.au" className="text-primary hover:underline">support@listhq.com.au</a> within 30 days of the charge. ListHQ will provide at least 30 days written notice via email before implementing any increase to subscription pricing.</p>
+              <p>Data portability: On cancellation, you may request an export of your listings, trust transaction history, and contact data at any time by contacting <a href="mailto:support@listhq.com.au" className="text-primary hover:underline">support@listhq.com.au</a>. Exports are provided within 10 business days.</p>
             </section>
 
             <section id="agents">

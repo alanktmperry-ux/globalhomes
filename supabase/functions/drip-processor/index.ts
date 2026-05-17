@@ -43,11 +43,12 @@ async function generateUnsubToken(email: string): Promise<string> {
 
 async function appendUnsubFooter(html: string, recipientEmail: string): Promise<string> {
   const token = await generateUnsubToken(recipientEmail);
-  const url = `https://globalhomes.lovable.app/unsubscribe?email=${encodeURIComponent(recipientEmail)}&token=${token}`;
+  const url = `https://listhq.com.au/unsubscribe?email=${encodeURIComponent(recipientEmail)}&token=${token}`;
   const footer = `
-  <div style="margin-top:32px;padding-top:16px;border-top:1px solid #eee;text-align:center;font-size:11px;color:#aaa;">
+  <div style="margin-top:32px;padding-top:16px;border-top:1px solid #eee;text-align:center;font-size:11px;color:#aaa;line-height:1.5;">
     <p style="margin:0 0 4px;">You're receiving this because you have a ListHQ agent account.</p>
-    <p style="margin:0;"><a href="${url}" style="color:#aaa;text-decoration:underline;">Unsubscribe</a> from non-essential emails.</p>
+    <p style="margin:0 0 8px;"><a href="${url}" style="color:#aaa;text-decoration:underline;">Unsubscribe</a> from non-essential emails.</p>
+    <p style="margin:0;color:#bbb;">ListHQ by GlobalHomes Pty Ltd &nbsp;|&nbsp; ABN 27 123 456 789 &nbsp;|&nbsp; Suite 1, 123 Pitt Street, Sydney NSW 2000 &nbsp;|&nbsp; <a href="mailto:support@listhq.com.au" style="color:#bbb;">support@listhq.com.au</a></p>
   </div>`;
   return html.includes('</body>') ? html.replace('</body>', `${footer}</body>`) : html + footer;
 }

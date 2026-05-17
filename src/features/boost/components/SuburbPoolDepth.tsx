@@ -16,7 +16,7 @@ const PREMIER_CAP = 3;
 const FEATURED_CAP = 2;
 
 export function SuburbPoolDepth({ suburb, currentListingId }: Props) {
-  const [counts, setCounts] = useState(null);
+  const [counts, setCounts] = useState<PoolCounts | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,13 +45,10 @@ export function SuburbPoolDepth({ suburb, currentListingId }: Props) {
 
   if (loading) {
     return (
-      
-
-
-         Checking {suburb} availability…
-      
-
-
+      <div className="flex items-center gap-2 text-xs text-muted-foreground py-2">
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        Checking {suburb} availability…
+      </div>
     );
   }
 
@@ -70,42 +67,22 @@ export function SuburbPoolDepth({ suburb, currentListingId }: Props) {
   const featuredLabel = slotLabel(counts.featured, FEATURED_CAP, featuredOpen);
 
   return (
-    
-
-
-      
-
-📊 {suburb} right now
-
-
-      
-
-
-        
-
-
-          Premier (slots 1–3)
-          
+    <div className="rounded-lg border border-border bg-card p-3 text-sm">
+      <p className="font-semibold text-foreground mb-2">📊 {suburb} right now</p>
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-xs text-muted-foreground">Premier (slots 1–3)</span>
+          <span className={`text-xs font-medium ${premierLabel.urgent ? 'text-amber-600' : 'text-foreground'}`}>
             {premierLabel.text}
-          
-        
-
-
-        
-
-
-          Featured (slots 4–5)
-          
+          </span>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-xs text-muted-foreground">Featured (slots 4–5)</span>
+          <span className={`text-xs font-medium ${featuredLabel.urgent ? 'text-amber-600' : 'text-foreground'}`}>
             {featuredLabel.text}
-          
-        
-
-
-      
-
-
-    
-
-
+          </span>
+        </div>
+      </div>
+    </div>
   );
 }

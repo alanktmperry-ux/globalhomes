@@ -604,7 +604,7 @@ ${agencyName || ''}`.trim();
         status: 'completed',
         conducted_date: format(completeForm.conducted_date, 'yyyy-MM-dd'),
         overall_notes: noteParts.join('\n\n'),
-      } as any)
+      })
       .eq('id', completeFor.id);
     if (insErr) {
       setSavingComplete(false);

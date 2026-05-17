@@ -84,7 +84,27 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
     featured_until: listing.featured_until || null,
   });
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
-  
+  const [boostStats, setBoostStats] = useState<{ impressions: number; clicks: number } | null>(null);
+
+  useEffect(() => {
+    if (!boostState.is_featured || !boostState.featured_until) return;
+    const expiresAt = new Date(boostState.featured_until);
+    const startedAt = new Date(expiresAt.getTime() - 30 * 24 * 60 * 60 * 1000);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
+      .from('listing_events')
+      .select('event_type')
+      .eq('listing_id', listing.id)
+      .gte('created_at', startedAt.toISOString())
+      .then(({ data }: { data: { event_type: string }[] | null }) => {
+        const rows = data ?? [];
+        setBoostStats({
+          impressions: rows.filter(r => r.event_type === 'impression').length,
+          clicks: rows.filter(r => r.event_type === 'click').length,
+        });
+      });
+  }, [listing.id, boostState.is_featured, boostState.featured_until]);
+
 
   const [vendorName, setVendorName] = useState(listing.vendor_name || '');
   const [vendorEmail, setVendorEmail] = useState(listing.vendor_email || '');

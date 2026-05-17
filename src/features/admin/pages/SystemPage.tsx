@@ -422,15 +422,15 @@ function ReportsTab() {
       run: async () => {
         const { data } = await supabase
           .from('leads')
-          .select('buyer_name, buyer_email, buyer_phone, created_at')
+          .select('user_name, user_email, user_phone, created_at')
           .gte('created_at', d90)
           .limit(2000);
         const rows = [['Name', 'Email', 'Phone', 'Submitted']];
         for (const r of data ?? []) {
           rows.push([
-            fmt(r.buyer_name),
-            fmt(r.buyer_email),
-            fmt(r.buyer_phone),
+            fmt(r.user_name),
+            fmt(r.user_email),
+            fmt(r.user_phone),
             r.created_at ? new Date(r.created_at).toISOString() : '',
           ]);
         }

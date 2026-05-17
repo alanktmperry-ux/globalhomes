@@ -441,7 +441,7 @@ const BuyerConciergePage = () => {
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] text-muted-foreground">{lastActive(m.intent)}</span>
                       <div className="flex gap-1.5">
-                        <Button size="sm" variant="outline" className="h-7 px-2 text-xs" onClick={() => archive(m.id)}>
+                        <Button size="sm" variant="outline" className="h-7 px-2 text-xs" aria-label="Archive buyer" onClick={() => archive(m.id)}>
                           <Archive size={12} />
                         </Button>
                         <Button size="sm" className="h-7 px-2.5 text-xs gap-1" onClick={() => openContact(m)}>
@@ -525,6 +525,7 @@ const BuyerConciergePage = () => {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="pl-8 h-9 w-64 text-sm"
+                    aria-label="Search matched buyers"
                   />
                 </div>
                 <Button
@@ -576,7 +577,7 @@ const BuyerConciergePage = () => {
                         <TableCell><StatusBadge status={m.status} /></TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => archive(m.id)}>
+                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0" aria-label="Archive buyer" onClick={() => archive(m.id)}>
                               <Archive size={12} />
                             </Button>
                             <Button size="sm" variant="outline" className="h-7 text-xs px-2" onClick={() => openContact(m)}>
@@ -631,7 +632,7 @@ const BuyerConciergePage = () => {
                   <p className="text-muted-foreground italic mt-2">"{contactMatch.match_reasoning}"</p>
                 )}
               </div>
-              <Textarea value={contactDraft} onChange={(e) => setContactDraft(e.target.value)} rows={6} className="text-sm" />
+              <Textarea value={contactDraft} onChange={(e) => setContactDraft(e.target.value)} rows={6} className="text-sm" aria-label="Message to buyer" />
               <DialogFooter>
                 <Button variant="outline" onClick={() => setContactMatch(null)}>Discard</Button>
                 <Button onClick={async () => {

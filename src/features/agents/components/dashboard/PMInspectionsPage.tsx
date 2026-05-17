@@ -853,6 +853,7 @@ ${agencyName || ''}`.trim();
                             <button
                               key={i.id}
                               onClick={() => navigate(`/dashboard/inspection/${i.id}`)}
+                              aria-label={`${TYPE_LABEL[i.inspection_type] ?? 'Inspection'} — ${addr || 'property'}`}
                               title={`${TYPE_LABEL[i.inspection_type]} — ${addr}`}
                               className={cn(
                                 'w-full text-left text-[10px] font-medium px-1.5 py-0.5 rounded truncate leading-tight',
@@ -1280,7 +1281,7 @@ ${agencyName || ''}`.trim();
           <DialogHeader>
             <DialogTitle>
               {(() => {
-                const t = (noticeFor as any)?.type;
+                const t = noticeFor?.inspection_type as string | undefined;
                 const label = t === 'entry' || t === 'ingoing' ? 'Entry Notice'
                   : t === 'routine' ? 'Routine Inspection Notice'
                   : t === 'exit' || t === 'outgoing' ? 'Exit Notice'

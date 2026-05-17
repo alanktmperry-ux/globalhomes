@@ -17,6 +17,7 @@ import {
 import DashboardHeader from './DashboardHeader';
 import { useTranslation } from '@/shared/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import { useAuth } from '@/lib/AuthProvider';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';

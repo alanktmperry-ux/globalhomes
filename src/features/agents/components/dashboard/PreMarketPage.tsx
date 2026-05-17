@@ -363,7 +363,7 @@ const PreMarketPage = () => {
           <DialogHeader>
             <DialogTitle className="text-base">Outreach Letter{letterModal.property ? ` — ${letterModal.property.address}` : ''}</DialogTitle>
           </DialogHeader>
-          <div className="bg-secondary rounded-xl p-4 text-sm leading-relaxed whitespace-pre-wrap min-h-[120px]">
+          <div className="bg-secondary rounded-xl p-4 text-sm leading-relaxed whitespace-pre-wrap min-h-[120px]" aria-live="polite">
             {letterModal.loading && !letterModal.content && (
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Loader2 size={14} className="animate-spin" /> Generating letter…

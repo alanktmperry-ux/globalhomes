@@ -176,7 +176,8 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
     if (e) e.preventDefault();
     if (!emailInput.trim()) return;
     if (!captchaToken) {
-      toast.error(t('agent.registration.email.completeCaptcha'));
+      setPendingEmailSubmit(true);
+      captchaRef.current?.execute();
       return;
     }
     setEmailSubmitting(true);

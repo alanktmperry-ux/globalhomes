@@ -980,17 +980,17 @@ const TeamPage = () => {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs font-medium">Email</Label>
-                <Input type="email" value={agencyEmail} onChange={(e) => setAgencyEmail(e.target.value)} className="mt-1.5" />
+                <Label htmlFor="edit-agency-email" className="text-xs font-medium">Email</Label>
+                <Input id="edit-agency-email" type="email" value={agencyEmail} onChange={(e) => setAgencyEmail(e.target.value)} className="mt-1.5" />
               </div>
               <div>
-                <Label className="text-xs font-medium">Phone</Label>
-                <Input value={agencyPhone} onChange={(e) => setAgencyPhone(e.target.value)} className="mt-1.5" />
+                <Label htmlFor="edit-agency-phone" className="text-xs font-medium">Phone</Label>
+                <Input id="edit-agency-phone" value={agencyPhone} onChange={(e) => setAgencyPhone(e.target.value)} className="mt-1.5" />
               </div>
             </div>
             <div>
-              <Label className="text-xs font-medium">Description</Label>
-              <Textarea value={agencyDescription} onChange={(e) => setAgencyDescription(e.target.value)} className="mt-1.5 resize-none" rows={3} />
+              <Label htmlFor="edit-agency-description" className="text-xs font-medium">Description</Label>
+              <Textarea id="edit-agency-description" value={agencyDescription} onChange={(e) => setAgencyDescription(e.target.value)} className="mt-1.5 resize-none" rows={3} />
             </div>
             <Button onClick={handleSaveBranding} disabled={savingBranding} className="w-full">
               {savingBranding ? <><Loader2 size={14} className="animate-spin mr-2" /> Saving...</> : 'Save Changes'}

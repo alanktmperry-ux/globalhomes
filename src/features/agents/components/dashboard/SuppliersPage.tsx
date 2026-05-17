@@ -234,7 +234,7 @@ export default function SuppliersPage() {
       <div className="flex items-center gap-2 flex-wrap">
         <div className="relative flex-1 min-w-[180px]">
           <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Search name…" value={search} onChange={e=>setSearch(e.target.value)} className="pl-8 h-9" />
+          <Input aria-label="Search suppliers" placeholder="Search name…" value={search} onChange={e=>setSearch(e.target.value)} className="pl-8 h-9" />
         </div>
         <Select value={tradeFilter} onValueChange={setTradeFilter}>
           <SelectTrigger className="w-[150px] h-9"><SelectValue/></SelectTrigger>

@@ -67,13 +67,12 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
     setEditing(false);
   };
 
-  const handleSaveSchoolZone = async () => {
-    setSavingSchoolZone(true);
-    await onUpdate({
+  const handleSaveSchoolZone = () => {
+    onUpdate({
       school_zone_top: schoolZoneTop,
       school_zone_name: schoolZoneTop ? (schoolZoneName.trim() || null) : null,
     } as Partial<PropertyRow>);
-    setSavingSchoolZone(false);
+    toast.success('School zone saved');
   };
 
   const toggleFeature = (f: string) => {

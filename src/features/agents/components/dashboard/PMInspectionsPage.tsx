@@ -1281,7 +1281,7 @@ ${agencyName || ''}`.trim();
           <DialogHeader>
             <DialogTitle>
               {(() => {
-                const t = noticeFor?.inspection_type;
+                const t = noticeFor?.inspection_type as string | undefined;
                 const label = t === 'entry' || t === 'ingoing' ? 'Entry Notice'
                   : t === 'routine' ? 'Routine Inspection Notice'
                   : t === 'exit' || t === 'outgoing' ? 'Exit Notice'

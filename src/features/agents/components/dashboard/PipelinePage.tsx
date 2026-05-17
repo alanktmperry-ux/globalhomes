@@ -308,6 +308,7 @@ const PipelinePage = () => {
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setOfferCard(card); }}
                                   className="p-1 rounded hover:bg-primary/10 transition-colors shrink-0"
+                                  aria-label="AI Offer Assistant"
                                   title="AI Offer Assistant"
                                 >
                                   <FileText size={12} className="text-primary" />
@@ -317,6 +318,7 @@ const PipelinePage = () => {
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setBrokerCard(card); }}
                                   className="p-1 rounded hover:bg-primary/10 transition-colors shrink-0"
+                                  aria-label="Refer buyer to mortgage broker"
                                   title="Refer buyer to mortgage broker"
                                 >
                                   <Banknote size={12} className="text-primary" />

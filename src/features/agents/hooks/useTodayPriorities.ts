@@ -203,8 +203,8 @@ export function useTodayPriorities(limit = 5) {
 
     for (const c of dueSoon || []) {
       const name = `${c.first_name ?? ''} ${c.last_name ?? ''}`.trim() || 'Contact';
-      const dueIn = new Date((c as any).next_action_due_at).getTime() - nowMs;
-      const note = (c as any).next_action_note || 'Follow up';
+      const dueIn = new Date(c.next_action_due_at!).getTime() - nowMs;
+      const note = c.next_action_note || 'Follow up';
       candidates.push({
         id: `due_soon:${c.id}`,
         sourceKey: 'due_soon',

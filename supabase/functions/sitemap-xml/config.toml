@@ -1,0 +1,2 @@
+[functions.sitemap-xml]
+verify_jwt = false

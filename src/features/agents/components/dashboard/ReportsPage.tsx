@@ -398,7 +398,7 @@ const ReportsPage = () => {
       l.title, l.address, String(l.price || 0),
       String(l.commission_rate ?? 2) + '%',
       AUD.format((l.price || 0) * (l.commission_rate ?? 2) / 100),
-      '_mock_status' in l ? l._mock_status : l.status,
+      String('_mock_status' in l ? l._mock_status : l.status ?? ''),
       l.listed_date || '',
     ]);
     exportCsv(headers, rows, 'sales_report');

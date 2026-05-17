@@ -635,7 +635,7 @@ const ListingsPage = () => {
       .select('id')
       .eq('property_id', l.id)
       .eq('status', 'pending')
-      .limit(1) as any;
+      .limit(1);
 
     if (pendingOffers && pendingOffers.length > 0) {
       if (!confirm('This listing has pending offers. Marking as sold will close them. Continue?')) {

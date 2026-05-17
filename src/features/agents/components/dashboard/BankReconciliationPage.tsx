@@ -176,7 +176,7 @@ const BankReconciliationPage = () => {
       const isCredit = item.amount > 0;
       const targetAmt = Math.abs(item.amount);
       const desc = (item.description || '').toLowerCase();
-      const bankRef = (item as any).bank_reference ?? null;
+      const bankRef = item.bank_reference ?? null;
 
       if (isCredit) {
         const candidate = receipts.find(r =>

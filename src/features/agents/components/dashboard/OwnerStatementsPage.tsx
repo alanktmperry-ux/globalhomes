@@ -395,7 +395,7 @@ export default function OwnerStatementsPage() {
             <div>
               <Label className="text-xs">Property</Label>
               <Select value={form.property_id} onValueChange={(v) => setForm({ ...form, property_id: v })}>
-                <SelectTrigger><SelectValue placeholder="Select property" /></SelectTrigger>
+                <SelectTrigger aria-label="Select property"><SelectValue placeholder="Select property" /></SelectTrigger>
                 <SelectContent>{properties.map((p) => <SelectItem key={p.id} value={p.id}>{p.address}</SelectItem>)}</SelectContent>
               </Select>
             </div>
@@ -435,7 +435,7 @@ export default function OwnerStatementsPage() {
                   <Input type="number" step="0.01" placeholder="Amount" className="w-32" value={d.amount} onChange={(e) => {
                     const next = [...otherDeductions]; next[i] = { ...next[i], amount: Number(e.target.value) }; setOtherDeductions(next);
                   }} />
-                  <Button size="icon" variant="ghost" onClick={() => setOtherDeductions(otherDeductions.filter((_, idx) => idx !== i))}>
+                  <Button size="icon" variant="ghost" onClick={() => setOtherDeductions(otherDeductions.filter((_, idx) => idx !== i))} aria-label="Remove deduction">
                     <X size={14} />
                   </Button>
                 </div>

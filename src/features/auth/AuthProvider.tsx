@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useRef, useCallback, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
 import { buildAuditMeta } from '@/shared/lib/auditLog';
 import { identify } from '@/shared/lib/posthog';
@@ -86,7 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let cancelled = false;
     (async () => {
       const nowIso = new Date().toISOString();
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('admin_impersonation_sessions')
         .select('id, impersonated_user_id, impersonated_email, expires_at')
         .eq('admin_id', user.id)
@@ -107,7 +108,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       // Cleanup any expired rows for this admin
-      await (supabase as any)
+      await supabase
         .from('admin_impersonation_sessions')
         .delete()
         .eq('admin_id', user.id)
@@ -129,8 +130,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         entity_type: 'user',
         entity_id: userId,
         description: 'Admin started impersonation session',
-        metadata: buildAuditMeta({ impersonated_email: userEmail }),
-      } as any);
+        metadata: buildAuditMeta({ impersonated_email: userEmail }) as Json,
+      });
       if (auditError) throw auditError;
     } catch (err) {
       console.error('impersonation audit log failed:', err);
@@ -139,7 +140,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     // Persist impersonation session server-side (1 hour TTL set by table default)
-    const { data: sessionRow, error: insertError } = await (supabase as any)
+    const { data: sessionRow, error: insertError } = await supabase
       .from('admin_impersonation_sessions')
       .insert({
         admin_id: user.id,
@@ -164,13 +165,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const stopImpersonation = async () => {
     const { error: auditError } = await supabase.from('audit_log').insert({
-      user_id: user?.id ?? null,
+      user_id: user?.id ?? '',
       action_type: 'admin_stop_impersonation',
       entity_type: 'user',
       entity_id: impersonatedUserId ?? null,
       description: 'Admin ended impersonation session',
-      metadata: buildAuditMeta({}),
-    } as any);
+      metadata: buildAuditMeta({}) as Json,
+    });
     if (auditError) {
       if (import.meta.env.DEV) console.error('impersonation audit log:', auditError);
       toast.error('Warning: could not log impersonation exit');
@@ -178,7 +179,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Remove only the current impersonation session row
     if (user && impersonationSessionId) {
-      await (supabase as any)
+      await supabase
         .from('admin_impersonation_sessions')
         .delete()
         .eq('id', impersonationSessionId);
@@ -245,7 +246,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const roles = rolesResult.data?.map((r) => r.role) || [];
     const agentData = agentResult.data;
     const isAdminUser = roles.includes('admin');
-    const isApprovedAgent = !!agentData && ((agentData as any).approval_status === 'approved' || isAdminUser);
+    const isApprovedAgent = !!agentData && (agentData.approval_status === 'approved' || isAdminUser);
     // Only grant agent role if the agents row is approved (admins always pass)
     const filteredRoles = roles.filter((r) => {
       if (r !== 'agent') return true;
@@ -254,14 +255,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (isApprovedAgent && !filteredRoles.includes('agent')) filteredRoles.push('agent');
     applyRoles(filteredRoles, user.email);
     if (agentData) {
-      setAgencyRole((agentData as any).agency_role || null);
+      setAgencyRole(agentData.agency_role || null);
       setAgencyId(agentData.agency_id || null);
-      if (isApprovedAgent && ((agentData as any).agency_role === 'principal' || (agentData as any).agency_role === 'admin')) {
+      if (isApprovedAgent && (agentData.agency_role === 'principal' || agentData.agency_role === 'admin')) {
         setIsPrincipal(true);
       }
       if (isApprovedAgent && !roles.includes('agent') && !roles.includes('admin')) {
         await supabase.from('user_roles').upsert(
-          { user_id: user.id, role: 'agent' as any },
+          { user_id: user.id, role: 'agent' as const },
           { onConflict: 'user_id,role' }
         );
       }
@@ -320,7 +321,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (cancelled || invalidatedRolesRequestId.current === requestId || activeRolesRequestId.current !== requestId) return;
 
         const isAdminUser = roles.includes('admin');
-        const isApprovedAgent = !!agentData && ((agentData as any).approval_status === 'approved' || isAdminUser);
+        const isApprovedAgent = !!agentData && (agentData.approval_status === 'approved' || isAdminUser);
         const filteredRoles = roles.filter((r) => {
           if (r !== 'agent') return true;
           return isApprovedAgent;
@@ -328,21 +329,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         if (isApprovedAgent && !filteredRoles.includes('agent')) {
           filteredRoles.push('agent');
-          supabase.from('user_roles').insert({ user_id: userId, role: 'agent' as any })
+          supabase.from('user_roles').insert({ user_id: userId, role: 'agent' as const })
             .then(({ error }) => { if (error && !String(error.message).includes('duplicate') && import.meta.env.DEV) console.warn('[Auth] backfill user_roles:', error.message); });
         }
 
         applyRoles(filteredRoles, userEmail);
 
         if (agentData) {
-          setAgencyRole((agentData as any).agency_role || null);
+          setAgencyRole(agentData.agency_role || null);
           setAgencyId(agentData.agency_id || null);
-          if (isApprovedAgent && ((agentData as any).agency_role === 'principal' || (agentData as any).agency_role === 'admin')) {
+          if (isApprovedAgent && (agentData.agency_role === 'principal' || agentData.agency_role === 'admin')) {
             setIsPrincipal(true);
           }
           if (isApprovedAgent && !roles.includes('agent') && !roles.includes('admin')) {
             await supabase.from('user_roles').upsert(
-              { user_id: userId, role: 'agent' as any },
+              { user_id: userId, role: 'agent' as const },
               { onConflict: 'user_id,role' }
             );
           }
@@ -467,7 +468,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Clear any active impersonation rows for this admin
     if (user) {
       try {
-        await (supabase as any)
+        await supabase
           .from('admin_impersonation_sessions')
           .delete()
           .eq('admin_id', user.id);

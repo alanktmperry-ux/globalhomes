@@ -107,25 +107,20 @@ const BankReconciliationPage = () => {
       .maybeSingle();
 
     const agentId = agentData?.id;
+    if (!agentId) { setLoading(false); return; }
 
     const [{ data: recon }, { data: recs }, { data: pays }] = await Promise.all([
-      agentId
-        ? supabase.from('trust_reconciliations').select('*').eq('agent_id', agentId).order('bank_date', { ascending: false })
-        : Promise.resolve({ data: [] }),
-      agentId
-        ? supabase.from('trust_receipts').select('id, receipt_number, client_name, amount, date_received, payment_method').eq('agent_id', agentId)
-        : Promise.resolve({ data: [] as any[] }) as any,
-      agentId
-        ? supabase.from('trust_payments').select('id, payment_number, client_name, amount, date_paid, payment_method').eq('agent_id', agentId)
-        : Promise.resolve({ data: [] as any[] }) as any,
+      supabase.from('trust_reconciliations').select('*').eq('agent_id', agentId).order('bank_date', { ascending: false }),
+      supabase.from('trust_receipts').select('id, receipt_number, client_name, amount, date_received, payment_method').eq('agent_id', agentId),
+      supabase.from('trust_payments').select('id, payment_number, client_name, amount, date_paid, payment_method').eq('agent_id', agentId),
     ]);
 
     if (recon) setItems(recon as unknown as Reconciliation[]);
-    if (recs) setReceipts((recs as any[]).map(r => ({
+    if (recs) setReceipts((recs || []).map(r => ({
       id: r.id, type: 'receipt' as const, number: r.receipt_number,
       client: r.client_name, amount: r.amount, date: r.date_received, method: r.payment_method,
     })));
-    if (pays) setPayments((pays as any[]).map(p => ({
+    if (pays) setPayments((pays || []).map(p => ({
       id: p.id, type: 'payment' as const, number: p.payment_number,
       client: p.client_name, amount: p.amount, date: p.date_paid, method: p.payment_method,
     })));

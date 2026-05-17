@@ -51,6 +51,10 @@ const ListingEditPage = () => {
     };
   }, [listingId, agentId]);
 
+  useEffect(() => {
+    if (notFound) toast.error('Listing not found or you do not have access.');
+  }, [notFound]);
+
   if (authLoading || agentLoading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -62,10 +66,7 @@ const ListingEditPage = () => {
   if (!user) return <Navigate to="/login" replace />;
   if (!agentId) return <Navigate to="/onboarding/agency" replace />;
 
-  if (notFound) {
-    toast.error('Listing not found or you do not have access.');
-    return <Navigate to="/dashboard/listings" replace />;
-  }
+  if (notFound) return <Navigate to="/dashboard/listings" replace />;
 
   if (loading || !listing) {
     return (

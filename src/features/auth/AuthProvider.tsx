@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useRef, useCallback, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
 import { buildAuditMeta } from '@/shared/lib/auditLog';
 import { identify } from '@/shared/lib/posthog';

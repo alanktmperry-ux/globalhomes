@@ -220,6 +220,7 @@ export default function InboxPage() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search threads…"
+                aria-label="Search threads"
                 className="pl-8 h-8 text-sm"
               />
             </div>

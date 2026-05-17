@@ -503,7 +503,7 @@ const ReportsPage = () => {
         {/* Period selector */}
         <div className="flex flex-wrap items-center gap-2">
           <Select value={period} onValueChange={v => setPeriod(v as Period)}>
-            <SelectTrigger className="w-[160px] h-8 text-xs">
+            <SelectTrigger className="w-[160px] h-8 text-xs" aria-label="Select report period">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

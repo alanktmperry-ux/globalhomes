@@ -303,10 +303,10 @@ export default function SuppliersPage() {
                 <Button size="sm" className="h-8 px-2 text-xs gap-1" onClick={()=>openAssign(s)} title="Assign job">
                   <Briefcase size={12}/> Assign
                 </Button>
-                <Button size="sm" variant="outline" className="h-8 px-2" onClick={()=>copyPortal(s.portal_token)} title="Copy portal link">
+                <Button size="sm" variant="outline" className="h-8 px-2" onClick={()=>copyPortal(s.portal_token)} aria-label="Copy supplier portal link">
                   <Copy size={12}/>
                 </Button>
-                <Button size="sm" variant="outline" className="h-8 px-2 text-destructive hover:bg-destructive/10" onClick={()=>removeSupplier(s)} title="Remove">
+                <Button size="sm" variant="outline" className="h-8 px-2 text-destructive hover:bg-destructive/10" onClick={()=>removeSupplier(s)} aria-label="Remove supplier">
                   <Trash2 size={12}/>
                 </Button>
               </div>

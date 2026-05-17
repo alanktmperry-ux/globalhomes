@@ -965,8 +965,8 @@ const TeamPage = () => {
           </DialogHeader>
           <div className="space-y-4 mt-2">
             <div>
-              <Label className="text-xs font-medium">Agency Name</Label>
-              <Input value={agencyName} onChange={(e) => setAgencyName(e.target.value)} className="mt-1.5" />
+              <Label htmlFor="edit-agency-name" className="text-xs font-medium">Agency Name</Label>
+              <Input id="edit-agency-name" value={agencyName} onChange={(e) => setAgencyName(e.target.value)} className="mt-1.5" />
             </div>
             <div>
               <Label className="text-xs font-medium">Office Address</Label>

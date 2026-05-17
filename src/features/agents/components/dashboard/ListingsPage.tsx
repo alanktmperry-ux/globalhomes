@@ -96,7 +96,7 @@ function toProperty(l: AgentListing): Property {
     listedDate: l.listed_date || '',
     views: l.views,
     contactClicks: l.contact_clicks,
-    status: (l.status as string) || 'listed',
+    status: (l.status as PropertyStatus) || 'listed',
   };
 }
 

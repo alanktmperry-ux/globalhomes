@@ -416,7 +416,7 @@ const ReportsPage = () => {
   const exportActivityReport = () => {
     const headers = ['Name', 'Type', 'Ranking', 'Email', 'Phone', 'Source', 'Pipeline Stage', 'Suburb'];
     const periodContacts = contacts.filter(c => {
-      const created = (c as any).created_at ? new Date((c as any).created_at) : null;
+      const created = c.created_at ? new Date(c.created_at) : null;
       return created ? created >= range.from && created <= range.to : true;
     });
     const rows = periodContacts.map(c => [

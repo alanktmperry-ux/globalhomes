@@ -729,55 +729,8 @@ const Index = () => {
                 Trusted by buyers and agents across Australia
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                {[
-                  {
-                    quote: "As a Vietnamese-speaking buyer, I could finally search in my language and understand every listing. Found my home in 3 weeks.",
-                    name: "David Nguyen",
-                    location: "Cabramatta, NSW",
-                    role: "First home buyer",
-                    flag: "🇻🇳",
-                  },
-                  {
-                    quote: "The multilingual search is incredible. I searched in Mandarin and the results actually made sense. No more Google Translate.",
-                    name: "Wei Chen",
-                    location: "Box Hill, VIC",
-                    role: "Property investor",
-                    flag: "🇨🇳",
-                  },
-                  {
-                    quote: "The Halo system changed how I work. Qualified buyers come to me already matched to what I list — no cold calling, no wasted time.",
-                    name: "Sarah Mitchell",
-                    location: "St Kilda, VIC",
-                    role: "Licensed real estate agent",
-                    flag: "🇦🇺",
-                  },
-                ].map(({ quote, name, location, role, flag }) => (
-                  <div
-                    key={name}
-                    className="bg-card border border-border rounded-2xl p-6 flex flex-col gap-4 hover:shadow-md transition-shadow duration-200"
-                  >
-                    <div className="flex gap-0.5 text-amber-400 text-sm" aria-label="5 stars">
-                      {'★★★★★'}
-                    </div>
-                    <p className="text-[14px] text-foreground leading-relaxed flex-1">
-                      "{quote}"
-                    </p>
-                    <div className="flex items-center gap-3 pt-2 border-t border-border">
-                      <span className="text-2xl leading-none" aria-hidden="true">{flag}</span>
-                      <div>
-                        <p className="text-[13px] font-semibold text-foreground">{name}</p>
-                        <p className="text-[12px] text-muted-foreground">{role} · {location}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <p className="text-center text-[11px] text-muted-foreground/50 mt-6">
-                * Placeholder testimonials — replace with verified agent and buyer quotes before launch
-              </p>
             </div>
+
           </section>
 
           {/* ═══ Replace five tools with one — Bose-signature visual ═══ */}

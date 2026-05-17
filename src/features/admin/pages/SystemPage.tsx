@@ -394,13 +394,13 @@ function ReportsTab() {
       description: 'All currently active properties.',
       icon: Home,
       run: async () => {
-        const { data } = await (supabase as any)
+        const { data } = await supabase
           .from('properties')
           .select('address, suburb, state, property_type, price, is_active, created_at')
           .eq('is_active', true)
           .limit(2000);
         const rows = [['Address', 'Suburb', 'State', 'Type', 'Price', 'Active', 'Listed']];
-        for (const r of (data ?? []) as any[]) {
+        for (const r of data ?? []) {
           rows.push([
             fmt(r.address),
             fmt(r.suburb),

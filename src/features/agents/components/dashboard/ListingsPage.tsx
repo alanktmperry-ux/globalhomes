@@ -598,7 +598,7 @@ const ListingsPage = () => {
   const handlePublish = async (l: AgentListing) => {
     if (l._source !== 'db') { toast.success('Demo listing — Create a real listing first.'); return; }
     setActionLoading(l.id);
-    const { error } = await supabase.from('properties').update({ status: 'public', is_active: true } as any).eq('id', l.id);
+    const { error } = await supabase.from('properties').update({ status: 'public', is_active: true }).eq('id', l.id);
     if (error) { toast.error('Failed to publish'); }
     else {
       toast.success('Your listing is now live on ListHQ!');

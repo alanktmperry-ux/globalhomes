@@ -253,6 +253,7 @@ const PropertyDocumentsPage = () => {
         <div className="relative flex-1">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
+            aria-label="Search documents"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by title or tenant…"
@@ -299,10 +300,10 @@ const PropertyDocumentsPage = () => {
                 <div className="flex items-start justify-between gap-2">
                   <Badge variant="outline" className={CATEGORY_COLORS[cat]}>{d.category}</Badge>
                   <div className="flex items-center gap-1">
-                    <Button size="icon" variant="ghost" onClick={() => downloadDoc(d)} title="Download">
+                    <Button size="icon" variant="ghost" onClick={() => downloadDoc(d)} aria-label="Download document">
                       <Download size={14} />
                     </Button>
-                    <Button size="icon" variant="ghost" onClick={() => setToDelete(d)} title="Delete">
+                    <Button size="icon" variant="ghost" onClick={() => setToDelete(d)} aria-label="Delete document">
                       <Trash2 size={14} className="text-red-600" />
                     </Button>
                   </div>

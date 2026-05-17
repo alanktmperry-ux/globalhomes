@@ -341,7 +341,7 @@ ${agencyName || ''}`.trim();
                         <FileText size={14} /> Breach Notice
                       </Button>
                       <Select value={status} onValueChange={(v) => updateStatus(row.id, v as ArrearsStatus)}>
-                        <SelectTrigger className="h-8 w-[140px] text-xs"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-8 w-[140px] text-xs" aria-label="Update arrears status"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">No action</SelectItem>
                           <SelectItem value="notice_sent">Notice sent</SelectItem>
@@ -377,6 +377,7 @@ ${agencyName || ''}`.trim();
             value={noticeText}
             rows={20}
             className="font-mono text-xs"
+            aria-label="Breach notice text"
           />
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={copyLetter} className="gap-1">

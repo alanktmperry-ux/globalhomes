@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
   AlertDialog,
@@ -59,7 +60,7 @@ async function logAudit(action_type: string, metadata: Record<string, unknown>) 
       action_type,
       entity_type: 'system',
       user_id: userRes.user?.id,
-      metadata: metadata as any,
+      metadata: metadata as unknown as Json,
     });
   } catch {
     /* noop */
@@ -220,12 +221,12 @@ function ComplianceTab() {
     (async () => {
       const d7 = new Date(Date.now() - 7 * 86400000).toISOString();
       const [weekly, latest] = await Promise.all([
-        (supabase as any)
+        supabase
           .from('audit_log')
           .select('action_type, created_at, user_id')
           .gte('created_at', d7)
           .limit(500),
-        (supabase as any)
+        supabase
           .from('audit_log')
           .select('action_type, description, created_at, user_id, entity_type, entity_id')
           .order('created_at', { ascending: false })
@@ -366,22 +367,21 @@ function ReportsTab() {
       description: 'Full agent roster with plan and subscription state.',
       icon: Users,
       run: async () => {
-        const { data } = await (supabase as any)
+        const { data } = await supabase
           .from('agents')
-          .select('name, email, agency, is_subscribed, created_at, state, agent_subscriptions(plan_type)')
+          .select('name, email, agency, is_subscribed, created_at, agent_subscriptions(plan_type)')
           .limit(1000);
-        const rows = [['Name', 'Agency', 'Email', 'Plan', 'Subscribed', 'State', 'Joined']];
-        for (const r of (data ?? []) as any[]) {
+        const rows = [['Name', 'Agency', 'Email', 'Plan', 'Subscribed', 'Joined']];
+        for (const r of data ?? []) {
           const plan = Array.isArray(r.agent_subscriptions)
             ? r.agent_subscriptions[0]?.plan_type
-            : r.agent_subscriptions?.plan_type;
+            : (r.agent_subscriptions as { plan_type?: string } | null)?.plan_type;
           rows.push([
             fmt(r.name),
             fmt(r.agency),
             fmt(r.email),
             fmt(plan),
             r.is_subscribed ? 'Yes' : 'No',
-            fmt(r.state),
             r.created_at ? new Date(r.created_at).toISOString().slice(0, 10) : '',
           ]);
         }
@@ -394,13 +394,13 @@ function ReportsTab() {
       description: 'All currently active properties.',
       icon: Home,
       run: async () => {
-        const { data } = await (supabase as any)
+        const { data } = await supabase
           .from('properties')
           .select('address, suburb, state, property_type, price, is_active, created_at')
           .eq('is_active', true)
           .limit(2000);
         const rows = [['Address', 'Suburb', 'State', 'Type', 'Price', 'Active', 'Listed']];
-        for (const r of (data ?? []) as any[]) {
+        for (const r of data ?? []) {
           rows.push([
             fmt(r.address),
             fmt(r.suburb),
@@ -420,17 +420,17 @@ function ReportsTab() {
       description: 'Buyer enquiries from the last 90 days.',
       icon: Mail,
       run: async () => {
-        const { data } = await (supabase as any)
+        const { data } = await supabase
           .from('leads')
-          .select('buyer_name, buyer_email, buyer_phone, created_at')
+          .select('user_name, user_email, user_phone, created_at')
           .gte('created_at', d90)
           .limit(2000);
         const rows = [['Name', 'Email', 'Phone', 'Submitted']];
-        for (const r of (data ?? []) as any[]) {
+        for (const r of data ?? []) {
           rows.push([
-            fmt(r.buyer_name),
-            fmt(r.buyer_email),
-            fmt(r.buyer_phone),
+            fmt(r.user_name),
+            fmt(r.user_email),
+            fmt(r.user_phone),
             r.created_at ? new Date(r.created_at).toISOString() : '',
           ]);
         }
@@ -443,16 +443,16 @@ function ReportsTab() {
       description: 'Plan, trial, and active state per agent.',
       icon: CreditCard,
       run: async () => {
-        const { data } = await (supabase as any)
+        const { data } = await supabase
           .from('agent_subscriptions')
-          .select('agent_id, plan_type, is_active, trial_ends_at, created_at')
+          .select('agent_id, plan_type, auto_renew, trial_ends_at, created_at')
           .limit(1000);
-        const rows = [['Agent ID', 'Plan', 'Active', 'Trial Ends', 'Created']];
-        for (const r of (data ?? []) as any[]) {
+        const rows = [['Agent ID', 'Plan', 'Auto-Renew', 'Trial Ends', 'Created']];
+        for (const r of data ?? []) {
           rows.push([
             fmt(r.agent_id),
             fmt(r.plan_type),
-            r.is_active ? 'Yes' : 'No',
+            r.auto_renew ? 'Yes' : 'No',
             r.trial_ends_at ? new Date(r.trial_ends_at).toISOString().slice(0, 10) : '',
             r.created_at ? new Date(r.created_at).toISOString().slice(0, 10) : '',
           ]);
@@ -466,13 +466,13 @@ function ReportsTab() {
       description: 'Admin & system actions captured for compliance.',
       icon: ScrollText,
       run: async () => {
-        const { data } = await (supabase as any)
+        const { data } = await supabase
           .from('audit_log')
           .select('action_type, description, entity_type, entity_id, created_at, user_id')
           .gte('created_at', d30)
           .limit(2000);
         const rows = [['Action', 'Description', 'Entity Type', 'Entity ID', 'Time', 'User ID']];
-        for (const r of (data ?? []) as any[]) {
+        for (const r of data ?? []) {
           rows.push([
             fmt(r.action_type),
             fmt(r.description),
@@ -491,12 +491,12 @@ function ReportsTab() {
       description: 'Registered buyers and budget bands.',
       icon: UserSquare,
       run: async () => {
-        const { data } = await (supabase as any)
+        const { data } = await supabase
           .from('buyer_profiles')
           .select('user_id, budget_min, budget_max, created_at')
           .limit(1000);
         const rows = [['User ID', 'Budget Min', 'Budget Max', 'Joined']];
-        for (const r of (data ?? []) as any[]) {
+        for (const r of data ?? []) {
           rows.push([
             fmt(r.user_id),
             fmt(r.budget_min),

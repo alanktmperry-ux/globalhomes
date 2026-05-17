@@ -581,7 +581,7 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
       if (draft.title_ko || draft.description_ko)
         manualTranslations['ko'] = { title: draft.title_ko || null, description: draft.description_ko || null };
       if (Object.keys(manualTranslations).length > 0) {
-        (payload as any).translations = manualTranslations;
+        payload.translations = manualTranslations as unknown as Json;
       }
 
       // Add 'Pets considered' to features if applicable

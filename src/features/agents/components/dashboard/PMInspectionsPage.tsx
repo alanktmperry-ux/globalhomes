@@ -577,7 +577,7 @@ ${agencyName || ''}`.trim();
     setSavingNotice(true);
     const { error } = await supabase
       .from('property_inspections')
-      .update({ notice_sent_at: new Date().toISOString() } as any)
+      .update({ notice_sent_at: new Date().toISOString() })
       .eq('id', noticeFor.id);
     setSavingNotice(false);
     if (error) { toast.error('Could not record notice'); return; }

@@ -104,7 +104,10 @@ export default function AgentLandingPage() {
           <div className="flex flex-col items-center gap-5 mt-10">
             <button
               type="button"
-              onClick={() => setShowModal(true)}
+              onClick={() => {
+                capture('agent_cta_clicked', { source: 'hero', label: 'start_free_trial' });
+                setShowModal(true);
+              }}
               className="px-8 md:px-9 py-4 bg-black text-white border-[1.5px] border-black rounded-full text-[15px] font-bold inline-flex items-center gap-2.5 hover:bg-white hover:text-black transition-all"
             >
               Start free trial — 60 days free

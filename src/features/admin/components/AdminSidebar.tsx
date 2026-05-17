@@ -30,6 +30,7 @@ interface AdminSidebarProps {
   failedPaymentsCount?: number;
   /** Unresolved support tickets */
   supportOpenCount?: number;
+  boostsPendingCount?: number;
   /** @deprecated legacy props — ignored */
   tab?: unknown;
   setTab?: unknown;

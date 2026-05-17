@@ -107,7 +107,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       // Cleanup any expired rows for this admin
-      await (supabase as any)
+      await supabase
         .from('admin_impersonation_sessions')
         .delete()
         .eq('admin_id', user.id)

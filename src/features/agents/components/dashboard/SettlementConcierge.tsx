@@ -73,6 +73,7 @@ const SettlementConcierge = () => {
       const { data: trustTx } = await supabase
         .from('trust_receipts')
         .select('property_id, client_name, created_at, status, purpose')
+        .eq('agent_id', agent.id)
         .in('purpose', ['settlement', 'holding_deposit', 'deposit'])
         .order('created_at', { ascending: false })
         .limit(20);
@@ -252,7 +253,12 @@ const SettlementConcierge = () => {
             return (
               <Card key={s.id} className={`transition-colors ${getBorderClass(s.settlementDate)}`}>
                 <CardContent className="p-4">
-                  <button onClick={() => setExpandedId(expanded ? null : s.id)} className="w-full text-left flex items-center justify-between gap-3">
+                  <button
+                    onClick={() => setExpandedId(expanded ? null : s.id)}
+                    aria-expanded={expanded}
+                    aria-controls={`settlement-detail-${s.id}`}
+                    className="w-full text-left flex items-center justify-between gap-3"
+                  >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <MapPin size={14} className="text-primary shrink-0" />
@@ -270,7 +276,7 @@ const SettlementConcierge = () => {
                   </button>
 
                   {expanded && (
-                    <div className="mt-4 pt-4 border-t border-border space-y-3">
+                    <div id={`settlement-detail-${s.id}`} className="mt-4 pt-4 border-t border-border space-y-3">
                       <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Settlement Checklist ({completedCount}/{CHECKLIST_ITEMS.length})</p>
                       {CHECKLIST_ITEMS.map((item, idx) => (
                         <label key={idx} className="flex items-center gap-3 cursor-pointer group">

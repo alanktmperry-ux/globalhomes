@@ -99,7 +99,7 @@ export function PropertySEOHead({ property, agent }: PropertySEOHeadProps) {
       <meta name="twitter:description" content={description} />
       {img && <meta name="twitter:image" content={img} />}
 
-      <script type="application/ld+json">{JSON.stringify(schema)}</script>
+      <script type="application/ld+json">{JSON.stringify(graph)}</script>
     </Helmet>
   );
 }

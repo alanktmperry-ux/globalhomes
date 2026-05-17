@@ -301,9 +301,9 @@ const PocketListingForm = ({ onPublish, onCancel, initialListingType, editProper
       }
 
       let priceDisplay: ListingDraft['priceDisplay'] = 'exact';
-      if (prop.price_formatted.includes('–')) priceDisplay = 'range';
-      else if (prop.price_formatted.toLowerCase().includes('expression')) priceDisplay = 'eoi';
-      else if (prop.price_formatted.toLowerCase().includes('contact')) priceDisplay = 'contact';
+      if (prop.price_formatted?.includes('–')) priceDisplay = 'range';
+      else if (prop.price_formatted?.toLowerCase().includes('expression')) priceDisplay = 'eoi';
+      else if (prop.price_formatted?.toLowerCase().includes('contact')) priceDisplay = 'contact';
 
       const descLines = (prop.description || '').split('\n').filter(Boolean);
       const bulletLines = descLines.filter(l => l.startsWith('•')).map(l => l.replace(/^•\s*/, ''));

@@ -44,8 +44,9 @@ describe('foreignSurcharge', () => {
 
 describe('calculateFirbCosts', () => {
   it('produces correct totals for a $1M NSW purchase', () => {
-    const duty = calculateStampDuty(1_000_000, 'NSW');
-    const result = calculateFirbCosts(1_000_000, 'NSW', duty);
+    const dutyAmount = calculateStampDuty(1_000_000, 'NSW', 'foreign', false).duty;
+    const result = calculateFirbCosts(1_000_000, 'NSW', dutyAmount);
+    const duty = dutyAmount;
     expect(result.purchasePrice).toBe(1_000_000);
     expect(result.firbFee).toBe(13_200);
     expect(result.surchargeRate).toBe(FOREIGN_SURCHARGE_RATES['NSW']);

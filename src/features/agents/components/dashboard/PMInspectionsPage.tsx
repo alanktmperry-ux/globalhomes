@@ -719,7 +719,7 @@ ${agencyName || ''}`.trim();
       const t = activeTenancies.find(x => x.id === p.tenancyId);
       return p.dates.map(date => ({
         tenancy_id: p.tenancyId,
-        property_id: t?.property_id,
+        property_id: t?.property_id ?? null,
         agent_id: agentId,
         inspection_type: 'routine',
         scheduled_date: date,
@@ -727,7 +727,7 @@ ${agencyName || ''}`.trim();
       }));
     });
 
-    const { error } = await supabase.from('property_inspections').insert(inserts as any);
+    const { error } = await supabase.from('property_inspections').insert(inserts);
     setAutoScheduling(false);
     if (error) { toast.error('Could not schedule inspections'); return; }
     toast.success(`${inserts.length} routine inspection${inserts.length === 1 ? '' : 's'} scheduled`);

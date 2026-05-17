@@ -491,6 +491,43 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
               ))}
             </ul>
 
+            {boostStats !== null && (
+              <div className="rounded-xl border border-border bg-secondary/40 p-4 space-y-3">
+                <p className="text-xs font-semibold text-foreground">Boost performance · this period</p>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <p className="text-lg font-bold text-foreground">{boostStats.impressions.toLocaleString()}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">impressions</p>
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-foreground">{boostStats.clicks.toLocaleString()}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">clicks</p>
+                  </div>
+                  {boostStats.impressions > 0 && (
+                    <div>
+                      <p className="text-lg font-bold text-foreground">
+                        {((boostStats.clicks / boostStats.impressions) * 100).toFixed(1)}%
+                      </p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wide">CTR</p>
+                    </div>
+                  )}
+                </div>
+                {boostState.featured_until && (() => {
+                  const daysLeft = Math.ceil(
+                    (new Date(boostState.featured_until!).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+                  );
+                  if (daysLeft > 3) return null;
+                  return (
+                    <p className="text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-lg p-2.5">
+                      ⚡ Your boost expires in {daysLeft} day{daysLeft !== 1 ? 's' : ''} — it delivered{' '}
+                      {boostStats.impressions.toLocaleString()} impressions and {boostStats.clicks} clicks.
+                      Renew to keep your listing at the top.
+                    </p>
+                  );
+                })()}
+              </div>
+            )}
+
             <p className="text-xs text-muted-foreground">
               Boost expires{' '}
               <span className="font-medium text-foreground">

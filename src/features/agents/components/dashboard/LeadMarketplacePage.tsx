@@ -56,7 +56,7 @@ const ScoreRing = ({ score, size = 44 }: { score: number; size?: number }) => {
   const pct = Math.min(score, 100) / 100;
   const color = score >= 70 ? 'hsl(var(--success))' : score >= 40 ? 'hsl(var(--warning, 45 93% 47%))' : 'hsl(var(--muted-foreground))';
   return (
-    <svg width={size} height={size} className="shrink-0">
+    <svg width={size} height={size} className="shrink-0" role="img" aria-label={`Lead score: ${score}`}>
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="hsl(var(--border))" strokeWidth="3" />
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth="3"
         strokeDasharray={circ} strokeDashoffset={circ * (1 - pct)}

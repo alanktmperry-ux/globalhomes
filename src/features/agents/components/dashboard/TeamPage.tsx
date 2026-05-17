@@ -619,8 +619,8 @@ const TeamPage = () => {
                 </div>
               </div>
               <div>
-                <Label className="text-xs font-medium">Agency Name *</Label>
-                <Input placeholder="e.g. Elite Property Group" value={newAgencyName} onChange={(e) => setNewAgencyName(e.target.value)} className="mt-1.5" />
+                <Label htmlFor="new-agency-name" className="text-xs font-medium">Agency Name *</Label>
+                <Input id="new-agency-name" placeholder="e.g. Elite Property Group" value={newAgencyName} onChange={(e) => setNewAgencyName(e.target.value)} className="mt-1.5" />
               </div>
               <div>
                 <Label className="text-xs font-medium">Office Address</Label>

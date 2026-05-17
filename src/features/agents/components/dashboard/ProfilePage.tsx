@@ -760,7 +760,7 @@ const ProfilePage = () => {
                           {c.verified_status === 'pending' && <Clock size={10} className="mr-1" />}
                           {c.verified_status}
                         </Badge>
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setConfirmDeleteCredId(c.id)}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Delete document" onClick={() => setConfirmDeleteCredId(c.id)}>
                           <Trash2 size={14} className="text-destructive" />
                         </Button>
                       </div>

@@ -924,8 +924,8 @@ const TeamPage = () => {
           </DialogHeader>
           <div className="space-y-4 mt-2">
             <div>
-              <Label className="text-sm font-medium mb-1.5 block">Email Address *</Label>
-              <Input type="email" placeholder="agent@example.com" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} />
+              <Label htmlFor="invite-email" className="text-sm font-medium mb-1.5 block">Email Address *</Label>
+              <Input id="invite-email" type="email" placeholder="agent@example.com" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} />
             </div>
             <div>
               <Label className="text-sm font-medium mb-1.5 block">Role</Label>

@@ -82,7 +82,7 @@ export default function BuyersPage() {
       const d30 = new Date(now - 30 * 86400000).toISOString();
       const twelveWeeksAgo = new Date(now - 84 * 86400000).toISOString();
 
-      const safe = async <T,>(p: Promise<{ data: T | null; count?: number | null }>): Promise<{ data: T; count: number }> => {
+      const safe = async <T,>(p: PromiseLike<{ data: T | null; count?: number | null }>): Promise<{ data: T; count: number }> => {
         try {
           const r = await p;
           return { data: (r.data ?? ([] as unknown as T)), count: r.count ?? 0 };

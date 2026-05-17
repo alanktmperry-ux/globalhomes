@@ -109,8 +109,8 @@ function PartnerTable({ rows, variant, onUpdate }: PartnerTableProps) {
 
   const handleStatus = async (p: Partner, next: PartnerStatus) => {
     try {
-      const { error } = await (supabase.from('partners'))
-        .update({ status: next })
+      const { error } = await supabase.from('partners')
+        .update({ status: next } as any)
         .eq('id', p.id);
       if (error) throw error;
       const action = next === 'suspended' ? 'partner_suspended' : 'partner_reactivated';
@@ -239,7 +239,7 @@ function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
     setSubmitting(true);
     try {
       try {
-        await (supabase.from('partner_invitations')).insert({
+        await supabase.from('partner_invitations' as any).insert({
           business_name: businessName,
           contact_name: contactName,
           email,
@@ -329,11 +329,11 @@ export default function PartnersPage() {
   const fetchPartners = useCallback(async () => {
     setLoading(true);
     try {
-      const { data, error } = await (supabase.from('partners'))
+      const { data, error } = await (supabase.from('partners') as any)
         .select('id, business_name, contact_name, email, phone, partner_type, abn, website, status, plan_type, created_at, notes')
         .order('created_at', { ascending: false });
       if (error) throw error;
-      setPartners((data || []) as Partner[]);
+      setPartners(((data as unknown) as Partner[]) || []);
     } catch {
       // table may not exist — show empty
       setPartners([]);

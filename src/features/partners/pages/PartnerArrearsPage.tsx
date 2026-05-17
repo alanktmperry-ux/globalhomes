@@ -169,7 +169,7 @@ const PartnerArrearsPage = () => {
       // Log activity
       const { data: membership } = await supabase.from('partner_members').select('partner_id').eq('user_id', user.id).maybeSingle();
       if (membership) {
-        await supabase.from('partner_activity_log').insert({
+        await supabase.from('partner_activity_log' as any).insert({
           partner_id: (membership as any).partner_id,
           agency_id: t.agencyId,
           action_type: 'arrears_reminder_sent',

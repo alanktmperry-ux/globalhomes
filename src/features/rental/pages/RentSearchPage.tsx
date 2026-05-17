@@ -10,6 +10,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter
 import { Button } from '@/components/ui/button';
 import { Filter, X } from 'lucide-react';
 import { AIPropertySearch } from '@/features/properties/components/AIPropertySearch';
+import { useListingDiscovery } from '@/features/boost/hooks/useListingDiscovery';
+import { FeaturedZone } from '@/features/boost/components/FeaturedZone';
 
 function parseRentalFiltersFromParams(sp: URLSearchParams): RentalFilters {
   const num = (k: string) => {
@@ -38,6 +40,8 @@ export default function RentSearchPage() {
   const [filters, setFilters] = useState<RentalFilters>(() => parseRentalFiltersFromParams(searchParams));
   const { properties, loading, total } = useRentalSearch(filters);
   const { t } = useTranslation();
+  const rentSuburb = filters.suburb ?? null;
+  const { suburb: detectedRentSuburb, featuredSlots: rentFeaturedSlots } = useListingDiscovery(rentSuburb, 'rent');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   // Re-sync when URL params change (voice search navigation)
@@ -133,6 +137,11 @@ export default function RentSearchPage() {
             {!loading && t('rent.showing', { shown: String(properties.length), total: String(total) })}
           </p>
         </div>
+
+        {/* Featured zone */}
+        {!loading && detectedRentSuburb && rentFeaturedSlots.length > 0 && (
+          <FeaturedZone slots={rentFeaturedSlots} suburb={detectedRentSuburb} />
+        )}
 
         {/* Grid */}
         {loading ? (

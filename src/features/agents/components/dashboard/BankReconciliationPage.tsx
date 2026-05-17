@@ -259,7 +259,7 @@ const BankReconciliationPage = () => {
       const matchedIds = items.filter(i => i.status === 'matched').map(i => i.id);
       if (matchedIds.length > 0) {
         await supabase.from('trust_reconciliations')
-          .update({ status: 'reconciled' } as any) // finalized
+          .update({ status: 'reconciled' }) // finalized
           .in('id', matchedIds);
       }
 

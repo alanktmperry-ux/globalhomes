@@ -155,7 +155,7 @@ export function useTodayPriorities(limit = 5) {
       .select('agency_id')
       .eq('id', agent.id)
       .maybeSingle();
-    const agencyId = (agentRow as any)?.agency_id;
+    const agencyId = agentRow?.agency_id;
 
     if (agencyId) {
       const cutoffIso = new Date(nowMs - 86_400_000).toISOString();

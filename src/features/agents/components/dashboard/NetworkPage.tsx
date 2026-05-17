@@ -513,7 +513,7 @@ const NetworkPage = () => {
                           <TableCell className="text-xs text-right font-semibold">{AUD.format(l.price)}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              <Switch checked={l.is_shared} onCheckedChange={() => toggleNetworkShare(l)} />
+                              <Switch checked={l.is_shared} onCheckedChange={() => toggleNetworkShare(l)} aria-label={`Share ${l.address} with network`} />
                               <span className="text-[10px] text-muted-foreground">{l.is_shared ? 'Shared' : 'Private'}</span>
                             </div>
                           </TableCell>

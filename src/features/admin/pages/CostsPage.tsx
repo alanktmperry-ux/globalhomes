@@ -159,7 +159,7 @@ export default function CostsPage() {
 
       // Pull all events from start of last month onwards.
       const { data: rows, error } = await supabase
-        .from('api_usage_events' as any)
+        .from('api_usage_events')
         .select('service, cost_estimate, user_id, created_at')
         .gte('created_at', prevMonthStart.toISOString())
         .order('created_at', { ascending: false })

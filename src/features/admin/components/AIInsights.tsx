@@ -76,7 +76,7 @@ const AIInsights = () => {
       // Top languages
       supabase.from('voice_searches').select('detected_language').gte('created_at', currentStart).limit(500),
       // Seller likelihood scores (all current)
-      supabase.from('seller_likelihood_scores' as any).select('score'),
+      supabase.from('seller_likelihood_scores').select('score'),
       // Offers
       supabase.from('offers').select('id', { count: 'exact', head: true }).gte('created_at', currentStart),
       supabase.from('offers').select('id', { count: 'exact', head: true }).gte('created_at', previousStart).lt('created_at', previousEnd),

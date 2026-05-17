@@ -109,7 +109,7 @@ function PartnerTable({ rows, variant, onUpdate }: PartnerTableProps) {
 
   const handleStatus = async (p: Partner, next: PartnerStatus) => {
     try {
-      const { error } = await ((supabase as any).from('partners'))
+      const { error } = await (supabase.from('partners'))
         .update({ status: next })
         .eq('id', p.id);
       if (error) throw error;
@@ -239,7 +239,7 @@ function InviteDialog({ open, onOpenChange }: InviteDialogProps) {
     setSubmitting(true);
     try {
       try {
-        await ((supabase as any).from('partner_invitations')).insert({
+        await (supabase.from('partner_invitations')).insert({
           business_name: businessName,
           contact_name: contactName,
           email,
@@ -329,7 +329,7 @@ export default function PartnersPage() {
   const fetchPartners = useCallback(async () => {
     setLoading(true);
     try {
-      const { data, error } = await ((supabase as any).from('partners'))
+      const { data, error } = await (supabase.from('partners'))
         .select('id, business_name, contact_name, email, phone, partner_type, abn, website, status, plan_type, created_at, notes')
         .order('created_at', { ascending: false });
       if (error) throw error;

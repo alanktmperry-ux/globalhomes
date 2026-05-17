@@ -574,7 +574,7 @@ const RentRollPage = () => {
     if (agent) setBulkAgentName(agent.name || '');
 
     const { data: existing } = await supabase
-      .from('property_inspections' as any)
+      .from('property_inspections')
       .select('*')
       .eq('tenancy_id', t.id)
       .order('scheduled_date', { ascending: true }) as any;
@@ -593,7 +593,7 @@ const RentRollPage = () => {
     const noticeDays = 7;
 
     for (const s of toCreate) {
-      await supabase.from('property_inspections' as any).insert({
+      await supabase.from('property_inspections').insert({
         tenancy_id: bulkInspectionTenancy.id,
         property_id: bulkInspectionTenancy.property_id,
         agent_id: agentId,
@@ -667,7 +667,7 @@ const RentRollPage = () => {
     let tenantContactId: string | null = null;
     if (form.tenant_email) {
       const { data: contactMatch } = await (supabase
-        .from('contacts' as any)
+        .from('contacts')
         .select('id')
         .eq('agent_id', agentId)
         .eq('email', form.tenant_email.trim().toLowerCase())

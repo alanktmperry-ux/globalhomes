@@ -10,7 +10,7 @@ export function useDocumentRequests(propertyId: string | undefined) {
     if (!propertyId) return;
     setLoading(true);
     supabase
-      .from('document_requests' as any)
+      .from('document_requests')
       .select('*, document_categories(slug, label, icon)')
       .eq('property_id', propertyId)
       .order('created_at', { ascending: false })
@@ -26,7 +26,7 @@ export function useDocumentRequests(propertyId: string | undefined) {
   ) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    await (supabase.from('document_requests' as any) as any).insert({
+    await (supabase.from('document_requests') as any).insert({
       property_id: propId,
       requested_by: user.id,
       ...params,
@@ -34,13 +34,13 @@ export function useDocumentRequests(propertyId: string | undefined) {
   }
 
   async function fulfillRequest(requestId: string, docId: string) {
-    await (supabase.from('document_requests' as any) as any)
+    await (supabase.from('document_requests') as any)
       .update({ status: 'uploaded', fulfilled_by_doc_id: docId, fulfilled_at: new Date().toISOString() })
       .eq('id', requestId);
   }
 
   async function cancelRequest(requestId: string) {
-    await (supabase.from('document_requests' as any) as any)
+    await (supabase.from('document_requests') as any)
       .update({ status: 'cancelled' })
       .eq('id', requestId);
   }

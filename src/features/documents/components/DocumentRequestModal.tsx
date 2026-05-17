@@ -33,7 +33,7 @@ export function DocumentRequestModal({ propertyId, open, onClose, onCreated }: P
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSending(false); return; }
 
-    await (supabase.from('document_requests' as any) as any).insert({
+    await (supabase.from('document_requests') as any).insert({
       property_id: propertyId,
       requested_by: user.id,
       requested_email: email,

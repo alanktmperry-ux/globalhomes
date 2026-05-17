@@ -165,7 +165,7 @@ export default function KeyRegisterPage() {
 
     const [keysRes, propsRes, tensRes] = await Promise.all([
       supabase
-        .from('key_register' as any)
+        .from('key_register')
         .select('*, properties(address, suburb), tenancies(tenant_name)')
         .eq('agent_id', aid),
       supabase
@@ -273,9 +273,9 @@ export default function KeyRegisterPage() {
     };
     let error;
     if (addEdit.id) {
-      ({ error } = await supabase.from('key_register' as any).update(payload).eq('id', addEdit.id));
+      ({ error } = await supabase.from('key_register').update(payload).eq('id', addEdit.id));
     } else {
-      ({ error } = await supabase.from('key_register' as any).insert(payload));
+      ({ error } = await supabase.from('key_register').insert(payload));
     }
     setSavingAddEdit(false);
     if (error) { toast.error('Could not save key'); return; }
@@ -301,7 +301,7 @@ export default function KeyRegisterPage() {
       returned_date: null,
       notes: issueForm.notes.trim() || issueTarget.notes || null,
     };
-    const { error } = await supabase.from('key_register' as any).update(payload).eq('id', issueTarget.id);
+    const { error } = await supabase.from('key_register').update(payload).eq('id', issueTarget.id);
     setSavingIssue(false);
     if (error) { toast.error('Could not issue key'); return; }
     toast.success(`Key issued to ${issueForm.issued_to_name.trim()}`);
@@ -325,7 +325,7 @@ export default function KeyRegisterPage() {
       expected_return_date: null,
       notes: returnForm.notes.trim() || returnTarget.notes || null,
     };
-    const { error } = await supabase.from('key_register' as any).update(payload).eq('id', returnTarget.id);
+    const { error } = await supabase.from('key_register').update(payload).eq('id', returnTarget.id);
     setSavingReturn(false);
     if (error) { toast.error('Could not return key'); return; }
     toast.success('Key returned');
@@ -335,7 +335,7 @@ export default function KeyRegisterPage() {
 
   const confirmLost = async () => {
     if (!lostTarget) return;
-    const { error } = await supabase.from('key_register' as any).update({ status: 'lost' }).eq('id', lostTarget.id);
+    const { error } = await supabase.from('key_register').update({ status: 'lost' }).eq('id', lostTarget.id);
     if (error) { toast.error('Could not update'); return; }
     toast.success('Key marked as lost');
     setLostTarget(null);

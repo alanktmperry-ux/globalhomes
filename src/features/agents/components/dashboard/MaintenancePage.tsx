@@ -248,7 +248,7 @@ export default function MaintenancePage() {
         .select('*, properties:property_id(address, suburb), tenancies:tenancy_id(tenant_name, tenant_email, tenant_portal_token), supplier:assigned_supplier_id(business_name)')
         .eq('agent_id', agentId)
         .order('created_at', { ascending: false }),
-      supabase.from('suppliers' as any).select('id, business_name, trade_category, email').eq('agent_id', agentId).eq('status', 'active'),
+      supabase.from('suppliers').select('id, business_name, trade_category, email').eq('agent_id', agentId).eq('status', 'active'),
     ]);
     const list: Job[] = (js || []).map((j: any) => ({
       ...j,

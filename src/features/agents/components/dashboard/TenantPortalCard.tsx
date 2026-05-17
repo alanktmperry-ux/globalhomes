@@ -49,7 +49,7 @@ export default function TenantPortalCard({ tenancyId, tenantName, tenantEmail, p
 
   const loadDocs = useCallback(async () => {
     const { data } = await supabase
-      .from('tenant_documents' as any)
+      .from('tenant_documents')
       .select('*')
       .eq('tenancy_id', tenancyId)
       .order('uploaded_at', { ascending: false });
@@ -92,7 +92,7 @@ export default function TenantPortalCard({ tenancyId, tenantName, tenantEmail, p
     const { error: upErr } = await supabase.storage.from('tenant-documents').upload(path, file);
     if (upErr) { setUploading(false); toast.error('Upload failed'); return; }
     const { data: urlData } = supabase.storage.from('tenant-documents').getPublicUrl(path);
-    const { error: insErr } = await supabase.from('tenant_documents' as any).insert({
+    const { error: insErr } = await supabase.from('tenant_documents').insert({
       tenancy_id: tenancyId,
       document_type: docType,
       label: docLabel || file.name,
@@ -108,13 +108,13 @@ export default function TenantPortalCard({ tenancyId, tenantName, tenantEmail, p
   };
 
   const toggleVisible = async (id: string, current: boolean) => {
-    await supabase.from('tenant_documents' as any).update({ visible_to_tenant: !current } as any).eq('id', id);
+    await supabase.from('tenant_documents').update({ visible_to_tenant: !current } as any).eq('id', id);
     loadDocs();
   };
 
   const deleteDoc = async (id: string) => {
     if (!confirm('Delete this document?')) return;
-    await supabase.from('tenant_documents' as any).delete().eq('id', id);
+    await supabase.from('tenant_documents').delete().eq('id', id);
     toast.success('Document deleted');
     loadDocs();
   };

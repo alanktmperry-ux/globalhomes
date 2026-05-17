@@ -77,7 +77,7 @@ export default function AdminLayout() {
       try {
         const [agentsRes, demosRes, partnersRes] = await Promise.all([
           supabase.from('agents').select('id', { count: 'exact', head: true }).eq('approval_status', 'pending'),
-          (supabase.from('demo_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
+          (supabase.from('demo_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
           (supabase.from('partners').select('id', { count: 'exact', head: true }).eq('is_verified', false)) as any,
         ]);
         if (cancelled) return;

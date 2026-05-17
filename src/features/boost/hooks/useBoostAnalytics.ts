@@ -24,7 +24,7 @@ export function useBoostAnalytics() {
 
   const record = useCallback(async (payload: EventPayload) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (supabase as any).from('listing_events').insert({
+    supabase.from('listing_events').insert({
       ...payload,
       session_id: sessionId.current,
     }).then(() => {});

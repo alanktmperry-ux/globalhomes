@@ -168,7 +168,7 @@ function StatusMenu({
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
             const { data: agentRow } = await supabase
-              .from('agents' as any).select('id').eq('user_id', user.id).maybeSingle();
+              .from('agents').select('id').eq('user_id', user.id).maybeSingle();
             const agentId = (agentRow as any)?.id;
             if (!agentId) return;
             const { count } = await supabase
@@ -572,7 +572,7 @@ const ListingsPage = () => {
         const newToken = crypto.randomUUID();
         const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
         const { data: insertData, error: insertError } = await supabase
-          .from('vendor_report_tokens' as any)
+          .from('vendor_report_tokens')
           .insert({
             property_id: l.id,
             agent_id: agent.id,

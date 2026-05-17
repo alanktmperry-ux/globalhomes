@@ -58,7 +58,7 @@ export async function recordConciergeAction(
   entityId?: string,
 ) {
   try {
-    await (supabase as any).from('concierge_usage').insert({
+    await supabase.from('concierge_usage').insert({
       agent_id: agentId,
       action,
       entity_id: entityId || null,

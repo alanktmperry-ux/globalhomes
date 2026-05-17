@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
 
         if (res.ok) {
           totalSent++;
-          await (supabase as any).from('email_log').insert({
+          await supabase.from('email_log').insert({
             recipient_email: agent.email,
             recipient_id: agent.id,
             template: `trial_expiry_${threshold.daysRemaining}d`,

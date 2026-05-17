@@ -89,7 +89,7 @@ const LeadMarketplacePage = () => {
   const fetchLeads = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from('consumer_profiles_marketplace' as any)
+      .from('consumer_profiles_marketplace')
       .select('id, name, email, buying_situation, budget_min, budget_max, preferred_suburbs, preferred_type, min_bedrooms, lead_score, is_purchasable, created_at')
       .eq('is_purchasable', true)
       .order('lead_score', { ascending: false }) as any;

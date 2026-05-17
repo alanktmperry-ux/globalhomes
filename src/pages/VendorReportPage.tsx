@@ -35,7 +35,7 @@ export default function VendorReportPage() {
       const agentId = row.agent_id as string;
 
       // Update view count (fire and forget)
-      supabase.from('vendor_report_tokens' as any)
+      supabase.from('vendor_report_tokens')
         .update({ last_viewed: new Date().toISOString() } as any)
         .eq('id', row.id as string)
         .then(() => {});

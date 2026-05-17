@@ -153,7 +153,7 @@ export default function VacanciesPage() {
     setPropertyMap(map);
 
     const { data: ev } = await supabase
-      .from('vacancy_events' as any)
+      .from('vacancy_events')
       .select('id, event_type, event_date, notes, property_id')
       .eq('agent_id', agentId)
       .order('event_date', { ascending: false })
@@ -188,7 +188,7 @@ export default function VacanciesPage() {
       return;
     }
     setSavingEvent(true);
-    const { error } = await supabase.from('vacancy_events' as any).insert({
+    const { error } = await supabase.from('vacancy_events').insert({
       agent_id: agentId,
       property_id: eventForm.property_id,
       event_type: eventForm.event_type,

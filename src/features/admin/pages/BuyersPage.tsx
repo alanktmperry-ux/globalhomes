@@ -100,14 +100,14 @@ export default function BuyersPage() {
         leads,
         briefs,
       ] = await Promise.all([
-        safe<unknown[]>((supabase as any).from('buyer_profiles').select('id', { count: 'exact', head: true })),
-        safe<{ created_at: string }[]>((supabase as any).from('buyer_profiles').select('created_at').gte('created_at', twelveWeeksAgo)),
-        safe<{ parsed_query: any; created_at: string }[]>((supabase as any).from('voice_searches').select('parsed_query, created_at').gte('created_at', d30).limit(500)),
-        safe<{ event_type: string; created_at: string; metadata: any }[]>((supabase as any).from('buyer_activity_events').select('event_type, created_at, metadata').gte('created_at', d30).limit(1000)),
-        safe<{ property_id: string; created_at: string }[]>((supabase as any).from('saved_properties').select('property_id, created_at').gte('saved_at', d30).limit(500)),
-        safe<{ id: string; created_at: string }[]>((supabase as any).from('leads').select('id, created_at').gte('created_at', d30)),
+        safe<unknown[]>(supabase.from('buyer_profiles').select('id', { count: 'exact', head: true })),
+        safe<{ created_at: string }[]>(supabase.from('buyer_profiles').select('created_at').gte('created_at', twelveWeeksAgo)),
+        safe<{ parsed_query: any; created_at: string }[]>(supabase.from('voice_searches').select('parsed_query, created_at').gte('created_at', d30).limit(500)),
+        safe<{ event_type: string; created_at: string; metadata: any }[]>(supabase.from('buyer_activity_events').select('event_type, created_at, metadata').gte('created_at', d30).limit(1000)),
+        safe<{ property_id: string; created_at: string }[]>(supabase.from('saved_properties').select('property_id, created_at').gte('saved_at', d30).limit(500)),
+        safe<{ id: string; created_at: string }[]>(supabase.from('leads').select('id, created_at').gte('created_at', d30)),
         safe<{ suburbs: any; min_price: number | null; max_price: number | null; property_type: string | null; urgency: string | null }[]>(
-          (supabase as any).from('buyer_briefs').select('suburbs, min_price, max_price, property_type, urgency').eq('is_active', true).limit(200)
+          supabase.from('buyer_briefs').select('suburbs, min_price, max_price, property_type, urgency').eq('is_active', true).limit(200)
         ),
       ]);
 
@@ -385,8 +385,8 @@ function SeekerRoster() {
         const ids = allSeekers.map(s => s.id);
         if (ids.length > 0) {
           const [{ data: saves }, { data: apps }] = await Promise.all([
-            (supabase as any).from('saved_properties').select('user_id').in('user_id', ids),
-            (supabase as any).from('rental_applications').select('applicant_id').in('applicant_id', ids),
+            supabase.from('saved_properties').select('user_id').in('user_id', ids),
+            supabase.from('rental_applications').select('applicant_id').in('applicant_id', ids),
           ]);
           if (cancelled) return;
           const sc: Record<string, number> = {};

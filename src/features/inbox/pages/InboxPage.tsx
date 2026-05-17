@@ -119,7 +119,7 @@ export default function InboxPage() {
         (async () => {
           try {
             const { data: lead } = await supabase
-              .from('crm_leads' as any)
+              .from('crm_leads')
               .select('id')
               .eq('contact_id', activeThread.contact!.id)
               .eq('agent_id', agentId)
@@ -131,14 +131,14 @@ export default function InboxPage() {
               const activityType = composeChannel === 'email' ? 'email' : 'note';
               const preview = draft.trim().slice(0, 200);
               await Promise.all([
-                supabase.from('crm_activities' as any).insert({
+                supabase.from('crm_activities').insert({
                   lead_id: (lead as any).id,
                   agent_id: agentId,
                   type: activityType,
                   body: `Inbox reply: ${preview}${draft.trim().length > 200 ? '…' : ''}`,
                   completed: true,
                 }),
-                supabase.from('crm_leads' as any)
+                supabase.from('crm_leads')
                   .update({ last_contacted: new Date().toISOString() } as any)
                   .eq('id', (lead as any).id),
               ]);

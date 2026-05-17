@@ -261,7 +261,7 @@ const AgentDashboardSidebar = () => {
     let channel: ReturnType<typeof supabase.channel> | null = null;
     const refresh = async () => {
       const { count } = await supabase
-        .from('inbox_threads' as any)
+        .from('inbox_threads')
         .select('id', { count: 'exact', head: true })
         .eq('agency_id', agent.agency_id)
         .eq('is_unread', true)

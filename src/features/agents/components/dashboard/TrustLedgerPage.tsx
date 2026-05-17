@@ -142,7 +142,7 @@ const TrustLedgerPage = () => {
     if (agentData) {
       setAgent(agentData);
       const { data: accts } = await supabase
-        .from('trust_accounts' as any)
+        .from('trust_accounts')
         .select('id')
         .eq('agent_id', agentData.id)
         .limit(1);
@@ -206,7 +206,7 @@ const TrustLedgerPage = () => {
   const fetchSuspense = useCallback(async () => {
     if (!agent?.id) return;
     const { data } = await supabase
-      .from('trust_suspense' as any)
+      .from('trust_suspense')
       .select('*')
       .eq('agent_id', agent.id)
       .eq('status', 'unidentified')
@@ -225,7 +225,7 @@ const TrustLedgerPage = () => {
     setJournalSaving(true);
     try {
       const { error } = await supabase
-        .from('trust_journal_entries' as any)
+        .from('trust_journal_entries')
         .insert({
           trust_account_id: accounts[0].id,
           agent_id: agent.id,
@@ -266,7 +266,7 @@ const TrustLedgerPage = () => {
     setSuspenseSaving(true);
     try {
       const { error } = await supabase
-        .from('trust_suspense' as any)
+        .from('trust_suspense')
         .insert({
           trust_account_id: accounts[0].id,
           agent_id: agent.id,

@@ -81,7 +81,7 @@ export default function TenancyContactsPanel({ tenancyId, readOnly = false }: Pr
   const load = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from('tenancy_contacts' as any)
+      .from('tenancy_contacts')
       .select('*')
       .eq('tenancy_id', tenancyId)
       .order('created_at', { ascending: true });
@@ -137,9 +137,9 @@ export default function TenancyContactsPanel({ tenancyId, readOnly = false }: Pr
     };
     let error;
     if (f.id) {
-      ({ error } = await supabase.from('tenancy_contacts' as any).update(payload).eq('id', f.id));
+      ({ error } = await supabase.from('tenancy_contacts').update(payload).eq('id', f.id));
     } else {
-      ({ error } = await supabase.from('tenancy_contacts' as any).insert(payload));
+      ({ error } = await supabase.from('tenancy_contacts').insert(payload));
     }
     setSaving(false);
     if (error) {
@@ -153,7 +153,7 @@ export default function TenancyContactsPanel({ tenancyId, readOnly = false }: Pr
 
   const toggleVerified = async (c: TenancyContact, value: boolean) => {
     const { error } = await supabase
-      .from('tenancy_contacts' as any)
+      .from('tenancy_contacts')
       .update({ id_verified: value })
       .eq('id', c.id);
     if (error) {
@@ -166,7 +166,7 @@ export default function TenancyContactsPanel({ tenancyId, readOnly = false }: Pr
   const remove = async () => {
     if (!removeTarget) return;
     const { error } = await supabase
-      .from('tenancy_contacts' as any)
+      .from('tenancy_contacts')
       .delete()
       .eq('id', removeTarget.id);
     if (error) {

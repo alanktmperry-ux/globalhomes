@@ -13,7 +13,7 @@ export function usePropertyDocuments(propertyId: string | undefined) {
     if (!propertyId) return;
     setLoading(true);
     const { data, error: err } = await supabase
-      .from('property_documents' as any)
+      .from('property_documents')
       .select('*, document_categories ( slug, label, icon, description )')
       .eq('property_id', propertyId)
       .eq('is_current', true)
@@ -48,7 +48,7 @@ export function usePropertyDocuments(propertyId: string | undefined) {
       if (storageErr) throw storageErr;
 
       const { data: docRecord, error: dbErr } = await (supabase
-        .from('property_documents' as any)
+        .from('property_documents')
         .insert({
           property_id: input.propertyId,
           category_slug: input.categorySlug,
@@ -91,12 +91,12 @@ export function usePropertyDocuments(propertyId: string | undefined) {
     const doc = documents.find(d => d.id === docId);
     if (!doc) return;
     await supabase.storage.from('property-documents').remove([doc.file_path]);
-    await (supabase.from('property_documents' as any) as any).delete().eq('id', docId);
+    await (supabase.from('property_documents') as any).delete().eq('id', docId);
     await fetchDocs();
   }
 
   async function updateAccess(docId: string, accessLevel: string, visibleToRoles: string[]) {
-    await (supabase.from('property_documents' as any) as any)
+    await (supabase.from('property_documents') as any)
       .update({ access_level: accessLevel, visible_to_roles: visibleToRoles })
       .eq('id', docId);
     await fetchDocs();

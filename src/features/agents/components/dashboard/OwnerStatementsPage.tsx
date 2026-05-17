@@ -140,7 +140,7 @@ export default function OwnerStatementsPage() {
       setLoading(true);
       const [{ data: props }, { data: stmts }] = await Promise.all([
         supabase.from('properties').select('id, address, suburb, owner_email, owner_name').eq('agent_id', agentId).order('address'),
-        supabase.from('owner_statements' as any).select('*, properties(address)').eq('agent_id', agentId).order('created_at', { ascending: false }),
+        supabase.from('owner_statements').select('*, properties(address)').eq('agent_id', agentId).order('created_at', { ascending: false }),
       ]);
       setProperties((props as any) || []);
       setStatements((stmts as any) || []);
@@ -194,7 +194,7 @@ export default function OwnerStatementsPage() {
     if (!agentId) return;
     setSaving(true);
     const { data, error } = await supabase
-      .from('owner_statements' as any)
+      .from('owner_statements')
       .insert({
         property_id: form.property_id,
         agent_id: agentId,
@@ -239,7 +239,7 @@ export default function OwnerStatementsPage() {
               html,
             },
           });
-          await supabase.from('owner_statements' as any).update({ emailed_to_owner: true, emailed_at: new Date().toISOString() } as any).eq('id', (data as any).id);
+          await supabase.from('owner_statements').update({ emailed_to_owner: true, emailed_at: new Date().toISOString() } as any).eq('id', (data as any).id);
         } catch (emailErr: any) {
           toast.error('Statement saved but email failed to send: ' + (emailErr?.message || 'Unknown error'));
         }
@@ -266,7 +266,7 @@ export default function OwnerStatementsPage() {
     if (!form.property_id) { toast.error('Select a property'); return; }
     if (!agentId) return;
     const { data: existing } = await supabase
-      .from('owner_statements' as any)
+      .from('owner_statements')
       .select('id')
       .eq('property_id', form.property_id)
       .eq('period_start', form.period_start)

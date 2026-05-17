@@ -154,7 +154,7 @@ const TrustAccountingPage = () => {
   const fetchPeriodStatus = useCallback(async () => {
     if (!agent?.id) return;
     const { data } = await supabase
-      .from('trust_account_balances' as any)
+      .from('trust_account_balances')
       .select('closing_balance, closed_at, is_closed, trust_account_id, trust_accounts!inner(agent_id)')
       .eq('period_year', currentYear)
       .eq('period_month', currentMonth)

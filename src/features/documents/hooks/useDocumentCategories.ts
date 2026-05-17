@@ -7,7 +7,7 @@ export function useDocumentCategories() {
 
   useEffect(() => {
     supabase
-      .from('document_categories' as any)
+      .from('document_categories')
       .select('*')
       .order('sort_order')
       .then(({ data }) => setCategories((data ?? []) as unknown as DocumentCategory[]));

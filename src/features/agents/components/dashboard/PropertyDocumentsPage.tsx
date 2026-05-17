@@ -109,7 +109,7 @@ const PropertyDocumentsPage = () => {
     setLoading(true);
     const [docsRes, tenRes] = await Promise.all([
       supabase
-        .from('pm_documents' as any)
+        .from('pm_documents')
         .select(`
           *,
           tenancy:tenancy_id ( tenant_name, properties:property_id ( address, suburb ) ),
@@ -189,7 +189,7 @@ const PropertyDocumentsPage = () => {
         .upload(path, uFile, { contentType: uFile.type, upsert: false });
       if (upErr) throw upErr;
 
-      const { error: insErr } = await supabase.from('pm_documents' as any).insert({
+      const { error: insErr } = await supabase.from('pm_documents').insert({
         agent_id: agent.id,
         tenancy_id: uTenancyId === 'none' ? null : uTenancyId,
         property_id: propId,
@@ -233,7 +233,7 @@ const PropertyDocumentsPage = () => {
     setToDelete(null);
     const { error: stErr } = await supabase.storage.from('property-docs').remove([d.file_path]);
     if (stErr) console.warn('Storage delete warning', stErr);
-    const { error: dbErr } = await supabase.from('pm_documents' as any).delete().eq('id', d.id);
+    const { error: dbErr } = await supabase.from('pm_documents').delete().eq('id', d.id);
     if (dbErr) {
       toast.error('Could not delete record');
       return;

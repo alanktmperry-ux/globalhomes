@@ -79,7 +79,7 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
     if (auditError) console.error('[AgentApprovalQueue] audit log failed:', auditError);
 
     // Also append to immutable admin audit log
-    const { error: adminAuditErr } = await supabase.from('admin_audit_log' as any).insert({
+    const { error: adminAuditErr } = await supabase.from('admin_audit_log').insert({
       actor_id: user?.id ?? null,
       actor_email: user?.email ?? 'unknown',
       action: action === 'approve' ? 'agent.approved' : 'agent.rejected',

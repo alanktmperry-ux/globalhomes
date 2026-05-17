@@ -28,7 +28,7 @@ export default function WaitlistPage() {
 
     try {
       const { data, error } = await supabase
-        .from('waitlist' as any)
+        .from('waitlist')
         .insert([{ email, name: name || null, agency: agency || null, referred_by: referredBy || null }] as any)
         .select('position')
         .single();
@@ -37,7 +37,7 @@ export default function WaitlistPage() {
         if (error.code === '23505') {
           // Already on waitlist — fetch position
           const { data: existing } = await supabase
-            .from('waitlist' as any)
+            .from('waitlist')
             .select('position')
             .eq('email', email)
             .single();

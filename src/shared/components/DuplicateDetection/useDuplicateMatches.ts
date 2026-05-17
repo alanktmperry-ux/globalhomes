@@ -183,7 +183,7 @@ export async function logDuplicateEvent(opts: {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    await supabase.from('contact_duplicate_events' as any).insert({
+    await supabase.from('contact_duplicate_events').insert({
       agent_user_id: user.id,
       agency_id: opts.agencyId,
       action: opts.action,

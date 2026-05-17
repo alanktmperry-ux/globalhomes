@@ -46,7 +46,7 @@ export default function TodayPrioritiesPanel() {
     } else if (item.sourceKey === 'unresponded') {
       // sourceId = inbox_threads.id → join contact
       const { data } = await supabase
-        .from('inbox_threads' as any)
+        .from('inbox_threads')
         .select('contact:contact_id(id, first_name, last_name, email, phone, mobile, preferred_language), subject')
         .eq('id', item.sourceId)
         .maybeSingle();
@@ -63,7 +63,7 @@ export default function TodayPrioritiesPanel() {
       const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
       if (!agent) return;
       const { data } = await supabase
-        .from('agent_dashboard_prefs' as any)
+        .from('agent_dashboard_prefs')
         .select('prefs')
         .eq('agent_id', agent.id)
         .maybeSingle();
@@ -83,13 +83,13 @@ export default function TodayPrioritiesPanel() {
     const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
     if (!agent) return;
     const { data: existing } = await supabase
-      .from('agent_dashboard_prefs' as any)
+      .from('agent_dashboard_prefs')
       .select('prefs')
       .eq('agent_id', agent.id)
       .maybeSingle();
     const newPrefs = { ...(((existing as any)?.prefs) || {}), priorities_collapsed: next };
     await supabase
-      .from('agent_dashboard_prefs' as any)
+      .from('agent_dashboard_prefs')
       .upsert({ agent_id: agent.id, prefs: newPrefs, updated_at: new Date().toISOString() }, { onConflict: 'agent_id' });
   };
 

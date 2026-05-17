@@ -163,7 +163,7 @@ const ArrearsPage = () => {
 
     // Fetch primary + co-tenant contacts so the notice addresses everyone on the lease
     const { data: contacts } = await supabase
-      .from('tenancy_contacts' as any)
+      .from('tenancy_contacts')
       .select('name, contact_type')
       .eq('tenancy_id', row.id)
       .in('contact_type', ['primary_tenant', 'co_tenant']);

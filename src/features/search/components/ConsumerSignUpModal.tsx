@@ -47,7 +47,7 @@ const ConsumerSignUpModal = ({ open, onOpenChange, lastQuery }: ConsumerSignUpMo
       const userId = authData.user?.id;
       if (!userId) throw new Error('No user ID returned');
 
-      const { error: insertError } = await supabase.from('consumer_profiles' as any).insert({
+      const { error: insertError } = await supabase.from('consumer_profiles').insert({
         user_id: userId,
         name: name.trim(),
         email: email.trim(),

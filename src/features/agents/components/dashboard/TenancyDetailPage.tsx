@@ -211,7 +211,7 @@ const TenancyDetailPage = () => {
     const oneYearAgo = new Date();
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
     const { data: recent } = await supabase
-      .from('rent_increase_notices' as any)
+      .from('rent_increase_notices')
       .select('id')
       .eq('tenancy_id', tenancy.id)
       .gte('effective_date', oneYearAgo.toISOString().slice(0, 10))
@@ -220,7 +220,7 @@ const TenancyDetailPage = () => {
       toast.warning('Warning: most states limit rent increases to once per 12 months. Check your state legislation before proceeding.');
     }
 
-    const { error: insertErr } = await supabase.from('rent_increase_notices' as any).insert({
+    const { error: insertErr } = await supabase.from('rent_increase_notices').insert({
       tenancy_id: tenancy.id,
       agent_id: agentId,
       old_rent_amount: tenancy.rent_amount,
@@ -313,7 +313,7 @@ const TenancyDetailPage = () => {
         .eq('tenancy_id', tenancyId)
         .order('scheduled_date', { ascending: false }),
       supabase
-        .from('tenancy_communications' as any)
+        .from('tenancy_communications')
         .select('id, type, subject, sent_at, recipient_email, status')
         .eq('tenancy_id', tenancyId)
         .order('sent_at', { ascending: false }),

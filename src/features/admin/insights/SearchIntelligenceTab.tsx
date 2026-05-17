@@ -106,7 +106,7 @@ export function SearchIntelligenceTab() {
       const days = RANGES.find((x) => x.key === r)?.days ?? 30;
       const since = new Date(Date.now() - days * 86400000).toISOString();
       const { data, error } = await supabase
-        .from('search_queries' as any)
+        .from('search_queries')
         .select(
           'id, raw_query, detected_language, parsed_filters, confidence, result_count, halo_offered, halo_clicked, halo_posted, created_at',
         )

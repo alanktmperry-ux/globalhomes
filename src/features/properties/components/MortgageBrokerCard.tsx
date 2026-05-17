@@ -206,7 +206,7 @@ export function MortgageBrokerCard({
     const fetchBrokers = async () => {
       try {
         const { data, error } = await supabase
-          .from("brokers_public_safe" as any)
+          .from("brokers_public_safe")
           .select("id, name, company, acl_number, photo_url, languages, tagline, calendar_url, is_founding_partner")
           .order("name", { ascending: true });
 

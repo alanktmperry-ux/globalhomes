@@ -438,7 +438,7 @@ const ReportsPage = () => {
 
   const downloadReconciliationPdf = () => {
     if (!agent) { toast.error('Agent details not loaded'); return; }
-    const agencyName = (agent as any).agency_name || (agent as any).agency || agent.name || 'Agency';
+    const agencyName = agent?.agency_name || agent?.agency || agent?.name || 'Agency';
     const today = format(new Date(), 'd MMM yyyy');
     const html = `<!doctype html><html><head><meta charset="utf-8"><title>Trust Reconciliation</title>
       <style>

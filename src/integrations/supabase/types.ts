@@ -7585,6 +7585,61 @@ export type Database = {
           },
         ]
       }
+      listing_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          listing_id: string
+          session_id: string
+          slot_position: number
+          source: string
+          suburb: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          listing_id: string
+          session_id: string
+          slot_position: number
+          source: string
+          suburb: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          listing_id?: string
+          session_id?: string
+          slot_position?: number
+          source?: string
+          suburb?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_events_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_events_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_events_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       maintenance_jobs: {
         Row: {
           actual_cost: number | null

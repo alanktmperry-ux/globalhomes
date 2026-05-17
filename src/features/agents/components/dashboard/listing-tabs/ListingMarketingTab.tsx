@@ -735,30 +735,20 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
                     </div>
                   </div>
                   <div className="space-y-2 mb-4">
-                    <div className="flex items-start gap-2 text-xs text-muted-foreground bg-amber-50 border border-amber-200 rounded-lg p-3 dark:bg-amber-500/10 dark:border-amber-500/20">
-                      <AlertCircle size={14} className="text-amber-600 flex-shrink-0 mt-px" />
-                      <div>
-                        <p className="font-medium text-amber-800 dark:text-amber-400 mb-0.5">How payment works right now</p>
-                        <p>
-                          Stripe instant payment is coming very soon. For now, payment is
-                          confirmed on activation and your listing goes live on the featured
-                          grid immediately.
-                        </p>
-                      </div>
+                    <div className="flex items-start gap-2 text-xs text-muted-foreground bg-muted/50 border border-border rounded-lg p-3">
+                      <Zap size={14} className="text-primary flex-shrink-0 mt-px" />
+                      <p>Secure payment via Stripe. Your listing goes live in the featured grid immediately after payment.</p>
                     </div>
                   </div>
                   <div className="flex gap-2">
                     <Button
                       className="flex-1"
-                      onClick={async () => {
-                        setShowPaymentStep(null);
-                        await handleRequestBoost(tier);
-                      }}
+                      onClick={() => handleBoostCheckout(tier)}
                       disabled={!!boostLoading}>
                       {boostLoading === tier
                         ? <Loader2 size={13} className="animate-spin mr-2" />
                         : <Zap size={13} className="mr-2" />}
-                      Confirm — request {tierData.label}
+                      Pay now — {tierData.label} {tierData.priceLabel}
                     </Button>
                     <Button variant="outline" onClick={() => setShowPaymentStep(null)}>
                       Back

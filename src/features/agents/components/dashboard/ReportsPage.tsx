@@ -643,7 +643,7 @@ const ReportsPage = () => {
                           <TableCell className="text-xs">{l.views || 0}</TableCell>
                           <TableCell className="text-xs">{l.contact_clicks || 0}</TableCell>
                           <TableCell>
-                            <Badge variant={status === 'sold' ? 'secondary' : 'default'} className="text-[10px] capitalize">{status}</Badge>
+                            <Badge variant={status === 'sold' ? 'secondary' : 'default'} className="text-[10px] capitalize">{String(status ?? '')}</Badge>
                           </TableCell>
                         </TableRow>
                       );

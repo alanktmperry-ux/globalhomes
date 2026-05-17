@@ -398,7 +398,7 @@ export default function PMInspectionsPage() {
       .update({
         dispute_resolved_at: new Date().toISOString(),
         dispute_resolution_notes: resolveNotes.trim() || null,
-      } as any)
+      })
       .eq('id', resolveFor.id);
     setSavingResolve(false);
     if (error) { toast.error('Could not mark resolved'); return; }

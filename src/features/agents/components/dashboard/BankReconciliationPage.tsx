@@ -17,6 +17,7 @@ import {
 import DashboardHeader from './DashboardHeader';
 import { useTranslation } from '@/shared/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 import { useAuth } from '@/lib/AuthProvider';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
@@ -36,6 +37,7 @@ interface Reconciliation {
   matched_payment_id: string | null;
   status: string;
   created_at: string;
+  bank_reference?: string | null;
 }
 
 interface MatchCandidate {
@@ -105,25 +107,20 @@ const BankReconciliationPage = () => {
       .maybeSingle();
 
     const agentId = agentData?.id;
+    if (!agentId) { setLoading(false); return; }
 
     const [{ data: recon }, { data: recs }, { data: pays }] = await Promise.all([
-      agentId
-        ? supabase.from('trust_reconciliations').select('*').eq('agent_id', agentId).order('bank_date', { ascending: false })
-        : Promise.resolve({ data: [] }),
-      agentId
-        ? supabase.from('trust_receipts').select('id, receipt_number, client_name, amount, date_received, payment_method').eq('agent_id', agentId)
-        : Promise.resolve({ data: [] as any[] }) as any,
-      agentId
-        ? supabase.from('trust_payments').select('id, payment_number, client_name, amount, date_paid, payment_method').eq('agent_id', agentId)
-        : Promise.resolve({ data: [] as any[] }) as any,
+      supabase.from('trust_reconciliations').select('*').eq('agent_id', agentId).order('bank_date', { ascending: false }),
+      supabase.from('trust_receipts').select('id, receipt_number, client_name, amount, date_received, payment_method').eq('agent_id', agentId),
+      supabase.from('trust_payments').select('id, payment_number, client_name, amount, date_paid, payment_method').eq('agent_id', agentId),
     ]);
 
     if (recon) setItems(recon as unknown as Reconciliation[]);
-    if (recs) setReceipts((recs as any[]).map(r => ({
+    if (recs) setReceipts((recs || []).map(r => ({
       id: r.id, type: 'receipt' as const, number: r.receipt_number,
       client: r.client_name, amount: r.amount, date: r.date_received, method: r.payment_method,
     })));
-    if (pays) setPayments((pays as any[]).map(p => ({
+    if (pays) setPayments((pays || []).map(p => ({
       id: p.id, type: 'payment' as const, number: p.payment_number,
       client: p.client_name, amount: p.amount, date: p.date_paid, method: p.payment_method,
     })));
@@ -168,8 +165,8 @@ const BankReconciliationPage = () => {
           metadata: buildAuditMeta({
             matched_amount: amount,
             bank_reference: bankRef,
-          }),
-        } as any);
+          }) as unknown as Json,
+        });
       } catch (e) {
         console.error('[BankReconciliation] audit log failed:', e);
       }
@@ -179,7 +176,7 @@ const BankReconciliationPage = () => {
       const isCredit = item.amount > 0;
       const targetAmt = Math.abs(item.amount);
       const desc = (item.description || '').toLowerCase();
-      const bankRef = (item as any).bank_reference ?? null;
+      const bankRef = item.bank_reference ?? null;
 
       if (isCredit) {
         const candidate = receipts.find(r =>
@@ -190,7 +187,7 @@ const BankReconciliationPage = () => {
         if (candidate) {
           const { error: matchError } = await supabase
             .from('trust_reconciliations')
-            .update({ status: 'matched', matched_receipt_id: candidate.id } as any)
+            .update({ status: 'matched', matched_receipt_id: candidate.id })
             .eq('id', item.id);
           if (matchError) {
             console.error('[BankReconciliation] match failed:', matchError);
@@ -210,7 +207,7 @@ const BankReconciliationPage = () => {
         if (candidate) {
           const { error: matchError } = await supabase
             .from('trust_reconciliations')
-            .update({ status: 'matched', matched_payment_id: candidate.id } as any)
+            .update({ status: 'matched', matched_payment_id: candidate.id })
             .eq('id', item.id);
           if (matchError) {
             console.error('[BankReconciliation] match failed:', matchError);
@@ -262,7 +259,7 @@ const BankReconciliationPage = () => {
       const matchedIds = items.filter(i => i.status === 'matched').map(i => i.id);
       if (matchedIds.length > 0) {
         await supabase.from('trust_reconciliations')
-          .update({ status: 'reconciled' } as any) // finalized
+          .update({ status: 'reconciled' }) // finalized
           .in('id', matchedIds);
       }
 
@@ -298,7 +295,7 @@ const BankReconciliationPage = () => {
 
     if (entries.length === 0) { toast.error('No valid entries found'); return; }
 
-    const { error, data: inserted } = await supabase.from('trust_reconciliations').insert(entries as any).select();
+    const { error, data: inserted } = await supabase.from('trust_reconciliations').insert(entries).select();
     if (error) { toast.error(error.message); return; }
 
     toast.success(`${entries.length} entries imported. Running auto-match…`);
@@ -403,7 +400,7 @@ const BankReconciliationPage = () => {
         amount: finalAmount,
         bank_balance: parseFloat(addBalance) || 0,
         status: 'unmatched',
-      } as any);
+      });
       if (error) throw error;
 
       toast.success('Bank statement entry added');
@@ -446,7 +443,7 @@ const BankReconciliationPage = () => {
     try {
       const { error } = await supabase
         .from('trust_reconciliations')
-        .update({ status: 'unmatched', matched_receipt_id: null, matched_payment_id: null } as any)
+        .update({ status: 'unmatched', matched_receipt_id: null, matched_payment_id: null })
         .eq('id', item.id);
       if (error) throw error;
       toast.success('Unmatched successfully');
@@ -468,7 +465,7 @@ const BankReconciliationPage = () => {
         .from('trust_reconciliations')
         .update({ status: 'manual', description: manualTarget.description
           ? `${manualTarget.description} [Manual: ${manualReason}]`
-          : `Manual reconciliation: ${manualReason}` } as any)
+          : `Manual reconciliation: ${manualReason}` })
         .eq('id', manualTarget.id);
       if (error) throw error;
       toast.success('Marked as manually reconciled — reason recorded in audit trail');
@@ -509,7 +506,7 @@ const BankReconciliationPage = () => {
 
       if (entries.length === 0) { toast.error('No valid entries found'); return; }
 
-      const { error } = await supabase.from('trust_reconciliations').insert(entries as any);
+      const { error } = await supabase.from('trust_reconciliations').insert(entries);
       if (error) throw error;
 
       toast.success(`${entries.length} bank statement entries imported`);

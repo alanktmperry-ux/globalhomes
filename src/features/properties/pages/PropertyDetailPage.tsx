@@ -677,7 +677,7 @@ export default function PropertyDetailPage() {
                   ) : translatedTitle}
                 </h1>
                 {property.listing_mode && property.listing_mode !== 'public' && (
-                  <OffMarketBadge mode={property.listing_mode} closeDate={property.eoi_close_date} />
+                  <OffMarketBadge mode={property.listing_mode as any} closeDate={property.eoi_close_date} />
                 )}
               </div>
               <p className="flex items-center gap-1.5 text-muted-foreground mt-1.5">

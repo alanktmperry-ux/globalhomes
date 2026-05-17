@@ -481,7 +481,7 @@ export default function PropertyDetailPage() {
     const title = `${property.address || 'Property'} — ${property.beds ?? 0} bed, ${property.baths ?? 0} bath | ListHQ`;
     const description = property.description
       ? property.description.slice(0, 160)
-      : `${(property as any).propertyType || (property as any).property_type || 'Property'} in ${property.suburb || ''}. Listed on ListHQ.`;
+      : `${property.propertyType || property.property_type || 'Property'} in ${property.suburb || ''}. Listed on ListHQ.`;
     const image = property.images?.[0] ?? '';
     const url = window.location.href;
 
@@ -676,17 +676,17 @@ export default function PropertyDetailPage() {
                     <span className="inline-block h-6 w-2/3 rounded bg-muted animate-pulse align-middle" aria-hidden />
                   ) : translatedTitle}
                 </h1>
-                {(property as any).listing_mode && (property as any).listing_mode !== 'public' && (
-                  <OffMarketBadge mode={(property as any).listing_mode} closeDate={(property as any).eoi_close_date} />
+                {property.listing_mode && property.listing_mode !== 'public' && (
+                  <OffMarketBadge mode={property.listing_mode as any} closeDate={property.eoi_close_date} />
                 )}
               </div>
               <p className="flex items-center gap-1.5 text-muted-foreground mt-1.5">
                 <MapPin size={16} />
-                {(property as any).address_hidden
+                {property.address_hidden
                   ? formatAddress(`${property.suburb ?? ''}, ${property.state ?? ''}`)
                   : formatAddress(`${property.address ?? ''}${property.country && property.country !== 'Australia' ? `, ${property.country}` : ''}`)}
               </p>
-              {(property as any).status === 'under_offer' && (
+              {(property.status as string) === 'under_offer' && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 mt-2 rounded-full bg-amber-100 text-amber-800 text-sm font-medium">
                   <span className="w-2 h-2 rounded-full bg-amber-500" />
                   {tp('property.underOfferBadge')}
@@ -710,7 +710,7 @@ export default function PropertyDetailPage() {
                 </span>
                 <div className="ml-auto">
                   <ListingLanguageSwitcher
-                    translations={(property as any).translations}
+                    translations={property.translations}
                     currentLang={language === 'zh' ? 'zh-CN' : language}
                     onChange={(code) => setLanguage((code === 'zh-CN' ? 'zh' : code) as any)}
                   />
@@ -749,13 +749,13 @@ export default function PropertyDetailPage() {
                   )}
                 </div>
               )}
-              {((property as any).listing_mode === 'eoi' || (property as any).listing_mode === 'off_market') && (
+              {(property.listing_mode === 'eoi' || property.listing_mode === 'off_market') && (
                 <div className="mt-4">
                   <EOISubmitPanel
                     propertyId={property.id}
-                    listingMode={(property as any).listing_mode}
-                    guidePrice={(property as any).eoi_guide_price}
-                    closeDate={(property as any).eoi_close_date}
+                    listingMode={property.listing_mode}
+                    guidePrice={property.eoi_guide_price}
+                    closeDate={property.eoi_close_date}
                     agentName={property.agent?.name}
                   />
                 </div>
@@ -974,7 +974,7 @@ export default function PropertyDetailPage() {
 
             {/* Uploaded walkthrough video (native player) */}
             {(() => {
-              const vUrl: string | null = (property as any).video_url ?? null;
+              const vUrl: string | null = property.video_url ?? null;
               const isUploadedVideo = !!vUrl && /\.(mp4|mov|webm)(\?|$)/i.test(vUrl);
               const tourVideoUrl = isUploadedVideo ? null : vUrl;
               return (
@@ -990,11 +990,11 @@ export default function PropertyDetailPage() {
                       />
                     </div>
                   )}
-                  {((property as any).virtual_tour_url || tourVideoUrl || (property as any).floor_plan_url) && (
+                  {(property.virtual_tour_url || tourVideoUrl || property.floor_plan_url) && (
                     <TourTabStrip
-                      virtualTourUrl={(property as any).virtual_tour_url ?? null}
+                      virtualTourUrl={property.virtual_tour_url ?? null}
                       videoUrl={tourVideoUrl}
-                      floorPlanUrl={(property as any).floor_plan_url ?? null}
+                      floorPlanUrl={property.floor_plan_url ?? null}
                       propertyAddress={property.address}
                     />
                   )}
@@ -1012,11 +1012,11 @@ export default function PropertyDetailPage() {
                 'ja': { title: 'title_ja', desc: 'description_ja' },
                 'ko': { title: 'title_ko', desc: 'description_ko' },
               } as any;
-              const fields = langMap[String((rawProperty as any).__lang ?? '')] || (
+              const fields = langMap[String(rawProperty.__lang ?? '')] || (
                 (typeof window !== 'undefined' ? langMap[sessionStorage.getItem('i18n-language') || sessionStorage.getItem('listhq_language') || ''] : undefined)
               );
-              const storedTitle = fields ? (rawProperty as any)[fields.title] : null;
-              const storedDesc = fields ? (rawProperty as any)[fields.desc] : null;
+              const storedTitle = fields ? rawProperty[fields.title] : null;
+              const storedDesc = fields ? rawProperty[fields.desc] : null;
               const hasStoredTranslation = !!(storedTitle || storedDesc);
 
               if (hasStoredTranslation) {
@@ -1090,37 +1090,37 @@ export default function PropertyDetailPage() {
               <InvestorCalculatorPanel
                 propertyId={property.id}
                 price={property.price}
-                estimatedWeeklyRent={(property as any).estimated_weekly_rent ?? property.rentalWeekly ?? null}
+                estimatedWeeklyRent={property.estimated_weekly_rent ?? property.rentalWeekly ?? null}
                 suburb={property.suburb}
                 state={property.state}
-                isNewBuild={(property as any).is_new_build ?? false}
-                propertyAgeYears={(property as any).property_age_years ?? null}
+                isNewBuild={property.is_new_build ?? false}
+                propertyAgeYears={property.property_age_years ?? null}
               />
             )}
 
             {/* Auction Intelligence */}
             <AuctionResultBadge propertyId={property.id} agentId={property.agent?.id} />
 
-            {(property as any).auction_date && (
+            {property.auction_date && (
               <SuburbClearanceRate suburb={property.suburb} state={property.state} />
             )}
 
-            {((property as any).price_guide_low || (property as any).price_guide_high) && (
+            {(property.price_guide_low || property.price_guide_high) && (
               <div className="p-4 rounded-2xl bg-card border border-border">
                 <p className="text-sm font-medium text-foreground">{tp('property.priceGuide')}</p>
                 <p className="text-xl font-bold text-foreground mt-1">
-                  {(property as any).price_guide_low && formatCurrency(Number((property as any).price_guide_low), language)}
-                  {(property as any).price_guide_low && (property as any).price_guide_high && (property as any).price_guide_low !== (property as any).price_guide_high
-                    ? ` – ${formatCurrency(Number((property as any).price_guide_high), language)}` : ''}
+                  {property.price_guide_low && formatCurrency(Number(property.price_guide_low), language)}
+                  {property.price_guide_low && property.price_guide_high && property.price_guide_low !== property.price_guide_high
+                    ? ` – ${formatCurrency(Number(property.price_guide_high), language)}` : ''}
                 </p>
-                <PriceGuideHistory propertyId={property.id} currentLow={(property as any).price_guide_low} currentHigh={(property as any).price_guide_high} />
+                <PriceGuideHistory propertyId={property.id} currentLow={property.price_guide_low} currentHigh={property.price_guide_high} />
               </div>
             )}
 
-            {(property as any).auction_date && (
+            {property.auction_date && (
               <AuctionRegisterPanel
                 propertyId={property.id}
-                auctionDate={(property as any).auction_date ?? null}
+                auctionDate={property.auction_date ?? null}
                 registrationCount={0}
               />
             )}
@@ -1187,7 +1187,7 @@ export default function PropertyDetailPage() {
               if (property.parking) rows.push({ icon: ParkingCircle, label: 'PARKING', value: `${property.parking} ${property.parking === 1 ? 'space' : 'spaces'}` });
               if (property.sqm) rows.push({ icon: Ruler, label: 'LAND SIZE', value: `${property.sqm} m²` });
               if (property.propertyType) rows.push({ icon: Home, label: 'PROPERTY TYPE', value: property.propertyType });
-              if ((property as any).yearBuilt) rows.push({ icon: Calendar, label: 'YEAR BUILT', value: String((property as any).yearBuilt) });
+              if (property.yearBuilt) rows.push({ icon: Calendar, label: 'YEAR BUILT', value: String(property.yearBuilt) });
               if (rows.length === 0) return null;
               return (
                 <div className="bg-white border border-[#E5E5E5] rounded-2xl p-7 mt-2">
@@ -1370,8 +1370,8 @@ export default function PropertyDetailPage() {
               listingType={isRental ? 'lease' : 'sale'}
               suburb={property.suburb}
               price={property.price}
-              weeklyRent={(rawProperty as any)?.rent_per_week ?? (rawProperty as any)?.weekly_rent ?? null}
-              propertyType={(rawProperty as any)?.property_type ?? null}
+              weeklyRent={rawProperty?.rent_per_week ?? rawProperty?.weekly_rent ?? null}
+              propertyType={rawProperty?.property_type ?? null}
             />
 
             {!isRental && (

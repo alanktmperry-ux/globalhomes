@@ -677,10 +677,10 @@ const BankReconciliationPage = () => {
           <div className="relative">
             <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Search description…" className="h-8 pl-8 w-[200px] text-xs" />
+              placeholder="Search description…" className="h-8 pl-8 w-[200px] text-xs" aria-label="Search reconciliation entries" />
           </div>
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-[130px] h-8 text-xs">
+            <SelectTrigger className="w-[130px] h-8 text-xs" aria-label="Filter by status">
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent>
@@ -922,7 +922,7 @@ const BankReconciliationPage = () => {
           <div className="relative">
             <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input value={matchSearch} onChange={e => setMatchSearch(e.target.value)}
-              placeholder="Search by client or number…" className="h-8 pl-8 text-xs" />
+              placeholder="Search by client or number…" className="h-8 pl-8 text-xs" aria-label="Search candidates to match" />
           </div>
 
           <div className="space-y-1.5 max-h-[300px] overflow-y-auto">

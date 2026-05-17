@@ -466,13 +466,13 @@ function ReportsTab() {
       description: 'Admin & system actions captured for compliance.',
       icon: ScrollText,
       run: async () => {
-        const { data } = await (supabase as any)
+        const { data } = await supabase
           .from('audit_log')
           .select('action_type, description, entity_type, entity_id, created_at, user_id')
           .gte('created_at', d30)
           .limit(2000);
         const rows = [['Action', 'Description', 'Entity Type', 'Entity ID', 'Time', 'User ID']];
-        for (const r of (data ?? []) as any[]) {
+        for (const r of data ?? []) {
           rows.push([
             fmt(r.action_type),
             fmt(r.description),

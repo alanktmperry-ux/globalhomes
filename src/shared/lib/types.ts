@@ -42,6 +42,40 @@ export interface Property {
   inspectionTimes?: InspectionSlot[];
   schoolZoneTop?: boolean | null;
   schoolZoneName?: string | null;
+
+  // Listing mode & EOI
+  listing_mode?: string | null;
+  eoi_close_date?: string | null;
+  eoi_guide_price?: number | null;
+
+  // Pricing
+  price_guide_low?: number | null;
+  price_guide_high?: number | null;
+
+  // Auction
+  auction_date?: string | null;
+
+  // Media
+  video_url?: string | null;
+  virtual_tour_url?: string | null;
+  floor_plan_url?: string | null;
+
+  // Property details
+  address_hidden?: boolean | null;
+  is_new_build?: boolean | null;
+  property_age_years?: number | null;
+  estimated_weekly_rent?: number | null;
+  property_type?: string | null;
+
+  // Translations
+  translations?: Record<string, unknown> | null;
+
+  // Database aliases used in raw query results
+  videoUrl?: string | null;
+  virtualTourUrl?: string | null;
+  rent_per_week?: number | null;
+  weekly_rent?: number | null;
+  __lang?: string | null;
 }
 
 export interface InspectionSlot {

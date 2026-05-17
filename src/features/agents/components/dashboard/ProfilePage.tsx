@@ -548,12 +548,13 @@ const ProfilePage = () => {
                   )}
                 </div>
                 <div>
-                  <Label className="text-xs">Years of Experience</Label>
-                  <Input type="number" min={0} max={50} value={form.years_experience} onChange={e => setForm(f => ({ ...f, years_experience: parseInt(e.target.value) || 0 }))} />
+                  <Label htmlFor="profile-experience" className="text-xs">Years of Experience</Label>
+                  <Input id="profile-experience" type="number" min={0} max={50} value={form.years_experience} onChange={e => setForm(f => ({ ...f, years_experience: parseInt(e.target.value) || 0 }))} />
                 </div>
                 <div>
-                  <Label className="text-xs">Specialization</Label>
+                  <Label htmlFor="profile-specialization" className="text-xs">Specialization</Label>
                   <select
+                    id="profile-specialization"
                     value={form.specialization}
                     onChange={e => setForm(f => ({ ...f, specialization: e.target.value }))}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"

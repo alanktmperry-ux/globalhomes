@@ -469,6 +469,31 @@ const Index = () => {
         {['x-default','en','zh','zh-TW','vi','ko','ar','hi','fil','id','th','ms','ta','ur','bn','te','ml','gu','mr','pa','ja','fr','de','es','pt'].map((code) => (
           <link key={code} rel="alternate" hrefLang={code} href="https://listhq.com.au/" />
         ))}
+        <script type="application/ld+json">{JSON.stringify({
+          '@context': 'https://schema.org',
+          '@graph': [
+            {
+              '@type': 'WebSite',
+              '@id': 'https://listhq.com.au/#website',
+              name: 'ListHQ',
+              url: 'https://listhq.com.au',
+              potentialAction: {
+                '@type': 'SearchAction',
+                target: { '@type': 'EntryPoint', urlTemplate: 'https://listhq.com.au/buy?q={search_term_string}' },
+                'query-input': 'required name=search_term_string',
+              },
+            },
+            {
+              '@type': 'Organization',
+              '@id': 'https://listhq.com.au/#organization',
+              name: 'ListHQ',
+              url: 'https://listhq.com.au',
+              logo: { '@type': 'ImageObject', url: 'https://listhq.com.au/og-image.png' },
+              sameAs: ['https://twitter.com/listhq'],
+              contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: 'support@listhq.com.au' },
+            },
+          ],
+        })}</script>
       </Helmet>
 
       <style>{`

@@ -189,7 +189,7 @@ const ReportsPage = () => {
         : amt;
       return sum + weekly;
     }, 0);
-    const tenantedPropertyIds = new Set(active.map(t => (t.properties as any)?.address ? t.id : t.id));
+    const tenantedPropertyIds = new Set(active.map(t => t.id));
     const totalProps = propertiesCount;
     const occupied = active.length;
     const vacancyRate = totalProps > 0 ? Math.max(0, ((totalProps - occupied) / totalProps) * 100) : 0;

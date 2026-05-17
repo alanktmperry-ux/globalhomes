@@ -369,20 +369,19 @@ function ReportsTab() {
       run: async () => {
         const { data } = await supabase
           .from('agents')
-          .select('name, email, agency, is_subscribed, created_at, state, agent_subscriptions(plan_type)')
+          .select('name, email, agency, is_subscribed, created_at, agent_subscriptions(plan_type)')
           .limit(1000);
-        const rows = [['Name', 'Agency', 'Email', 'Plan', 'Subscribed', 'State', 'Joined']];
+        const rows = [['Name', 'Agency', 'Email', 'Plan', 'Subscribed', 'Joined']];
         for (const r of data ?? []) {
           const plan = Array.isArray(r.agent_subscriptions)
             ? r.agent_subscriptions[0]?.plan_type
-            : r.agent_subscriptions?.plan_type;
+            : (r.agent_subscriptions as { plan_type?: string } | null)?.plan_type;
           rows.push([
             fmt(r.name),
             fmt(r.agency),
             fmt(r.email),
             fmt(plan),
             r.is_subscribed ? 'Yes' : 'No',
-            fmt(r.state),
             r.created_at ? new Date(r.created_at).toISOString().slice(0, 10) : '',
           ]);
         }

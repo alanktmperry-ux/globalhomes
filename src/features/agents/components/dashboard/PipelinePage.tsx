@@ -249,7 +249,7 @@ const PipelinePage = () => {
       <div className="p-4 sm:p-6 max-w-[1600px]">
         <div className="flex gap-3 overflow-x-auto pb-4">
           {effectiveStages.map((stage) => {
-            const stageCards = cards.filter(c => c.stageId === stage.id);
+            const stageCards = cardsByStage.get(stage.id) ?? [];
             const stageValue = stageCards.reduce((s, c) => s + c.estimatedValue, 0);
             const isOver = dragOverStageId === stage.id;
 

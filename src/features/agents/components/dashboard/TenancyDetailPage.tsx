@@ -63,7 +63,7 @@ interface Tenancy {
   renewal_notes: string | null;
   created_at: string;
   updated_at: string;
-  properties: { address: string; suburb: string; owner_portal_token?: string | null; owner_name?: string | null; owner_email?: string | null } | null;
+  properties: { address: string; suburb: string; state?: string | null; owner_portal_token?: string | null; owner_name?: string | null; owner_email?: string | null } | null;
 }
 
 interface RentPayment {
@@ -228,7 +228,7 @@ const TenancyDetailPage = () => {
       effective_date: rentIncreaseForm.effective_date,
       notice_sent_date: rentIncreaseForm.notice_sent_date,
       notes: rentIncreaseForm.notes || null,
-    } as any);
+    });
 
     if (insertErr) {
       setRentIncreaseSaving(false);
@@ -238,7 +238,7 @@ const TenancyDetailPage = () => {
 
     const { error: updateErr } = await supabase
       .from('tenancies')
-      .update({ rent_amount: newAmount } as any)
+      .update({ rent_amount: newAmount })
       .eq('id', tenancy.id);
 
     if (updateErr) {
@@ -327,8 +327,8 @@ const TenancyDetailPage = () => {
     }
     if (pRes.data) setPayments(pRes.data as RentPayment[]);
     if (jRes.data) setJobs(jRes.data as MaintenanceJob[]);
-    if (iRes.data) setInspections(iRes.data as any);
-    if (cRes.data) setComms(cRes.data as any);
+    if (iRes.data) setInspections(iRes.data as typeof inspections);
+    if (cRes.data) setComms(cRes.data as typeof comms);
     setLoading(false);
   }, [user, tenancyId]);
 
@@ -356,7 +356,7 @@ const TenancyDetailPage = () => {
       owner_account_number: editForm.owner_account_number,
       status: editForm.status,
       notes: editForm.notes,
-    } as any).eq('id', tenancyId);
+    }).eq('id', tenancyId);
     setSaving(false);
     if (error) { toast.error(error?.message || 'An unexpected error occurred'); return; }
     toast.success('Tenancy updated');
@@ -379,7 +379,7 @@ const TenancyDetailPage = () => {
       payment_method: payForm.payment_method,
       status: 'paid',
       notes: payForm.notes || null,
-    } as any);
+    });
 
     if (!error) {
       // Also insert trust receipt
@@ -396,7 +396,7 @@ const TenancyDetailPage = () => {
         purpose: 'rent',
         date_received: payForm.payment_date,
         status: 'received',
-      } as any);
+      });
     }
 
     setSaving(false);
@@ -426,7 +426,7 @@ const TenancyDetailPage = () => {
   };
 
   const handleMarkOverdue = async (paymentId: string) => {
-    await supabase.from('rent_payments').update({ status: 'overdue' } as any).eq('id', paymentId);
+    await supabase.from('rent_payments').update({ status: 'overdue' }).eq('id', paymentId);
     toast.success('Marked as overdue');
     fetchAll();
   };
@@ -437,13 +437,13 @@ const TenancyDetailPage = () => {
     const { error } = await supabase.from('maintenance_jobs').insert({
       tenancy_id: tenancyId,
       property_id: tenancy.property_id,
-      agent_id: agentId,
+      agent_id: agentId!,
       title: jobForm.title,
       description: jobForm.description || null,
       priority: jobForm.priority,
       assigned_to: jobForm.assigned_to || null,
       estimated_cost: jobForm.estimated_cost ? parseFloat(jobForm.estimated_cost) : null,
-    } as any);
+    });
     setSaving(false);
     if (error) { toast.error(error?.message || 'An unexpected error occurred'); return; }
     toast.success('Maintenance job created');
@@ -458,7 +458,7 @@ const TenancyDetailPage = () => {
       status: 'completed',
       actual_cost: jobActualCost ? parseFloat(jobActualCost) : null,
       completed_at: jobCompletedAt ? jobCompletedAt.toISOString() : new Date().toISOString(),
-    } as any).eq('id', jobId);
+    }).eq('id', jobId);
     // Fire automation: tenant completion notice
     supabase.functions.invoke('run-pm-automations', {
       body: { rule_type: 'maintenance_update', maintenance_job_id: jobId, new_status: 'completed' },
@@ -491,7 +491,7 @@ const TenancyDetailPage = () => {
       renewal_offered_lease_end: renewalForm.lease_end,
       renewal_type: renewalForm.type,
       renewal_notes: renewalForm.notes || null,
-    } as any).eq('id', tenancy.id);
+    }).eq('id', tenancy.id);
     setSaving(false);
     if (error) { toast.error('Could not record renewal offer'); return; }
     toast.success('Renewal offer recorded');
@@ -512,7 +512,7 @@ const TenancyDetailPage = () => {
 
   const declineRenewal = async () => {
     if (!tenancy) return;
-    const { error } = await supabase.from('tenancies').update({ renewal_status: 'declined' } as any).eq('id', tenancy.id);
+    const { error } = await supabase.from('tenancies').update({ renewal_status: 'declined' }).eq('id', tenancy.id);
     if (error) { toast.error('Could not update'); return; }
     toast.success('Tenant not renewing — consider listing for re-let');
     fetchAll();
@@ -533,9 +533,9 @@ const TenancyDetailPage = () => {
       inspection_type: 'exit',
       scheduled_date: format(scheduled, 'yyyy-MM-dd'),
       status: 'scheduled',
-    } as any).select('id').maybeSingle();
+    }).select('id').maybeSingle();
     if (error || !inserted) { toast.error('Could not schedule exit inspection'); return; }
-    navigate(`/dashboard/inspection/${(inserted as any).id}`);
+    navigate(`/dashboard/inspection/${inserted.id}`);
   };
 
   const copyInspectionLink = (token: string) => {
@@ -877,7 +877,7 @@ const TenancyDetailPage = () => {
             <div className="mt-4">
               <WaterBillingPanel
                 tenancyId={tenancy.id}
-                propertyState={(tenancy.properties as any)?.state ?? null}
+                propertyState={tenancy.properties?.state ?? null}
               />
             </div>
 
@@ -885,7 +885,7 @@ const TenancyDetailPage = () => {
               <div className="mt-4">
                 <SmokeAlarmPanel
                   propertyId={tenancy.property_id}
-                  propertyState={(tenancy.properties as any)?.state ?? null}
+                  propertyState={tenancy.properties?.state ?? null}
                   agentId={agentId}
                 />
               </div>

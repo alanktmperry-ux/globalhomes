@@ -182,6 +182,7 @@ const AgentRegistrationModal = ({ open, onOpenChange }: Props) => {
       return;
     }
     setEmailSubmitting(true);
+    capture('agent_registration_started', { email: emailInput.trim().toLowerCase() });
     try {
       const email = emailInput.trim().toLowerCase();
       const { data, error } = await supabase.auth.signUp({

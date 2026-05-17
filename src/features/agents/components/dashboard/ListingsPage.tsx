@@ -169,7 +169,7 @@ function StatusMenu({
             if (!user) return;
             const { data: agentRow } = await supabase
               .from('agents').select('id').eq('user_id', user.id).maybeSingle();
-            const agentId = (agentRow as any)?.id;
+            const agentId = agentRow?.id;
             if (!agentId) return;
             const { count } = await supabase
               .from('properties').select('id', { count: 'exact', head: true })

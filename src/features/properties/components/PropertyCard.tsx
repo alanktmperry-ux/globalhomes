@@ -156,12 +156,12 @@ export function PropertyCard({ property, onSelect, isSaved, onToggleSave, index,
             </span>
           </div>
           <TourBadge
-            virtualTourUrl={(property as any).virtualTourUrl ?? (property as any).virtual_tour_url ?? null}
-            videoUrl={(property as any).videoUrl ?? (property as any).video_url ?? null}
+            virtualTourUrl={property.virtualTourUrl ?? property.virtual_tour_url ?? null}
+            videoUrl={property.videoUrl ?? property.video_url ?? null}
           />
-          {(property as any).listing_mode && (property as any).listing_mode !== 'public' && (
+          {property.listing_mode && property.listing_mode !== 'public' && (
             <div className="absolute top-3 left-3" style={badge ? { marginTop: 28 } : undefined}>
-              <OffMarketBadge mode={(property as any).listing_mode} closeDate={(property as any).eoi_close_date} />
+              <OffMarketBadge mode={property.listing_mode as any} closeDate={property.eoi_close_date} />
             </div>
           )}
         </div>

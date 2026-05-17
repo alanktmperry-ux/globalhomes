@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useState } from 'react';
 import { Calendar, Clock, Plus, Trash2, GraduationCap } from 'lucide-react';
 import ListingCompleteness from './ListingCompleteness';
+import { toast } from 'sonner';
 
 const FEATURE_OPTIONS = [
   'Air Conditioning', 'Heating', 'Pool', 'Spa', 'Garage', 'Built-in Wardrobes',
@@ -49,7 +50,7 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
 
   const [schoolZoneTop, setSchoolZoneTop] = useState<boolean>(Boolean((listing as any).school_zone_top));
   const [schoolZoneName, setSchoolZoneName] = useState<string>((listing as any).school_zone_name || '');
-  const [savingSchoolZone, setSavingSchoolZone] = useState(false);
+  
 
   // Inspection times management
   const inspectionTimes: InspectionSlot[] = (listing.inspection_times as unknown as InspectionSlot[]) || [];
@@ -66,13 +67,12 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
     setEditing(false);
   };
 
-  const handleSaveSchoolZone = async () => {
-    setSavingSchoolZone(true);
-    await onUpdate({
+  const handleSaveSchoolZone = () => {
+    onUpdate({
       school_zone_top: schoolZoneTop,
       school_zone_name: schoolZoneTop ? (schoolZoneName.trim() || null) : null,
     } as Partial<PropertyRow>);
-    setSavingSchoolZone(false);
+    toast.success('School zone saved');
   };
 
   const toggleFeature = (f: string) => {
@@ -107,7 +107,7 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
 
       {/* Hero image */}
       {listing.image_url && (
-        <img src={listing.image_url} alt="" className="w-full h-48 object-cover rounded-xl" />
+        <img src={listing.image_url} alt={listing.address ?? 'Listing photo'} className="w-full h-48 object-cover rounded-xl" />
       )}
 
       <div className="flex items-center justify-between">
@@ -385,8 +385,8 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
         {(schoolZoneTop !== Boolean((listing as any).school_zone_top) ||
           schoolZoneName !== ((listing as any).school_zone_name || '')) && (
           <div className="mt-4 flex justify-end">
-            <Button size="sm" onClick={handleSaveSchoolZone} disabled={savingSchoolZone}>
-              {savingSchoolZone ? 'Saving…' : 'Save school zone'}
+            <Button size="sm" onClick={handleSaveSchoolZone}>
+              Save school zone
             </Button>
           </div>
         )}

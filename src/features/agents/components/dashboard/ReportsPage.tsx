@@ -272,25 +272,25 @@ const ReportsPage = () => {
   // ─── SALES DATA ───
   const salesData = useMemo(() => {
     const soldListings = listings.filter(l => {
-      const status = '_mock_status' in l ? l._mock_status : (l as any).status;
+      const status = '_mock_status' in l ? l._mock_status : l.status;
       if (status !== 'sold') return false;
-      const date = new Date((l as any).updated_at || (l as any).created_at);
+      const date = new Date(l.updated_at || l.created_at || '');
       return isWithinInterval(date, { start: range.from, end: range.to });
     });
 
     const totalGci = soldListings.reduce((sum, l) => {
-      const price = (l as any).price || 0;
-      const rate = (l as any).commission_rate || 2;
+      const price = l.price || 0;
+      const rate = l.commission_rate ?? 2;
       return sum + (price * rate / 100);
     }, 0);
 
-    const totalVolume = soldListings.reduce((sum, l) => sum + ((l as any).price || 0), 0);
+    const totalVolume = soldListings.reduce((sum, l) => sum + (l.price || 0), 0);
 
-    const datedSold = soldListings.filter(l => (l as any).listed_date);
+    const datedSold = soldListings.filter(l => l.listed_date);
     const avgDom = datedSold.length > 0
       ? Math.round(datedSold.reduce((sum, l) => {
-          const listed = new Date((l as any).listed_date);
-          const sold = new Date((l as any).updated_at || (l as any).created_at);
+          const listed = new Date(l.listed_date!);
+          const sold = new Date(l.updated_at || l.created_at || '');
           return sum + Math.max(1, Math.round((sold.getTime() - listed.getTime()) / 86400000));
         }, 0) / datedSold.length)
       : 0;
@@ -301,25 +301,25 @@ const ReportsPage = () => {
       const start = startOfMonth(m);
       const end = endOfMonth(m);
       const monthSold = soldListings.filter(l => {
-        const d = new Date((l as any).updated_at || (l as any).created_at);
+        const d = new Date(l.updated_at || l.created_at || '');
         return isWithinInterval(d, { start, end });
       });
       return {
         month: format(m, 'MMM yy'),
         sales: monthSold.length,
-        gci: monthSold.reduce((s, l) => s + ((l as any).price || 0) * ((l as any).commission_rate || 2) / 100, 0),
+        gci: monthSold.reduce((s, l) => s + (l.price || 0) * (l.commission_rate ?? 2) / 100, 0),
       };
     });
 
     // Property type breakdown
     const typeMap: Record<string, number> = {};
     soldListings.forEach(l => {
-      const t = (l as any).property_type || 'Unknown';
+      const t = l.property_type || 'Unknown';
       typeMap[t] = (typeMap[t] || 0) + 1;
     });
     const typeData = Object.entries(typeMap).map(([name, value]) => ({ name, value }));
 
-    return { soldListings, totalGci, totalVolume, avgDom, monthlyData, typeData, activeListings: listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : (l as any).status !== 'sold')).length };
+    return { soldListings, totalGci, totalVolume, avgDom, monthlyData, typeData, activeListings: listings.filter(l => ('_mock_status' in l ? l._mock_status !== 'sold' : l.status !== 'sold')).length };
   }, [listings, range]);
 
   // ─── FINANCIAL DATA ───

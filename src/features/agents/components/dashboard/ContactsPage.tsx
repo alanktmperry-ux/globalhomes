@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -105,9 +105,12 @@ const ContactsPage = () => {
 
   const showPrincipalControls = (isPrincipal || isAdmin) && agencyId;
 
-  const filteredContacts = agentFilter === 'all'
-    ? contacts
-    : contacts.filter(c => c.assigned_agent_id === agentFilter);
+  const filteredContacts = useMemo(
+    () => agentFilter === 'all'
+      ? contacts
+      : contacts.filter(c => c.assigned_agent_id === agentFilter),
+    [contacts, agentFilter],
+  );
 
   const handleReassignContact = async () => {
     if (!reassignContact || !reassignTo || !user) return;
@@ -177,7 +180,7 @@ const ContactsPage = () => {
           {/* Principal: Agent filter */}
           {showPrincipalControls && (
             <Select value={agentFilter} onValueChange={setAgentFilter}>
-              <SelectTrigger className="w-[180px] h-8 text-xs">
+              <SelectTrigger aria-label="Filter by agent" className="w-[180px] h-8 text-xs">
                 <SelectValue placeholder={t('agent.crm.actions.allAgents')} />
               </SelectTrigger>
               <SelectContent>

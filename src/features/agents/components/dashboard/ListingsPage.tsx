@@ -17,7 +17,7 @@ import { useAgentListings, type AgentListing } from '@/features/agents/hooks/use
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { PropertyDrawer } from '@/features/properties/components/PropertyDrawer';
-import { Property } from '@/shared/lib/types';
+import { Property, PropertyStatus } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { usePageTitle } from '@/lib/usePageTitle';

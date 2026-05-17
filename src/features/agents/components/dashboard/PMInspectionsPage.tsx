@@ -481,13 +481,13 @@ export default function PMInspectionsPage() {
       status: 'scheduled',
       inspector_name: scheduleForm.inspector_name.trim() || null,
       overall_notes: scheduleForm.notes.trim() || null,
-    } as any).select('id').maybeSingle();
+    }).select('id').maybeSingle();
     setSavingSchedule(false);
     if (error || !inserted) { toast.error('Could not schedule inspection'); return; }
     toast.success('Inspection scheduled');
     setScheduleForm(null);
     if (opts.startReport) {
-      navigate(`/dashboard/inspection/${(inserted as any).id}`);
+      navigate(`/dashboard/inspection/${inserted.id}`);
       return;
     }
     loadData();

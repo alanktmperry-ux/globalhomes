@@ -271,7 +271,7 @@ Deno.serve(async (req) => {
 
             const langPref = (profile as any).language_preference || 'en';
             const langParam = langPref !== 'en' ? `?lang=${encodeURIComponent(langPref)}` : '';
-            const propertyUrl = `https://globalhomes.lovable.app/property/${listing.id}${langParam}`;
+            const propertyUrl = `${APP_URL}/properties/${listing.id}${langParam}`;
 
             const listingPrice = listing.price
               ? new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 }).format(listing.price)

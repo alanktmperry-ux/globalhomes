@@ -385,8 +385,8 @@ const ListingDetailsTab = ({ listing, onUpdate }: Props) => {
         {(schoolZoneTop !== Boolean((listing as any).school_zone_top) ||
           schoolZoneName !== ((listing as any).school_zone_name || '')) && (
           <div className="mt-4 flex justify-end">
-            <Button size="sm" onClick={handleSaveSchoolZone} disabled={savingSchoolZone}>
-              {savingSchoolZone ? 'Saving…' : 'Save school zone'}
+            <Button size="sm" onClick={handleSaveSchoolZone}>
+              Save school zone
             </Button>
           </div>
         )}

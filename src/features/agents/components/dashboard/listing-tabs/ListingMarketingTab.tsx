@@ -338,8 +338,20 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
     }
   };
 
-
-  const handleSendReport = async () => {
+  const handleBoostCheckout = async (tier: 'featured' | 'premier') => {
+    setBoostLoading(tier);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-boost-checkout', {
+        body: { listingId: listing.id, tier, suburb: listing.suburb ?? '' },
+      });
+      if (error || !data?.url) throw error ?? new Error('No checkout URL returned');
+      window.location.href = data.url;
+    } catch (e) {
+      toast.error('Could not start checkout — please try again');
+      console.error(e);
+      setBoostLoading(null);
+    }
+  };
     if (!vendorName.trim() || !vendorEmail.trim()) {
       toast.error('Please enter both vendor name and email');
       return;

@@ -16,6 +16,7 @@ import {
   AuthDivider,
   AuthSpinner,
 } from '@/features/auth/components/AuthShell';
+import { capture } from '@/shared/lib/posthog';
 
 type Mode = 'signin' | 'signup';
 
@@ -152,6 +153,7 @@ const SeekerAuthPage = () => {
         },
       });
       if (signUpErr) throw signUpErr;
+      capture('seeker_signed_up', { source: 'email' });
       setPendingOtpEmail(cleanEmail);
       setOtpStep(true);
     } catch (err) {

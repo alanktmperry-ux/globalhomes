@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Lock, Sparkles, Loader2, MapPin, Home, DollarSign, BedDouble, Phone, Mail, ExternalLink } from 'lucide-react';
+import { capture } from '@/shared/lib/posthog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -111,6 +112,7 @@ const LeadMarketplacePage = () => {
         setSuccessModal(data.buyer);
         setLeads(prev => prev.filter(l => l.id !== lead.id));
         toast.success(`Lead purchased — you now have access to ${data.buyer.name}'s contact details.`);
+        capture('lead_purchased', { consumer_profile_id: lead.id, agent_id: agentId, price_aud: 29 });
       }
     } catch (err: unknown) {
       toast.error(getErrorMessage(err) || 'Purchase failed. Please try again.');

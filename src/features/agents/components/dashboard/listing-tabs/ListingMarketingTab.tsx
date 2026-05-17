@@ -106,6 +106,29 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
       });
   }, [listing.id, boostState.is_featured, boostState.featured_until]);
 
+  useEffect(() => {
+    if (searchParams.get('boost') !== 'success') return;
+    const activatedTier = searchParams.get('tier') as 'featured' | 'premier' | null;
+    toast.success(
+      `${activatedTier === 'premier' ? 'Premier' : 'Featured'} boost is live — your listing is now featured!`
+    );
+    const featuredUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    setBoostState(prev => ({
+      ...prev,
+      is_featured: true,
+      boost_tier: activatedTier,
+      featured_until: featuredUntil,
+      boost_requested_at: null,
+      boost_requested_tier: null,
+    }));
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      next.delete('boost');
+      next.delete('tier');
+      return next;
+    }, { replace: true });
+  }, [searchParams]);
+
 
   const [vendorName, setVendorName] = useState(listing.vendor_name || '');
   const [vendorEmail, setVendorEmail] = useState(listing.vendor_email || '');

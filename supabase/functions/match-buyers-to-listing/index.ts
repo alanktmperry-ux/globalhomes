@@ -114,6 +114,7 @@ Deno.serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    const APP_URL = Deno.env.get('APP_URL') ?? 'https://listhq.com.au';
 
     // Verify caller
     const userClient = createClient(supabaseUrl, anonKey, {
@@ -270,7 +271,7 @@ Deno.serve(async (req) => {
 
             const langPref = (profile as any).language_preference || 'en';
             const langParam = langPref !== 'en' ? `?lang=${encodeURIComponent(langPref)}` : '';
-            const propertyUrl = `https://globalhomes.lovable.app/property/${listing.id}${langParam}`;
+            const propertyUrl = `${APP_URL}/properties/${listing.id}${langParam}`;
 
             const listingPrice = listing.price
               ? new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 }).format(listing.price)
@@ -278,7 +279,7 @@ Deno.serve(async (req) => {
 
             const subject = `New match: ${listing.beds ?? ''}bd in ${listing.suburb ?? 'your area'}`;
             const unsubToken = await generateUnsubToken(profile.email);
-            const unsubUrl = `https://globalhomes.lovable.app/unsubscribe?email=${encodeURIComponent(profile.email)}&token=${unsubToken}`;
+            const unsubUrl = `${APP_URL}/unsubscribe?email=${encodeURIComponent(profile.email)}&token=${unsubToken}`;
 
             const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">

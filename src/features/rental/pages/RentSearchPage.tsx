@@ -40,6 +40,8 @@ export default function RentSearchPage() {
   const [filters, setFilters] = useState<RentalFilters>(() => parseRentalFiltersFromParams(searchParams));
   const { properties, loading, total } = useRentalSearch(filters);
   const { t } = useTranslation();
+  const rentSuburb = filters.suburb ?? null;
+  const { suburb: detectedRentSuburb, featuredSlots: rentFeaturedSlots } = useListingDiscovery(rentSuburb, 'rent');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   // Re-sync when URL params change (voice search navigation)

@@ -91,24 +91,24 @@ export default function AgentOpenHomeManager() {
         {live.length > 0 && (
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span aria-hidden="true" className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
               <h3 className="text-sm font-semibold text-foreground">Live now</h3>
             </div>
-            <div className="space-y-2">{live.map(s => <SessionRow key={s.id} session={s} />)}</div>
+            <div className="space-y-2">{live.map(s => <SessionRow key={s.id} session={s} propertyAddress={properties[s.property_id] ?? ''} onSelectSession={setSelected} />)}</div>
           </div>
         )}
 
         {upcoming.length > 0 && (
           <div className="space-y-2">
             <h3 className="text-sm font-semibold text-foreground">Upcoming</h3>
-            <div className="space-y-2">{upcoming.map(s => <SessionRow key={s.id} session={s} />)}</div>
+            <div className="space-y-2">{upcoming.map(s => <SessionRow key={s.id} session={s} propertyAddress={properties[s.property_id] ?? ''} onSelectSession={setSelected} />)}</div>
           </div>
         )}
 
         {past.length > 0 && (
           <div className="space-y-2">
             <h3 className="text-sm font-semibold text-muted-foreground">Recent</h3>
-            <div className="space-y-2">{past.map(s => <SessionRow key={s.id} session={s} />)}</div>
+            <div className="space-y-2">{past.map(s => <SessionRow key={s.id} session={s} propertyAddress={properties[s.property_id] ?? ''} onSelectSession={setSelected} />)}</div>
           </div>
         )}
 

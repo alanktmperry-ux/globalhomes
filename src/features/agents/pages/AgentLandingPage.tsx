@@ -8,6 +8,7 @@ import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import HomeCountUp from '@/components/HomeCountUp';
 // PricingSection moved to dedicated /for-agents/pricing route
 import FinalCTA from '@/features/marketing/FinalCTA';
+import { capture } from '@/shared/lib/posthog';
 
 const GRAD = 'linear-gradient(135deg, #2563EB 0%, #4F88FF 60%, #93C5FD 100%)';
 

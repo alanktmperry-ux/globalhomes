@@ -17,7 +17,7 @@ import { useAgentListings, type AgentListing } from '@/features/agents/hooks/use
 import { useCurrentAgent } from '@/features/agents/hooks/useCurrentAgent';
 import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import { PropertyDrawer } from '@/features/properties/components/PropertyDrawer';
-import { Property } from '@/shared/lib/types';
+import { Property, PropertyStatus } from '@/shared/lib/types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { usePageTitle } from '@/lib/usePageTitle';
@@ -96,7 +96,7 @@ function toProperty(l: AgentListing): Property {
     listedDate: l.listed_date || '',
     views: l.views,
     contactClicks: l.contact_clicks,
-    status: (l.status as any) || 'listed',
+    status: (l.status as PropertyStatus) || 'listed',
   };
 }
 
@@ -151,10 +151,10 @@ function StatusMenu({
   async function changeStatus(newStatus: string) {
     setSaving(true);
     setOpen(false);
-    const update: Record<string, unknown> = { status: newStatus };
+    const update: { status: string; is_active?: boolean } = { status: newStatus };
     if (newStatus === 'sold' || newStatus === 'leased' || newStatus === 'draft') update.is_active = false;
     if (newStatus === 'public') update.is_active = true;
-    const { error } = await supabase.from('properties').update(update as any).eq('id', listing.id);
+    const { error } = await supabase.from('properties').update(update).eq('id', listing.id);
     if (error) {
       toast.error('Failed to update status');
     } else {
@@ -169,7 +169,7 @@ function StatusMenu({
             if (!user) return;
             const { data: agentRow } = await supabase
               .from('agents').select('id').eq('user_id', user.id).maybeSingle();
-            const agentId = (agentRow as any)?.id;
+            const agentId = agentRow?.id;
             if (!agentId) return;
             const { count } = await supabase
               .from('properties').select('id', { count: 'exact', head: true })
@@ -299,7 +299,7 @@ const ListingCard = ({ l, actionLoading, onSelect, onPublish, onMarkSold, onSend
   
   const overlayKey = isRental && l._status === 'public' ? 'rent' : l._status;
   const overlay = STATUS_OVERLAY[overlayKey] || STATUS_OVERLAY.public;
-  const isBoosted = (l as any).is_featured === true || (l as any).boost_ends_at;
+  const isBoosted = l.is_featured === true;
 
   return (
     <div
@@ -526,9 +526,9 @@ const ListingsPage = () => {
           return acc;
         }, {});
       setStats({
-        enquiries: buildMap(enqRes.data as any[], 'property_id'),
-        views: buildMap(viewRes.data as any[], 'property_id'),
-        matches: buildMap(matchRes.data as any[], 'listing_id'),
+        enquiries: buildMap(enqRes.data, 'property_id'),
+        views: buildMap(viewRes.data, 'property_id'),
+        matches: buildMap(matchRes.data, 'listing_id'),
       });
     })();
     return () => { cancelled = true; };
@@ -564,7 +564,7 @@ const ListingsPage = () => {
         { p_property_id: l.id, p_agent_id: agent.id } as any,
       );
       if (!rpcError && rpcData) {
-        token = typeof rpcData === 'string' ? rpcData : (rpcData as any)?.token ?? null;
+        token = typeof rpcData === 'string' ? rpcData : (rpcData as unknown as { token?: string })?.token ?? null;
       }
 
       // Fallback: insert directly
@@ -578,11 +578,11 @@ const ListingsPage = () => {
             agent_id: agent.id,
             token: newToken,
             expires_at: expiresAt,
-          } as any)
+          })
           .select('token')
           .maybeSingle();
         if (insertError) throw insertError;
-        token = (insertData as any)?.token ?? newToken;
+        token = insertData?.token ?? newToken;
       }
 
       const url = `${window.location.origin}/vendor-report/${token}`;
@@ -598,7 +598,7 @@ const ListingsPage = () => {
   const handlePublish = async (l: AgentListing) => {
     if (l._source !== 'db') { toast.success('Demo listing — Create a real listing first.'); return; }
     setActionLoading(l.id);
-    const { error } = await supabase.from('properties').update({ status: 'public', is_active: true } as any).eq('id', l.id);
+    const { error } = await supabase.from('properties').update({ status: 'public', is_active: true }).eq('id', l.id);
     if (error) { toast.error('Failed to publish'); }
     else {
       toast.success('Your listing is now live on ListHQ!');
@@ -621,7 +621,7 @@ const ListingsPage = () => {
       .select('id')
       .eq('property_id', l.id)
       .eq('status', 'active')
-      .limit(1) as any;
+      .limit(1);
 
     if (activeTenancies && activeTenancies.length > 0) {
       toast.error('This property has an active tenancy. End the tenancy before marking as sold.');
@@ -635,7 +635,7 @@ const ListingsPage = () => {
       .select('id')
       .eq('property_id', l.id)
       .eq('status', 'pending')
-      .limit(1) as any;
+      .limit(1);
 
     if (pendingOffers && pendingOffers.length > 0) {
       if (!confirm('This listing has pending offers. Marking as sold will close them. Continue?')) {
@@ -644,7 +644,7 @@ const ListingsPage = () => {
       }
     }
 
-    const { error } = await supabase.from('properties').update({ status: 'sold', is_active: false } as any).eq('id', l.id);
+    const { error } = await supabase.from('properties').update({ status: 'sold', is_active: false }).eq('id', l.id);
     if (error) { toast.error('Failed to update'); }
     else { toast.success('Marked as sold! — Listing has been marked as sold.'); refetch(); }
     setActionLoading(null);
@@ -765,7 +765,7 @@ const ListingsPage = () => {
   const searchedFiltered = (() => {
     const q = searchQuery.trim().toLowerCase();
     let arr = !q ? filtered : filtered.filter((l) =>
-      [l.address, l.suburb, l.title, (l as any).reference_code]
+      [l.address, l.suburb, l.title]
         .filter(Boolean).some((s: string) => s.toLowerCase().includes(q))
     );
     arr = [...arr].sort((a, b) => {

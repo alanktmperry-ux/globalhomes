@@ -81,6 +81,7 @@ export interface Property {
   listed_date?: string | null;
   updated_at?: string | null;
   created_at?: string | null;
+  is_featured?: boolean | null;
 }
 
 export interface InspectionSlot {

@@ -446,8 +446,8 @@ export default function MaintenancePage() {
                     ? differenceInDays(parseISO(j.completed_at), parseISO(j.created_at))
                     : differenceInDays(new Date(), parseISO(j.created_at));
                   return (
-                  <>
-                    <TableRow key={j.id} className="cursor-pointer hover:bg-accent/40" onClick={() => setExpanded(expanded === j.id ? null : j.id)}>
+                  <React.Fragment key={j.id}>
+                    <TableRow className="cursor-pointer hover:bg-accent/40" onClick={() => setExpanded(expanded === j.id ? null : j.id)}>
                       <TableCell className="text-xs">{format(parseISO(j.created_at), 'd MMM')}</TableCell>
                       <TableCell className="text-sm font-medium">{j.property_address || '—'}</TableCell>
                       <TableCell className="text-sm">{j.tenant_name || '—'}</TableCell>
@@ -467,10 +467,15 @@ export default function MaintenancePage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-sm">{j.supplier_name || j.assigned_to || <span className="text-muted-foreground">Unassigned</span>}</TableCell>
-                      <TableCell>{expanded === j.id ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}</TableCell>
+                      <TableCell
+                        aria-expanded={expanded === j.id}
+                        aria-label={expanded === j.id ? 'Collapse job details' : 'Expand job details'}
+                      >
+                        {expanded === j.id ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}
+                      </TableCell>
                     </TableRow>
                     {expanded === j.id && (
-                      <TableRow key={j.id + '-d'}>
+                      <TableRow>
                         <TableCell colSpan={9} className="bg-accent/20 px-6 py-4">
                           <div className="space-y-3">
                             <div className="flex flex-wrap items-center gap-3 text-xs pb-2 border-b border-border/50">

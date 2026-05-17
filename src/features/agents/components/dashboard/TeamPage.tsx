@@ -656,8 +656,8 @@ const TeamPage = () => {
           <TabsContent value="join">
             <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
               <div>
-                <Label className="text-xs font-medium">Invite Code</Label>
-                <Input placeholder="e.g. ABCD1234" value={joinCode} onChange={(e) => setJoinCode(e.target.value.toUpperCase())} className="mt-1.5 font-mono tracking-widest text-center text-lg" maxLength={8} />
+                <Label htmlFor="join-code" className="text-xs font-medium">Invite Code</Label>
+                <Input id="join-code" placeholder="e.g. ABCD1234" value={joinCode} onChange={(e) => setJoinCode(e.target.value.toUpperCase())} className="mt-1.5 font-mono tracking-widest text-center text-lg" maxLength={8} />
                 <p className="text-[11px] text-muted-foreground mt-1.5">Ask your agency principal or admin for an invite code.</p>
               </div>
               <Button onClick={handleJoinAgency} disabled={joiningAgency || joinCode.trim().length < 4} className="w-full">

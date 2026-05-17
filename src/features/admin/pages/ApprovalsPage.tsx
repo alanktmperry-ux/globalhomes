@@ -88,7 +88,7 @@ function DemosTab({ onCount }: { onCount: (n: number) => void }) {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { data, error } = await (supabase.from('demo_requests' as any) as any)
+      const { data, error } = await (supabase.from('demo_requests') as any)
         .select('id, full_name, email, agency_name, phone, message, created_at, status')
         .eq('status', 'pending')
         .order('created_at', { ascending: false })
@@ -111,7 +111,7 @@ function DemosTab({ onCount }: { onCount: (n: number) => void }) {
     setBusyId(row.id);
     try {
       const newStatus = accept ? 'accepted' : 'declined';
-      const { error } = await (supabase.from('demo_requests' as any) as any)
+      const { error } = await (supabase.from('demo_requests') as any)
         .update({ status: newStatus })
         .eq('id', row.id);
       if (error) throw error;
@@ -318,7 +318,7 @@ export default function ApprovalsPage() {
       try {
         const [agentsRes, demosRes, partnersRes] = await Promise.all([
           supabase.from('agents').select('id', { count: 'exact', head: true }).eq('approval_status', 'pending'),
-          (supabase.from('demo_requests' as any).select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
+          (supabase.from('demo_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')) as any,
           (supabase.from('partners').select('id', { count: 'exact', head: true }).eq('is_verified', false)) as any,
         ]);
         if (cancelled) return;

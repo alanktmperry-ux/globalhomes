@@ -9,7 +9,7 @@ export function useVendorToken(propertyId: string, agentId: string) {
   async function createToken(vendorName?: string, vendorEmail?: string) {
     setCreating(true);
     const { data, error } = await supabase
-      .from('vendor_report_tokens' as any)
+      .from('vendor_report_tokens')
       .insert({ property_id: propertyId, agent_id: agentId, vendor_name: vendorName, vendor_email: vendorEmail })
       .select()
       .single();

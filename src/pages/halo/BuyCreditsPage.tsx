@@ -38,7 +38,7 @@ export default function BuyCreditsPage() {
   useEffect(() => {
     (async () => {
       const { data, error } = await supabase
-        .from('halo_credit_packages' as any)
+        .from('halo_credit_packages')
         .select('*')
         .eq('active', true)
         .order('credits', { ascending: true });

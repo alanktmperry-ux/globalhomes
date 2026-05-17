@@ -94,7 +94,7 @@ export function usePipelineStages() {
     setCanEdit(['principal', 'admin'].includes(agent.agency_role || ''));
 
     const { data } = await supabase
-      .from('pipeline_stages' as any)
+      .from('pipeline_stages')
       .select('*')
       .eq('agency_id', agent.agency_id)
       .is('deleted_at', null)

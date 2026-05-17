@@ -74,7 +74,7 @@ export function useUrgencyThresholds() {
       let row: any = null;
       if (agent.agency_id) {
         const { data } = await supabase
-          .from('crm_urgency_settings' as any)
+          .from('crm_urgency_settings')
           .select('*')
           .eq('agency_id', agent.agency_id)
           .maybeSingle();
@@ -82,7 +82,7 @@ export function useUrgencyThresholds() {
       }
       if (!row) {
         const { data } = await supabase
-          .from('crm_urgency_settings' as any)
+          .from('crm_urgency_settings')
           .select('*')
           .eq('agent_id', agent.id)
           .is('agency_id', null)

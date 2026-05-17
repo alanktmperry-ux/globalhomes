@@ -24,7 +24,7 @@ export default function MyHalosPage() {
     setLoading(true);
     setError(null);
     const { data, error } = await supabase
-      .from('halos' as any)
+      .from('halos')
       .select('*')
       .eq('seeker_id', user.id)
       .neq('status', 'deleted')
@@ -43,7 +43,7 @@ export default function MyHalosPage() {
 
   const updateStatus = async (id: string, status: HaloStatus) => {
     const { error } = await supabase
-      .from('halos' as any)
+      .from('halos')
       .update({ status })
       .eq('id', id);
     if (error) {
@@ -61,7 +61,7 @@ export default function MyHalosPage() {
 
   const handleFulfil = async (id: string) => {
     const { error } = await supabase
-      .from('halos' as any)
+      .from('halos')
       .update({ status: 'fulfilled' })
       .eq('id', id);
     if (error) {

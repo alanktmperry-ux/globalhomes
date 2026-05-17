@@ -38,7 +38,7 @@ export default function AdminAuditPage() {
   const load = async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from('admin_audit_log' as any)
+      .from('admin_audit_log')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(PAGE_SIZE);

@@ -231,7 +231,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
       );
 
       const { data: reportsData } = await supabase
-        .from('vendor_reports' as any)
+        .from('vendor_reports')
         .select('*')
         .eq('property_id', listing.id)
         .order('sent_at', { ascending: false })
@@ -408,7 +408,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
       if (error) throw error;
 
       if (agent) {
-        await supabase.from('vendor_reports' as any).insert({
+        await supabase.from('vendor_reports').insert({
           property_id: listing.id,
           agent_id: agent.id,
           vendor_name: vendorName,
@@ -419,7 +419,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
           days_on_market_at_send: daysOnMarket,
         });
         const { data: updated } = await supabase
-          .from('vendor_reports' as any)
+          .from('vendor_reports')
           .select('*')
           .eq('property_id', listing.id)
           .order('sent_at', { ascending: false })

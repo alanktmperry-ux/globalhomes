@@ -42,7 +42,7 @@ export default function OnboardingBuyerPrefsPage() {
         ? suburbs.split(',').map((s) => s.trim()).filter(Boolean)
         : [];
 
-      const { error } = await (supabase as any).from('user_preferences').upsert(
+      const { error } = await supabase.from('user_preferences').upsert(
         {
           user_id: u.id,
           seeking_type: seekingType,

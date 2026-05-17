@@ -74,7 +74,7 @@ export default function EditHaloPage() {
     }
     (async () => {
       const { data: halo, error } = await supabase
-        .from('halos' as any)
+        .from('halos')
         .select('*')
         .eq('seeker_id', user.id)
         .order('created_at', { ascending: false })
@@ -152,7 +152,7 @@ export default function EditHaloPage() {
     setSubmitting(true);
     try {
       const { error } = await supabase
-        .from('halos' as any)
+        .from('halos')
         .update({
           intent: data.intent,
           property_types: data.property_types,

@@ -85,7 +85,7 @@ export default function WaterBillingPanel({ tenancyId, propertyState }: Props) {
   const fetchBills = async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from('water_bills' as any)
+      .from('water_bills')
       .select('*')
       .eq('tenancy_id', tenancyId)
       .order('period_end', { ascending: false });
@@ -163,9 +163,9 @@ export default function WaterBillingPanel({ tenancyId, propertyState }: Props) {
     };
     let error;
     if (editing) {
-      ({ error } = await supabase.from('water_bills' as any).update(payload).eq('id', editing.id));
+      ({ error } = await supabase.from('water_bills').update(payload).eq('id', editing.id));
     } else {
-      ({ error } = await supabase.from('water_bills' as any).insert(payload));
+      ({ error } = await supabase.from('water_bills').insert(payload));
     }
     setSaving(false);
     if (error) {
@@ -181,7 +181,7 @@ export default function WaterBillingPanel({ tenancyId, propertyState }: Props) {
     const updates: Record<string, any> = { status };
     if (status === 'invoiced') updates.invoice_date = new Date().toISOString().slice(0, 10);
     if (status === 'paid') updates.paid_date = new Date().toISOString().slice(0, 10);
-    const { error } = await supabase.from('water_bills' as any).update(updates).eq('id', b.id);
+    const { error } = await supabase.from('water_bills').update(updates).eq('id', b.id);
     if (error) {
       toast.error(error.message);
       return;
@@ -192,7 +192,7 @@ export default function WaterBillingPanel({ tenancyId, propertyState }: Props) {
 
   const handleDelete = async () => {
     if (!deleteId) return;
-    const { error } = await supabase.from('water_bills' as any).delete().eq('id', deleteId);
+    const { error } = await supabase.from('water_bills').delete().eq('id', deleteId);
     setDeleteId(null);
     if (error) {
       toast.error(error.message);

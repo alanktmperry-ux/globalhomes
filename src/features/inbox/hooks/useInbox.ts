@@ -82,7 +82,7 @@ export function useInboxThreads(filter: InboxFilter, search: string) {
     setLoading(true);
 
     let q = supabase
-      .from('inbox_threads' as any)
+      .from('inbox_threads')
       .select('*, contact:contact_id(id, first_name, last_name, email, phone, mobile, avatar_url, preferred_language)')
       .eq('agency_id', agencyId)
       .order('last_message_at', { ascending: false })
@@ -161,7 +161,7 @@ export function useInboxMessages(threadId: string | null) {
     const from = targetPage * INBOX_PAGE_SIZE;
     const to = from + INBOX_PAGE_SIZE - 1;
     const { data } = await supabase
-      .from('inbox_messages' as any)
+      .from('inbox_messages')
       .select('*')
       .eq('thread_id', threadId)
       .order('sent_at', { ascending: false })
@@ -217,19 +217,19 @@ export function validateInboxAttachment(file: File): { valid: boolean; error?: s
 }
 
 export async function markThreadRead(threadId: string) {
-  await supabase.from('inbox_threads' as any).update({ is_unread: false }).eq('id', threadId);
+  await supabase.from('inbox_threads').update({ is_unread: false }).eq('id', threadId);
 }
 
 export async function setThreadStatus(threadId: string, status: InboxStatus, snoozedUntil?: string | null) {
   const { error } = await supabase
-    .from('inbox_threads' as any)
+    .from('inbox_threads')
     .update({ status, snoozed_until: snoozedUntil ?? null })
     .eq('id', threadId);
   if (error) throw error;
 }
 
 export async function assignThread(threadId: string, agentId: string | null) {
-  await supabase.from('inbox_threads' as any).update({ assigned_agent_id: agentId }).eq('id', threadId);
+  await supabase.from('inbox_threads').update({ assigned_agent_id: agentId }).eq('id', threadId);
 }
 
 export async function sendInboxMessage(opts: {
@@ -243,7 +243,7 @@ export async function sendInboxMessage(opts: {
 }) {
   // 1. Insert outbound message immediately (the trigger updates the thread)
   const { data: msg, error } = await supabase
-    .from('inbox_messages' as any)
+    .from('inbox_messages')
     .insert({
       thread_id: opts.threadId,
       channel: opts.channel,
@@ -284,7 +284,7 @@ export async function findOrCreateThreadForContact(opts: {
 }): Promise<string> {
   // Reuse open thread for this contact, otherwise create
   const { data: existing } = await supabase
-    .from('inbox_threads' as any)
+    .from('inbox_threads')
     .select('id')
     .eq('agency_id', opts.agencyId)
     .eq('contact_id', opts.contactId)
@@ -295,7 +295,7 @@ export async function findOrCreateThreadForContact(opts: {
   if ((existing as any)?.id) return (existing as any).id;
 
   const { data: created, error } = await supabase
-    .from('inbox_threads' as any)
+    .from('inbox_threads')
     .insert({
       agency_id: opts.agencyId,
       contact_id: opts.contactId,

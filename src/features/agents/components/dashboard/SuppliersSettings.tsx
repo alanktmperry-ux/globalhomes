@@ -51,7 +51,7 @@ const SuppliersSettings = () => {
     if (!agentId) return;
     setLoading(true);
     const { data } = await supabase
-      .from('agent_suppliers' as any)
+      .from('agent_suppliers')
       .select('*')
       .eq('agent_id', agentId)
       .order('created_at', { ascending: false });
@@ -96,14 +96,14 @@ const SuppliersSettings = () => {
 
     if (editing) {
       const { error } = await supabase
-        .from('agent_suppliers' as any)
+        .from('agent_suppliers')
         .update(payload)
         .eq('id', editing.id);
       if (error) toast.error('Failed to update');
       else toast.success('Supplier updated');
     } else {
       const { error } = await supabase
-        .from('agent_suppliers' as any)
+        .from('agent_suppliers')
         .insert(payload);
       if (error) toast.error('Failed to add supplier');
       else toast.success('Supplier added');
@@ -116,7 +116,7 @@ const SuppliersSettings = () => {
 
   const handleDelete = async (id: string) => {
     const { error } = await supabase
-      .from('agent_suppliers' as any)
+      .from('agent_suppliers')
       .delete()
       .eq('id', id);
     if (error) toast.error('Failed to delete');
@@ -128,7 +128,7 @@ const SuppliersSettings = () => {
 
   const toggleActive = async (s: Supplier) => {
     await supabase
-      .from('agent_suppliers' as any)
+      .from('agent_suppliers')
       .update({ is_active: !s.is_active })
       .eq('id', s.id);
     loadSuppliers();

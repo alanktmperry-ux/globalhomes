@@ -147,7 +147,7 @@ const RentIncreasePage = () => {
     }
 
     const { data: increases } = await supabase
-      .from('rent_increases' as any)
+      .from('rent_increases')
       .select('*')
       .in('tenancy_id', tRows.map(t => t.id))
       .order('effective_date', { ascending: false });
@@ -215,7 +215,7 @@ const RentIncreasePage = () => {
       return;
     }
     setSaving(true);
-    const { error } = await supabase.from('rent_increases' as any).insert({
+    const { error } = await supabase.from('rent_increases').insert({
       tenancy_id: scheduleFor.id,
       old_amount: Number(scheduleFor.rent_amount || 0),
       new_amount: Number(newRent),
@@ -236,7 +236,7 @@ const RentIncreasePage = () => {
 
   const openNotice = async (row: RowItem, increase: RentIncrease) => {
     const { data: contacts } = await supabase
-      .from('tenancy_contacts' as any)
+      .from('tenancy_contacts')
       .select('name, contact_type')
       .eq('tenancy_id', row.id)
       .in('contact_type', ['primary_tenant', 'co_tenant']);
@@ -290,7 +290,7 @@ ${agencyName || ''}`.trim();
     if (!noticeFor) return;
     const today = format(new Date(), 'yyyy-MM-dd');
     const { error } = await supabase
-      .from('rent_increases' as any)
+      .from('rent_increases')
       .update({ status: 'notice_sent', notice_sent_date: today })
       .eq('id', noticeFor.increase.id);
     if (error) {

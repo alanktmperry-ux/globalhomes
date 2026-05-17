@@ -44,7 +44,7 @@ const AdminDemoRequests = ({ onPendingCountChange }: Props) => {
   const fetchRequests = async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from('demo_requests' as any)
+      .from('demo_requests')
       .select('*')
       .order('created_at', { ascending: false });
     if (!error && data) {
@@ -83,7 +83,7 @@ const AdminDemoRequests = ({ onPendingCountChange }: Props) => {
     setActionLoading(req.id);
     try {
       const { error } = await supabase
-        .from('demo_requests' as any)
+        .from('demo_requests')
         .update({ status: 'declined' } as any)
         .eq('id', req.id);
       if (error) throw error;

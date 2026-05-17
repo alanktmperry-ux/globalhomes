@@ -57,7 +57,7 @@ export default function FindBrokerPage() {
   useEffect(() => {
     const fetchBrokers = async () => {
       const { data } = await supabase
-        .from('brokers_public_safe' as any)
+        .from('brokers_public_safe')
         .select('id, name, company, acl_number, photo_url, languages, tagline, calendar_url, specialties, suburb, state')
         .order('name', { ascending: true });
       if (data) setBrokers(data as unknown as BrokerData[]);

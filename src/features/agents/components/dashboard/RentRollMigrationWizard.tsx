@@ -550,7 +550,7 @@ export default function RentRollMigrationWizard({ onComplete, onCancel }: RentRo
       setImportStatus('Creating migration batch…');
       setImportProgress(5);
       const { data: batch, error: batchErr } = await supabase
-        .from('migration_batches' as any)
+        .from('migration_batches')
         .insert({
           agent_id: agent.id,
           source_system: sourceSystem,
@@ -764,7 +764,7 @@ export default function RentRollMigrationWizard({ onComplete, onCancel }: RentRo
       }
 
       if (ledgerInserts.length > 0) {
-        const { error: lErr } = await supabase.from('trust_ledger_accounts' as any).insert(ledgerInserts as any);
+        const { error: lErr } = await supabase.from('trust_ledger_accounts').insert(ledgerInserts as any);
         if (lErr) throw lErr;
       }
 
@@ -779,7 +779,7 @@ export default function RentRollMigrationWizard({ onComplete, onCancel }: RentRo
         ledgers: ledgerInserts.length,
       };
       setCounts(finalCounts);
-      await supabase.from('migration_batches' as any).update({
+      await supabase.from('migration_batches').update({
         status: 'completed',
         completed_at: new Date().toISOString(),
         property_count: finalCounts.properties,

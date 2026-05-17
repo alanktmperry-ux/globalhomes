@@ -55,7 +55,7 @@ function downloadCsv(rows: string[][], filename: string) {
 async function logAudit(action_type: string, metadata: Record<string, unknown>) {
   try {
     const { data: userRes } = await supabase.auth.getUser();
-    await (supabase as any).from('audit_log').insert({
+    await supabase.from('audit_log').insert({
       action_type,
       entity_type: 'system',
       user_id: userRes.user?.id,
@@ -581,7 +581,7 @@ function DatabaseTab() {
     const results = await Promise.all(
       COUNTED_TABLES.map(async (t) => {
         try {
-          const { count } = await (supabase as any).from(t).select('*', { count: 'exact', head: true });
+          const { count } = await supabase.from(t).select('*', { count: 'exact', head: true });
           return [t, typeof count === 'number' ? count : null] as const;
         } catch {
           return [t, null] as const;

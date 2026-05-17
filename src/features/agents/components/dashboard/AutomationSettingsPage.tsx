@@ -87,8 +87,8 @@ const AutomationSettingsPage = () => {
     if (!agentId) return;
     setLoading(true);
     const [{ data: r }, { data: l }] = await Promise.all([
-      supabase.from('pm_automation_rules' as any).select('*').eq('agent_id', agentId).order('rule_type').order('trigger_day', { nullsFirst: false }),
-      supabase.from('pm_automation_log' as any).select('id, recipient_email, subject, sent_at, status').eq('agent_id', agentId).order('sent_at', { ascending: false }).limit(20),
+      supabase.from('pm_automation_rules').select('*').eq('agent_id', agentId).order('rule_type').order('trigger_day', { nullsFirst: false }),
+      supabase.from('pm_automation_log').select('id, recipient_email, subject, sent_at, status').eq('agent_id', agentId).order('sent_at', { ascending: false }).limit(20),
     ]);
     setRules((r as any) ?? []);
     setLog((l as any) ?? []);
@@ -108,7 +108,7 @@ const AutomationSettingsPage = () => {
 
   const toggleActive = async (rule: Rule, next: boolean) => {
     setRules((prev) => prev.map((x) => (x.id === rule.id ? { ...x, is_active: next } : x)));
-    const { error } = await supabase.from('pm_automation_rules' as any).update({ is_active: next }).eq('id', rule.id);
+    const { error } = await supabase.from('pm_automation_rules').update({ is_active: next }).eq('id', rule.id);
     if (error) {
       toast.error('Could not update rule');
       setRules((prev) => prev.map((x) => (x.id === rule.id ? { ...x, is_active: !next } : x)));
@@ -125,7 +125,7 @@ const AutomationSettingsPage = () => {
     if (!editing) return;
     setSavingEdit(true);
     const { error } = await supabase
-      .from('pm_automation_rules' as any)
+      .from('pm_automation_rules')
       .update({ template_subject: editSubject, template_body: editBody })
       .eq('id', editing.id);
     setSavingEdit(false);

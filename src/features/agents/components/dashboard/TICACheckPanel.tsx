@@ -65,7 +65,7 @@ export default function TICACheckPanel({ applicationId, applicantName }: Props) 
   const fetchCheck = async () => {
     setLoading(true);
     const { data } = await supabase
-      .from('tica_checks' as any)
+      .from('tica_checks')
       .select('*')
       .eq('application_id', applicationId)
       .order('created_at', { ascending: false })
@@ -141,11 +141,11 @@ export default function TICACheckPanel({ applicationId, applicantName }: Props) 
       let error;
       if (check) {
         ({ error } = await supabase
-          .from('tica_checks' as any)
+          .from('tica_checks')
           .update(payload)
           .eq('id', check.id));
       } else {
-        ({ error } = await supabase.from('tica_checks' as any).insert(payload));
+        ({ error } = await supabase.from('tica_checks').insert(payload));
       }
       if (error) throw error;
       toast.success('TICA check recorded');

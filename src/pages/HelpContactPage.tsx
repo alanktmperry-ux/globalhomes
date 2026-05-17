@@ -24,7 +24,7 @@ export default function HelpContactPage() {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.from('support_tickets' as any).insert({
+    const { error } = await supabase.from('support_tickets').insert({
       name: form.name.trim(),
       email: form.email.trim(),
       subject: form.subject,

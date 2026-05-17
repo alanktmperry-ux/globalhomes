@@ -105,7 +105,7 @@ const MarketingSupplierToggle = ({ listing, onSent }: Props) => {
     if (!agentId) return;
     setLoadingSuppliers(true);
     const { data } = await supabase
-      .from('agent_suppliers' as any)
+      .from('agent_suppliers')
       .select('*')
       .eq('agent_id', agentId)
       .eq('is_active', true);
@@ -124,7 +124,7 @@ const MarketingSupplierToggle = ({ listing, onSent }: Props) => {
     if (suppliers.length === 0 && !loadingSuppliers) {
       // Suppliers not yet loaded, load then check
       const { data } = await supabase
-        .from('agent_suppliers' as any)
+        .from('agent_suppliers')
         .select('*')
         .eq('agent_id', agentId)
         .eq('is_active', true);

@@ -49,7 +49,7 @@ export function useTodayPriorities(limit = 5) {
 
     // --- Active dismissals ---
     const { data: dismissalsRaw } = await supabase
-      .from('agent_priority_dismissals' as any)
+      .from('agent_priority_dismissals')
       .select('source_key, source_id, dismissed_until')
       .eq('agent_id', agent.id)
       .gt('dismissed_until', new Date().toISOString());
@@ -159,7 +159,7 @@ export function useTodayPriorities(limit = 5) {
       const cutoffIso = new Date(nowMs - 86_400_000).toISOString();
       // Threads where last_message is inbound + older than 24h + still open
       const { data: unrespThreads } = await supabase
-        .from('inbox_threads' as any)
+        .from('inbox_threads')
         .select('id, subject, last_message_at, last_message_preview, contact:contact_id(id, first_name, last_name, email)')
         .eq('agency_id', agencyId)
         .eq('is_unread', true)
@@ -242,7 +242,7 @@ export function useTodayPriorities(limit = 5) {
   const dismiss = useCallback(async (item: PriorityItem) => {
     if (!agentId) return;
     setItems(prev => prev.filter(i => i.id !== item.id));
-    await supabase.from('agent_priority_dismissals' as any).upsert(
+    await supabase.from('agent_priority_dismissals').upsert(
       {
         agent_id: agentId,
         source_key: item.sourceKey,

@@ -120,7 +120,7 @@ function AgentRow({ agent, onNoteAdded }: { agent: AgentLifecycleRow; onNoteAdde
     setSavingNote(true);
     try {
       const { data, error } = await supabase
-        .from('agent_lifecycle_notes' as any)
+        .from('agent_lifecycle_notes')
         .insert({ agent_id: agent.id, note: noteText.trim(), author_name: 'Admin' })
         .select()
         .single();
@@ -285,10 +285,10 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
         supabase.from('leads').select('agent_id'),
         supabase.from('properties').select('agent_id, inspection_times').not('inspection_times', 'is', null).limit(5000),
         supabase.from('contacts').select('agent_id').limit(5000),
-        supabase.from('trust_receipts' as any).select('agent_id').limit(1000),
+        supabase.from('trust_receipts').select('agent_id').limit(1000),
       ]);
 
-      const notesRes = await supabase.from('agent_lifecycle_notes' as any).select('*').order('created_at', { ascending: false });
+      const notesRes = await supabase.from('agent_lifecycle_notes').select('*').order('created_at', { ascending: false });
 
       const signInMap = new Map<string, string | null>();
       try {

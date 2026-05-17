@@ -106,7 +106,7 @@ export default function CreateHaloPage() {
     (async () => {
       try {
         const { data: rows, error: selErr } = await supabase
-          .from('search_queries' as any)
+          .from('search_queries')
           .select('id')
           .eq('user_id', user.id)
           .eq('raw_query', rawQuery)
@@ -120,7 +120,7 @@ export default function CreateHaloPage() {
         const rowId = (rows?.[0] as { id?: string } | undefined)?.id;
         if (!rowId) return;
         const { error: updErr } = await supabase
-          .from('search_queries' as any)
+          .from('search_queries')
           .update({ halo_clicked: true })
           .eq('id', rowId);
         if (updErr) console.warn('[halo telemetry] halo_clicked update failed:', updErr);
@@ -258,7 +258,7 @@ export default function CreateHaloPage() {
       if (source.source_type) insertPayload.source_type = source.source_type;
 
       const { data: inserted, error } = await supabase
-        .from('halos' as any)
+        .from('halos')
         .insert(insertPayload)
         .select('id')
         .single();
@@ -297,7 +297,7 @@ export default function CreateHaloPage() {
         const rawQuery = searchParams.get('raw_q');
         if (fromSearch && rawQuery && user?.id) {
           const { data: rows } = await supabase
-            .from('search_queries' as any)
+            .from('search_queries')
             .select('id')
             .eq('user_id', user.id)
             .eq('raw_query', rawQuery)
@@ -306,7 +306,7 @@ export default function CreateHaloPage() {
           const rowId = (rows?.[0] as { id?: string } | undefined)?.id;
           if (rowId) {
             await supabase
-              .from('search_queries' as any)
+              .from('search_queries')
               .update({ halo_posted: true })
               .eq('id', rowId);
           }

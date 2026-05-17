@@ -130,7 +130,7 @@ export default function PipelineStagesSettings() {
       const removed = stages.filter(s => !draftIds.has(s.id));
       if (removed.length > 0) {
         const { error } = await supabase
-          .from('pipeline_stages' as any)
+          .from('pipeline_stages')
           .update({ deleted_at: new Date().toISOString(), is_active: false })
           .in('id', removed.map(s => s.id));
         if (error) throw error;
@@ -141,7 +141,7 @@ export default function PipelineStagesSettings() {
         .filter(s => s.id.startsWith('new-'))
         .map(({ id: _id, ...row }) => ({ ...row, agency_id: agencyId }));
       if (inserts.length > 0) {
-        const { error } = await supabase.from('pipeline_stages' as any).insert(inserts);
+        const { error } = await supabase.from('pipeline_stages').insert(inserts);
         if (error) throw error;
       }
 
@@ -154,7 +154,7 @@ export default function PipelineStagesSettings() {
           .some(k => (original as any)[k] !== (u as any)[k]);
         if (!changed) continue;
         const { error } = await supabase
-          .from('pipeline_stages' as any)
+          .from('pipeline_stages')
           .update({
             label: u.label,
             color: u.color,

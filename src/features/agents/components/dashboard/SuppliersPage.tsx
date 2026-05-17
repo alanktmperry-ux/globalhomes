@@ -65,7 +65,7 @@ export default function SuppliersPage() {
   const load = async () => {
     if (!agentId) return;
     setLoading(true);
-    const { data } = await supabase.from('suppliers' as any).select('*')
+    const { data } = await supabase.from('suppliers').select('*')
       .eq('agent_id', agentId).order('preferred', { ascending: false }).order('business_name');
     setSuppliers((data as any) || []);
     setLoading(false);
@@ -119,8 +119,8 @@ export default function SuppliersPage() {
       status: form.status,
     };
     const { error } = editing
-      ? await supabase.from('suppliers' as any).update(payload).eq('id', editing.id)
-      : await supabase.from('suppliers' as any).insert(payload);
+      ? await supabase.from('suppliers').update(payload).eq('id', editing.id)
+      : await supabase.from('suppliers').insert(payload);
     setSaving(false);
     if (error) { toast.error(error.message); return; }
     toast.success(editing ? 'Supplier updated' : 'Supplier added');
@@ -192,7 +192,7 @@ export default function SuppliersPage() {
 
   const confirmRemove = async () => {
     if (!toRemove) return;
-    const { error } = await supabase.from('suppliers' as any).update({ status: 'inactive' } as any).eq('id', toRemove.id);
+    const { error } = await supabase.from('suppliers').update({ status: 'inactive' } as any).eq('id', toRemove.id);
     setToRemove(null);
     if (error) { toast.error('Could not remove'); return; }
     toast.success('Supplier removed');

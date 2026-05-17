@@ -45,8 +45,8 @@ export default function ReferralPartnerManager() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     const [{ data: ps }, { data: ls }] = await Promise.all([
-      (supabase as any).from('referral_partners').select('*').order('created_at', { ascending: false }),
-      (supabase as any).from('partner_buyer_leads').select('*').order('created_at', { ascending: false }),
+      supabase.from('referral_partners').select('*').order('created_at', { ascending: false }),
+      supabase.from('partner_buyer_leads').select('*').order('created_at', { ascending: false }),
     ]);
     const leadList = (ls || []) as Lead[];
     const counts: Record<string, number> = {};
@@ -95,7 +95,7 @@ export default function ReferralPartnerManager() {
         return;
       }
 
-      const { error } = await (supabase as any).from('referral_partners').insert({
+      const { error } = await supabase.from('referral_partners').insert({
         user_id: userId,
         partner_code: partnerCode.trim(),
         display_name: displayName.trim(),

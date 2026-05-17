@@ -507,18 +507,19 @@ const ProfilePage = () => {
               <Separator />
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-xs">Agency Name</Label>
-                  <Input value={form.agency} onChange={e => setForm(f => ({ ...f, agency: e.target.value }))} />
+                  <Label htmlFor="profile-agency" className="text-xs">Agency Name</Label>
+                  <Input id="profile-agency" value={form.agency} onChange={e => setForm(f => ({ ...f, agency: e.target.value }))} />
                 </div>
                 <div>
-                  <Label className="text-xs">License Number</Label>
-                  <Input value={form.license_number} onChange={e => setForm(f => ({ ...f, license_number: e.target.value }))} />
+                  <Label htmlFor="profile-license" className="text-xs">License Number</Label>
+                  <Input id="profile-license" value={form.license_number} onChange={e => setForm(f => ({ ...f, license_number: e.target.value }))} />
                 </div>
                 <div className="relative">
-                  <Label className="text-xs">Office Address</Label>
+                  <Label htmlFor="profile-address" className="text-xs">Office Address</Label>
                   <div className="relative">
                     <MapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <Input
+                      id="profile-address"
                       value={form.office_address}
                       onChange={e => handleOfficeAddressChange(e.target.value)}
                       onFocus={() => addressSuggestions.length > 0 && setShowAddressSuggestions(true)}

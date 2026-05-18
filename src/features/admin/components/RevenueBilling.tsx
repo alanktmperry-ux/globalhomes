@@ -210,8 +210,8 @@ export default function RevenueBilling() {
           ? Math.ceil((new Date(renewalDate).getTime() - now.getTime()) / 86400000)
           : null;
         return {
-          id: a.id, name: a.name, email: a.email, agency: a.agency,
-          plan, mrr, isSubscribed: a.is_subscribed,
+          id: a.id, name: a.name, email: a.email ?? '', agency: a.agency ?? '',
+          plan, mrr, isSubscribed: !!a.is_subscribed,
           subscriptionStart, subscriptionEnd, renewalDate, daysUntilRenewal,
           lastLogin: signInMap.get(a.id) || null,
           stripeConnected: !!a.stripe_customer_id,

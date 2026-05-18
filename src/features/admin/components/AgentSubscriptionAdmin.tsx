@@ -113,7 +113,7 @@ export default function AgentSubscriptionAdmin() {
         supabase
           .from('agents')
           .select(
-            'id, name, email, subscription_status, is_subscribed, is_approved, created_at, payment_failed_at, admin_grace_until, agent_subscriptions(plan_type)'
+            'id, user_id, name, email, subscription_status, is_subscribed, is_approved, created_at, payment_failed_at, admin_grace_until, agent_subscriptions(plan_type)'
           )
           .order('created_at', { ascending: false }),
         supabase.from('properties').select('agent_id'),

@@ -62,7 +62,9 @@ const PartnerArrearsPage = () => {
 
     if (!tenancies || tenancies.length === 0) { setOverdue([]); setLoading(false); return; }
 
-    const tIds = tenancies.map((t: any) => t.id);
+    type TenancyRow = { id: string; tenant_name: string; tenant_email: string | null; tenant_phone: string | null; rent_amount: number; rent_frequency: string; agent_id: string; properties: { address: string; suburb: string } | null };
+    const tenancyRows = (tenancies ?? []) as unknown as TenancyRow[];
+    const tIds = tenancyRows.map((t) => t.id);
     const { data: payments } = await supabase
       .from('rent_payments')
       .select('tenancy_id, period_to, status')

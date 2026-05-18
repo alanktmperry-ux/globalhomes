@@ -2,7 +2,7 @@ export interface FaqItem {
   id: string;
   question: string;
   answer: string;
-  category: 'general' | 'agents' | 'buyers' | 'renters' | 'vendors' | 'auctions' | 'billing' | 'technical' | 'property-managers';
+  category: 'general' | 'agents' | 'buyers' | 'renters' | 'vendors' | 'auctions' | 'billing' | 'technical' | 'property-managers' | 'halo';
   tags: string[];
 }
 

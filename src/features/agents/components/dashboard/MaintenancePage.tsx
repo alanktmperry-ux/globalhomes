@@ -311,10 +311,10 @@ export default function MaintenancePage() {
     }
     setEntrySaving(true);
     const nowIso = new Date().toISOString();
-    const { error } = await supabase.from('maintenance_jobs').update({
+    const { error } = await sbExt.from('maintenance_jobs').update({
       scheduled_entry_date: entryDate,
       entry_notice_sent_at: nowIso,
-    } as any).eq('id', entryFor.id);
+    }).eq('id', entryFor.id);
     if (error) { setEntrySaving(false); toast.error(error.message || 'Failed to record entry notice'); return; }
 
     if (entryFor.tenant_email) {

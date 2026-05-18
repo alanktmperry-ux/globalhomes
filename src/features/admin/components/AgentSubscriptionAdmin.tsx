@@ -126,6 +126,7 @@ export default function AgentSubscriptionAdmin() {
 
       const rows: AdminAgentRow[] = (agentsRes.data || []).map((a: any) => ({
         id: a.id,
+        user_id: a.user_id ?? null,
         name: a.name,
         email: a.email,
         plan_type: Array.isArray(a.agent_subscriptions)

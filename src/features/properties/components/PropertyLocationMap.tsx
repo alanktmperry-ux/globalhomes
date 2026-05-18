@@ -44,9 +44,22 @@ export function PropertyLocationMap({ lat, lng, address, heightClass = 'h-[280px
         await loadGoogleMapsScript();
         const { Geocoder } = (await google.maps.importLibrary('geocoding')) as google.maps.GeocodingLibrary;
         const geocoder = new Geocoder();
-        const { results } = await geocoder.geocode({ address });
+        const hasCountry = /australia/i.test(address);
+        const candidates = hasCountry ? [address] : [address, `${address}, Australia`, `${address}, VIC, Australia`];
+        let loc: google.maps.LatLng | null = null;
+        for (const candidate of candidates) {
+          try {
+            const { results } = await geocoder.geocode({ address: candidate });
+            if (cancelled) return;
+            if (results?.[0]?.geometry?.location) {
+              loc = results[0].geometry.location;
+              break;
+            }
+          } catch {
+            // ZERO_RESULTS or similar — try next candidate
+          }
+        }
         if (cancelled) return;
-        const loc = results?.[0]?.geometry?.location;
         if (loc) {
           setResolved({ lat: loc.lat(), lng: loc.lng() });
         } else {

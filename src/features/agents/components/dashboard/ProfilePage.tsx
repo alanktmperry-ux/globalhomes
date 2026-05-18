@@ -214,7 +214,7 @@ const ProfilePage = () => {
       const { error: upErr } = await supabase.storage.from('agency-logos').upload(filePath, file, { upsert: true });
       if (upErr) throw upErr;
       const { data: { publicUrl } } = supabase.storage.from('agency-logos').getPublicUrl(filePath);
-      await supabase.from('agents').update({ company_logo_url: publicUrl } as any).eq('id', agent.id);
+      await sbExt.from('agents').update({ company_logo_url: publicUrl }).eq('id', agent.id);
       setAgent(prev => prev ? { ...prev, company_logo_url: publicUrl } : null);
       toast.success('Company logo updated');
     } catch (err: unknown) {

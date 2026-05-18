@@ -515,8 +515,8 @@ const TeamPage = () => {
         const { data: { publicUrl } } = supabase.storage.from('agency-logos').getPublicUrl(filePath);
         await supabase.from('agencies').update({ logo_url: publicUrl }).eq('id', agency.id);
       }
-      const { error: memberError } = await supabase.from('agency_members').insert({
-        agency_id: agency.id, user_id: user.id, role: 'principal' as any, access_level: 'full',
+      const { error: memberError } = await sbExt.from('agency_members').insert({
+        agency_id: agency.id, user_id: user.id, role: 'principal', access_level: 'full',
       });
       if (memberError) throw memberError;
       const { data: agentRecord } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
@@ -527,7 +527,7 @@ const TeamPage = () => {
           user_id: user.id, name: user.email || 'Principal',
           email: user.email || newAgencyEmail || null, agency_id: agency.id, agency: newAgencyName.trim(),
         });
-        await supabase.from('user_roles').insert({ user_id: user.id, role: 'agent' as any }).then(() => {});
+        await sbExt.from('user_roles').insert({ user_id: user.id, role: 'agent' }).then(() => {});
       }
       toast.success(`Agency created! — ${newAgencyName} is ready. You are the Principal.`);
       setNewAgencyName(''); setNewAgencyEmail(''); setNewAgencyPhone('');

@@ -12,6 +12,7 @@ const categories = [
   { title: 'Agents', description: 'Listing, CRM, auctions, and billing', icon: 'Building2', href: '/help/agents', key: 'agents' },
   { title: 'Property Managers', description: 'Rent roll, trust accounting, arrears, maintenance, vacancies and inspections', icon: 'ClipboardList', href: '/help/property-managers', key: 'property-managers' },
   { title: 'Buyers', description: 'Searching, saving, open homes, auctions, and finance tools', icon: 'Home', href: '/help/buyers', key: 'buyers' },
+  { title: 'Halo — Seekers', description: 'Create a Halo brief, let agents find you, manage responses', icon: 'Zap', href: '/help/seekers', key: 'halo' },
   { title: 'Renters', description: 'Finding rentals, applying, tracking applications', icon: 'Key', href: '/help/renters', key: 'renters' },
   { title: 'Vendors', description: 'Performance reports, auctions, and documents', icon: 'BarChart3', href: '/help/vendors', key: 'vendors' },
   { title: 'Partner Agencies', description: 'Rent roll, trust accounting, arrears and team management for accounting partners.', icon: 'Briefcase', href: '/help/property-managers', key: 'property-managers' },

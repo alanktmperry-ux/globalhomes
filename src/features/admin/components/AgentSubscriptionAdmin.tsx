@@ -501,6 +501,59 @@ export default function AgentSubscriptionAdmin() {
           </table>
         </div>
       )}
+
+      <Dialog open={!!editAgent} onOpenChange={(o) => !o && closeEditDialog()}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit agent credentials</DialogTitle>
+            <DialogDescription>
+              {editAgent?.name || editAgent?.email || 'Agent'} — leave a field blank to keep it unchanged.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-agent-email">New email</Label>
+              <Input
+                id="edit-agent-email"
+                type="email"
+                value={editEmail}
+                onChange={(e) => setEditEmail(e.target.value)}
+                placeholder="agent@example.com"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-agent-password">New password</Label>
+              <Input
+                id="edit-agent-password"
+                type="password"
+                value={editPassword}
+                onChange={(e) => setEditPassword(e.target.value)}
+                placeholder="At least 8 characters"
+                autoComplete="new-password"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-agent-password-confirm">Confirm password</Label>
+              <Input
+                id="edit-agent-password-confirm"
+                type="password"
+                value={editPasswordConfirm}
+                onChange={(e) => setEditPasswordConfirm(e.target.value)}
+                placeholder="Repeat password"
+                autoComplete="new-password"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={closeEditDialog} disabled={editSubmitting}>
+              Cancel
+            </Button>
+            <Button onClick={submitEdit} disabled={editSubmitting}>
+              {editSubmitting ? 'Saving…' : 'Save changes'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

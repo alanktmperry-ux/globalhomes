@@ -3,8 +3,8 @@ import { Loader2, MapPin } from 'lucide-react';
 import { loadGoogleMapsScript } from '@/shared/lib/googleMapsService';
 
 interface Props {
-  lat: number;
-  lng: number;
+  lat?: number | null;
+  lng?: number | null;
   address?: string;
   /** Tailwind height class — defaults to a height proportional to the hero image */
   heightClass?: string;
@@ -13,6 +13,7 @@ interface Props {
 /**
  * Lightweight single-pin map for the property detail page.
  * Loads Google Maps lazily and renders a single AdvancedMarker at the property location.
+ * If lat/lng are missing, falls back to geocoding the address client-side.
  */
 export function PropertyLocationMap({ lat, lng, address, heightClass = 'h-[280px] md:h-[340px]' }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -20,8 +21,50 @@ export function PropertyLocationMap({ lat, lng, address, heightClass = 'h-[280px
   const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [resolved, setResolved] = useState<{ lat: number; lng: number } | null>(
+    typeof lat === 'number' && typeof lng === 'number' && Number.isFinite(lat) && Number.isFinite(lng)
+      ? { lat, lng }
+      : null,
+  );
 
+  // Geocode from address if no coords provided
   useEffect(() => {
+    if (resolved) return;
+    if (!address) {
+      setError('No location available');
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        await loadGoogleMapsScript();
+        const { Geocoder } = (await google.maps.importLibrary('geocoding')) as google.maps.GeocodingLibrary;
+        const geocoder = new Geocoder();
+        const { results } = await geocoder.geocode({ address });
+        if (cancelled) return;
+        const loc = results?.[0]?.geometry?.location;
+        if (loc) {
+          setResolved({ lat: loc.lat(), lng: loc.lng() });
+        } else {
+          setError('Map unavailable');
+          setLoading(false);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Map failed to load');
+          setLoading(false);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [address, resolved]);
+
+  // Render the map once we have coords
+  useEffect(() => {
+    if (!resolved) return;
     let cancelled = false;
     (async () => {
       try {
@@ -31,7 +74,7 @@ export function PropertyLocationMap({ lat, lng, address, heightClass = 'h-[280px
         await google.maps.importLibrary('marker');
 
         mapInstance.current = new Map(mapRef.current, {
-          center: { lat, lng },
+          center: resolved,
           zoom: 15,
           mapId: 'property-detail-location',
           disableDefaultUI: true,
@@ -42,7 +85,7 @@ export function PropertyLocationMap({ lat, lng, address, heightClass = 'h-[280px
 
         markerRef.current = new google.maps.marker.AdvancedMarkerElement({
           map: mapInstance.current,
-          position: { lat, lng },
+          position: resolved,
           title: address ?? '',
         });
 
@@ -58,15 +101,15 @@ export function PropertyLocationMap({ lat, lng, address, heightClass = 'h-[280px
       cancelled = true;
       if (markerRef.current) markerRef.current.map = null;
     };
-  }, [lat, lng, address]);
+  }, [resolved, address]);
 
   // Pan if coords change after mount
   useEffect(() => {
-    if (mapInstance.current) {
-      mapInstance.current.panTo({ lat, lng });
-      if (markerRef.current) markerRef.current.position = { lat, lng };
+    if (mapInstance.current && resolved) {
+      mapInstance.current.panTo(resolved);
+      if (markerRef.current) markerRef.current.position = resolved;
     }
-  }, [lat, lng]);
+  }, [resolved]);
 
   return (
     <div className={`relative w-full ${heightClass} rounded-2xl overflow-hidden border border-border bg-secondary`}>

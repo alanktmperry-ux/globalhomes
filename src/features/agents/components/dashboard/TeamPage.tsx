@@ -245,11 +245,11 @@ const TeamPage = () => {
     setCreating(true);
     try {
       const code = generateCode();
-      const { error } = await supabase.from('agency_invite_codes').insert({
+      const { error } = await sbExt.from('agency_invite_codes').insert({
         agency_id: agencyId,
         code,
         created_by: user.id,
-        role: newInviteRole as any,
+        role: newInviteRole,
         max_uses: parseInt(newInviteMaxUses) || null,
       });
       if (error) throw error;

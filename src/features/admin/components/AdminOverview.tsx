@@ -44,7 +44,7 @@ const StatCard = ({
   color?: string;
   trend?: 'up' | 'down' | 'flat';
   trendLabel?: string;
-  icon?: any;
+  icon?: LucideIcon;
 }) => (
   <div className="bg-card border border-border rounded-xl p-4 space-y-1">
     <div className="flex items-center justify-between">

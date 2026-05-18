@@ -452,15 +452,26 @@ export default function HeroSearchPreview() {
             }}
           >
             <div style={{ position: 'relative', aspectRatio: '4 / 5', width: '100%' }}>
-              {heroImg ? (
-                <img
-                  src={heroImg}
-                  alt="Renovated north-facing family home in Auburn, NSW"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                  loading="eager"
-                  decoding="async"
-                  {...({ fetchpriority: 'high' } as any)}
-                />
+              {heroImgs.length > 0 ? (
+                <>
+                  {heroImgs.map((src, i) => (
+                    <img
+                      key={src}
+                      src={src}
+                      alt="Featured listing"
+                      style={{
+                        position: 'absolute', inset: 0,
+                        width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                        opacity: i === imgIdx ? 1 : 0,
+                        transition: 'opacity 1.2s ease-in-out',
+                        zIndex: i === imgIdx ? 1 : 0,
+                      }}
+                      loading={i === 0 ? 'eager' : 'lazy'}
+                      decoding="async"
+                      {...(i === 0 ? ({ fetchpriority: 'high' } as any) : {})}
+                    />
+                  ))}
+                </>
               ) : (
                 <picture>
                   <source

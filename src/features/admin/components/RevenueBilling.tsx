@@ -275,7 +275,8 @@ export default function RevenueBilling() {
           .order('created_at', { ascending: false })
           .limit(200);
         const totals: Record<string, { units: number; revenue: number }> = {};
-        (addonData || []).forEach((p: any) => {
+        type AddonRow = { id: string; package_id: string | null; amount_paid_aud: number | null; created_at: string; agent_id: string | null; status: string };
+        ((addonData ?? []) as unknown as AddonRow[]).forEach((p) => {
           const key = 'halo_credits';
           if (!totals[key]) totals[key] = { units: 0, revenue: 0 };
           totals[key].units += 1;

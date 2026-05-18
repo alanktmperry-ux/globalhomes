@@ -391,6 +391,35 @@ export default function AgentSubscriptionAdmin() {
                           <DropdownMenuItem onClick={() => handleResetTrial(a.id)}>
                             <RotateCcw size={14} className="mr-2" /> Reset to trial
                           </DropdownMenuItem>
+                          <DropdownMenuSub>
+                            <DropdownMenuSubTrigger>
+                              <CreditCard size={14} className="mr-2" /> Change plan
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent className="bg-popover">
+                              <DropdownMenuLabel className="text-xs text-muted-foreground">
+                                Set plan
+                              </DropdownMenuLabel>
+                              {PLAN_OPTIONS.map((p) => (
+                                <DropdownMenuItem
+                                  key={p.value}
+                                  onClick={() => handleChangePlan(a, p.value)}
+                                  className={cn(a.plan_type === p.value && 'font-semibold')}
+                                >
+                                  {p.label}
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuSubContent>
+                          </DropdownMenuSub>
+                          <DropdownMenuItem onClick={() => handleImpersonate(a)}>
+                            <LogIn size={14} className="mr-2" /> Impersonate
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => handleDelete(a)}
+                            className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                          >
+                            <Trash2 size={14} className="mr-2" /> Delete agent
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>

@@ -60,7 +60,7 @@ const AUDIENCE_CONFIG: Record<Audience, { label: string; desc: string; color: st
   at_risk: { label: 'At risk', desc: 'No login in 14+ days', color: 'bg-destructive/10 text-destructive' },
 };
 
-const METHOD_CONFIG: Record<SendMethod, { label: string; icon: any }> = {
+const METHOD_CONFIG: Record<SendMethod, { label: string; icon: LucideIcon }> = {
   in_app: { label: 'In-app only', icon: Bell },
   email: { label: 'Email only', icon: Mail },
   both: { label: 'In-app + Email', icon: Send },

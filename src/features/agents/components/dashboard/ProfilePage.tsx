@@ -140,17 +140,17 @@ const ProfilePage = () => {
         office_address: data.office_address || '',
         years_experience: data.years_experience || 0,
         specialization: data.specialization || 'Residential',
-        bio: (data as any).bio || '',
-        website_url: (data as any).website_url || '',
-        title_position: (data as any).title_position || 'Agent',
+        bio: data.bio || '',
+        website_url: data.website_url || '',
+        title_position: (data as unknown as { title_position?: string }).title_position || 'Agent',
         social_instagram: social.instagram || '',
         social_linkedin: social.linkedin || '',
         social_facebook: social.facebook || '',
         social_twitter: social.twitter || '',
-        investment_niche: (data as any).investment_niche || '',
+        investment_niche: (data as unknown as { investment_niche?: string }).investment_niche || '',
       });
-      setServiceAreas((data as any).service_areas || []);
-      setLanguages((data as any).languages_spoken || []);
+      setServiceAreas(data.service_areas || []);
+      setLanguages(data.languages_spoken || []);
 
       // Load credentials
       const { data: creds } = await supabase

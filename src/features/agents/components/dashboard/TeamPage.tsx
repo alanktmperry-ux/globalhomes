@@ -3,6 +3,8 @@ import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
 import { Copy, Plus, Trash2, UserPlus, Building2, Shield, Users, RefreshCw, Loader2, Camera, Upload, LogIn, ArrowRight, Mail, MapPin, Eye, Lock, Kanban, ClipboardList, AlertTriangle, CheckCircle2, UserMinus, ArrowRightLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sbExt = supabase as any;
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -198,9 +200,9 @@ const TeamPage = () => {
                 email: agentData.email,
                 phone: agentData.phone,
                 avatar_url: agentData.avatar_url,
-                agency_role: (agentData as any).agency_role,
+                agency_role: (agentData as { agency_role?: string | null }).agency_role ?? null,
                 license_number: agentData.license_number,
-                licence_expiry_date: (agentData as any).licence_expiry_date,
+                licence_expiry_date: (agentData as { licence_expiry_date?: string | null }).licence_expiry_date ?? null,
               } : null,
               agentId: agentData?.id || undefined,
               contactCount,
@@ -243,11 +245,11 @@ const TeamPage = () => {
     setCreating(true);
     try {
       const code = generateCode();
-      const { error } = await supabase.from('agency_invite_codes').insert({
+      const { error } = await sbExt.from('agency_invite_codes').insert({
         agency_id: agencyId,
         code,
         created_by: user.id,
-        role: newInviteRole as any,
+        role: newInviteRole,
         max_uses: parseInt(newInviteMaxUses) || null,
       });
       if (error) throw error;
@@ -325,16 +327,16 @@ const TeamPage = () => {
 
   const handleChangeRole = async (memberId: string, newRole: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await sbExt
         .from('agency_members')
-        .update({ role: newRole as any })
+        .update({ role: newRole })
         .eq('id', memberId);
       if (error) throw error;
 
       // Also update agents.agency_role
       const member = members.find(m => m.id === memberId);
       if (member?.agentId) {
-        await supabase.from('agents').update({ agency_role: newRole } as any).eq('id', member.agentId);
+        await sbExt.from('agents').update({ agency_role: newRole }).eq('id', member.agentId);
       }
 
       toast.success(`Role updated — Member role changed to ${newRole}`);
@@ -361,7 +363,7 @@ const TeamPage = () => {
   const handleDeactivateAgent = async () => {
     if (!deactivateTarget?.agentId || !user) return;
     try {
-      await supabase.from('agents').update({ is_subscribed: false } as any).eq('id', deactivateTarget.agentId);
+      await sbExt.from('agents').update({ is_subscribed: false }).eq('id', deactivateTarget.agentId);
       
       logAction({
         agencyId: agencyId,
@@ -389,14 +391,14 @@ const TeamPage = () => {
       const toAgent = members.find(m => m.agentId === reassignTo);
 
       if (reassignTarget.type === 'contacts') {
-        await supabase
+        await sbExt
           .from('contacts')
-          .update({ assigned_agent_id: reassignTo } as any)
+          .update({ assigned_agent_id: reassignTo })
           .eq('assigned_agent_id', fromAgentId);
       } else {
-        await supabase
+        await sbExt
           .from('properties')
-          .update({ agent_id: reassignTo } as any)
+          .update({ agent_id: reassignTo })
           .eq('agent_id', fromAgentId);
       }
 
@@ -513,8 +515,8 @@ const TeamPage = () => {
         const { data: { publicUrl } } = supabase.storage.from('agency-logos').getPublicUrl(filePath);
         await supabase.from('agencies').update({ logo_url: publicUrl }).eq('id', agency.id);
       }
-      const { error: memberError } = await supabase.from('agency_members').insert({
-        agency_id: agency.id, user_id: user.id, role: 'principal' as any, access_level: 'full',
+      const { error: memberError } = await sbExt.from('agency_members').insert({
+        agency_id: agency.id, user_id: user.id, role: 'principal', access_level: 'full',
       });
       if (memberError) throw memberError;
       const { data: agentRecord } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
@@ -525,7 +527,7 @@ const TeamPage = () => {
           user_id: user.id, name: user.email || 'Principal',
           email: user.email || newAgencyEmail || null, agency_id: agency.id, agency: newAgencyName.trim(),
         });
-        await supabase.from('user_roles').insert({ user_id: user.id, role: 'agent' as any }).then(() => {});
+        await sbExt.from('user_roles').insert({ user_id: user.id, role: 'agent' }).then(() => {});
       }
       toast.success(`Agency created! — ${newAgencyName} is ready. You are the Principal.`);
       setNewAgencyName(''); setNewAgencyEmail(''); setNewAgencyPhone('');

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, AlertTriangle, Zap, Globe, BarChart3, Users, Home, DollarSign, ChevronRight, Wallet } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, Zap, Globe, BarChart3, Users, Home, DollarSign, ChevronRight, Wallet, type LucideIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { InsightsData } from '../pages/AdminDashboard';
 
@@ -44,7 +44,7 @@ const StatCard = ({
   color?: string;
   trend?: 'up' | 'down' | 'flat';
   trendLabel?: string;
-  icon?: any;
+  icon?: LucideIcon;
 }) => (
   <div className="bg-card border border-border rounded-xl p-4 space-y-1">
     <div className="flex items-center justify-between">
@@ -67,7 +67,7 @@ const StatCard = ({
   </div>
 );
 
-const SectionTitle = ({ icon: Icon, title }: { icon: any; title: string }) => (
+const SectionTitle = ({ icon: Icon, title }: { icon: LucideIcon; title: string }) => (
   <div className="flex items-center gap-2 mb-3">
     <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
       <Icon size={14} className="text-primary" />
@@ -97,9 +97,11 @@ const AdminOverview = ({ stats, users, insights, onNavigate }: Props) => {
           supabase.from('agent_subscriptions').select('agent_id, plan_type'),
         ]);
         const planMap = new Map<string, string>();
-        (subsRes.data || []).forEach((s: any) => planMap.set(s.agent_id, s.plan_type));
+        type SubRow = { agent_id: string; plan_type: string | null };
+        ((subsRes.data ?? []) as unknown as SubRow[]).forEach((s) => planMap.set(s.agent_id, s.plan_type ?? ''));
         let mrr = 0;
-        (agentsRes.data || []).forEach((a: any) => {
+        type AgentRow = { id: string; is_subscribed: boolean | null };
+        ((agentsRes.data ?? []) as unknown as AgentRow[]).forEach((a) => {
           if (!a.is_subscribed) return;
           const plan = (planMap.get(a.id) || 'demo').toLowerCase();
           mrr += PLAN_MRR[plan] || 0;
@@ -130,22 +132,25 @@ const AdminOverview = ({ stats, users, insights, onNavigate }: Props) => {
 
         // At-risk agents — fetch agent ids with their listing counts
         const { data: allAgents } = await supabase.from('agents').select('id, user_id');
-        const agentIds = (allAgents || []).map((a: any) => a.id);
+        type AgentLite = { id: string; user_id: string };
+        const allAgentsTyped = ((allAgents ?? []) as unknown as AgentLite[]);
+        const agentIds = allAgentsTyped.map((a) => a.id);
         const userIdToLastSeen = new Map<string, number | null>(
           users.map(u => [u.id, u.last_sign_in_at ? new Date(u.last_sign_in_at).getTime() : null])
         );
-        let activeListingCounts = new Map<string, number>();
+        const activeListingCounts = new Map<string, number>();
         if (agentIds.length > 0) {
           const { data: props } = await supabase
             .from('properties')
             .select('agent_id')
             .eq('is_active', true)
             .in('agent_id', agentIds);
-          (props || []).forEach((p: any) => {
+          type PropAgent = { agent_id: string };
+          ((props ?? []) as unknown as PropAgent[]).forEach((p) => {
             activeListingCounts.set(p.agent_id, (activeListingCounts.get(p.agent_id) || 0) + 1);
           });
         }
-        const atRisk = (allAgents || []).filter((a: any) => {
+        const atRisk = allAgentsTyped.filter((a) => {
           const lastSeen = userIdToLastSeen.get(a.user_id);
           const staleLogin = !lastSeen || lastSeen < new Date(fourteenDaysAgo).getTime();
           const noListings = (activeListingCounts.get(a.id) || 0) === 0;
@@ -178,20 +183,23 @@ const AdminOverview = ({ stats, users, insights, onNavigate }: Props) => {
           let q = supabase.from('agents').select('id, created_at').gte('created_at', since);
           if (until) q = q.lt('created_at', until);
           const { data: agentsBatch } = await q;
-          const ids = (agentsBatch || []).map((a: any) => a.id);
+          type AgentLite2 = { id: string; created_at: string };
+          const agentsTyped = ((agentsBatch ?? []) as unknown as AgentLite2[]);
+          const ids = agentsTyped.map((a) => a.id);
           if (ids.length === 0) return null;
           const { data: props } = await supabase
             .from('properties')
             .select('agent_id, created_at')
             .in('agent_id', ids);
           const firstByAgent = new Map<string, number>();
-          (props || []).forEach((p: any) => {
+          type PropTime = { agent_id: string; created_at: string };
+          ((props ?? []) as unknown as PropTime[]).forEach((p) => {
             const t = new Date(p.created_at).getTime();
             const cur = firstByAgent.get(p.agent_id);
             if (cur === undefined || t < cur) firstByAgent.set(p.agent_id, t);
           });
           const diffs: number[] = [];
-          (agentsBatch || []).forEach((a: any) => {
+          agentsTyped.forEach((a) => {
             const first = firstByAgent.get(a.id);
             if (first) diffs.push((first - new Date(a.created_at).getTime()) / DAY);
           });

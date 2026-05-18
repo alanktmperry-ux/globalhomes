@@ -294,36 +294,44 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
       try {
         const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
         const j = await callAdminFunction('list_users');
-        (j?.users || []).forEach((u: any) => signInMap.set(u.id, u.last_sign_in_at || null));
+        type AdminUserRow = { id: string; last_sign_in_at: string | null };
+        (j?.users || []).forEach((u: AdminUserRow) => signInMap.set(u.id, u.last_sign_in_at || null));
       } catch {}
 
+      type PropRow = { agent_id: string | null; is_active: boolean | null };
       const propMap = new Map<string, number>();
-      (propsRes.data || []).forEach((p: any) => {
+      ((propsRes.data ?? []) as unknown as PropRow[]).forEach((p) => {
         if (p.is_active && p.agent_id) propMap.set(p.agent_id, (propMap.get(p.agent_id) || 0) + 1);
       });
 
+      type LeadRow = { agent_id: string | null };
       const leadMap = new Map<string, number>();
-      (leadsRes.data || []).forEach((l: any) => {
+      ((leadsRes.data ?? []) as unknown as LeadRow[]).forEach((l) => {
         if (l.agent_id) leadMap.set(l.agent_id, (leadMap.get(l.agent_id) || 0) + 1);
       });
 
+      type OpenHomeRow = { agent_id: string | null; inspection_times: unknown };
       const openHomeSet = new Set(
-        (openHomeRes.data || [])
-          .filter((p: any) => Array.isArray(p.inspection_times) && p.inspection_times.length > 0)
-          .map((p: any) => p.agent_id)
-          .filter(Boolean)
+        ((openHomeRes.data ?? []) as unknown as OpenHomeRow[])
+          .filter((p) => Array.isArray(p.inspection_times) && (p.inspection_times as unknown[]).length > 0)
+          .map((p) => p.agent_id)
+          .filter((id): id is string => !!id)
       );
-      const contactSet = new Set((contactsRes.data || []).map((c: any) => c.agent_id).filter(Boolean));
-      const trustSet = new Set((trustRes.data || []).map((t: any) => t.agent_id).filter(Boolean));
+      type ContactRow = { agent_id: string | null };
+      const contactSet = new Set(((contactsRes.data ?? []) as unknown as ContactRow[]).map((c) => c.agent_id).filter((id): id is string => !!id));
+      type TrustRow = { agent_id: string | null };
+      const trustSet = new Set(((trustRes.data ?? []) as unknown as TrustRow[]).map((t) => t.agent_id).filter((id): id is string => !!id));
 
+      type NoteRow = Note & { agent_id: string };
       const notesMap = new Map<string, Note[]>();
-      ((notesRes.data || []) as any[]).forEach((n: any) => {
+      ((notesRes.data ?? []) as unknown as NoteRow[]).forEach((n) => {
         const arr = notesMap.get(n.agent_id) || [];
         arr.push(n);
         notesMap.set(n.agent_id, arr);
       });
 
-      const rows: AgentLifecycleRow[] = (agentsRes.data || []).map((a: any) => {
+      type AgentRow = { id: string; user_id: string; name: string; email: string; agency: string | null; phone: string | null; created_at: string; is_subscribed: boolean | null; onboarding_complete: boolean | null; lead_source: string | null; lifecycle_stage: string | null; agent_subscriptions: { plan_type: string | null } | { plan_type: string | null }[] | null };
+      const rows: AgentLifecycleRow[] = ((agentsRes.data ?? []) as unknown as AgentRow[]).map((a) => {
         const planType = Array.isArray(a.agent_subscriptions)
           ? a.agent_subscriptions[0]?.plan_type || null
           : a.agent_subscriptions?.plan_type || null;
@@ -347,7 +355,7 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
 
         return {
           id: a.id, name: a.name, email: a.email, agency: a.agency, phone: a.phone,
-          created_at: a.created_at, is_subscribed: a.is_subscribed, plan_type: planType,
+          created_at: a.created_at, is_subscribed: !!a.is_subscribed, plan_type: planType,
           lastLogin, daysSinceLogin, trialDaysLeft,
           adoption: { score, hasListing, hasOpenHome, hasTrust, hasContacts, hasProfile },
           activeListings: propMap.get(a.id) || 0, totalLeads: leadMap.get(a.id) || 0,
@@ -429,7 +437,7 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, email or agency…" className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
         </div>
-        <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className="text-xs bg-card border border-border rounded-xl px-3 py-2 text-foreground outline-none">
+        <select value={sortBy} onChange={e => setSortBy(e.target.value as 'joined' | 'login' | 'adoption' | 'trial')} className="text-xs bg-card border border-border rounded-xl px-3 py-2 text-foreground outline-none">
           <option value="trial">Sort: Trial ending soonest</option>
           <option value="login">Sort: Last login</option>
           <option value="adoption">Sort: Adoption score</option>

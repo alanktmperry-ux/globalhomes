@@ -62,7 +62,9 @@ const PartnerArrearsPage = () => {
 
     if (!tenancies || tenancies.length === 0) { setOverdue([]); setLoading(false); return; }
 
-    const tIds = tenancies.map((t: any) => t.id);
+    type TenancyRow = { id: string; tenant_name: string; tenant_email: string | null; tenant_phone: string | null; rent_amount: number; rent_frequency: string; agent_id: string; properties: { address: string; suburb: string } | null };
+    const tenancyRows = (tenancies ?? []) as unknown as TenancyRow[];
+    const tIds = tenancyRows.map((t) => t.id);
     const { data: payments } = await supabase
       .from('rent_payments')
       .select('tenancy_id, period_to, status')
@@ -72,7 +74,8 @@ const PartnerArrearsPage = () => {
     const today = new Date();
     const latestMap = new Map<string, string>();
     const overdueSet = new Set<string>();
-    for (const p of (payments || []) as any[]) {
+    type PaymentRow = { tenancy_id: string; period_to: string; status: string };
+    for (const p of ((payments ?? []) as unknown as PaymentRow[])) {
       if (!latestMap.has(p.tenancy_id)) latestMap.set(p.tenancy_id, p.period_to);
       if (p.status === 'overdue') overdueSet.add(p.tenancy_id);
     }
@@ -80,7 +83,7 @@ const PartnerArrearsPage = () => {
     const agencyMap = new Map(agencies.map(a => [a.agentId, a]));
 
     const results: OverdueTenancy[] = [];
-    for (const t of tenancies as any[]) {
+    for (const t of tenancyRows) {
       const hasOverdue = overdueSet.has(t.id);
       const latestPeriod = latestMap.get(t.id);
       const daysBehind = latestPeriod ? differenceInDays(today, new Date(latestPeriod)) : 0;
@@ -116,7 +119,7 @@ const PartnerArrearsPage = () => {
       .select('is_active')
       .eq('rule_type', 'arrears_sequence')
       .in('agent_id', agentIds);
-    setAutoOn(!!rules?.some((r: any) => r.is_active));
+    setAutoOn(!!(rules as Array<{ is_active: boolean }> | null)?.some((r) => r.is_active));
 
     const { data: logs } = await sbExt
       .from('pm_automation_log')
@@ -125,7 +128,8 @@ const PartnerArrearsPage = () => {
       .gte('sent_at', new Date(Date.now() - 14 * 86400000).toISOString())
       .order('sent_at', { ascending: false });
     const map: Record<string, string> = {};
-    for (const l of (logs || []) as any[]) {
+    type LogRow = { recipient_email: string | null; sent_at: string };
+    for (const l of ((logs ?? []) as unknown as LogRow[])) {
       if (l.recipient_email && !map[l.recipient_email]) map[l.recipient_email] = l.sent_at;
     }
     setAutoLogs(map);
@@ -173,7 +177,7 @@ const PartnerArrearsPage = () => {
       const { data: membership } = await supabase.from('partner_members').select('partner_id').eq('user_id', user.id).maybeSingle();
       if (membership) {
         await sbExt.from('partner_activity_log').insert({
-          partner_id: (membership as any).partner_id,
+          partner_id: (membership as { partner_id: string }).partner_id,
           agency_id: t.agencyId,
           action_type: 'arrears_reminder_sent',
           entity_type: 'tenancies',

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import {
   DollarSign, TrendingUp, TrendingDown, Users,
@@ -100,7 +101,7 @@ function exportCSV(rows: AgentBillingRow[]) {
 }
 
 function KPI({ label, value, sub, icon: Icon, color = 'text-primary', trend }: {
-  label: string; value: string | number; sub?: string; icon: any; color?: string; trend?: 'up' | 'down' | null;
+  label: string; value: string | number; sub?: string; icon: LucideIcon; color?: string; trend?: 'up' | 'down' | null;
 }) {
   return (
     <div className="bg-card border border-border rounded-2xl p-5">
@@ -184,13 +185,16 @@ export default function RevenueBilling() {
       try {
         const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
         const j = await callAdminFunction('list_users');
-        (j?.users || []).forEach((u: any) => signInMap.set(u.id, u.last_sign_in_at || null));
+        type AdminUserRow = { id: string; last_sign_in_at: string | null };
+        (j?.users || []).forEach((u: AdminUserRow) => signInMap.set(u.id, u.last_sign_in_at || null));
       } catch {}
 
-      const subMap = new Map<string, any>();
-      (subsRes.data || []).forEach((s: any) => subMap.set(s.agent_id, s));
+      type SubRow = { agent_id: string; plan_type: string | null; subscription_start: string | null; subscription_end: string | null; auto_renew: boolean | null };
+      const subMap = new Map<string, SubRow>();
+      (subsRes.data ?? []).forEach((s) => subMap.set(s.agent_id, s as SubRow));
 
-      const rows: AgentBillingRow[] = (agentsRes.data || []).map((a: any) => {
+      type AgentRow = { id: string; name: string; email: string | null; agency: string | null; is_subscribed: boolean | null; created_at: string; stripe_customer_id: string | null };
+      const rows: AgentBillingRow[] = ((agentsRes.data ?? []) as unknown as AgentRow[]).map((a) => {
         const sub = subMap.get(a.id);
         const plan = (sub?.plan_type || 'demo').toLowerCase();
         const mrr = a.is_subscribed ? (PLAN_MRR[plan] || 0) : 0;
@@ -206,8 +210,8 @@ export default function RevenueBilling() {
           ? Math.ceil((new Date(renewalDate).getTime() - now.getTime()) / 86400000)
           : null;
         return {
-          id: a.id, name: a.name, email: a.email, agency: a.agency,
-          plan, mrr, isSubscribed: a.is_subscribed,
+          id: a.id, name: a.name, email: a.email ?? '', agency: a.agency ?? '',
+          plan, mrr, isSubscribed: !!a.is_subscribed,
           subscriptionStart, subscriptionEnd, renewalDate, daysUntilRenewal,
           lastLogin: signInMap.get(a.id) || null,
           stripeConnected: !!a.stripe_customer_id,
@@ -245,16 +249,17 @@ export default function RevenueBilling() {
           return start <= monthEnd && (!end || end > monthStart);
         });
         const mrr = activePaidAtMonth.reduce((s, r) => s + r.mrr, 0);
-        const monthEvents = events.filter((e: any) => {
+        type SubEvent = { agent_id: string; event_type: string; from_plan: string | null; to_plan: string | null; mrr_change: number | null; created_at: string };
+        const monthEvents = (events as unknown as SubEvent[]).filter((e) => {
           const d = new Date(e.created_at);
           return d >= monthStart && d <= monthEnd;
         });
         const newMrr = monthEvents
-          .filter((e: any) => e.event_type === 'converted' || e.event_type === 'upgraded')
-          .reduce((s: number, e: any) => s + (e.mrr_change || 0), 0);
+          .filter((e) => e.event_type === 'converted' || e.event_type === 'upgraded')
+          .reduce((s, e) => s + (e.mrr_change || 0), 0);
         const churnMrr = monthEvents
-          .filter((e: any) => e.event_type === 'cancelled' || e.event_type === 'downgraded')
-          .reduce((s: number, e: any) => s + Math.abs(e.mrr_change || 0), 0);
+          .filter((e) => e.event_type === 'cancelled' || e.event_type === 'downgraded')
+          .reduce((s, e) => s + Math.abs(e.mrr_change || 0), 0);
         trend.push({ label, mrr, arr: mrr * 12, newMrr, churnMrr, netNew: newMrr - churnMrr });
       }
       setMrrTrend(trend);
@@ -270,7 +275,8 @@ export default function RevenueBilling() {
           .order('created_at', { ascending: false })
           .limit(200);
         const totals: Record<string, { units: number; revenue: number }> = {};
-        (addonData || []).forEach((p: any) => {
+        type AddonRow = { id: string; package_id: string | null; amount_paid_aud: number | null; created_at: string; agent_id: string | null; status: string };
+        ((addonData ?? []) as unknown as AddonRow[]).forEach((p) => {
           const key = 'halo_credits';
           if (!totals[key]) totals[key] = { units: 0, revenue: 0 };
           totals[key].units += 1;

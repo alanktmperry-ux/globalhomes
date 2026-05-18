@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sbExt = supabase as any;
 import { useAgentId } from '@/features/crm/hooks/useAgentId';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +18,7 @@ import { Plus, Loader2, Mail, X, FileText, Download, Calculator } from 'lucide-r
 import { toast } from 'sonner';
 import { format, parseISO, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import DashboardHeader from './DashboardHeader';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2 });
 

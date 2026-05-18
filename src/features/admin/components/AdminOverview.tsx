@@ -97,9 +97,11 @@ const AdminOverview = ({ stats, users, insights, onNavigate }: Props) => {
           supabase.from('agent_subscriptions').select('agent_id, plan_type'),
         ]);
         const planMap = new Map<string, string>();
-        (subsRes.data || []).forEach((s: any) => planMap.set(s.agent_id, s.plan_type));
+        type SubRow = { agent_id: string; plan_type: string | null };
+        ((subsRes.data ?? []) as unknown as SubRow[]).forEach((s) => planMap.set(s.agent_id, s.plan_type ?? ''));
         let mrr = 0;
-        (agentsRes.data || []).forEach((a: any) => {
+        type AgentRow = { id: string; is_subscribed: boolean | null };
+        ((agentsRes.data ?? []) as unknown as AgentRow[]).forEach((a) => {
           if (!a.is_subscribed) return;
           const plan = (planMap.get(a.id) || 'demo').toLowerCase();
           mrr += PLAN_MRR[plan] || 0;

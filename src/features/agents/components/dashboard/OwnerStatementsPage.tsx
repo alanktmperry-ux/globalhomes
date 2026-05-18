@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sbExt = supabase as any;
 import { useAgentId } from '@/features/crm/hooks/useAgentId';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +18,7 @@ import { Plus, Loader2, Mail, X, FileText, Download, Calculator } from 'lucide-r
 import { toast } from 'sonner';
 import { format, parseISO, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import DashboardHeader from './DashboardHeader';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 const AUD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2 });
 
@@ -76,9 +79,9 @@ export default function OwnerStatementsPage() {
       if (pErr) throw pErr;
 
       const totalRentReceived = (receipts || [])
-        .filter((r: any) => (r.description || '').toLowerCase().includes('rent'))
-        .reduce((s: number, r: any) => s + Number(r.amount || 0), 0);
-      const totalExpenses = (payments || []).reduce((s: number, p: any) => s + Number(p.amount || 0), 0);
+        .filter((r) => (r.description || '').toLowerCase().includes('rent'))
+        .reduce((s, r) => s + Number(r.amount || 0), 0);
+      const totalExpenses = (payments || []).reduce((s, p) => s + Number(p.amount || 0), 0);
       const pct = feeSource?.percent ?? 0;
       const managementFeeAud = pct ? Math.round(totalRentReceived * (pct / 100) * 100) / 100 : 0;
 
@@ -89,8 +92,8 @@ export default function OwnerStatementsPage() {
         management_fee_aud: managementFeeAud,
       }));
       toast.success('Statement pre-filled from trust ledger');
-    } catch (e: any) {
-      toast.error(e?.message || 'Failed to auto-fill from ledger');
+    } catch (e) {
+      toast.error(getErrorMessage(e) || 'Failed to auto-fill from ledger');
     } finally {
       setAutoFilling(false);
     }
@@ -142,8 +145,8 @@ export default function OwnerStatementsPage() {
         supabase.from('properties').select('id, address, suburb, owner_email, owner_name').eq('agent_id', agentId).order('address'),
         supabase.from('owner_statements').select('*, properties(address)').eq('agent_id', agentId).order('created_at', { ascending: false }),
       ]);
-      setProperties((props as any) || []);
-      setStatements((stmts as any) || []);
+      setProperties((props || []) as unknown as Property[]);
+      setStatements((stmts || []) as unknown as Statement[]);
       setLoading(false);
     })();
   }, [agentId]);
@@ -167,7 +170,7 @@ export default function OwnerStatementsPage() {
 
   // Auto-calc mgmt fee from tenancy/default percent when gross rent changes
   useEffect(() => {
-    if (form.gross_rent_aud > 0 && feeSource && (form.management_fee_aud === 0 || (form.management_fee_aud as any) === '')) {
+    if (form.gross_rent_aud > 0 && feeSource && (form.management_fee_aud === 0 || (form.management_fee_aud as unknown as string) === '')) {
       setForm((f) => ({ ...f, management_fee_aud: Math.round(Number(f.gross_rent_aud) * (feeSource.percent / 100) * 100) / 100 }));
     }
   }, [form.gross_rent_aud, form.management_fee_aud, feeSource?.percent]);
@@ -182,8 +185,8 @@ export default function OwnerStatementsPage() {
       if (error || !data?.pdf_url) throw new Error(error?.message || 'Failed');
       setStatements((all) => all.map((s) => s.id === statement.id ? { ...s, pdf_url: data.pdf_url } : s));
       toast.success('PDF ready — click the download link');
-    } catch (err: any) {
-      toast.error(err.message || 'Could not generate PDF');
+    } catch (err) {
+      toast.error(getErrorMessage(err) || 'Could not generate PDF');
     } finally {
       setPdfLoading((s) => ({ ...s, [statement.id]: false }));
     }
@@ -193,7 +196,7 @@ export default function OwnerStatementsPage() {
     if (!form.property_id) { toast.error('Select a property'); return; }
     if (!agentId) return;
     setSaving(true);
-    const { data, error } = await supabase
+    const { data, error } = await sbExt
       .from('owner_statements')
       .insert({
         property_id: form.property_id,
@@ -205,10 +208,10 @@ export default function OwnerStatementsPage() {
         management_fee_gst_aud: mgmtFeeGst,
         maintenance_costs_aud: form.maintenance_costs_aud,
         other_deductions_aud: otherTotal,
-        other_deductions_breakdown: otherDeductions as any,
+        other_deductions_breakdown: otherDeductions,
         net_amount_aud: netAmount,
         statement_notes: form.notes || null,
-      } as any)
+      })
       .select('*, properties(address)')
       .single();
 
@@ -239,14 +242,14 @@ export default function OwnerStatementsPage() {
               html,
             },
           });
-          await supabase.from('owner_statements').update({ emailed_to_owner: true, emailed_at: new Date().toISOString() } as any).eq('id', (data as any).id);
-        } catch (emailErr: any) {
-          toast.error('Statement saved but email failed to send: ' + (emailErr?.message || 'Unknown error'));
+          await sbExt.from('owner_statements').update({ emailed_to_owner: true, emailed_at: new Date().toISOString() }).eq('id', (data as { id: string }).id);
+        } catch (emailErr) {
+          toast.error('Statement saved but email failed to send: ' + (getErrorMessage(emailErr) || 'Unknown error'));
         }
       }
     }
 
-    setStatements((s) => [data as any, ...s]);
+    setStatements((s) => [data as unknown as Statement, ...s]);
     setShowCreate(false);
     setForm({
       property_id: '',
@@ -272,7 +275,7 @@ export default function OwnerStatementsPage() {
       .eq('period_start', form.period_start)
       .eq('period_end', form.period_end)
       .limit(1);
-    if (existing && (existing as any[]).length > 0) {
+    if (existing && existing.length > 0) {
       setPendingAlsoEmail(alsoEmail);
       setShowDuplicateWarn(true);
       return;

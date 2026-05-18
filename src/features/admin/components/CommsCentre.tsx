@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sbExt = supabase as any;
 import { dispatchNotification } from '@/shared/lib/notify';
 import {
   Send, Mail, Bell, Users, Clock, CheckCircle2, Plus, Trash2, Edit2,
@@ -57,7 +60,7 @@ const AUDIENCE_CONFIG: Record<Audience, { label: string; desc: string; color: st
   at_risk: { label: 'At risk', desc: 'No login in 14+ days', color: 'bg-destructive/10 text-destructive' },
 };
 
-const METHOD_CONFIG: Record<SendMethod, { label: string; icon: any }> = {
+const METHOD_CONFIG: Record<SendMethod, { label: string; icon: LucideIcon }> = {
   in_app: { label: 'In-app only', icon: Bell },
   email: { label: 'Email only', icon: Mail },
   both: { label: 'In-app + Email', icon: Send },
@@ -98,27 +101,29 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
     setPreviewLoading(true);
     try {
       const now = new Date();
-      const { data: allAgents } = await supabase.from('agents').select('id, name, email, agency, is_subscribed, created_at');
-      if (!allAgents) return;
+      type AgentRow = { id: string; name: string | null; email: string | null; agency: string | null; is_subscribed: boolean | null; created_at: string };
+      const { data: allAgentsRaw } = await supabase.from('agents').select('id, name, email, agency, is_subscribed, created_at');
+      const allAgents = (allAgentsRaw || []) as unknown as AgentRow[];
+      if (!allAgentsRaw) return;
 
       const signInMap = new Map<string, string | null>();
       if (aud === 'at_risk') {
         try {
           const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
           const j = await callAdminFunction('list_users');
-          (j?.users || []).forEach((u: any) => signInMap.set(u.id, u.last_sign_in_at || null));
-        } catch {}
+          ((j?.users || []) as Array<{ id: string; last_sign_in_at: string | null }>).forEach((u) => signInMap.set(u.id, u.last_sign_in_at || null));
+        } catch {/* ignore */}
       }
 
       let agentsWithListings = new Set<string>();
       if (aud === 'never_listed') {
         const { data: props } = await supabase.from('properties').select('agent_id').eq('is_active', true);
-        agentsWithListings = new Set((props || []).map((p: any) => p.agent_id).filter(Boolean));
+        agentsWithListings = new Set(((props || []) as Array<{ agent_id: string | null }>).map((p) => p.agent_id).filter(Boolean) as string[]);
       }
 
       const d14 = new Date(now.getTime() - 14 * 86400000).toISOString();
 
-      const filtered = allAgents.filter((a: any) => {
+      const filtered = allAgents.filter((a) => {
         if (aud === 'all') return true;
         if (aud === 'trial') return !a.is_subscribed;
         if (aud === 'paid') return a.is_subscribed;
@@ -135,7 +140,7 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
         return true;
       });
 
-      setPreview(filtered.map((a: any) => ({ id: a.id, name: a.name, email: a.email, agency: a.agency })));
+      setPreview(filtered.map((a) => ({ id: a.id, name: a.name || '', email: a.email || '', agency: a.agency })));
     } finally {
       setPreviewLoading(false);
     }
@@ -166,7 +171,7 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
 
     setSending(true);
 
-    const { data: campaign, error: campErr } = await supabase
+    const { data: campaign, error: campErr } = await sbExt
       .from('broadcast_campaigns')
       .insert({
         title: title || subject,
@@ -177,7 +182,7 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
         recipient_count: preview.length,
         status: 'sending',
         created_by: user?.id,
-      } as any)
+      })
       .select()
       .single();
 
@@ -206,21 +211,22 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
       } catch {}
     }
 
-    await supabase.from('broadcast_campaigns').update({
+    const campaignId = (campaign as { id: string }).id;
+    await sbExt.from('broadcast_campaigns').update({
       status: 'sent',
       sent_count: sentCount,
       sent_at: new Date().toISOString(),
-    } as any).eq('id', (campaign as any).id);
+    }).eq('id', campaignId);
 
     if (user?.id) {
-      await supabase.from('audit_log').insert({
+      await sbExt.from('audit_log').insert({
         user_id: user.id,
         action_type: 'bulk_email_sent',
         entity_type: 'broadcast_campaign',
-        entity_id: (campaign as any).id,
+        entity_id: campaignId,
         description: subject,
         metadata: buildAuditMeta({ recipient_count: preview.length, admin_id: user.id }),
-      } as any);
+      });
     }
 
     toast.success(`Sent to ${sentCount} of ${preview.length} agents`);
@@ -356,10 +362,10 @@ function TemplatesPanel({ templates, onRefresh }: { templates: Template[]; onRef
     try {
       const payload = { name: form.name, subject: form.subject, body: form.body, audience: form.audience || null, category: form.category };
       if (editId) {
-        await supabase.from('message_templates').update(payload as any).eq('id', editId);
+        await sbExt.from('message_templates').update(payload).eq('id', editId);
         toast.success('Template updated');
       } else {
-        await supabase.from('message_templates').insert(payload as any);
+        await sbExt.from('message_templates').insert(payload);
         toast.success('Template created');
       }
       setShowNew(false);
@@ -511,8 +517,8 @@ export default function CommsCentre() {
         supabase.from('message_templates').select('*').order('category').order('name'),
         supabase.from('broadcast_campaigns').select('*').order('created_at', { ascending: false }).limit(50),
       ]);
-      setTemplates((tmplRes.data || []) as any);
-      setCampaigns((campRes.data || []) as any);
+      setTemplates((tmplRes.data || []) as unknown as Template[]);
+      setCampaigns((campRes.data || []) as unknown as Campaign[]);
     } finally { setLoading(false); }
   }, []);
 

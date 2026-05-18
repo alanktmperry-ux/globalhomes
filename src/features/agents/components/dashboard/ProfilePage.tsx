@@ -24,6 +24,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sbExt = supabase as any;
 import { useAuth } from '@/features/auth/AuthProvider';
 import { autocomplete } from '@/shared/lib/googleMapsService';
 import DashboardHeader from './DashboardHeader';
@@ -138,17 +140,17 @@ const ProfilePage = () => {
         office_address: data.office_address || '',
         years_experience: data.years_experience || 0,
         specialization: data.specialization || 'Residential',
-        bio: (data as any).bio || '',
-        website_url: (data as any).website_url || '',
-        title_position: (data as any).title_position || 'Agent',
+        bio: data.bio || '',
+        website_url: data.website_url || '',
+        title_position: (data as unknown as { title_position?: string }).title_position || 'Agent',
         social_instagram: social.instagram || '',
         social_linkedin: social.linkedin || '',
         social_facebook: social.facebook || '',
         social_twitter: social.twitter || '',
-        investment_niche: (data as any).investment_niche || '',
+        investment_niche: (data as unknown as { investment_niche?: string }).investment_niche || '',
       });
-      setServiceAreas((data as any).service_areas || []);
-      setLanguages((data as any).languages_spoken || []);
+      setServiceAreas(data.service_areas || []);
+      setLanguages(data.languages_spoken || []);
 
       // Load credentials
       const { data: creds } = await supabase
@@ -212,7 +214,7 @@ const ProfilePage = () => {
       const { error: upErr } = await supabase.storage.from('agency-logos').upload(filePath, file, { upsert: true });
       if (upErr) throw upErr;
       const { data: { publicUrl } } = supabase.storage.from('agency-logos').getPublicUrl(filePath);
-      await supabase.from('agents').update({ company_logo_url: publicUrl } as any).eq('id', agent.id);
+      await sbExt.from('agents').update({ company_logo_url: publicUrl }).eq('id', agent.id);
       setAgent(prev => prev ? { ...prev, company_logo_url: publicUrl } : null);
       toast.success('Company logo updated');
     } catch (err: unknown) {
@@ -225,7 +227,7 @@ const ProfilePage = () => {
   const removeLogo = async () => {
     if (!agent) return;
     try {
-      const { error } = await supabase.from('agents').update({ company_logo_url: null } as any).eq('id', agent.id);
+      const { error } = await sbExt.from('agents').update({ company_logo_url: null }).eq('id', agent.id);
       if (error) throw error;
       setAgent(prev => prev ? { ...prev, company_logo_url: null } : null);
       toast.success('Logo removed');
@@ -281,7 +283,7 @@ const ProfilePage = () => {
     if (!agent) return;
     setSaving(true);
     try {
-      const { error } = await supabase
+      const { error } = await sbExt
         .from('agents')
         .update({
           name: form.name,
@@ -304,7 +306,7 @@ const ProfilePage = () => {
           languages_spoken: languages,
           service_areas: serviceAreas,
           investment_niche: form.investment_niche || null,
-        } as any)
+        })
         .eq('id', agent.id);
       if (error) throw error;
       toast.success('Profile saved — All changes have been saved successfully.');
@@ -586,7 +588,7 @@ const ProfilePage = () => {
                       'Strata & Apartments',
                       'Business Broking',
                     ].map(s => {
-                      const current = ((form as any).investment_niche || '').split(',').map((x: string) => x.trim()).filter(Boolean);
+                      const current = (form.investment_niche || '').split(',').map((x: string) => x.trim()).filter(Boolean);
                       const active = current.includes(s);
                       return (
                         <button
@@ -594,7 +596,7 @@ const ProfilePage = () => {
                           type="button"
                           onClick={() => {
                             const updated = active ? current.filter((x: string) => x !== s) : [...current, s];
-                            setForm(f => ({ ...f, investment_niche: updated.join(', ') } as any));
+                            setForm(f => ({ ...f, investment_niche: updated.join(', ') }));
                           }}
                           className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-colors ${
                             active

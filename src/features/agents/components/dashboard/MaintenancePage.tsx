@@ -1,8 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sbExt = supabase as any;
 import { useAgentId } from '@/features/crm/hooks/useAgentId';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -107,7 +110,7 @@ export default function MaintenancePage() {
         .eq('user_id', user.id)
         .maybeSingle();
       if (cancelled) return;
-      const t = (data as any)?.maintenance_auto_approve_threshold;
+      const t = (data as { maintenance_auto_approve_threshold?: number | null } | null)?.maintenance_auto_approve_threshold;
       const val = t == null ? 500 : Number(t);
       setAutoApproveThreshold(val);
       setThresholdInput(String(val));
@@ -120,9 +123,9 @@ export default function MaintenancePage() {
     if (!user?.id) return;
     const val = Math.max(0, Math.floor(Number(thresholdInput) || 0));
     setSavingThreshold(true);
-    const { error } = await supabase
+    const { error } = await sbExt
       .from('agents')
-      .update({ maintenance_auto_approve_threshold: val } as any)
+      .update({ maintenance_auto_approve_threshold: val })
       .eq('user_id', user.id);
     setSavingThreshold(false);
     if (error) { toast.error(error.message || 'Failed to save threshold'); return; }
@@ -149,15 +152,15 @@ export default function MaintenancePage() {
         if (signed?.signedUrl) newUrls.push(signed.signedUrl);
       }
       const merged = [...(job.photo_urls || []), ...newUrls];
-      const { error: updErr } = await supabase
+      const { error: updErr } = await sbExt
         .from('maintenance_jobs')
-        .update({ photo_urls: merged } as any)
+        .update({ photo_urls: merged })
         .eq('id', job.id);
       if (updErr) throw updErr;
       setJobs(prev => prev.map(j => j.id === job.id ? { ...j, photo_urls: merged } : j));
       toast.success('Photos uploaded');
-    } catch (e: any) {
-      toast.error(e?.message || 'Upload failed');
+    } catch (e) {
+      toast.error(getErrorMessage(e) || 'Upload failed');
     } finally {
       setUploadingFor(null);
     }
@@ -200,7 +203,7 @@ export default function MaintenancePage() {
       .select('id, address, suburb, agency_id')
       .eq('agent_id', agentId)
       .order('address', { ascending: true });
-    setNewJobProperties((data as any) || []);
+    setNewJobProperties((data || []) as unknown as Array<{ id: string; address: string; suburb: string | null; agency_id: string | null }>);
   };
 
   useEffect(() => {
@@ -213,7 +216,7 @@ export default function MaintenancePage() {
         .eq('property_id', newJobPropertyId)
         .eq('status', 'active');
       if (cancelled) return;
-      setNewJobTenancies(((data as any) || []).map((t: any) => ({ id: t.id, tenant_name: t.tenant_name })));
+      setNewJobTenancies(((data || []) as Array<{ id: string; tenant_name: string | null }>).map((t) => ({ id: t.id, tenant_name: t.tenant_name })));
     })();
     return () => { cancelled = true; };
   }, [newJobPropertyId]);
@@ -222,7 +225,7 @@ export default function MaintenancePage() {
     if (!agentId || !newJobPropertyId || !newJobDescription.trim()) return;
     const title = newJobDescription.trim().slice(0, 80);
     setNewJobSaving(true);
-    const { error } = await supabase.from('maintenance_jobs').insert({
+    const { error } = await sbExt.from('maintenance_jobs').insert({
       property_id: newJobPropertyId,
       tenancy_id: newJobTenancyId || null,
       agent_id: agentId,
@@ -231,7 +234,7 @@ export default function MaintenancePage() {
       priority: newJobPriority,
       status: 'new',
       reported_by: newJobReportedBy.trim() || null,
-    } as any);
+    });
     setNewJobSaving(false);
     if (error) { toast.error(error.message || 'Failed to create job'); return; }
     toast.success('Job created');
@@ -250,7 +253,12 @@ export default function MaintenancePage() {
         .order('created_at', { ascending: false }),
       supabase.from('suppliers').select('id, business_name, trade_category, email').eq('agent_id', agentId).eq('status', 'active'),
     ]);
-    const list: Job[] = (js || []).map((j: any) => ({
+    type RawJob = Job & {
+      properties?: { address: string; suburb: string | null } | null;
+      tenancies?: { tenant_name: string | null; tenant_email: string | null; tenant_portal_token: string | null } | null;
+      supplier?: { business_name: string | null } | null;
+    };
+    const list: Job[] = ((js || []) as unknown as RawJob[]).map((j) => ({
       ...j,
       photo_urls: Array.isArray(j.photo_urls) ? j.photo_urls : [],
       property_address: j.properties ? `${j.properties.address}, ${j.properties.suburb}` : null,
@@ -260,7 +268,7 @@ export default function MaintenancePage() {
       supplier_name: j.supplier?.business_name || null,
     }));
     setJobs(list);
-    setSuppliers((sups as any) || []);
+    setSuppliers(((sups || []) as unknown as Supplier[]));
     setLoading(false);
   };
 
@@ -269,7 +277,7 @@ export default function MaintenancePage() {
   const filtered = useMemo(() => jobs.filter(j => statusFilter === 'all' || j.status === statusFilter), [jobs, statusFilter]);
 
   const updateStatus = async (j: Job, status: string) => {
-    await supabase.from('maintenance_jobs').update({ status } as any).eq('id', j.id);
+    await sbExt.from('maintenance_jobs').update({ status }).eq('id', j.id);
     if (status === 'completed') {
       supabase.functions.invoke('run-pm-automations', {
         body: { rule_type: 'maintenance_update', maintenance_job_id: j.id, new_status: 'completed' },
@@ -281,10 +289,10 @@ export default function MaintenancePage() {
 
   const submitAssign = async () => {
     if (!assignFor || !assignSupplierId) return;
-    const { error } = await supabase.from('maintenance_jobs').update({
+    const { error } = await sbExt.from('maintenance_jobs').update({
       assigned_supplier_id: assignSupplierId,
       status: assignFor.status === 'new' ? 'assigned' : assignFor.status,
-    } as any).eq('id', assignFor.id);
+    }).eq('id', assignFor.id);
     if (error) { toast.error(error.message || 'Failed to assign'); return; }
     toast.success('Supplier assigned');
     const justAssigned = { ...assignFor, assigned_supplier_id: assignSupplierId };
@@ -303,10 +311,10 @@ export default function MaintenancePage() {
     }
     setEntrySaving(true);
     const nowIso = new Date().toISOString();
-    const { error } = await supabase.from('maintenance_jobs').update({
+    const { error } = await sbExt.from('maintenance_jobs').update({
       scheduled_entry_date: entryDate,
       entry_notice_sent_at: nowIso,
-    } as any).eq('id', entryFor.id);
+    }).eq('id', entryFor.id);
     if (error) { setEntrySaving(false); toast.error(error.message || 'Failed to record entry notice'); return; }
 
     if (entryFor.tenant_email) {
@@ -335,11 +343,11 @@ export default function MaintenancePage() {
     if (!quoteFor || !quoteAmount) return;
     const cost = parseFloat(quoteAmount);
     const shouldAutoApprove = !isNaN(cost) && cost <= autoApproveThreshold;
-    await supabase.from('maintenance_jobs').update({
+    await sbExt.from('maintenance_jobs').update({
       estimated_cost: cost,
       status: shouldAutoApprove ? 'approved' : 'quoted',
       ...(shouldAutoApprove ? { auto_approved: true } : {}),
-    } as any).eq('id', quoteFor.id);
+    }).eq('id', quoteFor.id);
     if (shouldAutoApprove) {
       toast.success(`Job auto-approved (under $${autoApproveThreshold} threshold)`);
     } else {

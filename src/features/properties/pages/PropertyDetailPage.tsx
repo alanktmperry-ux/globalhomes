@@ -634,6 +634,17 @@ export default function PropertyDetailPage() {
           </div>
         )}
 
+        {/* Location map — directly below hero, proportional height */}
+        {(rawProperty?.lat && rawProperty?.lng) ? (
+          <div className="mt-4">
+            <PropertyLocationMap
+              lat={Number(rawProperty.lat)}
+              lng={Number(rawProperty.lng)}
+              address={property.address}
+            />
+          </div>
+        ) : null}
+
         {/* Action bar below hero */}
         <div className="flex flex-wrap gap-2 mt-4 mb-6">
           <button

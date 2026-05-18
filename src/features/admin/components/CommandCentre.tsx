@@ -31,6 +31,7 @@ import {
   Ban,
   Trash2,
   UserPlus,
+  LogOut,
 } from 'lucide-react';
 import {
   AreaChart,

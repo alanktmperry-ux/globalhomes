@@ -1,5 +1,8 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sbExt = supabase as any;
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -65,7 +68,7 @@ function downloadCsv(rows: string[][], filename: string) {
 async function logAudit(actionType: string, metadata: Record<string, unknown>) {
   try {
     const { data: { user } } = await supabase.auth.getUser();
-    await (supabase.from('audit_log') as any).insert({
+    await sbExt.from('audit_log').insert({
       action_type: actionType,
       entity_type: 'segment',
       user_id: user?.id ?? null,
@@ -131,7 +134,7 @@ export default function OutreachPage() {
   const fetchAgents = useCallback(async () => {
     setLoading(true);
     try {
-      const { data: agentsData } = await (supabase as any)
+      const { data: agentsData } = await sbExt
         .from('agents')
         .select('id, name, email, agency, is_subscribed, created_at, state, agent_subscriptions(plan_type, subscription_start)')
         .limit(500);
@@ -209,7 +212,7 @@ export default function OutreachPage() {
   const fetchBuyers = useCallback(async () => {
     setLoading(true);
     try {
-      const { data: profileData } = await (supabase as any)
+      const { data: profileData } = await sbExt
         .from('buyer_profiles')
         .select('id, user_id, budget_min, budget_max, created_at')
         .limit(500);
@@ -219,7 +222,7 @@ export default function OutreachPage() {
       // saved counts
       const savedMap = new Map<string, number>();
       if (userIds.length > 0) {
-        const { data: savedData } = await (supabase as any)
+        const { data: savedData } = await sbExt
           .from('saved_properties')
           .select('user_id');
         (savedData || []).forEach((s: any) => {
@@ -230,7 +233,7 @@ export default function OutreachPage() {
       // emails
       const emailMap = new Map<string, string>();
       if (userIds.length > 0) {
-        const { data: profilesData } = await (supabase as any)
+        const { data: profilesData } = await sbExt
           .from('profiles')
           .select('id, email')
           .in('id', userIds);
@@ -242,7 +245,7 @@ export default function OutreachPage() {
       // briefs
       const briefSet = new Set<string>();
       try {
-        const { data: briefsData } = await (supabase as any)
+        const { data: briefsData } = await sbExt
           .from('buyer_briefs')
           .select('buyer_id, user_id');
         (briefsData || []).forEach((b: any) => {

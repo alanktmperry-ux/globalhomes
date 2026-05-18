@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sbExt = supabase as any;
 import { toast } from 'sonner';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -40,7 +43,7 @@ async function logAudit(actionType: string, entityType: string, entityId: string
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    await (supabase.from('audit_log') as any).insert({
+    await sbExt.from('audit_log').insert({
       user_id: user.id,
       action_type: actionType,
       entity_type: entityType,
@@ -88,7 +91,7 @@ function DemosTab({ onCount }: { onCount: (n: number) => void }) {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { data, error } = await (supabase.from('demo_requests') as any)
+      const { data, error } = await sbExt.from('demo_requests')
         .select('id, full_name, email, agency_name, phone, message, created_at, status')
         .eq('status', 'pending')
         .order('created_at', { ascending: false })
@@ -111,7 +114,7 @@ function DemosTab({ onCount }: { onCount: (n: number) => void }) {
     setBusyId(row.id);
     try {
       const newStatus = accept ? 'accepted' : 'declined';
-      const { error } = await (supabase.from('demo_requests') as any)
+      const { error } = await sbExt.from('demo_requests')
         .update({ status: newStatus })
         .eq('id', row.id);
       if (error) throw error;
@@ -190,7 +193,7 @@ function PartnersTab({ onCount }: { onCount: (n: number) => void }) {
     try {
       // Bug Fix 2: query the real `partners` table (no `partner_applications` table exists).
       // A partner is "pending" when it hasn't been verified yet.
-      const { data, error } = await (supabase.from('partners') as any)
+      const { data, error } = await sbExt.from('partners')
         .select('id, company_name, contact_name, contact_email, contact_phone, partner_type, abn, notes, created_at')
         .eq('is_verified', false)
         .order('created_at', { ascending: false })
@@ -226,7 +229,7 @@ function PartnersTab({ onCount }: { onCount: (n: number) => void }) {
       const patch = approve
         ? { is_verified: true, verified_at: new Date().toISOString() }
         : { is_verified: false, notes: (row.message ? row.message + '\n' : '') + '[Rejected by admin]' };
-      const { error } = await (supabase.from('partners') as any)
+      const { error } = await sbExt.from('partners')
         .update(patch)
         .eq('id', row.id);
       if (error) throw error;

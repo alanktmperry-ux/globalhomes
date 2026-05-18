@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePartner } from './PartnerDashboardLayout';
 import { supabase } from '@/integrations/supabase/client';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sbExt = supabase as any;
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -108,14 +111,14 @@ const PartnerArrearsPage = () => {
     if (agencies.length === 0) return;
     const agentIds = agencies.map(a => a.agentId).filter(Boolean);
     if (agentIds.length === 0) return;
-    const { data: rules } = await (supabase as any)
+    const { data: rules } = await sbExt
       .from('pm_automation_rules')
       .select('is_active')
       .eq('rule_type', 'arrears_sequence')
       .in('agent_id', agentIds);
     setAutoOn(!!rules?.some((r: any) => r.is_active));
 
-    const { data: logs } = await (supabase as any)
+    const { data: logs } = await sbExt
       .from('pm_automation_log')
       .select('recipient_email, sent_at')
       .eq('rule_type', 'arrears_sequence')
@@ -136,7 +139,7 @@ const PartnerArrearsPage = () => {
     try {
       const agentIds = agencies.map(a => a.agentId).filter(Boolean);
       const newState = !autoOn;
-      const { error } = await (supabase as any)
+      const { error } = await sbExt
         .from('pm_automation_rules')
         .update({ is_active: newState })
         .eq('rule_type', 'arrears_sequence')
@@ -169,7 +172,7 @@ const PartnerArrearsPage = () => {
       // Log activity
       const { data: membership } = await supabase.from('partner_members').select('partner_id').eq('user_id', user.id).maybeSingle();
       if (membership) {
-        await supabase.from('partner_activity_log' as any).insert({
+        await sbExt.from('partner_activity_log').insert({
           partner_id: (membership as any).partner_id,
           agency_id: t.agencyId,
           action_type: 'arrears_reminder_sent',

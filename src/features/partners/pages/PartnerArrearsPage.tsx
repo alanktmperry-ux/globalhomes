@@ -119,7 +119,7 @@ const PartnerArrearsPage = () => {
       .select('is_active')
       .eq('rule_type', 'arrears_sequence')
       .in('agent_id', agentIds);
-    setAutoOn(!!rules?.some((r: any) => r.is_active));
+    setAutoOn(!!(rules as Array<{ is_active: boolean }> | null)?.some((r) => r.is_active));
 
     const { data: logs } = await sbExt
       .from('pm_automation_log')

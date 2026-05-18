@@ -322,8 +322,9 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
       type TrustRow = { agent_id: string | null };
       const trustSet = new Set(((trustRes.data ?? []) as unknown as TrustRow[]).map((t) => t.agent_id).filter((id): id is string => !!id));
 
+      type NoteRow = Note & { agent_id: string };
       const notesMap = new Map<string, Note[]>();
-      ((notesRes.data ?? []) as unknown as Note[]).forEach((n) => {
+      ((notesRes.data ?? []) as unknown as NoteRow[]).forEach((n) => {
         const arr = notesMap.get(n.agent_id) || [];
         arr.push(n);
         notesMap.set(n.agent_id, arr);

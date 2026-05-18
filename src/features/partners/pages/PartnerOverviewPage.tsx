@@ -101,15 +101,27 @@ const PartnerOverviewPage = () => {
       .eq('partner_id', partnerId)
       .eq('status', 'active');
 
-    const agentIds = (activeLinks || []).map((l: any) => l.invited_by_agent_id).filter(Boolean);
+    const agentIds = (activeLinks || []).map((l) => l.invited_by_agent_id).filter(Boolean) as string[];
 
     if (agentIds.length > 0) {
+      type TenancyRow = {
+        id: string;
+        rent_amount: number | null;
+        rent_frequency: string | null;
+        status: string | null;
+        lease_end: string | null;
+        actual_vacate_date: string | null;
+        re_let_date: string | null;
+        days_to_re_let: number | null;
+        vacancy_loss_aud: number | null;
+      };
       const { data: tenancies } = await supabase
         .from('tenancies')
         .select('id, rent_amount, rent_frequency, status, lease_end, actual_vacate_date, re_let_date, days_to_re_let, vacancy_loss_aud')
         .in('agent_id', agentIds);
+      const tList = (tenancies || []) as unknown as TenancyRow[];
 
-      const active = (tenancies || []).filter((t: any) => t.status === 'active');
+      const active = tList.filter((t) => t.status === 'active');
       setTenancyCount(active.length);
 
       // Vacancy KPIs
@@ -117,31 +129,31 @@ const PartnerOverviewPage = () => {
       const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
       const threeMonthsAgo = new Date(); threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
-      const vacant = (tenancies || []).filter((t: any) => t.status === 'ended' && !t.re_let_date);
-      const vacatingMonth = (tenancies || []).filter((t: any) => {
+      const vacant = tList.filter((t) => t.status === 'ended' && !t.re_let_date);
+      const vacatingMonth = tList.filter((t) => {
         if (t.status !== 'vacating') return false;
         if (!t.lease_end) return true;
         const days = Math.floor((new Date(t.lease_end).getTime() - today.getTime()) / 86400000);
         return days <= 30;
       });
-      const recentReLet = (tenancies || []).filter((t: any) => t.re_let_date && new Date(t.re_let_date) >= threeMonthsAgo && t.days_to_re_let != null);
+      const recentReLet = tList.filter((t) => t.re_let_date && new Date(t.re_let_date) >= threeMonthsAgo && t.days_to_re_let != null);
       const avgReLet = recentReLet.length
-        ? Math.round(recentReLet.reduce((s: number, t: any) => s + (t.days_to_re_let || 0), 0) / recentReLet.length)
+        ? Math.round(recentReLet.reduce((s, t) => s + (t.days_to_re_let || 0), 0) / recentReLet.length)
         : null;
-      const lossMonth = (tenancies || [])
-        .filter((t: any) => t.re_let_date && new Date(t.re_let_date) >= monthStart)
-        .reduce((s: number, t: any) => s + Number(t.vacancy_loss_aud || 0), 0);
+      const lossMonth = tList
+        .filter((t) => t.re_let_date && new Date(t.re_let_date) >= monthStart)
+        .reduce((s, t) => s + Number(t.vacancy_loss_aud || 0), 0);
 
       setVacancyStats({ vacant: vacant.length, vacatingMonth: vacatingMonth.length, avgReLet, lossMonth });
 
       if (active.length > 0) {
-        const tIds = active.map((t: any) => t.id);
+        const tIds = active.map((t) => t.id);
         const { data: payments } = await supabase
           .from('rent_payments')
           .select('tenancy_id, status')
           .in('tenancy_id', tIds)
           .eq('status', 'overdue');
-        setArrearsCount(new Set((payments || []).map((p: any) => p.tenancy_id)).size);
+        setArrearsCount(new Set((payments || []).map((p) => p.tenancy_id)).size);
       }
     }
 

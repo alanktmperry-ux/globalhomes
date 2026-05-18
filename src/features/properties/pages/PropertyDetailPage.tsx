@@ -611,6 +611,7 @@ export default function PropertyDetailPage() {
               <ListingImageGallery
                 images={images}
                 address={property.address}
+                layout={rawProperty?.lat && rawProperty?.lng ? 'hero-rail' : 'grid'}
                 overlay={
                   <div className="absolute top-4 left-4 flex gap-2 pointer-events-none">
                     {badge && (

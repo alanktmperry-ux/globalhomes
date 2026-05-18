@@ -362,10 +362,10 @@ function TemplatesPanel({ templates, onRefresh }: { templates: Template[]; onRef
     try {
       const payload = { name: form.name, subject: form.subject, body: form.body, audience: form.audience || null, category: form.category };
       if (editId) {
-        await supabase.from('message_templates').update(payload as any).eq('id', editId);
+        await sbExt.from('message_templates').update(payload).eq('id', editId);
         toast.success('Template updated');
       } else {
-        await supabase.from('message_templates').insert(payload as any);
+        await sbExt.from('message_templates').insert(payload);
         toast.success('Template created');
       }
       setShowNew(false);

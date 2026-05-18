@@ -100,6 +100,8 @@ function trialEnd(createdAt: string) {
 }
 
 export default function AgentSubscriptionAdmin() {
+  const navigate = useNavigate();
+  const { startImpersonation } = useAuth();
   const [agents, setAgents] = useState<AdminAgentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');

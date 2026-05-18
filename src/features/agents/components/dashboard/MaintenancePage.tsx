@@ -216,7 +216,7 @@ export default function MaintenancePage() {
         .eq('property_id', newJobPropertyId)
         .eq('status', 'active');
       if (cancelled) return;
-      setNewJobTenancies(((data as any) || []).map((t: any) => ({ id: t.id, tenant_name: t.tenant_name })));
+      setNewJobTenancies(((data || []) as Array<{ id: string; tenant_name: string | null }>).map((t) => ({ id: t.id, tenant_name: t.tenant_name })));
     })();
     return () => { cancelled = true; };
   }, [newJobPropertyId]);

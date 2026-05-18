@@ -24,6 +24,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sbExt = supabase as any;
 import { useAuth } from '@/features/auth/AuthProvider';
 import { autocomplete } from '@/shared/lib/googleMapsService';
 import DashboardHeader from './DashboardHeader';

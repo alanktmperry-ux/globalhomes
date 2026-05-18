@@ -39,7 +39,13 @@ export default function HeroSearchPreview() {
   const viewerLocale = useViewerLocale();
   const [idx, setIdx] = useState(0);
   const [q, setQ] = useState('');
-  const [heroImgs, setHeroImgs] = useState<string[]>([]);
+  type BoostedListing = {
+    id: string; image: string; address: string; suburb: string; state: string | null;
+    price: string | null; listing_type: 'sale' | 'rent' | null;
+    beds: number | null; baths: number | null; parking: number | null;
+    boost_tier: 'premier' | 'featured' | null;
+  };
+  const [boosted, setBoosted] = useState<BoostedListing[]>([]);
   const [imgIdx, setImgIdx] = useState(0);
   const [hasExplicitLocale, setHasExplicitLocale] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
@@ -157,38 +163,57 @@ export default function HeroSearchPreview() {
 
   useEffect(() => { paused.current = q.length > 0; }, [q]);
 
-  // Fetch a pool of featured listing images to rotate through.
+  // Fetch boosted (Premier/Featured) listings to rotate through with full details.
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
+        const nowIso = new Date().toISOString();
         const { data } = await supabase
           .from('properties')
-          .select('id, image_url, images, is_featured, featured_until, created_at')
+          .select('id, address, suburb, state, price_formatted, listing_type, beds, baths, parking, image_url, images, boost_tier, featured_until')
           .eq('is_active', true)
           .eq('status', 'public')
           .eq('moderation_status', 'approved')
-          .order('is_featured', { ascending: false })
-          .order('created_at', { ascending: false })
-          .limit(12);
+          .eq('is_featured', true)
+          .gt('featured_until', nowIso)
+          .order('boost_tier', { ascending: true }) // 'premier' < 'featured' alphabetically
+          .order('featured_until', { ascending: false })
+          .limit(8);
         if (cancelled) return;
-        const imgs = (data ?? [])
-          .map((row: any) => row?.image_url ?? row?.images?.[0] ?? null)
-          .filter((u: string | null): u is string => !!u);
-        if (imgs.length) setHeroImgs(imgs.slice(0, 8));
-      } catch { /* fallback to placeholder */ }
+        const rows: BoostedListing[] = (data ?? [])
+          .map((r: any) => {
+            const img = r?.image_url ?? r?.images?.[0] ?? null;
+            if (!img) return null;
+            return {
+              id: r.id,
+              image: img,
+              address: r.address ?? '',
+              suburb: r.suburb ?? '',
+              state: r.state ?? null,
+              price: r.price_formatted ?? null,
+              listing_type: r.listing_type ?? null,
+              beds: r.beds ?? null,
+              baths: r.baths ?? null,
+              parking: r.parking ?? null,
+              boost_tier: r.boost_tier ?? null,
+            } as BoostedListing;
+          })
+          .filter((r: BoostedListing | null): r is BoostedListing => !!r);
+        if (rows.length) setBoosted(rows);
+      } catch { /* fallback to static placeholder */ }
     })();
     return () => { cancelled = true; };
   }, []);
 
-  // Rotate the hero image every 4.5s (slightly offset from language cycle)
+  // Rotate the boosted listing every 4.5s
   useEffect(() => {
-    if (heroImgs.length < 2) return;
+    if (boosted.length < 2) return;
     const id = window.setInterval(() => {
-      setImgIdx(i => (i + 1) % heroImgs.length);
+      setImgIdx(i => (i + 1) % boosted.length);
     }, 4500);
     return () => window.clearInterval(id);
-  }, [heroImgs.length]);
+  }, [boosted.length]);
 
   // Pre-warm edge functions — eliminates cold start for first voice/search user
   useEffect(() => {
@@ -452,13 +477,13 @@ export default function HeroSearchPreview() {
             }}
           >
             <div style={{ position: 'relative', aspectRatio: '4 / 5', width: '100%' }}>
-              {heroImgs.length > 0 ? (
+              {boosted.length > 0 ? (
                 <>
-                  {heroImgs.map((src, i) => (
+                  {boosted.map((b, i) => (
                     <img
-                      key={src}
-                      src={src}
-                      alt="Featured listing"
+                      key={b.id}
+                      src={b.image}
+                      alt={b.address || 'Featured listing'}
                       style={{
                         position: 'absolute', inset: 0,
                         width: '100%', height: '100%', objectFit: 'cover', display: 'block',
@@ -500,43 +525,100 @@ export default function HeroSearchPreview() {
               <div style={{
                 position: 'absolute', inset: 0, pointerEvents: 'none',
                 background: 'linear-gradient(to bottom, transparent 50%, rgba(10,15,30,0.65) 100%)',
+                zIndex: 2,
               }} />
 
-              {/* Top badge */}
+              {/* Top badges: language + listing type + boost tier */}
               <div style={{
-                position: 'absolute', top: 16, left: 16,
-                background: 'rgba(255,255,255,0.95)',
-                color: '#1E40AF',
-                borderRadius: 100, padding: '7px 13px',
-                fontSize: 11, fontWeight: 700,
-                display: 'inline-flex', alignItems: 'center', gap: 6,
+                position: 'absolute', top: 16, left: 16, right: 16, zIndex: 3,
+                display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
               }}>
-                <span aria-hidden>🌐</span> {cardBadge}
+                <div style={{
+                  background: 'rgba(255,255,255,0.95)', color: '#1E40AF',
+                  borderRadius: 100, padding: '7px 13px',
+                  fontSize: 11, fontWeight: 700,
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                }}>
+                  <span aria-hidden>🌐</span> {cardBadge}
+                </div>
+                {boosted[imgIdx]?.listing_type && (
+                  <div style={{
+                    background: boosted[imgIdx].listing_type === 'rent' ? '#10B981' : '#2563EB',
+                    color: '#fff',
+                    borderRadius: 100, padding: '6px 12px',
+                    fontSize: 10, fontWeight: 800, letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                  }}>
+                    {boosted[imgIdx].listing_type === 'rent' ? 'For Rent' : 'For Sale'}
+                  </div>
+                )}
+                {boosted[imgIdx]?.boost_tier && (
+                  <div style={{
+                    marginLeft: 'auto',
+                    background: boosted[imgIdx].boost_tier === 'premier' ? '#F59E0B' : '#2563EB',
+                    color: '#fff',
+                    borderRadius: 100, padding: '6px 10px',
+                    fontSize: 10, fontWeight: 800, letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                  }}>
+                    {boosted[imgIdx].boost_tier === 'premier' ? '★ Premier' : '⚡ Featured'}
+                  </div>
+                )}
               </div>
 
               {/* Bottom overlay */}
               <div style={{
                 position: 'absolute', left: 0, right: 0, bottom: 0,
-                padding: 24, color: '#fff',
+                padding: 24, color: '#fff', zIndex: 3,
               }}>
-                <div style={{
-                  fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
-                  color: 'rgba(255,255,255,0.78)', textTransform: 'uppercase',
-                  marginBottom: 8,
-                }}>
-                  {cardSuburb}
-                </div>
-                <div
-                  id="propTitle"
-                  style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.15, marginBottom: 10 }}
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(cardTitleHtml) }}
-                />
-                <div id="propPrice" style={{ fontSize: 24, fontWeight: 800, marginBottom: 10 }}>
-                  {cardPrice}
-                </div>
-                <div style={{ fontSize: 13, fontWeight: 600, opacity: 0.9 }}>
-                  🛏 4 · 🛁 3 · 🚗 2
-                </div>
+                {boosted.length > 0 ? (
+                  <>
+                    <div style={{
+                      fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
+                      color: 'rgba(255,255,255,0.78)', textTransform: 'uppercase',
+                      marginBottom: 8,
+                    }}>
+                      {boosted[imgIdx].suburb}{boosted[imgIdx].state ? ` · ${boosted[imgIdx].state}` : ''}
+                    </div>
+                    <div style={{ fontSize: 20, fontWeight: 800, lineHeight: 1.2, marginBottom: 10 }}>
+                      {boosted[imgIdx].address}
+                    </div>
+                    {boosted[imgIdx].price && (
+                      <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>
+                        {boosted[imgIdx].price}
+                        {boosted[imgIdx].listing_type === 'rent' && (
+                          <span style={{ fontSize: 13, fontWeight: 600, opacity: 0.85 }}> / week</span>
+                        )}
+                      </div>
+                    )}
+                    <div style={{ fontSize: 13, fontWeight: 600, opacity: 0.9 }}>
+                      {boosted[imgIdx].beds != null && <>🛏 {boosted[imgIdx].beds} </>}
+                      {boosted[imgIdx].baths != null && <>· 🛁 {boosted[imgIdx].baths} </>}
+                      {boosted[imgIdx].parking != null && <>· 🚗 {boosted[imgIdx].parking}</>}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{
+                      fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
+                      color: 'rgba(255,255,255,0.78)', textTransform: 'uppercase',
+                      marginBottom: 8,
+                    }}>
+                      {cardSuburb}
+                    </div>
+                    <div
+                      id="propTitle"
+                      style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.15, marginBottom: 10 }}
+                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(cardTitleHtml) }}
+                    />
+                    <div id="propPrice" style={{ fontSize: 24, fontWeight: 800, marginBottom: 10 }}>
+                      {cardPrice}
+                    </div>
+                    <div style={{ fontSize: 13, fontWeight: 600, opacity: 0.9 }}>
+                      🛏 4 · 🛁 3 · 🚗 2
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 

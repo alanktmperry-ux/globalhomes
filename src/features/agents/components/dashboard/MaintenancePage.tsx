@@ -203,7 +203,7 @@ export default function MaintenancePage() {
       .select('id, address, suburb, agency_id')
       .eq('agent_id', agentId)
       .order('address', { ascending: true });
-    setNewJobProperties((data as any) || []);
+    setNewJobProperties((data || []) as unknown as Array<{ id: string; address: string; suburb: string | null; agency_id: string | null }>);
   };
 
   useEffect(() => {

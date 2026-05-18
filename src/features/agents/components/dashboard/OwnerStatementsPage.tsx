@@ -275,7 +275,7 @@ export default function OwnerStatementsPage() {
       .eq('period_start', form.period_start)
       .eq('period_end', form.period_end)
       .limit(1);
-    if (existing && (existing as any[]).length > 0) {
+    if (existing && existing.length > 0) {
       setPendingAlsoEmail(alsoEmail);
       setShowDuplicateWarn(true);
       return;

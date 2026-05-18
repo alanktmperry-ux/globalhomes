@@ -253,7 +253,12 @@ export default function MaintenancePage() {
         .order('created_at', { ascending: false }),
       supabase.from('suppliers').select('id, business_name, trade_category, email').eq('agent_id', agentId).eq('status', 'active'),
     ]);
-    const list: Job[] = (js || []).map((j: any) => ({
+    type RawJob = Job & {
+      properties?: { address: string; suburb: string | null } | null;
+      tenancies?: { tenant_name: string | null; tenant_email: string | null; tenant_portal_token: string | null } | null;
+      supplier?: { business_name: string | null } | null;
+    };
+    const list: Job[] = ((js || []) as unknown as RawJob[]).map((j) => ({
       ...j,
       photo_urls: Array.isArray(j.photo_urls) ? j.photo_urls : [],
       property_address: j.properties ? `${j.properties.address}, ${j.properties.suburb}` : null,
@@ -263,7 +268,7 @@ export default function MaintenancePage() {
       supplier_name: j.supplier?.business_name || null,
     }));
     setJobs(list);
-    setSuppliers((sups as any) || []);
+    setSuppliers(((sups || []) as unknown as Supplier[]));
     setLoading(false);
   };
 

@@ -177,7 +177,7 @@ const PartnerArrearsPage = () => {
       const { data: membership } = await supabase.from('partner_members').select('partner_id').eq('user_id', user.id).maybeSingle();
       if (membership) {
         await sbExt.from('partner_activity_log').insert({
-          partner_id: (membership as any).partner_id,
+          partner_id: (membership as { partner_id: string }).partner_id,
           agency_id: t.agencyId,
           action_type: 'arrears_reminder_sent',
           entity_type: 'tenancies',

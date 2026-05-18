@@ -163,38 +163,57 @@ export default function HeroSearchPreview() {
 
   useEffect(() => { paused.current = q.length > 0; }, [q]);
 
-  // Fetch a pool of featured listing images to rotate through.
+  // Fetch boosted (Premier/Featured) listings to rotate through with full details.
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
+        const nowIso = new Date().toISOString();
         const { data } = await supabase
           .from('properties')
-          .select('id, image_url, images, is_featured, featured_until, created_at')
+          .select('id, address, suburb, state, price_formatted, listing_type, beds, baths, parking, image_url, images, boost_tier, featured_until')
           .eq('is_active', true)
           .eq('status', 'public')
           .eq('moderation_status', 'approved')
-          .order('is_featured', { ascending: false })
-          .order('created_at', { ascending: false })
-          .limit(12);
+          .eq('is_featured', true)
+          .gt('featured_until', nowIso)
+          .order('boost_tier', { ascending: true }) // 'premier' < 'featured' alphabetically
+          .order('featured_until', { ascending: false })
+          .limit(8);
         if (cancelled) return;
-        const imgs = (data ?? [])
-          .map((row: any) => row?.image_url ?? row?.images?.[0] ?? null)
-          .filter((u: string | null): u is string => !!u);
-        if (imgs.length) setHeroImgs(imgs.slice(0, 8));
-      } catch { /* fallback to placeholder */ }
+        const rows: BoostedListing[] = (data ?? [])
+          .map((r: any) => {
+            const img = r?.image_url ?? r?.images?.[0] ?? null;
+            if (!img) return null;
+            return {
+              id: r.id,
+              image: img,
+              address: r.address ?? '',
+              suburb: r.suburb ?? '',
+              state: r.state ?? null,
+              price: r.price_formatted ?? null,
+              listing_type: r.listing_type ?? null,
+              beds: r.beds ?? null,
+              baths: r.baths ?? null,
+              parking: r.parking ?? null,
+              boost_tier: r.boost_tier ?? null,
+            } as BoostedListing;
+          })
+          .filter((r: BoostedListing | null): r is BoostedListing => !!r);
+        if (rows.length) setBoosted(rows);
+      } catch { /* fallback to static placeholder */ }
     })();
     return () => { cancelled = true; };
   }, []);
 
-  // Rotate the hero image every 4.5s (slightly offset from language cycle)
+  // Rotate the boosted listing every 4.5s
   useEffect(() => {
-    if (heroImgs.length < 2) return;
+    if (boosted.length < 2) return;
     const id = window.setInterval(() => {
-      setImgIdx(i => (i + 1) % heroImgs.length);
+      setImgIdx(i => (i + 1) % boosted.length);
     }, 4500);
     return () => window.clearInterval(id);
-  }, [heroImgs.length]);
+  }, [boosted.length]);
 
   // Pre-warm edge functions — eliminates cold start for first voice/search user
   useEffect(() => {

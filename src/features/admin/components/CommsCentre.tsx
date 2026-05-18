@@ -517,8 +517,8 @@ export default function CommsCentre() {
         supabase.from('message_templates').select('*').order('category').order('name'),
         supabase.from('broadcast_campaigns').select('*').order('created_at', { ascending: false }).limit(50),
       ]);
-      setTemplates((tmplRes.data || []) as any);
-      setCampaigns((campRes.data || []) as any);
+      setTemplates((tmplRes.data || []) as unknown as Template[]);
+      setCampaigns((campRes.data || []) as unknown as Campaign[]);
     } finally { setLoading(false); }
   }, []);
 

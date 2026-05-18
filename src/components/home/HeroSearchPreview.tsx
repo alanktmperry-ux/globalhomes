@@ -39,7 +39,13 @@ export default function HeroSearchPreview() {
   const viewerLocale = useViewerLocale();
   const [idx, setIdx] = useState(0);
   const [q, setQ] = useState('');
-  const [heroImgs, setHeroImgs] = useState<string[]>([]);
+  type BoostedListing = {
+    id: string; image: string; address: string; suburb: string; state: string | null;
+    price: string | null; listing_type: 'sale' | 'rent' | null;
+    beds: number | null; baths: number | null; parking: number | null;
+    boost_tier: 'premier' | 'featured' | null;
+  };
+  const [boosted, setBoosted] = useState<BoostedListing[]>([]);
   const [imgIdx, setImgIdx] = useState(0);
   const [hasExplicitLocale, setHasExplicitLocale] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;

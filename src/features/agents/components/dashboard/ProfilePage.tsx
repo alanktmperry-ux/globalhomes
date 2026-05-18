@@ -283,7 +283,7 @@ const ProfilePage = () => {
     if (!agent) return;
     setSaving(true);
     try {
-      const { error } = await supabase
+      const { error } = await sbExt
         .from('agents')
         .update({
           name: form.name,
@@ -306,7 +306,7 @@ const ProfilePage = () => {
           languages_spoken: languages,
           service_areas: serviceAreas,
           investment_niche: form.investment_niche || null,
-        } as Record<string, unknown>)
+        })
         .eq('id', agent.id);
       if (error) throw error;
       toast.success('Profile saved — All changes have been saved successfully.');

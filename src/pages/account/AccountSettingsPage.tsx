@@ -41,19 +41,21 @@ export default function AccountSettingsPage() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [changingPassword, setChangingPassword] = useState(false);
 
+  const effectiveUserId = impersonating && impersonatedUserId ? impersonatedUserId : user?.id ?? null;
+
   const load = async () => {
-    if (!user) return;
+    if (!effectiveUserId) return;
     setLoading(true);
     const { data } = await supabase
       .from("profiles")
       .select("id, full_name, phone, language_preference, locale, email_unsubscribed, email_unsubscribed_at")
-      .eq("id", user.id)
+      .eq("id", effectiveUserId)
       .maybeSingle();
 
     const { data: agentRow } = await supabase
       .from("agents")
       .select("id")
-      .eq("user_id", user.id)
+      .eq("user_id", effectiveUserId)
       .maybeSingle();
 
     if (data) {
@@ -67,7 +69,7 @@ export default function AccountSettingsPage() {
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [effectiveUserId]);
 
   const saveDetails = async () => {
     if (!user) return;

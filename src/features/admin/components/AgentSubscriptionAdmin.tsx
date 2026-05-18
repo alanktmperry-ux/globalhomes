@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { Search, MoreVertical, ShieldCheck, ShieldX, Lock, RotateCcw, CalendarClock } from 'lucide-react';
+import { Search, MoreVertical, ShieldCheck, ShieldX, Lock, RotateCcw, CalendarClock, LogIn, CreditCard, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,18 +9,32 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useAuth } from '@/features/auth/AuthProvider';
+
+const PLAN_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: 'demo', label: 'Trial (demo)' },
+  { value: 'solo', label: 'Solo' },
+  { value: 'agency', label: 'Agency' },
+  { value: 'agency_pro', label: 'Agency Pro' },
+  { value: 'enterprise', label: 'Enterprise' },
+];
 
 type StatusFilter = 'all' | 'trial' | 'active' | 'payment_failed' | 'locked' | 'unapproved';
 
 interface AdminAgentRow {
   id: string;
+  user_id: string | null;
   name: string | null;
   email: string | null;
   plan_type: string | null;
@@ -85,6 +100,8 @@ function trialEnd(createdAt: string) {
 }
 
 export default function AgentSubscriptionAdmin() {
+  const navigate = useNavigate();
+  const { startImpersonation } = useAuth();
   const [agents, setAgents] = useState<AdminAgentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -98,7 +115,7 @@ export default function AgentSubscriptionAdmin() {
         supabase
           .from('agents')
           .select(
-            'id, name, email, subscription_status, is_subscribed, is_approved, created_at, payment_failed_at, admin_grace_until, agent_subscriptions(plan_type)'
+            'id, user_id, name, email, subscription_status, is_subscribed, is_approved, created_at, payment_failed_at, admin_grace_until, agent_subscriptions(plan_type)'
           )
           .order('created_at', { ascending: false }),
         supabase.from('properties').select('agent_id'),
@@ -111,6 +128,7 @@ export default function AgentSubscriptionAdmin() {
 
       const rows: AdminAgentRow[] = (agentsRes.data || []).map((a: any) => ({
         id: a.id,
+        user_id: a.user_id ?? null,
         name: a.name,
         email: a.email,
         plan_type: Array.isArray(a.agent_subscriptions)
@@ -188,6 +206,45 @@ export default function AgentSubscriptionAdmin() {
     if (!date) return;
     updateAgent(id, { admin_grace_until: date.toISOString() }, 'Grace period granted');
     setGraceOpenFor(null);
+  };
+
+  const handleImpersonate = async (agent: AdminAgentRow) => {
+    if (!agent.user_id) {
+      toast.error('This agent has no linked auth user.');
+      return;
+    }
+    if (!confirm(`View the platform as ${agent.email || agent.name}? An orange banner will let you exit.`)) return;
+    await startImpersonation(agent.user_id, agent.email || '');
+    navigate('/dashboard');
+  };
+
+  const handleChangePlan = async (agent: AdminAgentRow, plan: string) => {
+    const { error } = await supabase
+      .from('agent_subscriptions')
+      .upsert({ agent_id: agent.id, plan_type: plan }, { onConflict: 'agent_id' });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(`Plan changed to ${plan.replace('_', ' ')}`);
+    fetchAgents();
+  };
+
+  const handleDelete = async (agent: AdminAgentRow) => {
+    if (!agent.user_id) {
+      toast.error('This agent has no linked auth user — cannot delete.');
+      return;
+    }
+    if (!confirm(`Permanently delete ${agent.email || agent.name}? This removes their listings, trust accounts, and auth record. This cannot be undone.`)) return;
+    const { data, error } = await supabase.functions.invoke('admin-delete-agent', {
+      body: { userId: agent.user_id },
+    });
+    if (error || data?.error) {
+      toast.error(error?.message || data?.error || 'Failed to delete agent');
+      return;
+    }
+    setAgents((prev) => prev.filter((x) => x.id !== agent.id));
+    toast.success('Agent deleted');
   };
 
   return (
@@ -333,6 +390,35 @@ export default function AgentSubscriptionAdmin() {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={() => handleResetTrial(a.id)}>
                             <RotateCcw size={14} className="mr-2" /> Reset to trial
+                          </DropdownMenuItem>
+                          <DropdownMenuSub>
+                            <DropdownMenuSubTrigger>
+                              <CreditCard size={14} className="mr-2" /> Change plan
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent className="bg-popover">
+                              <DropdownMenuLabel className="text-xs text-muted-foreground">
+                                Set plan
+                              </DropdownMenuLabel>
+                              {PLAN_OPTIONS.map((p) => (
+                                <DropdownMenuItem
+                                  key={p.value}
+                                  onClick={() => handleChangePlan(a, p.value)}
+                                  className={cn(a.plan_type === p.value && 'font-semibold')}
+                                >
+                                  {p.label}
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuSubContent>
+                          </DropdownMenuSub>
+                          <DropdownMenuItem onClick={() => handleImpersonate(a)}>
+                            <LogIn size={14} className="mr-2" /> Impersonate
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => handleDelete(a)}
+                            className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                          >
+                            <Trash2 size={14} className="mr-2" /> Delete agent
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

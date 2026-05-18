@@ -343,11 +343,11 @@ export default function MaintenancePage() {
     if (!quoteFor || !quoteAmount) return;
     const cost = parseFloat(quoteAmount);
     const shouldAutoApprove = !isNaN(cost) && cost <= autoApproveThreshold;
-    await supabase.from('maintenance_jobs').update({
+    await sbExt.from('maintenance_jobs').update({
       estimated_cost: cost,
       status: shouldAutoApprove ? 'approved' : 'quoted',
       ...(shouldAutoApprove ? { auto_approved: true } : {}),
-    } as any).eq('id', quoteFor.id);
+    }).eq('id', quoteFor.id);
     if (shouldAutoApprove) {
       toast.success(`Job auto-approved (under $${autoApproveThreshold} threshold)`);
     } else {

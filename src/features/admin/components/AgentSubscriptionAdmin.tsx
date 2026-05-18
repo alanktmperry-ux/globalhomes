@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { Search, MoreVertical, ShieldCheck, ShieldX, Lock, RotateCcw, CalendarClock } from 'lucide-react';
+import { Search, MoreVertical, ShieldCheck, ShieldX, Lock, RotateCcw, CalendarClock, LogIn, CreditCard, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,13 +9,26 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useAuth } from '@/features/auth/AuthProvider';
+
+const PLAN_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: 'demo', label: 'Trial (demo)' },
+  { value: 'solo', label: 'Solo' },
+  { value: 'agency', label: 'Agency' },
+  { value: 'agency_pro', label: 'Agency Pro' },
+  { value: 'enterprise', label: 'Enterprise' },
+];
 
 type StatusFilter = 'all' | 'trial' | 'active' | 'payment_failed' | 'locked' | 'unapproved';
 

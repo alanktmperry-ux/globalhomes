@@ -363,7 +363,7 @@ const TeamPage = () => {
   const handleDeactivateAgent = async () => {
     if (!deactivateTarget?.agentId || !user) return;
     try {
-      await supabase.from('agents').update({ is_subscribed: false } as any).eq('id', deactivateTarget.agentId);
+      await sbExt.from('agents').update({ is_subscribed: false }).eq('id', deactivateTarget.agentId);
       
       logAction({
         agencyId: agencyId,

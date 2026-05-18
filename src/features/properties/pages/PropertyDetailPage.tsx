@@ -55,6 +55,7 @@ import { useListingTranslation } from '@/features/properties/hooks/useListingTra
 import { HaloFromListingCTA } from '@/components/halo/HaloFromListingCTA';
 import { useOffmarketSubscriptions } from '@/features/offmarket/hooks/useOffmarketSubscriptions';
 import { ListingImageGallery } from '@/features/properties/components/ListingImageGallery';
+import { PropertyLocationMap } from '@/features/properties/components/PropertyLocationMap';
 
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -632,6 +633,17 @@ export default function PropertyDetailPage() {
             <ImageIcon size={48} />
           </div>
         )}
+
+        {/* Location map — directly below hero, proportional height */}
+        {(rawProperty?.lat && rawProperty?.lng) ? (
+          <div className="mt-4">
+            <PropertyLocationMap
+              lat={Number(rawProperty.lat)}
+              lng={Number(rawProperty.lng)}
+              address={property.address}
+            />
+          </div>
+        ) : null}
 
         {/* Action bar below hero */}
         <div className="flex flex-wrap gap-2 mt-4 mb-6">

@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { usePartner } from './PartnerDashboardLayout';
 import { supabase } from '@/integrations/supabase/client';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sbExt = supabase as any;
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -83,7 +86,7 @@ const PartnerOverviewPage = () => {
       supabase.from('partner_agencies').select('id', { count: 'exact', head: true }).eq('partner_id', partnerId).eq('status', 'active'),
       supabase.from('partner_agencies').select('id', { count: 'exact', head: true }).eq('partner_id', partnerId).eq('status', 'pending'),
       supabase.from('partner_agencies').select('id, agency_id, access_level, invite_token, invited_at, agencies(name)').eq('partner_id', partnerId).eq('status', 'pending').order('invited_at', { ascending: false }),
-      supabase.from('partner_activity_log' as any).select('id, action_type, description, agency_id, created_at').eq('partner_id', partnerId).order('created_at', { ascending: false }).limit(10),
+      sbExt.from('partner_activity_log').select('id, action_type, description, agency_id, created_at').eq('partner_id', partnerId).order('created_at', { ascending: false }).limit(10),
     ]);
 
     setActiveCount(activeRes.count || 0);

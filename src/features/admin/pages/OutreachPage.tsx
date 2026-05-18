@@ -1,5 +1,8 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sbExt = supabase as any;
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -65,7 +68,7 @@ function downloadCsv(rows: string[][], filename: string) {
 async function logAudit(actionType: string, metadata: Record<string, unknown>) {
   try {
     const { data: { user } } = await supabase.auth.getUser();
-    await (supabase.from('audit_log') as any).insert({
+    await sbExt.from('audit_log').insert({
       action_type: actionType,
       entity_type: 'segment',
       user_id: user?.id ?? null,

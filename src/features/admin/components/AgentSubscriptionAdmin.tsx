@@ -1,10 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { Search, MoreVertical, ShieldCheck, ShieldX, Lock, RotateCcw, CalendarClock, LogIn, CreditCard, Trash2 } from 'lucide-react';
+import { Search, MoreVertical, ShieldCheck, ShieldX, Lock, RotateCcw, CalendarClock, LogIn, CreditCard, Trash2, Pencil } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -107,6 +116,65 @@ export default function AgentSubscriptionAdmin() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [graceOpenFor, setGraceOpenFor] = useState<string | null>(null);
+  const [editAgent, setEditAgent] = useState<AdminAgentRow | null>(null);
+  const [editEmail, setEditEmail] = useState('');
+  const [editPassword, setEditPassword] = useState('');
+  const [editPasswordConfirm, setEditPasswordConfirm] = useState('');
+  const [editSubmitting, setEditSubmitting] = useState(false);
+
+  const openEditDialog = (agent: AdminAgentRow) => {
+    setEditAgent(agent);
+    setEditEmail(agent.email || '');
+    setEditPassword('');
+    setEditPasswordConfirm('');
+  };
+
+  const closeEditDialog = () => {
+    setEditAgent(null);
+    setEditEmail('');
+    setEditPassword('');
+    setEditPasswordConfirm('');
+  };
+
+  const submitEdit = async () => {
+    if (!editAgent) return;
+    if (!editAgent.user_id) {
+      toast.error('This agent has no linked auth user.');
+      return;
+    }
+    const emailChanged = editEmail.trim() && editEmail.trim() !== (editAgent.email || '');
+    const wantsPassword = editPassword.length > 0;
+    if (!emailChanged && !wantsPassword) {
+      toast.error('Nothing to update.');
+      return;
+    }
+    if (wantsPassword) {
+      if (editPassword.length < 8) {
+        toast.error('Password must be at least 8 characters.');
+        return;
+      }
+      if (editPassword !== editPasswordConfirm) {
+        toast.error('Passwords do not match.');
+        return;
+      }
+    }
+    setEditSubmitting(true);
+    const payload: { user_id: string; email?: string; password?: string } = {
+      user_id: editAgent.user_id,
+    };
+    if (emailChanged) payload.email = editEmail.trim();
+    if (wantsPassword) payload.password = editPassword;
+
+    const { data, error } = await supabase.functions.invoke('admin-update-user', { body: payload });
+    setEditSubmitting(false);
+    if (error || data?.error) {
+      toast.error(error?.message || data?.error || 'Failed to update agent');
+      return;
+    }
+    toast.success('Agent credentials updated');
+    closeEditDialog();
+    fetchAgents();
+  };
 
   const fetchAgents = useCallback(async () => {
     setLoading(true);
@@ -410,6 +478,9 @@ export default function AgentSubscriptionAdmin() {
                               ))}
                             </DropdownMenuSubContent>
                           </DropdownMenuSub>
+                          <DropdownMenuItem onClick={() => openEditDialog(a)}>
+                            <Pencil size={14} className="mr-2" /> Edit email / password
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleImpersonate(a)}>
                             <LogIn size={14} className="mr-2" /> Impersonate
                           </DropdownMenuItem>
@@ -430,6 +501,59 @@ export default function AgentSubscriptionAdmin() {
           </table>
         </div>
       )}
+
+      <Dialog open={!!editAgent} onOpenChange={(o) => !o && closeEditDialog()}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit agent credentials</DialogTitle>
+            <DialogDescription>
+              {editAgent?.name || editAgent?.email || 'Agent'} — leave a field blank to keep it unchanged.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-agent-email">New email</Label>
+              <Input
+                id="edit-agent-email"
+                type="email"
+                value={editEmail}
+                onChange={(e) => setEditEmail(e.target.value)}
+                placeholder="agent@example.com"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-agent-password">New password</Label>
+              <Input
+                id="edit-agent-password"
+                type="password"
+                value={editPassword}
+                onChange={(e) => setEditPassword(e.target.value)}
+                placeholder="At least 8 characters"
+                autoComplete="new-password"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-agent-password-confirm">Confirm password</Label>
+              <Input
+                id="edit-agent-password-confirm"
+                type="password"
+                value={editPasswordConfirm}
+                onChange={(e) => setEditPasswordConfirm(e.target.value)}
+                placeholder="Repeat password"
+                autoComplete="new-password"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={closeEditDialog} disabled={editSubmitting}>
+              Cancel
+            </Button>
+            <Button onClick={submitEdit} disabled={editSubmitting}>
+              {editSubmitting ? 'Saving…' : 'Save changes'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -227,7 +227,7 @@ const ProfilePage = () => {
   const removeLogo = async () => {
     if (!agent) return;
     try {
-      const { error } = await supabase.from('agents').update({ company_logo_url: null } as any).eq('id', agent.id);
+      const { error } = await sbExt.from('agents').update({ company_logo_url: null }).eq('id', agent.id);
       if (error) throw error;
       setAgent(prev => prev ? { ...prev, company_logo_url: null } : null);
       toast.success('Logo removed');

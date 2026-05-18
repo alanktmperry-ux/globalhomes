@@ -391,14 +391,14 @@ const TeamPage = () => {
       const toAgent = members.find(m => m.agentId === reassignTo);
 
       if (reassignTarget.type === 'contacts') {
-        await supabase
+        await sbExt
           .from('contacts')
-          .update({ assigned_agent_id: reassignTo } as any)
+          .update({ assigned_agent_id: reassignTo })
           .eq('assigned_agent_id', fromAgentId);
       } else {
-        await supabase
+        await sbExt
           .from('properties')
-          .update({ agent_id: reassignTo } as any)
+          .update({ agent_id: reassignTo })
           .eq('agent_id', fromAgentId);
       }
 

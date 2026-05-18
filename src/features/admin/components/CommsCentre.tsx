@@ -211,21 +211,22 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
       } catch {}
     }
 
-    await supabase.from('broadcast_campaigns').update({
+    const campaignId = (campaign as { id: string }).id;
+    await sbExt.from('broadcast_campaigns').update({
       status: 'sent',
       sent_count: sentCount,
       sent_at: new Date().toISOString(),
-    } as any).eq('id', (campaign as any).id);
+    }).eq('id', campaignId);
 
     if (user?.id) {
-      await supabase.from('audit_log').insert({
+      await sbExt.from('audit_log').insert({
         user_id: user.id,
         action_type: 'bulk_email_sent',
         entity_type: 'broadcast_campaign',
-        entity_id: (campaign as any).id,
+        entity_id: campaignId,
         description: subject,
         metadata: buildAuditMeta({ recipient_count: preview.length, admin_id: user.id }),
-      } as any);
+      });
     }
 
     toast.success(`Sent to ${sentCount} of ${preview.length} agents`);

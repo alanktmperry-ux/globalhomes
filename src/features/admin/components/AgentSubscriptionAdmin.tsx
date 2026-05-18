@@ -208,6 +208,45 @@ export default function AgentSubscriptionAdmin() {
     setGraceOpenFor(null);
   };
 
+  const handleImpersonate = async (agent: AdminAgentRow) => {
+    if (!agent.user_id) {
+      toast.error('This agent has no linked auth user.');
+      return;
+    }
+    if (!confirm(`View the platform as ${agent.email || agent.name}? An orange banner will let you exit.`)) return;
+    await startImpersonation(agent.user_id, agent.email || '');
+    navigate('/dashboard');
+  };
+
+  const handleChangePlan = async (agent: AdminAgentRow, plan: string) => {
+    const { error } = await supabase
+      .from('agent_subscriptions')
+      .upsert({ agent_id: agent.id, plan_type: plan }, { onConflict: 'agent_id' });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(`Plan changed to ${plan.replace('_', ' ')}`);
+    fetchAgents();
+  };
+
+  const handleDelete = async (agent: AdminAgentRow) => {
+    if (!agent.user_id) {
+      toast.error('This agent has no linked auth user — cannot delete.');
+      return;
+    }
+    if (!confirm(`Permanently delete ${agent.email || agent.name}? This removes their listings, trust accounts, and auth record. This cannot be undone.`)) return;
+    const { data, error } = await supabase.functions.invoke('admin-delete-agent', {
+      body: { userId: agent.user_id },
+    });
+    if (error || data?.error) {
+      toast.error(error?.message || data?.error || 'Failed to delete agent');
+      return;
+    }
+    setAgents((prev) => prev.filter((x) => x.id !== agent.id));
+    toast.success('Agent deleted');
+  };
+
   return (
     <div className="space-y-4 mb-10">
       <div>

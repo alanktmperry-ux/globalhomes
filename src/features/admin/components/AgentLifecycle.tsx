@@ -355,7 +355,7 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
 
         return {
           id: a.id, name: a.name, email: a.email, agency: a.agency, phone: a.phone,
-          created_at: a.created_at, is_subscribed: a.is_subscribed, plan_type: planType,
+          created_at: a.created_at, is_subscribed: !!a.is_subscribed, plan_type: planType,
           lastLogin, daysSinceLogin, trialDaysLeft,
           adoption: { score, hasListing, hasOpenHome, hasTrust, hasContacts, hasProfile },
           activeListings: propMap.get(a.id) || 0, totalLeads: leadMap.get(a.id) || 0,

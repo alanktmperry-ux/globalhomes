@@ -101,7 +101,7 @@ function exportCSV(rows: AgentBillingRow[]) {
 }
 
 function KPI({ label, value, sub, icon: Icon, color = 'text-primary', trend }: {
-  label: string; value: string | number; sub?: string; icon: ComponentType<{ size?: number }>; color?: string; trend?: 'up' | 'down' | null;
+  label: string; value: string | number; sub?: string; icon: LucideIcon; color?: string; trend?: 'up' | 'down' | null;
 }) {
   return (
     <div className="bg-card border border-border rounded-2xl p-5">

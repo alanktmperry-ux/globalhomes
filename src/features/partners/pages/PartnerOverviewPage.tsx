@@ -70,7 +70,7 @@ const PartnerOverviewPage = () => {
       .maybeSingle();
 
     if (!membership) { setLoading(false); return; }
-    const partnerId = (membership as any).partner_id;
+    const partnerId = (membership as { partner_id: string }).partner_id;
 
     const { data: p } = await supabase
       .from('partners')

@@ -294,36 +294,43 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
       try {
         const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
         const j = await callAdminFunction('list_users');
-        (j?.users || []).forEach((u: any) => signInMap.set(u.id, u.last_sign_in_at || null));
+        type AdminUserRow = { id: string; last_sign_in_at: string | null };
+        (j?.users || []).forEach((u: AdminUserRow) => signInMap.set(u.id, u.last_sign_in_at || null));
       } catch {}
 
+      type PropRow = { agent_id: string | null; is_active: boolean | null };
       const propMap = new Map<string, number>();
-      (propsRes.data || []).forEach((p: any) => {
+      ((propsRes.data ?? []) as unknown as PropRow[]).forEach((p) => {
         if (p.is_active && p.agent_id) propMap.set(p.agent_id, (propMap.get(p.agent_id) || 0) + 1);
       });
 
+      type LeadRow = { agent_id: string | null };
       const leadMap = new Map<string, number>();
-      (leadsRes.data || []).forEach((l: any) => {
+      ((leadsRes.data ?? []) as unknown as LeadRow[]).forEach((l) => {
         if (l.agent_id) leadMap.set(l.agent_id, (leadMap.get(l.agent_id) || 0) + 1);
       });
 
+      type OpenHomeRow = { agent_id: string | null; inspection_times: unknown };
       const openHomeSet = new Set(
-        (openHomeRes.data || [])
-          .filter((p: any) => Array.isArray(p.inspection_times) && p.inspection_times.length > 0)
-          .map((p: any) => p.agent_id)
-          .filter(Boolean)
+        ((openHomeRes.data ?? []) as unknown as OpenHomeRow[])
+          .filter((p) => Array.isArray(p.inspection_times) && (p.inspection_times as unknown[]).length > 0)
+          .map((p) => p.agent_id)
+          .filter((id): id is string => !!id)
       );
-      const contactSet = new Set((contactsRes.data || []).map((c: any) => c.agent_id).filter(Boolean));
-      const trustSet = new Set((trustRes.data || []).map((t: any) => t.agent_id).filter(Boolean));
+      type ContactRow = { agent_id: string | null };
+      const contactSet = new Set(((contactsRes.data ?? []) as unknown as ContactRow[]).map((c) => c.agent_id).filter((id): id is string => !!id));
+      type TrustRow = { agent_id: string | null };
+      const trustSet = new Set(((trustRes.data ?? []) as unknown as TrustRow[]).map((t) => t.agent_id).filter((id): id is string => !!id));
 
       const notesMap = new Map<string, Note[]>();
-      ((notesRes.data || []) as any[]).forEach((n: any) => {
+      ((notesRes.data ?? []) as unknown as Note[]).forEach((n) => {
         const arr = notesMap.get(n.agent_id) || [];
         arr.push(n);
         notesMap.set(n.agent_id, arr);
       });
 
-      const rows: AgentLifecycleRow[] = (agentsRes.data || []).map((a: any) => {
+      type AgentRow = { id: string; user_id: string; name: string; email: string; agency: string | null; phone: string | null; created_at: string; is_subscribed: boolean | null; onboarding_complete: boolean | null; lead_source: string | null; lifecycle_stage: string | null; agent_subscriptions: { plan_type: string | null } | { plan_type: string | null }[] | null };
+      const rows: AgentLifecycleRow[] = ((agentsRes.data ?? []) as unknown as AgentRow[]).map((a) => {
         const planType = Array.isArray(a.agent_subscriptions)
           ? a.agent_subscriptions[0]?.plan_type || null
           : a.agent_subscriptions?.plan_type || null;

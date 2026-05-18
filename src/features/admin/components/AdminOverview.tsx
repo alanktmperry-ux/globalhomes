@@ -183,20 +183,23 @@ const AdminOverview = ({ stats, users, insights, onNavigate }: Props) => {
           let q = supabase.from('agents').select('id, created_at').gte('created_at', since);
           if (until) q = q.lt('created_at', until);
           const { data: agentsBatch } = await q;
-          const ids = (agentsBatch || []).map((a: any) => a.id);
+          type AgentLite2 = { id: string; created_at: string };
+          const agentsTyped = ((agentsBatch ?? []) as unknown as AgentLite2[]);
+          const ids = agentsTyped.map((a) => a.id);
           if (ids.length === 0) return null;
           const { data: props } = await supabase
             .from('properties')
             .select('agent_id, created_at')
             .in('agent_id', ids);
           const firstByAgent = new Map<string, number>();
-          (props || []).forEach((p: any) => {
+          type PropTime = { agent_id: string; created_at: string };
+          ((props ?? []) as unknown as PropTime[]).forEach((p) => {
             const t = new Date(p.created_at).getTime();
             const cur = firstByAgent.get(p.agent_id);
             if (cur === undefined || t < cur) firstByAgent.set(p.agent_id, t);
           });
           const diffs: number[] = [];
-          (agentsBatch || []).forEach((a: any) => {
+          agentsTyped.forEach((a) => {
             const first = firstByAgent.get(a.id);
             if (first) diffs.push((first - new Date(a.created_at).getTime()) / DAY);
           });

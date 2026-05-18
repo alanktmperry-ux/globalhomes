@@ -79,9 +79,9 @@ export default function OwnerStatementsPage() {
       if (pErr) throw pErr;
 
       const totalRentReceived = (receipts || [])
-        .filter((r: any) => (r.description || '').toLowerCase().includes('rent'))
-        .reduce((s: number, r: any) => s + Number(r.amount || 0), 0);
-      const totalExpenses = (payments || []).reduce((s: number, p: any) => s + Number(p.amount || 0), 0);
+        .filter((r) => (r.description || '').toLowerCase().includes('rent'))
+        .reduce((s, r) => s + Number(r.amount || 0), 0);
+      const totalExpenses = (payments || []).reduce((s, p) => s + Number(p.amount || 0), 0);
       const pct = feeSource?.percent ?? 0;
       const managementFeeAud = pct ? Math.round(totalRentReceived * (pct / 100) * 100) / 100 : 0;
 
@@ -92,8 +92,8 @@ export default function OwnerStatementsPage() {
         management_fee_aud: managementFeeAud,
       }));
       toast.success('Statement pre-filled from trust ledger');
-    } catch (e: any) {
-      toast.error(e?.message || 'Failed to auto-fill from ledger');
+    } catch (e) {
+      toast.error(getErrorMessage(e) || 'Failed to auto-fill from ledger');
     } finally {
       setAutoFilling(false);
     }

@@ -185,8 +185,8 @@ export default function OwnerStatementsPage() {
       if (error || !data?.pdf_url) throw new Error(error?.message || 'Failed');
       setStatements((all) => all.map((s) => s.id === statement.id ? { ...s, pdf_url: data.pdf_url } : s));
       toast.success('PDF ready — click the download link');
-    } catch (err: any) {
-      toast.error(err.message || 'Could not generate PDF');
+    } catch (err) {
+      toast.error(getErrorMessage(err) || 'Could not generate PDF');
     } finally {
       setPdfLoading((s) => ({ ...s, [statement.id]: false }));
     }

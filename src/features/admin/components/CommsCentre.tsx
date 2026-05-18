@@ -171,7 +171,7 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
 
     setSending(true);
 
-    const { data: campaign, error: campErr } = await supabase
+    const { data: campaign, error: campErr } = await sbExt
       .from('broadcast_campaigns')
       .insert({
         title: title || subject,
@@ -182,7 +182,7 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
         recipient_count: preview.length,
         status: 'sending',
         created_by: user?.id,
-      } as any)
+      })
       .select()
       .single();
 

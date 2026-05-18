@@ -31,6 +31,7 @@ import {
   Ban,
   Trash2,
   UserPlus,
+  LogOut,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -979,6 +980,20 @@ export default function CommandCentre() {
           >
             <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
             Refresh
+          </button>
+          <button
+            onClick={async () => {
+              try {
+                await auth.signOut();
+              } finally {
+                navigate('/');
+              }
+            }}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary text-xs font-medium text-muted-foreground hover:text-destructive transition-colors"
+            title="Sign out"
+          >
+            <LogOut size={14} />
+            Sign out
           </button>
         </div>
       </div>

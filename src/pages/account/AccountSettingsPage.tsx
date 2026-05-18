@@ -25,7 +25,7 @@ type Profile = {
 
 export default function AccountSettingsPage() {
   usePageTitle('Account Settings');
-  const { user, impersonating, impersonatedUserId } = useAuth();
+  const { user, impersonating, impersonatedUserId, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -304,6 +304,30 @@ export default function AccountSettingsPage() {
             {passwordError && <p className="text-xs text-red-600">{passwordError}</p>}
             <Button onClick={updatePassword} disabled={changingPassword || !newPassword}>
               {changingPassword ? "Updating…" : "Update password"}
+            </Button>
+          </div>
+        </section>
+
+        <hr className="border-slate-200 my-8" />
+
+        {/* Section 5 — Sign out */}
+        <section className="mb-10">
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">Sign out</h2>
+          <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
+            <p className="text-sm text-slate-600">
+              Sign out of your ListHQ account on this device.
+            </p>
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                try {
+                  await signOut();
+                } finally {
+                  navigate("/");
+                }
+              }}
+            >
+              Sign out
             </Button>
           </div>
         </section>

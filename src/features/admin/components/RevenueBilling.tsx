@@ -185,13 +185,16 @@ export default function RevenueBilling() {
       try {
         const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
         const j = await callAdminFunction('list_users');
-        (j?.users || []).forEach((u: any) => signInMap.set(u.id, u.last_sign_in_at || null));
+        type AdminUserRow = { id: string; last_sign_in_at: string | null };
+        (j?.users || []).forEach((u: AdminUserRow) => signInMap.set(u.id, u.last_sign_in_at || null));
       } catch {}
 
-      const subMap = new Map<string, any>();
-      (subsRes.data || []).forEach((s: any) => subMap.set(s.agent_id, s));
+      type SubRow = { agent_id: string; plan_type: string | null; subscription_start: string | null; subscription_end: string | null; auto_renew: boolean | null };
+      const subMap = new Map<string, SubRow>();
+      (subsRes.data ?? []).forEach((s) => subMap.set(s.agent_id, s as SubRow));
 
-      const rows: AgentBillingRow[] = (agentsRes.data || []).map((a: any) => {
+      type AgentRow = { id: string; name: string; email: string | null; agency: string | null; is_subscribed: boolean | null; created_at: string; stripe_customer_id: string | null };
+      const rows: AgentBillingRow[] = ((agentsRes.data ?? []) as unknown as AgentRow[]).map((a) => {
         const sub = subMap.get(a.id);
         const plan = (sub?.plan_type || 'demo').toLowerCase();
         const mrr = a.is_subscribed ? (PLAN_MRR[plan] || 0) : 0;

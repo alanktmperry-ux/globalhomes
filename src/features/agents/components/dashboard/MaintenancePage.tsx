@@ -225,7 +225,7 @@ export default function MaintenancePage() {
     if (!agentId || !newJobPropertyId || !newJobDescription.trim()) return;
     const title = newJobDescription.trim().slice(0, 80);
     setNewJobSaving(true);
-    const { error } = await supabase.from('maintenance_jobs').insert({
+    const { error } = await sbExt.from('maintenance_jobs').insert({
       property_id: newJobPropertyId,
       tenancy_id: newJobTenancyId || null,
       agent_id: agentId,
@@ -234,7 +234,7 @@ export default function MaintenancePage() {
       priority: newJobPriority,
       status: 'new',
       reported_by: newJobReportedBy.trim() || null,
-    } as any);
+    });
     setNewJobSaving(false);
     if (error) { toast.error(error.message || 'Failed to create job'); return; }
     toast.success('Job created');

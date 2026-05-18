@@ -132,22 +132,25 @@ const AdminOverview = ({ stats, users, insights, onNavigate }: Props) => {
 
         // At-risk agents — fetch agent ids with their listing counts
         const { data: allAgents } = await supabase.from('agents').select('id, user_id');
-        const agentIds = (allAgents || []).map((a: any) => a.id);
+        type AgentLite = { id: string; user_id: string };
+        const allAgentsTyped = ((allAgents ?? []) as unknown as AgentLite[]);
+        const agentIds = allAgentsTyped.map((a) => a.id);
         const userIdToLastSeen = new Map<string, number | null>(
           users.map(u => [u.id, u.last_sign_in_at ? new Date(u.last_sign_in_at).getTime() : null])
         );
-        let activeListingCounts = new Map<string, number>();
+        const activeListingCounts = new Map<string, number>();
         if (agentIds.length > 0) {
           const { data: props } = await supabase
             .from('properties')
             .select('agent_id')
             .eq('is_active', true)
             .in('agent_id', agentIds);
-          (props || []).forEach((p: any) => {
+          type PropAgent = { agent_id: string };
+          ((props ?? []) as unknown as PropAgent[]).forEach((p) => {
             activeListingCounts.set(p.agent_id, (activeListingCounts.get(p.agent_id) || 0) + 1);
           });
         }
-        const atRisk = (allAgents || []).filter((a: any) => {
+        const atRisk = allAgentsTyped.filter((a) => {
           const lastSeen = userIdToLastSeen.get(a.user_id);
           const staleLogin = !lastSeen || lastSeen < new Date(fourteenDaysAgo).getTime();
           const noListings = (activeListingCounts.get(a.id) || 0) === 0;

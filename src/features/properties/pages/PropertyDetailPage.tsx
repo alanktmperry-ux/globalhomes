@@ -604,13 +604,19 @@ export default function PropertyDetailPage() {
       </div>
 
       <main className="max-w-[1280px] mx-auto w-full px-6 md:px-8 pt-6 pb-24 md:pb-16">
-        {/* Hero gallery (left) + location map (right) on desktop, stacked on mobile */}
+        {/* Hero gallery (left) + thumbnail rail + location map, stacked only on narrow mobile */}
         {(() => {
           const hasCoords = !!(rawProperty?.lat && rawProperty?.lng);
           const showMap = hasCoords || !!property.address;
           return (
-            <div className={`grid grid-cols-1 ${showMap ? 'lg:grid-cols-3' : ''} gap-4`}>
-              <div className={showMap ? 'lg:col-span-2 min-w-0' : 'min-w-0'}>
+            <div
+              className={
+                showMap
+                  ? 'grid grid-cols-1 gap-4 items-start sm:grid-cols-[minmax(0,1fr)_220px] lg:grid-cols-[minmax(0,1fr)_320px]'
+                  : 'grid grid-cols-1 gap-4'
+              }
+            >
+              <div className="min-w-0">
                 {images.length > 0 ? (
                   <ListingImageGallery
                     images={images}
@@ -643,12 +649,12 @@ export default function PropertyDetailPage() {
               </div>
 
               {showMap ? (
-                <div className="lg:col-span-1 min-w-0">
+                <div className="min-w-0 sm:sticky sm:top-24 self-start">
                   <PropertyLocationMap
                     lat={hasCoords ? Number(rawProperty.lat) : null}
                     lng={hasCoords ? Number(rawProperty.lng) : null}
                     address={property.address}
-                    heightClass="h-[280px] lg:h-full lg:min-h-[320px]"
+                    heightClass="h-[280px] sm:h-[420px] lg:h-[520px]"
                   />
                 </div>
               ) : null}

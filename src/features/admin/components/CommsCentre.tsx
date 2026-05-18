@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sbExt = supabase as any;
 import { dispatchNotification } from '@/shared/lib/notify';
 import {
   Send, Mail, Bell, Users, Clock, CheckCircle2, Plus, Trash2, Edit2,

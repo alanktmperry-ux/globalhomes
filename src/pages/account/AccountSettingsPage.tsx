@@ -25,7 +25,7 @@ type Profile = {
 
 export default function AccountSettingsPage() {
   usePageTitle('Account Settings');
-  const { user } = useAuth();
+  const { user, impersonating, impersonatedUserId } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 

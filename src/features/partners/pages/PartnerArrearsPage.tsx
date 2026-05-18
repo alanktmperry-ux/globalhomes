@@ -128,7 +128,8 @@ const PartnerArrearsPage = () => {
       .gte('sent_at', new Date(Date.now() - 14 * 86400000).toISOString())
       .order('sent_at', { ascending: false });
     const map: Record<string, string> = {};
-    for (const l of (logs || []) as any[]) {
+    type LogRow = { recipient_email: string | null; sent_at: string };
+    for (const l of ((logs ?? []) as unknown as LogRow[])) {
       if (l.recipient_email && !map[l.recipient_email]) map[l.recipient_email] = l.sent_at;
     }
     setAutoLogs(map);

@@ -67,7 +67,7 @@ const StatCard = ({
   </div>
 );
 
-const SectionTitle = ({ icon: Icon, title }: { icon: any; title: string }) => (
+const SectionTitle = ({ icon: Icon, title }: { icon: LucideIcon; title: string }) => (
   <div className="flex items-center gap-2 mb-3">
     <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
       <Icon size={14} className="text-primary" />

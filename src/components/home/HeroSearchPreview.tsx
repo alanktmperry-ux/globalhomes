@@ -39,7 +39,8 @@ export default function HeroSearchPreview() {
   const viewerLocale = useViewerLocale();
   const [idx, setIdx] = useState(0);
   const [q, setQ] = useState('');
-  const [heroImg, setHeroImg] = useState<string | null>(null);
+  const [heroImgs, setHeroImgs] = useState<string[]>([]);
+  const [imgIdx, setImgIdx] = useState(0);
   const [hasExplicitLocale, setHasExplicitLocale] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     return localStorage.getItem('listhq.locale') !== null || localStorage.getItem('gh-lang') !== null;

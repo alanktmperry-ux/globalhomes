@@ -152,15 +152,15 @@ export default function MaintenancePage() {
         if (signed?.signedUrl) newUrls.push(signed.signedUrl);
       }
       const merged = [...(job.photo_urls || []), ...newUrls];
-      const { error: updErr } = await supabase
+      const { error: updErr } = await sbExt
         .from('maintenance_jobs')
-        .update({ photo_urls: merged } as any)
+        .update({ photo_urls: merged })
         .eq('id', job.id);
       if (updErr) throw updErr;
       setJobs(prev => prev.map(j => j.id === job.id ? { ...j, photo_urls: merged } : j));
       toast.success('Photos uploaded');
-    } catch (e: any) {
-      toast.error(e?.message || 'Upload failed');
+    } catch (e) {
+      toast.error(getErrorMessage(e) || 'Upload failed');
     } finally {
       setUploadingFor(null);
     }

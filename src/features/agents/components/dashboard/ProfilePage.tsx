@@ -588,7 +588,7 @@ const ProfilePage = () => {
                       'Strata & Apartments',
                       'Business Broking',
                     ].map(s => {
-                      const current = ((form as any).investment_niche || '').split(',').map((x: string) => x.trim()).filter(Boolean);
+                      const current = (form.investment_niche || '').split(',').map((x: string) => x.trim()).filter(Boolean);
                       const active = current.includes(s);
                       return (
                         <button
@@ -596,7 +596,7 @@ const ProfilePage = () => {
                           type="button"
                           onClick={() => {
                             const updated = active ? current.filter((x: string) => x !== s) : [...current, s];
-                            setForm(f => ({ ...f, investment_niche: updated.join(', ') } as any));
+                            setForm(f => ({ ...f, investment_niche: updated.join(', ') }));
                           }}
                           className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-colors ${
                             active

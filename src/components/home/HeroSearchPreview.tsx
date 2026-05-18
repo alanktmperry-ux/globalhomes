@@ -6,6 +6,7 @@ import { useTranslation } from '@/shared/lib/i18n/useTranslation';
 import { useViewerLocale } from '@/features/auth/hooks/useViewerLocale';
 import { useVoiceSearch } from '@/features/search/hooks/useVoiceSearch';
 import { parsePropertyQuery } from '@/features/search/lib/parsePropertyQuery';
+import DOMPurify from 'dompurify';
 
 type Seq = {
   flag: string; code: string; line: string; ph: string;
@@ -503,7 +504,7 @@ export default function HeroSearchPreview() {
                 <div
                   id="propTitle"
                   style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.15, marginBottom: 10 }}
-                  dangerouslySetInnerHTML={{ __html: cardTitleHtml }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(cardTitleHtml) }}
                 />
                 <div id="propPrice" style={{ fontSize: 24, fontWeight: 800, marginBottom: 10 }}>
                   {cardPrice}

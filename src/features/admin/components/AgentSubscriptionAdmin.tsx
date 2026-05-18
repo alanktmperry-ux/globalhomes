@@ -34,6 +34,7 @@ type StatusFilter = 'all' | 'trial' | 'active' | 'payment_failed' | 'locked' | '
 
 interface AdminAgentRow {
   id: string;
+  user_id: string | null;
   name: string | null;
   email: string | null;
   plan_type: string | null;

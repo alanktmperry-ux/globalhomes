@@ -19,13 +19,16 @@ export function PropertyLocationMap({ lat, lng, address, heightClass = 'h-[280px
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<google.maps.Map | null>(null);
   const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
+  const hasCoords = typeof lat === 'number' && typeof lng === 'number' && Number.isFinite(lat) && Number.isFinite(lng);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [resolved, setResolved] = useState<{ lat: number; lng: number } | null>(
-    typeof lat === 'number' && typeof lng === 'number' && Number.isFinite(lat) && Number.isFinite(lng)
-      ? { lat, lng }
-      : null,
-  );
+  const [resolved, setResolved] = useState<{ lat: number; lng: number } | null>(hasCoords ? { lat, lng } : null);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    setResolved(hasCoords ? { lat: lat as number, lng: lng as number } : null);
+  }, [address, hasCoords, lat, lng]);
 
   // Geocode from address if no coords provided
   useEffect(() => {

@@ -38,6 +38,7 @@ const CATEGORY_KEYWORDS: Record<FaqItem['category'], string[]> = {
   billing: ['billing', 'payment', 'invoice', 'subscription'],
   technical: ['browser', 'notifications', 'privacy', 'account'],
   'property-managers': ['property manager', 'rent roll', 'trust', 'arrears', 'maintenance', 'inspection', 'vacancy', 'supplier', 'statement', 'automation', 'tenant portal', 'owner portal'],
+  halo: ['halo', 'brief', 'seeker', 'reverse marketplace', 'credits', 'unlock'],
 };
 
 const RENTAL_INTENT_TERMS: Set<string> = new Set(SYNONYM_GROUPS[0]);

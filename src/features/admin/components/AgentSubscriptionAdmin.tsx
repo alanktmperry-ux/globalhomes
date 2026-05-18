@@ -478,6 +478,9 @@ export default function AgentSubscriptionAdmin() {
                               ))}
                             </DropdownMenuSubContent>
                           </DropdownMenuSub>
+                          <DropdownMenuItem onClick={() => openEditDialog(a)}>
+                            <Pencil size={14} className="mr-2" /> Edit email / password
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleImpersonate(a)}>
                             <LogIn size={14} className="mr-2" /> Impersonate
                           </DropdownMenuItem>

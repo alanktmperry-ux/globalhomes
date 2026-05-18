@@ -110,7 +110,7 @@ export default function MaintenancePage() {
         .eq('user_id', user.id)
         .maybeSingle();
       if (cancelled) return;
-      const t = (data as any)?.maintenance_auto_approve_threshold;
+      const t = (data as { maintenance_auto_approve_threshold?: number | null } | null)?.maintenance_auto_approve_threshold;
       const val = t == null ? 500 : Number(t);
       setAutoApproveThreshold(val);
       setThresholdInput(String(val));

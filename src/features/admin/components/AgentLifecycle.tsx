@@ -437,7 +437,7 @@ export default function AgentLifecycle({ filter }: { filter?: string | null } = 
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, email or agency…" className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
         </div>
-        <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className="text-xs bg-card border border-border rounded-xl px-3 py-2 text-foreground outline-none">
+        <select value={sortBy} onChange={e => setSortBy(e.target.value as 'joined' | 'login' | 'adoption' | 'trial')} className="text-xs bg-card border border-border rounded-xl px-3 py-2 text-foreground outline-none">
           <option value="trial">Sort: Trial ending soonest</option>
           <option value="login">Sort: Last login</option>
           <option value="adoption">Sort: Adoption score</option>

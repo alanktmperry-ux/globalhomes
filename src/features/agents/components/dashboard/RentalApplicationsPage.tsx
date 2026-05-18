@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp, Check, X as XIcon, FileText, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sbExt = supabase as any;
 import { useAuth } from '@/features/auth/AuthProvider';
 import DashboardHeader from './DashboardHeader';
 import { Badge } from '@/components/ui/badge';
@@ -102,7 +105,7 @@ const RentalApplicationsPage = () => {
       } as any).select('id').maybeSingle();
       if (tErr) throw tErr;
 
-      const { error: uErr } = await (supabase as any)
+      const { error: uErr } = await sbExt
         .from('rental_applications')
         .update({ tenancy_id: tenancy?.id, status: 'converted' })
         .eq('id', convertApp.id);
@@ -124,7 +127,7 @@ const RentalApplicationsPage = () => {
     const { data: agent } = await supabase.from('agents').select('id').eq('user_id', user.id).maybeSingle();
     if (!agent) { setNoAgent(true); setLoading(false); return; }
 
-    const { data } = await (supabase as any)
+    const { data } = await sbExt
       .from('rental_applications')
       .select('*, properties(address, suburb, beds, rental_weekly), tica_checks(result, created_at)')
       .eq('agent_id', agent.id)
@@ -140,7 +143,7 @@ const RentalApplicationsPage = () => {
     setActing(app.id);
     try {
       // Update application status
-      const { error: updateErr } = await (supabase as any)
+      const { error: updateErr } = await sbExt
         .from('rental_applications')
         .update({ status: 'approved' })
         .eq('id', app.id);
@@ -189,7 +192,7 @@ const RentalApplicationsPage = () => {
   const handleDecline = async (app: Application) => {
     setActing(app.id);
     try {
-      const { error } = await (supabase as any)
+      const { error } = await sbExt
         .from('rental_applications')
         .update({ status: 'declined' })
         .eq('id', app.id);

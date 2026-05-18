@@ -5,6 +5,9 @@ import MarketingSupplierToggle from '../MarketingSupplierToggle';
 import ListingPhotoGallery from './ListingPhotoGallery';
 import { SuburbPoolDepth } from '@/features/boost/components/SuburbPoolDepth';
 import { supabase } from '@/integrations/supabase/client';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sbExt = supabase as any;
 import { dispatchNotification } from '@/shared/lib/notify';
 import { useAuth } from '@/features/auth/AuthProvider';
 import {
@@ -92,7 +95,7 @@ const ListingMarketingTab = ({ listing, onViewAllLeads }: Props) => {
     const expiresAt = new Date(boostState.featured_until);
     const startedAt = new Date(expiresAt.getTime() - 30 * 24 * 60 * 60 * 1000);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (supabase as any)
+    sbExt
       .from('listing_events')
       .select('event_type')
       .eq('listing_id', listing.id)

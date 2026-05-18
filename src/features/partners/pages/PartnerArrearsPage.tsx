@@ -111,14 +111,14 @@ const PartnerArrearsPage = () => {
     if (agencies.length === 0) return;
     const agentIds = agencies.map(a => a.agentId).filter(Boolean);
     if (agentIds.length === 0) return;
-    const { data: rules } = await (supabase as any)
+    const { data: rules } = await sbExt
       .from('pm_automation_rules')
       .select('is_active')
       .eq('rule_type', 'arrears_sequence')
       .in('agent_id', agentIds);
     setAutoOn(!!rules?.some((r: any) => r.is_active));
 
-    const { data: logs } = await (supabase as any)
+    const { data: logs } = await sbExt
       .from('pm_automation_log')
       .select('recipient_email, sent_at')
       .eq('rule_type', 'arrears_sequence')
@@ -139,7 +139,7 @@ const PartnerArrearsPage = () => {
     try {
       const agentIds = agencies.map(a => a.agentId).filter(Boolean);
       const newState = !autoOn;
-      const { error } = await (supabase as any)
+      const { error } = await sbExt
         .from('pm_automation_rules')
         .update({ is_active: newState })
         .eq('rule_type', 'arrears_sequence')

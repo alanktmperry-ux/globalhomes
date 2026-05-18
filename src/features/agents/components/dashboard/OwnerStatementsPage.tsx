@@ -145,8 +145,8 @@ export default function OwnerStatementsPage() {
         supabase.from('properties').select('id, address, suburb, owner_email, owner_name').eq('agent_id', agentId).order('address'),
         supabase.from('owner_statements').select('*, properties(address)').eq('agent_id', agentId).order('created_at', { ascending: false }),
       ]);
-      setProperties((props as any) || []);
-      setStatements((stmts as any) || []);
+      setProperties((props || []) as unknown as Property[]);
+      setStatements((stmts || []) as unknown as Statement[]);
       setLoading(false);
     })();
   }, [agentId]);

@@ -289,10 +289,10 @@ export default function MaintenancePage() {
 
   const submitAssign = async () => {
     if (!assignFor || !assignSupplierId) return;
-    const { error } = await supabase.from('maintenance_jobs').update({
+    const { error } = await sbExt.from('maintenance_jobs').update({
       assigned_supplier_id: assignSupplierId,
       status: assignFor.status === 'new' ? 'assigned' : assignFor.status,
-    } as any).eq('id', assignFor.id);
+    }).eq('id', assignFor.id);
     if (error) { toast.error(error.message || 'Failed to assign'); return; }
     toast.success('Supplier assigned');
     const justAssigned = { ...assignFor, assigned_supplier_id: assignSupplierId };

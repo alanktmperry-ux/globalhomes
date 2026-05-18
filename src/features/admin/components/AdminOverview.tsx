@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, AlertTriangle, Zap, Globe, BarChart3, Users, Home, DollarSign, ChevronRight, Wallet } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, Zap, Globe, BarChart3, Users, Home, DollarSign, ChevronRight, Wallet, type LucideIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { InsightsData } from '../pages/AdminDashboard';
 

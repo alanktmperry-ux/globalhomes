@@ -16,12 +16,15 @@ const sections = [
   { title: 'Open Homes', ids: ['agent-open-home'] },
   { title: 'Auctions', ids: ['agent-auction-setup', 'agent-auction-registration'] },
   { title: 'CRM & Leads', ids: ['agent-crm', 'agent-saved-searches', 'agent-lead-marketplace'] },
+  { title: 'Halo Board', ids: ['halo-board-what', 'halo-credits-what', 'halo-credits-buy', 'halo-credits-cost', 'halo-board-browse', 'halo-board-contact'] },
   { title: 'Rentals & Property Management', ids: ['agent-rental-pm'] },
   { title: 'Market Tools', ids: ['agent-suburb-intelligence', 'agent-cma'] },
+  { title: 'Sales Pipeline & Settlement', ids: ['agent-pipeline', 'agent-settlement-concierge', 'agent-voice-leads'] },
   { title: 'Client Reporting', ids: ['agent-vendor-dashboard', 'agent-documents', 'agent-vendor-report-link'] },
   { title: 'Team & Agency', ids: ['agent-team-invite', 'agent-team-roles', 'agent-team-access-levels'] },
   { title: 'Reviews & Profile', ids: ['agent-reviews'] },
   { title: 'Billing & Support', ids: ['agent-billing', 'billing-plans', 'billing-cancel', 'billing-invoices', 'billing-update-card', 'billing-founding-agent'] },
+  { title: 'Compliance (Property Managers)', ids: ['pm-smoke-alarms', 'pm-bond-claims', 'pm-rent-increase', 'pm-rent-increase-notice', 'pm-bank-reconciliation'] },
 ];
 
 export default function HelpAgentsPage() {

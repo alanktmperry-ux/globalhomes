@@ -198,6 +198,7 @@ const HelpBuyersPage = React.lazy(() => import("./pages/HelpBuyersPage"));
 const HelpRentersPage = React.lazy(() => import("./pages/HelpRentersPage"));
 const HelpVendorsPage = React.lazy(() => import("./pages/HelpVendorsPage"));
 const HelpPropertyManagersPage = React.lazy(() => import("./pages/HelpPropertyManagersPage"));
+const HelpSeekerPage = React.lazy(() => import("./pages/HelpSeekerPage"));
 const HelpContactPage = React.lazy(() => import("./pages/HelpContactPage"));
 const CRMPage = React.lazy(() => import("./features/crm/pages/CRMPage"));
 const ContactImportPage = React.lazy(() => import("./features/agents/components/dashboard/ContactImportPage"));
@@ -394,6 +395,7 @@ const App = () => (
                   <Route path="/help/renters" element={<HelpRentersPage />} />
                   <Route path="/help/vendors" element={<HelpVendorsPage />} />
                   <Route path="/help/property-managers" element={<HelpPropertyManagersPage />} />
+                  <Route path="/help/seekers" element={<HelpSeekerPage />} />
                   <Route path="/help/contact" element={<HelpContactPage />} />
                   <Route path="/home-services" element={<HomeServicesPage />} />
                   <Route path="/conveyancing" element={<ConveyancingPage />} />

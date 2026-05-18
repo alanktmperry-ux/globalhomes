@@ -1,0 +1,1 @@
+UPDATE public.properties SET suburb = 'Doncaster' WHERE id = '81b358d1-923a-41d2-abff-3416fe89a743';

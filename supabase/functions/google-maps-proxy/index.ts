@@ -61,8 +61,7 @@ Deno.serve(async (req) => {
 
   try {
     if (action === 'get_key') {
-      return new Response(JSON.stringify({ error: 'This action has been removed.' }), {
-        status: 410,
+      return new Response(JSON.stringify({ key: apiKey }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }

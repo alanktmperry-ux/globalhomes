@@ -7,11 +7,19 @@ import { supabase } from '@/integrations/supabase/client';
 // The unrestricted server key lives only in the google-maps-proxy edge function.
 const BROWSER_MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_BROWSER_KEY as string | undefined;
 
+let cachedKey: string | null = null;
+
 export async function getGoogleMapsApiKey(): Promise<string> {
-  if (!BROWSER_MAPS_KEY) {
-    throw new Error('Google Maps browser key is not configured (VITE_GOOGLE_MAPS_BROWSER_KEY).');
+  if (BROWSER_MAPS_KEY) return BROWSER_MAPS_KEY;
+  if (cachedKey) return cachedKey;
+  const { data, error } = await supabase.functions.invoke('google-maps-proxy', {
+    body: { action: 'get_key' },
+  });
+  if (error || !data?.key) {
+    throw new Error('Google Maps key is not available.');
   }
-  return BROWSER_MAPS_KEY;
+  cachedKey = data.key as string;
+  return cachedKey;
 }
 
 export async function autocomplete(input: string, types?: string): Promise<{ description: string; place_id: string }[]> {

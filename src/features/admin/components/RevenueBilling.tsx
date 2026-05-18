@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, type ComponentType } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import {
   DollarSign, TrendingUp, TrendingDown, Users,

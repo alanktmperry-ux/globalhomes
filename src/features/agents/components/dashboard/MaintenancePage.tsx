@@ -277,7 +277,7 @@ export default function MaintenancePage() {
   const filtered = useMemo(() => jobs.filter(j => statusFilter === 'all' || j.status === statusFilter), [jobs, statusFilter]);
 
   const updateStatus = async (j: Job, status: string) => {
-    await supabase.from('maintenance_jobs').update({ status } as any).eq('id', j.id);
+    await sbExt.from('maintenance_jobs').update({ status }).eq('id', j.id);
     if (status === 'completed') {
       supabase.functions.invoke('run-pm-automations', {
         body: { rule_type: 'maintenance_update', maintenance_job_id: j.id, new_status: 'completed' },

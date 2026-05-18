@@ -101,27 +101,29 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
     setPreviewLoading(true);
     try {
       const now = new Date();
-      const { data: allAgents } = await supabase.from('agents').select('id, name, email, agency, is_subscribed, created_at');
-      if (!allAgents) return;
+      type AgentRow = { id: string; name: string | null; email: string | null; agency: string | null; is_subscribed: boolean | null; created_at: string };
+      const { data: allAgentsRaw } = await supabase.from('agents').select('id, name, email, agency, is_subscribed, created_at');
+      const allAgents = (allAgentsRaw || []) as unknown as AgentRow[];
+      if (!allAgentsRaw) return;
 
       const signInMap = new Map<string, string | null>();
       if (aud === 'at_risk') {
         try {
           const { callAdminFunction } = await import('@/features/admin/lib/adminApi');
           const j = await callAdminFunction('list_users');
-          (j?.users || []).forEach((u: any) => signInMap.set(u.id, u.last_sign_in_at || null));
-        } catch {}
+          ((j?.users || []) as Array<{ id: string; last_sign_in_at: string | null }>).forEach((u) => signInMap.set(u.id, u.last_sign_in_at || null));
+        } catch {/* ignore */}
       }
 
       let agentsWithListings = new Set<string>();
       if (aud === 'never_listed') {
         const { data: props } = await supabase.from('properties').select('agent_id').eq('is_active', true);
-        agentsWithListings = new Set((props || []).map((p: any) => p.agent_id).filter(Boolean));
+        agentsWithListings = new Set(((props || []) as Array<{ agent_id: string | null }>).map((p) => p.agent_id).filter(Boolean) as string[]);
       }
 
       const d14 = new Date(now.getTime() - 14 * 86400000).toISOString();
 
-      const filtered = allAgents.filter((a: any) => {
+      const filtered = allAgents.filter((a) => {
         if (aud === 'all') return true;
         if (aud === 'trial') return !a.is_subscribed;
         if (aud === 'paid') return a.is_subscribed;
@@ -138,7 +140,7 @@ function ComposePanel({ templates, onSent }: { templates: Template[]; onSent: ()
         return true;
       });
 
-      setPreview(filtered.map((a: any) => ({ id: a.id, name: a.name, email: a.email, agency: a.agency })));
+      setPreview(filtered.map((a) => ({ id: a.id, name: a.name || '', email: a.email || '', agency: a.agency })));
     } finally {
       setPreviewLoading(false);
     }

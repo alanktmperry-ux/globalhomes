@@ -123,9 +123,9 @@ export default function MaintenancePage() {
     if (!user?.id) return;
     const val = Math.max(0, Math.floor(Number(thresholdInput) || 0));
     setSavingThreshold(true);
-    const { error } = await supabase
+    const { error } = await sbExt
       .from('agents')
-      .update({ maintenance_auto_approve_threshold: val } as any)
+      .update({ maintenance_auto_approve_threshold: val })
       .eq('user_id', user.id);
     setSavingThreshold(false);
     if (error) { toast.error(error.message || 'Failed to save threshold'); return; }

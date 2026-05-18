@@ -242,14 +242,14 @@ export default function OwnerStatementsPage() {
               html,
             },
           });
-          await supabase.from('owner_statements').update({ emailed_to_owner: true, emailed_at: new Date().toISOString() } as any).eq('id', (data as any).id);
-        } catch (emailErr: any) {
-          toast.error('Statement saved but email failed to send: ' + (emailErr?.message || 'Unknown error'));
+          await sbExt.from('owner_statements').update({ emailed_to_owner: true, emailed_at: new Date().toISOString() }).eq('id', (data as { id: string }).id);
+        } catch (emailErr) {
+          toast.error('Statement saved but email failed to send: ' + (getErrorMessage(emailErr) || 'Unknown error'));
         }
       }
     }
 
-    setStatements((s) => [data as any, ...s]);
+    setStatements((s) => [data as unknown as Statement, ...s]);
     setShowCreate(false);
     setForm({
       property_id: '',

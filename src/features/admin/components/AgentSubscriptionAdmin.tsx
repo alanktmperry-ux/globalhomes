@@ -116,6 +116,65 @@ export default function AgentSubscriptionAdmin() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [graceOpenFor, setGraceOpenFor] = useState<string | null>(null);
+  const [editAgent, setEditAgent] = useState<AdminAgentRow | null>(null);
+  const [editEmail, setEditEmail] = useState('');
+  const [editPassword, setEditPassword] = useState('');
+  const [editPasswordConfirm, setEditPasswordConfirm] = useState('');
+  const [editSubmitting, setEditSubmitting] = useState(false);
+
+  const openEditDialog = (agent: AdminAgentRow) => {
+    setEditAgent(agent);
+    setEditEmail(agent.email || '');
+    setEditPassword('');
+    setEditPasswordConfirm('');
+  };
+
+  const closeEditDialog = () => {
+    setEditAgent(null);
+    setEditEmail('');
+    setEditPassword('');
+    setEditPasswordConfirm('');
+  };
+
+  const submitEdit = async () => {
+    if (!editAgent) return;
+    if (!editAgent.user_id) {
+      toast.error('This agent has no linked auth user.');
+      return;
+    }
+    const emailChanged = editEmail.trim() && editEmail.trim() !== (editAgent.email || '');
+    const wantsPassword = editPassword.length > 0;
+    if (!emailChanged && !wantsPassword) {
+      toast.error('Nothing to update.');
+      return;
+    }
+    if (wantsPassword) {
+      if (editPassword.length < 8) {
+        toast.error('Password must be at least 8 characters.');
+        return;
+      }
+      if (editPassword !== editPasswordConfirm) {
+        toast.error('Passwords do not match.');
+        return;
+      }
+    }
+    setEditSubmitting(true);
+    const payload: { user_id: string; email?: string; password?: string } = {
+      user_id: editAgent.user_id,
+    };
+    if (emailChanged) payload.email = editEmail.trim();
+    if (wantsPassword) payload.password = editPassword;
+
+    const { data, error } = await supabase.functions.invoke('admin-update-user', { body: payload });
+    setEditSubmitting(false);
+    if (error || data?.error) {
+      toast.error(error?.message || data?.error || 'Failed to update agent');
+      return;
+    }
+    toast.success('Agent credentials updated');
+    closeEditDialog();
+    fetchAgents();
+  };
 
   const fetchAgents = useCallback(async () => {
     setLoading(true);

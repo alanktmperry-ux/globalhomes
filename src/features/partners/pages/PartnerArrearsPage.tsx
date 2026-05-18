@@ -74,7 +74,8 @@ const PartnerArrearsPage = () => {
     const today = new Date();
     const latestMap = new Map<string, string>();
     const overdueSet = new Set<string>();
-    for (const p of (payments || []) as any[]) {
+    type PaymentRow = { tenancy_id: string; period_to: string; status: string };
+    for (const p of ((payments ?? []) as unknown as PaymentRow[])) {
       if (!latestMap.has(p.tenancy_id)) latestMap.set(p.tenancy_id, p.period_to);
       if (p.status === 'overdue') overdueSet.add(p.tenancy_id);
     }
@@ -82,7 +83,7 @@ const PartnerArrearsPage = () => {
     const agencyMap = new Map(agencies.map(a => [a.agentId, a]));
 
     const results: OverdueTenancy[] = [];
-    for (const t of tenancies as any[]) {
+    for (const t of tenancyRows) {
       const hasOverdue = overdueSet.has(t.id);
       const latestPeriod = latestMap.get(t.id);
       const daysBehind = latestPeriod ? differenceInDays(today, new Date(latestPeriod)) : 0;

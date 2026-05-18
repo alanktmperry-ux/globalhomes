@@ -55,6 +55,7 @@ import { useListingTranslation } from '@/features/properties/hooks/useListingTra
 import { HaloFromListingCTA } from '@/components/halo/HaloFromListingCTA';
 import { useOffmarketSubscriptions } from '@/features/offmarket/hooks/useOffmarketSubscriptions';
 import { ListingImageGallery } from '@/features/properties/components/ListingImageGallery';
+import { PropertyLocationMap } from '@/features/properties/components/PropertyLocationMap';
 
 import { Skeleton } from '@/components/ui/skeleton';
 

@@ -74,16 +74,22 @@ export function ListingImageGallery({ images, address, overlay }: Props) {
 
   const totalCount = safeImages.length;
   const sideImages = safeImages.slice(1, 5);
+  const hasSideImages = sideImages.length > 0;
+  // If the listing only has one photo, let the hero take the full gallery width
+  // instead of leaving empty side slots that look like a layout gap.
+  const heroColClass = hasSideImages ? 'md:col-span-2' : 'md:col-span-4';
+  const gridColsClass = hasSideImages ? 'md:grid-cols-4' : 'md:grid-cols-1';
+  const gridRowsClass = hasSideImages ? 'md:grid-rows-2' : 'md:grid-rows-1';
 
   return (
     <>
       {/* 5-image grid hero */}
-      <div className="relative grid grid-cols-1 md:grid-cols-4 grid-rows-1 md:grid-rows-2 gap-2 h-[420px] md:h-[520px] rounded-3xl overflow-hidden">
+      <div className={cn('relative grid grid-cols-1 grid-rows-1 gap-2 h-[420px] md:h-[520px] rounded-3xl overflow-hidden', gridColsClass, gridRowsClass)}>
         {/* Main image */}
         <button
           type="button"
           onClick={() => openLightbox(0)}
-          className="relative col-span-1 md:col-span-2 row-span-1 md:row-span-2 w-full h-full overflow-hidden group/hero"
+          className={cn('relative col-span-1 row-span-1 md:row-span-2 w-full h-full overflow-hidden group/hero', heroColClass)}
         >
           <img
             src={safeImages[0]}

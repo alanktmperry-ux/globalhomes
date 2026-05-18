@@ -72,13 +72,13 @@ export default function AccountSettingsPage() {
   }, [effectiveUserId]);
 
   const saveDetails = async () => {
-    if (!user) return;
+    if (!effectiveUserId) return;
     setSaving(true);
     try {
       const { error } = await supabase
         .from("profiles")
         .update({ full_name: form.fullName, phone: form.phone })
-        .eq("id", user.id);
+        .eq("id", effectiveUserId);
       if (error) throw error;
       toast({ title: "Saved", description: "Your details have been updated." });
       load();
@@ -90,7 +90,7 @@ export default function AccountSettingsPage() {
   };
 
   const toggleNotifications = async () => {
-    if (!user || !profile) return;
+    if (!effectiveUserId || !profile) return;
     const newValue = !profile.email_unsubscribed;
     const { error } = await supabase
       .from("profiles")
@@ -98,7 +98,7 @@ export default function AccountSettingsPage() {
         email_unsubscribed: newValue,
         email_unsubscribed_at: newValue ? new Date().toISOString() : null,
       })
-      .eq("id", user.id);
+      .eq("id", effectiveUserId);
     if (error) {
       toast({ title: "Couldn't update", description: error.message, variant: "destructive" });
       return;

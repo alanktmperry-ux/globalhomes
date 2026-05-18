@@ -249,16 +249,17 @@ export default function RevenueBilling() {
           return start <= monthEnd && (!end || end > monthStart);
         });
         const mrr = activePaidAtMonth.reduce((s, r) => s + r.mrr, 0);
-        const monthEvents = events.filter((e: any) => {
+        type SubEvent = { agent_id: string; event_type: string; from_plan: string | null; to_plan: string | null; mrr_change: number | null; created_at: string };
+        const monthEvents = (events as unknown as SubEvent[]).filter((e) => {
           const d = new Date(e.created_at);
           return d >= monthStart && d <= monthEnd;
         });
         const newMrr = monthEvents
-          .filter((e: any) => e.event_type === 'converted' || e.event_type === 'upgraded')
-          .reduce((s: number, e: any) => s + (e.mrr_change || 0), 0);
+          .filter((e) => e.event_type === 'converted' || e.event_type === 'upgraded')
+          .reduce((s, e) => s + (e.mrr_change || 0), 0);
         const churnMrr = monthEvents
-          .filter((e: any) => e.event_type === 'cancelled' || e.event_type === 'downgraded')
-          .reduce((s: number, e: any) => s + Math.abs(e.mrr_change || 0), 0);
+          .filter((e) => e.event_type === 'cancelled' || e.event_type === 'downgraded')
+          .reduce((s, e) => s + Math.abs(e.mrr_change || 0), 0);
         trend.push({ label, mrr, arr: mrr * 12, newMrr, churnMrr, netNew: newMrr - churnMrr });
       }
       setMrrTrend(trend);

@@ -952,4 +952,5 @@ export const FAQ_CATEGORIES = [
   { key: 'auctions', label: 'Auctions', icon: 'Hammer' },
   { key: 'billing', label: 'Billing', icon: 'CreditCard' },
   { key: 'technical', label: 'Technical', icon: 'Settings' },
+  { key: 'halo', label: 'Halo', icon: 'Zap' },
 ] as const;

@@ -3,6 +3,8 @@ import { useSubscription } from '@/features/agents/hooks/useSubscription';
 import UpgradeGate from '@/features/agents/components/shared/UpgradeGate';
 import { Copy, Plus, Trash2, UserPlus, Building2, Shield, Users, RefreshCw, Loader2, Camera, Upload, LogIn, ArrowRight, Mail, MapPin, Eye, Lock, Kanban, ClipboardList, AlertTriangle, CheckCircle2, UserMinus, ArrowRightLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sbExt = supabase as any;
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';

@@ -163,44 +163,88 @@ export default function HeroSearchPreview() {
 
   useEffect(() => { paused.current = q.length > 0; }, [q]);
 
-  // Fetch boosted (Premier/Featured) listings to rotate through with full details.
+  // Fetch boosted listings first; then top up with newest active/approved
+  // listings (matches what's shown in the "Featured in <suburb>" zone below).
+  // Target: 10 cards rotating in the hero.
   useEffect(() => {
     let cancelled = false;
+    const TARGET = 10;
+    const SELECT = 'id, address, suburb, state, price_formatted, listing_type, beds, baths, parking, image_url, images, boost_tier, featured_until, created_at';
+
+    const mapRow = (r: any): BoostedListing | null => {
+      const img = r?.image_url ?? r?.images?.[0] ?? null;
+      if (!img) return null;
+      const isBoostActive = !!r.featured_until && new Date(r.featured_until) > new Date();
+      return {
+        id: r.id,
+        image: img,
+        address: r.address ?? '',
+        suburb: r.suburb ?? '',
+        state: r.state ?? null,
+        price: r.price_formatted ?? null,
+        listing_type: r.listing_type ?? null,
+        beds: r.beds ?? null,
+        baths: r.baths ?? null,
+        parking: r.parking ?? null,
+        // Only show the Premier/Featured badge when the boost is actually active.
+        boost_tier: isBoostActive ? (r.boost_tier ?? null) : null,
+      } as BoostedListing;
+    };
+
     (async () => {
       try {
         const nowIso = new Date().toISOString();
-        const { data } = await supabase
+
+        // 1) Boosted (Premier first, then Featured) — currently active.
+        const boostedRes = await supabase
           .from('properties')
-          .select('id, address, suburb, state, price_formatted, listing_type, beds, baths, parking, image_url, images, boost_tier, featured_until')
+          .select(SELECT)
           .eq('is_active', true)
           .eq('status', 'public')
           .eq('moderation_status', 'approved')
           .eq('is_featured', true)
           .gt('featured_until', nowIso)
-          .order('boost_tier', { ascending: true }) // 'premier' < 'featured' alphabetically
+          .order('boost_tier', { ascending: true })
           .order('featured_until', { ascending: false })
-          .limit(8);
+          .limit(TARGET);
+
+        const boostedRows = (boostedRes.data ?? [])
+          .map(mapRow)
+          .filter((r): r is BoostedListing => !!r);
+
+        let combined: BoostedListing[] = [...boostedRows];
+
+        // 2) Top up with newest active/approved listings if we don't have 10 boosted.
+        if (combined.length < TARGET) {
+          const excludeIds = combined.map(r => r.id);
+          let fillerQ = supabase
+            .from('properties')
+            .select(SELECT)
+            .eq('is_active', true)
+            .eq('status', 'public')
+            .eq('moderation_status', 'approved')
+            .order('created_at', { ascending: false })
+            .limit(TARGET * 2);
+          if (excludeIds.length) {
+            fillerQ = fillerQ.not('id', 'in', `(${excludeIds.join(',')})`);
+          }
+          const fillerRes = await fillerQ;
+          const fillerRows = (fillerRes.data ?? [])
+            .map(mapRow)
+            .filter((r): r is BoostedListing => !!r);
+
+          // Dedupe by id and trim to TARGET.
+          const seen = new Set(combined.map(r => r.id));
+          for (const r of fillerRows) {
+            if (combined.length >= TARGET) break;
+            if (seen.has(r.id)) continue;
+            seen.add(r.id);
+            combined.push(r);
+          }
+        }
+
         if (cancelled) return;
-        const rows: BoostedListing[] = (data ?? [])
-          .map((r: any) => {
-            const img = r?.image_url ?? r?.images?.[0] ?? null;
-            if (!img) return null;
-            return {
-              id: r.id,
-              image: img,
-              address: r.address ?? '',
-              suburb: r.suburb ?? '',
-              state: r.state ?? null,
-              price: r.price_formatted ?? null,
-              listing_type: r.listing_type ?? null,
-              beds: r.beds ?? null,
-              baths: r.baths ?? null,
-              parking: r.parking ?? null,
-              boost_tier: r.boost_tier ?? null,
-            } as BoostedListing;
-          })
-          .filter((r: BoostedListing | null): r is BoostedListing => !!r);
-        if (rows.length) setBoosted(rows);
+        if (combined.length) setBoosted(combined);
       } catch { /* fallback to static placeholder */ }
     })();
     return () => { cancelled = true; };

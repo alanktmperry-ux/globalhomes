@@ -133,28 +133,28 @@ const StepAddress = ({ draft, update }: Props) => {
         </div>
       )}
 
-      {manualMode && (
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <Label className="text-xs">Suburb</Label>
-            <Input
-              value={draft.suburb}
-              onChange={(e) => update({ suburb: e.target.value })}
-              placeholder="South Yarra"
-              className="bg-secondary border-border"
-            />
-          </div>
-          <div>
-            <Label className="text-xs">State</Label>
-            <Input
-              value={draft.state}
-              onChange={(e) => update({ state: e.target.value })}
-              placeholder="VIC"
-              className="bg-secondary border-border"
-            />
-          </div>
+      {/* Suburb & State — always editable so agents can correct what the geocoder picked.
+          Buyer search filters on the suburb field, so getting this right matters. */}
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <Label className="text-xs">Suburb <span className="text-muted-foreground font-normal">(used for buyer search)</span></Label>
+          <Input
+            value={draft.suburb}
+            onChange={(e) => update({ suburb: e.target.value })}
+            placeholder="Doncaster"
+            className="bg-secondary border-border"
+          />
         </div>
-      )}
+        <div>
+          <Label className="text-xs">State</Label>
+          <Input
+            value={draft.state}
+            onChange={(e) => update({ state: e.target.value })}
+            placeholder="VIC"
+            className="bg-secondary border-border"
+          />
+        </div>
+      </div>
     </div>
   );
 };

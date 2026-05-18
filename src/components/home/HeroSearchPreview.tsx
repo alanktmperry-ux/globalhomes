@@ -157,25 +157,38 @@ export default function HeroSearchPreview() {
 
   useEffect(() => { paused.current = q.length > 0; }, [q]);
 
-  // Fetch a featured listing image from Auburn/Box Hill, fall back to placeholder.
+  // Fetch a pool of featured listing images to rotate through.
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         const { data } = await supabase
           .from('properties')
-          .select('id, suburb, image_urls, hero_image_url')
-          .in('suburb', ['Auburn', 'Box Hill'])
+          .select('id, image_url, images, is_featured, featured_until, created_at')
           .eq('is_active', true)
-          .limit(1);
+          .eq('status', 'public')
+          .eq('moderation_status', 'approved')
+          .order('is_featured', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(12);
         if (cancelled) return;
-        const row: any = data?.[0];
-        const img = row?.hero_image_url ?? row?.image_urls?.[0] ?? null;
-        if (img) setHeroImg(img);
+        const imgs = (data ?? [])
+          .map((row: any) => row?.image_url ?? row?.images?.[0] ?? null)
+          .filter((u: string | null): u is string => !!u);
+        if (imgs.length) setHeroImgs(imgs.slice(0, 8));
       } catch { /* fallback to placeholder */ }
     })();
     return () => { cancelled = true; };
   }, []);
+
+  // Rotate the hero image every 4.5s (slightly offset from language cycle)
+  useEffect(() => {
+    if (heroImgs.length < 2) return;
+    const id = window.setInterval(() => {
+      setImgIdx(i => (i + 1) % heroImgs.length);
+    }, 4500);
+    return () => window.clearInterval(id);
+  }, [heroImgs.length]);
 
   // Pre-warm edge functions — eliminates cold start for first voice/search user
   useEffect(() => {

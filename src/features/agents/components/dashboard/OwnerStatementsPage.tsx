@@ -196,7 +196,7 @@ export default function OwnerStatementsPage() {
     if (!form.property_id) { toast.error('Select a property'); return; }
     if (!agentId) return;
     setSaving(true);
-    const { data, error } = await supabase
+    const { data, error } = await sbExt
       .from('owner_statements')
       .insert({
         property_id: form.property_id,
@@ -208,10 +208,10 @@ export default function OwnerStatementsPage() {
         management_fee_gst_aud: mgmtFeeGst,
         maintenance_costs_aud: form.maintenance_costs_aud,
         other_deductions_aud: otherTotal,
-        other_deductions_breakdown: otherDeductions as any,
+        other_deductions_breakdown: otherDeductions,
         net_amount_aud: netAmount,
         statement_notes: form.notes || null,
-      } as any)
+      })
       .select('*, properties(address)')
       .single();
 

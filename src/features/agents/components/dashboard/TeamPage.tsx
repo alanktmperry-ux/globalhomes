@@ -327,16 +327,16 @@ const TeamPage = () => {
 
   const handleChangeRole = async (memberId: string, newRole: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await sbExt
         .from('agency_members')
-        .update({ role: newRole as any })
+        .update({ role: newRole })
         .eq('id', memberId);
       if (error) throw error;
 
       // Also update agents.agency_role
       const member = members.find(m => m.id === memberId);
       if (member?.agentId) {
-        await supabase.from('agents').update({ agency_role: newRole } as any).eq('id', member.agentId);
+        await sbExt.from('agents').update({ agency_role: newRole }).eq('id', member.agentId);
       }
 
       toast.success(`Role updated — Member role changed to ${newRole}`);

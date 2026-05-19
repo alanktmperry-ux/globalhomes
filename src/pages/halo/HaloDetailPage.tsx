@@ -118,6 +118,7 @@ export default function HaloDetailPage() {
         }
         setHalo(haloRes.data as Halo);
         setAgentProps((propsRes.data || []) as AgentProperty[]);
+        setTemplates(((tplRes.data || []) as PitchTemplate[]));
         capture('halo_viewed_by_agent', { halo_id: id, pitch_sent: !!(resp as ResponseRow).body });
 
         if (contactRes.error) {

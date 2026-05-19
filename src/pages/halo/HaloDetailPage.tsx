@@ -25,6 +25,13 @@ interface ResponseRow {
   suggested_property_ids: string[] | null;
   accepted: boolean | null;
   dismissed_by_seeker: boolean | null;
+  template_label?: string | null;
+}
+
+interface PitchTemplate {
+  id: string;
+  label: string;
+  body: string;
 }
 
 interface AgentProperty {
@@ -60,6 +67,8 @@ export default function HaloDetailPage() {
   const [selectedPropIds, setSelectedPropIds] = useState<Set<string>>(new Set());
   const [agentProps, setAgentProps] = useState<AgentProperty[]>([]);
   const [sending, setSending] = useState(false);
+  const [templates, setTemplates] = useState<PitchTemplate[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
 
   // Thread state
   const [messages, setMessages] = useState<HaloMessage[]>([]);
@@ -74,7 +83,7 @@ export default function HaloDetailPage() {
       try {
         const { data: resp } = await supabase
           .from('halo_responses')
-          .select('id, body, suggested_property_ids, accepted, dismissed_by_seeker')
+          .select('id, body, suggested_property_ids, accepted, dismissed_by_seeker, template_label')
           .eq('halo_id', id)
           .eq('agent_id', user.id)
           .maybeSingle();
@@ -84,7 +93,7 @@ export default function HaloDetailPage() {
         }
         if (active) setResponse(resp as ResponseRow);
 
-        const [haloRes, contactRes, propsRes] = await Promise.all([
+        const [haloRes, contactRes, propsRes, tplRes] = await Promise.all([
           supabase.from('halos').select('*').eq('id', id).maybeSingle(),
           supabase.functions.invoke('get-halo-contact', { body: { halo_id: id } }),
           supabase
@@ -94,6 +103,12 @@ export default function HaloDetailPage() {
             .eq('is_active', true)
             .order('created_at', { ascending: false })
             .limit(50),
+          supabase
+            .from('halo_pitch_templates')
+            .select('id, label, body')
+            .eq('agent_id', user.id)
+            .eq('is_active', true)
+            .order('sort_order', { ascending: true }),
         ]);
 
         if (!active) return;
@@ -103,6 +118,7 @@ export default function HaloDetailPage() {
         }
         setHalo(haloRes.data as Halo);
         setAgentProps((propsRes.data || []) as AgentProperty[]);
+        setTemplates(((tplRes.data || []) as PitchTemplate[]));
         capture('halo_viewed_by_agent', { halo_id: id, pitch_sent: !!(resp as ResponseRow).body });
 
         if (contactRes.error) {
@@ -151,14 +167,17 @@ export default function HaloDetailPage() {
     setSending(true);
     try {
       const ids = Array.from(selectedPropIds);
+      const selectedTpl = templates.find((x) => x.id === selectedTemplateId);
       const { data, error: updErr } = await supabase
         .from('halo_responses')
         .update({
           body: pitch.trim(),
           suggested_property_ids: ids,
+          template_id: selectedTpl?.id ?? null,
+          template_label: selectedTpl?.label ?? null,
         })
         .eq('id', response.id)
-        .select('id, body, suggested_property_ids, accepted, dismissed_by_seeker')
+        .select('id, body, suggested_property_ids, accepted, dismissed_by_seeker, template_label')
         .maybeSingle();
       if (updErr || !data) throw updErr ?? new Error('update failed');
 
@@ -167,7 +186,7 @@ export default function HaloDetailPage() {
         .invoke('send-halo-agent-response', { body: { halo_id: id } })
         .catch((e) => console.warn('[HaloDetail] notify seeker failed', e));
 
-      capture('halo_response_sent', { halo_id: id, suggested_count: ids.length });
+      capture('halo_response_sent', { halo_id: id, suggested_count: ids.length, template_label: selectedTpl?.label ?? null });
       setResponse(data as ResponseRow);
       toast.success(t('halo.detail.pitchSent') || 'Pitch sent to seeker');
     } catch (e) {
@@ -306,6 +325,52 @@ export default function HaloDetailPage() {
                 Introduce yourself, what you can help with, and optionally attach up to 3 of your listings.
               </p>
             </div>
+
+            {templates.length > 0 && (
+              <div className="space-y-2">
+                <div className="text-sm font-medium flex items-center justify-between">
+                  <span>Use a template <span className="text-muted-foreground font-normal">(A/B tracked)</span></span>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/dashboard/pitch-templates')}
+                    className="text-xs text-blue-600 hover:underline"
+                  >
+                    Manage
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {templates.map((tpl) => {
+                    const active = selectedTemplateId === tpl.id;
+                    return (
+                      <button
+                        key={tpl.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedTemplateId(tpl.id);
+                          setPitch(tpl.body);
+                        }}
+                        className={`text-xs px-3 py-1.5 rounded-full border transition ${
+                          active
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white text-slate-700 border-slate-200 hover:border-blue-400'
+                        }`}
+                      >
+                        {tpl.label}
+                      </button>
+                    );
+                  })}
+                  {selectedTemplateId && (
+                    <button
+                      type="button"
+                      onClick={() => { setSelectedTemplateId(null); }}
+                      className="text-xs px-3 py-1.5 rounded-full border border-transparent text-muted-foreground hover:text-slate-700"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
             <Textarea
               value={pitch}
               onChange={(e) => setPitch(e.target.value)}

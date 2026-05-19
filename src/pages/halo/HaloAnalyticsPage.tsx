@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Loader2, Sparkles, TrendingUp, Coins, RotateCcw, Clock, CheckCircle2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Loader2, Sparkles, TrendingUp, Coins, RotateCcw, Clock, CheckCircle2, FlaskConical } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface Metrics {
@@ -35,9 +37,20 @@ function StatCard({
   );
 }
 
+interface AbRow {
+  template_id: string;
+  label: string;
+  is_active: boolean;
+  sends: number;
+  accepts: number;
+  dismissals: number;
+  accept_rate: number;
+}
+
 export default function HaloAnalyticsPage() {
   const { user } = useAuth();
   const [metrics, setMetrics] = useState<Metrics | null>(null);
+  const [ab, setAb] = useState<AbRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,10 +60,13 @@ export default function HaloAnalyticsPage() {
       setLoading(true);
       setError(null);
       try {
-        const { data, error: rpcErr } = await supabase
-          .rpc('get_agent_halo_analytics', { _agent_id: user.id });
-        if (rpcErr) throw rpcErr;
-        setMetrics(data as unknown as Metrics);
+        const [m, a] = await Promise.all([
+          supabase.rpc('get_agent_halo_analytics', { _agent_id: user.id }),
+          supabase.rpc('get_agent_pitch_ab_stats', { _agent_id: user.id }),
+        ]);
+        if (m.error) throw m.error;
+        setMetrics(m.data as unknown as Metrics);
+        if (!a.error) setAb((a.data as unknown as AbRow[]) || []);
       } catch (e: unknown) {
         setError(getErrorMessage(e));
       } finally {
@@ -147,6 +163,57 @@ export default function HaloAnalyticsPage() {
             </div>
           </CardContent>
         </Card>
+      </section>
+
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <FlaskConical className="h-5 w-5 text-primary" />
+            Pitch A/B Performance
+          </h2>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/dashboard/pitch-templates">Manage templates</Link>
+          </Button>
+        </div>
+        {ab.length === 0 ? (
+          <Card>
+            <CardContent className="p-6 text-sm text-muted-foreground">
+              No pitch templates yet. <Link to="/dashboard/pitch-templates" className="text-blue-600 hover:underline">Create at least 2</Link> to start A/B testing your pitches.
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50 text-xs uppercase text-muted-foreground">
+                    <tr>
+                      <th className="text-left p-3">Template</th>
+                      <th className="text-right p-3">Sends</th>
+                      <th className="text-right p-3">Accepts</th>
+                      <th className="text-right p-3">Dismissed</th>
+                      <th className="text-right p-3">Accept rate</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {ab.map((row) => (
+                      <tr key={row.template_id}>
+                        <td className="p-3 font-medium">
+                          {row.label}
+                          {!row.is_active && <span className="ml-2 text-xs text-muted-foreground">(inactive)</span>}
+                        </td>
+                        <td className="p-3 text-right">{row.sends}</td>
+                        <td className="p-3 text-right text-emerald-700">{row.accepts}</td>
+                        <td className="p-3 text-right text-muted-foreground">{row.dismissals}</td>
+                        <td className="p-3 text-right font-semibold">{row.accept_rate}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </section>
 
       <p className="text-xs text-muted-foreground">

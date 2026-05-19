@@ -199,14 +199,23 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch, matchS
           </div>
           {matchReasons && matchReasons.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {matchReasons.slice(0, 3).map((r, i) => (
-                <span
-                  key={i}
-                  className="bg-[#F9FAFB] text-[#374151] border border-[#E5E7EB] rounded-full px-2 py-0.5 text-[10px] font-medium"
-                >
-                  {r}
-                </span>
-              ))}
+              {matchReasons.slice(0, 3).map((r, i) => {
+                const isSemantic = /semantic|portfolio/i.test(r);
+                return (
+                  <span
+                    key={i}
+                    className={
+                      isSemantic
+                        ? 'bg-[#F3E8FF] text-[#6B21A8] border border-[#E9D5FF] rounded-full px-2 py-0.5 text-[10px] font-semibold inline-flex items-center gap-1'
+                        : 'bg-[#F9FAFB] text-[#374151] border border-[#E5E7EB] rounded-full px-2 py-0.5 text-[10px] font-medium'
+                    }
+                    title={isSemantic ? 'AI-inferred fit based on your portfolio and the brief' : undefined}
+                  >
+                    {isSemantic && <span aria-hidden>✨</span>}
+                    {r}
+                  </span>
+                );
+              })}
             </div>
           )}
         </div>

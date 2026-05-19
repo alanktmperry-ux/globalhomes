@@ -36,6 +36,14 @@ const AuthCallbackPage = () => {
     };
 
     const checkOnboarding = async (userId: string) => {
+      const loginIntent = sessionStorage.getItem('listhq_login_intent');
+      if (loginIntent === 'seeker') {
+        sessionStorage.setItem('post_login_redirected', '1');
+        sessionStorage.removeItem('listhq_login_intent');
+        navigate('/seeker/dashboard', { replace: true });
+        return;
+      }
+
       // Agents go straight to dashboard
       const { data: agentData } = await supabase
         .from('agents')

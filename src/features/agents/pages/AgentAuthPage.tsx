@@ -102,6 +102,7 @@ const AgentAuthPage = () => {
     }
     setLoading(true);
     try {
+      sessionStorage.setItem('listhq_login_intent', 'agent');
       const { error } = await supabase.auth.signInWithPassword({ email, password, options: { captchaToken } });
       setCaptchaToken(null);
       captchaRef.current?.resetCaptcha();
@@ -193,6 +194,7 @@ const AgentAuthPage = () => {
       return;
     }
     const { lovable } = await import('@/integrations/lovable/index');
+    sessionStorage.setItem('listhq_login_intent', 'agent');
     const { error } = await lovable.auth.signInWithOAuth(provider, {
       redirect_uri: window.location.origin + '/auth/callback',
     });
@@ -203,6 +205,7 @@ const AgentAuthPage = () => {
     setShowOAuthConsentModal(false);
     if (!pendingOAuthProvider) return;
     const { lovable } = await import('@/integrations/lovable/index');
+    sessionStorage.setItem('listhq_login_intent', 'agent');
     const { error } = await lovable.auth.signInWithOAuth(pendingOAuthProvider, {
       redirect_uri: window.location.origin + '/auth/callback',
     });

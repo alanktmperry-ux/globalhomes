@@ -353,21 +353,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         const isAgentUser = filteredRoles.includes('agent') || filteredRoles.includes('admin');
         const path = window.location.pathname;
+        const loginIntent = sessionStorage.getItem('listhq_login_intent');
         const agentAuthPages = [
           '/', '/login', '/auth', '/agent-auth', '/agents/login',
           '/auth/confirm', '/auth/callback',
         ];
         const seekerAuthPages = ['/login', '/auth', '/auth/confirm', '/auth/callback'];
         if (sessionStorage.getItem('post_login_redirected') !== '1') {
-          const returnTo = new URLSearchParams(window.location.search).get('return_to');
+          const params = new URLSearchParams(window.location.search);
+          const returnTo = params.get('return_to') ?? params.get('redirect');
           const safeReturnTo = returnTo && returnTo.startsWith('/') ? returnTo : null;
+          if (loginIntent === 'seeker' && seekerAuthPages.includes(path)) {
+            sessionStorage.setItem('post_login_redirected', '1');
+            sessionStorage.removeItem('listhq_login_intent');
+            window.location.replace(safeReturnTo ?? '/seeker/dashboard');
+            return;
+          }
           if (isAgentUser && agentAuthPages.includes(path)) {
             sessionStorage.setItem('post_login_redirected', '1');
+            sessionStorage.removeItem('listhq_login_intent');
             window.location.replace(safeReturnTo ?? (filteredRoles.includes('admin') ? '/admin' : '/dashboard'));
             return;
           }
           if (!isAgentUser && !filteredRoles.includes('partner') && !filteredRoles.includes('support') && seekerAuthPages.includes(path)) {
             sessionStorage.setItem('post_login_redirected', '1');
+            sessionStorage.removeItem('listhq_login_intent');
             window.location.replace(safeReturnTo ?? '/seeker/dashboard');
             return;
           }

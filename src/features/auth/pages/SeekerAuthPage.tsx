@@ -63,6 +63,8 @@ const SeekerAuthPage = () => {
   const routeAfterSignIn = async () => {
     // User entered via the seeker login — always respect that choice,
     // even if they also hold an agent/admin role on the same account.
+    sessionStorage.setItem('post_login_redirected', '1');
+    sessionStorage.removeItem('listhq_login_intent');
     if (redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')) {
       navigate(redirectTo, { replace: true });
       return;
@@ -79,6 +81,7 @@ const SeekerAuthPage = () => {
     }
     setLoading(true);
     try {
+      sessionStorage.setItem('listhq_login_intent', 'seeker');
       const { error: signErr } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
@@ -167,6 +170,7 @@ const SeekerAuthPage = () => {
       setShowOAuthConsentModal(true);
       return;
     }
+    sessionStorage.setItem('listhq_login_intent', 'seeker');
     const { error: oErr } = await lovable.auth.signInWithOAuth(provider, {
       redirect_uri: window.location.origin + '/auth/callback',
     });
@@ -176,6 +180,7 @@ const SeekerAuthPage = () => {
   const confirmOAuthConsent = async () => {
     setShowOAuthConsentModal(false);
     if (!pendingOAuthProvider) return;
+    sessionStorage.setItem('listhq_login_intent', 'seeker');
     const { error: oErr } = await lovable.auth.signInWithOAuth(pendingOAuthProvider, {
       redirect_uri: window.location.origin + '/auth/callback',
     });

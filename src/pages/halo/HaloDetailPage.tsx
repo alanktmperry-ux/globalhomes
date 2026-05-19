@@ -103,6 +103,7 @@ export default function HaloDetailPage() {
         }
         setHalo(haloRes.data as Halo);
         setAgentProps((propsRes.data || []) as AgentProperty[]);
+        capture('halo_viewed_by_agent', { halo_id: id, pitch_sent: !!(resp as ResponseRow).body });
 
         if (contactRes.error) {
           console.warn('[HaloDetail] contact fetch error', contactRes.error);

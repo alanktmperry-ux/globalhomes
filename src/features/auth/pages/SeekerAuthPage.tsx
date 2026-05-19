@@ -61,18 +61,8 @@ const SeekerAuthPage = () => {
   }, [navigate]);
 
   const routeAfterSignIn = async () => {
-    const { data: { user: signedInUser } } = await supabase.auth.getUser();
-    if (signedInUser) {
-      const { data: roles } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', signedInUser.id);
-      const roleList = roles?.map(r => r.role) || [];
-      if (roleList.includes('admin') || roleList.includes('agent')) {
-        navigate('/dashboard', { replace: true });
-        return;
-      }
-    }
+    // User entered via the seeker login — always respect that choice,
+    // even if they also hold an agent/admin role on the same account.
     if (redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')) {
       navigate(redirectTo, { replace: true });
       return;

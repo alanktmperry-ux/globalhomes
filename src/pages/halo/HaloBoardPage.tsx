@@ -389,15 +389,21 @@ export default function HaloBoardPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filtered.map((h) => (
-                <HaloPreviewCard
-                  key={h.id}
-                  halo={h}
-                  unlocked={unlockedIds.has(h.id)}
-                  onRespond={setTarget}
-                  pocketMatch={pocketMatchIds.has(h.id)}
-                />
-              ))}
+              {filtered.map((h) => {
+                const m = matches.get(h.id);
+                return (
+                  <HaloPreviewCard
+                    key={h.id}
+                    halo={h}
+                    unlocked={unlockedIds.has(h.id)}
+                    onRespond={setTarget}
+                    pocketMatch={pocketMatchIds.has(h.id)}
+                    matchScore={m?.score ?? null}
+                    matchReasons={m?.reasons ?? []}
+                    heatScore={(h as any).heat_score ?? null}
+                  />
+                );
+              })}
             </div>
           )}
 

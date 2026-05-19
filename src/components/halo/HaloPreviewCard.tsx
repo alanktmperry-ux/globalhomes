@@ -15,6 +15,9 @@ interface Props {
   unlocked: boolean;
   onRespond: (halo: Halo) => void;
   pocketMatch?: boolean;
+  matchScore?: number | null;
+  matchReasons?: string[];
+  heatScore?: number | null;
 }
 
 const fmtMoney = (n: number) => {
@@ -60,7 +63,7 @@ const LANG_META: Record<string, { flag: string; label: string }> = {
 
 
 
-export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Props) {
+export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch, matchScore, matchReasons, heatScore }: Props) {
   const navigate = useNavigate();
   const [revealing, setRevealing] = useState(false);
   const [revealed, setRevealed] = useState<{ email: string | null; name?: string | null } | null>(null);
@@ -164,6 +167,50 @@ export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Prop
         )}
         <DetailRow icon={CheckCircle} label="Finance" value={FINANCE_LABELS[halo.finance_status] || '—'} />
       </div>
+
+      {/* Phase B: Match score + reason chips + heat */}
+      {((matchScore != null && matchScore > 0) || (heatScore != null && heatScore >= 30) || (matchReasons && matchReasons.length > 0)) && (
+        <div className="mt-4 pt-4 border-t border-[#F3F4F6]">
+          <div className="flex items-center gap-2 flex-wrap">
+            {matchScore != null && matchScore > 0 && (
+              <span
+                className={`rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.10em] inline-flex items-center gap-1 ${
+                  matchScore >= 70
+                    ? 'bg-[#ECFDF5] text-[#065F46]'
+                    : matchScore >= 40
+                    ? 'bg-[#EFF6FF] text-[#1E40AF]'
+                    : 'bg-[#F3F4F6] text-[#374151]'
+                }`}
+                title="Your personal fit score"
+              >
+                <Star size={12} />
+                {Math.round(matchScore)}% match
+              </span>
+            )}
+            {heatScore != null && heatScore >= 30 && (
+              <span
+                className="bg-[#FEF2F2] text-[#DC2626] rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.10em] inline-flex items-center gap-1"
+                title="Predicted unlock probability — agents only"
+              >
+                <Flame size={12} />
+                Hot {Math.round(heatScore)}
+              </span>
+            )}
+          </div>
+          {matchReasons && matchReasons.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {matchReasons.slice(0, 3).map((r, i) => (
+                <span
+                  key={i}
+                  className="bg-[#F9FAFB] text-[#374151] border border-[#E5E7EB] rounded-full px-2 py-0.5 text-[10px] font-medium"
+                >
+                  {r}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Footer */}
       <div className="mt-5 pt-5 border-t border-[#F3F4F6] flex items-center justify-between gap-3">

@@ -31,6 +31,7 @@ export default function HaloBoardPage() {
   const queryClient = useQueryClient();
   const { balance } = useHaloCreditsBalance();
   const [halos, setHalos] = useState<Halo[]>([]);
+  const [matches, setMatches] = useState<Map<string, { score: number; reasons: string[] }>>(new Map());
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set());
   const [pocketMatchIds, setPocketMatchIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -63,14 +64,19 @@ export default function HaloBoardPage() {
           .maybeSingle();
         const agentId = agentData?.id ?? null;
 
-        const [halosRes, respRes, pmRes] = await Promise.all([
+        const [halosRes, respRes, pmRes, matchRes] = await Promise.all([
           halosPromise,
-          agentId
-            ? supabase.from('halo_responses').select('halo_id').eq('agent_id', agentId)
-            : Promise.resolve({ data: [] as any[] }),
+          // halo_responses.agent_id FK is auth.users(id), not agents.id
+          supabase.from('halo_responses').select('halo_id').eq('agent_id', user.id),
           agentId
             ? supabase.from('halo_pocket_matches').select('halo_id').eq('agent_id', agentId)
             : Promise.resolve({ data: [] as any[] }),
+          // Phase B: my match scores + reasons
+          supabase
+            .from('halo_matches')
+            .select('halo_id, combined_score, reasons')
+            .eq('match_kind', 'agent')
+            .eq('agent_id', user.id),
         ]);
         if (!active) return;
         if ((halosRes as any).error) throw (halosRes as any).error;
@@ -79,6 +85,14 @@ export default function HaloBoardPage() {
         queryClient.setQueryData(['halo-board-halos'], halosData);
         setUnlockedIds(new Set((respRes.data ?? []).map((r: any) => r.halo_id)));
         setPocketMatchIds(new Set((pmRes.data ?? []).map((r: any) => r.halo_id)));
+        const m = new Map<string, { score: number; reasons: string[] }>();
+        for (const row of ((matchRes as any).data ?? [])) {
+          m.set(row.halo_id, {
+            score: Number(row.combined_score) || 0,
+            reasons: Array.isArray(row.reasons) ? row.reasons : [],
+          });
+        }
+        setMatches(m);
       } catch (e) {
         console.error('[HaloBoard] load error', e);
         if (active) setError(true);
@@ -162,7 +176,16 @@ export default function HaloBoardPage() {
   const cleanHalos = useMemo(() => halos.filter((h) => !isJunk(h)), [halos]);
 
   const tabFiltered = tab === 'pocket' ? cleanHalos.filter((h) => pocketMatchIds.has(h.id)) : cleanHalos;
-  const filtered = applyFilters(tabFiltered, filters);
+  const filteredRaw = applyFilters(tabFiltered, filters);
+  // Phase B: sort by personal match score (desc), then recency
+  const filtered = useMemo(() => {
+    return [...filteredRaw].sort((a, b) => {
+      const sa = matches.get(a.id)?.score ?? 0;
+      const sb = matches.get(b.id)?.score ?? 0;
+      if (sb !== sa) return sb - sa;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  }, [filteredRaw, matches]);
 
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const showLowCreditBanner = balance <= 2 && !(balance > 0 && bannerDismissed);
@@ -366,15 +389,21 @@ export default function HaloBoardPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filtered.map((h) => (
-                <HaloPreviewCard
-                  key={h.id}
-                  halo={h}
-                  unlocked={unlockedIds.has(h.id)}
-                  onRespond={setTarget}
-                  pocketMatch={pocketMatchIds.has(h.id)}
-                />
-              ))}
+              {filtered.map((h) => {
+                const m = matches.get(h.id);
+                return (
+                  <HaloPreviewCard
+                    key={h.id}
+                    halo={h}
+                    unlocked={unlockedIds.has(h.id)}
+                    onRespond={setTarget}
+                    pocketMatch={pocketMatchIds.has(h.id)}
+                    matchScore={m?.score ?? null}
+                    matchReasons={m?.reasons ?? []}
+                    heatScore={(h as any).heat_score ?? null}
+                  />
+                );
+              })}
             </div>
           )}
 

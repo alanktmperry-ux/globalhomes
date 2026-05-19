@@ -64,14 +64,19 @@ export default function HaloBoardPage() {
           .maybeSingle();
         const agentId = agentData?.id ?? null;
 
-        const [halosRes, respRes, pmRes] = await Promise.all([
+        const [halosRes, respRes, pmRes, matchRes] = await Promise.all([
           halosPromise,
-          agentId
-            ? supabase.from('halo_responses').select('halo_id').eq('agent_id', agentId)
-            : Promise.resolve({ data: [] as any[] }),
+          // halo_responses.agent_id FK is auth.users(id), not agents.id
+          supabase.from('halo_responses').select('halo_id').eq('agent_id', user.id),
           agentId
             ? supabase.from('halo_pocket_matches').select('halo_id').eq('agent_id', agentId)
             : Promise.resolve({ data: [] as any[] }),
+          // Phase B: my match scores + reasons
+          supabase
+            .from('halo_matches')
+            .select('halo_id, combined_score, reasons')
+            .eq('match_kind', 'agent')
+            .eq('agent_id', user.id),
         ]);
         if (!active) return;
         if ((halosRes as any).error) throw (halosRes as any).error;
@@ -80,6 +85,14 @@ export default function HaloBoardPage() {
         queryClient.setQueryData(['halo-board-halos'], halosData);
         setUnlockedIds(new Set((respRes.data ?? []).map((r: any) => r.halo_id)));
         setPocketMatchIds(new Set((pmRes.data ?? []).map((r: any) => r.halo_id)));
+        const m = new Map<string, { score: number; reasons: string[] }>();
+        for (const row of ((matchRes as any).data ?? [])) {
+          m.set(row.halo_id, {
+            score: Number(row.combined_score) || 0,
+            reasons: Array.isArray(row.reasons) ? row.reasons : [],
+          });
+        }
+        setMatches(m);
       } catch (e) {
         console.error('[HaloBoard] load error', e);
         if (active) setError(true);

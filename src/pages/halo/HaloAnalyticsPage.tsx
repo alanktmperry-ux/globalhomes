@@ -240,7 +240,6 @@ export default function HaloAnalyticsPage() {
             </>
           );
         })()}
-        )}
       </section>
 
       <p className="text-xs text-muted-foreground">

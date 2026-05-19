@@ -83,7 +83,7 @@ export default function HaloDetailPage() {
       try {
         const { data: resp } = await supabase
           .from('halo_responses')
-          .select('id, body, suggested_property_ids, accepted, dismissed_by_seeker')
+          .select('id, body, suggested_property_ids, accepted, dismissed_by_seeker, template_label')
           .eq('halo_id', id)
           .eq('agent_id', user.id)
           .maybeSingle();
@@ -167,7 +167,7 @@ export default function HaloDetailPage() {
           suggested_property_ids: ids,
         })
         .eq('id', response.id)
-        .select('id, body, suggested_property_ids, accepted, dismissed_by_seeker')
+        .select('id, body, suggested_property_ids, accepted, dismissed_by_seeker, template_label')
         .maybeSingle();
       if (updErr || !data) throw updErr ?? new Error('update failed');
 

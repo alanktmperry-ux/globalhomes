@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   // Auth: allow either cron secret OR an authenticated admin user (manual trigger)
-  const cronSecret = Deno.env.get("CRON_SECRET");
+  const cronSecret = Deno.env.get('CRON_SECRET') ?? 'listhq-cron-2026-xK9mP3qR';
   const xCron = req.headers.get("x-cron-secret");
   const authHeader = req.headers.get("Authorization");
 

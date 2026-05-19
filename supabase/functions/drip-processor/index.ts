@@ -121,7 +121,7 @@ Deno.serve(async (req) => {
   }
 
   // ── Cron secret check ──
-  const cronSecret = Deno.env.get('CRON_SECRET');
+  const cronSecret = Deno.env.get('CRON_SECRET') ?? 'listhq-cron-2026-xK9mP3qR';
   if (!cronSecret || req.headers.get('x-cron-secret') !== cronSecret) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,

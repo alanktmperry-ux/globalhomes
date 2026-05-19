@@ -52,6 +52,7 @@ const NAV_SECTIONS: NavSection[] = [
     badgeKey: 'haloCredits',
     children: [
       { title: 'Browse Halo Board', url: '/dashboard/halo-board', icon: Sparkles },
+      { title: 'My Analytics', url: '/dashboard/halo-analytics', icon: BarChart3 },
       { title: 'Buy Credits', url: '/dashboard/buy-credits', icon: HandCoins },
     ],
   },

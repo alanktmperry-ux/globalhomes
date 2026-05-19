@@ -53,6 +53,7 @@ const NAV_SECTIONS: NavSection[] = [
     children: [
       { title: 'Browse Halo Board', url: '/dashboard/halo-board', icon: Sparkles },
       { title: 'My Analytics', url: '/dashboard/halo-analytics', icon: BarChart3 },
+      { title: 'Pitch Templates', url: '/dashboard/pitch-templates', icon: FileText },
       { title: 'Buy Credits', url: '/dashboard/buy-credits', icon: HandCoins },
     ],
   },

@@ -211,6 +211,10 @@ export default function SeekerInbox() {
     if (error) return toast.error(t('seeker.inbox.toast.acceptError'));
     toast.success(t('seeker.inbox.toast.accepted'));
     capture('halo_response_accepted', { halo_id: selected.halo_id, agent_id: selected.agent_id });
+    // Notify agent by email (fire-and-forget)
+    supabase.functions
+      .invoke('send-halo-accept-notification', { body: { response_id: selected.id } })
+      .catch((e) => console.warn('[SeekerInbox] notify agent failed', e));
     loadResponses();
   };
 

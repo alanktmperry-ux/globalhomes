@@ -15,6 +15,9 @@ interface Props {
   unlocked: boolean;
   onRespond: (halo: Halo) => void;
   pocketMatch?: boolean;
+  matchScore?: number | null;
+  matchReasons?: string[];
+  heatScore?: number | null;
 }
 
 const fmtMoney = (n: number) => {

@@ -31,6 +31,7 @@ export default function HaloBoardPage() {
   const queryClient = useQueryClient();
   const { balance } = useHaloCreditsBalance();
   const [halos, setHalos] = useState<Halo[]>([]);
+  const [matches, setMatches] = useState<Map<string, { score: number; reasons: string[] }>>(new Map());
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set());
   const [pocketMatchIds, setPocketMatchIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);

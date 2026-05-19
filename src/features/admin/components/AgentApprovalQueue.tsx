@@ -45,20 +45,28 @@ export default function AgentApprovalQueue({ onPendingCountChange }: AgentApprov
 
   const fetchPending = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('agents')
-      .select('id, user_id, name, email, agency, license_number, created_at')
-      .eq('approval_status', 'pending')
-      .order('created_at', { ascending: true });
+    try {
+      const { data, error } = await supabase
+        .from('agents')
+        .select('id, user_id, name, email, agency, license_number, created_at')
+        .eq('approval_status', 'pending')
+        .order('created_at', { ascending: true });
 
-    if (error) {
-      console.error('Failed to fetch pending agents:', error);
-      toast({ title: 'Error loading pending agents', variant: 'destructive' });
+      if (error) {
+        console.error('Failed to fetch pending agents:', error);
+        toast({ title: 'Error loading pending agents', description: error.message, variant: 'destructive' });
+      }
+      const list = (data as PendingAgent[]) || [];
+      setAgents(list);
+      onPendingCountChange?.(list.length);
+    } catch (err) {
+      console.error('[AgentApprovalQueue] fetchPending threw:', err);
+      toast({ title: 'Error loading pending agents', description: String((err as Error)?.message ?? err), variant: 'destructive' });
+      setAgents([]);
+      onPendingCountChange?.(0);
+    } finally {
+      setLoading(false);
     }
-    const list = (data as PendingAgent[]) || [];
-    setAgents(list);
-    onPendingCountChange?.(list.length);
-    setLoading(false);
   };
 
   useEffect(() => { fetchPending(); }, []);

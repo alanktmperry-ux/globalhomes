@@ -16298,10 +16298,12 @@ export type Database = {
     }
     Functions: {
       accept_broker_invite: { Args: { _token: string }; Returns: string }
+      admin_get_cron_secret_status: { Args: never; Returns: Json }
       admin_moderate_listing: {
         Args: { listing_id: string; new_status: string }
         Returns: undefined
       }
+      admin_set_cron_secret: { Args: { p_value: string }; Returns: Json }
       agent_can_see_halo_match: {
         Args: { _agent_id: string; _halo_id: string }
         Returns: boolean

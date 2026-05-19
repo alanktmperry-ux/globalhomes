@@ -37,9 +37,20 @@ function StatCard({
   );
 }
 
+interface AbRow {
+  template_id: string;
+  label: string;
+  is_active: boolean;
+  sends: number;
+  accepts: number;
+  dismissals: number;
+  accept_rate: number;
+}
+
 export default function HaloAnalyticsPage() {
   const { user } = useAuth();
   const [metrics, setMetrics] = useState<Metrics | null>(null);
+  const [ab, setAb] = useState<AbRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,10 +60,13 @@ export default function HaloAnalyticsPage() {
       setLoading(true);
       setError(null);
       try {
-        const { data, error: rpcErr } = await supabase
-          .rpc('get_agent_halo_analytics', { _agent_id: user.id });
-        if (rpcErr) throw rpcErr;
-        setMetrics(data as unknown as Metrics);
+        const [m, a] = await Promise.all([
+          supabase.rpc('get_agent_halo_analytics', { _agent_id: user.id }),
+          supabase.rpc('get_agent_pitch_ab_stats', { _agent_id: user.id }),
+        ]);
+        if (m.error) throw m.error;
+        setMetrics(m.data as unknown as Metrics);
+        if (!a.error) setAb((a.data as unknown as AbRow[]) || []);
       } catch (e: unknown) {
         setError(getErrorMessage(e));
       } finally {

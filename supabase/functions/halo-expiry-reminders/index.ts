@@ -227,6 +227,14 @@ Deno.serve(async (req) => {
           .maybeSingle();
         if (alreadySent) continue;
 
+        // Sprint 4: suppress agents already heavily engaged (≥3 unlocks in last 24h)
+        const { count: recentUnlocks } = await admin
+          .from('halo_responses')
+          .select('id', { count: 'exact', head: true })
+          .eq('agent_id', agentId)
+          .gte('unlocked_at', new Date(Date.now() - 86400000).toISOString());
+        if ((recentUnlocks ?? 0) >= 3) continue;
+
         const matching = recentHalos.filter((h: any) =>
           (h.suburbs ?? []).some((s: string) => suburbs.has(s))
         );

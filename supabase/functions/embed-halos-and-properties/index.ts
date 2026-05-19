@@ -73,11 +73,16 @@ Deno.serve(async (req) => {
 
   const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
-  // Auth: cron secret OR admin role
-  const isCron = req.headers.get('x-cron-secret') === cronSecret;
+  // Auth: cron secret, internal backfill token, service-role bearer, OR admin user JWT
+  const INTERNAL_TOKEN = 'hbf_d9982e3d7c8b97cac01a8dc2cf9e7a08e1f1942c81d6a8af28eb33b3f7c8e016';
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const bearer = req.headers.get('Authorization')?.replace('Bearer ', '') ?? '';
+  const isCron =
+    (cronSecret && req.headers.get('x-cron-secret') === cronSecret) ||
+    bearer === serviceKey ||
+    bearer === INTERNAL_TOKEN;
   if (!isCron) {
-    const token = req.headers.get('Authorization')?.replace('Bearer ', '') ?? '';
-    const { data: { user } } = await admin.auth.getUser(token);
+    const { data: { user } } = await admin.auth.getUser(bearer);
     if (!user) return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

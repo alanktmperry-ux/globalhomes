@@ -186,6 +186,8 @@ export default function HaloBoardPage() {
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
   }, [filteredRaw, matches]);
+
+  const [bannerDismissed, setBannerDismissed] = useState(false);
   const showLowCreditBanner = balance <= 2 && !(balance > 0 && bannerDismissed);
   const persistentBanner = balance === 0;
 

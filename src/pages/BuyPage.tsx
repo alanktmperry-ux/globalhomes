@@ -363,6 +363,36 @@ const BuyPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
 
+  // AI-powered semantic match boost: when the buyer typed a natural-language
+  // query (e.g. "quiet leafy street near good schools"), fetch the embedding
+  // matches and use them to reorder results so the most semantically relevant
+  // listings rise to the top.
+  const [semanticRank, setSemanticRank] = useState<Map<string, number>>(new Map());
+  useEffect(() => {
+    const q = filters.rawQuery?.trim();
+    // Only meaningful for multi-word natural-language queries
+    if (!q || q.length < 8 || !/\s/.test(q)) {
+      setSemanticRank(new Map());
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('semantic-property-search', {
+          body: { query: q, limit: 20 },
+        });
+        if (cancelled || error) return;
+        const matches = (data?.matches ?? []) as Array<{ id: string; similarity: number }>;
+        const map = new Map<string, number>();
+        matches.forEach((m) => map.set(m.id, m.similarity));
+        setSemanticRank(map);
+      } catch (e) {
+        if (import.meta.env.DEV) console.warn('[BuyPage] semantic search failed', e);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [filters.rawQuery]);
+
   // Reset pagination whenever filters change
   useEffect(() => {
     setPage(0);

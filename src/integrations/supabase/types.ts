@@ -16337,7 +16337,7 @@ export type Database = {
           }
       compute_agent_reputation: { Args: { p_agent_id: string }; Returns: Json }
       compute_agent_stats: { Args: { p_agent_id: string }; Returns: undefined }
-      compute_halo_matches: { Args: { p_halo_id: string }; Returns: number }
+      compute_halo_matches: { Args: { p_halo_id: string }; Returns: undefined }
       compute_suburb_stats: {
         Args: { p_state: string; p_suburb: string }
         Returns: undefined

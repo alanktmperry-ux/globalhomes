@@ -25,6 +25,13 @@ interface ResponseRow {
   suggested_property_ids: string[] | null;
   accepted: boolean | null;
   dismissed_by_seeker: boolean | null;
+  template_label?: string | null;
+}
+
+interface PitchTemplate {
+  id: string;
+  label: string;
+  body: string;
 }
 
 interface AgentProperty {

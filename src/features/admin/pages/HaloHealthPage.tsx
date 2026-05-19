@@ -189,6 +189,93 @@ export default function HaloHealthPage() {
         <StatCard label="Credits spent (month)" value={stats.creditsSpent} />
       </div>
 
+      {diag && (
+        <Card>
+          <CardContent className="p-5 space-y-4">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <h2 className="font-semibold flex items-center gap-2">
+                <Brain size={18} /> Semantic embedding coverage
+              </h2>
+              <Button size="sm" variant="outline" onClick={triggerReembed} disabled={reembedding}>
+                {reembedding ? <Loader2 size={14} className="animate-spin" /> : 'Re-embed stale'}
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="rounded-lg border p-3">
+                <p className="text-[10px] text-muted-foreground uppercase">Halos embedded</p>
+                <p className="text-xl font-bold">{diag.halos.embedded}/{diag.halos.total}</p>
+                {diag.halos.stale > 0 && <p className="text-[10px] text-amber-700 mt-1">{diag.halos.stale} stale (&gt;30d)</p>}
+              </div>
+              <div className="rounded-lg border p-3">
+                <p className="text-[10px] text-muted-foreground uppercase">Properties embedded</p>
+                <p className="text-xl font-bold">{diag.properties.embedded}/{diag.properties.total}</p>
+                {diag.properties.stale > 0 && <p className="text-[10px] text-amber-700 mt-1">{diag.properties.stale} stale (&gt;30d)</p>}
+              </div>
+              <div className="rounded-lg border p-3 col-span-2">
+                <p className="text-[10px] text-muted-foreground uppercase">Halo coverage</p>
+                <div className="h-2 bg-slate-100 rounded mt-2 overflow-hidden">
+                  <div
+                    className="h-full bg-purple-500"
+                    style={{ width: `${diag.halos.total ? (diag.halos.embedded / diag.halos.total) * 100 : 0}%` }}
+                  />
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  {diag.halos.total === 0 ? 'No active halos' : `${Math.round((diag.halos.embedded / diag.halos.total) * 100)}% coverage`}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold flex items-center gap-2 mt-4 mb-2">
+                <Clock size={16} /> Scheduled jobs
+              </h3>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Job</TableHead>
+                    <TableHead>Schedule</TableHead>
+                    <TableHead>Last status</TableHead>
+                    <TableHead>Last run</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {diag.jobs.map((j) => {
+                    const ok = j.last_status === 'succeeded';
+                    return (
+                      <TableRow key={j.jobname}>
+                        <TableCell className="text-xs font-mono">{j.jobname}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground">{j.schedule}</TableCell>
+                        <TableCell className="text-xs">
+                          {j.last_status ? (
+                            <Badge variant="outline" className={ok ? 'bg-green-50 text-green-800 border-green-200' : 'bg-red-50 text-red-800 border-red-200'}>
+                              {ok ? <CheckCircle2 size={11} className="mr-1" /> : <AlertTriangle size={11} className="mr-1" />}
+                              {j.last_status}
+                            </Badge>
+                          ) : (
+                            <span className="text-muted-foreground">never run</span>
+                          )}
+                          {j.last_error && !ok && (
+                            <div className="text-[10px] text-red-700 mt-1 max-w-md truncate" title={j.last_error}>{j.last_error}</div>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {j.last_start ? new Date(j.last_start).toLocaleString('en-AU') : '—'}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                  {diag.jobs.length === 0 && (
+                    <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-4">No scheduled jobs found.</TableCell></TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+
+
       <Card>
         <CardContent className="p-5 space-y-3">
           <h2 className="font-semibold">Halos needing attention</h2>

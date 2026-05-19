@@ -93,7 +93,7 @@ export default function HaloDetailPage() {
         }
         if (active) setResponse(resp as ResponseRow);
 
-        const [haloRes, contactRes, propsRes, tplRes] = await Promise.all([
+        const [haloRes, contactRes, propsRes, tplRes, sendCountsRes] = await Promise.all([
           supabase.from('halos').select('*').eq('id', id).maybeSingle(),
           supabase.functions.invoke('get-halo-contact', { body: { halo_id: id } }),
           supabase
@@ -109,6 +109,12 @@ export default function HaloDetailPage() {
             .eq('agent_id', user.id)
             .eq('is_active', true)
             .order('sort_order', { ascending: true }),
+          supabase
+            .from('halo_responses')
+            .select('template_id')
+            .eq('agent_id', user.id)
+            .not('template_id', 'is', null)
+            .not('body', 'is', null),
         ]);
 
         if (!active) return;
@@ -118,7 +124,22 @@ export default function HaloDetailPage() {
         }
         setHalo(haloRes.data as Halo);
         setAgentProps((propsRes.data || []) as AgentProperty[]);
-        setTemplates(((tplRes.data || []) as PitchTemplate[]));
+        const tpls = (tplRes.data || []) as PitchTemplate[];
+        setTemplates(tpls);
+
+        // Auto-rotate: pre-select least-used active template for balanced A/B sample
+        if (tpls.length >= 2 && !(resp as ResponseRow).body) {
+          const counts = new Map<string, number>();
+          tpls.forEach((tt) => counts.set(tt.id, 0));
+          for (const r of (sendCountsRes.data || []) as { template_id: string }[]) {
+            if (counts.has(r.template_id)) counts.set(r.template_id, (counts.get(r.template_id) || 0) + 1);
+          }
+          const least = tpls.reduce((min, cur) =>
+            (counts.get(cur.id) ?? 0) < (counts.get(min.id) ?? 0) ? cur : min,
+          tpls[0]);
+          setSelectedTemplateId(least.id);
+          setPitch(least.body);
+        }
         capture('halo_viewed_by_agent', { halo_id: id, pitch_sent: !!(resp as ResponseRow).body });
 
         if (contactRes.error) {

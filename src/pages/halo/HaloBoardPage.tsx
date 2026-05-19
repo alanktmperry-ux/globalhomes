@@ -176,9 +176,16 @@ export default function HaloBoardPage() {
   const cleanHalos = useMemo(() => halos.filter((h) => !isJunk(h)), [halos]);
 
   const tabFiltered = tab === 'pocket' ? cleanHalos.filter((h) => pocketMatchIds.has(h.id)) : cleanHalos;
-  const filtered = applyFilters(tabFiltered, filters);
-
-  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const filteredRaw = applyFilters(tabFiltered, filters);
+  // Phase B: sort by personal match score (desc), then recency
+  const filtered = useMemo(() => {
+    return [...filteredRaw].sort((a, b) => {
+      const sa = matches.get(a.id)?.score ?? 0;
+      const sb = matches.get(b.id)?.score ?? 0;
+      if (sb !== sa) return sb - sa;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  }, [filteredRaw, matches]);
   const showLowCreditBanner = balance <= 2 && !(balance > 0 && bannerDismissed);
   const persistentBanner = balance === 0;
 

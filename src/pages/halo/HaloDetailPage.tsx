@@ -93,7 +93,7 @@ export default function HaloDetailPage() {
         }
         if (active) setResponse(resp as ResponseRow);
 
-        const [haloRes, contactRes, propsRes] = await Promise.all([
+        const [haloRes, contactRes, propsRes, tplRes] = await Promise.all([
           supabase.from('halos').select('*').eq('id', id).maybeSingle(),
           supabase.functions.invoke('get-halo-contact', { body: { halo_id: id } }),
           supabase
@@ -103,6 +103,12 @@ export default function HaloDetailPage() {
             .eq('is_active', true)
             .order('created_at', { ascending: false })
             .limit(50),
+          supabase
+            .from('halo_pitch_templates')
+            .select('id, label, body')
+            .eq('agent_id', user.id)
+            .eq('is_active', true)
+            .order('sort_order', { ascending: true }),
         ]);
 
         if (!active) return;

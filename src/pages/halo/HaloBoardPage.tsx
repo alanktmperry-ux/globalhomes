@@ -172,46 +172,27 @@ export default function HaloBoardPage() {
     if (!user || !target) return;
     setBusy(true);
     try {
-      // Resolve agents.id (halo_credits.agent_id references agents.id, not auth user id)
-      const { data: agent } = await supabase
-        .from('agents')
-        .select('id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (!agent) {
-        toast.error(t('halo.board.toast.agentNotFound'));
-        setTarget(null);
-        return;
-      }
-
-      // Atomic spend via RPC (prevents double-spend race conditions)
-      const { error: rpcErr } = await (supabase.rpc as any)('spend_halo_credit', {
-        p_agent_id: agent.id,
-        p_halo_id: target.id,
+      // Single transactional path: locks credit row, checks balance,
+      // deducts, inserts response, writes credit txn, emits audit event.
+      const { data, error: rpcErr } = await (supabase.rpc as any)('unlock_halo', {
+        _halo_id: target.id,
       });
+
       if (rpcErr) {
-        toast.error(t('halo.board.toast.insufficient'));
+        const msg = (rpcErr.message || '').toLowerCase();
+        if (msg.includes('insufficient')) {
+          toast.error(t('halo.board.toast.insufficient'));
+        } else if (msg.includes('not active')) {
+          toast.error(t('halo.board.toast.error'));
+        } else {
+          console.error('[HaloBoard] unlock_halo error', rpcErr);
+          toast.error(t('halo.board.toast.error'));
+        }
         setTarget(null);
         return;
       }
 
-      // Log transaction (best-effort)
-      await supabase.from('halo_credit_transactions').insert({
-        agent_id: agent.id,
-        amount: -1,
-        type: 'spend',
-        halo_id: target.id,
-        note: 'Halo unlock',
-      });
-
-      // Insert response
-      const { error: respErr } = await supabase.from('halo_responses').insert({
-        halo_id: target.id,
-        agent_id: agent.id,
-      });
-      if (respErr && respErr.code !== '23505') throw respErr;
-
-      // Notify seeker (best effort)
+      // Notify seeker (best effort, fire-and-forget)
       supabase.functions
         .invoke('send-halo-agent-response', { body: { halo_id: target.id } })
         .catch((e) => console.warn('[HaloBoard] notify seeker failed', e));
@@ -220,7 +201,9 @@ export default function HaloBoardPage() {
       setTarget(null);
       queryClient.invalidateQueries({ queryKey: ['halo-credits-balance', user.id] });
       setUnlockedIds((prev) => new Set(prev).add(id));
-      toast.success(t('halo.board.toast.unlocked'));
+      if (!data?.already_unlocked) {
+        toast.success(t('halo.board.toast.unlocked'));
+      }
       navigate(`/dashboard/halo-board/${id}`);
     } catch (e) {
       console.error('[HaloBoard] unlock error', e);

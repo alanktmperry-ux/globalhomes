@@ -167,11 +167,14 @@ export default function HaloDetailPage() {
     setSending(true);
     try {
       const ids = Array.from(selectedPropIds);
+      const selectedTpl = templates.find((x) => x.id === selectedTemplateId);
       const { data, error: updErr } = await supabase
         .from('halo_responses')
         .update({
           body: pitch.trim(),
           suggested_property_ids: ids,
+          template_id: selectedTpl?.id ?? null,
+          template_label: selectedTpl?.label ?? null,
         })
         .eq('id', response.id)
         .select('id, body, suggested_property_ids, accepted, dismissed_by_seeker, template_label')
@@ -183,7 +186,7 @@ export default function HaloDetailPage() {
         .invoke('send-halo-agent-response', { body: { halo_id: id } })
         .catch((e) => console.warn('[HaloDetail] notify seeker failed', e));
 
-      capture('halo_response_sent', { halo_id: id, suggested_count: ids.length });
+      capture('halo_response_sent', { halo_id: id, suggested_count: ids.length, template_label: selectedTpl?.label ?? null });
       setResponse(data as ResponseRow);
       toast.success(t('halo.detail.pitchSent') || 'Pitch sent to seeker');
     } catch (e) {

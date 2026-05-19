@@ -780,7 +780,7 @@ const BuyPage = () => {
                 viewMode === 'map' ? (
                   <div className="rounded-xl overflow-hidden border border-border">
                     <PropertyMap
-                      properties={allProperties}
+                      properties={displayProperties}
                       onPropertySelect={(p) => setSelectedPropertyId(p.id)}
                       selectedPropertyId={selectedPropertyId}
                       centerOn={mapCenter ? { ...mapCenter, key: `${primarySuburb || 'fallback'}-${mapZoom}` } : null}
@@ -791,7 +791,7 @@ const BuyPage = () => {
                 ) : viewMode === 'split' ? (
                   <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[calc(100vh-220px)] overflow-y-auto pr-1">
-                      {allProperties.map((property, index) => (
+                      {displayProperties.map((property, index) => (
                         <PropertyCard
                           key={property.id}
                           property={property}
@@ -804,7 +804,7 @@ const BuyPage = () => {
                     </div>
                     <div className="hidden lg:block sticky top-20 h-[calc(100vh-220px)] rounded-xl overflow-hidden border border-border">
                       <PropertyMap
-                        properties={allProperties}
+                        properties={displayProperties}
                         onPropertySelect={(p) => { setSelectedPropertyId(p.id); }}
                         selectedPropertyId={selectedPropertyId}
                         centerOn={mapCenter ? { ...mapCenter, key: `${primarySuburb || 'fallback'}-${mapZoom}` } : null}
@@ -815,7 +815,7 @@ const BuyPage = () => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {allProperties.map((property, index) => (
+                    {displayProperties.map((property, index) => (
                       <PropertyCard
                         key={property.id}
                         property={property}

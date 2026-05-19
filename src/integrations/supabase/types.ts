@@ -6413,6 +6413,39 @@ export type Database = {
           },
         ]
       }
+      halo_pitch_templates: {
+        Row: {
+          agent_id: string
+          body: string
+          created_at: string
+          id: string
+          is_active: boolean
+          label: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          body: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       halo_pocket_matches: {
         Row: {
           agent_id: string
@@ -6493,6 +6526,8 @@ export type Database = {
           id: string
           outcome: string | null
           suggested_property_ids: string[] | null
+          template_id: string | null
+          template_label: string | null
           unlocked_at: string
           viewed_by_seeker: boolean
         }
@@ -6508,6 +6543,8 @@ export type Database = {
           id?: string
           outcome?: string | null
           suggested_property_ids?: string[] | null
+          template_id?: string | null
+          template_label?: string | null
           unlocked_at?: string
           viewed_by_seeker?: boolean
         }
@@ -6523,6 +6560,8 @@ export type Database = {
           id?: string
           outcome?: string | null
           suggested_property_ids?: string[] | null
+          template_id?: string | null
+          template_label?: string | null
           unlocked_at?: string
           viewed_by_seeker?: boolean
         }
@@ -6532,6 +6571,13 @@ export type Database = {
             columns: ["halo_id"]
             isOneToOne: false
             referencedRelation: "halos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "halo_responses_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "halo_pitch_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -16503,6 +16549,18 @@ export type Database = {
       generate_referral_code: { Args: never; Returns: string }
       get_agent_halo_analytics: { Args: { _agent_id: string }; Returns: Json }
       get_agent_id_for_user: { Args: { p_user_id: string }; Returns: string }
+      get_agent_pitch_ab_stats: {
+        Args: { _agent_id: string }
+        Returns: {
+          accept_rate: number
+          accepts: number
+          dismissals: number
+          is_active: boolean
+          label: string
+          sends: number
+          template_id: string
+        }[]
+      }
       get_agent_sidebar_counts: { Args: { p_agent_id: string }; Returns: Json }
       get_auction_public: { Args: { p_property_id: string }; Returns: Json }
       get_auction_sensitive: {

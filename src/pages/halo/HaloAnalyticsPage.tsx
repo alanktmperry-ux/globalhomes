@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Loader2, Sparkles, TrendingUp, Coins, RotateCcw, Clock, CheckCircle2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Loader2, Sparkles, TrendingUp, Coins, RotateCcw, Clock, CheckCircle2, FlaskConical } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface Metrics {

@@ -16294,6 +16294,7 @@ export type Database = {
         Args: { _agent_id: string; _halo_id: string }
         Returns: boolean
       }
+      auto_refund_unresponsive_halo_unlocks: { Args: never; Returns: number }
       bump_rate_limit: {
         Args: {
           p_bucket_key: string
@@ -16324,6 +16325,7 @@ export type Database = {
           }
       compute_agent_reputation: { Args: { p_agent_id: string }; Returns: Json }
       compute_agent_stats: { Args: { p_agent_id: string }; Returns: undefined }
+      compute_halo_matches: { Args: { p_halo_id: string }; Returns: number }
       compute_suburb_stats: {
         Args: { p_state: string; p_suburb: string }
         Returns: undefined
@@ -17082,6 +17084,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      recompute_halo_heat: { Args: { p_halo_id: string }; Returns: undefined }
       record_auction_bid: {
         Args: {
           p_auction_id: string
@@ -17098,6 +17101,7 @@ export type Database = {
         Args: { p_agent_id: string }
         Returns: undefined
       }
+      refresh_stale_halo_matches: { Args: never; Returns: number }
       refresh_supplier_rating: {
         Args: { p_supplier_id: string }
         Returns: undefined

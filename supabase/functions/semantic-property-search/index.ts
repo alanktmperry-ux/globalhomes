@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-embedding-001",
+        model: "openai/text-embedding-3-small",
         input: query.trim().slice(0, 2000),
       }),
     });

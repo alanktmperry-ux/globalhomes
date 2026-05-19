@@ -199,7 +199,15 @@ export default function AdminLayout() {
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
             <AdminErrorBoundary>
-              <Outlet />
+              <Suspense
+                fallback={
+                  <div className="flex items-center justify-center py-20">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
+                }
+              >
+                <Outlet />
+              </Suspense>
             </AdminErrorBoundary>
           </div>
         </div>

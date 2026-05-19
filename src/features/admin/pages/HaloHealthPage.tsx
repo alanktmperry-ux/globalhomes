@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Loader2, Activity, Send } from 'lucide-react';
+import { Loader2, Activity, Send, Brain, Clock, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,6 +9,20 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import HaloQualityBadge from '@/components/halo/HaloQualityBadge';
+
+interface Diagnostics {
+  halos: { total: number; embedded: number; stale: number };
+  properties: { total: number; embedded: number; stale: number };
+  jobs: Array<{
+    jobname: string;
+    schedule: string;
+    active: boolean;
+    last_status: string | null;
+    last_start: string | null;
+    last_end: string | null;
+    last_error: string | null;
+  }>;
+}
 
 interface HaloRow {
   id: string;
@@ -45,6 +59,30 @@ export default function HaloHealthPage() {
   const [activity, setActivity] = useState<TxRow[]>([]);
   const [emailMap, setEmailMap] = useState<Map<string, string>>(new Map());
   const [nudgingId, setNudgingId] = useState<string | null>(null);
+  const [diag, setDiag] = useState<Diagnostics | null>(null);
+  const [reembedding, setReembedding] = useState(false);
+
+  const loadDiag = async () => {
+    const { data, error } = await supabase.rpc('admin_halo_diagnostics');
+    if (!error && data) setDiag(data as unknown as Diagnostics);
+  };
+
+  const triggerReembed = async () => {
+    setReembedding(true);
+    try {
+      const { error } = await supabase.functions.invoke('embed-halos-and-properties', { body: { mode: 'backfill' } });
+      if (error) throw error;
+      toast.success('Embedding backfill triggered.');
+      await loadDiag();
+    } catch (e) {
+      console.error(e);
+      toast.error('Backfill failed.');
+    } finally {
+      setReembedding(false);
+    }
+  };
+
+  useEffect(() => { loadDiag(); }, []);
 
   useEffect(() => {
     (async () => {

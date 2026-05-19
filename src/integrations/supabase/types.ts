@@ -6221,6 +6221,150 @@ export type Database = {
         }
         Relationships: []
       }
+      halo_embeddings: {
+        Row: {
+          embedding: string
+          halo_id: string
+          model_version: string
+          source_hash: string
+          updated_at: string
+        }
+        Insert: {
+          embedding: string
+          halo_id: string
+          model_version?: string
+          source_hash: string
+          updated_at?: string
+        }
+        Update: {
+          embedding?: string
+          halo_id?: string
+          model_version?: string
+          source_hash?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "halo_embeddings_halo_id_fkey"
+            columns: ["halo_id"]
+            isOneToOne: true
+            referencedRelation: "halos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      halo_events: {
+        Row: {
+          actor_id: string | null
+          actor_role: string
+          created_at: string
+          event_type: string
+          halo_id: string
+          id: string
+          payload: Json
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_role: string
+          created_at?: string
+          event_type: string
+          halo_id: string
+          id?: string
+          payload?: Json
+        }
+        Update: {
+          actor_id?: string | null
+          actor_role?: string
+          created_at?: string
+          event_type?: string
+          halo_id?: string
+          id?: string
+          payload?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "halo_events_halo_id_fkey"
+            columns: ["halo_id"]
+            isOneToOne: false
+            referencedRelation: "halos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      halo_matches: {
+        Row: {
+          agent_id: string | null
+          combined_score: number
+          computed_at: string
+          created_at: string
+          halo_id: string
+          hard_score: number
+          id: string
+          listing_id: string | null
+          match_kind: string
+          reasons: Json
+          semantic_score: number | null
+          stale: boolean
+        }
+        Insert: {
+          agent_id?: string | null
+          combined_score?: number
+          computed_at?: string
+          created_at?: string
+          halo_id: string
+          hard_score?: number
+          id?: string
+          listing_id?: string | null
+          match_kind: string
+          reasons?: Json
+          semantic_score?: number | null
+          stale?: boolean
+        }
+        Update: {
+          agent_id?: string | null
+          combined_score?: number
+          computed_at?: string
+          created_at?: string
+          halo_id?: string
+          hard_score?: number
+          id?: string
+          listing_id?: string | null
+          match_kind?: string
+          reasons?: Json
+          semantic_score?: number | null
+          stale?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "halo_matches_halo_id_fkey"
+            columns: ["halo_id"]
+            isOneToOne: false
+            referencedRelation: "halos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "halo_matches_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_translation_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "halo_matches_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "halo_matches_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "properties_public_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       halo_messages: {
         Row: {
           body: string
@@ -6347,6 +6491,7 @@ export type Database = {
           dismissed_by_seeker: boolean | null
           halo_id: string
           id: string
+          outcome: string | null
           suggested_property_ids: string[] | null
           unlocked_at: string
           viewed_by_seeker: boolean
@@ -6361,6 +6506,7 @@ export type Database = {
           dismissed_by_seeker?: boolean | null
           halo_id: string
           id?: string
+          outcome?: string | null
           suggested_property_ids?: string[] | null
           unlocked_at?: string
           viewed_by_seeker?: boolean
@@ -6375,6 +6521,7 @@ export type Database = {
           dismissed_by_seeker?: boolean | null
           halo_id?: string
           id?: string
+          outcome?: string | null
           suggested_property_ids?: string[] | null
           unlocked_at?: string
           viewed_by_seeker?: boolean
@@ -6424,8 +6571,10 @@ export type Database = {
           expires_at: string
           expiry_reminder_sent: boolean
           finance_status: string
+          heat_score: number | null
           id: string
           intent: string
+          last_match_computed_at: string | null
           must_haves: string[]
           no_response_alert_sent: boolean
           preferred_language: string
@@ -6455,8 +6604,10 @@ export type Database = {
           expires_at?: string
           expiry_reminder_sent?: boolean
           finance_status: string
+          heat_score?: number | null
           id?: string
           intent: string
+          last_match_computed_at?: string | null
           must_haves?: string[]
           no_response_alert_sent?: boolean
           preferred_language?: string
@@ -6486,8 +6637,10 @@ export type Database = {
           expires_at?: string
           expiry_reminder_sent?: boolean
           finance_status?: string
+          heat_score?: number | null
           id?: string
           intent?: string
+          last_match_computed_at?: string | null
           must_haves?: string[]
           no_response_alert_sent?: boolean
           preferred_language?: string
@@ -16137,6 +16290,10 @@ export type Database = {
         Args: { listing_id: string; new_status: string }
         Returns: undefined
       }
+      agent_can_see_halo_match: {
+        Args: { _agent_id: string; _halo_id: string }
+        Returns: boolean
+      }
       bump_rate_limit: {
         Args: {
           p_bucket_key: string
@@ -16505,6 +16662,16 @@ export type Database = {
       }
       log_document_download: {
         Args: { p_document_id: string; p_session_id?: string }
+        Returns: string
+      }
+      log_halo_event: {
+        Args: {
+          _actor_id: string
+          _actor_role: string
+          _event_type: string
+          _halo_id: string
+          _payload?: Json
+        }
         Returns: string
       }
       log_property_view: {
@@ -16935,6 +17102,10 @@ export type Database = {
         Args: { p_supplier_id: string }
         Returns: undefined
       }
+      refund_halo_unlock: {
+        Args: { _reason: string; _response_id: string }
+        Returns: Json
+      }
       rollback_migration_batch: {
         Args: { p_agent_id: string; p_batch_id: string }
         Returns: Json
@@ -16963,6 +17134,10 @@ export type Database = {
       seed_pm_automation_defaults: {
         Args: { _agent_id: string }
         Returns: undefined
+      }
+      seeker_owns_halo: {
+        Args: { _halo_id: string; _user_id: string }
+        Returns: boolean
       }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
@@ -17020,6 +17195,7 @@ export type Database = {
       }
       test_webhook: { Args: { p_webhook_name: string }; Returns: Json }
       track_cma_view: { Args: { p_share_token: string }; Returns: Json }
+      unlock_halo: { Args: { _halo_id: string }; Returns: Json }
       validate_migration_balances: {
         Args: { p_batch_id: string }
         Returns: Json

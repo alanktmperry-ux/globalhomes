@@ -4,7 +4,7 @@ import { Loader2, Sparkles, TrendingUp, Coins, RotateCcw, Clock, CheckCircle2 } 
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Card, CardContent } from '@/components/ui/card';
-import { getErrorMessage } from '@/shared/lib/errors';
+import { getErrorMessage } from '@/shared/lib/errorUtils';
 
 interface Metrics {
   unlocks: number;

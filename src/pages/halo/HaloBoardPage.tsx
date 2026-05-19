@@ -222,10 +222,12 @@ export default function HaloBoardPage() {
         .catch((e) => console.warn('[HaloBoard] notify seeker failed', e));
 
       const id = target.id;
+      const score = matches.get(id)?.score ?? null;
       setTarget(null);
       queryClient.invalidateQueries({ queryKey: ['halo-credits-balance', user.id] });
       setUnlockedIds((prev) => new Set(prev).add(id));
       if (!data?.already_unlocked) {
+        capture('halo_unlocked', { halo_id: id, match_score: score });
         toast.success(t('halo.board.toast.unlocked'));
       }
       navigate(`/dashboard/halo-board/${id}`);

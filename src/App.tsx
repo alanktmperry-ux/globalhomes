@@ -539,6 +539,7 @@ const App = () => (
                   <Route path="halo-board" element={<HaloBoardPage />} />
                   <Route path="halo-board/:id" element={<HaloDetailPage />} />
                   <Route path="buy-credits" element={<BuyCreditsPage />} />
+                  <Route path="halo-analytics" element={<AgentHaloAnalyticsPage />} />
                   <Route path="market-tools" element={<MarketToolsPage />} />
                   <Route path="market" element={<MarketToolsPage />} />
                 </Route>

@@ -363,6 +363,36 @@ const BuyPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
 
+  // AI-powered semantic match boost: when the buyer typed a natural-language
+  // query (e.g. "quiet leafy street near good schools"), fetch the embedding
+  // matches and use them to reorder results so the most semantically relevant
+  // listings rise to the top.
+  const [semanticRank, setSemanticRank] = useState<Map<string, number>>(new Map());
+  useEffect(() => {
+    const q = filters.rawQuery?.trim();
+    // Only meaningful for multi-word natural-language queries
+    if (!q || q.length < 8 || !/\s/.test(q)) {
+      setSemanticRank(new Map());
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('semantic-property-search', {
+          body: { query: q, limit: 20 },
+        });
+        if (cancelled || error) return;
+        const matches = (data?.matches ?? []) as Array<{ id: string; similarity: number }>;
+        const map = new Map<string, number>();
+        matches.forEach((m) => map.set(m.id, m.similarity));
+        setSemanticRank(map);
+      } catch (e) {
+        if (import.meta.env.DEV) console.warn('[BuyPage] semantic search failed', e);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [filters.rawQuery]);
+
   // Reset pagination whenever filters change
   useEffect(() => {
     setPage(0);
@@ -456,6 +486,17 @@ const BuyPage = () => {
   );
   const hasActiveFilters = activeChipCount > 0;
 
+  // Reorder loaded properties to boost semantic matches when AI search is active.
+  // Matches preserve relative similarity order; non-matches keep their original
+  // order behind the matches. Page count is unchanged so pagination still works.
+  const displayProperties = useMemo(() => {
+    if (semanticRank.size === 0) return allProperties;
+    const boosted = allProperties.filter((p) => semanticRank.has(p.id));
+    const rest = allProperties.filter((p) => !semanticRank.has(p.id));
+    boosted.sort((a, b) => (semanticRank.get(b.id) ?? 0) - (semanticRank.get(a.id) ?? 0));
+    return [...boosted, ...rest];
+  }, [allProperties, semanticRank]);
+
   const headerSuburbLabel = filters.suburbs.length === 1
     ? filters.suburbs[0]
     : filters.suburbs.length > 1
@@ -523,6 +564,11 @@ const BuyPage = () => {
               <p className="text-muted-foreground mt-1">
                 {isLoading ? t('Searching…') : `${allProperties.length} ${t('properties found')}${hasMore && allProperties.length > 0 ? ` — ${t('scroll down for more')}` : ''}`}
               </p>
+              {semanticRank.size > 0 && !isLoading && (
+                <p className="text-xs text-primary mt-1 inline-flex items-center gap-1">
+                  ✨ {t('AI-ranked')} — {semanticRank.size} {t('results boosted by your query')}
+                </p>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <div className="hidden sm:inline-flex rounded-md border border-input p-0.5 bg-card">
@@ -739,7 +785,7 @@ const BuyPage = () => {
                 viewMode === 'map' ? (
                   <div className="rounded-xl overflow-hidden border border-border">
                     <PropertyMap
-                      properties={allProperties}
+                      properties={displayProperties}
                       onPropertySelect={(p) => setSelectedPropertyId(p.id)}
                       selectedPropertyId={selectedPropertyId}
                       centerOn={mapCenter ? { ...mapCenter, key: `${primarySuburb || 'fallback'}-${mapZoom}` } : null}
@@ -750,7 +796,7 @@ const BuyPage = () => {
                 ) : viewMode === 'split' ? (
                   <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[calc(100vh-220px)] overflow-y-auto pr-1">
-                      {allProperties.map((property, index) => (
+                      {displayProperties.map((property, index) => (
                         <PropertyCard
                           key={property.id}
                           property={property}
@@ -763,7 +809,7 @@ const BuyPage = () => {
                     </div>
                     <div className="hidden lg:block sticky top-20 h-[calc(100vh-220px)] rounded-xl overflow-hidden border border-border">
                       <PropertyMap
-                        properties={allProperties}
+                        properties={displayProperties}
                         onPropertySelect={(p) => { setSelectedPropertyId(p.id); }}
                         selectedPropertyId={selectedPropertyId}
                         centerOn={mapCenter ? { ...mapCenter, key: `${primarySuburb || 'fallback'}-${mapZoom}` } : null}
@@ -774,7 +820,7 @@ const BuyPage = () => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {allProperties.map((property, index) => (
+                    {displayProperties.map((property, index) => (
                       <PropertyCard
                         key={property.id}
                         property={property}

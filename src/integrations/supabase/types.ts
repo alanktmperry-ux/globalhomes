@@ -16726,6 +16726,17 @@ export type Database = {
         }[]
       }
       mark_review_request_used: { Args: { p_token: string }; Returns: boolean }
+      match_properties_semantic: {
+        Args: {
+          match_count?: number
+          min_similarity?: number
+          query_embedding: string
+        }
+        Returns: {
+          id: string
+          similarity: number
+        }[]
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string

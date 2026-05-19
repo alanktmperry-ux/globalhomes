@@ -165,6 +165,57 @@ export default function HaloAnalyticsPage() {
         </Card>
       </section>
 
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <FlaskConical className="h-5 w-5 text-primary" />
+            Pitch A/B Performance
+          </h2>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/dashboard/pitch-templates">Manage templates</Link>
+          </Button>
+        </div>
+        {ab.length === 0 ? (
+          <Card>
+            <CardContent className="p-6 text-sm text-muted-foreground">
+              No pitch templates yet. <Link to="/dashboard/pitch-templates" className="text-blue-600 hover:underline">Create at least 2</Link> to start A/B testing your pitches.
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50 text-xs uppercase text-muted-foreground">
+                    <tr>
+                      <th className="text-left p-3">Template</th>
+                      <th className="text-right p-3">Sends</th>
+                      <th className="text-right p-3">Accepts</th>
+                      <th className="text-right p-3">Dismissed</th>
+                      <th className="text-right p-3">Accept rate</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {ab.map((row) => (
+                      <tr key={row.template_id}>
+                        <td className="p-3 font-medium">
+                          {row.label}
+                          {!row.is_active && <span className="ml-2 text-xs text-muted-foreground">(inactive)</span>}
+                        </td>
+                        <td className="p-3 text-right">{row.sends}</td>
+                        <td className="p-3 text-right text-emerald-700">{row.accepts}</td>
+                        <td className="p-3 text-right text-muted-foreground">{row.dismissals}</td>
+                        <td className="p-3 text-right font-semibold">{row.accept_rate}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </section>
+
       <p className="text-xs text-muted-foreground">
         Refund rate is the share of unlocks where credits were automatically returned (e.g. the seeker didn't respond within the SLA).
       </p>

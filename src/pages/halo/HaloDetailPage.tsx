@@ -67,6 +67,8 @@ export default function HaloDetailPage() {
   const [selectedPropIds, setSelectedPropIds] = useState<Set<string>>(new Set());
   const [agentProps, setAgentProps] = useState<AgentProperty[]>([]);
   const [sending, setSending] = useState(false);
+  const [templates, setTemplates] = useState<PitchTemplate[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
 
   // Thread state
   const [messages, setMessages] = useState<HaloMessage[]>([]);

@@ -181,38 +181,65 @@ export default function HaloAnalyticsPage() {
               No pitch templates yet. <Link to="/dashboard/pitch-templates" className="text-blue-600 hover:underline">Create at least 2</Link> to start A/B testing your pitches.
             </CardContent>
           </Card>
-        ) : (
-          <Card>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="bg-slate-50 text-xs uppercase text-muted-foreground">
-                    <tr>
-                      <th className="text-left p-3">Template</th>
-                      <th className="text-right p-3">Sends</th>
-                      <th className="text-right p-3">Accepts</th>
-                      <th className="text-right p-3">Dismissed</th>
-                      <th className="text-right p-3">Accept rate</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {ab.map((row) => (
-                      <tr key={row.template_id}>
-                        <td className="p-3 font-medium">
-                          {row.label}
-                          {!row.is_active && <span className="ml-2 text-xs text-muted-foreground">(inactive)</span>}
-                        </td>
-                        <td className="p-3 text-right">{row.sends}</td>
-                        <td className="p-3 text-right text-emerald-700">{row.accepts}</td>
-                        <td className="p-3 text-right text-muted-foreground">{row.dismissals}</td>
-                        <td className="p-3 text-right font-semibold">{row.accept_rate}%</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
+        ) : (() => {
+          const MIN_SENDS = 30;
+          const LEAD_PP = 5;
+          const eligible = [...ab].filter((r) => Number(r.sends) >= MIN_SENDS)
+            .sort((a, b) => Number(b.accept_rate) - Number(a.accept_rate));
+          const winnerId = eligible.length >= 2 && (Number(eligible[0].accept_rate) - Number(eligible[1].accept_rate) >= LEAD_PP)
+            ? eligible[0].template_id
+            : null;
+          return (
+            <>
+              <Card>
+                <CardContent className="p-0">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-slate-50 text-xs uppercase text-muted-foreground">
+                        <tr>
+                          <th className="text-left p-3">Template</th>
+                          <th className="text-right p-3">Sends</th>
+                          <th className="text-right p-3">Accepts</th>
+                          <th className="text-right p-3">Dismissed</th>
+                          <th className="text-right p-3">Accept rate</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {ab.map((row) => (
+                          <tr key={row.template_id} className={winnerId === row.template_id ? 'bg-emerald-50/60' : ''}>
+                            <td className="p-3 font-medium">
+                              <span className="inline-flex items-center gap-2">
+                                {row.label}
+                                {winnerId === row.template_id && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-600 text-white">
+                                    🏆 Winning
+                                  </span>
+                                )}
+                                {Number(row.sends) < MIN_SENDS && Number(row.sends) > 0 && (
+                                  <span className="text-[10px] text-muted-foreground font-normal">
+                                    needs {MIN_SENDS - Number(row.sends)} more sends
+                                  </span>
+                                )}
+                              </span>
+                              {!row.is_active && <span className="ml-2 text-xs text-muted-foreground">(inactive)</span>}
+                            </td>
+                            <td className="p-3 text-right">{row.sends}</td>
+                            <td className="p-3 text-right text-emerald-700">{row.accepts}</td>
+                            <td className="p-3 text-right text-muted-foreground">{row.dismissals}</td>
+                            <td className="p-3 text-right font-semibold">{row.accept_rate}%</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+              <p className="text-xs text-muted-foreground">
+                A template is flagged <strong>Winning</strong> once it has ≥{MIN_SENDS} sends and leads the next-best by ≥{LEAD_PP} percentage points.
+              </p>
+            </>
+          );
+        })()}
         )}
       </section>
 

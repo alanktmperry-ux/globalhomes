@@ -9,5 +9,8 @@ verify_jwt = false
 [functions.parse-search-query]
 verify_jwt = false
 
+[functions.semantic-property-search]
+verify_jwt = false
+
 [functions.process-email-queue]
 verify_jwt = true

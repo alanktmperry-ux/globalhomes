@@ -486,6 +486,17 @@ const BuyPage = () => {
   );
   const hasActiveFilters = activeChipCount > 0;
 
+  // Reorder loaded properties to boost semantic matches when AI search is active.
+  // Matches preserve relative similarity order; non-matches keep their original
+  // order behind the matches. Page count is unchanged so pagination still works.
+  const displayProperties = useMemo(() => {
+    if (semanticRank.size === 0) return allProperties;
+    const boosted = allProperties.filter((p) => semanticRank.has(p.id));
+    const rest = allProperties.filter((p) => !semanticRank.has(p.id));
+    boosted.sort((a, b) => (semanticRank.get(b.id) ?? 0) - (semanticRank.get(a.id) ?? 0));
+    return [...boosted, ...rest];
+  }, [allProperties, semanticRank]);
+
   const headerSuburbLabel = filters.suburbs.length === 1
     ? filters.suburbs[0]
     : filters.suburbs.length > 1

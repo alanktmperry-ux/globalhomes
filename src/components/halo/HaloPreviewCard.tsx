@@ -63,7 +63,7 @@ const LANG_META: Record<string, { flag: string; label: string }> = {
 
 
 
-export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch }: Props) {
+export function HaloPreviewCard({ halo, unlocked, onRespond, pocketMatch, matchScore, matchReasons, heatScore }: Props) {
   const navigate = useNavigate();
   const [revealing, setRevealing] = useState(false);
   const [revealed, setRevealed] = useState<{ email: string | null; name?: string | null } | null>(null);

@@ -6568,6 +6568,8 @@ export type Database = {
           created_at: string
           deal_breakers: string | null
           description: string | null
+          embedding: string | null
+          embedding_updated_at: string | null
           expires_at: string
           expiry_reminder_sent: boolean
           finance_status: string
@@ -6601,6 +6603,8 @@ export type Database = {
           created_at?: string
           deal_breakers?: string | null
           description?: string | null
+          embedding?: string | null
+          embedding_updated_at?: string | null
           expires_at?: string
           expiry_reminder_sent?: boolean
           finance_status: string
@@ -6634,6 +6638,8 @@ export type Database = {
           created_at?: string
           deal_breakers?: string | null
           description?: string | null
+          embedding?: string | null
+          embedding_updated_at?: string | null
           expires_at?: string
           expiry_reminder_sent?: boolean
           finance_status?: string
@@ -10003,6 +10009,8 @@ export type Database = {
           description_zh: string | null
           description_zh_tw: string | null
           electricity_included: boolean | null
+          embedding: string | null
+          embedding_updated_at: string | null
           ensuites: number | null
           eoi_close_date: string | null
           eoi_guide_price: number | null
@@ -10162,6 +10170,8 @@ export type Database = {
           description_zh?: string | null
           description_zh_tw?: string | null
           electricity_included?: boolean | null
+          embedding?: string | null
+          embedding_updated_at?: string | null
           ensuites?: number | null
           eoi_close_date?: string | null
           eoi_guide_price?: number | null
@@ -10321,6 +10331,8 @@ export type Database = {
           description_zh?: string | null
           description_zh_tw?: string | null
           electricity_included?: boolean | null
+          embedding?: string | null
+          embedding_updated_at?: string | null
           ensuites?: number | null
           eoi_close_date?: string | null
           eoi_guide_price?: number | null
@@ -16762,6 +16774,8 @@ export type Database = {
               description_zh: string | null
               description_zh_tw: string | null
               electricity_included: boolean | null
+              embedding: string | null
+              embedding_updated_at: string | null
               ensuites: number | null
               eoi_close_date: string | null
               eoi_guide_price: number | null
@@ -16936,6 +16950,8 @@ export type Database = {
               description_zh: string | null
               description_zh_tw: string | null
               electricity_included: boolean | null
+              embedding: string | null
+              embedding_updated_at: string | null
               ensuites: number | null
               eoi_close_date: string | null
               eoi_guide_price: number | null

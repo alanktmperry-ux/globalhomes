@@ -16299,6 +16299,7 @@ export type Database = {
     Functions: {
       accept_broker_invite: { Args: { _token: string }; Returns: string }
       admin_get_cron_secret_status: { Args: never; Returns: Json }
+      admin_halo_diagnostics: { Args: never; Returns: Json }
       admin_moderate_listing: {
         Args: { listing_id: string; new_status: string }
         Returns: undefined

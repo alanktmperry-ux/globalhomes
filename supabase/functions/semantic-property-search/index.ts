@@ -14,7 +14,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const { query, limit = 20, min_similarity = 0.55 } = await req.json();
+    const { query, limit = 20, min_similarity = 0.25 } = await req.json();
 
     if (typeof query !== "string" || query.trim().length < 3) {
       return new Response(JSON.stringify({ matches: [] }), {

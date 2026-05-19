@@ -564,6 +564,11 @@ const BuyPage = () => {
               <p className="text-muted-foreground mt-1">
                 {isLoading ? t('Searching…') : `${allProperties.length} ${t('properties found')}${hasMore && allProperties.length > 0 ? ` — ${t('scroll down for more')}` : ''}`}
               </p>
+              {semanticRank.size > 0 && !isLoading && (
+                <p className="text-xs text-primary mt-1 inline-flex items-center gap-1">
+                  ✨ {t('AI-ranked')} — {semanticRank.size} {t('results boosted by your query')}
+                </p>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <div className="hidden sm:inline-flex rounded-md border border-input p-0.5 bg-card">

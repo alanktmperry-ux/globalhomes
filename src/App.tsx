@@ -216,6 +216,7 @@ const AdminHaloCreditsPage = React.lazy(() => import("./features/admin/pages/Hal
 const AdminHaloHealthPage = React.lazy(() => import("./features/admin/pages/HaloHealthPage"));
 const AdminHaloAnalyticsPage = React.lazy(() => import("./features/admin/pages/HaloAnalyticsPage"));
 const BuyCreditsPage = React.lazy(() => import("./pages/halo/BuyCreditsPage"));
+const AgentHaloAnalyticsPage = React.lazy(() => import("./pages/halo/HaloAnalyticsPage"));
 const StampDutyPage = React.lazy(() => import("./pages/StampDutyPage"));
 const HomeServicesPage = React.lazy(() => import("./features/services/pages/HomeServicesPage"));
 const ConveyancingPage = React.lazy(() => import("./features/conveyancing/pages/ConveyancingPage"));
